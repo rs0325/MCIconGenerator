@@ -1,20 +1,19 @@
 package io.github.rs0325.mcicon.worker;
 
 import com.google.gson.*;
-import java.awt.image.BufferedImage;
 import java.nio.*;
 import java.nio.file.*;
 import java.util.*;
-import javax.imageio.ImageIO;
 
-/** Minecraft 1.21.4 GUI backend. Other rendering generations have separate adapters. */
+/** Immediate GuiGraphics backend, selected only for explicitly validated releases. */
 public class ModernRenderer implements WorkerRenderer {
     protected final Symbols s;
     protected final Object minecraft,items,blocks;
     public ModernRenderer(Symbols symbols,Object minecraft) throws Exception {
         this.s=symbols; this.minecraft=minecraft;
-        items=s.field("net.minecraft.core.registries.BuiltInRegistries","ITEM",null);
-        blocks=s.field("net.minecraft.core.registries.BuiltInRegistries","BLOCK",null);
+        String registries=(RenderAgent.config.get("version").getAsString().startsWith("26.")||s.hasField("net.minecraft.core.registries.BuiltInRegistries","ITEM"))?"net.minecraft.core.registries.BuiltInRegistries":"net.minecraft.core.Registry";
+        items=s.field(registries,"ITEM",null);
+        blocks=s.field(registries,"BLOCK",null);
     }
     public String environment() throws Exception {
         return s.call("org.lwjgl.opengl.GL11","glGetString",null,7937)+" / "+s.call("org.lwjgl.opengl.GL11","glGetString",null,7938);
@@ -51,54 +50,87 @@ public class ModernRenderer implements WorkerRenderer {
     public JsonObject render(JsonObject request) throws Exception {
         String id=request.get("id").getAsString(); int size=request.get("size").getAsInt();
         if(!Arrays.asList(16,32,64,128,256,512).contains(size))throw new IllegalArgumentException("Unsupported size");
-        Object location=s.call("net.minecraft.resources.ResourceLocation","parse",null,id);
-        Object item=s.call("net.minecraft.core.Registry","getValue",items,location);
+        String locationClass=(RenderAgent.config.get("version").getAsString().startsWith("26.")||s.hasClass("net.minecraft.resources.Identifier"))?"net.minecraft.resources.Identifier":"net.minecraft.resources.ResourceLocation";
+        Object location=locationClass.endsWith("Identifier")||s.hasMethod(locationClass,"parse",1)?s.call(locationClass,"parse",null,id):s.construct(locationClass,id);
+        Object item=s.call("net.minecraft.core.Registry",s.hasMethod("net.minecraft.core.Registry","getValue",1)?"getValue":"get",items,location);
         if(item==null||key(items,item).equals("minecraft:air"))throw new IllegalArgumentException("Unknown item: "+id);
         Object stack=s.call("net.minecraft.world.item.Item","getDefaultInstance",item);
-        Object target=s.construct("com.mojang.blaze3d.pipeline.TextureTarget",size,size,true);
+        boolean oldTarget=s.hasMethod("com.mojang.blaze3d.pipeline.RenderTarget","clear",1);
+        Object target=createTarget(size,oldTarget);
         Object original=s.field("net.minecraft.client.Minecraft","mainRenderTarget",minecraft);
         Object view=null;
         try {
             s.setField("net.minecraft.client.Minecraft","mainRenderTarget",minecraft,target);
-            s.call("com.mojang.blaze3d.pipeline.RenderTarget","setClearColor",target,0f,0f,0f,0f);
-            s.call("com.mojang.blaze3d.pipeline.RenderTarget","clear",target);
-            s.call("com.mojang.blaze3d.pipeline.RenderTarget","bindWrite",target,true);
-            Object projection=s.construct("org.joml.Matrix4f");
-            s.call("org.joml.Matrix4f","setOrtho",projection,0f,16f,16f,0f,1000f,21000f);
-            Object type=s.field("com.mojang.blaze3d.ProjectionType","ORTHOGRAPHIC",null);
-            s.call("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",null,projection,type);
-            view=s.call("com.mojang.blaze3d.systems.RenderSystem","getModelViewStack",null);
-            s.call("org.joml.Matrix4fStack","pushMatrix",view);
-            s.call("org.joml.Matrix4f","translation",view,0f,0f,-11000f);
-            s.call("com.mojang.blaze3d.platform.Lighting","setupFor3DItems",null);
-            Object buffers=s.call("net.minecraft.client.Minecraft","renderBuffers",minecraft);
-            Object source=s.call("net.minecraft.client.renderer.RenderBuffers","bufferSource",buffers);
-            Object graphics=s.construct("net.minecraft.client.gui.GuiGraphics",minecraft,source);
-            s.call("net.minecraft.client.gui.GuiGraphics","renderItem",graphics,stack,0,0);
-            s.call("net.minecraft.client.gui.GuiGraphics","flush",graphics);
-            ByteBuffer pixels=ByteBuffer.allocateDirect(size*size*4);
-            s.call("org.lwjgl.opengl.GL11","glReadPixels",null,0,0,size,size,6408,5121,pixels);
-            BufferedImage image=new BufferedImage(size,size,BufferedImage.TYPE_INT_ARGB);
-            int visible=0;
-            for(int y=0;y<size;y++)for(int x=0;x<size;x++) {
-                int offset=((size-1-y)*size+x)*4;
-                int r=pixels.get(offset)&255,g=pixels.get(offset+1)&255,b=pixels.get(offset+2)&255,a=pixels.get(offset+3)&255;
-                if(a>0)visible++;
-                // GUI blend output is premultiplied on a transparent framebuffer.
-                if(a>0&&a<255){r=Math.min(255,(r*255+a/2)/a);g=Math.min(255,(g*255+a/2)/a);b=Math.min(255,(b*255+a/2)/a);}
-                if(a==0)r=g=b=0;
-                image.setRGB(x,y,(a<<24)|(r<<16)|(g<<8)|b);
-            }
-            if(visible==0)throw new IllegalStateException("Empty icon: "+id);
+            clearTarget(target,oldTarget);
+            bindTarget(target);
+            view=setupView(oldTarget);
+            setupLighting();
+            drawItem(stack);
+            ByteBuffer pixels=readPixels(target,size);
             Path output=Paths.get(request.get("path").getAsString());
-            Files.createDirectories(output.getParent());
-            if(!ImageIO.write(image,"PNG",output.toFile()))throw new IllegalStateException("PNG encoder unavailable");
+            int visible=PngOutput.write(pixels,size,output);
             JsonObject result=new JsonObject();result.addProperty("path",output.toString());result.addProperty("visiblePixels",visible);return result;
         } finally {
-            if(view!=null)s.call("org.joml.Matrix4fStack","popMatrix",view);
+            if(view!=null)restoreView(view);
             s.setField("net.minecraft.client.Minecraft","mainRenderTarget",minecraft,original);
-            s.call("com.mojang.blaze3d.pipeline.RenderTarget","bindWrite",original,true);
+            bindTarget(original);
             s.call("com.mojang.blaze3d.pipeline.RenderTarget","destroyBuffers",target);
         }
+    }
+    protected void setupLighting() throws Exception {s.call("com.mojang.blaze3d.platform.Lighting","setupFor3DItems",null);}
+    protected Object setupView(boolean oldTarget) throws Exception {
+        Object projection;
+        if(s.hasClass("com.mojang.math.Matrix4f"))projection=s.call("com.mojang.math.Matrix4f","orthographic",null,16f,-16f,1000f,21000f);
+        else {
+            projection=s.construct("org.joml.Matrix4f");
+            s.call("org.joml.Matrix4f","setOrtho",projection,0f,16f,16f,0f,1000f,21000f);
+        }
+        if(s.hasMethod("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",1))s.call("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",null,projection);
+        else {
+            Object type=oldTarget?s.field("com.mojang.blaze3d.vertex.VertexSorting","ORTHOGRAPHIC_Z",null):s.field("com.mojang.blaze3d.ProjectionType","ORTHOGRAPHIC",null);
+            s.call("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",null,projection,type);
+        }
+        Object view=s.call("com.mojang.blaze3d.systems.RenderSystem","getModelViewStack",null);
+        if(view.getClass().getName().equals(s.actualClass("com.mojang.blaze3d.vertex.PoseStack"))) {
+            s.call("com.mojang.blaze3d.vertex.PoseStack","pushPose",view);
+            s.call("com.mojang.blaze3d.vertex.PoseStack","setIdentity",view);
+            s.call("com.mojang.blaze3d.vertex.PoseStack","translate",view,0d,0d,-11000d);
+            s.call("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",null);
+        } else {
+            s.call("org.joml.Matrix4fStack","pushMatrix",view);
+            s.call("org.joml.Matrix4f","translation",view,0f,0f,-11000f);
+            if(s.hasMethod("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",0))s.call("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",null);
+        }
+        return view;
+    }
+    protected void restoreView(Object view) throws Exception {
+        if(view.getClass().getName().equals(s.actualClass("com.mojang.blaze3d.vertex.PoseStack"))) {
+            s.call("com.mojang.blaze3d.vertex.PoseStack","popPose",view);
+            s.call("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",null);
+        } else {
+            s.call("org.joml.Matrix4fStack","popMatrix",view);
+            if(s.hasMethod("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",0))s.call("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",null);
+        }
+    }
+    protected void drawItem(Object stack) throws Exception {
+        Object buffers=s.call("net.minecraft.client.Minecraft","renderBuffers",minecraft);
+        Object source=s.call("net.minecraft.client.renderer.RenderBuffers","bufferSource",buffers);
+        Object graphics=s.construct("net.minecraft.client.gui.GuiGraphics",minecraft,source);
+        s.call("net.minecraft.client.gui.GuiGraphics","renderItem",graphics,stack,0,0);
+        s.call("net.minecraft.client.gui.GuiGraphics","flush",graphics);
+    }
+    protected Object createTarget(int size,boolean oldTarget) throws Exception {
+        return oldTarget?s.construct("com.mojang.blaze3d.pipeline.TextureTarget",size,size,true,false):s.construct("com.mojang.blaze3d.pipeline.TextureTarget",size,size,true);
+    }
+    protected void clearTarget(Object target,boolean oldTarget) throws Exception {
+        s.call("com.mojang.blaze3d.pipeline.RenderTarget","setClearColor",target,CanonicalContext.backgroundColor(),CanonicalContext.backgroundColor(),CanonicalContext.backgroundColor(),CanonicalContext.backgroundAlpha());
+        if(oldTarget)s.call("com.mojang.blaze3d.pipeline.RenderTarget","clear",target,false);
+        else s.call("com.mojang.blaze3d.pipeline.RenderTarget","clear",target);
+    }
+    protected void bindTarget(Object target) throws Exception {s.call("com.mojang.blaze3d.pipeline.RenderTarget","bindWrite",target,true);}
+    protected ByteBuffer readPixels(Object target,int size) throws Exception {
+        ByteBuffer pixels=ByteBuffer.allocateDirect(size*size*4);
+        s.call("org.lwjgl.opengl.GL11","glReadPixels",null,0,0,size,size,6408,5121,pixels);
+        return pixels;
     }
 }

@@ -25,7 +25,7 @@ game.mkdir(exist_ok=True)
 (game/'options.txt').write_text('soundCategory_master:0.0\nguiScale:1\nmaxFps:30\nfullscreen:false\nonboardAccessibility:false\n')
 cp=[base/'client.jar']+[root/p for p in json.loads((base/'classpath-linux.json').read_text())]
 agent=next(Path('/workspace/worker/build/libs').glob('*-agent.jar'))
-command=[args.java,'-Xmx2G','-Djava.awt.headless=true',
+command=[args.java,'-Xmx2G','-Djava.awt.headless=true','-Duser.timezone=UTC',
  '-Djava.library.path='+str(base/'natives-linux'),
  '-javaagent:'+str(agent)+'='+str(base/'agent.json'),
  '-cp',os.pathsep.join(map(str,cp)),meta['mainClass'],

@@ -16,11 +16,11 @@ public final class RuntimePreparer {
     private final CancellationToken token;
     public RuntimePreparer(AssetStore assets,VersionService versions,CancellationToken token){this.assets=assets;this.versions=versions;this.token=token;}
     public Prepared prepare(VersionInfo version) throws Exception {
-        String profile=switch(version.id()){case "1.13","1.13.1","1.13.2"->"legacy-1.13";case "1.21.4"->"gui-1.21.4";case "26.3"->"gui-26.3";default->throw new McIconException("ADAPTER_UNAVAILABLE","Rendering adapter is not implemented for "+version.id(),2);};
+        String profile=profileFor(version.id());
         JsonNode meta=versions.metadata(version);Path client=versions.client(version);
         Path mappings=null;
         if(meta.path("downloads").has("client_mappings"))mappings=download(meta.path("downloads").path("client_mappings"),"versions/"+version.id()+"/mappings.txt");
-        if(profile.equals("legacy-1.13")) {
+        if(profile.startsWith("legacy-")) {
             mappings=LegacyMappings.prepare(assets,version.id());
         }
         List<JsonNode> libraries=new ArrayList<>();
@@ -59,8 +59,25 @@ public final class RuntimePreparer {
             }));
             for(Future<?> future:futures)future.get();
         }
-        int javaMajor=meta.path("javaVersion").path("majorVersion").asInt(profile.equals("legacy-1.13")?8:21);
+        int javaMajor=runtimeJavaMajor(meta.path("javaVersion").path("majorVersion").asInt(profile.startsWith("legacy-")?8:21));
         return new Prepared(version,meta,client,mappings,List.copyOf(classpath),natives,assets.root().resolve("assets"),javaMajor,profile);
+    }
+    static int runtimeJavaMajor(int minimum) {
+        // Java 16 is no longer an image runtime; 1.17 runs on the Java 17 LTS.
+        return minimum==16?17:minimum;
+    }
+    static String profileFor(String version) {
+        return switch(version) {
+            case "1.13","1.13.1","1.13.2" -> "legacy-1.13";
+            case "1.14","1.14.1","1.14.2","1.14.3" -> "legacy-1.14";
+            case "1.14.4","1.15","1.15.1","1.15.2","1.16","1.16.1","1.16.2","1.16.3","1.16.4","1.16.5" -> "gui-fixed";
+            case "1.17","1.17.1","1.18","1.18.1","1.18.2","1.19","1.19.1","1.19.2","1.19.3","1.19.4" -> "gui-classic";
+            case "1.20","1.20.1","1.20.2","1.20.3","1.20.4","1.20.5","1.20.6","1.21","1.21.1","1.21.2","1.21.3","1.21.4" -> "gui-1.21.4";
+            case "1.21.5" -> "gui-1.21.5";
+            case "1.21.6","1.21.7","1.21.8","1.21.9","1.21.10","1.21.11","26.1","26.1.1","26.1.2","26.2" -> "gui-deferred";
+            case "26.3" -> "gui-26.3";
+            default -> throw new McIconException("ADAPTER_UNAVAILABLE","Rendering adapter is not implemented for "+version,2);
+        };
     }
     private Path download(JsonNode ref,String path) throws IOException {
         if(!ref.has("url")||!ref.has("sha1"))throw new IOException("Missing download metadata");

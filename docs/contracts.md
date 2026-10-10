@@ -18,10 +18,10 @@ exit 0=成功、1=起動/IO等の致命エラー、2=不正な引数/版/ID、3=
 
 ## Worker JSON Lines
 
-UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1であることを要求します。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致は致命エラーにします。requestは1MiB、responseは16MiBを上限とします。待受ポートは使いません。
+UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1、contextProfile=fixed-v1、animationFrameZero=trueであることを要求します。profile/hookの不一致はWORKER_CONTEXT_MISMATCHです。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致は致命エラーにします。requestは1MiB、responseは16MiBを上限とします。待受ポートは使いません。
 
 ```json
-{"type":"ready","protocolVersion":1,"renderer":"llvmpipe / OpenGL"}
+{"type":"ready","protocolVersion":1,"renderer":"llvmpipe / OpenGL","contextProfile":"fixed-v1","animationFrameZero":true}
 {"requestId":"1","command":"catalog"}
 {"requestId":"1","type":"result","entries":[{"id":"minecraft:stone","kind":"block","status":"available","blocks":["minecraft:stone"]}]}
 {"requestId":"2","command":"render","id":"minecraft:stone","size":64,"path":"/mcicon/cache/worker-.../icon-....png"}
@@ -32,18 +32,22 @@ UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームロ�
 
 エラーはtype=error、code、messageを返します。PNGは専用cache内の一時ファイルで渡し、coreでサイズ・alphaを検証してから出力へ原子的に移します。PNGバイナリをstdoutへ流しません。workerは一つのrender threadで要求を処理し、全件ジョブで再利用します。
 
-cancelは現在coreのCancellationTokenと専用Dockerコンテナ終了で行います。応答中の描画を同じrender threadでキャンセルするJSON commandは未実装です。timeout、startup失敗、cancel後は所有するコンテナだけを停止します。shutdownで正常終了を待ち、失敗時は強制終了します。worker.logは診断用にcacheへ残し、一時icon PNGを削除します。
+cancelは現在coreのCancellationTokenと専用Dockerコンテナ終了で行います。応答中の描画を同じrender threadでキャンセルするJSON commandは未実装です。timeout、startup失敗、cancel後は所有するコンテナだけを停止します。shutdownで正常終了を待ち、失敗時は強制終了します。worker.logは診断用にcacheへ残し、一時icon PNGを削除します。起動するagentはジョブごとにsnapshotを取り、記録したSHA-256と実際に起動したbytesを一致させます。coreの通常終了・SIGTERMでは専用containerの終了を要求します。SIGKILL時の即時cleanupは保証しません。
 
 ## Manifest
 
 [JSON Schema](../schemas/manifest-v1.schema.json)が現在の出力形式です。sorted entries、mode、exact version、client SHA-256、settingsとdigest、counts、completeを含みます。iconsはadapter、renderer、Java major、Linux amd64、context、catalogを含みます。settingsにはworker agent・mappings hashを含めます。rawのentryはsourceSha256・mcmeta path/hashを持ちます。資格情報・ユーザーの絶対パスをmanifestに書きません。
 
-countsはそのmanifestに蓄積した成功/失敗の数です。同条件で別の単品を追加した場合、以前の成功entryも残ります。completeは選択した処理が中断せず、manifest中に失敗がない状態です。全レジストリの網羅を意味するのはallを指定したジョブに限ります。別設定のoverwriteでは旧manifestを引き継ぎませんが、選択外の古いPNGまでは削除しません。
+countsはそのmanifestに蓄積した成功/失敗の数です。iconsの選択IDは描画前にNOT_RENDEREDとして予約するため、途中終了時には未処理IDもfailedに含めます。16件ごと・失敗時・終了時にcheckpointを保存します。予約済みの未確定PNGは再開時に再描画し、所有権不明のOUTPUT_EXISTSは保持します。同条件で別の単品を追加した場合、以前の成功entryも残ります。completeは選択した処理が中断せず、manifest中に失敗がない状態です。全レジストリの網羅を意味するのはallを指定したジョブに限ります。別設定のoverwriteでは旧manifestを引き継ぎませんが、選択外の古いPNGまでは削除しません。
 
 再開は元JAR、settings digest、renderer、保存PNG/sidecar hashを照合し、一致した成功だけ再利用します。iconsのsettingsにはversion metadata・mappings・agentのSHA-256とDocker image IDを含めます。Dockerのtagは起動前にimage IDへ解決し、そのIDでworkerを起動します。旧版mappingsは固定SHA-1のTinyを毎回検証・合成します。
 
-## canonical-v1の目標と現状
+## fixed-v1とcanonical-v1の受入
 
-受入後のcanonical-v1はtick=0、partialTick=0、seed=0、時刻=0、暦日=2000-01-01 UTC、world=null、player=nullのcontextを版別に実装する計画です。worldなしでも乱数を使うclock/compass等はモデルのpropertyを一定値にし、アニメーション・glintの時間も固定する必要があります。
+fixed-v1はcount=1、既定ItemStack、overlayなし、world/playerなし、partialTick=0です。ゲーム内の暦日を2000-01-01 UTCにし、描画中の経過時刻を1000msに固定します。0msでは初期化を時刻で判定するバニラcacheに影響するため、正の定数を使います。worker自身のtimeout時計は固定しません。
 
-現行preview-v1は既定ItemStackとoverlayなしだけを適用しています。時間・乱数・暦日・atlas animationを固定できたと誤認しないようdeterministic=falseです。canonical-v1へ移行するとsettings digestが変わり、古いPNGを再利用しません。任意NBT/componentsや状態の直積は対象外です。
+atlasのanimation更新を抑止し、初期フレームを保持します。時計・コンパス等の動的property乱数を各描画passでseed=0に戻します。モデルが明示的にseedを設定するquad用乱数はバニラのまま保持します。ゲームJAR内の対象呼び出しだけをagentで変換し、依存JARは変換しません。ASMはagent専用packageへrelocateし、ゲーム同梱ASMとの衝突を避けます。
+
+透過PNGは黒・白の不透明背景で同じアイテムを2回描画し、背景差からalphaとstraight RGBを復元します。GPU readbackの上下を反転し、alpha=0のRGBを0にします。sRGB・半透明・glintを含む実ゲーム基準画像との受入は未完了です。
+
+canonical-v1への昇格には、固定環境の反復RGBAとsingle/all一致、意味的な画像検査、色空間の確認が必要です。現在はdeterministic=falseです。agent/contextの変更はsettings digestを変え、古いPNGを再利用しません。任意NBT/componentsや状態の直積は対象外です。

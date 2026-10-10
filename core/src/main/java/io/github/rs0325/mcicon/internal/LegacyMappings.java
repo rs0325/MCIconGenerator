@@ -26,10 +26,11 @@ public final class LegacyMappings {
         }
         if (pins.isMissingNode()) throw new IOException("No pinned legacy mappings for " + version);
         String repository = "https://maven.ornithemc.net/releases/net/ornithemc/";
-        String featherName = "feather-" + version + "+build.31-v2.jar";
+        int build=pins.path("featherBuild").asInt(31);
+        String featherName = "feather-" + version + "+build."+build+"-v2.jar";
         String intermediaryName = "calamus-intermediary-" + version + "-v2.jar";
         Path feather = store.obtain("mappings/" + version + "/feather.jar",
-                URI.create(repository + "feather/" + version + "+build.31/" + featherName),
+                URI.create(repository + "feather/" + version + "+build."+build+"/" + featherName),
                 pins.path("feather").asText(), -1, false);
         Path intermediary = store.obtain("mappings/" + version + "/intermediary.jar",
                 URI.create(repository + "calamus-intermediary/" + version + "/" + intermediaryName),

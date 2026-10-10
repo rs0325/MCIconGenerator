@@ -1,21 +1,23 @@
 package io.github.rs0325.mcicon.worker;
 
 import com.google.gson.*;
-import java.awt.image.BufferedImage;
 import java.nio.*;
 import java.nio.file.*;
 import java.util.*;
-import javax.imageio.ImageIO;
 
 /** Fixed-function vanilla GUI pipeline for the 1.13 release family. */
 public final class LegacyRenderer implements WorkerRenderer {
     private final Symbols s;
     private final Object minecraft,items,blocks;
     private final String registryOwner;
-    private static final String GL="net.minecraft.client.render.platform.GlStateManager";
-    private static final String TARGET="net.minecraft.client.render.pipeline.RenderTarget";
+    private final String GL,TARGET,LIGHTING;
+    private final boolean early;
     public LegacyRenderer(Symbols symbols,Object minecraft) throws Exception {
         s=symbols;this.minecraft=minecraft;
+        early=RenderAgent.config.get("profile").getAsString().equals("legacy-1.13");
+        GL=early?"net.minecraft.client.render.platform.GlStateManager":"com.mojang.blaze3d.platform.GlStateManager";
+        TARGET=early?"net.minecraft.client.render.pipeline.RenderTarget":"com.mojang.blaze3d.pipeline.RenderTarget";
+        LIGHTING=early?"net.minecraft.client.render.platform.Lighting":"com.mojang.blaze3d.platform.Lighting";
         boolean unified=!RenderAgent.config.get("version").getAsString().equals("1.13");
         registryOwner=unified?"net.minecraft.util.registry.Registry":"net.minecraft.util.registry.IdRegistry";
         items=s.field(unified?registryOwner:"net.minecraft.item.Item",unified?"ITEM":"REGISTRY",null);
@@ -49,30 +51,24 @@ public final class LegacyRenderer implements WorkerRenderer {
         Object item=null;for(Object value:(Iterable<?>)items)if(key(items,value).equals(id)){item=value;break;}
         if(item==null||id.equals("minecraft:air"))throw new IllegalArgumentException("Unknown item: "+id);
         Object stack=s.call("net.minecraft.item.Item","defaultItem",item);
-        Object target=s.construct(TARGET,size,size,true);
+        Object target=early?s.construct(TARGET,size,size,true):s.construct(TARGET,size,size,true,false);
         Object original=s.call("net.minecraft.client.Minecraft","getRenderTarget",minecraft);
         try {
             s.setField("net.minecraft.client.Minecraft","renderTarget",minecraft,target);
-            s.call(TARGET,"setClearColor",target,0f,0f,0f,0f);s.call(TARGET,"clear",target);s.call(TARGET,"bindWrite",target,true);
+            s.call(TARGET,"setClearColor",target,CanonicalContext.backgroundColor(),CanonicalContext.backgroundColor(),CanonicalContext.backgroundColor(),CanonicalContext.backgroundAlpha());
+            if(early)s.call(TARGET,"clear",target);else s.call(TARGET,"clear",target,false);
+            s.call(TARGET,"bindWrite",target,true);
             s.call(GL,"matrixMode",null,5889);s.call(GL,"pushMatrix",null);s.call(GL,"loadIdentity",null);
             s.call(GL,"ortho",null,0d,16d,16d,0d,1000d,3000d);
             s.call(GL,"matrixMode",null,5888);s.call(GL,"pushMatrix",null);s.call(GL,"loadIdentity",null);
             s.call(GL,"translated",null,0d,0d,-2000d);
-            s.call("net.minecraft.client.render.platform.Lighting","turnOnGui",null);
+            s.call(LIGHTING,"turnOnGui",null);
             Object renderer=s.call("net.minecraft.client.Minecraft","getItemRenderer",minecraft);
             s.call("net.minecraft.client.render.entity.ItemRenderer","renderGuiItem",renderer,stack,0,0);
             ByteBuffer pixels=ByteBuffer.allocateDirect(size*size*4);
             s.call("org.lwjgl.opengl.GL11","glReadPixels",null,0,0,size,size,6408,5121,pixels);
-            BufferedImage image=new BufferedImage(size,size,BufferedImage.TYPE_INT_ARGB);int visible=0;
-            for(int y=0;y<size;y++)for(int x=0;x<size;x++) {
-                int index=((size-1-y)*size+x)*4;
-                int r=pixels.get(index)&255,g=pixels.get(index+1)&255,b=pixels.get(index+2)&255,a=pixels.get(index+3)&255;
-                if(a>0)visible++;
-                if(a>0&&a<255){r=Math.min(255,(r*255+a/2)/a);g=Math.min(255,(g*255+a/2)/a);b=Math.min(255,(b*255+a/2)/a);}
-                if(a==0)r=g=b=0;image.setRGB(x,y,(a<<24)|(r<<16)|(g<<8)|b);
-            }
-            if(visible==0)throw new IllegalStateException("Empty icon: "+id);
-            Path output=Paths.get(request.get("path").getAsString());Files.createDirectories(output.getParent());ImageIO.write(image,"png",output.toFile());
+            Path output=Paths.get(request.get("path").getAsString());
+            int visible=PngOutput.write(pixels,size,output);
             JsonObject result=new JsonObject();result.addProperty("path",output.toString());result.addProperty("visiblePixels",visible);return result;
         } finally {
             s.call(GL,"matrixMode",null,5888);s.call(GL,"popMatrix",null);s.call(GL,"matrixMode",null,5889);s.call(GL,"popMatrix",null);s.call(GL,"matrixMode",null,5888);

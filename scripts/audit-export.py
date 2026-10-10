@@ -48,6 +48,10 @@ def rgba_png(data):
         offset = y * (stride + 1)
         method = raw[offset]
         row = bytearray(raw[offset + 1:offset + 1 + stride])
+        if method == 0:
+            pixels.extend(row)
+            previous = row
+            continue
         for x in range(stride):
             a = row[x - 4] if x >= 4 else 0
             b = previous[x]
@@ -72,9 +76,16 @@ def rgba_png(data):
     return width, height, pixels
 
 
-def audit(manifest_path, source_jar=None, compare=None):
+def audit(manifest_path, source_jar=None, compare=None, require_all=False):
     manifest = json.loads(manifest_path.read_text())
     failures = []
+    compared = 0
+    comparison_entries = {}
+    if compare:
+        previous=json.loads(compare.read_text())
+        if previous.get("version")!=manifest.get("version") or previous.get("mode")!=manifest.get("mode"):
+            failures.append("Comparison version or mode differs")
+        comparison_entries={e["id"]:e for e in previous["entries"] if e["status"]=="success"}
     ids = [e['id'] for e in manifest['entries']]
     if ids != sorted(set(ids)):
         failures.append('Unsorted or duplicate IDs')
@@ -83,6 +94,25 @@ def audit(manifest_path, source_jar=None, compare=None):
         failures.append('Manifest counts disagree')
     if manifest['complete'] and manifest['counts']['failed']:
         failures.append('complete=true with failures')
+    paths = [e['path'] for e in manifest['entries']]
+    if len(paths) != len(set(paths)):
+        failures.append('Duplicate output paths')
+    registry_checked = False
+    if manifest['mode'] == 'icons':
+        catalog = manifest['catalog']
+        catalog_ids = [e['id'] for e in catalog]
+        if len(catalog_ids) != len(set(catalog_ids)):
+            failures.append('Duplicate catalog IDs')
+        excluded = [e for e in catalog if e['status'] == 'no_item_form']
+        if len(excluded) != manifest['counts']['noItemForm'] or any(e['kind'] != 'block' or e['blocks'] for e in excluded):
+            failures.append('no_item_form records disagree')
+        available = {e['id'] for e in catalog if e['status'] == 'available'}
+        if not set(ids).issubset(available):
+            failures.append('Output ID is absent from registry')
+        if require_all:
+            registry_checked = set(ids) == available
+            if not registry_checked:
+                failures.append('Full export differs from registry population')
     source = zipfile.ZipFile(source_jar) if source_jar else None
     alpha_pixels = 0
     transparent_images = 0
@@ -112,32 +142,46 @@ def audit(manifest_path, source_jar=None, compare=None):
                 if width != manifest['settings']['size'] or height != width:
                     raise ValueError('Canvas size differs')
                 alpha = rgba[3::4]
+                if any(rgba[i] or rgba[i+1] or rgba[i+2] for i in range(0, len(rgba), 4) if not rgba[i+3]):
+                    raise ValueError('Hidden RGB in transparent pixel')
                 if not any(alpha):
                     raise ValueError('Empty output')
                 if 0 in alpha:
                     transparent_images += 1
                 alpha_pixels += sum(0 < a < 255 for a in alpha)
                 if compare:
-                    other = compare.parent / entry['path']
-                    if other.exists() and rgba_png(other.read_bytes())[2] != rgba:
+                    previous_entry=comparison_entries.get(entry["id"])
+                    if not previous_entry or previous_entry["path"]!=entry["path"]:
+                        raise ValueError("Comparison manifest has no matching successful entry")
+                    other = (compare.parent / previous_entry["path"]).resolve()
+                    if not other.is_relative_to(compare.parent.resolve()):
+                        raise ValueError('Comparison path escapes output')
+                    other_data=other.read_bytes()
+                    if hashlib.sha256(other_data).hexdigest()!=previous_entry["sha256"]:
+                        raise ValueError("Comparison PNG SHA-256 mismatch")
+                    other_width, other_height, other_rgba = rgba_png(other_data)
+                    if (other_width, other_height) != (width, height) or other_rgba != rgba:
                         raise ValueError('Decoded RGBA differs from comparison export')
+                    compared += 1
         except Exception as error:
             failures.append(entry['id'] + ': ' + str(error))
     if source:
         source.close()
     return {'version': manifest['version'], 'mode': manifest['mode'], 'audited': successes,
-            'transparentImages': transparent_images, 'fractionalAlphaPixels': alpha_pixels,
-            'failures': failures, 'canonicalVerified': False}
+            'registryPopulationVerified': registry_checked, 'transparentImages': transparent_images, 'fractionalAlphaPixels': alpha_pixels,
+            'failures': failures, 'compared': compared,
+            'comparisonVerified': bool(compare) and not failures and compared == successes, 'canonicalVerified': False}
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('manifest', type=Path)
+    parser.add_argument('--require-all', action='store_true')
     parser.add_argument('--source-jar', type=Path)
     parser.add_argument('--compare', type=Path)
     parser.add_argument('--report', type=Path)
     args = parser.parse_args()
-    result = audit(args.manifest, args.source_jar, args.compare)
+    result = audit(args.manifest, args.source_jar, args.compare, args.require_all)
     text = json.dumps(result, indent=2)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)

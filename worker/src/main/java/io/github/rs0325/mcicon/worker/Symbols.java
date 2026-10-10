@@ -9,6 +9,7 @@ import java.util.regex.*;
 
 /** Resolves official source names against an unmodified, obfuscated client. */
 public final class Symbols {
+    private final Map<String,String> sourceClasses = new HashMap<String,String>();
     private final Map<String,String> classes = new HashMap<String,String>();
     private final Map<String,String> fields = new HashMap<String,String>();
     private final Map<String,List<Member>> methods = new HashMap<String,List<Member>>();
@@ -25,7 +26,8 @@ public final class Symbols {
             if (!line.startsWith(" ")) {
                 int arrow=line.indexOf(" -> ");
                 owner=line.substring(0,arrow);
-                classes.put(owner,line.substring(arrow+4,line.length()-1));
+                String actual=line.substring(arrow+4,line.length()-1);
+                classes.put(owner,actual);sourceClasses.put(actual,owner);
             } else {
                 Matcher match=METHOD.matcher(line.trim());
                 if (match.matches()) {
@@ -40,6 +42,19 @@ public final class Symbols {
             }
         }
     }
+    public String sourceClass(String actual) {return sourceClasses.containsKey(actual)?sourceClasses.get(actual):actual;}
+    public boolean hasClass(String name) {return classes.containsKey(name);}
+    public boolean hasField(String owner,String name) {return fields.containsKey(owner+"#"+name);}
+    public boolean hasMethod(String owner,String name,String...parameters) {
+        List<Member> list=methods.get(owner+"#"+name);
+        if(list!=null)for(Member member:list)if(Arrays.equals(member.parameters,parameters))return true;
+        return false;
+    }
+    public boolean hasMethod(String owner,String name,int arity) {
+        List<Member> list=methods.get(owner+"#"+name);
+        if(list!=null)for(Member member:list)if(member.parameters.length==arity)return true;
+        return false;
+    }
     public String actualClass(String name) { return classes.containsKey(name)?classes.get(name):name; }
     public Class<?> type(String name) throws ClassNotFoundException { return Class.forName(actualClass(name)); }
     public String fieldName(String owner,String name) { String value=fields.get(owner+"#"+name); return value==null?name:value; }
@@ -48,6 +63,11 @@ public final class Symbols {
     }
     public void setField(String owner,String name,Object object,Object value) throws Exception {
         Field f=type(owner).getDeclaredField(fieldName(owner,name)); f.setAccessible(true); f.set(object,value);
+    }
+    public String methodName(String owner,String name,String...parameters) {
+        List<Member> list=methods.get(owner+"#"+name);
+        if(list!=null)for(Member member:list)if(Arrays.equals(member.parameters,parameters))return member.actual;
+        return name;
     }
     public String methodName(String owner,String name,int arity) {
         List<Member> list=methods.get(owner+"#"+name);

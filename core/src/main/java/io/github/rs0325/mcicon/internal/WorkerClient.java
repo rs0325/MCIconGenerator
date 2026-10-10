@@ -6,10 +6,11 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.time.Duration;
+import java.util.jar.JarFile;
 import java.util.*;
 import java.util.concurrent.*;
 
-public final class WorkerClient implements AutoCloseable {
+public final class WorkerClient implements AutoCloseable,IconWorker {
     private final Process process;
     private final BufferedWriter output;
     private final BlockingQueue<JsonNode> messages=new LinkedBlockingQueue<>(256);
@@ -20,33 +21,40 @@ public final class WorkerClient implements AutoCloseable {
     private final String containerName="mcicon-worker-"+UUID.randomUUID();
     private final String agentSha256;
     private final String imageId;
+    private final Thread shutdownHook;
     public WorkerClient(RuntimePreparer.Prepared runtime,Path cache,WorkerOptions options,CancellationToken token) throws Exception {
         this.token=token;this.options=options;
         if(!Files.isRegularFile(options.agentJar()))throw new McIconException("WORKER_NOT_FOUND","Worker JAR not found; run :worker:agentJar or specify --worker-jar",1);
-        agentSha256=FilesSupport.hash(options.agentJar(),"SHA-256");
+        byte[] agentBytes=readAgent(options.agentJar());
+        agentSha256=FilesSupport.hash(agentBytes);
         imageId=resolveImage(options,token);
         cache=cache.toAbsolutePath().normalize();
         runDirectory=Files.createTempDirectory(cache,"worker-");
+        Path agentSnapshot=runDirectory.resolve("worker-agent.jar");
+        FilesSupport.atomicWrite(agentSnapshot,agentBytes);
+        validateAgentSnapshot(agentSnapshot);
         Map<String,Object> config=new TreeMap<>();config.put("version",runtime.version().id());config.put("profile",runtime.profile());
         if(runtime.mappings()!=null)config.put("mappings",inContainer(cache,runtime.mappings()));
-        if(runtime.profile().equals("legacy-1.13")) {config.put("hookClass","net.minecraft.client.render.GameRenderer");config.put("tickMethod","render");config.put("hookDescriptor","(FJZ)V");}
+        if(runtime.profile().startsWith("legacy-")) {config.put("hookClass","net.minecraft.client.render.GameRenderer");config.put("tickMethod","render");config.put("hookDescriptor","(FJZ)V");}
         FilesSupport.atomicWrite(runDirectory.resolve("agent.json"),Json.MAPPER.writeValueAsBytes(config));
         Path game=runDirectory.resolve("game");Files.createDirectories(game);
         Files.writeString(game.resolve("options.txt"),"soundCategory_master:0.0\nguiScale:1\nmaxFps:60\nfullscreen:false\nonboardAccessibility:false\n");
         List<String> cp=new ArrayList<>();cp.add(inContainer(cache,runtime.client()));for(Path lib:runtime.libraries())cp.add(inContainer(cache,lib));
         List<String> command=new ArrayList<>(List.of("docker","--context",options.dockerContext(),"run","--rm","--name",containerName,"-i","--platform","linux/amd64",
-                "--network","none","--memory","3g","--cpus","4","-v",cache+":/mcicon/cache","-v",options.agentJar().toAbsolutePath()+":/mcicon/worker.jar:ro",imageId));
+                "--network","none","--memory","3g","--cpus","4","-v",cache+":/mcicon/cache","-v",agentSnapshot+":/mcicon/worker.jar:ro",imageId));
         if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"-e");
         if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"SDL_VIDEO_FORCE_EGL=1");
         String java=runtime.javaMajor()==25?"/opt/java/openjdk/bin/java":"/opt/java/java"+runtime.javaMajor()+"/bin/java";
         String run=inContainer(cache,runDirectory);
-        command.addAll(List.of(java,"-Xmx2G","-Djava.awt.headless=true","-Djava.library.path="+inContainer(cache,runtime.natives()),
+        command.addAll(List.of(java,"-Xmx2G","-Djava.awt.headless=true","-Duser.timezone=UTC","-Djava.library.path="+inContainer(cache,runtime.natives()),
                 "-javaagent:/mcicon/worker.jar="+run+"/agent.json","-cp",String.join(":",cp),runtime.metadata().path("mainClass").asText(),
                 "--username","MCIconGenerator","--version",runtime.version().id(),"--gameDir",run+"/game",
                 "--assetsDir",inContainer(cache,runtime.assets()),"--assetIndex",runtime.metadata().path("assetIndex").path("id").asText(),
                 "--accessToken","0","--uuid","00000000000000000000000000000000","--userType","legacy","--width","320","--height","240","--demo","--disableMultiplayer","--disableChat"));
         ProcessBuilder builder=new ProcessBuilder(command).redirectError(runDirectory.resolve("worker.log").toFile());
         process=builder.start();output=new BufferedWriter(new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8));
+        shutdownHook=new Thread(this::terminate,"mcicon-cleanup-"+containerName);
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
         Thread reader=Thread.ofPlatform().daemon().name("mcicon-worker-reader").start(()-> {
             try(BufferedReader input=process.inputReader(StandardCharsets.UTF_8)) {
                 String line;while((line=input.readLine())!=null) {
@@ -58,8 +66,25 @@ public final class WorkerClient implements AutoCloseable {
         try {
             JsonNode hello=await(options.startupTimeout());
             if(!hello.path("type").asText().equals("ready")||hello.path("protocolVersion").asInt()!=1)throw new IOException("Worker protocol version mismatch");
+            if(!hello.path("animationFrameZero").asBoolean()||!hello.path("contextProfile").asText().equals("fixed-v1"))
+                throw new McIconException("WORKER_CONTEXT_MISMATCH","Worker did not install the required fixed-v1 context",1);
             renderer=hello.path("renderer").asText();
-        }catch(Exception e){terminate();throw e;}
+        }catch(Exception e){terminate();removeShutdownHook();throw e;}
+    }
+    static void validateAgentSnapshot(Path file) throws IOException {
+        try(JarFile jar=new JarFile(file.toFile())) {
+            var manifest=jar.getManifest();
+            String premain=manifest==null?null:manifest.getMainAttributes().getValue("Premain-Class");
+            if(premain==null||jar.getJarEntry(premain.replace('.','/')+".class")==null)
+                throw new IOException("Worker JAR has no valid Premain-Class");
+        } catch(IOException e) {throw new McIconException("WORKER_INVALID","Worker JAR is incomplete or invalid; finish the build before starting a job",1,e);}
+    }
+    static byte[] readAgent(Path file) throws IOException {
+        try(InputStream input=Files.newInputStream(file)) {
+            byte[] data=input.readNBytes(64*1024*1024+1);
+            if(data.length>64*1024*1024)throw new IOException("Worker JAR exceeds 64 MiB");
+            return data;
+        }
     }
     public List<CatalogEntry> catalog() throws Exception {
         JsonNode result=request(Map.of("command","catalog"));List<CatalogEntry> entries=new ArrayList<>();
@@ -114,10 +139,15 @@ public final class WorkerClient implements AutoCloseable {
         }catch(IOException ignored){}catch(InterruptedException e){interrupted=true;}
         finally{if(interrupted)Thread.currentThread().interrupt();}
     }
+    private void removeShutdownHook() {
+        try {Runtime.getRuntime().removeShutdownHook(shutdownHook);}catch(IllegalStateException ignored){}
+    }
     @Override public void close() {
         try {if(process.isAlive()) {request(Map.of("command","shutdown"));if(!process.waitFor(10,TimeUnit.SECONDS))terminate();}}
         catch(Exception e){terminate();}
+        removeShutdownHook();
         try {output.close();}catch(IOException ignored){}
+        try {Files.deleteIfExists(runDirectory.resolve("worker-agent.jar"));}catch(IOException ignored){}
         try(var files=Files.list(runDirectory)){for(Path file:files.filter(p->p.getFileName().toString().startsWith("icon-")).toList())Files.deleteIfExists(file);}
         catch(IOException ignored){}
     }

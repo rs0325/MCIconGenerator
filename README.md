@@ -2,7 +2,7 @@
 
 Minecraft Java Editionの元テクスチャと、インベントリ表示の透過PNGを取得する開発者向けCLI・Javaライブラリです。対象は1.13以降の正式版です。
 
-開発中です。元PNG抽出、CLI・Java API、ローカルDockerでのバニラGUI描画を実装しています。描画adapterは1.13 / 1.13.1 / 1.13.2 / 1.21.4 / 26.3のexperimentalです。全51版への対応、時間・乱数の固定、画質の受入検証はまだ完成していません。設計・進捗は[Issue #1](https://github.com/rs0325/MCIconGenerator/issues/1)、実測結果は[検証記録](docs/validation.md)で管理しています。
+開発中です。元PNG抽出、CLI・Java API、ローカルDockerでのバニラGUI描画を実装しています。固定集合の全51版に描画adapterを実装しています。全件生成とPNG監査の結果は版ごとに記録し、未完了の検査を公開しています。描画contextはfixed-v1ですが、画質と再現性の受入検証が残るため、すべてexperimentalです。設計・進捗は[Issue #1](https://github.com/rs0325/MCIconGenerator/issues/1)、実測結果は[検証記録](docs/validation.md)で管理しています。
 
 Java 21以上でビルドします。描画にはDockerのLinux amd64コンテナを使い、版に応じてJava 8/17/21/25を別プロセスで起動します。GitHub Actionsは使用しません。
 

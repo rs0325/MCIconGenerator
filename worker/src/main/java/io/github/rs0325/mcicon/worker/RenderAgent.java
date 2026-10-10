@@ -13,11 +13,14 @@ public final class RenderAgent {
     public static Symbols symbols;
     public static JsonObject config;
     public static PrintStream protocol;
+    public static CanonicalTransformer canonical;
     public static void premain(String argument,Instrumentation instrumentation) throws Exception {
         protocol=System.out;
         System.setOut(System.err);
         config=new JsonParser().parse(new String(Files.readAllBytes(Paths.get(argument)),StandardCharsets.UTF_8)).getAsJsonObject();
         symbols=new Symbols(config.has("mappings")?Paths.get(config.get("mappings").getAsString()):null);
+        canonical=new CanonicalTransformer(symbols,config.has("profile")&&config.get("profile").getAsString().startsWith("legacy-"));
+        instrumentation.addTransformer(canonical);
         final String owner=config.has("hookClass")?config.get("hookClass").getAsString():"net.minecraft.client.Minecraft";
         final String target=symbols.actualClass(owner).replace('.','/');
         final String descriptor=config.has("hookDescriptor")?config.get("hookDescriptor").getAsString():"(Z)V";

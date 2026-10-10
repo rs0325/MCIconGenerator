@@ -1,12 +1,10 @@
 package io.github.rs0325.mcicon.worker;
 
 import com.google.gson.*;
-import java.awt.image.BufferedImage;
 import java.nio.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Supplier;
-import javax.imageio.ImageIO;
 
 /** Deferred GUI extraction and RenderPearl readback in Java Edition 26.3. */
 public final class LatestRenderer extends ModernRenderer {
@@ -46,7 +44,7 @@ public final class LatestRenderer extends ModernRenderer {
             Object encoder=s.call("com.mojang.renderpearl.api.device.GpuDevice","createCommandEncoder",gpu);
             Object texture=s.call("com.mojang.blaze3d.pipeline.RenderTarget","getColorTexture",target);
             Object depth=s.call("com.mojang.blaze3d.pipeline.RenderTarget","getDepthTexture",target);
-            Object transparent=s.construct("org.joml.Vector4f",0f,0f,0f,0f);
+            Object transparent=s.construct("org.joml.Vector4f",CanonicalContext.backgroundColor(),CanonicalContext.backgroundColor(),CanonicalContext.backgroundColor(),CanonicalContext.backgroundAlpha());
             s.call("com.mojang.renderpearl.api.commands.CommandEncoder","clearColorAndDepthTextures",encoder,texture,transparent,depth,0d);
             s.call("net.minecraft.client.gui.render.GuiRenderer","render",guiRenderer);
             int usage=((Integer)s.field("com.mojang.renderpearl.api.buffers.GpuBuffer","USAGE_MAP_READ",null))|((Integer)s.field("com.mojang.renderpearl.api.buffers.GpuBuffer","USAGE_COPY_DST",null));
@@ -57,16 +55,8 @@ public final class LatestRenderer extends ModernRenderer {
             if(!Boolean.TRUE.equals(s.call("com.mojang.renderpearl.api.commands.GpuFence","awaitCompletion",fence,10000000000L)))throw new IllegalStateException("GPU readback timeout");
             mapping=s.call("com.mojang.renderpearl.api.buffers.GpuBuffer","map",buffer,true,false);
             ByteBuffer pixels=(ByteBuffer)s.call("com.mojang.renderpearl.api.buffers.GpuBufferSlice$MappedView","data",mapping);
-            BufferedImage image=new BufferedImage(size,size,BufferedImage.TYPE_INT_ARGB);int visible=0;
-            for(int y=0;y<size;y++)for(int x=0;x<size;x++) {
-                int offset=((size-1-y)*size+x)*4;
-                int r=pixels.get(offset)&255,g=pixels.get(offset+1)&255,b=pixels.get(offset+2)&255,a=pixels.get(offset+3)&255;
-                if(a>0)visible++;
-                if(a>0&&a<255){r=Math.min(255,(r*255+a/2)/a);g=Math.min(255,(g*255+a/2)/a);b=Math.min(255,(b*255+a/2)/a);}
-                if(a==0)r=g=b=0;image.setRGB(x,y,(a<<24)|(r<<16)|(g<<8)|b);
-            }
-            if(visible==0)throw new IllegalStateException("Empty icon: "+id);
-            Path output=Paths.get(request.get("path").getAsString());Files.createDirectories(output.getParent());ImageIO.write(image,"PNG",output.toFile());
+            Path output=Paths.get(request.get("path").getAsString());
+            int visible=PngOutput.write(pixels,size,output);
             JsonObject result=new JsonObject();result.addProperty("path",output.toString());result.addProperty("visiblePixels",visible);return result;
         } finally {
             if(mapping!=null)s.call("com.mojang.renderpearl.api.buffers.GpuBufferSlice$MappedView","close",mapping);
