@@ -31,28 +31,32 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
         cache=cache.toAbsolutePath().normalize();
         runDirectory=Files.createTempDirectory(cache,"worker-");
         Path agentSnapshot=runDirectory.resolve("worker-agent.jar");
-        FilesSupport.atomicWrite(agentSnapshot,agentBytes);
-        validateAgentSnapshot(agentSnapshot);
-        Map<String,Object> config=new TreeMap<>();config.put("version",runtime.version().id());config.put("profile",runtime.profile());
-        if(runtime.mappings()!=null)config.put("mappings",inContainer(cache,runtime.mappings()));
-        if(runtime.profile().startsWith("legacy-")) {config.put("hookClass","net.minecraft.client.render.GameRenderer");config.put("tickMethod","render");config.put("hookDescriptor","(FJZ)V");}
-        FilesSupport.atomicWrite(runDirectory.resolve("agent.json"),Json.MAPPER.writeValueAsBytes(config));
-        Path game=runDirectory.resolve("game");Files.createDirectories(game);
-        Files.writeString(game.resolve("options.txt"),"soundCategory_master:0.0\nguiScale:1\nmaxFps:60\nfullscreen:false\nonboardAccessibility:false\n");
-        List<String> cp=new ArrayList<>();cp.add(inContainer(cache,runtime.client()));for(Path lib:runtime.libraries())cp.add(inContainer(cache,lib));
-        List<String> command=new ArrayList<>(List.of("docker","--context",options.dockerContext(),"run","--rm","--name",containerName,"-i","--platform","linux/amd64",
-                "--network","none","--memory","3g","--cpus","4","-v",cache+":/mcicon/cache","-v",agentSnapshot+":/mcicon/worker.jar:ro",imageId));
-        if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"-e");
-        if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"SDL_VIDEO_FORCE_EGL=1");
-        String java=runtime.javaMajor()==25?"/opt/java/openjdk/bin/java":"/opt/java/java"+runtime.javaMajor()+"/bin/java";
-        String run=inContainer(cache,runDirectory);
-        command.addAll(List.of(java,"-Xmx2G","-Djava.awt.headless=true","-Duser.timezone=UTC","-Djava.library.path="+inContainer(cache,runtime.natives()),
-                "-javaagent:/mcicon/worker.jar="+run+"/agent.json","-cp",String.join(":",cp),runtime.metadata().path("mainClass").asText(),
-                "--username","MCIconGenerator","--version",runtime.version().id(),"--gameDir",run+"/game",
-                "--assetsDir",inContainer(cache,runtime.assets()),"--assetIndex",runtime.metadata().path("assetIndex").path("id").asText(),
-                "--accessToken","0","--uuid","00000000000000000000000000000000","--userType","legacy","--width","320","--height","240","--demo","--disableMultiplayer","--disableChat"));
-        ProcessBuilder builder=new ProcessBuilder(command).redirectError(runDirectory.resolve("worker.log").toFile());
-        process=builder.start();output=new BufferedWriter(new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8));
+        boolean initialized=false;
+        try {
+            FilesSupport.atomicWrite(agentSnapshot,agentBytes);
+            validateAgentSnapshot(agentSnapshot);
+            Map<String,Object> config=new TreeMap<>();config.put("version",runtime.version().id());config.put("profile",runtime.profile());
+            if(runtime.mappings()!=null)config.put("mappings",inContainer(cache,runtime.mappings()));
+            if(runtime.profile().startsWith("legacy-")) {config.put("hookClass","net.minecraft.client.render.GameRenderer");config.put("tickMethod","render");config.put("hookDescriptor","(FJZ)V");}
+            FilesSupport.atomicWrite(runDirectory.resolve("agent.json"),Json.MAPPER.writeValueAsBytes(config));
+            Path game=runDirectory.resolve("game");Files.createDirectories(game);
+            Files.writeString(game.resolve("options.txt"),"soundCategory_master:0.0\nguiScale:1\nmaxFps:60\nfullscreen:false\nonboardAccessibility:false\n");
+            List<String> cp=new ArrayList<>();cp.add(inContainer(cache,runtime.client()));for(Path lib:runtime.libraries())cp.add(inContainer(cache,lib));
+            List<String> command=new ArrayList<>(List.of("docker","--context",options.dockerContext(),"run","--rm","--name",containerName,"-i","--platform","linux/amd64",
+                    "--network","none","--memory","3g","--cpus","4","-v",cache+":/mcicon/cache","-v",agentSnapshot+":/mcicon/worker.jar:ro",imageId));
+            if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"-e");
+            if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"SDL_VIDEO_FORCE_EGL=1");
+            String java=runtime.javaMajor()==25?"/opt/java/openjdk/bin/java":"/opt/java/java"+runtime.javaMajor()+"/bin/java";
+            String run=inContainer(cache,runDirectory);
+            command.addAll(List.of(java,"-Xmx2G","-Djava.awt.headless=true","-Duser.timezone=UTC","-Djava.library.path="+inContainer(cache,runtime.natives()),
+                    "-javaagent:/mcicon/worker.jar="+run+"/agent.json","-cp",String.join(":",cp),runtime.metadata().path("mainClass").asText(),
+                    "--username","MCIconGenerator","--version",runtime.version().id(),"--gameDir",run+"/game",
+                    "--assetsDir",inContainer(cache,runtime.assets()),"--assetIndex",runtime.metadata().path("assetIndex").path("id").asText(),
+                    "--accessToken","0","--uuid","00000000000000000000000000000000","--userType","legacy","--width","320","--height","240","--demo","--disableMultiplayer","--disableChat"));
+            ProcessBuilder builder=new ProcessBuilder(command).redirectError(runDirectory.resolve("worker.log").toFile());
+            process=builder.start();output=new BufferedWriter(new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8));
+            initialized=true;
+        } finally {if(!initialized)cleanupTemporaryFiles();}
         shutdownHook=new Thread(this::terminate,"mcicon-cleanup-"+containerName);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
         Thread reader=Thread.ofPlatform().daemon().name("mcicon-worker-reader").start(()-> {
@@ -69,7 +73,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
             if(!hello.path("animationFrameZero").asBoolean()||!hello.path("contextProfile").asText().equals("fixed-v1"))
                 throw new McIconException("WORKER_CONTEXT_MISMATCH","Worker did not install the required fixed-v1 context",1);
             renderer=hello.path("renderer").asText();
-        }catch(Exception e){terminate();removeShutdownHook();throw e;}
+        }catch(Exception e){terminate();removeShutdownHook();cleanupTemporaryFiles();try{output.close();}catch(IOException ignored){}throw e;}
     }
     static void validateAgentSnapshot(Path file) throws IOException {
         try(JarFile jar=new JarFile(file.toFile())) {
@@ -147,6 +151,9 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
         catch(Exception e){terminate();}
         removeShutdownHook();
         try {output.close();}catch(IOException ignored){}
+        cleanupTemporaryFiles();
+    }
+    private void cleanupTemporaryFiles() {
         try {Files.deleteIfExists(runDirectory.resolve("worker-agent.jar"));}catch(IOException ignored){}
         try(var files=Files.list(runDirectory)){for(Path file:files.filter(p->p.getFileName().toString().startsWith("icon-")).toList())Files.deleteIfExists(file);}
         catch(IOException ignored){}
