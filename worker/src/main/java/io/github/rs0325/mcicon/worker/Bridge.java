@@ -37,7 +37,7 @@ public final class Bridge {
                         if(!Boolean.TRUE.equals(RenderAgent.symbols.call("net.minecraft.client.Minecraft","isGameLoadFinished",minecraft)))return;
                     } else if(RenderAgent.symbols.call("net.minecraft.client.Minecraft","getOverlay",minecraft)!=null)return;
                 }
-                boolean latest=RenderAgent.config.has("profile")&&RenderAgent.config.get("profile").getAsString().equals("gui-26.3");
+                boolean latest=RenderAgent.config.has("profile")&&RenderAgent.config.get("profile").getAsString().matches("gui-26\\.[23]");
                 boolean gpuImmediate=RenderAgent.config.has("profile")&&RenderAgent.config.get("profile").getAsString().equals("gui-1.21.5");
                 boolean classic=RenderAgent.config.has("profile")&&RenderAgent.config.get("profile").getAsString().equals("gui-classic");
                 boolean fixed=RenderAgent.config.has("profile")&&RenderAgent.config.get("profile").getAsString().equals("gui-fixed");
@@ -46,6 +46,7 @@ public final class Bridge {
                 JsonObject hello=new JsonObject(); hello.addProperty("type","ready"); hello.addProperty("protocolVersion",1);
                 hello.addProperty("renderer",renderer.environment()); hello.addProperty("animationFrameZero",RenderAgent.canonical.animationHook); hello.addProperty("contextProfile","fixed-v1"); emit(hello); ready=true;
             }
+            int requestsInFrame=0;
             while(true) {
             JsonObject request=requests.poll(250,TimeUnit.MILLISECONDS);
             if(request==null)return;
@@ -65,6 +66,8 @@ public final class Bridge {
                 result.addProperty("message",e.getClass().getSimpleName()+": "+String.valueOf(e.getMessage()));
             }
             emit(result);
+            // Let the native frame present and reclaim deferred GPU resources.
+            if(++requestsInFrame>=16)return;
             }
         } catch(Throwable e) { e.printStackTrace(System.err); System.exit(1); }
     }

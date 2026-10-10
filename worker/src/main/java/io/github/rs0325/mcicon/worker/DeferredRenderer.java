@@ -49,10 +49,16 @@ public final class DeferredRenderer extends GpuImmediateRenderer {
             if(original instanceof Double)replacement=(double)value;else replacement=value;
             s.setField(windowClass,field,window,replacement);
         }
+        // Atlas placement affects projected foil UVs. Every pass starts at the
+        // same slot so single-item and full-catalog jobs share the same phase.
+        GuiAtlasReset.reset(s,guiRenderer);
         s.call(stateClass,"reset",state);
         return window;
     }
     protected void restoreView(Object ignored) throws Exception {
+        if(extracted)s.call("net.minecraft.client.gui.render.GuiRenderer","endFrame",guiRenderer);
+        Object uniforms=s.call("com.mojang.blaze3d.systems.RenderSystem","getDynamicUniforms",null);
+        s.call("net.minecraft.client.renderer.DynamicUniforms","reset",uniforms);
         for(Map.Entry<String,Object> entry:originalWindow.entrySet())s.setField(windowClass,entry.getKey(),window,entry.getValue());
     }
     protected void drawItem(Object stack) throws Exception {

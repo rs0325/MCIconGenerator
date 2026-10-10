@@ -12,6 +12,9 @@ class RuntimeProfilesTest {
         }
         assertEquals("ADAPTER_UNAVAILABLE",assertThrows(McIconException.class,()->RuntimePreparer.profileFor("26.4")).code());
         assertThrows(McIconException.class,()->RuntimePreparer.profileFor("1.12.2"));
+        assertEquals("gui-deferred",RuntimePreparer.profileFor("26.1.2"));
+        assertEquals("gui-26.2",RuntimePreparer.profileFor("26.2"));
+        assertEquals("gui-26.3",RuntimePreparer.profileFor("26.3"));
     }
     @Test void choosesLtsRuntimeForJava16ClientsAndPreservesOtherMajors() {
         assertEquals(17,RuntimePreparer.runtimeJavaMajor(16));

@@ -78,7 +78,7 @@ public final class IconExporter {
         manifest.put("environment",Map.of("os","linux","arch","amd64","backend","docker","imageId",worker.imageId()));
         Map<String,Object> context=new TreeMap<>();
         context.put("profile","fixed-v1");context.put("alphaMethod","black-white-native-composite-v1");context.put("deterministic",false);context.put("count",1);context.put("overlays",false);
-        context.put("animationFrame",0);context.put("randomSeed",0);context.put("timeMillis",1000);context.put("epochMillis",946684800000L);
+        context.put("guiItemAtlas","reset-per-pass");context.put("animationFrame",0);context.put("randomSeed",0);context.put("timeMillis",1000);context.put("epochMillis",946684800000L);
         context.put("partialTick",0.0);context.put("world","absent");context.put("player","absent");context.put("timeZone","UTC");
         manifest.put("context",context);
         manifest.put("entries",entries.values());manifest.put("complete",complete);
