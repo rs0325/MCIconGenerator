@@ -17,6 +17,7 @@ spec.loader.exec_module(audit_module)
 parser=argparse.ArgumentParser()
 parser.add_argument('--versions',nargs='+')
 parser.add_argument('--mode',choices=('icons','raw'),default='icons')
+parser.add_argument('--size',type=int,choices=(16,32,64,128,256,512),default=64)
 parser.add_argument('--cli',type=Path,default=repo/'cli/build/install/mcicon/bin/mcicon')
 parser.add_argument('--cache',type=Path,default=repo/'.local/cache')
 parser.add_argument('--out',type=Path,required=True)
@@ -42,7 +43,7 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=args.out) as tempor
     core_hash=hashlib.sha256(core_jars[0].read_bytes()).hexdigest()
     for version in versions:
         command=[str(cli),'render' if args.mode=='icons' else 'extract','--version',version,'--cache',str(args.cache.resolve()),'--out',str(args.out),'--json']
-        if args.mode=='icons':command+=['--allow-experimental']
+        if args.mode=='icons':command+=['--allow-experimental','--size',str(args.size)]
         if args.ids:
             for item in args.ids:command+=['--id' if args.mode=='icons' else '--texture',item]
         else:command+=['--all']
