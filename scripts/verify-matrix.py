@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Explicit local vanilla integration QA; no assets are added to the repository."""
 import argparse
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -15,11 +16,12 @@ audit_module=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(audit_module)
 parser=argparse.ArgumentParser()
 parser.add_argument('--versions',nargs='+')
+parser.add_argument('--mode',choices=('icons','raw'),default='icons')
 parser.add_argument('--cli',type=Path,default=repo/'cli/build/install/mcicon/bin/mcicon')
 parser.add_argument('--cache',type=Path,default=repo/'.local/cache')
 parser.add_argument('--out',type=Path,required=True)
 parser.add_argument('--compare',type=Path)
-parser.add_argument('--ids',nargs='+',help='Representative IDs instead of all entries')
+parser.add_argument('--ids',nargs='+',help='Item IDs (icons) or texture IDs (raw) instead of all entries')
 parser.add_argument('--offline',action='store_true')
 parser.add_argument('--overwrite',action='store_true')
 args=parser.parse_args()
@@ -35,25 +37,30 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=args.out) as tempor
     distribution=Path(temporary)/'mcicon'
     shutil.copytree(args.cli.resolve().parent.parent,distribution)
     cli=distribution/'bin/mcicon'
+    core_jars=list((distribution/'lib').glob('core-*.jar'))
+    if len(core_jars)!=1:raise ValueError('CLI distribution must contain one core JAR')
+    core_hash=hashlib.sha256(core_jars[0].read_bytes()).hexdigest()
     for version in versions:
-        command=[str(cli),'render','--version',version,'--allow-experimental','--cache',str(args.cache.resolve()),'--out',str(args.out),'--json']
+        command=[str(cli),'render' if args.mode=='icons' else 'extract','--version',version,'--cache',str(args.cache.resolve()),'--out',str(args.out),'--json']
+        if args.mode=='icons':command+=['--allow-experimental']
         if args.ids:
-            for item in args.ids:command+=['--id',item]
+            for item in args.ids:command+=['--id' if args.mode=='icons' else '--texture',item]
         else:command+=['--all']
         if args.offline:command+=['--offline']
         if args.overwrite:command+=['--overwrite']
         started=time.monotonic()
         with (reports/(version+'-result.json')).open('w') as output,(reports/(version+'-cli.log')).open('w') as log:
             process=subprocess.run(command,stdout=output,stderr=log)
-        manifest=args.out/'java'/version/'icons/manifest.json'
+        manifest=args.out/'java'/version/args.mode/'manifest.json'
         if manifest.exists():
-            comparison=args.compare/'java'/version/'icons/manifest.json' if args.compare else None
-            try:report=audit_module.audit(manifest,compare=comparison,require_all=not args.ids)
+            comparison=args.compare/'java'/version/args.mode/'manifest.json' if args.compare else None
+            source=args.cache.resolve()/'versions'/version/'client.jar' if args.mode=='raw' else None
+            try:report=audit_module.audit(manifest,source_jar=source,compare=comparison,require_all=args.mode=='icons' and not args.ids)
             except Exception as error:report={'version':version,'audited':0,'failures':[str(error)]}
         else:report={'version':version,'audited':0,'failures':['CLI produced no manifest']}
-        report.update(exitCode=process.returncode,elapsedSeconds=round(time.monotonic()-started,2))
+        report.update(exitCode=process.returncode,elapsedSeconds=round(time.monotonic()-started,2),cliCoreSha256=core_hash)
         (reports/(version+'-audit.json')).write_text(json.dumps(report,indent=2)+'\n')
         if process.returncode or report['failures']:failures.append(version)
-        print(version,'PASS' if version not in failures else 'FAIL',report['audited'],'icons',report['elapsedSeconds'],'seconds',flush=True)
+        print(version,'PASS' if version not in failures else 'FAIL',report['audited'],args.mode,report['elapsedSeconds'],'seconds',flush=True)
 (reports/('matrix-'+versions[0]+'-'+versions[-1]+'.json')).write_text(json.dumps({'versions':versions,'failedVersions':failures},indent=2)+'\n')
 raise SystemExit(bool(failures))

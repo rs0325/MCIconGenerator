@@ -25,6 +25,7 @@ public final class IconExporter {
             try {acquired=channel.tryLock();}catch(OverlappingFileLockException e){acquired=null;}
             if(acquired==null)throw new McIconException("OUTPUT_BUSY","Another export owns the output directory",1);
             try(FileLock lock=acquired) {
+                FilesSupport.cleanupExportTemps(base);
                 if(Files.exists(manifest)) {
                     JsonNode previous=Json.MAPPER.readTree(manifest.toFile());
                     boolean matches=previous.path("settingsDigest").asText().equals(digest)&&previous.path("sourceSha256").asText().equals(source)
@@ -34,7 +35,8 @@ public final class IconExporter {
                 }
                 // Reserve selected paths before writing PNGs. A crash between checkpoints
                 // can then safely re-render owned files without adopting unrelated output.
-                for(CatalogEntry entry:selected.values())if(!entries.containsKey(entry.id())) {
+                for(CatalogEntry entry:selected.values())if(!entries.containsKey(entry.id())
+                        ||request.overwrite()&&"OUTPUT_EXISTS".equals(entries.get(entry.id()).code())) {
                     ResourceId id=ResourceId.parse(entry.id());String path="assets/"+id.namespace()+"/textures/"+entry.kind()+"/"+id.path()+".png";
                     boolean unowned=Files.exists(FilesSupport.safeResolve(base,path))&&!request.overwrite();
                     entries.put(entry.id(),new ExportResult.Entry(entry.id(),entry.kind(),"failed",path,null,null,Map.of(),unowned?"OUTPUT_EXISTS":"NOT_RENDERED",unowned?"Unverified output exists":"Rendering has not completed"));

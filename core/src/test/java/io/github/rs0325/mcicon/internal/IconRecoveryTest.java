@@ -60,4 +60,15 @@ class IconRecoveryTest {
         var resumed=new IconExporter(new CancellationToken(),ProgressListener.NONE).export(runtime,new FakeWorker(-1),catalog(20),request());
         assertTrue(resumed.complete());assertEquals(20,resumed.succeeded());
     }
+    @Test void interruptedExplicitOverwriteClaimsPreviouslyUnownedPng() throws Exception {
+        Path file=directory.resolve("out/java/1.21.4/icons/assets/minecraft/textures/item/sample_00.png");
+        Files.createDirectories(file.getParent());Files.write(file,new byte[]{9,8,7});
+        var runtime=runtime();var exporter=new IconExporter(new CancellationToken(),ProgressListener.NONE);
+        assertFalse(exporter.export(runtime,new FakeWorker(-1),catalog(2),request()).complete());
+        var overwrite=new RenderRequest("1.21.4",List.of(),true,"all",16,directory.resolve("out"),true,false,true);
+        // sample_01 was previously successful, so force a render after sample_00.
+        Files.delete(file.resolveSibling("sample_01.png"));
+        assertThrows(AssertionError.class,()->exporter.export(runtime,new FakeWorker(1),catalog(2),overwrite));
+        assertTrue(exporter.export(runtime,new FakeWorker(-1),catalog(2),request()).complete());
+    }
 }

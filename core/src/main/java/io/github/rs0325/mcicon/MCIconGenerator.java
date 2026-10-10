@@ -3,6 +3,7 @@ package io.github.rs0325.mcicon;
 import io.github.rs0325.mcicon.internal.*;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.*;
 
 /** Application-facing API. No Minecraft classes or authentication values cross this boundary. */
@@ -12,6 +13,8 @@ public final class MCIconGenerator implements AutoCloseable {
     private final VersionService versions;
     private final CancellationToken cancellation;
     private final ProgressListener progress;
+    private final Set<CompletableFuture<?>> pending=ConcurrentHashMap.newKeySet();
+    private boolean closed;
     public MCIconGenerator(Path cache,boolean offline,ProgressListener progress,CancellationToken cancellation) {
         this.assets=new AssetStore(cache,offline,cancellation);this.versions=new VersionService(assets);this.cancellation=cancellation;this.progress=progress;
     }
@@ -43,8 +46,24 @@ public final class MCIconGenerator implements AutoCloseable {
             return new RawExporter(cancellation,progress).export(version.id(),client,request);
         });
     }
-    private <T> CompletableFuture<T> submit(Callable<T> task) {
-        return CompletableFuture.supplyAsync(()->{try {cancellation.check();return task.call();}catch(RuntimeException e){throw e;}catch(Exception e){throw new McIconException("IO_FAILED","Input/output operation failed",1,e);}},executor);
+    private synchronized <T> CompletableFuture<T> submit(Callable<T> task) {
+        if(closed)return CompletableFuture.failedFuture(new McIconException("GENERATOR_CLOSED","Generator is closed; create a new instance",1));
+        CompletableFuture<T> future=new CompletableFuture<>();pending.add(future);
+        future.whenComplete((result,error)->pending.remove(future));
+        executor.execute(()-> {
+            if(future.isDone())return;
+            try {cancellation.check();future.complete(task.call());}
+            catch(Throwable error) {
+                future.completeExceptionally(error instanceof RuntimeException||error instanceof Error?error
+                        :new McIconException("IO_FAILED","Input/output operation failed",1,error));
+            }
+        });
+        return future;
     }
-    @Override public void close() {cancellation.cancel();executor.shutdownNow();}
+    /** Cancels active/queued futures and requests worker cleanup. Completed results remain available. */
+    @Override public synchronized void close() {
+        if(closed)return;
+        closed=true;cancellation.cancel();
+        pending.forEach(future->future.cancel(false));executor.shutdownNow();
+    }
 }

@@ -5,6 +5,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.security.*;
 import java.util.HexFormat;
+import java.nio.file.attribute.BasicFileAttributes;
 
 public final class FilesSupport {
     private FilesSupport() {}
@@ -40,5 +41,14 @@ public final class FilesSupport {
             try {Files.move(temp,target,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}
             catch(AtomicMoveNotSupportedException e) {Files.move(temp,target,StandardCopyOption.REPLACE_EXISTING);}
         } finally {Files.deleteIfExists(temp);}
+    }
+    /** Reclaims our reserved temporary namespace after a crash, under the export lock. */
+    static void cleanupExportTemps(Path root) throws IOException {
+        Files.walkFileTree(root,new SimpleFileVisitor<>() {
+            @Override public FileVisitResult visitFile(Path path,BasicFileAttributes attributes) throws IOException {
+                if(attributes.isRegularFile()&&path.getFileName().toString().matches("\\.mcicon-[0-9]+\\.part"))Files.delete(path);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }

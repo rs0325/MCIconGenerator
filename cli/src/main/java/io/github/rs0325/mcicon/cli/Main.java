@@ -25,9 +25,10 @@ public final class Main implements Runnable {
             line.getErr().println(code+": "+cause.getMessage());return exit;
         }).execute(args);
     }
-    @Command(name="doctor",description="Check the local Docker image, JVM, Mesa, and adapter.",mixinStandardHelpOptions=true)
+    @Command(name="doctor",description="Check the local Docker image, JVM, Mesa, and adapter.")
     static final class Doctor implements Callable<Integer> {
         @Mixin Common common;
+        @Mixin ReleaseHelp help;
         @Mixin WorkerArguments worker;
         @Option(names="--version",required=true) String version;
         public Integer call() throws Exception {
@@ -61,6 +62,11 @@ public final class Main implements Runnable {
             return new MCIconGenerator(cache,offline,event->System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total()),token);
         }
     }
+    // The standard help mixin also defines --version, which conflicts with the
+    // Minecraft release selector and causes picocli to remove that entire mixin.
+    static class ReleaseHelp {
+        @Option(names={"-h","--help"},usageHelp=true,description="Show this help message and exit.") boolean help;
+    }
     static class WorkerArguments {
         @Option(names="--worker-jar",description="Rendering agent JAR.") Path agent;
         @Option(names="--docker-context",defaultValue="colima-mcicon") String context;
@@ -76,9 +82,10 @@ public final class Main implements Runnable {
             return new WorkerOptions(path,context,image,Duration.ofSeconds(startup),Duration.ofSeconds(timeout));
         }
     }
-    @Command(name="list",description="Read item/block registries from the exact vanilla client.",mixinStandardHelpOptions=true)
+    @Command(name="list",description="Read item/block registries from the exact vanilla client.")
     static final class Catalog implements Callable<Integer> {
         @Mixin Common common;
+        @Mixin ReleaseHelp help;
         @Mixin WorkerArguments worker;
         @Option(names="--version",required=true) String version;
         @Option(names="--kind",defaultValue="all") String kind;
@@ -92,9 +99,10 @@ public final class Main implements Runnable {
             }
         }
     }
-    @Command(name="render",description="Render inventory PNGs using an experimental vanilla adapter.",mixinStandardHelpOptions=true)
+    @Command(name="render",description="Render inventory PNGs using an experimental vanilla adapter.")
     static final class Render implements Callable<Integer> {
         @Mixin Common common;
+        @Mixin ReleaseHelp help;
         @Mixin WorkerArguments worker;
         @Option(names="--version",required=true) String version;
         @ArgGroup(exclusive=true,multiplicity="1") Selection selection;
@@ -133,9 +141,10 @@ public final class Main implements Runnable {
             }
         }
     }
-    @Command(name="extract",description="Extract original PNG textures and animation metadata.",mixinStandardHelpOptions=true)
+    @Command(name="extract",description="Extract original PNG textures and animation metadata.")
     static final class Extract implements Callable<Integer> {
         @Mixin Common common;
+        @Mixin ReleaseHelp help;
         @Option(names="--version",required=true,description="Exact release ID, or latest.") String version;
         @ArgGroup(exclusive=true,multiplicity="1") Selection selection;
         @Option(names="--out",required=true) Path output;

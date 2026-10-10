@@ -52,8 +52,72 @@ class ExportIntegrityTest {
         Path jar=jar(Map.of(name,png(),name+".mcmeta","{}".getBytes()));
         Path root=directory.resolve("out/java/1.21.4/raw");Path sidecar=root.resolve(name+".mcmeta");
         Files.createDirectories(sidecar.getParent());Files.writeString(sidecar,"owned by another tool");
-        ExportResult result=exporter().export("1.21.4",jar,request(true,List.of()));
-        assertFalse(result.complete());assertEquals("owned by another tool",Files.readString(sidecar));assertFalse(Files.exists(root.resolve(name)));
+        for(int i=0;i<2;i++) {
+            ExportResult result=exporter().export("1.21.4",jar,request(true,List.of()));
+            assertFalse(result.complete());assertEquals("OUTPUT_EXISTS",result.entries().getFirst().code());
+            assertEquals("owned by another tool",Files.readString(sidecar));assertFalse(Files.exists(root.resolve(name)));
+        }
+    }
+    @Test void repeatedResumeNeverClaimsUnownedPng() throws Exception {
+        String name="assets/minecraft/textures/item/test.png";
+        Path jar=jar(Map.of(name,png()));Path target=directory.resolve("out/java/1.21.4/raw").resolve(name);
+        Files.createDirectories(target.getParent());byte[] original={9,8,7};Files.write(target,original);
+        for(int i=0;i<2;i++) {
+            ExportResult result=exporter().export("1.21.4",jar,request(true,List.of()));
+            assertFalse(result.complete());assertEquals("OUTPUT_EXISTS",result.entries().getFirst().code());
+            assertArrayEquals(original,Files.readAllBytes(target));
+        }
+    }
+    @Test void crashBeforeFirstCheckpointCanResumeReservedPngAndMetadata() throws Exception {
+        String name="assets/minecraft/textures/item/test.png";byte[] original=png(),metadata="{\"animation\":{}}".getBytes();
+        Path jar=jar(Map.of(name,original,name+".mcmeta",metadata));
+        RawExporter interrupted=new RawExporter(new CancellationToken(),event->{throw new AssertionError("Process stopped before checkpoint");});
+        assertThrows(AssertionError.class,()->interrupted.export("1.21.4",jar,request(true,List.of())));
+        Path root=directory.resolve("out/java/1.21.4/raw");
+        assertFalse(Json.MAPPER.readTree(root.resolve("manifest.json").toFile()).path("complete").asBoolean());
+        var checkpoint=Json.MAPPER.readTree(root.resolve("manifest.json").toFile());
+        assertEquals(name+".mcmeta",checkpoint.path("reservedAuxiliary").path("minecraft:item/test").asText());
+        assertTrue(checkpoint.path("entries").get(0).path("auxiliary").isEmpty());
+        ExportResult resumed=exporter().export("1.21.4",jar,request(true,List.of()));
+        assertTrue(resumed.complete());assertArrayEquals(original,Files.readAllBytes(root.resolve(name)));
+        assertArrayEquals(metadata,Files.readAllBytes(root.resolve(name+".mcmeta")));
+        assertTrue(Json.MAPPER.readTree(root.resolve("manifest.json").toFile()).path("reservedAuxiliary").isEmpty());
+    }
+    @Test void cancelRecordsEveryPlannedTextureAndCanResume() throws Exception {
+        Path jar=jar(Map.of("assets/minecraft/textures/item/a.png",png(),"assets/minecraft/textures/item/b.png",png(),"assets/minecraft/textures/item/c.png",png()));
+        CancellationToken token=new CancellationToken();
+        RawExporter interrupted=new RawExporter(token,event->{if(event.completed()==1)token.cancel();});
+        ExportResult first=interrupted.export("1.21.4",jar,request(true,List.of()));
+        assertFalse(first.complete());assertEquals(1,first.succeeded());assertEquals(2,first.failed());
+        assertTrue(exporter().export("1.21.4",jar,request(true,List.of())).complete());
+    }
+    @Test void explicitOverwriteCanReplacePreviouslyRejectedPngAndSidecar() throws Exception {
+        String name="assets/minecraft/textures/item/test.png";byte[] original=png(),metadata="{}".getBytes();
+        Path jar=jar(Map.of(name,original,name+".mcmeta",metadata));
+        Path root=directory.resolve("out/java/1.21.4/raw");Files.createDirectories(root.resolve(name).getParent());
+        Files.writeString(root.resolve(name),"unowned PNG");Files.writeString(root.resolve(name+".mcmeta"),"unowned metadata");
+        assertFalse(exporter().export("1.21.4",jar,request(true,List.of())).complete());
+        var overwrite=new ExtractRequest("1.21.4",List.of(),true,directory.resolve("out"),true,false);
+        assertTrue(exporter().export("1.21.4",jar,overwrite).complete());
+        assertArrayEquals(original,Files.readAllBytes(root.resolve(name)));assertArrayEquals(metadata,Files.readAllBytes(root.resolve(name+".mcmeta")));
+    }
+    @Test void failFastRetainsUnprocessedIdsForRecovery() throws Exception {
+        Path jar=jar(Map.of("assets/minecraft/textures/item/a.png",new byte[]{1},"assets/minecraft/textures/item/b.png",png()));
+        var failFast=new ExtractRequest("1.21.4",List.of(),true,directory.resolve("out"),false,true);
+        ExportResult first=exporter().export("1.21.4",jar,failFast);
+        assertFalse(first.complete());assertEquals(2,first.failed());assertEquals("NOT_EXTRACTED",first.entries().get(1).code());
+        ExportResult continued=exporter().export("1.21.4",jar,request(true,List.of()));
+        assertEquals(1,continued.succeeded());assertEquals(1,continued.failed());
+    }
+    @Test void interruptedExplicitOverwriteOwnsThePairOnResume() throws Exception {
+        String name="assets/minecraft/textures/item/test.png";Path jar=jar(Map.of(name,png(),name+".mcmeta","{}".getBytes()));
+        Path root=directory.resolve("out/java/1.21.4/raw");Files.createDirectories(root.resolve(name).getParent());
+        Files.writeString(root.resolve(name),"unowned");Files.writeString(root.resolve(name+".mcmeta"),"unowned");
+        assertFalse(exporter().export("1.21.4",jar,request(true,List.of())).complete());
+        RawExporter interrupted=new RawExporter(new CancellationToken(),event->{throw new AssertionError("Stopped before checkpoint");});
+        var overwrite=new ExtractRequest("1.21.4",List.of(),true,directory.resolve("out"),true,false);
+        assertThrows(AssertionError.class,()->interrupted.export("1.21.4",jar,overwrite));
+        assertTrue(exporter().export("1.21.4",jar,request(true,List.of())).complete());
     }
     @Test void symlinkAndTraversalCannotEscapeOutput() throws Exception {
         assertThrows(IllegalArgumentException.class,()->ResourceId.parse("../outside"));

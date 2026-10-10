@@ -46,7 +46,7 @@ mcicon cache verify --json
 
 初回はオンラインで完了させ、同じcacheに `--offline` を付けて再実行できます。offline時も公式SHA-1・sizeまたは記録済みSHA-256を照合します。cache verifyは記録済みSHA-256のある入力を検証する機能で、cache内のすべてのファイルが検証対象という意味ではありません。破損した入力はオンライン準備時に修復します。
 
-同じ出力先はサイズ、元JAR、mappings、worker agent、描画環境等が一致するジョブで再利用してください。条件が変わったら別の `--out` または `--overwrite` を使います。overwriteは今回選択したファイルに対して働き、以前の別IDのファイルを一括削除しません。PNG・manifestはそれぞれ原子的に保存します。複数ファイル全体が一つのトランザクションではないので、途中終了後はmanifestのhash照合から再開してください。iconsでは書き込み前に選択IDをNOT_RENDEREDとして予約し、16件ごと・失敗時・終了時にmanifestを更新します。クラッシュ後の未確定PNGは再描画します。OUTPUT_EXISTSとされた所有権不明のファイルは、再開しても上書きしません。
+同じ出力先はサイズ、元JAR、mappings、worker agent、描画環境等が一致するジョブで再利用してください。条件が変わったら別の `--out` または `--overwrite` を使います。overwriteは今回選択したファイルに対して働き、以前の別IDのファイルを一括削除しません。PNG・manifestはそれぞれ原子的に保存します。複数ファイル全体が一つのトランザクションではないので、途中終了後はmanifestのhash照合から再開してください。icons/rawとも書き込み前に選択IDと必要な付随mcmetaを予約し、16件ごと・失敗時・終了時にmanifestを更新します。クラッシュ後の未確定ファイルは再生成します。OUTPUT_EXISTSとされた所有権不明のファイルは、再開しても上書きしません。明示overwriteの受理後は新たな予約として再開できます。ツール専用の `.mcicon-<数字>.part` が残った場合は、次のエクスポートがロック取得後に回収します。
 
 ## 取得対象
 
@@ -71,7 +71,7 @@ try (var generator = new MCIconGenerator(Path.of("cache"), false, ProgressListen
 }
 ```
 
-`listVersions`, `listEntries`, `render`, `extract`, `doctor`, `cache` はCompletableFutureを返します。一つのgeneratorではジョブを順番に処理します。別generatorは別cache/outputの利用を推奨します。CancellationToken.cancel()でキャンセル、close()でexecutorとworkerの終了を要求します。キャンセルしたgeneratorは新ジョブに再利用せず、新しいinstance/tokenを作ってください。
+`listVersions`, `listEntries`, `render`, `extract`, `doctor`, `cache` はCompletableFutureを返します。一つのgeneratorではジョブを順番に処理します。進捗callbackはジョブのスレッドで実行するため、同じgeneratorの別ジョブの完了をcallback内で待たないでください。別generatorは別cache/outputの利用を推奨します。CancellationToken.cancel()は途中のエクスポートを中断し、未完了のExportResult/manifestを返します。close()は実行中・待機中のFutureをCancellationExceptionで終了させ、executorとworkerの終了を要求します。完了済みの結果は保持します。close後の新規呼び出しはGENERATOR_CLOSEDのfailed Futureを返します。キャンセルしたgeneratorは新ジョブに再利用せず、新しいinstance/tokenを作ってください。
 
 ```sh
 ./gradlew :cli:distZip :core:publishCorePublicationToLocalBuildRepository
