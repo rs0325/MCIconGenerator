@@ -51,7 +51,9 @@ public final class DeferredRenderer extends GpuImmediateRenderer {
     }
     protected void drawItem(Object stack) throws Exception {
         if(s.hasMethod("net.minecraft.client.gui.render.GuiRenderer","incrementFrameNumber",0))s.call("net.minecraft.client.gui.render.GuiRenderer","incrementFrameNumber",guiRenderer);
-        Object graphics=s.construct(graphicsClass,minecraft,state,0,0);
+        Object graphics;
+        try {graphics=s.construct(graphicsClass,minecraft,state,0,0);}
+        catch(NoSuchMethodException olderSignature) {graphics=s.construct(graphicsClass,minecraft,state);}
         s.call(graphicsClass,extracted?"item":"renderItem",graphics,stack,0,0);
         Object fog=s.field("net.minecraft.client.renderer.GameRenderer","fogRenderer",gameRenderer);
         String fogClass="net.minecraft.client.renderer.fog.FogRenderer";
@@ -63,11 +65,17 @@ public final class DeferredRenderer extends GpuImmediateRenderer {
         Object gpu=s.call("com.mojang.blaze3d.systems.RenderSystem","getDevice",null);
         Object encoder=s.call("com.mojang.blaze3d.systems.GpuDevice","createCommandEncoder",gpu);
         int usage=((Integer)s.field("com.mojang.blaze3d.buffers.GpuBuffer","USAGE_MAP_READ",null))|((Integer)s.field("com.mojang.blaze3d.buffers.GpuBuffer","USAGE_COPY_DST",null));
-        Object buffer=s.call("com.mojang.blaze3d.systems.GpuDevice","createBuffer",gpu,new Supplier<String>(){public String get(){return "mcicon readback";}},usage,(long)size*size*4);
+        Object bufferSize;
+        if(s.hasMethod("com.mojang.blaze3d.systems.GpuDevice","createBuffer","java.util.function.Supplier","int","int"))bufferSize=size*size*4;
+        else bufferSize=(long)size*size*4;
+        Object buffer=s.call("com.mojang.blaze3d.systems.GpuDevice","createBuffer",gpu,new Supplier<String>(){public String get(){return "mcicon readback";}},usage,bufferSize);
         Object view=null,fence=null;
         try {
             Object texture=s.call("com.mojang.blaze3d.pipeline.RenderTarget","getColorTexture",target);
-            s.call("com.mojang.blaze3d.systems.CommandEncoder","copyTextureToBuffer",encoder,texture,buffer,0L,new Runnable(){public void run(){}},0);
+            Object offset;
+            if(s.hasMethod("com.mojang.blaze3d.systems.CommandEncoder","copyTextureToBuffer","com.mojang.blaze3d.textures.GpuTexture","com.mojang.blaze3d.buffers.GpuBuffer","int","java.lang.Runnable","int"))offset=0;
+            else offset=0L;
+            s.call("com.mojang.blaze3d.systems.CommandEncoder","copyTextureToBuffer",encoder,texture,buffer,offset,new Runnable(){public void run(){}},0);
             fence=s.call("com.mojang.blaze3d.systems.CommandEncoder","createFence",encoder);
             if(!Boolean.TRUE.equals(s.call("com.mojang.blaze3d.buffers.GpuFence","awaitCompletion",fence,10000000000L)))throw new IllegalStateException("GPU readback timeout");
             view=s.call("com.mojang.blaze3d.systems.CommandEncoder","mapBuffer",encoder,buffer,true,false);

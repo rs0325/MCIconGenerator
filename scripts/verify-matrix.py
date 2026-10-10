@@ -21,6 +21,7 @@ parser.add_argument('--out',type=Path,required=True)
 parser.add_argument('--compare',type=Path)
 parser.add_argument('--ids',nargs='+',help='Representative IDs instead of all entries')
 parser.add_argument('--offline',action='store_true')
+parser.add_argument('--overwrite',action='store_true')
 args=parser.parse_args()
 versions=args.versions or [v['id'] for v in json.loads((repo/'adapters/releases.json').read_text())['versions']]
 known={v["id"] for v in json.loads((repo/"adapters/releases.json").read_text())["versions"]}
@@ -40,6 +41,7 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=args.out) as tempor
             for item in args.ids:command+=['--id',item]
         else:command+=['--all']
         if args.offline:command+=['--offline']
+        if args.overwrite:command+=['--overwrite']
         started=time.monotonic()
         with (reports/(version+'-result.json')).open('w') as output,(reports/(version+'-cli.log')).open('w') as log:
             process=subprocess.run(command,stdout=output,stderr=log)
