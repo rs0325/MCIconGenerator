@@ -22,6 +22,11 @@ public final class LegacyRenderer implements WorkerRenderer {
         registryOwner=unified?"net.minecraft.util.registry.Registry":"net.minecraft.util.registry.IdRegistry";
         items=s.field(unified?registryOwner:"net.minecraft.item.Item",unified?"ITEM":"REGISTRY",null);
         blocks=s.field(unified?registryOwner:"net.minecraft.block.Block",unified?"BLOCK":"REGISTRY",null);
+        // Vanilla initializes this dependency when entering a world. GUI-only
+        // bootstrap must supply it or block entities keep the item atlas bound.
+        String dispatcherClass="net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher";
+        Object dispatcher=s.field(dispatcherClass,"INSTANCE",null);
+        s.setField(dispatcherClass,"textureManager",dispatcher,s.call("net.minecraft.client.Minecraft","getTextureManager",minecraft));
     }
     public String environment() throws Exception {return s.call("org.lwjgl.opengl.GL11","glGetString",null,7937)+" / "+s.call("org.lwjgl.opengl.GL11","glGetString",null,7938);}
     private String key(Object registry,Object value) throws Exception {return String.valueOf(s.call(registryOwner,"getKey",registry,value));}
