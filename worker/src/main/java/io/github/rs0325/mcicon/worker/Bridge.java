@@ -62,7 +62,7 @@ public final class Bridge {
                 else throw new IllegalArgumentException("Unknown command: "+command);
                 result.addProperty("type","result");
             } catch(Exception e) {
-                e.printStackTrace(System.err); result.addProperty("type","error"); result.addProperty("code","RENDER_FAILED");
+                e.printStackTrace(System.err); result.addProperty("type","error"); result.addProperty("code",e instanceof ResourceGuard.MissingResourceException?((ResourceGuard.MissingResourceException)e).code:"RENDER_FAILED");
                 result.addProperty("message",e.getClass().getSimpleName()+": "+String.valueOf(e.getMessage()));
             }
             emit(result);
@@ -73,15 +73,18 @@ public final class Bridge {
     }
     private static JsonObject renderTransparent(JsonObject request) throws Exception {
         Path output=Paths.get(request.get("path").getAsString());
+        ResourceGuard.begin();
         try {
             CanonicalContext.beginProbe(0f);renderer.render(request);
+            ResourceGuard.check();
             java.awt.image.BufferedImage black=CanonicalContext.probeImage();
             CanonicalContext.end();CanonicalContext.beginProbe(1f);renderer.render(request);
+            ResourceGuard.check();
             java.awt.image.BufferedImage white=CanonicalContext.probeImage();
             CanonicalContext.end();
             int visible=PngOutput.compose(black,white,output);
             JsonObject result=new JsonObject();result.addProperty("path",output.toString());result.addProperty("visiblePixels",visible);return result;
-        } finally {CanonicalContext.end();}
+        } finally {CanonicalContext.end();ResourceGuard.end();}
     }
     private static void emit(JsonObject result) { RenderAgent.protocol.println(gson.toJson(result)); RenderAgent.protocol.flush(); }
 }

@@ -21,6 +21,7 @@ public final class RenderAgent {
         symbols=new Symbols(config.has("mappings")?Paths.get(config.get("mappings").getAsString()):null);
         canonical=new CanonicalTransformer(symbols,config.has("profile")&&config.get("profile").getAsString().startsWith("legacy-"));
         instrumentation.addTransformer(canonical);
+        instrumentation.addTransformer(new ResourceTransformer(symbols,config.has("profile")&&config.get("profile").getAsString().startsWith("legacy-")));
         final String owner=config.has("hookClass")?config.get("hookClass").getAsString():"net.minecraft.client.Minecraft";
         final String target=symbols.actualClass(owner).replace('.','/');
         final String descriptor=config.has("hookDescriptor")?config.get("hookDescriptor").getAsString():"(Z)V";

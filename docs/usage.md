@@ -56,6 +56,8 @@ iconsの全件はair以外の登録アイテムを既定ItemStackで各1枚で�
 
 block-itemの関連・aliasを実レジストリから取得します。水等の独立アイテムがないブロックは `no_item_form` です。`--kind block --id water` は `NO_ITEM_FORM` を返し、別の画像を代用しません。
 
+描画passで追跡したモデル・quadにバニラのfallbackが含まれた場合は `MISSING_MODEL` / `MISSING_TEXTURE` として失敗をmanifestへ記録します。特殊rendererの直接テクスチャ取得等も含む、欠損リソースの完全検出はまだ保証しません。
+
 rawの全件はtextures/item/**とtextures/block/**のPNG・存在する付随mcmetaです。entity等は明示texture IDで抽出します。アイテムIDとtexture IDは別概念です。animated sheet・解像度・alpha・bytesを保持します。
 
 現行描画はfixed-v1です。暦日を2000-01-01 UTC、描画中の経過時刻を1000ms、partialTickを0、atlas animationを初期フレームに固定します。時計・コンパス等の動的propertyの乱数はseed=0に戻します。モデルのquad選択など、バニラ自身がseedを指定する乱数は保持します。黒・白背景の2回のネイティブ描画からstraight alphaを復元します。別ジョブ間のdecoded RGBA一致、GPU間一致、missing modelの完全検出、sRGBの厳密な検証をまだ保証しません。manifestのcontext.deterministic=falseを確認してください。
