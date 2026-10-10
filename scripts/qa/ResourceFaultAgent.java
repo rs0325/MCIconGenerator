@@ -9,6 +9,7 @@ import java.security.ProtectionDomain;
 public final class ResourceFaultAgent {
     private static String fault;
     private static boolean legacy;
+    private static final ThreadLocal<Boolean> selected=new ThreadLocal<Boolean>();
     public static void premain(String argument,Instrumentation instrumentation) throws Exception {
         try(java.io.InputStream input=ResourceFaultAgent.class.getResourceAsStream("/mcicon-resource-fault.txt")) {
             fault=new String(read(input),"UTF-8").trim();
@@ -25,6 +26,22 @@ public final class ResourceFaultAgent {
         final String method=s.methodName(owner,fault.equals("model")?(baked?"getModel":"getItemModel"):(legacy||s.hasMethod(quad,"getSprite",0)?"getSprite":"sprite"),arity);
         instrumentation.addTransformer(new ClassFileTransformer() {
             public byte[] transform(ClassLoader loader,String name,Class<?> redef,ProtectionDomain domain,byte[] bytes) {
+                if(name.equals("io/github/rs0325/mcicon/worker/Bridge")) {
+                    ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
+                    reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
+                        public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
+                            MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
+                            if(!name.equals("renderTransparent"))return target;
+                            return new MethodVisitor(Opcodes.ASM9,target) {
+                                public void visitCode() {
+                                    super.visitCode();super.visitVarInsn(Opcodes.ALOAD,0);
+                                    super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/ResourceFaultAgent","select","(Lcom/google/gson/JsonObject;)V",false);
+                                }
+                            };
+                        }
+                    },0);
+                    return writer.toByteArray();
+                }
                 if(!name.equals(s.actualClass(owner).replace('.','/')))return null;
                 ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                 reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
@@ -49,8 +66,9 @@ public final class ResourceFaultAgent {
         // Substitute first so the production observer sees the actual fallback.
         RenderAgent.premain(argument,instrumentation);
     }
+    public static void select(com.google.gson.JsonObject request) {selected.set(request.get("id").getAsString().equals("minecraft:stone"));}
     public static Object model(Object original) {
-        if(!CanonicalContext.active())return original;
+        if(!CanonicalContext.active()||!Boolean.TRUE.equals(selected.get()))return original;
         try {
             Symbols s=RenderAgent.symbols;
             Object minecraft=s.call("net.minecraft.client.Minecraft","getInstance",null);
@@ -63,7 +81,7 @@ public final class ResourceFaultAgent {
         }catch(Exception e){throw new IllegalStateException("QA model substitution failed",e);}
     }
     public static Object texture(Object original) {
-        if(!CanonicalContext.active())return original;
+        if(!CanonicalContext.active()||!Boolean.TRUE.equals(selected.get()))return original;
         try {
             Symbols s=RenderAgent.symbols;
             Object minecraft=s.call("net.minecraft.client.Minecraft","getInstance",null);

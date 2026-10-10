@@ -95,6 +95,16 @@ class ResourceGuardTest {
         assertSame(value,type.getMethod("getModel",Object.class).invoke(instance,value));
         assertNull(type.getMethod("getModel",Object.class).invoke(instance,new Object[]{null}));
     }
+    @Test void sameObfuscatedNameWithAnotherReturnTypeIsNotInspected() throws Exception {
+        Symbols symbols=symbols(false);ClassWriter writer=new ClassWriter(0);
+        writer.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,"fixture/Quad",null,"java/lang/Object",null);
+        MethodVisitor method=writer.visitMethod(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC,"sprite","()Ljava/lang/String;",null,null);
+        method.visitCode();method.visitLdcInsn("unrelated");method.visitInsn(Opcodes.ARETURN);method.visitMaxs(1,0);method.visitEnd();writer.visitEnd();
+        final byte[] bytes=new ResourceTransformer(symbols,false).transformGameClass("fixture/Quad",writer.toByteArray());
+        Class<?> type=new ClassLoader(){Class<?> define(){return defineClass(null,bytes,0,bytes.length);}}.define();
+        ResourceGuard.begin();CanonicalContext.begin();
+        assertEquals("unrelated",type.getMethod("sprite").invoke(null));ResourceGuard.check();
+    }
     private byte[] quadFixture() {
         String sprite=Type.getInternalName(Sprite.class);ClassWriter writer=new ClassWriter(0);
         writer.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,"fixture/Quad",null,"java/lang/Object",null);

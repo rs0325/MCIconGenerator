@@ -30,13 +30,14 @@ final class ResourceTransformer implements ClassFileTransformer {
         final String updateMethod=symbols.methodName(source,"update",7);
         final String verticesMethod=symbols.methodName(source,symbols.hasMethod(source,"getVertices",0)||legacy?"getVertices":"vertices",0);
         final String modelDescriptor="L"+symbols.actualClass(legacy?"net.minecraft.client.resource.model.BakedModel":"net.minecraft.client.resources.model.BakedModel").replace('.','/')+";";
+        final String spriteDescriptor="L"+symbols.actualClass(legacy?"net.minecraft.client.render.texture.TextureAtlasSprite":"net.minecraft.client.renderer.texture.TextureAtlasSprite").replace('.','/')+";";
         ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
         reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
             public MethodVisitor visitMethod(int access,String method,String desc,String signature,String[] exceptions) {
                 MethodVisitor target=super.visitMethod(access,method,desc,signature,exceptions);
-                final boolean inspectSprite=quad&&method.equals(spriteMethod)&&desc.startsWith("()L");
+                final boolean inspectSprite=quad&&method.equals(spriteMethod)&&desc.equals("()"+spriteDescriptor);
                 final boolean inspectModel=manager&&method.equals(modelMethod)&&Type.getArgumentTypes(desc).length==1&&Type.getReturnType(desc).getDescriptor().equals(modelDescriptor);
-                final boolean inspectMissing=missing&&method.equals(updateMethod)&&desc.endsWith(")V");
+                final boolean inspectMissing=missing&&method.equals(updateMethod)&&Type.getArgumentTypes(desc).length==7&&desc.endsWith(")V");
                 final boolean inspectVertices=quad&&method.equals(verticesMethod)&&desc.equals("()[I");
                 final boolean inspectMaterial=geometry&&method.equals("materialInfo")&&desc.startsWith("()L");
                 final boolean inspectItem=itemRenderer&&method.equals(symbols.methodName(source,"getModel",Type.getArgumentTypes(desc).length))&&Type.getReturnType(desc).getDescriptor().equals(modelDescriptor);

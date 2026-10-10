@@ -32,14 +32,14 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
    if sum(name.startswith('mcicon-worker-') for name in active)>1:raise RuntimeError('At most two native workers are allowed; wait for other QA to finish')
    root=out/fault/v;root.mkdir(parents=True)
    with (root/'result.json').open('w') as stdout,(root/'cli.log').open('w') as stderr:
-    run=subprocess.run([str(distribution/'bin/mcicon'),'render','--version',v,'--cache',str(a.cache.resolve()),'--offline','--id','stone','--allow-experimental','--out',str(root),'--worker-jar',str(injected),'--docker-context',a.docker_context,'--docker-image',a.docker_image,'--json'],stdout=stdout,stderr=stderr)
+    run=subprocess.run([str(distribution/'bin/mcicon'),'render','--version',v,'--cache',str(a.cache.resolve()),'--offline','--id','stone','--id','wheat','--allow-experimental','--out',str(root),'--worker-jar',str(injected),'--docker-context',a.docker_context,'--docker-image',a.docker_image,'--json'],stdout=stdout,stderr=stderr)
    manifest=root/'java'/v/'icons/manifest.json'
    m=json.loads(manifest.read_text()) if manifest.exists() else {}
-   e=m.get('entries',[{}])[0];expected='MISSING_'+fault.upper()
+   entries={e['id']:e for e in m.get('entries',[])};e=entries.get('minecraft:stone',{});healthy=entries.get('minecraft:wheat',{});expected='MISSING_'+fault.upper()
    diagnostics=e.get('diagnostics',[])
    codes=[d.get('code') for d in diagnostics]
-   record={'version':v,'fault':fault,'exitCode':run.returncode,'code':e.get('code'),'diagnosticCodes':codes,'pngFiles':len(list(root.rglob('*.png'))),'counts':m.get('counts')}
-   record['passed']=run.returncode==3 and record['pngFiles']==0 and (record['code']==expected or expected in codes) and m.get('counts',{}).get('succeeded')==0
+   record={'version':v,'fault':fault,'exitCode':run.returncode,'code':e.get('code'),'diagnosticCodes':codes,'pngFiles':len(list(root.rglob('*.png'))),'counts':m.get('counts'),'continuedHealthyItem':healthy.get('status')=='success','fallbackPngWritten':(manifest.parent/e.get('path','absent.png')).is_file()}
+   record['passed']=run.returncode==3 and record['pngFiles']==1 and not record['fallbackPngWritten'] and record['continuedHealthyItem'] and (record['code']==expected or expected in codes) and m.get('counts',{}).get('succeeded')==1 and m.get('counts',{}).get('failed')==1
    results.append(record);(out/'report.json').write_text(json.dumps({'productionAgentSha256':agent_hash,'syntheticFaultInjection':True,'officialInputsModified':False,'results':results},indent=2)+'\n')
    print(v,fault,'PASS' if record['passed'] else 'FAIL',flush=True)
 raise SystemExit(any(not r['passed'] for r in results))
