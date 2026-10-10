@@ -68,13 +68,36 @@ python3 scripts/benchmark-native.py --out .local/benchmark-repeat
 
 16/512pxの端点は9 adapter・各6代表ID、18ジョブ/108 PNGが監査に成功しました。1.13/16pxの初回は準備段階でIO_FAILED、単独再実行で成功し、並行準備8回では再現しませんでした。最初の失敗も追加記録に保存します。
 
-目視比較では1.13〜1.14.3のチェストが不自然な多色表示になっていることを確認しました。原因はワールド入場時に設定されるBlockEntity dispatcherのTextureManagerがGUI専用起動ではnullになり、vanillaのbindTextureが何もしなかったことでした。83d2382でMinecraftのTextureManagerを供給し、旧7版・5,866件の全件監査とチェストの正常なテクスチャ表示を確認しました。1.13/1.14.3の特殊モデル・時計等18代表IDも修正後の全件結果とRGBA一致しました。修正後workerはSHA-256が変わります。前述の51版反復・性能の記録は以前のworkerの結果で、新binaryで全51版を再実行したという意味ではありません。全件生成・反復一致だけで画質を受理しません。
+目視比較では1.13〜1.14.3のチェストが不自然な多色表示になっていることを確認しました。原因はワールド入場時に設定されるBlockEntity dispatcherのTextureManagerがGUI専用起動ではnullになり、vanillaのbindTextureが何もしなかったことでした。83d2382でMinecraftのTextureManagerを供給し、旧7版・5,866件の全件監査とチェストの正常なテクスチャ表示を確認しました。1.13/1.14.3の特殊モデル・時計等18代表IDも修正後の全件結果とRGBA一致しました。修正後workerはSHA-256が変わります。この追加検証時点の51版反復・性能は以前のworkerの記録です。次節に新workerの全51版再試験を記録します。全件生成・反復一致だけで画質を受理しません。
 
 startup timeout=1秒と不正agentの実CLI試験では、専用agent snapshotと一時PNGが回収されました。対応コミットは64ff362です。core SIGKILLの即時cache snapshot回収は保証しません。
 
+## fallback診断・新workerの全件比較（同日）
+
+CLIの診断は8ccdadb、描画中のresource観測は63ce8d9 / 5c6719a / 521302c、26.x検証fixtureのatlas指定修正は1d49f77です。[数値記録](../qa/validation-2026-10-10-resource-guard.json)に、各ジョブのcore/agent/source/image hashと以前の記録への参照を保存します。
+
+チェスト修正後のworkerで全51版・60,265枚を再生成・PNG監査しました。さらにresource観測を加えたworkerで全51版を独立生成し、全60,265枚のdecoded RGBA・パスがこの基準と一致しました。比較する二つのaggregate agent hashは異なります。これは追加した観測処理が出力画像を変えないことの検証で、全IDを別々のsingleプロセスで描画した試験ではありません。
+
+requested inventory passで選択されたfallback BakedModel / MissingItemModelをMISSING_MODEL、消費されたquad/materialのminecraft:missingno spriteをMISSING_TEXTUREとして診断します。全51版の実bytecodeにobserverの依存を照合しました。1.15〜1.16.xの9版の公式mappingsにはgetSpriteが載りますが、release JARでは未使用getterが削除されていたため、保持されたspriteフィールドから観測する方式へ修正しました。元のstack mapがreturn地点のreceiverを破棄するケース、同じ難読化名で返り値が異なるgetter、mapped getterが実JARにないケースも回帰テストに含めます。
+
+9 adapterの18 native fault試験では、stoneを期待したコードで失敗させ、同じworkerで続くwheatの正常PNGを生成し、全件基準とRGBA一致しました。失敗したstoneのPNGは出力しません。モデルfixtureは解決済みモデルをバニラ自身のfallbackへ置換します。texture fixtureは消費spriteの観測入力を、バニラ自身のmissing atlas spriteへ置換します。公式ゲームJAR/assetsは変更せず、検証用agentはproduction配布物に含めません。resource packの破損ロードや特殊rendererの全テクスチャ取得を受け入れたという意味ではありません。26.x fixtureのgetAtlasOrThrowはtextureパスでなくatlas定義IDを受け取るため、AtlasIds.BLOCKSを使用します。fixtureの修正前後のhashを区別して保存します。
+
+JUnit54件成功。実CLIでcacheを通常ファイルにしてIO_FAILEDを起こした場合、通常/--debugともexit 1・stdoutは空でした。--debugだけが根本のFileSystemExceptionとstack traceをstderrへ出します。CLI引数の前後どちらでdebugを指定しても、通常のエラーコード・終了コードを保持します。
+
+同じ1.13 cacheを2つの独立JVMから4回ずつoffline準備し、確定したmapping/native bytesのhashが基準と一致しました。検査では他プロセスが書き込み中のツール専用partを確定ファイルに数えません。以前の一過性IO_FAILEDは今回も再現せず、原因は未特定です。今後は任意の--debugで準備例外の原因を追跡できます。
+
+```sh
+python3 scripts/verify-resource-faults.py --out .local/resource-fault-repeat \
+  --compare .local/qa-output
+python3 scripts/verify-concurrent-prepare.py --out .local/prepare-repeat
+python3 scripts/verify-resource-capabilities.py --out .local/capability-repeat
+```
+
+特殊rendererの直接texture取得やGPU cacheを含むmissing resourceの完全監査、実ゲーム基準画像・色空間・全IDの個別/all・他hostの受入は継続します。以前のbenchmarkやSIGKILLは当時のbinaryの実測を保持し、新workerの性能・障害保証へ流用しません。
+
 ## 未完了の受入検証
 
-- 修正後の全51版の新worker再試験、一過性の準備IO_FAILED、全IDの個別/all一致、実ゲーム基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。
+- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、実ゲーム基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。
 - sRGB・半透明・alpha復元の色精度、missing texture/modelの完全検出。
 - Windows/Linux host、Docker Desktop、native、ARM64 image。
 - daemon障害・書き込み経路の競合など、今回のSIGKILL/ENOSPC/lock試験を超える障害受入。

@@ -58,6 +58,6 @@
 
 全件成功数はairを除く登録アイテム数です。no_item_formのブロックは別に記録します。実測値と入力hashは[初回記録](../qa/validation-2026-10-10.json)と[追加検証記録](../qa/validation-2026-10-10-followup.json)に保存します。独立全件比較はall/allの反復です。個別/all比較は21版・25代表IDの別検証で、全IDの個別比較とは区別します。
 
-追加修正83d2382で、legacy-1.13 / legacy-1.14のBlockEntity dispatcherへTextureManagerを供給し、チェスト等にitem atlasが誤って使われる問題を修正しました。旧7版・5,866枚の全件生成とPNG監査を新workerで再確認しています。表の51版の全件反復比較は修正前のworkerの記録です。残る44版のadapterのコードは変えていませんが、新しいJAR hashでの全51版再実行は未実施です。画質の受入が完了するまでexperimentalを維持します。
+追加修正83d2382で、legacy-1.13 / legacy-1.14のBlockEntity dispatcherへTextureManagerを供給し、チェスト等にitem atlasが誤って使われる問題を修正しました。修正後の全51版・60,265枚を再生成・PNG監査し、さらに521302cのfallback観測を加えたworkerでも全件がdecoded RGBA・パス一致しました。[新workerの数値記録](../qa/validation-2026-10-10-resource-guard.json)に異なるagent hashと版別入力hashを保存します。表の独立反復と代表ID比較は以前のworkerの記録も含み、全IDの個別/all比較や画質・missing resource完全検出の受入とは区別します。画質の受入が完了するまでexperimentalを維持します。
 
 ホストmacOS Apple Silicon＋Colima/Rosetta上のLinux amd64 containerを検証しています。Windows/Linux host、Docker Desktop、host native、Linux ARM64 imageは未検証です。GitHub Actionsは使用しません。
