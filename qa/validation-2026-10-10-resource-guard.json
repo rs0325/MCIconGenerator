@@ -2313,5 +2313,6 @@
     "The earlier one-off preparation IO_FAILED was not reproduced; root cause remains unknown.",
     "Game reference images, exact game color space, all-ID single/all equivalence and other host platforms remain acceptance work.",
     "Earlier benchmark and SIGKILL records used earlier binaries; the guarded binary has not been rebenchmarked or separately repeated for every failure scenario."
-  ]
+  ],
+  "continuedBy": "qa/validation-2026-10-10-gui-reference.json"
 }

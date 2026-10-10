@@ -95,9 +95,33 @@ python3 scripts/verify-resource-capabilities.py --out .local/capability-repeat
 
 特殊rendererの直接texture取得やGPU cacheを含むmissing resourceの完全監査、実ゲーム基準画像・色空間・全IDの個別/all・他hostの受入は継続します。以前のbenchmarkやSIGKILLは当時のbinaryの実測を保持し、新workerの性能・障害保証へ流用しません。
 
+## 通常GUIフレームとの比較（同日）
+
+検証用wrapperの実装は4b240e0です。[数値記録](../qa/validation-2026-10-10-gui-reference.json)に、入力・production/QA agent・Docker image・PNGのhash、比較誤差と条件を保存します。production workerは521302cのままで、今回の追加はQAツールと記録です。
+
+1.13 / 1.21.4 / 26.3の各20代表アイテムを、灰色 `#7f7f7f` と青緑 `#206080` の背景で比較しました。チェスト・ベッド・旗・盾・頭・shulker、ガラス・氷、草・葉・ポーション・スポーンエッグ・皮防具、時計・コンパス・enchanted_bookを含みます。通常GUI座標 `(32,32)` の120比較に加え、原点 `(0,0)` の10代表IDを3版で比較し、合計150比較が許容誤差内でした。RGB各channelの最大誤差は1.13で1/255、1.21.4で2/255、26.3で1/255。許容値2/255を超えたpixelは0です。
+
+比較用画面はQA wrapperでTitleScreenの描画部分を置換し、ゲーム自身の通常GameRenderer、1280×960のmain target、GUI scale 4、native Screenshotを使います。16 GUI pixelのアイテム部分を64pxで切り出し、export PNGを背景へbyte RGBで再合成した結果と照合します。referenceの描画にはWorkerRenderer.render、専用export target・projection、PngOutputのalpha復元を使いません。full-frameとcropの画像はローカルのみに保持します。
+
+最初の検証画面では起動ロゴのoverlay fadeを混ぜていたため、overlay終了を待つよう修正しました。1.13ではInventoryMenuScreenのslotと同じdepth testと、GameRenderer.renderWorldからGUIが引き継ぐcullingを設定します。これを欠くTitleScreen fixtureでは裏面やglintが不正に見えるため、その失敗を製品の描画不良として扱いません。修正した条件は数値記録に明記します。
+
+さらに、ゲームクラス・GPU・固定化hookを使わず、元PNGとgenerated-modelの宣言から平面画像を計算する独立検査を追加しました。3版のdiamond、1.21.4と26.3のcreeper_spawn_eggの計5ケースでRGB・alphaが完全一致しました。1.21.4はモデルJSONの2つの定数tintを使ったlayer合成です。16pxの静的テクスチャ、alpha 0/255、既定GUI変換という限定した検査で、汎用モデルrendererではありません。実装ad7ff9e、使用したJSON/PNGのhashを数値記録に含めます。
+
+fixed-v1の時間・乱数・animation hook、registry/componentのbootstrapはproductionと共有しています。world/playerなしのGUI fixtureであり、無改変のワールド内inventory screenshotとの照合や共有hookの独立検証は未完了です。2背景・64pxの一致を、すべての色空間・サイズ・版・状態の画質保証へ広げません。experimental/deterministic=falseを維持します。
+
+```sh
+python3 scripts/verify-gui-reference.py --out .local/gui-reference-repeat \
+  --compare .local/qa-output
+python3 scripts/verify-gui-reference.py --out .local/gui-reference-origin-repeat \
+  --compare .local/qa-output --position 0 0 --backgrounds 7f7f7f \
+  --ids chest shield glass ice grass_block potion leather_chestplate clock compass enchanted_book
+python3 scripts/verify-flat-textures.py --out .local/flat-texture-repeat \
+  --compare .local/qa-output
+```
+
 ## 未完了の受入検証
 
-- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、実ゲーム基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。
+- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、無改変のワールド内inventory基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。
 - sRGB・半透明・alpha復元の色精度、missing texture/modelの完全検出。
 - Windows/Linux host、Docker Desktop、native、ARM64 image。
 - daemon障害・書き込み経路の競合など、今回のSIGKILL/ENOSPC/lock試験を超える障害受入。
