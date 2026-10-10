@@ -1,0 +1,14 @@
+{
+  "1.13": {
+    "feather": "2ab6680fc17d589416b22a7feed00081306d9b9d",
+    "intermediary": "c48b0ac3c78d8013287fdd5400d7e15ef976a111"
+  },
+  "1.13.1": {
+    "feather": "8bc2006b84d9ecd1c8baec5928d71fc91a308b03",
+    "intermediary": "a5efb7fc2b2b2920dd2c7a6d9b54d9db490d0d1a"
+  },
+  "1.13.2": {
+    "feather": "431f8663d09185ac8a5910d4e8da74736fab7a1b",
+    "intermediary": "de83ec66b07efefa54f59b421e1bf6e5d0593714"
+  }
+}

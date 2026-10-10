@@ -1,0 +1,2 @@
+rootProject.name = 'MCIconGenerator'
+include 'core', 'cli', 'worker'

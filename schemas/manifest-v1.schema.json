@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rs0325/MCIconGenerator/schemas/manifest-v1.schema.json",
+  "title": "MCIconGenerator export manifest v1",
+  "type": "object",
+  "required": ["schemaVersion", "edition", "version", "mode", "toolVersion", "sourceSha256", "settings", "settingsDigest", "entries", "counts", "complete"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "edition": {"const": "java"},
+    "version": {"type": "string", "minLength": 1},
+    "mode": {"enum": ["icons", "raw"]},
+    "toolVersion": {"type": "string"},
+    "adapterVersion": {"type": "string"},
+    "sourceSha256": {"$ref": "#/$defs/sha256"},
+    "settingsDigest": {"$ref": "#/$defs/sha256"},
+    "settings": {"type": "object"},
+    "renderer": {"type": "string"},
+    "javaMajor": {"type": "integer", "minimum": 8},
+    "environment": {"type": "object"},
+    "context": {"type": "object", "required": ["profile", "deterministic"], "properties": {"profile": {"type": "string"}, "deterministic": {"type": "boolean"}}},
+    "catalog": {"type": "array", "items": {"type": "object", "required": ["id", "kind", "status", "blocks"], "properties": {
+      "id": {"$ref": "#/$defs/id"}, "kind": {"enum": ["block", "item"]},
+      "status": {"enum": ["available", "no_item_form"]}, "blocks": {"type": "array", "items": {"$ref": "#/$defs/id"}, "uniqueItems": true}
+    }}},
+    "entries": {"type": "array", "items": {"$ref": "#/$defs/entry"}},
+    "counts": {"type": "object", "required": ["succeeded", "failed"], "properties": {
+      "succeeded": {"type": "integer", "minimum": 0}, "failed": {"type": "integer", "minimum": 0}, "noItemForm": {"type": "integer", "minimum": 0}
+    }},
+    "complete": {"type": "boolean"}
+  },
+  "allOf": [{"if": {"properties": {"mode": {"const": "icons"}}}, "then": {"required": ["adapterVersion", "renderer", "javaMajor", "environment", "context", "catalog"]}}],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "id": {"type": "string", "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"},
+    "entry": {
+      "type": "object", "required": ["id", "kind", "status", "path", "auxiliary"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "kind": {"enum": ["block", "item", "texture"]},
+        "status": {"enum": ["success", "failed"]}, "path": {"type": "string", "pattern": "^assets/"},
+        "sha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "sourceSha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "auxiliary": {"type": "object", "additionalProperties": {"$ref": "#/$defs/sha256"}},
+        "code": {"type": ["string", "null"]}, "message": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "success"}}}, "then": {"required": ["sha256"], "properties": {"sha256": {"$ref": "#/$defs/sha256"}}}},
+        {"if": {"properties": {"status": {"const": "failed"}}}, "then": {"required": ["code"], "properties": {"code": {"type": "string"}}}}
+      ]
+    }
+  }
+}

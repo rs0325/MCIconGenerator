@@ -1,0 +1,15 @@
+dependencies {
+    implementation 'org.ow2.asm:asm:9.11'
+    implementation 'com.google.code.gson:gson:2.13.2'
+}
+tasks.register('agentJar', Jar) {
+    archiveClassifier = 'agent'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.main.output
+    from(rootProject.file('licenses')) { into 'META-INF/licenses' }
+    from(rootProject.file('LICENSE')) { into 'META-INF/mcicon' }
+    from { configurations.runtimeClasspath.collect { zipTree(it) } }
+    exclude 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/*.DSA', 'module-info.class', 'META-INF/versions/**'
+    manifest { attributes('Premain-Class': 'io.github.rs0325.mcicon.worker.RenderAgent') }
+}
+assemble.dependsOn agentJar

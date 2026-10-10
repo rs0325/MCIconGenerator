@@ -1,0 +1,22 @@
+plugins { id 'maven-publish' }
+dependencies {
+    api 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
+}
+tasks.named('processResources') {
+    from(rootProject.file('adapters')) { into 'adapters' }
+}
+publishing {
+    publications {
+        core(MavenPublication) {
+            from components.java
+            artifactId = 'mcicon-core'
+            pom {
+                name = 'MCIconGenerator Core'
+                description = 'Vanilla Minecraft texture and inventory icon export API'
+                url = 'https://github.com/rs0325/MCIconGenerator'
+                licenses { license { name = 'MIT License'; url = 'https://opensource.org/license/mit' } }
+            }
+        }
+    }
+    repositories { maven { name = 'localBuild'; url = layout.buildDirectory.dir('maven') } }
+}
