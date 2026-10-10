@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Explicit local native fallback QA with a wrapper agent; official assets stay intact."""
-import argparse,hashlib,json,shutil,subprocess,tempfile,zipfile
+import argparse,hashlib,importlib.util,json,shutil,subprocess,tempfile,zipfile
 from pathlib import Path
 repo=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser()
@@ -10,14 +10,19 @@ p.add_argument('--cache',type=Path,default=repo/'.local/cache')
 p.add_argument('--cli',type=Path,default=repo/'cli/build/install/mcicon/bin/mcicon')
 p.add_argument('--docker-context',default='colima-mcicon')
 p.add_argument('--docker-image',default='mcicon-render:dev')
+p.add_argument('--compare',type=Path,help='Optional normal full-export baseline for the healthy item')
+p.add_argument('--faults',nargs='+',choices=['model','texture'],default=['model','texture'])
 a=p.parse_args();out=a.out.resolve();out.mkdir(parents=True,exist_ok=False)
+if len(a.faults)!=len(set(a.faults)) or len(a.versions)!=len(set(a.versions)):p.error('Use unique faults and versions')
+sources={str(path.relative_to(repo)):hashlib.sha256(path.read_bytes()).hexdigest() for path in [Path(__file__).resolve(),repo/'scripts/qa/ResourceFaultAgent.java']}
 results=[]
+spec=importlib.util.spec_from_file_location('audit_export',repo/'scripts/audit-export.py');audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit)
 with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
  distribution=Path(temporary)/'mcicon';shutil.copytree(a.cli.resolve().parent.parent,distribution)
  agent=distribution/'worker/worker-agent.jar';agent_hash=hashlib.sha256(agent.read_bytes()).hexdigest()
  classes=out/'classes';classes.mkdir()
  subprocess.run(['javac','--release','8','-cp',str(agent),'-d',str(classes),str(repo/'scripts/qa/ResourceFaultAgent.java')],check=True)
- for fault in ['model','texture']:
+ for fault in a.faults:
   injected=out/(fault+'-worker.jar')
   with zipfile.ZipFile(agent) as source,zipfile.ZipFile(injected,'w',compression=zipfile.ZIP_DEFLATED) as target:
    for entry in source.infolist():
@@ -39,7 +44,17 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
    diagnostics=e.get('diagnostics',[])
    codes=[d.get('code') for d in diagnostics]
    record={'version':v,'fault':fault,'exitCode':run.returncode,'code':e.get('code'),'diagnosticCodes':codes,'pngFiles':len(list(root.rglob('*.png'))),'counts':m.get('counts'),'continuedHealthyItem':healthy.get('status')=='success','fallbackPngWritten':(manifest.parent/e.get('path','absent.png')).is_file()}
-   record['passed']=run.returncode==3 and record['pngFiles']==1 and not record['fallbackPngWritten'] and record['continuedHealthyItem'] and (record['code']==expected or expected in codes) and m.get('counts',{}).get('succeeded')==1 and m.get('counts',{}).get('failed')==1
-   results.append(record);(out/'report.json').write_text(json.dumps({'productionAgentSha256':agent_hash,'syntheticFaultInjection':True,'officialInputsModified':False,'results':results},indent=2)+'\n')
+   record.update(qaAgentSha256=m.get('settings',{}).get('agentSha256'),sourceSha256=m.get('sourceSha256'),healthyPngIntegrity=False,healthyRgbaMatchesBaseline=None)
+   if record['continuedHealthyItem']:
+    try:
+     data=(manifest.parent/healthy['path']).read_bytes();width,height,rgba=audit.rgba_png(data)
+     record['healthyPngIntegrity']=hashlib.sha256(data).hexdigest()==healthy['sha256'] and width==height==64 and any(rgba[3::4]) and not any(rgba[i] or rgba[i+1] or rgba[i+2] for i in range(0,len(rgba),4) if not rgba[i+3])
+     if a.compare:
+      reference=a.compare.resolve()/'java'/v/'icons/manifest.json';baseline=json.loads(reference.read_text());entry=next(e for e in baseline['entries'] if e['id']=='minecraft:wheat')
+      original=(reference.parent/entry['path']).read_bytes()
+      record['healthyRgbaMatchesBaseline']=hashlib.sha256(original).hexdigest()==entry['sha256'] and audit.rgba_png(original)==(width,height,rgba) and entry['path']==healthy['path'] and baseline['sourceSha256']==m['sourceSha256']
+    except Exception as error:record['healthyAuditError']=str(error)
+   record['passed']=run.returncode==3 and record['pngFiles']==1 and not record['fallbackPngWritten'] and record['continuedHealthyItem'] and record['healthyPngIntegrity'] and (not a.compare or record['healthyRgbaMatchesBaseline']) and (record['code']==expected or expected in codes) and m.get('counts',{}).get('succeeded')==1 and m.get('counts',{}).get('failed')==1
+   results.append(record);(out/'report.json').write_text(json.dumps({'productionAgentSha256':agent_hash,'syntheticFaultInjection':True,'officialInputsModified':False,'harnessSourcesSha256':sources,'injectionScope':{'model':'Resolved item model replaced with vanilla fallback','texture':'Consumed sprite observer input replaced with vanilla missing atlas sprite'},'results':results},indent=2)+'\n')
    print(v,fault,'PASS' if record['passed'] else 'FAIL',flush=True)
 raise SystemExit(any(not r['passed'] for r in results))

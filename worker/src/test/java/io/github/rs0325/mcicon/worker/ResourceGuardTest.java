@@ -25,6 +25,9 @@ class ResourceGuardTest {
         public Object missingModel=new Object();
         public Object missing=missingModel;
     }
+    public static class FieldOnlyQuad {
+        public Sprite sprite=new Sprite("minecraft:missingno");
+    }
     @AfterEach void cleanup() {CanonicalContext.end();ResourceGuard.end();RenderAgent.symbols=null;RenderAgent.config=null;}
     private Symbols symbols(boolean legacy) throws Exception {
         String sprite=legacy?"net.minecraft.client.render.texture.TextureAtlasSprite":"net.minecraft.client.renderer.texture.TextureAtlasSprite";
@@ -104,6 +107,17 @@ class ResourceGuardTest {
         Class<?> type=new ClassLoader(){Class<?> define(){return defineClass(null,bytes,0,bytes.length);}}.define();
         ResourceGuard.begin();CanonicalContext.begin();
         assertEquals("unrelated",type.getMethod("sprite").invoke(null));ResourceGuard.check();
+    }
+    @Test void consumedQuadDoesNotRequireTheMappedGetterToExistInTheJar() throws Exception {
+        for(boolean legacy:new boolean[]{true,false}) {
+            symbols(legacy);Path mapping=directory.resolve("mappings.txt");
+            String owner=legacy?"net.minecraft.client.resource.model.BakedQuad":"net.minecraft.client.renderer.block.model.BakedQuad";
+            Files.write(mapping,(owner+" -> "+FieldOnlyQuad.class.getName()+":\n    java.lang.Object sprite -> sprite\n").getBytes("UTF-8"),StandardOpenOption.APPEND);
+            RenderAgent.symbols=new Symbols(mapping);ResourceGuard.begin();CanonicalContext.begin();
+            ResourceGuard.quad(new FieldOnlyQuad());
+            assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+            ResourceGuard.end();CanonicalContext.end();
+        }
     }
     private byte[] quadFixture() {
         String sprite=Type.getInternalName(Sprite.class);ClassWriter writer=new ClassWriter(0);

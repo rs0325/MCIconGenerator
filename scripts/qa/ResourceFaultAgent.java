@@ -20,10 +20,9 @@ public final class ResourceFaultAgent {
         final String manager=legacy?"net.minecraft.client.resource.model.ModelManager":"net.minecraft.client.resources.model.ModelManager";
         final boolean baked=legacy||s.hasField(manager,"missingModel")&&!s.hasField(manager,"missingItemModel");
         final String itemRenderer=legacy?"net.minecraft.client.render.entity.ItemRenderer":"net.minecraft.client.renderer.entity.ItemRenderer";
-        final String quad=legacy?"net.minecraft.client.resource.model.BakedQuad":config.get("version").getAsString().startsWith("26.")?"net.minecraft.client.resources.model.geometry.BakedQuad$MaterialInfo":"net.minecraft.client.renderer.block.model.BakedQuad";
-        final String owner=fault.equals("model")?(baked?itemRenderer:manager):quad;
-        final int arity=fault.equals("model")?(baked?(legacy||s.hasMethod(itemRenderer,"getModel",3)?3:4):1):0;
-        final String method=s.methodName(owner,fault.equals("model")?(baked?"getModel":"getItemModel"):(legacy||s.hasMethod(quad,"getSprite",0)?"getSprite":"sprite"),arity);
+        final String owner=baked?itemRenderer:manager;
+        final int arity=baked?(legacy||s.hasMethod(itemRenderer,"getModel",3)?3:4):1;
+        final String method=s.methodName(owner,baked?"getModel":"getItemModel",arity);
         instrumentation.addTransformer(new ClassFileTransformer() {
             public byte[] transform(ClassLoader loader,String name,Class<?> redef,ProtectionDomain domain,byte[] bytes) {
                 if(name.equals("io/github/rs0325/mcicon/worker/Bridge")) {
@@ -42,6 +41,25 @@ public final class ResourceFaultAgent {
                     },0);
                     return writer.toByteArray();
                 }
+                if(fault.equals("texture")&&name.equals("io/github/rs0325/mcicon/worker/ResourceGuard")) {
+                    ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
+                    reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
+                        public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
+                            MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
+                            if(!name.equals("sprite")||!desc.equals("(Ljava/lang/Object;)V"))return target;
+                            return new MethodVisitor(Opcodes.ASM9,target) {
+                                public void visitCode() {
+                                    super.visitCode();super.visitVarInsn(Opcodes.ALOAD,0);
+                                    super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/ResourceFaultAgent","texture","(Ljava/lang/Object;)Ljava/lang/Object;",false);
+                                    super.visitVarInsn(Opcodes.ASTORE,0);
+                                }
+                            };
+                        }
+                    },0);
+                    System.err.println("[mcicon QA] missing sprite observer input substituted");
+                    return writer.toByteArray();
+                }
+                if(!fault.equals("model"))return null;
                 if(!name.equals(s.actualClass(owner).replace('.','/')))return null;
                 ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                 reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
@@ -51,7 +69,7 @@ public final class ResourceFaultAgent {
                         return new MethodVisitor(Opcodes.ASM9,target) {
                             public void visitInsn(int opcode) {
                                 if(opcode==Opcodes.ARETURN) {
-                                    super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/ResourceFaultAgent",fault.equals("model")?"model":"texture","(Ljava/lang/Object;)Ljava/lang/Object;",false);
+                                    super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/ResourceFaultAgent","model","(Ljava/lang/Object;)Ljava/lang/Object;",false);
                                     super.visitTypeInsn(Opcodes.CHECKCAST,Type.getReturnType(desc).getInternalName());
                                 }
                                 super.visitInsn(opcode);

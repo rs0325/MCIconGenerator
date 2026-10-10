@@ -50,7 +50,8 @@ public final class ResourceGuard {
             Symbols s=RenderAgent.symbols;
             boolean legacy=RenderAgent.config.get("profile").getAsString().startsWith("legacy-");
             String owner=legacy?"net.minecraft.client.resource.model.BakedQuad":"net.minecraft.client.renderer.block.model.BakedQuad";
-            sprite(s.call(owner,legacy||s.hasMethod(owner,"getSprite",0)?"getSprite":"sprite",value));
+            // Official mappings include getters removed from some release JARs.
+            sprite(s.field(owner,"sprite",value));
         } catch(Exception e) {throw new IllegalStateException("Cannot inspect consumed vanilla quad",e);}
     }
     public static void material(Object value) {
