@@ -9,10 +9,11 @@ import java.util.concurrent.TimeUnit;
 public final class Diagnostics {
     public static DiagnosticReport doctor(VersionService service, String version, WorkerOptions worker) throws IOException {
         VersionInfo exact = service.resolve(version);
-        int javaMajor = service.metadata(exact).path("javaVersion").path("majorVersion").asInt(exact.id().startsWith("1.13") ? 8 : 21);
+        int javaMajor = RuntimePreparer.runtimeJavaMajor(service.metadata(exact).path("javaVersion").path("majorVersion").asInt(exact.id().startsWith("1.13") || exact.id().startsWith("1.14") ? 8 : 21));
         List<DiagnosticReport.Check> checks = new ArrayList<>();
         checks.add(new DiagnosticReport.Check("core_java", Runtime.version().feature() >= 21, "Java " + Runtime.version().feature()));
-        boolean adapter = Set.of("1.13", "1.13.1", "1.13.2", "1.21.4", "26.3").contains(exact.id());
+        boolean adapter;
+        try {RuntimePreparer.profileFor(exact.id());adapter=true;}catch(McIconException unavailable){adapter=false;}
         checks.add(new DiagnosticReport.Check("adapter", adapter, adapter ? "experimental; canonical context is pending" : "ADAPTER_UNAVAILABLE"));
         checks.add(new DiagnosticReport.Check("agent", Files.isRegularFile(worker.agentJar()), "Rendering agent must exist"));
         List<String> docker = List.of("docker", "--context", worker.dockerContext());
@@ -64,13 +65,16 @@ public final class Diagnostics {
         List<String> failures=new ArrayList<>();
         try(var walk=Files.walk(root)) {
             for(Path file:walk.filter(p->Files.isRegularFile(p,LinkOption.NOFOLLOW_LINKS)).sorted().toList()) {
-                token.check(); bytes+=Files.size(file);files++;
+                token.check();
+                try {
+                bytes+=Files.size(file);files++;
                 if(verify && file.getFileName().toString().endsWith(".sha256")) {
                     String relative=root.relativize(file).toString();
                     Path source=FilesSupport.safeResolve(root,relative.substring(0,relative.length()-7));
                     if(Files.isRegularFile(source,LinkOption.NOFOLLOW_LINKS) && Files.readString(file).trim().equals(FilesSupport.hash(source,"SHA-256")))verified++;
                     else failures.add(relative.substring(0,relative.length()-7));
                 }
+                }catch(NoSuchFileException transientWorkerFile){ /* A concurrent worker completed and removed its temporary file. */ }
             }
         }
         return new CacheReport(bytes,files,verified,failures);

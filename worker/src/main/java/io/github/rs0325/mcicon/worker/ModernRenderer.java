@@ -52,7 +52,7 @@ public class ModernRenderer implements WorkerRenderer {
         if(!Arrays.asList(16,32,64,128,256,512).contains(size))throw new IllegalArgumentException("Unsupported size");
         String locationClass=(RenderAgent.config.get("version").getAsString().startsWith("26.")||s.hasClass("net.minecraft.resources.Identifier"))?"net.minecraft.resources.Identifier":"net.minecraft.resources.ResourceLocation";
         Object location=locationClass.endsWith("Identifier")||s.hasMethod(locationClass,"parse",1)?s.call(locationClass,"parse",null,id):s.construct(locationClass,id);
-        Object item=s.call("net.minecraft.core.Registry",s.hasMethod("net.minecraft.core.Registry","getValue",1)?"getValue":"get",items,location);
+        Object item=s.call("net.minecraft.core.Registry",(RenderAgent.config.get("version").getAsString().startsWith("26.")||s.hasMethod("net.minecraft.core.Registry","getValue",1))?"getValue":"get",items,location);
         if(item==null||key(items,item).equals("minecraft:air"))throw new IllegalArgumentException("Unknown item: "+id);
         Object stack=s.call("net.minecraft.world.item.Item","getDefaultInstance",item);
         boolean oldTarget=s.hasMethod("com.mojang.blaze3d.pipeline.RenderTarget","clear",1);

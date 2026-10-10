@@ -100,13 +100,16 @@ def audit(manifest_path, source_jar=None, compare=None, require_all=False):
     registry_checked = False
     if manifest['mode'] == 'icons':
         catalog = manifest['catalog']
-        catalog_ids = [e['id'] for e in catalog]
+        catalog_ids = [(e['id'], e['kind'], e['status']) for e in catalog]
         if len(catalog_ids) != len(set(catalog_ids)):
             failures.append('Duplicate catalog IDs')
         excluded = [e for e in catalog if e['status'] == 'no_item_form']
         if len(excluded) != manifest['counts']['noItemForm'] or any(e['kind'] != 'block' or e['blocks'] for e in excluded):
             failures.append('no_item_form records disagree')
-        available = {e['id'] for e in catalog if e['status'] == 'available'}
+        available_ids = [e['id'] for e in catalog if e['status'] == 'available']
+        available = set(available_ids)
+        if len(available) != len(available_ids):
+            failures.append('Duplicate registered item IDs')
         if not set(ids).issubset(available):
             failures.append('Output ID is absent from registry')
         if require_all:
