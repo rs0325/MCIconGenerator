@@ -5,7 +5,7 @@ import io.github.rs0325.mcicon.worker.shaded.asm.*;
 import java.lang.instrument.*;
 import java.security.ProtectionDomain;
 
-/** QA-only agent wrapper: substitute vanilla's real fallback in a requested pass. */
+/** QA-only wrapper: substitute a resolved model or consumed-sprite observer input. */
 public final class ResourceFaultAgent {
     private static String fault;
     private static boolean legacy;
@@ -113,7 +113,8 @@ public final class ResourceFaultAgent {
             Object missing=s.call("net.minecraft.client.renderer.texture.MissingTextureAtlasSprite","getLocation",null);
             if(identifier.endsWith("Identifier")) {
                 Object manager=s.call("net.minecraft.client.Minecraft","getAtlasManager",minecraft);
-                Object atlas=s.call("net.minecraft.client.resources.model.sprite.AtlasManager","getAtlasOrThrow",manager,atlasId);
+                Object definition=s.field("net.minecraft.data.AtlasIds","BLOCKS",null);
+                Object atlas=s.call("net.minecraft.client.resources.model.sprite.AtlasManager","getAtlasOrThrow",manager,definition);
                 return s.call("net.minecraft.client.renderer.texture.TextureAtlas","getSprite",atlas,missing);
             }
             @SuppressWarnings("unchecked") java.util.function.Function<Object,Object> sprites=(java.util.function.Function<Object,Object>)s.call("net.minecraft.client.Minecraft","getTextureAtlas",minecraft,atlasId);
