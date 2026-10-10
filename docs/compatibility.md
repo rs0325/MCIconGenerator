@@ -5,14 +5,14 @@
 | Version | Adapter | Java | 64px全件生成・PNG監査 |
 | --- | --- | --- | --- |
 | 26.3 | gui-26.3 | 25 | 1,657 成功 / 0 失敗（passed） |
-| 26.2 | gui-deferred | metadataから解決 | 起動失敗（修正後の再試験待ち） |
-| 26.1.2 | gui-deferred | metadataから解決 | 未実行 |
-| 26.1.1 | gui-deferred | metadataから解決 | 未実行 |
+| 26.2 | gui-26.2 | 25 | 1,536 成功 / 0 失敗（passed） |
+| 26.1.2 | gui-deferred | 25 | 1,505 成功 / 0 失敗（passed） |
+| 26.1.1 | gui-deferred | 25 | 1,505 成功 / 0 失敗（passed） |
 | 26.1 | gui-deferred | 25 | 1,505 成功 / 0 失敗（passed） |
 | 1.21.11 | gui-deferred | 21 | 1,504 成功 / 0 失敗（passed） |
-| 1.21.10 | gui-deferred | metadataから解決 | 未実行 |
-| 1.21.9 | gui-deferred | metadataから解決 | 未実行 |
-| 1.21.8 | gui-deferred | metadataから解決 | 未実行 |
+| 1.21.10 | gui-deferred | 21 | 1,487 成功 / 0 失敗（passed） |
+| 1.21.9 | gui-deferred | 21 | 1,487 成功 / 0 失敗（passed） |
+| 1.21.8 | gui-deferred | 21 | 1,415 成功 / 0 失敗（passed） |
 | 1.21.7 | gui-deferred | 21 | 1,415 成功 / 0 失敗（passed） |
 | 1.21.6 | gui-deferred | 21 | 1,414 成功 / 0 失敗（passed） |
 | 1.21.5 | gui-1.21.5 | 21 | 1,395 成功 / 0 失敗（passed） |
@@ -28,15 +28,15 @@
 | 1.20.2 | gui-1.21.4 | 17 | 1,254 成功 / 0 失敗（passed） |
 | 1.20.1 | gui-1.21.4 | 17 | 1,254 成功 / 0 失敗（passed） |
 | 1.20 | gui-1.21.4 | 17 | 1,254 成功 / 0 失敗（passed） |
-| 1.19.4 | gui-classic | metadataから解決 | 未実行 |
-| 1.19.3 | gui-classic | metadataから解決 | 未実行 |
-| 1.19.2 | gui-classic | metadataから解決 | 未実行 |
-| 1.19.1 | gui-classic | metadataから解決 | 未実行 |
-| 1.19 | gui-classic | metadataから解決 | 未実行 |
-| 1.18.2 | gui-classic | metadataから解決 | 未実行 |
-| 1.18.1 | gui-classic | metadataから解決 | 未実行 |
-| 1.18 | gui-classic | metadataから解決 | 未実行 |
-| 1.17.1 | gui-classic | metadataから解決 | 未実行 |
+| 1.19.4 | gui-classic | 17 | 1,227 成功 / 0 失敗（passed） |
+| 1.19.3 | gui-classic | 17 | 1,185 成功 / 0 失敗（passed） |
+| 1.19.2 | gui-classic | 17 | 1,151 成功 / 0 失敗（passed） |
+| 1.19.1 | gui-classic | 17 | 1,151 成功 / 0 失敗（passed） |
+| 1.19 | gui-classic | 17 | 1,151 成功 / 0 失敗（passed） |
+| 1.18.2 | gui-classic | 17 | 1,100 成功 / 0 失敗（passed） |
+| 1.18.1 | gui-classic | 17 | 1,100 成功 / 0 失敗（passed） |
+| 1.18 | gui-classic | 17 | 1,100 成功 / 0 失敗（passed） |
+| 1.17.1 | gui-classic | 17 | 1,099 成功 / 0 失敗（passed） |
 | 1.17 | gui-classic | 17 | 1,099 成功 / 0 失敗（passed） |
 | 1.16.5 | gui-fixed | 8 | 975 成功 / 0 失敗（passed） |
 | 1.16.4 | gui-fixed | 8 | 975 成功 / 0 失敗（passed） |

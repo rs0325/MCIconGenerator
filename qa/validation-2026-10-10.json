@@ -1,8 +1,39 @@
 {
+  "realWorkerCrashResumeAudit": {
+    "version": "1.13",
+    "mode": "icons",
+    "audited": 784,
+    "registryPopulationVerified": true,
+    "transparentImages": 768,
+    "fractionalAlphaPixels": 131821,
+    "failures": [],
+    "compared": 784,
+    "comparisonVerified": true,
+    "canonicalVerified": false
+  },
+  "agentSha256s": [
+    "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c"
+  ],
+  "sameWorkerBinary": true,
+  "implementationCommit": "9513d6a",
+  "firstAttemptCacheMisses": [
+    "1.21.9",
+    "1.21.10"
+  ],
+  "retriedVersionsPassed": [
+    "1.21.9",
+    "1.21.10"
+  ],
+  "onlineCliSmoke": {
+    "versionsCount": 51,
+    "rawExtraction": true,
+    "sourceBytesVerified": true,
+    "offlineResume": true
+  },
   "cacheVerification": {
-    "bytes": 2697279043,
-    "files": 9378,
-    "verified": 2783,
+    "bytes": 2816898878,
+    "files": 9817,
+    "verified": 2843,
     "failures": []
   },
   "doctor": {
@@ -771,31 +802,14 @@
     "comparisonVerified": true,
     "canonicalVerified": false
   },
-  "capturedAt": "2026-10-10T03:25:52.103406+00:00",
+  "capturedAt": "2026-10-10T04:26:46.003877+00:00",
   "method": "native GUI, fixed-v1, 64px, local Docker Linux amd64; experimental",
   "scope": "PNG integrity and registry coverage do not certify visual semantics or color space",
   "unitTests": 35,
-  "passedVersions": 36,
-  "successfulIcons": 41066,
-  "pendingVersions": [
-    "26.1.2",
-    "26.1.1",
-    "1.21.10",
-    "1.21.9",
-    "1.21.8",
-    "1.19.4",
-    "1.19.3",
-    "1.19.2",
-    "1.19.1",
-    "1.19",
-    "1.18.2",
-    "1.18.1",
-    "1.18",
-    "1.17.1"
-  ],
-  "failedVersions": [
-    "26.2"
-  ],
+  "passedVersions": 51,
+  "successfulIcons": 60265,
+  "pendingVersions": [],
+  "failedVersions": [],
   "versions": [
     {
       "version": "26.3",
@@ -806,7 +820,7 @@
       "failed": 0,
       "noItemForm": 78,
       "javaMajor": 25,
-      "elapsedSeconds": 80.94,
+      "elapsedSeconds": 57.3,
       "audit": {
         "version": "26.3",
         "mode": "icons",
@@ -819,7 +833,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 80.94
+        "elapsedSeconds": 57.3
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -827,6 +841,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -836,41 +851,145 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "29b144ff0118684b5d9e61c586c4cc1ba86065d633f4b0be50377e88b5524cb4",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "4508d006323f24fa02876310c192d739af56516eb259000ac50f0909a68c9a2d",
       "mappingsSha256": "named",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "26.2",
-      "profile": "gui-deferred",
+      "profile": "gui-26.2",
       "status": "experimental",
-      "fullExport": "failed",
-      "succeeded": 0,
-      "failed": 1,
-      "startupFailure": true,
+      "fullExport": "passed",
+      "succeeded": 1536,
+      "failed": 0,
+      "noItemForm": 77,
+      "javaMajor": 25,
+      "elapsedSeconds": 53.24,
       "audit": {
         "version": "26.2",
-        "audited": 0,
-        "failures": [
-          "CLI produced no manifest"
-        ],
-        "exitCode": 1,
-        "elapsedSeconds": 38.66
+        "mode": "icons",
+        "audited": 1536,
+        "registryPopulationVerified": true,
+        "transparentImages": 1520,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 53.24
       },
-      "elapsedSeconds": 38.66
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "40896ee9f1e2bec3c934daac7e93d41e9e3d9c2f8ae0ca366d52ffbfd1afa290",
+      "mappingsSha256": "named",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "26.1.2",
       "profile": "gui-deferred",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1505,
+      "failed": 0,
+      "noItemForm": 77,
+      "javaMajor": 25,
+      "elapsedSeconds": 70.95,
+      "audit": {
+        "version": "26.1.2",
+        "mode": "icons",
+        "audited": 1505,
+        "registryPopulationVerified": true,
+        "transparentImages": 1489,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 70.95
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0",
+      "mappingsSha256": "named",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "26.1.1",
       "profile": "gui-deferred",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1505,
+      "failed": 0,
+      "noItemForm": 77,
+      "javaMajor": 25,
+      "elapsedSeconds": 70.4,
+      "audit": {
+        "version": "26.1.1",
+        "mode": "icons",
+        "audited": 1505,
+        "registryPopulationVerified": true,
+        "transparentImages": 1489,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 70.4
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "8c109be6177f40d10d0afd820b06542f9609597874242b96e16c5b0dc9e1fef3",
+      "mappingsSha256": "named",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "26.1",
@@ -881,7 +1000,7 @@
       "failed": 0,
       "noItemForm": 77,
       "javaMajor": 25,
-      "elapsedSeconds": 32.59,
+      "elapsedSeconds": 70.85,
       "audit": {
         "version": "26.1",
         "mode": "icons",
@@ -894,7 +1013,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 32.59
+        "elapsedSeconds": 70.85
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -902,6 +1021,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -911,7 +1031,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "dfe46aa8847973944788b17063c0ebb95fc8f81d64f9e3f933204f2e007b4c47",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "bc6194c61566b587f196090d730698f2191170f7580adb143e4ff839939d3840",
       "mappingsSha256": "named",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -925,7 +1045,7 @@
       "failed": 0,
       "noItemForm": 76,
       "javaMajor": 21,
-      "elapsedSeconds": 99.52,
+      "elapsedSeconds": 67.2,
       "audit": {
         "version": "1.21.11",
         "mode": "icons",
@@ -938,7 +1058,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 99.52
+        "elapsedSeconds": 67.2
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -946,6 +1066,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -955,7 +1076,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "29b144ff0118684b5d9e61c586c4cc1ba86065d633f4b0be50377e88b5524cb4",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "1473c9489ac50fda3c435049a76a70d61a10b8610db27f5ba9d8756b686cd3bd",
       "mappingsSha256": "517799a8485e107e932dc1bd27c002b2d0b9207eb2396b685bcfe6c3321a9fbd",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -964,19 +1085,136 @@
       "version": "1.21.10",
       "profile": "gui-deferred",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1487,
+      "failed": 0,
+      "noItemForm": 76,
+      "javaMajor": 21,
+      "elapsedSeconds": 41.11,
+      "audit": {
+        "version": "1.21.10",
+        "mode": "icons",
+        "audited": 1487,
+        "registryPopulationVerified": true,
+        "transparentImages": 1471,
+        "fractionalAlphaPixels": 121568,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 41.11
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "e65ca028bc58da12bf8413066c90ecd4d48c94fb351d9bbd22ecdff5c87f9482",
+      "mappingsSha256": "2a6f53f4c1fd048e8fa956e3a3fbbb0afc02d5bbc23e52a16b328aed61b9bf39",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.21.9",
       "profile": "gui-deferred",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1487,
+      "failed": 0,
+      "noItemForm": 76,
+      "javaMajor": 21,
+      "elapsedSeconds": 43.75,
+      "audit": {
+        "version": "1.21.9",
+        "mode": "icons",
+        "audited": 1487,
+        "registryPopulationVerified": true,
+        "transparentImages": 1471,
+        "fractionalAlphaPixels": 121568,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 43.75
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "40c0a32c46601f71f6a61dae9f126202ded5cc453cfb8da6e42ae73f2a3f5c1b",
+      "mappingsSha256": "f223e9775abb66b6712c505cb1a73b48d615efebaf43a9f81dd58df9a9b1c7b3",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.21.8",
       "profile": "gui-deferred",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1415,
+      "failed": 0,
+      "noItemForm": 76,
+      "javaMajor": 21,
+      "elapsedSeconds": 62.48,
+      "audit": {
+        "version": "1.21.8",
+        "mode": "icons",
+        "audited": 1415,
+        "registryPopulationVerified": true,
+        "transparentImages": 1399,
+        "fractionalAlphaPixels": 121568,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 62.48
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "ea74e9c5e92d01f95f3d39196ddb734e19a077a58b4c433c34109487d600276f",
+      "mappingsSha256": "dce035fedcc047ce0306c69892176b5eb9036bcc2845c87198163f12bb1d67ca",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.21.7",
@@ -987,7 +1225,7 @@
       "failed": 0,
       "noItemForm": 76,
       "javaMajor": 21,
-      "elapsedSeconds": 93.23,
+      "elapsedSeconds": 66.11,
       "audit": {
         "version": "1.21.7",
         "mode": "icons",
@@ -1000,7 +1238,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 93.23
+        "elapsedSeconds": 66.11
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1008,6 +1246,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1017,7 +1256,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "29b144ff0118684b5d9e61c586c4cc1ba86065d633f4b0be50377e88b5524cb4",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "6d0aa64c6a0aee3270253317f51e9e816f94cd3b16b44f5d605615c39fc62fb9",
       "mappingsSha256": "328f2c5849c7c5fc4f2b1eae4f74a7cfe6bb337c7938242ac5c4f9eac89b1e50",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1031,7 +1270,7 @@
       "failed": 0,
       "noItemForm": 76,
       "javaMajor": 21,
-      "elapsedSeconds": 97.86,
+      "elapsedSeconds": 94.23,
       "audit": {
         "version": "1.21.6",
         "mode": "icons",
@@ -1044,7 +1283,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 97.86
+        "elapsedSeconds": 94.23
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1052,6 +1291,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1061,7 +1301,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "29b144ff0118684b5d9e61c586c4cc1ba86065d633f4b0be50377e88b5524cb4",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "9592df8587d6d3ec0334c873ad432dc76006d6129afdce9a7eac52638339a24a",
       "mappingsSha256": "2ff82b34ce5f849aaafdff51e23b9448c4263881238b780a441fe1061a6fc261",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1075,7 +1315,7 @@
       "failed": 0,
       "noItemForm": 76,
       "javaMajor": 21,
-      "elapsedSeconds": 76.06,
+      "elapsedSeconds": 91.44,
       "audit": {
         "version": "1.21.5",
         "mode": "icons",
@@ -1088,7 +1328,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 76.06
+        "elapsedSeconds": 91.44
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1096,6 +1336,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1105,7 +1346,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "522672ad20b460c02c2e39b6c5035ef6a849af28eb11ab2ac7eb293d395a8c11",
       "mappingsSha256": "3907657ade3e61bc8cffb4ca0a1bcba15f57986be4e613900947119364a206e5",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1119,7 +1360,7 @@
       "failed": 0,
       "noItemForm": 76,
       "javaMajor": 21,
-      "elapsedSeconds": 57.38,
+      "elapsedSeconds": 67.44,
       "audit": {
         "version": "1.21.4",
         "mode": "icons",
@@ -1132,7 +1373,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 57.38
+        "elapsedSeconds": 67.44
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1140,6 +1381,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1149,7 +1391,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
       "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1163,7 +1405,7 @@
       "failed": 0,
       "noItemForm": 74,
       "javaMajor": 21,
-      "elapsedSeconds": 61.86,
+      "elapsedSeconds": 70.19,
       "audit": {
         "version": "1.21.3",
         "mode": "icons",
@@ -1176,7 +1418,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 61.86
+        "elapsedSeconds": 70.19
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1184,6 +1426,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1193,7 +1436,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "25190c556bc56d11070638ccab3b3c6efd76bb9684c92a2680a4de01c3c7138b",
       "mappingsSha256": "e92a9cb01c233075b51a6233d0c22f56dcda3fcab46438d3f7a1781d104dcd41",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1207,7 +1450,7 @@
       "failed": 0,
       "noItemForm": 74,
       "javaMajor": 21,
-      "elapsedSeconds": 54.92,
+      "elapsedSeconds": 69.27,
       "audit": {
         "version": "1.21.2",
         "mode": "icons",
@@ -1220,7 +1463,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 54.92
+        "elapsedSeconds": 69.27
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1228,6 +1471,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1237,7 +1481,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "613091da0f62426ae8dcf9afb30eb639485f493b81cda3a2b96b1fb8a6b9976c",
       "mappingsSha256": "e37560e4889168916a73dbc4922c563002eff70fbecfe1cf5c50a7b222f451b2",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1251,7 +1495,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 21,
-      "elapsedSeconds": 65.98,
+      "elapsedSeconds": 67.62,
       "audit": {
         "version": "1.21.1",
         "mode": "icons",
@@ -1264,7 +1508,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 65.98
+        "elapsedSeconds": 67.62
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1272,6 +1516,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1281,7 +1526,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
       "mappingsSha256": "140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1295,7 +1540,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 21,
-      "elapsedSeconds": 59.18,
+      "elapsedSeconds": 59.23,
       "audit": {
         "version": "1.21",
         "mode": "icons",
@@ -1308,7 +1553,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 59.18
+        "elapsedSeconds": 59.23
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1316,6 +1561,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1325,7 +1571,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "4b56bc9b44de7e88f9fbb52e716c18240da34469fcbafa5ed2e75b04d60617e8",
       "mappingsSha256": "127485d79248d4ae2955a7d061c3626d38853ecb054c4d008707732264b0aac1",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1339,7 +1585,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 21,
-      "elapsedSeconds": 58.51,
+      "elapsedSeconds": 62.94,
       "audit": {
         "version": "1.20.6",
         "mode": "icons",
@@ -1352,7 +1598,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 58.51
+        "elapsedSeconds": 62.94
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1360,6 +1606,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1369,7 +1616,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "02dfd345ac1ad55692d5dbc8486ac7e4fea72cd54ac494a79cd48963048e56b2",
       "mappingsSha256": "27f4ef3a9362e9874e2c33edac981b6f485ad97f92c4e35b497525b646aae745",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1383,7 +1630,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 21,
-      "elapsedSeconds": 60.78,
+      "elapsedSeconds": 60.45,
       "audit": {
         "version": "1.20.5",
         "mode": "icons",
@@ -1396,7 +1643,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 60.78
+        "elapsedSeconds": 60.45
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1404,6 +1651,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1413,7 +1661,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "49d5949adbb1021a7eb00c1b949f9e39934b10249cbf86d25004774d1b3ff510",
       "mappingsSha256": "9afdb3b7fcc4c6acbec3bc6ccb46192bfc6460e12bf9e268e29bfee46bc7fbac",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1427,7 +1675,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 17,
-      "elapsedSeconds": 58.14,
+      "elapsedSeconds": 59.09,
       "audit": {
         "version": "1.20.4",
         "mode": "icons",
@@ -1440,7 +1688,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 58.14
+        "elapsedSeconds": 59.09
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1448,6 +1696,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1457,7 +1706,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "9221ab461a491bf9661cd8e773a5e662aaa43d600fa7970b8c12bbfb0431b838",
       "mappingsSha256": "ad03c803d866062909dd378ed5f1611687dc0ed0a76cc7fd57e968a99d641e5f",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1471,7 +1720,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 17,
-      "elapsedSeconds": 74.59,
+      "elapsedSeconds": 64.13,
       "audit": {
         "version": "1.20.3",
         "mode": "icons",
@@ -1484,7 +1733,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 74.59
+        "elapsedSeconds": 64.13
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1492,6 +1741,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1501,7 +1751,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "bef21938224902dd925e2d89dcfe1d2540656d4cf7a5abd2b93e0402d135c655",
       "mappingsSha256": "ad03c803d866062909dd378ed5f1611687dc0ed0a76cc7fd57e968a99d641e5f",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1515,7 +1765,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 17,
-      "elapsedSeconds": 87.74,
+      "elapsedSeconds": 66.12,
       "audit": {
         "version": "1.20.2",
         "mode": "icons",
@@ -1528,7 +1778,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 87.74
+        "elapsedSeconds": 66.12
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1536,6 +1786,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1545,7 +1796,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "fa1a19be56a506426308abbc1cad85f299a7fc6dae4335559351ba0246713fda",
       "mappingsSha256": "d4e2eb2b32ae7bd2e95ea3a8391813a7b6795e20884cf01d989dce68f906e2fd",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1559,7 +1810,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 17,
-      "elapsedSeconds": 68.1,
+      "elapsedSeconds": 62.33,
       "audit": {
         "version": "1.20.1",
         "mode": "icons",
@@ -1572,7 +1823,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 68.1
+        "elapsedSeconds": 62.33
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1580,6 +1831,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1589,7 +1841,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "56b71336d2b4fdffd197f56595b0da93e32a946f78f382a299b8f4b92758bb0f",
       "mappingsSha256": "67bfc33ef0c7103f002d6ac134f8eddd3d67e2ce45d266e83816d1a2e2c9b01d",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1603,7 +1855,7 @@
       "failed": 0,
       "noItemForm": 73,
       "javaMajor": 17,
-      "elapsedSeconds": 84.35,
+      "elapsedSeconds": 64.22,
       "audit": {
         "version": "1.20",
         "mode": "icons",
@@ -1616,7 +1868,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 84.35
+        "elapsedSeconds": 64.22
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1624,6 +1876,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1633,7 +1886,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "5ac9ead135746f5f27048f2e01d8d5bdc2dabc4d91422f73ef2435f4c3d24aff",
       "mappingsSha256": "fdd921d6bcc7657850f78514d36bb57af0b8a340786d12c46ec18d9c46c039de",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1642,55 +1895,406 @@
       "version": "1.19.4",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1227,
+      "failed": 0,
+      "noItemForm": 73,
+      "javaMajor": 17,
+      "elapsedSeconds": 77.6,
+      "audit": {
+        "version": "1.19.4",
+        "mode": "icons",
+        "audited": 1227,
+        "registryPopulationVerified": true,
+        "transparentImages": 1211,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 77.6
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "0e79cf7f07c107e9a1fe22ed703e472372b44149e64114944f0811abbd25f3ec",
+      "mappingsSha256": "5ef270b938f89cfc77371e0deee9f9044c41d9a373fa11dcb1fd1923272c4606",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.19.3",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1185,
+      "failed": 0,
+      "noItemForm": 71,
+      "javaMajor": 17,
+      "elapsedSeconds": 105.52,
+      "audit": {
+        "version": "1.19.3",
+        "mode": "icons",
+        "audited": 1185,
+        "registryPopulationVerified": true,
+        "transparentImages": 1169,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 105.52
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "b7228c23dbc8988129561af3918dd469577de842d2eb3c7dabe00316bf9a44d6",
+      "mappingsSha256": "f72a4675ae77fa16966a0338567e30ee3a64bb7476932e264e8b25937f664a1b",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.19.2",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1151,
+      "failed": 0,
+      "noItemForm": 72,
+      "javaMajor": 17,
+      "elapsedSeconds": 131.68,
+      "audit": {
+        "version": "1.19.2",
+        "mode": "icons",
+        "audited": 1151,
+        "registryPopulationVerified": true,
+        "transparentImages": 1135,
+        "fractionalAlphaPixels": 121568,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 131.68
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "e1ac65de9b471b6916cc457fdcff00c1bafac17027aa79100c4df893b3d956db",
+      "mappingsSha256": "c5db94c44c1ce6c5d3bfce64152831090310c202f4abe4375adbb3454afcec76",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.19.1",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1151,
+      "failed": 0,
+      "noItemForm": 72,
+      "javaMajor": 17,
+      "elapsedSeconds": 132.85,
+      "audit": {
+        "version": "1.19.1",
+        "mode": "icons",
+        "audited": 1151,
+        "registryPopulationVerified": true,
+        "transparentImages": 1135,
+        "fractionalAlphaPixels": 121568,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 132.85
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "146d4018cfed50c5e77483940653091f186d2eea9ad42fc40939f5c72d6b7f52",
+      "mappingsSha256": "9b2dfe745719f4de1ce3fb23baeb24e31623c1fcc249e39bbdb068ad7f600236",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.19",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1151,
+      "failed": 0,
+      "noItemForm": 72,
+      "javaMajor": 17,
+      "elapsedSeconds": 109.22,
+      "audit": {
+        "version": "1.19",
+        "mode": "icons",
+        "audited": 1151,
+        "registryPopulationVerified": true,
+        "transparentImages": 1135,
+        "fractionalAlphaPixels": 121568,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 109.22
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "ffd4fb3037d4110085b4d3d2dc47b760695528eb14292c3e5f7c758983c6d764",
+      "mappingsSha256": "9e31de7fc15b1bac0e58abc441a5e56c320266112feaea981bcffd41dd6201e1",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.18.2",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1100,
+      "failed": 0,
+      "noItemForm": 71,
+      "javaMajor": 17,
+      "elapsedSeconds": 115.57,
+      "audit": {
+        "version": "1.18.2",
+        "mode": "icons",
+        "audited": 1100,
+        "registryPopulationVerified": true,
+        "transparentImages": 1084,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 115.57
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "1d09e3639644b6b2254499469d0765cc005a286d19f3fa595b0ed8fb07971ec7",
+      "mappingsSha256": "a2aa6ee1030bfef79e9b2e08e79de1637fdd7ecb5bf8891cf2e9a4b186042543",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.18.1",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1100,
+      "failed": 0,
+      "noItemForm": 71,
+      "javaMajor": 17,
+      "elapsedSeconds": 107.14,
+      "audit": {
+        "version": "1.18.1",
+        "mode": "icons",
+        "audited": 1100,
+        "registryPopulationVerified": true,
+        "transparentImages": 1084,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 107.14
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "737c28a56c8980fcd8574465c61538ebde8f511bdd035c69d0cbe27953f892aa",
+      "mappingsSha256": "a7a4109255dfb74b9552b339482f0714bb0e7e7143d1059b0bf62a526d2c2a84",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.18",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1100,
+      "failed": 0,
+      "noItemForm": 71,
+      "javaMajor": 17,
+      "elapsedSeconds": 109.54,
+      "audit": {
+        "version": "1.18",
+        "mode": "icons",
+        "audited": 1100,
+        "registryPopulationVerified": true,
+        "transparentImages": 1084,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 109.54
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "381e090ef22584526113bcccf26ae38a310a22094d14c2d0dec72b71fdf65aaa",
+      "mappingsSha256": "b4c7d514328050fa09ac04818d21e4be0b58e75c6b0847e56ce09f6637b8877b",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.17.1",
       "profile": "gui-classic",
       "status": "experimental",
-      "fullExport": "pending"
+      "fullExport": "passed",
+      "succeeded": 1099,
+      "failed": 0,
+      "noItemForm": 71,
+      "javaMajor": 17,
+      "elapsedSeconds": 105.59,
+      "audit": {
+        "version": "1.17.1",
+        "mode": "icons",
+        "audited": 1099,
+        "registryPopulationVerified": true,
+        "transparentImages": 1083,
+        "fractionalAlphaPixels": 120416,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 105.59
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+      "clientSha256": "a49b4a56c5bbe15c9ed9fe53efa9a591f265a1f5ba7d6aa9739a58ea7a92b79d",
+      "mappingsSha256": "2b28ded68f8602aaf2f35ef92dd10ee41ba2cf9723e29570155d60e1723848e9",
+      "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
     },
     {
       "version": "1.17",
@@ -1701,7 +2305,7 @@
       "failed": 0,
       "noItemForm": 71,
       "javaMajor": 17,
-      "elapsedSeconds": 121.36,
+      "elapsedSeconds": 104.03,
       "audit": {
         "version": "1.17",
         "mode": "icons",
@@ -1714,7 +2318,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 121.36
+        "elapsedSeconds": 104.03
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1722,6 +2326,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1731,7 +2336,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "14122287d4e4256c2d65ec8c0ccfa3b56448495fa3ccabc87d0f0eeb4fa1c30f",
       "mappingsSha256": "191b957aaa40b294402feef29651ae7a9f1263ec22c5382f3b8fa0a4918b0471",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1745,7 +2350,7 @@
       "failed": 0,
       "noItemForm": 50,
       "javaMajor": 8,
-      "elapsedSeconds": 121.86,
+      "elapsedSeconds": 99.86,
       "audit": {
         "version": "1.16.5",
         "mode": "icons",
@@ -1758,7 +2363,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 121.86
+        "elapsedSeconds": 99.86
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1766,6 +2371,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1775,7 +2381,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "00b5ebbc33e95ea88c1ab80601599c9827e9aa861d93ccc2cfcbbfd996e86263",
       "mappingsSha256": "7931ed6d723eceb1d621d05a76e10ddf643bf468c6ecf1c4ecf377bd72cf8b8c",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1789,7 +2395,7 @@
       "failed": 0,
       "noItemForm": 50,
       "javaMajor": 8,
-      "elapsedSeconds": 103.59,
+      "elapsedSeconds": 97.91,
       "audit": {
         "version": "1.16.4",
         "mode": "icons",
@@ -1802,7 +2408,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 103.59
+        "elapsedSeconds": 97.91
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1810,6 +2416,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1819,7 +2426,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "d6740464ee2bdf37d285c5d368d2e16497492427fb5783e2db3482bbf0079ed0",
       "mappingsSha256": "93f188a0038fec8c2402d78e7acca983680978d6a9237c1fab80f22caddb00fe",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1833,7 +2440,7 @@
       "failed": 0,
       "noItemForm": 50,
       "javaMajor": 8,
-      "elapsedSeconds": 85.94,
+      "elapsedSeconds": 93.97,
       "audit": {
         "version": "1.16.3",
         "mode": "icons",
@@ -1846,7 +2453,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 85.94
+        "elapsedSeconds": 93.97
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1854,6 +2461,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1863,7 +2471,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "da85197babd989a7de318774cf5d97bcef95e89a70c9fa9a4c8180463e9589fa",
       "mappingsSha256": "c41c58faaf3a3b651d8883b9b1df355cb6ad59c4d6296b2e1ffc3dfe2bf9be3e",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1877,7 +2485,7 @@
       "failed": 0,
       "noItemForm": 50,
       "javaMajor": 8,
-      "elapsedSeconds": 79.24,
+      "elapsedSeconds": 99.36,
       "audit": {
         "version": "1.16.2",
         "mode": "icons",
@@ -1890,7 +2498,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 79.24
+        "elapsedSeconds": 99.36
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1898,6 +2506,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1907,7 +2516,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "19960f4e3c60f2723f361844d2b4020b8bf2160bd91a1e1efde8ce5aea4ff73d",
       "mappingsSha256": "c95a7046ab43371cc476b8b51978c6f2155c62f4cc5756b05c8ef81e0f11691f",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1921,7 +2530,7 @@
       "failed": 0,
       "noItemForm": 50,
       "javaMajor": 8,
-      "elapsedSeconds": 97.72,
+      "elapsedSeconds": 92.02,
       "audit": {
         "version": "1.16.1",
         "mode": "icons",
@@ -1934,7 +2543,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 97.72
+        "elapsedSeconds": 92.02
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1942,6 +2551,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1951,7 +2561,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "b4831e7b63b10588ff06ea86322108d916c536446f3aea3ae988b7fe3e1f66ef",
       "mappingsSha256": "6cc374f819bca44d940f8912044b07bdac3e240a02e37117ae1d4ad63c21409b",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -1965,7 +2575,7 @@
       "failed": 0,
       "noItemForm": 50,
       "javaMajor": 8,
-      "elapsedSeconds": 84.83,
+      "elapsedSeconds": 91.87,
       "audit": {
         "version": "1.16",
         "mode": "icons",
@@ -1978,7 +2588,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 84.83
+        "elapsedSeconds": 91.87
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -1986,6 +2596,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -1995,7 +2606,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "00740ef4475d4cd0a1d7064f89602f759c45ff9afe29da9b0ee0b9037ebb2a71",
       "mappingsSha256": "53d46abe149aadd367be8789207c53a7cee46ba8382e5bfd60247eb22984119d",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2009,7 +2620,7 @@
       "failed": 0,
       "noItemForm": 43,
       "javaMajor": 8,
-      "elapsedSeconds": 67.9,
+      "elapsedSeconds": 76.32,
       "audit": {
         "version": "1.15.2",
         "mode": "icons",
@@ -2022,7 +2633,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 67.9
+        "elapsedSeconds": 76.32
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2030,6 +2641,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2039,7 +2651,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "4a73008a73f3824b7c711750a5a37556df8614f193c0a531e292dad159a73a7c",
       "mappingsSha256": "65ad295b6cf63821f5d8f961c128128475e6d39386358d22eb238a3ce6e31777",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2053,7 +2665,7 @@
       "failed": 0,
       "noItemForm": 43,
       "javaMajor": 8,
-      "elapsedSeconds": 64.66,
+      "elapsedSeconds": 66.99,
       "audit": {
         "version": "1.15.1",
         "mode": "icons",
@@ -2066,7 +2678,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 64.66
+        "elapsedSeconds": 66.99
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2074,6 +2686,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2083,7 +2696,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "6e28ecd008d0ca5e1dcd346dbc2882430f02a77a78864d57acc49fc8bc1b5358",
       "mappingsSha256": "f46186d0ed9d17e073e16ae2c98675dbbc70b4a29495700837aa5de9c1b42c34",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2097,7 +2710,7 @@
       "failed": 0,
       "noItemForm": 43,
       "javaMajor": 8,
-      "elapsedSeconds": 76.01,
+      "elapsedSeconds": 66.39,
       "audit": {
         "version": "1.15",
         "mode": "icons",
@@ -2110,7 +2723,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 76.01
+        "elapsedSeconds": 66.39
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2118,6 +2731,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2127,7 +2741,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "41eee66b4c8e76c018745a63a46a15097cc1c6482c94b38801054938a010b21b",
       "mappingsSha256": "11415bc25024658f0ef1c1a0028df282135299e526a689de2f29c4662edf931a",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2141,7 +2755,7 @@
       "failed": 0,
       "noItemForm": 43,
       "javaMajor": 8,
-      "elapsedSeconds": 57.7,
+      "elapsedSeconds": 61.33,
       "audit": {
         "version": "1.14.4",
         "mode": "icons",
@@ -2154,7 +2768,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 57.7
+        "elapsedSeconds": 61.33
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2162,6 +2776,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2171,7 +2786,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
       "mappingsSha256": "2dd53a5e70ba493cf6e33c0fc52bbdf4c57f9429c7a13842565aa825fd44d910",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2185,7 +2800,7 @@
       "failed": 0,
       "noItemForm": 43,
       "javaMajor": 8,
-      "elapsedSeconds": 65.95,
+      "elapsedSeconds": 62.14,
       "audit": {
         "version": "1.14.3",
         "mode": "icons",
@@ -2198,7 +2813,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 65.95
+        "elapsedSeconds": 62.14
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2206,6 +2821,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2215,7 +2831,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "4063062677433988e012fba53e42e4c21adb6919ac7f061f19f3c6e75b334e07",
       "mappingsSha256": "66bef28aeda67b19e6b5d050015e6c5c5029fc7969e54a3fb0ed6458b7d86a38",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2229,7 +2845,7 @@
       "failed": 0,
       "noItemForm": 43,
       "javaMajor": 8,
-      "elapsedSeconds": 67.6,
+      "elapsedSeconds": 61.8,
       "audit": {
         "version": "1.14.2",
         "mode": "icons",
@@ -2242,7 +2858,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 67.6
+        "elapsedSeconds": 61.8
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2250,6 +2866,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2259,7 +2876,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "9b740c9fd4955981125ebd3cd086baa8b4392963d043a3480b5b942a96637c25",
       "mappingsSha256": "9f9738a423f0a2745eb184bafe8a6501f65ea9e6b9852acf66f0690ad9f8facd",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2273,7 +2890,7 @@
       "failed": 0,
       "noItemForm": 43,
       "javaMajor": 8,
-      "elapsedSeconds": 66.72,
+      "elapsedSeconds": 62.31,
       "audit": {
         "version": "1.14.1",
         "mode": "icons",
@@ -2286,7 +2903,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 66.72
+        "elapsedSeconds": 62.31
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2294,6 +2911,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2303,7 +2921,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "7194d1326cf796f62ac55f3cb56f851c232895639ae27510f3207d5a73f91814",
       "mappingsSha256": "607c9954fcc374a1d043835d9944963dfd71fb541bf89ea5c7513a9135440e22",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2317,7 +2935,7 @@
       "failed": 0,
       "noItemForm": 43,
       "javaMajor": 8,
-      "elapsedSeconds": 98.44,
+      "elapsedSeconds": 60.62,
       "audit": {
         "version": "1.14",
         "mode": "icons",
@@ -2330,7 +2948,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 98.44
+        "elapsedSeconds": 60.62
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2338,6 +2956,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2347,7 +2966,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "93907cbf0655aa5f10d049efa4d745f4250eecc5d0d5d1268046eec3144f323a",
       "mappingsSha256": "567545c1b8989500274956b6482c29f275be223b696157cb5c23f5d2eb2e6505",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2361,7 +2980,7 @@
       "failed": 0,
       "noItemForm": 46,
       "javaMajor": 8,
-      "elapsedSeconds": 78.06,
+      "elapsedSeconds": 44.34,
       "audit": {
         "version": "1.13.2",
         "mode": "icons",
@@ -2374,7 +2993,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 78.06
+        "elapsedSeconds": 44.34
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2382,6 +3001,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2391,7 +3011,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "3410887ba652f25792c7675bfaf9140e73b60e93cfbf113a803f8a98cb05c0f9",
       "mappingsSha256": "66d513dddb0672b4b01c431908a99ee6dc85d2e6465759c34aa33d10306a2039",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2405,7 +3025,7 @@
       "failed": 0,
       "noItemForm": 46,
       "javaMajor": 8,
-      "elapsedSeconds": 56.34,
+      "elapsedSeconds": 48.46,
       "audit": {
         "version": "1.13.1",
         "mode": "icons",
@@ -2418,7 +3038,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 56.34
+        "elapsedSeconds": 48.46
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2426,6 +3046,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2435,7 +3056,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "f0b4cf6d1a87ae150f87a535651138ca7b82bdad8853f76e7ddbff1dd610ac87",
       "mappingsSha256": "cd1c386538992efb9137688fef920a3b1d0a6dc1db99e315cab72d9865599d2b",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2449,7 +3070,7 @@
       "failed": 0,
       "noItemForm": 46,
       "javaMajor": 8,
-      "elapsedSeconds": 76.47,
+      "elapsedSeconds": 39.76,
       "audit": {
         "version": "1.13",
         "mode": "icons",
@@ -2462,7 +3083,7 @@
         "comparisonVerified": false,
         "canonicalVerified": false,
         "exitCode": 0,
-        "elapsedSeconds": 76.47
+        "elapsedSeconds": 39.76
       },
       "context": {
         "alphaMethod": "black-white-native-composite-v1",
@@ -2470,6 +3091,7 @@
         "count": 1,
         "deterministic": false,
         "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
         "overlays": false,
         "partialTick": 0.0,
         "player": "absent",
@@ -2479,7 +3101,7 @@
         "timeZone": "UTC",
         "world": "absent"
       },
-      "agentSha256": "e0fbbc27120fa2fa2b0799177a8c1fc7c03e272fbab7105d5feac947e6a316c9",
+      "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
       "clientSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
       "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
       "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
@@ -2487,76 +3109,298 @@
   ],
   "independentProcessSubsetComparisons": [
     {
-      "version": "1.21.6",
+      "version": "26.3",
       "mode": "icons",
-      "audited": 9,
+      "audited": 25,
       "registryPopulationVerified": false,
-      "transparentImages": 9,
+      "transparentImages": 25,
       "fractionalAlphaPixels": 0,
-      "failures": [
-        "minecraft:enchanted_book: Decoded RGBA differs from comparison export"
-      ],
-      "compared": 8,
-      "comparisonVerified": false,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
       "canonicalVerified": false,
       "exitCode": 0,
-      "elapsedSeconds": 36.31
+      "elapsedSeconds": 33.4
+    },
+    {
+      "version": "26.2",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 31.36
+    },
+    {
+      "version": "26.1",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 32.41
+    },
+    {
+      "version": "1.21.11",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 28.51
+    },
+    {
+      "version": "1.21.10",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 19.98
+    },
+    {
+      "version": "1.21.9",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 31.08
+    },
+    {
+      "version": "1.21.8",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 31.7
+    },
+    {
+      "version": "1.21.6",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 29.79
     },
     {
       "version": "1.21.5",
       "mode": "icons",
-      "audited": 9,
+      "audited": 25,
       "registryPopulationVerified": false,
-      "transparentImages": 9,
+      "transparentImages": 25,
       "fractionalAlphaPixels": 0,
       "failures": [],
-      "compared": 9,
+      "compared": 25,
       "comparisonVerified": true,
       "canonicalVerified": false,
       "exitCode": 0,
-      "elapsedSeconds": 43.45
+      "elapsedSeconds": 48.44
     },
     {
       "version": "1.21.4",
       "mode": "icons",
-      "audited": 9,
+      "audited": 25,
       "registryPopulationVerified": false,
-      "transparentImages": 9,
+      "transparentImages": 25,
       "fractionalAlphaPixels": 0,
       "failures": [],
-      "compared": 9,
+      "compared": 25,
       "comparisonVerified": true,
       "canonicalVerified": false,
       "exitCode": 0,
-      "elapsedSeconds": 30.26
+      "elapsedSeconds": 39.38
+    },
+    {
+      "version": "1.20.5",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 44.63
+    },
+    {
+      "version": "1.19.4",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 45.23
+    },
+    {
+      "version": "1.19.2",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 73.02
+    },
+    {
+      "version": "1.18.2",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 70.75
+    },
+    {
+      "version": "1.17.1",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 61.44
+    },
+    {
+      "version": "1.16.5",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 70.32
+    },
+    {
+      "version": "1.15.2",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 44.93
     },
     {
       "version": "1.14.4",
       "mode": "icons",
-      "audited": 9,
+      "audited": 25,
       "registryPopulationVerified": false,
-      "transparentImages": 9,
-      "fractionalAlphaPixels": 85,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 779,
       "failures": [],
-      "compared": 9,
+      "compared": 25,
       "comparisonVerified": true,
       "canonicalVerified": false,
       "exitCode": 0,
-      "elapsedSeconds": 60.21
+      "elapsedSeconds": 45.43
     },
     {
-      "version": "1.14",
+      "version": "1.14.3",
       "mode": "icons",
-      "audited": 9,
+      "audited": 25,
       "registryPopulationVerified": false,
-      "transparentImages": 9,
-      "fractionalAlphaPixels": 85,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 779,
       "failures": [],
-      "compared": 9,
+      "compared": 25,
       "comparisonVerified": true,
       "canonicalVerified": false,
       "exitCode": 0,
-      "elapsedSeconds": 71.14
+      "elapsedSeconds": 40.25
+    },
+    {
+      "version": "1.13.2",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 795,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 20.33
+    },
+    {
+      "version": "1.13",
+      "mode": "icons",
+      "audited": 25,
+      "registryPopulationVerified": false,
+      "transparentImages": 25,
+      "fractionalAlphaPixels": 788,
+      "failures": [],
+      "compared": 25,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 25.73
     }
   ],
   "canonicalVerified": false
