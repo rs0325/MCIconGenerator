@@ -42,6 +42,8 @@ mcicon cache verify --json
 
 `--id` と `--texture` は反復可能です。各々の `--all` と併用できません。namespace省略時はminecraft、`--kind` はall/item/block、`--size` は16/32/64/128/256/512です。`--json` の結果はstdout、進捗はstderrに出ます。
 
+準備やI/Oの失敗を調べる場合は `mcicon --debug ...` または各サブコマンドの `--debug` を指定できます。通常のエラーコード・終了コードを保持し、原因例外とstack traceをstderrへ追加します。stdoutのJSONには診断を混ぜません。traceにはローカルのパスや例外メッセージが含まれます。
+
 描画のオプションは `--worker-jar`、`--docker-context`（既定colima-mcicon）、`--docker-image`（既定mcicon-render:dev）、`--startup-timeout`（180秒）、`--item-timeout`（30秒）です。他のDocker contextでは明示してください。ゲームJVMはimage内の版別Javaを使います。hostの `--java-home` / `--minecraft-dir` による準備経路は未実装です。
 
 初回はオンラインで完了させ、同じcacheに `--offline` を付けて再実行できます。offline時も公式SHA-1・sizeまたは記録済みSHA-256を照合します。cache verifyは記録済みSHA-256のある入力を検証する機能で、cache内のすべてのファイルが検証対象という意味ではありません。破損した入力はオンライン準備時に修復します。

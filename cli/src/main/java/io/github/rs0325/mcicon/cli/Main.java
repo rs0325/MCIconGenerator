@@ -14,16 +14,23 @@ import java.time.Duration;
         subcommands={Main.Versions.class,Main.Extract.class,Main.Render.class,Main.Catalog.class,Main.Doctor.class,Main.Cache.class})
 public final class Main implements Runnable {
     @Spec Model.CommandSpec spec;
+    @Option(names="--debug",scope=ScopeType.INHERIT,description="Print exception causes to stderr on failure.") boolean debug;
     @Override public void run() {spec.commandLine().usage(System.out);}
     public static void main(String[] args) {System.exit(execute(args));}
     public static int execute(String...args) {
-        return new CommandLine(new Main()).setExecutionExceptionHandler((exception,line,result)-> {
+        return commandLine().execute(args);
+    }
+    static CommandLine commandLine() {
+        Main root=new Main();
+        return new CommandLine(root).setExecutionExceptionHandler((exception,line,result)-> {
             Throwable cause=exception;
             while(cause instanceof CompletionException&&cause.getCause()!=null)cause=cause.getCause();
             String code=cause instanceof McIconException m?m.code():cause instanceof IllegalArgumentException?"INVALID_REQUEST":"INTERNAL_ERROR";
             int exit=cause instanceof McIconException m?m.exitCode():cause instanceof IllegalArgumentException?2:1;
-            line.getErr().println(code+": "+cause.getMessage());return exit;
-        }).execute(args);
+            line.getErr().println(code+": "+cause.getMessage());
+            if(root.debug)cause.printStackTrace(line.getErr());
+            line.getErr().flush();return exit;
+        });
     }
     @Command(name="doctor",description="Check the local Docker image, JVM, Mesa, and adapter.")
     static final class Doctor implements Callable<Integer> {
