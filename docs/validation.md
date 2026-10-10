@@ -6,17 +6,25 @@
 
 描画image ID: `sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977`。Mesa25.2.8 / llvmpipe LLVM20.1.2 / OpenGL4.5。26.3はSDL_VIDEO_FORCE_EGL=1です。
 
-今回のfixed-v1・64pxの全件生成と監査は18/51版、合計19,331枚が成功しています。失敗版: なし。未完了: 26.3, 26.2, 26.1.2, 26.1.1, 26.1, 1.21.11, 1.21.10, 1.21.9, 1.21.8, 1.21.7, 1.21.6, 1.21.5, 1.21.4, 1.21.3, 1.21.2, 1.19.4, 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.16, 1.15.2, 1.15.1。版別件数は[対応表](compatibility.md)、入力・agent・image hashと時間は[数値記録](../qa/validation-2026-10-10.json)をご覧ください。
+今回のfixed-v1・64pxの全件生成と監査は36/51版、合計41,066枚が成功しています。失敗版: 26.2。未完了: 26.1.2, 26.1.1, 1.21.10, 1.21.9, 1.21.8, 1.19.4, 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1。版別件数は[対応表](compatibility.md)、入力・agent・image hashと時間は[数値記録](../qa/validation-2026-10-10.json)をご覧ください。
+
+検証中にdeferred GUIのconstructorとGPU bufferのint/long境界を修正したため、agent hashを版ごとに記録します。全版を同一binaryで再試験した記録ではありません。
 
 監査はPNG hash/CRC、decoded RGBA8、size、alpha、alpha=0の隠れたRGB、空画像、重複、実レジストリ母集団と全件出力ID、no_item_formを確認します。意味的なmissing texture/modelの検出や色空間の正しさは、この監査だけでは保証しません。
 
-独立したゲームプロセスでの代表ID再生成比較: 0版。成功した比較は数値記録にcomparedとcomparisonVerifiedで記録します。比較対象は各版の全件出力で、decoded RGBAと同じ出力パスを照合します。代表IDの比較は全IDの反復一致を意味しません。
+既知の再現性差分: 1.21.6のenchanted_bookがsingle/all比較でdecoded RGBA不一致。描画時刻の固定だけではdeferred glintの全状態固定を保証できず、原因とshader/cache時刻の確認を次の受入課題とします。
+
+独立したゲームプロセスでの代表ID再生成比較: 5版を実行、4版で一致。成功した比較は数値記録にcomparedとcomparisonVerifiedで記録します。比較対象は各版の全件出力で、decoded RGBAと同じ出力パスを照合します。代表IDの比較は全IDの反復一致を意味しません。
+
+実Java APIで3件生成後にcancelし、新tokenで再開した全784件のPNG監査と全件基準とのRGBA比較に成功しました。
 
 JUnit 35件が成功。cache破損・offline・bounded retry、path/symlink、raw bytes/animation/alpha、出力所有権、再開、alias/no_item_form、CLI排他、exact profile、agent snapshot、ASM isolation、固定context、alpha復元を合成fixtureで検証します。iconsのクラッシュと途中cancelでは、予約済み未完了IDの再描画、成功PNGのhash再利用、unowned PNGの保護を確認しました。ゲーム資産をfixtureに含めません。
 
+今回のdoctor 1.17はhealthy=True、cache verifyは記録済み2783入力を照合し、失敗0件でした。cacheの総bytes/filesは処理中の一時ファイルを含む時点値です。
+
 CLI zipとsources/javadoc付きJavaライブラリをローカル生成しました。配布ZIPにゲームJAR・assets・PNGは含まれません。依存ライセンスを同梱します。正式release/Mavenへの公開は未実施です。
 
-以前のコミットでraw1.21.4の1,683 PNGと付随mcmetaが元JAR bytesと一致し、doctor、記録済み541入力のcache hash、startup timeout=1秒後のcontainer cleanupを確認しています。これらは今回の51版描画試験と別の実測です。
+今回の元テクスチャ全件抽出は51/51版、合計72,638 PNGと付随mcmetaが元JAR bytesと一致しました。数値記録に版別件数を保存します。以前のコミットではdoctor、記録済み541入力のcache hash、startup timeout=1秒後のcontainer cleanupも確認しています。
 
 ## 再実行
 

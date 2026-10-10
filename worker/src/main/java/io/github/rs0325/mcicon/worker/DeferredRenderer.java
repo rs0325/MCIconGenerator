@@ -14,6 +14,12 @@ public final class DeferredRenderer extends GpuImmediateRenderer {
     public DeferredRenderer(Symbols symbols,Object minecraft) throws Exception {
         super(symbols,minecraft);
         extracted=RenderAgent.config.get("version").getAsString().startsWith("26.");
+        if(extracted) {
+            Object lookup=s.call("net.minecraft.data.registries.VanillaRegistries","createLookup",null);
+            Object initializers=s.field("net.minecraft.core.registries.BuiltInRegistries","DATA_COMPONENT_INITIALIZERS",null);
+            Iterable<?> pending=(Iterable<?>)s.call("net.minecraft.core.component.DataComponentInitializers","build",initializers,lookup);
+            for(Object components:pending)s.call("net.minecraft.core.component.DataComponentInitializers$PendingComponents","apply",components);
+        }
         gameRenderer=s.field("net.minecraft.client.Minecraft","gameRenderer",minecraft);
         guiRenderer=s.field("net.minecraft.client.renderer.GameRenderer","guiRenderer",gameRenderer);
         if(extracted) {

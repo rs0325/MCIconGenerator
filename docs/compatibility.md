@@ -4,21 +4,21 @@
 
 | Version | Adapter | Java | 64px全件生成・PNG監査 |
 | --- | --- | --- | --- |
-| 26.3 | gui-26.3 | metadataから解決 | 未実行 |
-| 26.2 | gui-deferred | metadataから解決 | 未実行 |
+| 26.3 | gui-26.3 | 25 | 1,657 成功 / 0 失敗（passed） |
+| 26.2 | gui-deferred | metadataから解決 | 起動失敗（修正後の再試験待ち） |
 | 26.1.2 | gui-deferred | metadataから解決 | 未実行 |
 | 26.1.1 | gui-deferred | metadataから解決 | 未実行 |
-| 26.1 | gui-deferred | metadataから解決 | 未実行 |
-| 1.21.11 | gui-deferred | metadataから解決 | 未実行 |
+| 26.1 | gui-deferred | 25 | 1,505 成功 / 0 失敗（passed） |
+| 1.21.11 | gui-deferred | 21 | 1,504 成功 / 0 失敗（passed） |
 | 1.21.10 | gui-deferred | metadataから解決 | 未実行 |
 | 1.21.9 | gui-deferred | metadataから解決 | 未実行 |
 | 1.21.8 | gui-deferred | metadataから解決 | 未実行 |
-| 1.21.7 | gui-deferred | metadataから解決 | 未実行 |
-| 1.21.6 | gui-deferred | metadataから解決 | 未実行 |
-| 1.21.5 | gui-1.21.5 | metadataから解決 | 未実行 |
-| 1.21.4 | gui-1.21.4 | metadataから解決 | 未実行 |
-| 1.21.3 | gui-1.21.4 | metadataから解決 | 未実行 |
-| 1.21.2 | gui-1.21.4 | metadataから解決 | 未実行 |
+| 1.21.7 | gui-deferred | 21 | 1,415 成功 / 0 失敗（passed） |
+| 1.21.6 | gui-deferred | 21 | 1,414 成功 / 0 失敗（passed） |
+| 1.21.5 | gui-1.21.5 | 21 | 1,395 成功 / 0 失敗（passed） |
+| 1.21.4 | gui-1.21.4 | 21 | 1,384 成功 / 0 失敗（passed） |
+| 1.21.3 | gui-1.21.4 | 21 | 1,374 成功 / 0 失敗（passed） |
+| 1.21.2 | gui-1.21.4 | 21 | 1,374 成功 / 0 失敗（passed） |
 | 1.21.1 | gui-1.21.4 | 21 | 1,332 成功 / 0 失敗（passed） |
 | 1.21 | gui-1.21.4 | 21 | 1,332 成功 / 0 失敗（passed） |
 | 1.20.6 | gui-1.21.4 | 21 | 1,329 成功 / 0 失敗（passed） |
@@ -37,15 +37,15 @@
 | 1.18.1 | gui-classic | metadataから解決 | 未実行 |
 | 1.18 | gui-classic | metadataから解決 | 未実行 |
 | 1.17.1 | gui-classic | metadataから解決 | 未実行 |
-| 1.17 | gui-classic | metadataから解決 | 未実行 |
-| 1.16.5 | gui-fixed | metadataから解決 | 未実行 |
-| 1.16.4 | gui-fixed | metadataから解決 | 未実行 |
-| 1.16.3 | gui-fixed | metadataから解決 | 未実行 |
-| 1.16.2 | gui-fixed | metadataから解決 | 未実行 |
-| 1.16.1 | gui-fixed | metadataから解決 | 未実行 |
-| 1.16 | gui-fixed | metadataから解決 | 未実行 |
-| 1.15.2 | gui-fixed | metadataから解決 | 未実行 |
-| 1.15.1 | gui-fixed | metadataから解決 | 未実行 |
+| 1.17 | gui-classic | 17 | 1,099 成功 / 0 失敗（passed） |
+| 1.16.5 | gui-fixed | 8 | 975 成功 / 0 失敗（passed） |
+| 1.16.4 | gui-fixed | 8 | 975 成功 / 0 失敗（passed） |
+| 1.16.3 | gui-fixed | 8 | 975 成功 / 0 失敗（passed） |
+| 1.16.2 | gui-fixed | 8 | 975 成功 / 0 失敗（passed） |
+| 1.16.1 | gui-fixed | 8 | 974 成功 / 0 失敗（passed） |
+| 1.16 | gui-fixed | 8 | 974 成功 / 0 失敗（passed） |
+| 1.15.2 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） |
+| 1.15.1 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） |
 | 1.15 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） |
 | 1.14.4 | gui-fixed | 8 | 876 成功 / 0 失敗（passed） |
 | 1.14.3 | legacy-1.14 | 8 | 876 成功 / 0 失敗（passed） |
