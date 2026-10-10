@@ -16,6 +16,7 @@ distributions {
             from(rootProject.file('THIRD_PARTY_NOTICES.md'))
             from(rootProject.file('licenses')) { into 'licenses' }
             from(rootProject.file('docs')) { into 'docs' }
+            from(rootProject.file('qa')) { into 'qa' }
         }
     }
 }
