@@ -76,4 +76,4 @@ iconsのPNGへsRGB Perceptualの指定を追加しました。最終workerで1.2
 
 512pxの平面5種類の差は、比較計算がバニラのUV縮小を含めていなかったためでした。1.21.4の観測atlas寸法を入力にして公式UV式を計算すると、6サイズ×5種類の30ケースでRGB・alpha誤差0です。PNGや描画worker、許容誤差は変更していません。[UV比較の数値記録](../qa/validation-2026-10-11-inventory-uv.json)を参照してください。立体モデル全般・他版・別GPUの画質受入とは区別します。
 
-Issue #6の1.21.4描画backendの実装・指定範囲の検証は完了し、重点反証で未修正の確定問題は見つかりませんでした。PR #17のmainへのmerge・Issue closeは別の段階です。全IDの個別/all一致はIssue #8、全版/全model・他OS/GPU等の品質受入はIssue #13で継続し、experimental/deterministic=falseを維持します。
+Issue #6の1.21.4描画backendはPR #17でmainへmergeされ、Issueはcloseされました。Issue #8では1.21.4・64pxの全1,384IDを別々のCLI・ゲームプロセスで個別生成し、全件出力とdecoded RGBA・パスの厳密一致を確認しました。初回の起動WORKER_TIMEOUT 1件を保存し、同条件の単独再実行を初回基準へ照合しています。[全ID比較の数値記録](../qa/validation-2026-10-11-single-all.json)は他版・他サイズの受入とは区別します。全版/全model・他OS/GPU等の品質と起動障害の受入はIssue #13で継続し、experimental/deterministic=falseを維持します。

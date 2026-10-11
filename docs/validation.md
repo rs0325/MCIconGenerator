@@ -274,9 +274,29 @@ python3 scripts/verify-flat-textures.py --out .local/flat-uv \
 
 これは1.21.4のcanonicalな既定stackと明記した検証環境・基準の完了であり、全版・全model・他GPUの画質や完全に無計装のclient表示、linear-light合成まで保証しません。全IDの個別/all一致はIssue #8、全版・対応OS・より広い画質と障害受入はIssue #13で継続します。PR #17はmainへ統合するためのReady PRで、実装・検証の完了とmerge・Issue closeを区別します。全版experimental/deterministic=falseを維持し、マイルストーンは未完了です。
 
+## Issue #8の全ID個別/all比較の完了（2026-10-11）
+
+PR #17をmergeしたmainの1c31978を起点とします。`verify-single-all.py`は独立した全件CLIジョブの登録アイテム全体を基準に、各IDを1件だけ指定したCLIジョブを起動します。個別ジョブごとに新しい出力先とゲームプロセスを使い、manifestの入力・設定・環境・catalogを照合した上でPNGのhash、decoded RGBA、出力パスを比較します。CLI配布物は開始時にsnapshotへ複製します。単一実行の全IDが成功した場合だけ`allIdsVerified=true`を記録し、`--ids`による部分集合の成功は全ID受入に数えません。
+
+1.21.4・64pxの全1,384PNG監査と、1,384IDの独立個別CLIジョブを実行しました。初回は1,383IDが厳密一致し、netherite_ingotだけが描画前の起動応答180秒でWORKER_TIMEOUTとなりました。初回のexit 1・failed=1・allIdsVerified=falseを保存し、失敗を成功へ置き換えません。単独再実行では成功し、そのPNG・入力・設定・環境・catalogを初回の全件基準へ再照合しました。再実行側の全1,384PNGも初回基準と一致しました。両実行の成功IDの和集合が登録全1,384IDと一致することを確認し、数値記録の`acceptance.allIdsComparedSuccessfullyAcrossRuns=true`に保存します。画素差の許容は0で、柵の輪郭許容も使いません。
+
+初回の全件検証は2並列で25,665.659秒（約7時間8分）、再実行は1並列で49.397秒でした。起動タイムアウトの根本原因は未特定で、障害受入はIssue #13に残します。[全IDと再実行の数値記録](../qa/validation-2026-10-11-single-all.json)に各IDのhash・パス・初回の失敗・再照合結果を保存し、[代表8IDの開始時記録](../qa/validation-2026-10-11-single-all-pilot.json)も維持します。誤色、同一RGBAでのパス違い、入力/設定/環境/catalogの違い、複数entry、指定ID違い、PNGの差し替えを拒否する7件のQAテストとJUnit61件が成功しました。
+
+```sh
+python3 scripts/test-single-all.py
+python3 scripts/verify-single-all.py --version 1.21.4 --size 64 \
+  --cache .local/cache --out .local/single-all --workers 2
+# 調査用の再実行。部分集合の成功だけで全ID成功とは扱わない。
+python3 scripts/verify-single-all.py --version 1.21.4 --size 64 \
+  --cache .local/cache --out .local/single-retry --workers 1 \
+  --ids minecraft:netherite_ingot
+```
+
+事前にCLIをbuildし、同じworktreeのcacheへ公式入力を準備してください。検証はofflineで実行し、途中結果は指定出力先の`report.json`へ原子的に保存します。画像・ゲーム入力・workerログは公開リポジトリへ含めません。2並列はこの検証に使った上限で、他環境の速度・メモリ保証ではありません。今回の受入は1.21.4・64px・ローカルDocker/Linux amd64/Mesaに限定し、全版・全サイズ・他OS/GPUの品質受入と区別します。experimental/deterministic=falseを維持します。実装・検証の完了と、PR公開・merge・Issue closeは別の段階です。
+
 ## 未完了の受入検証
 
-- Issue #8: 全IDの個別/all一致。Issue #13: 一過性の準備IO_FAILEDの原因特定、1.21.4以外の照明基準、完全な無計装clientの基準画像、全版/全modelへの比較拡張と動的表現の受入。
+- Issue #13: 一過性の準備IO_FAILED・起動WORKER_TIMEOUTの原因特定、1.21.4以外の照明基準、完全な無計装clientの基準画像、全版/全modelへの比較拡張と動的表現の受入。
 - Issue #13: 今回の1.21.4のRGBA8/sRGB/straight alpha・既知合成サンプルを超える色精度/linear-lightの検証、全リソース経路の欠損監査とnative buffer部分使用後の復旧。
 - Windows/Linux host、Docker Desktop、native、ARM64 image。
 - daemon障害・書き込み経路の競合など、今回のSIGKILL/ENOSPC/lock試験を超える障害受入。
