@@ -14,6 +14,15 @@ public class ModernRenderer implements WorkerRenderer {
         String registries=(RenderAgent.config.get("version").getAsString().startsWith("26.")||s.hasField("net.minecraft.core.registries.BuiltInRegistries","ITEM"))?"net.minecraft.core.registries.BuiltInRegistries":"net.minecraft.core.Registry";
         items=s.field(registries,"ITEM",null);
         blocks=s.field(registries,"BLOCK",null);
+        if(RenderAgent.config.get("version").getAsString().equals("1.21.4")) {
+            Object gameRenderer=s.field("net.minecraft.client.Minecraft","gameRenderer",minecraft);
+            Object light=s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",gameRenderer);
+            Object target=s.field("net.minecraft.client.renderer.LightTexture","target",light);
+            // 実ワールドのfull-bright lightmapと同じ252/255へ初期化する。
+            s.call("com.mojang.blaze3d.pipeline.RenderTarget","setClearColor",target,0.99f,0.99f,0.99f,1f);
+            s.call("com.mojang.blaze3d.pipeline.RenderTarget","clear",target);
+            bindTarget(s.call("net.minecraft.client.Minecraft","getMainRenderTarget",minecraft));
+        }
     }
     public String environment() throws Exception {
         return s.call("org.lwjgl.opengl.GL11","glGetString",null,7937)+" / "+s.call("org.lwjgl.opengl.GL11","glGetString",null,7938);

@@ -47,7 +47,7 @@
 | 1.15.2 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） | 全件一致 |
 | 1.15.1 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） | 全件一致 |
 | 1.15 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） | 全件一致 |
-| 1.14.4 | gui-fixed | 8 | 876 成功 / 0 失敗（passed） | 全件一致 |
+| 1.14.4 | gui-fixed | 8 | 876 成功 / 0 失敗（passed） | 旧基準から特殊59件を修正 |
 | 1.14.3 | legacy-1.14 | 8 | 876 成功 / 0 失敗（passed） | 全件一致 |
 | 1.14.2 | legacy-1.14 | 8 | 876 成功 / 0 失敗（passed） | 全件一致 |
 | 1.14.1 | legacy-1.14 | 8 | 876 成功 / 0 失敗（passed） | 全件一致 |
@@ -60,4 +60,12 @@
 
 追加修正83d2382で、legacy-1.13 / legacy-1.14のBlockEntity dispatcherへTextureManagerを供給し、チェスト等にitem atlasが誤って使われる問題を修正しました。修正後の全51版・60,265枚を再生成・PNG監査し、さらに521302cのfallback観測を加えたworkerでも全件がdecoded RGBA・パス一致しました。[新workerの数値記録](../qa/validation-2026-10-10-resource-guard.json)に異なるagent hashと版別入力hashを保存します。表の独立反復と代表ID比較は以前のworkerの記録も含み、全IDの個別/all比較や画質・missing resource完全検出の受入とは区別します。画質の受入が完了するまでexperimentalを維持します。
 
+1.14.4では同じ参照補完が抜けていたため、特殊59種類が直前のテクスチャへ依存していました。修正後の876件を監査し、影響59種類とwheatの個別指定・全件比較、および通常GUI fixtureの2背景比較が成功しました。以前の全件反復一致は画像の正しさを保証するものではありません。版別結果と対象IDは[1.14.4初期化の数値記録](../qa/validation-2026-10-11-classic-bootstrap.json)を参照してください。
+
+iconsのPNGへsRGB Perceptualの指定を追加しました。最終workerで1.21.4全1,384枚と9描画境界版の代表54枚のdecoded RGBA・パスが以前の正しい基準と一致し、PNG bytes・hashはmetadata追加で変わります。通常GUIの6背景比較と既知RGBAの検証は[色・alphaの数値記録](../qa/validation-2026-10-11-alpha-srgb.json)を参照してください。全51版の全件再実行や全モデルの色空間受入とは区別します。
+
+1.21.4の通常ワールドのInventoryScreenと、productionのbootstrap・固定化を共有しないQAで静的28種類を比較しました。変更前は生RGBで11種類が許容値を超え、worldなしlightmap初期値255と実ワールドのfull-bright値252の差を確認しました。実測lightmapを乗算した診断では全28種類が誤差2/255以内でした。補正診断を生比較の成功やcanonicalの受入完了とは扱いません。[変更前のワールド内比較記録](../qa/validation-2026-10-11-world-inventory.json)を参照してください。後続作業では実インベントリの照明を固定基準に選び、1.21.4だけ描画時に反映します。全版experimental/deterministic=falseを維持します。
+
 ホストmacOS Apple Silicon＋Colima/Rosetta上のLinux amd64 containerを検証しています。Windows/Linux host、Docker Desktop、host native、Linux ARM64 imageは未検証です。GitHub Actionsは使用しません。
+
+1.21.4のlightmapを実インベントリのRGB252へ合わせた後、通常ワールドの静的28種類はPNGのRGB補正なしで全件成功（最大誤差1/255）しました。新workerの全1,384枚を監査し、1,382枚のRGBAが変更前から変わります。透明領域のmaskと出力パスは不変ですが、alphaには最大1/255の量子化差があります。以前のiconsは新しい出力先で再生成してください。他9境界版の代表54枚は既存RGBA・パスと一致しました。[照明変更後の数値記録](../qa/validation-2026-10-11-inventory-lighting.json)は以前の全51版記録と区別します。他版の照明、全ID・動的表現の独立受入は未完了です。

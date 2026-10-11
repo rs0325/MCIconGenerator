@@ -119,9 +119,112 @@ python3 scripts/verify-flat-textures.py --out .local/flat-texture-repeat \
   --compare .local/qa-output
 ```
 
+## 実際の破損リソースパックによる検証（2026-10-11）
+
+Issue #6の継続作業です。起点はPR #15の593c745、担当ブランチはfeature/issue-6です。描画・欠損観測を置き換えず、QA専用パックに破損したモデルJSONまたはPNGを配置して、ゲーム自身の読み込みとfallback処理を通します。パック形式は元JARのversion.jsonまたはpack.mcmetaから取得します。取得Resourceの提供元がQAパックであること、所有runのパックSHA、公式入力JARが変化しないことを確認します。ゲーム素材・QA agent・破損パックは公開配布物へ含めません。
+
+初期workerでは1.13 / 1.21.4 / 26.3の破損チェストを代替画像のまま成功出力していました。通常quadの観測に加え、TextureAtlasのsprite取得、26.xのAtlasManagerのcached sprite取得、旧版Textureの直接bindを観測します。旧版のmissing textureは保持フィールドで比較し、生成getterを呼んで初回bindへ再入しないようにします。失敗は描画処理終了後に通知し、同じworkerの正常アイテムの継続を検証します。
+
+モデルJSONが破損した場合も版によりMISSING_MODELまたはMISSING_TEXTUREとなります。バニラがmissing spriteを持つ代替形状へ解決した場合は後者です。この検証はfallback PNGを成功として返さないことを確認し、元ファイルの破損種別を常に識別する保証にはしません。
+
+```sh
+python3 scripts/verify-resource-faults.py --injection resource-pack \
+  --faults model texture special-texture --out .local/resource-pack-check \
+  --compare .local/qa-output
+```
+
+最終workerの27破損ケースで、全て期待した欠損診断とPNG未出力、同じworkerで続くwheatの基準RGBA一致を確認しました。既存の観測値置換fixtureも3版・6件で回帰確認し、missing spriteを描画passの前に取得することでQA自身がatlas観測へ再入しないようにしました。正常全51版・60,265枚は基準のRGBAと出力パスが一致し、PNG監査も成功しました。入力・worker・QA helperのhashと版別結果は[数値記録](../qa/validation-2026-10-11-resource-pack.json)に保存しています。JUnit56件、実bytecodeの依存照合51/51版は成功しています。重点反証で指摘された旧版getterの遅延生成による再帰と並列QAログの混入は修正しました。版によって起動ログが省略されたりSTDERRにprefixが付くため、パック選択の証明は取得Resourceの提供元で行います。modernの直接非atlasテクスチャ、全てのキャッシュ済み特殊描画、画像の意味・色空間の受入は引き続き未完了です。
+
+## 直接テクスチャの欠損とキャッシュ取得（2026-10-11）
+
+Issue #6 / PR #16の継続で、起点はb317c60です。1.21.4・1.21.5・26.3で、ドラゴンの頭が使用するtextures/entity/enderdragon/dragon.pngを破損させると、以前のworkerは代替画像を成功PNGとして返しました。modernではTextureContents.createMissingの内容を元のtextureへ適用するため、atlas sprite名や共有missing textureとの比較だけでは識別できません。
+
+生成された代替内容と適用先textureを弱参照で追跡し、requested passのTextureManager取得・直接bind・GPU getterでMISSING_TEXTUREを記録します。状態はpass間で保持し、render executorでの正常な内容の適用で解除します。取得後のバニラ処理と戻り値は維持し、対象PNGを出力せず、同じworkerのwheatは継続します。描画前に破損textureをロードするQAでは、ロード時には失敗判定せず、キャッシュからの取得を対象passで検出します。
+
+```sh
+python3 scripts/verify-resource-faults.py --injection resource-pack \
+  --faults direct-texture --versions 1.21.4 1.21.5 26.3 \
+  --out .local/direct-texture-check --compare .local/qa-output
+python3 scripts/verify-resource-faults.py --injection resource-pack \
+  --preload-direct-texture --faults direct-texture \
+  --versions 1.21.4 1.21.5 26.3 --out .local/direct-texture-cached-check \
+  --compare .local/qa-output
+```
+
+JUnit59件と実bytecodeの依存照合51/51版は成功しました。1.21.5はGPU view getterをまだ持たないため、実際に存在するgetterだけを照合します。直接PNGの破損9境界版、事前ロード3版、既存の欠損診断12件、観測値置換6件は成功しました。全30件で対象PNGの未出力と同じworkerのwheat成功・基準RGBA一致を確認しています。正常全51版・60,265枚は基準のRGBAと出力パスが一致し、PNG監査も成功しました。入力・worker・QA helperのhashと版別結果は[数値記録](../qa/validation-2026-10-11-direct-texture.json)に保存しています。
+
+1.14.4のdragon_headは破損パックあり・なしの個別描画でともにEmpty inventory iconとなり、同じworkerのwheatは基準と一致しました。以前の65388d58 workerでも正常個別描画の失敗を再現したため、今回の観測追加による回帰ではなく既存問題と確認しました。欠損診断成功には数えません。この時点の全件基準には成功PNGがありました。個別と全件の差は下記の1.14.4初期化修正で調査・解消しています。非render threadからapplyだけを呼んでGPU適用を後送する外部経路との並行性、全てのGPU cache・特殊リソース、無改変ワールド内の画像・色空間の受入は未完了です。全版experimental/deterministic=falseを維持します。
+
+## 1.14.4の特殊描画の初期化（2026-10-11）
+
+Issue #6 / PR #16の継続で、起点は1a5f394です。以前のworkerでは正常なdragon_headの個別描画がEmpty inventory iconとなり、全件では直前のテクスチャが特殊アイテムへ貼られていました。1.14.4実JARのBlockEntityRenderer.bindTextureはdispatcher.textureManagerがnullなら切り替えを省略します。バニラのワールド開始時に渡す同じTextureManagerをFixedRendererの初期化で供給します。bindTextureを持つgui-fixed版だけに適用し、現行対象は1.14.4のみです。
+
+最終workerで1.14.4・1.15.2・1.16.5の全2,734枚を生成・PNG監査しました。1.14.4の59種類の特殊アイテムは誤テクスチャから修正され、残り817種類と全パスは以前の基準と一致します。1.15.2の883枚・1.16.5の975枚も以前のRGBA・パスと一致しました。影響59種類とwheatを個別指定した60件、およびdragon_headだけを最初に描画した単独起動は、新しい全件出力とRGBA・パスが一致しました。
+
+通常GUI fixtureを1.14.4へ拡張し、影響59種類とwheatの2背景・120件で、透明PNGを再合成したRGBと画面からのcropとの差が全て0でした。通常のnative GUI projection・画面target・Screenshotを使い、WorkerRenderer.renderやPngOutputは使いません。ただし同じFixedRenderer constructorとfixed-v1 hookを共有するため、bootstrap自体の独立証明や無改変ワールド内inventoryの最終受入には数えません。実bytecodeでの原因確認、正常個別・全件の一致、画像の確認を合わせた限定検証です。
+
+```sh
+python3 scripts/verify-matrix.py --offline --versions 1.14.4 \
+  --ids dragon_head --out .local/classic-single --compare .local/qa-output
+python3 scripts/verify-gui-reference.py --versions 1.14.4 \
+  --ids dragon_head chest white_bed white_banner shield player_head white_shulker_box \
+  --out .local/classic-gui --compare .local/qa-output
+```
+
+破損ドラゴンPNG・チェストPNG、および描画前にロード済みの破損ドラゴンPNGの3ケースはMISSING_TEXTURE、対象PNG未出力、同じworkerのwheat成功・基準RGBA一致を確認しました。事前ロードfixtureは古いgetTextureがキャッシュ参照だけだったためbindによるロードへ修正し、1.21.4でも事前ロードの回帰を確認しました。最初のfixture失敗は成功に数えず記録します。公式入力は変更していません。JUnit59件とCLIビルドは成功し、重点反証では新しい確定問題は見つかりませんでした。対象ID・入力・worker・QA helper・画像hashは[数値記録](../qa/validation-2026-10-11-classic-bootstrap.json)に保存しています。最新workerでの全51版再実行は行っておらず、以前の51版記録と今回の3版検証を区別します。全版experimental/deterministic=falseを維持します。
+
+## 1.21.4の色・alpha復元とsRGB指定（2026-10-11）
+
+Issue #6 / PR #16の継続で、起点は2e280f5です。PNGの画素はRGBA8でしたが色空間の指定がなかったため、共通保存処理でsRGB chunk（Perceptual）を付けます。RGB・alphaの計算やraw抽出は変えません。PNG bytes・SHA-256は変わるため、以前のiconsを使う場合は新しい出力先で再生成してください。既存manifestは新しいagent/settings digestと区別されます。
+
+1.21.4のガラス・氷・スライム・ハチミツ・着色・glint等15種類を黒、白、灰、青緑、赤系、緑系の6背景で通常GUIと比較します。さらに16pxの既知RGBAを持つQAパックで、1層と2層のgenerated-modelを通常のitem shaderへ渡します。実shaderのalpha<0.1 discardを含むsource-overを、ゲームクラス・GPU・PngOutputを使わない数値oracleで計算します。透明画素の隠れたRGB、上下方向、低alphaでのstraight RGB量子化、重ね順を検証します。許容範囲は今回の固定パレット・2層までのfixtureに限ります。
+
+```sh
+python3 scripts/verify-alpha-textures.py --out .local/alpha-calibration
+python3 scripts/verify-gui-reference.py --versions 1.21.4 --framebuffer-probe \
+  --ids glass ice slime_block honey_block enchanted_book \
+  --backgrounds 000000 ffffff 7f7f7f 206080 c02040 20c040 \
+  --out .local/alpha-vanilla --compare .local/qa-output
+```
+
+最終workerの1.21.4全1,384枚と9描画境界版の代表54枚は、以前の正しい基準とdecoded RGBA・パスが一致しました。全1,438枚のIHDR 8bit RGBA、sRGB Perceptual、PNG integrityを確認しました。全51版の全件再実行とは区別します。1.21.4の全件比較元は1a5f394時点のworker、1.14.4の比較元は初期化修正後の2e280f5です。
+
+バニラ15種類×6背景の90比較、既知RGBAの2種類＋正常wheat×6背景の18比較は、全て最大RGB誤差2/255以内でした。独立数値oracleの8,192pixelでは、1層のalpha誤差0・最大straight RGB誤差5、2層のalpha誤差0.875未満・最大straight RGB誤差2.021未満です。alphaが小さいと8bit readbackの量子化を除算で拡大するため、straight RGBだけの固定誤差上限では判定しません。alpha誤差は1段階以内、premultiplied RGB誤差は最大1.245未満で、各pixelが今回の量子化上限内でした。shaderでdiscardされる透明画素のRGBも0でした。RGBA各8bit・GL_LINEARのframebufferで、sRGB変換は無効、観測GL errorは全て0でした。
+
+共用QAパック配置を使う欠損モデル・直接テクスチャの2ケースも成功し、対象PNGの未出力と正常wheatの基準一致を確認しました。JUnit60件とCLIビルドは成功しました。重点反証で指摘された提供元のfile/ prefix判定と、GUI失敗時に全成功を残し得るQA記録は修正しました。入力・shader・worker・QA helper・画像hashと修正前の対照は[数値記録](../qa/validation-2026-10-11-alpha-srgb.json)に保存します。
+
+framebuffer観測は通常GUIの描画後に行い、GL bindingや描画設定を変えません。glGetErrorはerror flagを読むため、観測時に0であることも受入条件にします。通常GUI fixtureはfixed-v1 hookとbootstrapを共有し、無改変ワールド内inventoryの独立基準ではありません。sRGB指定と通常GUIとのbyte RGB一致を、物理的に正しいlinear-light合成や全モデル・GPU・driverの色保証として扱いません。全版experimental/deterministic=falseとIssueの未完了条件を維持します。
+
+## 1.21.4のワールド内インベントリと照明差（2026-10-11）
+
+43eff9bのPNGを、通常のローカルflatワールドのInventoryScreenと比較しました。QA用agentはMinecraft.runTick末尾に画面操作・撮影callbackだけを追加し、ワールド作成画面からseed=0のflatを作成します。通常の既定stackをinventory slot 9へ入れ、空スロットと各アイテムをnative Screenshotで撮影します。GUI scale=4、1280×960画面から64pxのスロット領域を比較します。
+
+standalone QA JARにはJSON・ASM・Symbolsによるreflectionと画面操作helperだけを含め、RenderAgent、描画renderer、CanonicalTransformer、CanonicalContext、ResourceTransformer、Bridge、PngOutputを除きます。InventoryScreen・GameRenderer・item shaderの描画メソッドを変更せず、productionのbootstrap・時刻固定・透過復元を呼びません。完全な無計装clientとは区別します。cacheは読み取り専用mount、専用game/outputだけを書き込み、ネットワークは無効です。
+
+```sh
+python3 scripts/verify-world-inventory.py --out .local/world-inventory \
+  --compare .local/qa-output
+```
+
+スクリプトの既定は18種類です。最終検証では、色違いのbed/banner/shulker、各種head、trapped_chest、blue_stained_glassを加えた静的28種類を比較しました。生RGBでは17種類が許容誤差2/255以内、11種類が不一致で、最大誤差は4/255でした。全撮影のfull-bright lightmap texelはRGB 252/252/252でした。バニラのLightTexture constructorは白255で初期化し、ワールド入場後のlightmap shaderは最後にcolorを0.75へ0.04混合します。fixed-v1のworldなし描画と実ワールドの照明差を確認しました。
+
+別の診断として、生成PNGのRGBへ各撮影で読み取ったlightmap値を乗算してから空スロット背景へbyte RGB合成すると、28種類すべてが最大誤差2/255以内で一致しました。diamondは誤差0、iceは最大2、その他は最大1でした。生RGBのpassed=falseとlightmapAdjustedPassed=trueを分けて記録します。スクリプトは生比較の不一致に対してexit 1を返し、補正比較だけを全体成功に数えません。確認前の18種類の対照も成功扱いへ書き換えません。
+
+この時点の補正は照明差の原因を調べるもので、productionのPNGは変更していません。後続作業ではユーザー確認により実インベントリの照明を固定基準に選びました。glint、時計・コンパス、アニメーション、全ID・全版、別背景・GPUの受入は継続します。入力・QA helper・通常画面・shaderのhashと各比較結果は[変更前の数値記録](../qa/validation-2026-10-11-world-inventory.json)に保存しています。重点反証では新しい確定問題は見つからず、timeout・中断の停止処理はコード確認のみで障害注入は未実施です。ゲーム画像、worldデータ、QA agentは公開配布物に含めません。
+
+## 実インベントリの照明への適合（2026-10-11）
+
+ユーザー指定により、1.21.4の描画前lightmapをRGB252へ初期化しました。通常ワールドの静的28種類は、保存PNGのRGBを補正せず背景へ合成した比較で全件成功し、最大誤差は1/255でした。実ワールドの観測lightmapも全撮影でRGB252です。ワールド・プレイヤー・時刻・天候はproductionへ導入しません。
+
+新workerの1.21.4全1,384枚をPNG監査し、8bit RGBA・sRGB Perceptualを確認しました。変更前と出力パスは同一で、1,382枚のRGBAが変わります。透明領域のmaskは不変ですが、8bit量子化により930pixelのalphaが最大1/255変わります。以前のiconsは新しい出力先で再生成してください。
+
+照明を変更しない9境界版（1.13、1.14.3、1.14.4、1.19.4、1.21.3、1.21.5、1.21.6、26.2、26.3）の代表6種類・計54枚は既存基準とRGBA・パス一致しました。既知RGBAの1層・2層8,192pixelは量子化上限内、6背景の通常GUI18比較と着色・透過・glintの2背景24比較は誤差2/255以内です。独立flat oracleの5ケースは誤差0ですが、1.13・26.3の入力は以前の基準出力です。欠損モデル・直接テクスチャの2ケースで対象PNG未出力と正常wheatの継続・基準一致を確認しました。JUnit60件は成功しました。
+
+数値・入力hash・QA helper hashは[照明変更後の記録](../qa/validation-2026-10-11-inventory-lighting.json)に保存します。通常GUI fixtureはfixed-v1とbootstrapを共有し、通常ワールド28種類の独立比較と区別します。全51版の全件再実行、他版の実ワールド照明、全ID・動的表現・他GPUの受入は未完了で、全版experimental/deterministic=falseを維持します。
+
 ## 未完了の受入検証
 
-- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、無改変のワールド内inventory基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。
+- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、1.21.4以外の照明基準、完全な無計装clientの基準画像、通常ワールド比較の対象拡張、glint・時計/コンパス・animated textureの意味的な比較。
 - sRGB・半透明・alpha復元の色精度、missing texture/modelの完全検出。
 - Windows/Linux host、Docker Desktop、native、ARM64 image。
 - daemon障害・書き込み経路の競合など、今回のSIGKILL/ENOSPC/lock試験を超える障害受入。

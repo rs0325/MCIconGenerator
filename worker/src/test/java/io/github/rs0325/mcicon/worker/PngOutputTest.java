@@ -31,4 +31,24 @@ class PngOutputTest {
         BufferedImage recovered=ImageIO.read(output.toFile());
         assertEquals(0x7f4081c1,recovered.getRGB(0,0));assertEquals(0,recovered.getRGB(1,0));
     }
+    @Test void declaresSrgbWithoutChangingRgbaForReadbackAndComposite() throws Exception {
+        Path direct=directory.resolve("direct.png"),composite=directory.resolve("composite.png");
+        PngOutput.write(ByteBuffer.wrap(new byte[]{32,64,96,(byte)255}),1,direct);
+        BufferedImage image=new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);image.setRGB(0,0,0xff204060);
+        PngOutput.compose(image,image,composite);
+        for(Path output:new Path[]{direct,composite}) {
+            ByteBuffer png=ByteBuffer.wrap(Files.readAllBytes(output));png.position(8);
+            int declarations=0;boolean imageData=false;
+            while(png.hasRemaining()) {
+                int length=png.getInt();byte[] type=new byte[4];png.get(type);
+                String name=new String(type,"US-ASCII");
+                if(name.equals("IHDR")){assertEquals(8,png.get(png.position()+8));assertEquals(6,png.get(png.position()+9));}
+                if(name.equals("sRGB")){assertFalse(imageData);assertEquals(1,length);assertEquals(0,png.get(png.position()));declarations++;}
+                if(name.equals("IDAT"))imageData=true;
+                png.position(png.position()+length+4);
+            }
+            assertEquals(1,declarations);assertTrue(imageData);
+            assertEquals(0xff204060,ImageIO.read(output.toFile()).getRGB(0,0));
+        }
+    }
 }

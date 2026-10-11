@@ -5,6 +5,12 @@ public final class FixedRenderer extends ClassicRenderer {
     private final String gl;
     public FixedRenderer(Symbols symbols,Object minecraft) throws Exception {
         super(symbols,minecraft);
+        if(s.hasMethod("net.minecraft.client.renderer.blockentity.BlockEntityRenderer","bindTexture",1)) {
+            // 1.14.4ではワールド開始時に設定される参照をGUIだけの起動でも補う。
+            String dispatcherClass="net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher";
+            Object dispatcher=s.field(dispatcherClass,"instance",null);
+            s.setField(dispatcherClass,"textureManager",dispatcher,s.call("net.minecraft.client.Minecraft","getTextureManager",minecraft));
+        }
         gl=s.hasMethod("com.mojang.blaze3d.platform.GlStateManager","matrixMode",1)?"com.mojang.blaze3d.platform.GlStateManager":"com.mojang.blaze3d.systems.RenderSystem";
     }
     protected Object createTarget(int size,boolean ignored) throws Exception {

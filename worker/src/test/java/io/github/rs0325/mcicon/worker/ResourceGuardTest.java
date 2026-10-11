@@ -28,6 +28,10 @@ class ResourceGuardTest {
     public static class FieldOnlyQuad {
         public Sprite sprite=new Sprite("minecraft:missingno");
     }
+    public static class MissingTexture {
+        public static Object value;
+        public static Object getTexture(){throw new AssertionError("観測処理で遅延生成getterを呼ばない");}
+    }
     @AfterEach void cleanup() {CanonicalContext.end();ResourceGuard.end();RenderAgent.symbols=null;RenderAgent.config=null;}
     private Symbols symbols(boolean legacy) throws Exception {
         String sprite=legacy?"net.minecraft.client.render.texture.TextureAtlasSprite":"net.minecraft.client.renderer.texture.TextureAtlasSprite";
@@ -117,6 +121,116 @@ class ResourceGuardTest {
             ResourceGuard.quad(new FieldOnlyQuad());
             assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
             ResourceGuard.end();CanonicalContext.end();
+        }
+    }
+    @Test void specialAtlasLookupPreservesTheSpriteAndDetectsFallback() throws Exception {
+        Symbols symbols=symbols(false);Path mapping=directory.resolve("mappings.txt");
+        Files.write(mapping,("net.minecraft.client.renderer.texture.TextureAtlas -> fixture.Atlas:\n"
+            +"    net.minecraft.client.renderer.texture.TextureAtlasSprite getSprite(java.lang.Object) -> getSprite\n").getBytes("UTF-8"),StandardOpenOption.APPEND);
+        symbols=new Symbols(mapping);RenderAgent.symbols=symbols;ClassWriter writer=new ClassWriter(0);
+        writer.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,"fixture/Atlas",null,"java/lang/Object",null);
+        MethodVisitor method=writer.visitMethod(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC,"getSprite","(Ljava/lang/Object;)L"+Type.getInternalName(Sprite.class)+";",null,null);
+        method.visitCode();method.visitVarInsn(Opcodes.ALOAD,0);method.visitTypeInsn(Opcodes.CHECKCAST,Type.getInternalName(Sprite.class));method.visitInsn(Opcodes.ARETURN);method.visitMaxs(1,1);method.visitEnd();writer.visitEnd();
+        final byte[] bytes=new ResourceTransformer(symbols,false).transformGameClass("fixture/Atlas",writer.toByteArray());
+        Class<?> type=new ClassLoader(){Class<?> define(){return defineClass(null,bytes,0,bytes.length);}}.define();
+        Method getter=type.getMethod("getSprite",Object.class);Sprite missing=new Sprite("minecraft:missingno");ResourceGuard.begin();
+        assertSame(missing,getter.invoke(null,missing));ResourceGuard.check();
+        CanonicalContext.begin();Sprite normal=new Sprite("minecraft:entity/chest/normal");
+        assertSame(normal,getter.invoke(null,normal));ResourceGuard.check();
+        assertSame(missing,getter.invoke(null,missing));
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+    }
+    @Test void legacyDirectBindDetectsTheCachedFallbackWithoutStoppingTheBind() throws Exception {
+        symbols(true);Path mapping=directory.resolve("mappings.txt");
+        Files.write(mapping,("net.minecraft.client.render.texture.MissingTextureAtlasSprite -> "+MissingTexture.class.getName()+":\n    java.lang.Object getTexture() -> getTexture\n    java.lang.Object texture -> value\n"
+            +"net.minecraft.client.render.texture.Texture -> fixture.Texture:\n    void bind() -> bind\n").getBytes("UTF-8"),StandardOpenOption.APPEND);
+        Symbols symbols=new Symbols(mapping);RenderAgent.symbols=symbols;ClassWriter writer=new ClassWriter(0);
+        writer.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,"fixture/Texture",null,"java/lang/Object",null);
+        writer.visitField(Opcodes.ACC_PUBLIC,"bound","Z",null,null).visitEnd();
+        MethodVisitor method=writer.visitMethod(Opcodes.ACC_PUBLIC,"<init>","()V",null,null);
+        method.visitCode();method.visitVarInsn(Opcodes.ALOAD,0);method.visitMethodInsn(Opcodes.INVOKESPECIAL,"java/lang/Object","<init>","()V",false);method.visitInsn(Opcodes.RETURN);method.visitMaxs(1,1);method.visitEnd();
+        method=writer.visitMethod(Opcodes.ACC_PUBLIC,"bind","()V",null,null);method.visitCode();method.visitVarInsn(Opcodes.ALOAD,0);method.visitInsn(Opcodes.ICONST_1);method.visitFieldInsn(Opcodes.PUTFIELD,"fixture/Texture","bound","Z");method.visitInsn(Opcodes.RETURN);method.visitMaxs(2,1);method.visitEnd();writer.visitEnd();
+        final byte[] bytes=new ResourceTransformer(symbols,true).transformGameClass("fixture/Texture",writer.toByteArray());
+        Class<?> type=new ClassLoader(){Class<?> define(){return defineClass(null,bytes,0,bytes.length);}}.define();
+        Object fallback=type.getConstructor().newInstance(),normal=type.getConstructor().newInstance();MissingTexture.value=fallback;
+        Method bind=type.getMethod("bind");ResourceGuard.begin();bind.invoke(fallback);ResourceGuard.check();
+        CanonicalContext.begin();bind.invoke(normal);ResourceGuard.check();bind.invoke(fallback);
+        assertTrue(type.getField("bound").getBoolean(fallback));
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+        ResourceGuard.end();ResourceGuard.begin();bind.invoke(fallback);
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+        MissingTexture.value=null;
+    }
+    @Test void directFallbackSurvivesPassesAndClearsWhenNormalContentsAreApplied() throws Exception {
+        symbols(false);Object missing=new Object(),texture=new Object(),normal=new Object();
+        Thread load=new Thread(()->ResourceGuard.missingContents(missing));load.start();load.join();
+        ResourceGuard.appliedTexture(texture,missing);ResourceGuard.begin();ResourceGuard.texture(texture);ResourceGuard.check();
+        CanonicalContext.begin();ResourceGuard.texture(normal);ResourceGuard.check();ResourceGuard.texture(texture);
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+        ResourceGuard.end();ResourceGuard.begin();ResourceGuard.texture(texture);
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+        ResourceGuard.appliedTexture(texture,new Object());ResourceGuard.end();ResourceGuard.begin();
+        ResourceGuard.texture(texture);ResourceGuard.check();
+    }
+    @Test void directTextureHooksPreserveContentsApplicationAndCachedGpuAccess() throws Exception {
+        symbols(false);Path mapping=directory.resolve("mappings.txt");
+        Files.write(mapping,("net.minecraft.client.renderer.texture.TextureContents -> fixture.Contents:\n    fixture.Contents createMissing() -> createMissing\n"
+            +"net.minecraft.client.renderer.texture.ReloadableTexture -> fixture.Reloadable:\n    void apply(net.minecraft.client.renderer.texture.TextureContents) -> apply\n"
+            +"net.minecraft.client.renderer.texture.AbstractTexture -> fixture.Abstract:\n    java.lang.Object getTextureView() -> getTextureView\n"
+            +"net.minecraft.client.renderer.texture.TextureManager -> fixture.Textures:\n    fixture.Reloadable getTexture(fixture.Reloadable) -> getTexture\n").getBytes("UTF-8"),StandardOpenOption.APPEND);
+        Symbols symbols=new Symbols(mapping);RenderAgent.symbols=symbols;
+        class Loader extends ClassLoader {Class<?> define(byte[] bytes){return defineClass(null,bytes,0,bytes.length);}}
+        Loader loader=new Loader();Class<?> contents=null,texture=null,textures=null;
+        for(String owner:new String[]{"fixture/Abstract","fixture/Contents","fixture/Reloadable","fixture/Textures"}) {
+            ClassWriter writer=new ClassWriter(0);String parent=owner.equals("fixture/Reloadable")?"fixture/Abstract":"java/lang/Object";
+            writer.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,owner,null,parent,null);
+            MethodVisitor method=writer.visitMethod(Opcodes.ACC_PUBLIC,"<init>","()V",null,null);
+            method.visitCode();method.visitVarInsn(Opcodes.ALOAD,0);method.visitMethodInsn(Opcodes.INVOKESPECIAL,parent,"<init>","()V",false);
+            method.visitInsn(Opcodes.RETURN);method.visitMaxs(1,1);method.visitEnd();
+            if(owner.equals("fixture/Contents")) {
+                method=writer.visitMethod(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC,"createMissing","()Lfixture/Contents;",null,null);
+                method.visitCode();method.visitTypeInsn(Opcodes.NEW,owner);method.visitInsn(Opcodes.DUP);
+                method.visitMethodInsn(Opcodes.INVOKESPECIAL,owner,"<init>","()V",false);method.visitInsn(Opcodes.ARETURN);method.visitMaxs(2,0);method.visitEnd();
+            } else if(owner.equals("fixture/Reloadable")) {
+                writer.visitField(Opcodes.ACC_PUBLIC,"applied","Ljava/lang/Object;",null,null).visitEnd();
+                method=writer.visitMethod(Opcodes.ACC_PUBLIC,"apply","(Lfixture/Contents;)V",null,null);
+                method.visitCode();method.visitVarInsn(Opcodes.ALOAD,0);method.visitVarInsn(Opcodes.ALOAD,1);
+                method.visitFieldInsn(Opcodes.PUTFIELD,owner,"applied","Ljava/lang/Object;");method.visitInsn(Opcodes.RETURN);method.visitMaxs(2,2);method.visitEnd();
+            } else {
+                boolean manager=owner.equals("fixture/Textures");
+                method=writer.visitMethod(Opcodes.ACC_PUBLIC|(manager?Opcodes.ACC_STATIC:0),manager?"getTexture":"getTextureView",manager?"(Lfixture/Reloadable;)Lfixture/Reloadable;":"()Ljava/lang/Object;",null,null);
+                method.visitCode();method.visitVarInsn(Opcodes.ALOAD,0);method.visitInsn(Opcodes.ARETURN);method.visitMaxs(1,1);method.visitEnd();
+            }
+            writer.visitEnd();Class<?> type=loader.define(new ResourceTransformer(symbols,false).transformGameClass(owner,writer.toByteArray()));
+            if(owner.equals("fixture/Contents"))contents=type;else if(owner.equals("fixture/Reloadable"))texture=type;else if(owner.equals("fixture/Textures"))textures=type;
+        }
+        Object fallback=contents.getMethod("createMissing").invoke(null),instance=texture.getConstructor().newInstance();
+        texture.getMethod("apply",contents).invoke(instance,fallback);assertSame(fallback,texture.getField("applied").get(instance));
+        Method lookup=textures.getMethod("getTexture",texture);ResourceGuard.begin();assertSame(instance,lookup.invoke(null,instance));ResourceGuard.check();
+        CanonicalContext.begin();assertSame(instance,lookup.invoke(null,instance));
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+        ResourceGuard.end();ResourceGuard.begin();assertSame(instance,texture.getMethod("getTextureView").invoke(instance));
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+        Object healthy=contents.getConstructor().newInstance();texture.getMethod("apply",contents).invoke(instance,healthy);
+        ResourceGuard.end();ResourceGuard.begin();assertSame(instance,lookup.invoke(null,instance));ResourceGuard.check();
+    }
+    @Test void fallbackGetterIsObservedAfterVanillaReturnsTheRetainedTexture() throws Exception {
+        for(boolean legacy:new boolean[]{true,false}) {
+            symbols(legacy);Path mapping=directory.resolve("mappings.txt");
+            String owner=legacy?"net.minecraft.client.render.texture.MissingTextureAtlasSprite":"net.minecraft.client.renderer.texture.MissingTextureAtlasSprite";
+            Files.write(mapping,(owner+" -> "+MissingTexture.class.getName()+":\n    java.lang.Object "+(legacy?"texture":"missingTexture")+" -> value\n    java.lang.Object getTexture() -> getTexture\n").getBytes("UTF-8"),StandardOpenOption.APPEND);
+            Symbols symbols=new Symbols(mapping);RenderAgent.symbols=symbols;ClassWriter writer=new ClassWriter(0);
+            writer.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,"fixture/FallbackGetter",null,"java/lang/Object",null);
+            MethodVisitor method=writer.visitMethod(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC,"getTexture","()Ljava/lang/Object;",null,null);
+            method.visitCode();method.visitFieldInsn(Opcodes.GETSTATIC,Type.getInternalName(MissingTexture.class),"value","Ljava/lang/Object;");
+            method.visitInsn(Opcodes.ARETURN);method.visitMaxs(1,0);method.visitEnd();writer.visitEnd();
+            final byte[] bytes=new ResourceTransformer(symbols,legacy).transformGameClass(Type.getInternalName(MissingTexture.class),writer.toByteArray());
+            Class<?> type=new ClassLoader(){Class<?> define(){return defineClass(null,bytes,0,bytes.length);}}.define();
+            Object fallback=new Object();MissingTexture.value=fallback;Method getter=type.getMethod("getTexture");
+            ResourceGuard.begin();assertSame(fallback,getter.invoke(null));ResourceGuard.check();CanonicalContext.begin();
+            assertSame(fallback,getter.invoke(null));
+            assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+            CanonicalContext.end();ResourceGuard.end();MissingTexture.value=null;
         }
     }
     private byte[] quadFixture() {

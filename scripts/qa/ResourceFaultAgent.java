@@ -9,6 +9,7 @@ import java.security.ProtectionDomain;
 public final class ResourceFaultAgent {
     private static String fault;
     private static boolean legacy;
+    private static Object missingSprite;
     private static final ThreadLocal<Boolean> selected=new ThreadLocal<Boolean>();
     public static void premain(String argument,Instrumentation instrumentation) throws Exception {
         try(java.io.InputStream input=ResourceFaultAgent.class.getResourceAsStream("/mcicon-resource-fault.txt")) {
@@ -84,7 +85,10 @@ public final class ResourceFaultAgent {
         // Substitute first so the production observer sees the actual fallback.
         RenderAgent.premain(argument,instrumentation);
     }
-    public static void select(com.google.gson.JsonObject request) {selected.set(request.get("id").getAsString().equals("minecraft:stone"));}
+    public static void select(com.google.gson.JsonObject request) {
+        selected.set(request.get("id").getAsString().equals("minecraft:stone"));
+        if(fault.equals("texture")&&Boolean.TRUE.equals(selected.get())&&missingSprite==null)missingSprite=findMissingSprite();
+    }
     public static Object model(Object original) {
         if(!CanonicalContext.active()||!Boolean.TRUE.equals(selected.get()))return original;
         try {
@@ -100,6 +104,9 @@ public final class ResourceFaultAgent {
     }
     public static Object texture(Object original) {
         if(!CanonicalContext.active()||!Boolean.TRUE.equals(selected.get()))return original;
+        return missingSprite;
+    }
+    private static Object findMissingSprite() {
         try {
             Symbols s=RenderAgent.symbols;
             Object minecraft=s.call("net.minecraft.client.Minecraft","getInstance",null);
@@ -119,7 +126,7 @@ public final class ResourceFaultAgent {
             }
             @SuppressWarnings("unchecked") java.util.function.Function<Object,Object> sprites=(java.util.function.Function<Object,Object>)s.call("net.minecraft.client.Minecraft","getTextureAtlas",minecraft,atlasId);
             return sprites.apply(missing);
-        }catch(Exception e){throw new IllegalStateException("QA texture substitution failed",e);}
+        }catch(Exception e){throw new IllegalStateException("QA用missing spriteを描画passの前に取得できません",e);}
     }
     private static byte[] read(java.io.InputStream input) throws java.io.IOException {
         if(input==null)throw new java.io.IOException("Missing QA fault selector");

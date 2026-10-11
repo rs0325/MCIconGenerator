@@ -4,9 +4,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.*;
-import javax.imageio.ImageIO;
+import javax.imageio.*;
+import javax.imageio.metadata.*;
+import javax.imageio.stream.ImageOutputStream;
+import java.util.Iterator;
 
-/** Converts bottom-up premultiplied RGBA8 readback to straight-alpha PNG. */
+/** 下から上のRGBA8 readbackをstraight alphaのsRGB PNGへ変換する。 */
 final class PngOutput {
     private PngOutput() {}
     static int write(ByteBuffer pixels,int size,Path output) throws IOException {
@@ -24,8 +27,7 @@ final class PngOutput {
         }
         if(visible==0)throw new IOException("Empty inventory icon");
         if(CanonicalContext.opaqueProbe()){CanonicalContext.probeImage(image);return visible;}
-        Files.createDirectories(output.getParent());
-        if(!ImageIO.write(image,"PNG",output.toFile()))throw new IOException("PNG encoder unavailable");
+        save(image,output);
         return visible;
     }
     static int compose(Path black,Path white,Path output) throws IOException {
@@ -46,9 +48,23 @@ final class PngOutput {
             result.setRGB(x,y,(alpha<<24)|(r<<16)|(g<<8)|blue);
         }
         if(visible==0)throw new IOException("Empty inventory icon");
-        Files.createDirectories(output.getParent());
-        if(!ImageIO.write(result,"PNG",output.toFile()))throw new IOException("PNG encoder unavailable");
+        save(result,output);
         return visible;
+    }
+    private static void save(BufferedImage image,Path output) throws IOException {
+        Files.createDirectories(output.getParent());
+        Iterator<ImageWriter> writers=ImageIO.getImageWritersByFormatName("PNG");
+        if(!writers.hasNext())throw new IOException("PNG encoder unavailable");
+        ImageWriter writer=writers.next();
+        try {
+            IIOMetadata metadata=writer.getDefaultImageMetadata(ImageTypeSpecifier.createFromRenderedImage(image),null);
+            IIOMetadataNode root=new IIOMetadataNode("javax_imageio_png_1.0"),srgb=new IIOMetadataNode("sRGB");
+            srgb.setAttribute("renderingIntent","Perceptual");root.appendChild(srgb);
+            metadata.mergeTree("javax_imageio_png_1.0",root);
+            try(ImageOutputStream stream=ImageIO.createImageOutputStream(output.toFile())) {
+                writer.setOutput(stream);writer.write(new IIOImage(image,null,metadata));
+            }
+        } finally {writer.dispose();}
     }
     private static int unpremultiply(int component,int alpha) {return Math.min(255,(component*255+alpha/2)/alpha);}
 }

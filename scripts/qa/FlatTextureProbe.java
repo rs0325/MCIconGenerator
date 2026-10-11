@@ -8,13 +8,14 @@ import java.util.zip.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-/** Independent, deliberately narrow oracle for opaque/transparent generated texture layers. */
+/** ゲーム・GPUを使わず、不透明・透明のgenerated textureと定数tintを照合する。 */
 public final class FlatTextureProbe {
     public static void main(String[] args) throws Exception {
         String version=args[0];Path client=Paths.get(args[1]),folder=Paths.get(args[2]);
         JsonObject manifest=json(Files.readAllBytes(folder.resolve("manifest.json")));
         String sourceHash=hash(Files.readAllBytes(client));
         if(!sourceHash.equals(manifest.get("sourceSha256").getAsString()))throw new IOException("Client/baseline hash mismatch");
+        int light=version.equals("1.21.4")?252:255;
         JsonArray results=new JsonArray();boolean passed=true;
         try(ZipFile jar=new ZipFile(client.toFile())) {
             for(int i=3;i<args.length;i++) {
@@ -45,9 +46,9 @@ public final class FlatTextureProbe {
                         int pixel=image.getRGB(x,y),alpha=pixel>>>24;
                         if(alpha!=0&&alpha!=255)throw new IllegalArgumentException("Oracle does not evaluate translucent layers");
                         if(alpha==0)continue;
-                        int r=(((pixel>>>16)&255)*((tint>>>16)&255)+127)/255;
-                        int g=(((pixel>>>8)&255)*((tint>>>8)&255)+127)/255;
-                        int b=((pixel&255)*(tint&255)+127)/255;
+                        int r=(((pixel>>>16)&255)*((tint>>>16)&255)*light+32512)/65025;
+                        int g=(((pixel>>>8)&255)*((tint>>>8)&255)*light+32512)/65025;
+                        int b=((pixel&255)*(tint&255)*light+32512)/65025;
                         expected.setRGB(x,y,0xff000000|(r<<16)|(g<<8)|b);
                     }
                 }
@@ -65,7 +66,7 @@ public final class FlatTextureProbe {
                 JsonObject result=new JsonObject();result.addProperty("id",id);result.addProperty("model",modelId);result.add("tints",tints);result.add("resourceInputs",inputs);result.addProperty("exportPngSha256",hash(bytes));result.addProperty("maxRgbError",colorError);result.addProperty("maxAlphaError",alphaError);result.addProperty("pixelsOverTolerance",bad);result.addProperty("passed",bad==0);results.add(result);passed&=bad==0;
             }
         }
-        JsonObject report=new JsonObject();report.addProperty("version",version);report.addProperty("sourceSha256",sourceHash);report.addProperty("baselineAgentSha256",manifest.getAsJsonObject("settings").get("agentSha256").getAsString());report.addProperty("gameClassesLoaded",false);report.add("results",results);report.addProperty("passed",passed);
+        JsonObject report=new JsonObject();report.addProperty("version",version);report.addProperty("fullBrightLightmap",light);report.addProperty("sourceSha256",sourceHash);report.addProperty("baselineAgentSha256",manifest.getAsJsonObject("settings").get("agentSha256").getAsString());report.addProperty("gameClassesLoaded",false);report.add("results",results);report.addProperty("passed",passed);
         System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(report));if(!passed)System.exit(1);
     }
     private static byte[] resource(ZipFile jar,String name,JsonArray inputs) throws Exception {

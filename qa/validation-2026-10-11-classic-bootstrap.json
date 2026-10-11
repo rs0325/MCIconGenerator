@@ -1,0 +1,2495 @@
+{
+  "recordedAtUtc": "2026-10-11T03:16:12.641339+00:00",
+  "issue": 6,
+  "branch": "feature/issue-6",
+  "basisCommit": "1a5f394bbc9cb5c3cc872cc6c1a0a4ab628b8df0",
+  "productionAgentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+  "productionSourcesSha256": {
+    "worker/src/main/java/io/github/rs0325/mcicon/worker/FixedRenderer.java": "96f89d31d458837d79ad75ffa7582a250db0a9732e16094ce43bdc9668531c29"
+  },
+  "canonicalVerified": false,
+  "allVersionsExperimental": true,
+  "scope": "1.14.4の特殊描画に必要なTextureManager参照をワールド開始前に補完する。最新workerの全51版再実行ではなく、影響版と隣接世代の限定検証。",
+  "nativeCause": {
+    "version": "1.14.4",
+    "dispatcher": "net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher",
+    "field": "textureManager",
+    "officialInputUnmodified": true,
+    "confirmation": "実JARのprepareは受け取ったTextureManagerを同じフィールドへ設定し、BlockEntityRenderer.bindTextureはnullならbindを省略する。",
+    "capabilityGate": "BlockEntityRenderer.bindTexture/1があるgui-fixed版のみ。現行対象では1.14.4だけ。"
+  },
+  "tests": {
+    "junit": 59,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "normalAll": [
+    {
+      "version": "1.14.4",
+      "audit": {
+        "version": "1.14.4",
+        "mode": "icons",
+        "audited": 876,
+        "registryPopulationVerified": true,
+        "transparentImages": 860,
+        "fractionalAlphaPixels": 114928,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 30.39,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+      "settings": {
+        "agentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "mappingsSha256": "2dd53a5e70ba493cf6e33c0fc52bbdf4c57f9429c7a13842565aa825fd44d910",
+        "metadataSha256": "7239a8a156a64f38292f3120736e57aa2b9bc32087240b402804d1912cacec4c",
+        "profile": "gui-fixed",
+        "size": 64
+      }
+    },
+    {
+      "version": "1.15.2",
+      "audit": {
+        "version": "1.15.2",
+        "mode": "icons",
+        "audited": 883,
+        "registryPopulationVerified": true,
+        "transparentImages": 867,
+        "fractionalAlphaPixels": 117672,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 46.82,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      "sourceSha256": "4a73008a73f3824b7c711750a5a37556df8614f193c0a531e292dad159a73a7c",
+      "settings": {
+        "agentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "mappingsSha256": "65ad295b6cf63821f5d8f961c128128475e6d39386358d22eb238a3ce6e31777",
+        "metadataSha256": "26c8d846678e21a99e6f2f6a13e8551a7397ea0ef1f1bb06311111b0bbe667d2",
+        "profile": "gui-fixed",
+        "size": 64
+      }
+    },
+    {
+      "version": "1.16.5",
+      "audit": {
+        "version": "1.16.5",
+        "mode": "icons",
+        "audited": 975,
+        "registryPopulationVerified": true,
+        "transparentImages": 959,
+        "fractionalAlphaPixels": 117672,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 52.7,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      "sourceSha256": "00b5ebbc33e95ea88c1ab80601599c9827e9aa861d93ccc2cfcbbfd996e86263",
+      "settings": {
+        "agentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "mappingsSha256": "7931ed6d723eceb1d621d05a76e10ddf643bf468c6ecf1c4ecf377bd72cf8b8c",
+        "metadataSha256": "b701431689b6b721578e0cf7bfa4d1e99baabf25e686edccb5e02531ef3bbf44",
+        "profile": "gui-fixed",
+        "size": 64
+      }
+    }
+  ],
+  "beforeAfterRgba": [
+    {
+      "version": "1.14.4",
+      "sameRgba": 817,
+      "changed": [
+        {
+          "id": "minecraft:black_banner",
+          "beforeSha256": "1d77d822d49e483b8cfc95265dd603569966313cd6d5ed696326ba97aa7509a0",
+          "afterSha256": "79f237ee4d81bc634a98a8f0251ea1bb2949a0525e903574fddfc679a5e407ac"
+        },
+        {
+          "id": "minecraft:black_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "cc8a379ae73f30345917d25f982cc888e5dd0e189ce39fa32c45f6b3370653b3"
+        },
+        {
+          "id": "minecraft:black_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "6579c4f67bc26fc3643f23b77d0841fcfe0f3895d1ee16a082ca884d645edfb3"
+        },
+        {
+          "id": "minecraft:blue_banner",
+          "beforeSha256": "31ab37c5b61af0799bb124a4199ce1f7db353009911256b3303b276f2e8b2aab",
+          "afterSha256": "c880b135a97ed8126029e71808212ed7c520ebba13d763e53d354148a0e82faf"
+        },
+        {
+          "id": "minecraft:blue_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "c5be1252b1b2eb87df3f32526281d312739931470cd841b260ea0ec75d070348"
+        },
+        {
+          "id": "minecraft:blue_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "83fc27deb587baa442d25d08b3e4a3dd5849bc1edb3f9a04acd116d94ed34c23"
+        },
+        {
+          "id": "minecraft:brown_banner",
+          "beforeSha256": "626fda8700b105340be71518a3dcefd83f8d2866df4eb34cde730e8abe0d39dc",
+          "afterSha256": "453744dd5c4fc48f861ed71a5651e05923fb8b5c5bb2d5c4a935afe1a3d4f607"
+        },
+        {
+          "id": "minecraft:brown_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "6ee2ff1257f87ec25840d6cde6bd39c156e61b81d557773a1f67af0474b5c8ed"
+        },
+        {
+          "id": "minecraft:brown_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "6e0e211a5e38573e3552dda0b8bb1d4aa965dfe9f3cc4e8e6371919fe97e3d85"
+        },
+        {
+          "id": "minecraft:chest",
+          "beforeSha256": "022a5dca2d2ce1d0b9465b6cc2e34237466e994db037782883a5171b4831e283",
+          "afterSha256": "97bd7a95c878409be93c3e19126d34d8029d7c420b42fe95dbe78cd84073ec15"
+        },
+        {
+          "id": "minecraft:conduit",
+          "beforeSha256": "27e18b4fbb05c784daec60c375791a32817a7aa5eb972c27609491eb91081ec3",
+          "afterSha256": "2ee4cbbc5c83c50df61aadcfc10bebbb675a37dd94089c70f7148fe1a8fd96ae"
+        },
+        {
+          "id": "minecraft:creeper_head",
+          "beforeSha256": "9da5e2d793a6bc8783417ac323b840bad4923272e2e7b184748c31d244775e07",
+          "afterSha256": "71260fb40014731b1fdee79fcd307778028a7490d4422c88b634ac3e7b2923c9"
+        },
+        {
+          "id": "minecraft:cyan_banner",
+          "beforeSha256": "b87bc26d4b0160d8fc32a0f7edeba235ad42af2c36365931b067d28194c25509",
+          "afterSha256": "0701fb617d19163168ad60b51031146eb9aeb0e871065af3644328d6c0fc2b3c"
+        },
+        {
+          "id": "minecraft:cyan_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "a31560f74b02373fb4059f45b9447ffee79b065c47620a6bce75d8b8e62b4057"
+        },
+        {
+          "id": "minecraft:cyan_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "c262677aa5222134790f7b7e1306570a0fa946d68609d36f3e5a3b565fc554ca"
+        },
+        {
+          "id": "minecraft:dragon_head",
+          "beforeSha256": "21d499be3ae8c5afa58f0d957bfc821f32c9b71ddbb8a024a3409dcdabf52083",
+          "afterSha256": "24f2231384328cb8612d0a8c79806f868241e62bc90e3ac462ae8d8cd4695c17"
+        },
+        {
+          "id": "minecraft:ender_chest",
+          "beforeSha256": "022a5dca2d2ce1d0b9465b6cc2e34237466e994db037782883a5171b4831e283",
+          "afterSha256": "728394b5859090fa16228bf55c07d5b6e56227222f2c05927340467b0c0b9a5a"
+        },
+        {
+          "id": "minecraft:gray_banner",
+          "beforeSha256": "642313ae3ec0beba97720b06567b463d6bf786e7a2eec8bf91ce59518bcdbb26",
+          "afterSha256": "a080b01727e8c482faec4cc74137fe388a82f7ab908b9387e8a1ab5f623549c8"
+        },
+        {
+          "id": "minecraft:gray_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "b1e7740df84f9fd475da29d2482153e11f9439e989e10892add9c946b6095a73"
+        },
+        {
+          "id": "minecraft:gray_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "7a46a1eca488d713def4dff62d6a80d8fa6facfc2afd0c5f29cf8c5cd5b2f93d"
+        },
+        {
+          "id": "minecraft:green_banner",
+          "beforeSha256": "6d0fc7756742171953b7a08670b9aa5a0c872fd33d29ffa701fcf8689d595a58",
+          "afterSha256": "db1d6732ef09dd45287ef4d483e667c3a2051a92e3722625560a64096acc237e"
+        },
+        {
+          "id": "minecraft:green_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "614362180eccf63bc827a1539b15c9a8e5512d71a05af547acca997e5664091d"
+        },
+        {
+          "id": "minecraft:green_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "cadfb404f61f048bf89ac5eb51fdfab6f70e8c0331b0db233add51c4fd565195"
+        },
+        {
+          "id": "minecraft:light_blue_banner",
+          "beforeSha256": "ae6f25570a17a180fc7e4029477b43f64f3c26b281020b3e33d77615f1a7cc89",
+          "afterSha256": "3bc1c30b46a6030c97a3fedc540566f7871fad4dc506a8e94505dfb4d84f4a02"
+        },
+        {
+          "id": "minecraft:light_blue_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "cd1ba2f31133ba314d8b1e1fce82f589e5417cbf29d535c1f2e26efa2fbf3b6d"
+        },
+        {
+          "id": "minecraft:light_blue_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "9bb1fe3831532ec3242647ad47958fea553864df92c4beacc3ca5a570d3da0ea"
+        },
+        {
+          "id": "minecraft:light_gray_banner",
+          "beforeSha256": "f685d3dc3337cfe497aefd201562f6b4d3ae24ec03f37606a01bb30e6116cd41",
+          "afterSha256": "4fb25ea2832b9f5009ea08e74a78909e51b2d16d6fc1b7aa8812b214cce5dd53"
+        },
+        {
+          "id": "minecraft:light_gray_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "3aca4f4728544c6652aa4f706bc94dcf611fdfd615aba1c86e34a4225a461251"
+        },
+        {
+          "id": "minecraft:light_gray_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "c87981503aa4c8a9b1fae3049dd25793eca7ef1e72b7a6c37275c81861493ada"
+        },
+        {
+          "id": "minecraft:lime_banner",
+          "beforeSha256": "75f0a71867a0c24d9f4c8f28e9d75d0c6f7f2006716fd9d198fe80f5d829da2b",
+          "afterSha256": "2292c37beea0b5255727bd314fa5ecba726ae869550985860c0e5e1c02a7a9ac"
+        },
+        {
+          "id": "minecraft:lime_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "8ab227d28e06c8f294fb04819711b765b67693b6825759543c0ea68e8603942c"
+        },
+        {
+          "id": "minecraft:lime_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "83468dc71139e136591d95a42277b0c8e9ab9aa946e872c2d235fdceed781d38"
+        },
+        {
+          "id": "minecraft:magenta_banner",
+          "beforeSha256": "ece97bb4f3dcd5f80a49469417f1b71769f5f7518795947cc539f63f99169081",
+          "afterSha256": "3868b5724b8b6d21c0820f590d08506f4b76a7a036c4af22e726226364d6ca0b"
+        },
+        {
+          "id": "minecraft:magenta_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "442c0d3229336dacf2e200119d6fd2cfa91404d9fa182012bd4ff848e69c0617"
+        },
+        {
+          "id": "minecraft:magenta_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "cce46a10ef8f7d3673216f4dc855553760ce90fb70854c3feac17ac872bda964"
+        },
+        {
+          "id": "minecraft:orange_banner",
+          "beforeSha256": "4795bd9df8229c149ebab70bfed693e442a26209f10b7b1ca3cd3a7254c11fef",
+          "afterSha256": "9a70ebb10822379dad54d67cf4e4fff11dc2664c16f879c339876010a1a0e8ab"
+        },
+        {
+          "id": "minecraft:orange_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "0353c64c90d9361e31602418601a0aa975ba20f42e1030da8a161005f4aa5a03"
+        },
+        {
+          "id": "minecraft:orange_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "1c3066952e5366ecfc5253e0be5b5c4eedcf00835eea4548c8839eb9c900d0e2"
+        },
+        {
+          "id": "minecraft:pink_banner",
+          "beforeSha256": "2054308a8ab387d12f8215228f2eb86564a685773deab34d0718c94a69546de6",
+          "afterSha256": "8d4ac2816ae7e3ba3a1d1c766b336678b2aec8660e4e86036dbfa70e110ca248"
+        },
+        {
+          "id": "minecraft:pink_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "61be43541cdcfffef6218cb227110269263ced6ea17a6804d0051eb2b1b00282"
+        },
+        {
+          "id": "minecraft:pink_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "dd2e156391010afca25519a6ffa0bc6c73aaa8380cb1daf7c46bf57ee24df811"
+        },
+        {
+          "id": "minecraft:player_head",
+          "beforeSha256": "828eef721c622b00afd6e215c3b1f935f65a53a0311538f9fb98162e060a60a1",
+          "afterSha256": "c807386445290d8657ca6843ccdcff8aeacddf4ba8cedbbb1efb9fdeb590b6af"
+        },
+        {
+          "id": "minecraft:purple_banner",
+          "beforeSha256": "ef1f85019005b810d5ace7290055a0cbfdb8b84cf49a9e244f06747b1b8f080e",
+          "afterSha256": "e78dd8dc27ba11656e9ea57287eaec9dc13e08acd9bf6c2ce2eb55e6642a675d"
+        },
+        {
+          "id": "minecraft:purple_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "b6c6ae35c35f574da33d67b976e49e5f750192da4dd6b8ed4f2c12f758759cbe"
+        },
+        {
+          "id": "minecraft:purple_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "4c4c853f3793280770aa9ccd89333d8610b4ef501c2652d41a7daf8089a72ebd"
+        },
+        {
+          "id": "minecraft:red_banner",
+          "beforeSha256": "f21d531870d7bd671f07682b8851f822d615a48f2e3868e85a26df38f68a4614",
+          "afterSha256": "683096a21742f8cb49392979dc5a846ad94fb4e4d4fde41d23e3d2903324b96c"
+        },
+        {
+          "id": "minecraft:red_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "b3c7cbcbaf87a05288cb3434ce01189a02cafcc0677910f101a6c8ccaa56fe5a"
+        },
+        {
+          "id": "minecraft:red_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "19995f09a0b82e444f67c54883d0466d8f0b98a7b5f5b9f53504c62f4211ad4c"
+        },
+        {
+          "id": "minecraft:shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "aeeba0ebc01af6179f5f5ba92c2cbad785746ee9caaa63a87831a3d6d4bc6577"
+        },
+        {
+          "id": "minecraft:skeleton_skull",
+          "beforeSha256": "9da5e2d793a6bc8783417ac323b840bad4923272e2e7b184748c31d244775e07",
+          "afterSha256": "087f120d0e953c2f13f7bd818c2661fdd58ac36fcf1d7eafdcbbac90fab6269f"
+        },
+        {
+          "id": "minecraft:trapped_chest",
+          "beforeSha256": "022a5dca2d2ce1d0b9465b6cc2e34237466e994db037782883a5171b4831e283",
+          "afterSha256": "de27ec6e9f00cf341480379603d9554b21c467a8f5b50fb1551fa85543a9a5e9"
+        },
+        {
+          "id": "minecraft:white_banner",
+          "beforeSha256": "43b9abcb2737cc8347b8648e7d32f2e9e719644be2b79bb1bdaa9a49bdb76e27",
+          "afterSha256": "9b9fb90399c110cb8140437dd8c044a7de9b762b57a428b9edf9e27d1eadcb70"
+        },
+        {
+          "id": "minecraft:white_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "4bb8c43d3afa5b40d8e25ad9b8c44d84f52eecd749a23d9fde19b4cb4ab6d0a3"
+        },
+        {
+          "id": "minecraft:white_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "0c1aad5d8fafb8bf806c6c5a59759c472891bde30d06c2ab0d9afa5167608c1f"
+        },
+        {
+          "id": "minecraft:wither_skeleton_skull",
+          "beforeSha256": "9da5e2d793a6bc8783417ac323b840bad4923272e2e7b184748c31d244775e07",
+          "afterSha256": "1be54a552b489e89103448bb9071b6a532c8857a746c402288e502c7865ab741"
+        },
+        {
+          "id": "minecraft:yellow_banner",
+          "beforeSha256": "567c5963cfac378516e22411299624792b252e3265a7eb104d065b0db6760523",
+          "afterSha256": "f23c7e434db459bd0b37f5ab7d3f7e2a548346d683e9f509ec18121fcdb5ca0c"
+        },
+        {
+          "id": "minecraft:yellow_bed",
+          "beforeSha256": "16033096e046afff1ece280cdb6044f2a543689526231bfc82da5e04a0a694ae",
+          "afterSha256": "45740e4571ff4f5196f3659ab30f21987d2408c8f86c6c926af07e01a0e2f4e3"
+        },
+        {
+          "id": "minecraft:yellow_shulker_box",
+          "beforeSha256": "c73f1c847256ddadea0c611f3e19876d508a4b328a35be1be9d8544bc8f17fb9",
+          "afterSha256": "27c9cbe9bdda94c8c8b79770dc6f4a8ac8d10217f1ab604f175eb57b6eb0c81f"
+        },
+        {
+          "id": "minecraft:zombie_head",
+          "beforeSha256": "828eef721c622b00afd6e215c3b1f935f65a53a0311538f9fb98162e060a60a1",
+          "afterSha256": "3bef5efa3bf06be8d7a96f2ef13a70076c248126db9cd08def71bd184e647df5"
+        }
+      ],
+      "pathsMatch": true
+    },
+    {
+      "version": "1.15.2",
+      "sameRgba": 883,
+      "changed": [],
+      "pathsMatch": true
+    },
+    {
+      "version": "1.16.5",
+      "sameRgba": 975,
+      "changed": [],
+      "pathsMatch": true
+    }
+  ],
+  "selectedVersusAll": [
+    {
+      "ids": [
+        "minecraft:dragon_head"
+      ],
+      "audit": {
+        "version": "1.14.4",
+        "mode": "icons",
+        "audited": 1,
+        "registryPopulationVerified": false,
+        "transparentImages": 1,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 1,
+        "comparisonVerified": true,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 35.12,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      "settings": {
+        "agentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "mappingsSha256": "2dd53a5e70ba493cf6e33c0fc52bbdf4c57f9429c7a13842565aa825fd44d910",
+        "metadataSha256": "7239a8a156a64f38292f3120736e57aa2b9bc32087240b402804d1912cacec4c",
+        "profile": "gui-fixed",
+        "size": 64
+      }
+    },
+    {
+      "ids": [
+        "minecraft:black_banner",
+        "minecraft:black_bed",
+        "minecraft:black_shulker_box",
+        "minecraft:blue_banner",
+        "minecraft:blue_bed",
+        "minecraft:blue_shulker_box",
+        "minecraft:brown_banner",
+        "minecraft:brown_bed",
+        "minecraft:brown_shulker_box",
+        "minecraft:chest",
+        "minecraft:conduit",
+        "minecraft:creeper_head",
+        "minecraft:cyan_banner",
+        "minecraft:cyan_bed",
+        "minecraft:cyan_shulker_box",
+        "minecraft:dragon_head",
+        "minecraft:ender_chest",
+        "minecraft:gray_banner",
+        "minecraft:gray_bed",
+        "minecraft:gray_shulker_box",
+        "minecraft:green_banner",
+        "minecraft:green_bed",
+        "minecraft:green_shulker_box",
+        "minecraft:light_blue_banner",
+        "minecraft:light_blue_bed",
+        "minecraft:light_blue_shulker_box",
+        "minecraft:light_gray_banner",
+        "minecraft:light_gray_bed",
+        "minecraft:light_gray_shulker_box",
+        "minecraft:lime_banner",
+        "minecraft:lime_bed",
+        "minecraft:lime_shulker_box",
+        "minecraft:magenta_banner",
+        "minecraft:magenta_bed",
+        "minecraft:magenta_shulker_box",
+        "minecraft:orange_banner",
+        "minecraft:orange_bed",
+        "minecraft:orange_shulker_box",
+        "minecraft:pink_banner",
+        "minecraft:pink_bed",
+        "minecraft:pink_shulker_box",
+        "minecraft:player_head",
+        "minecraft:purple_banner",
+        "minecraft:purple_bed",
+        "minecraft:purple_shulker_box",
+        "minecraft:red_banner",
+        "minecraft:red_bed",
+        "minecraft:red_shulker_box",
+        "minecraft:shulker_box",
+        "minecraft:skeleton_skull",
+        "minecraft:trapped_chest",
+        "minecraft:wheat",
+        "minecraft:white_banner",
+        "minecraft:white_bed",
+        "minecraft:white_shulker_box",
+        "minecraft:wither_skeleton_skull",
+        "minecraft:yellow_banner",
+        "minecraft:yellow_bed",
+        "minecraft:yellow_shulker_box",
+        "minecraft:zombie_head"
+      ],
+      "audit": {
+        "version": "1.14.4",
+        "mode": "icons",
+        "audited": 60,
+        "registryPopulationVerified": false,
+        "transparentImages": 60,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 60,
+        "comparisonVerified": true,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 38.02,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      "settings": {
+        "agentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "mappingsSha256": "2dd53a5e70ba493cf6e33c0fc52bbdf4c57f9429c7a13842565aa825fd44d910",
+        "metadataSha256": "7239a8a156a64f38292f3120736e57aa2b9bc32087240b402804d1912cacec4c",
+        "profile": "gui-fixed",
+        "size": 64
+      }
+    }
+  ],
+  "nativeGuiReference": {
+    "scope": "Instrumented title-screen fixture in normal native GUI frames; shared fixed-v1 context and registry initialization, independent export target/projection/composition. Not uninstrumented world screenshots or final semantic acceptance.",
+    "officialInputsModified": false,
+    "size": 64,
+    "positionGui": [
+      32,
+      32
+    ],
+    "windowPixels": [
+      1280,
+      960
+    ],
+    "guiScale": 4,
+    "legacyInventoryState": {
+      "depthTest": true,
+      "cullFace": true,
+      "lighting": "Lighting.turnOnGui"
+    },
+    "maxAllowedChannelError": 2,
+    "harnessSourcesSha256": {
+      "scripts/verify-gui-reference.py": "ab773aadbc48dbf6f42d7419e7290fa9ac030b004796b3c5adb779b51466fceb",
+      "scripts/qa/GuiReferenceAgent.java": "533ddd3c24c2eda2f4b74e7335f784b6a6c60b3e6bd8554f36b4b4df6601e2e3"
+    },
+    "jobs": [
+      {
+        "version": "1.14.4",
+        "background": "7f7f7f",
+        "exitCode": 0,
+        "qaAgentSha256": "27308dbc3a973fc89857d5f442ebb17a3384585a8c0d14a535a20592f8ed28fd",
+        "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+        "baselineAgentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "entries": [
+          {
+            "id": "minecraft:black_banner",
+            "status": "success",
+            "exportPngSha256": "79f237ee4d81bc634a98a8f0251ea1bb2949a0525e903574fddfc679a5e407ac",
+            "referenceCropSha256": "8c93e51d55bdd55b7d6dbab295dffc2fee83951796f272c539806c2930f643e6",
+            "referenceScreenSha256": "57d6dfce2e60c62ad5289ab64671401f8a811ad5603f870a6b9c7876c6cf2278",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:black_bed",
+            "status": "success",
+            "exportPngSha256": "cc8a379ae73f30345917d25f982cc888e5dd0e189ce39fa32c45f6b3370653b3",
+            "referenceCropSha256": "6ab40e0c9d862ef50978bb63f354df3f98fc161d8482065921a93bb4a9ea71d3",
+            "referenceScreenSha256": "6548feb4224e8a3eef024526e6e7b2352bc6f697d2239f57d84ad3ce17e54b76",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:black_shulker_box",
+            "status": "success",
+            "exportPngSha256": "6579c4f67bc26fc3643f23b77d0841fcfe0f3895d1ee16a082ca884d645edfb3",
+            "referenceCropSha256": "88fc229e94bd662c50fecbc1a448d6a0466d6a90e38ecafdb704368cae4538ac",
+            "referenceScreenSha256": "56dd38b1ca824f4b30912329105d36f4176921547246d448b005e6d09a8b1b0f",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:blue_banner",
+            "status": "success",
+            "exportPngSha256": "c880b135a97ed8126029e71808212ed7c520ebba13d763e53d354148a0e82faf",
+            "referenceCropSha256": "87f564b0711593f382687bbcbd870a8e4d5bc29566635a200b43ca77c084837f",
+            "referenceScreenSha256": "33d92f62a84e20160e0014f65c2cdba9954fb336ba3fb85a4d4ad467bd5748b7",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:blue_bed",
+            "status": "success",
+            "exportPngSha256": "c5be1252b1b2eb87df3f32526281d312739931470cd841b260ea0ec75d070348",
+            "referenceCropSha256": "c8013af43416a8a3d60c2ac23978384619022a50182c531c45bb23b0e51156a5",
+            "referenceScreenSha256": "f2969273cc0ed6878e0e0a57f7a1744309d2ef4f1da7838c609ba5a314baf101",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:blue_shulker_box",
+            "status": "success",
+            "exportPngSha256": "83fc27deb587baa442d25d08b3e4a3dd5849bc1edb3f9a04acd116d94ed34c23",
+            "referenceCropSha256": "3a4e7a86af0a4100a16d00ab2205cd305c01201fdbb31ebad98860e820060b26",
+            "referenceScreenSha256": "118b29e31cb7f2eba220b4702678d0e66a82bfbee3abb98f08ac15012b50cef3",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:brown_banner",
+            "status": "success",
+            "exportPngSha256": "453744dd5c4fc48f861ed71a5651e05923fb8b5c5bb2d5c4a935afe1a3d4f607",
+            "referenceCropSha256": "93c92b0ee9fe2008f035d4f2ee630621b90924bf9777f0a65f0fde7273c293cd",
+            "referenceScreenSha256": "22b2025efd4b6900272ccab85b0c61fee1f07fb278f94d71db329be15cb8a351",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:brown_bed",
+            "status": "success",
+            "exportPngSha256": "6ee2ff1257f87ec25840d6cde6bd39c156e61b81d557773a1f67af0474b5c8ed",
+            "referenceCropSha256": "0a2650d9feb6357286e71a664df795f3bb1038657b9df308e21270c4a2b861fb",
+            "referenceScreenSha256": "a760f6aefdd716224bfe5f9406cd75fb57908f6b41f81faf6046c08317a92673",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:brown_shulker_box",
+            "status": "success",
+            "exportPngSha256": "6e0e211a5e38573e3552dda0b8bb1d4aa965dfe9f3cc4e8e6371919fe97e3d85",
+            "referenceCropSha256": "90e4c34f2e19119d404253862edacfb7d42d277abecbe8b48e791c66dc406026",
+            "referenceScreenSha256": "7939d3b5399f66dc0877dbe68826ba8d1ab4a8d271edec369679d61f5ce2af6b",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:chest",
+            "status": "success",
+            "exportPngSha256": "97bd7a95c878409be93c3e19126d34d8029d7c420b42fe95dbe78cd84073ec15",
+            "referenceCropSha256": "3fa2ced94e2da280dadbac18c85c0f916bf4f744f6f582ac94368163081fcd5e",
+            "referenceScreenSha256": "32bf7fdd33aa74063aafbe862b0a6da49e25367e0aaf635fa169a6d5d90b77c5",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:conduit",
+            "status": "success",
+            "exportPngSha256": "2ee4cbbc5c83c50df61aadcfc10bebbb675a37dd94089c70f7148fe1a8fd96ae",
+            "referenceCropSha256": "49746a211f0d80020379499ee4ca1fb2be3d5361263f56836b29e7570ac99596",
+            "referenceScreenSha256": "a4502b8850b5ac19f57f6fd39cf6b9ce898657c00eb8404b5dd07e916a122e45",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:creeper_head",
+            "status": "success",
+            "exportPngSha256": "71260fb40014731b1fdee79fcd307778028a7490d4422c88b634ac3e7b2923c9",
+            "referenceCropSha256": "612f03976235e46976a76bb562534fe03c42bb4aee6732d3facd2db92f151676",
+            "referenceScreenSha256": "237cd74362dee53d0acf3fcce5214284ab497bb59c5c7345adb4d3384bd64a34",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:cyan_banner",
+            "status": "success",
+            "exportPngSha256": "0701fb617d19163168ad60b51031146eb9aeb0e871065af3644328d6c0fc2b3c",
+            "referenceCropSha256": "5f8496c836c9372f019103704cc793cfc08f3faeffb4a9b551f7256c41f8e52b",
+            "referenceScreenSha256": "9f453bf519a6a07fccbc5cf9d069e082e251200dcd4b86128641e531dfa308cc",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:cyan_bed",
+            "status": "success",
+            "exportPngSha256": "a31560f74b02373fb4059f45b9447ffee79b065c47620a6bce75d8b8e62b4057",
+            "referenceCropSha256": "91131eabe9a219535ee3b1bc3ad740f20f08ea173f7e9a4fbb9235b002880e53",
+            "referenceScreenSha256": "bec3bf19151a882fa4cddcb9009e7036931ed350b400ed6743d2ba8bf2269caa",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:cyan_shulker_box",
+            "status": "success",
+            "exportPngSha256": "c262677aa5222134790f7b7e1306570a0fa946d68609d36f3e5a3b565fc554ca",
+            "referenceCropSha256": "1727cab79bc72acc72ad57227cc74bd649db26b31d0bbde6c5b60a2cf01f7d89",
+            "referenceScreenSha256": "5e65e2363bfa2a042c9515e7d5c6803eebea5095d5b9d069ff6d4876b87faae5",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:dragon_head",
+            "status": "success",
+            "exportPngSha256": "24f2231384328cb8612d0a8c79806f868241e62bc90e3ac462ae8d8cd4695c17",
+            "referenceCropSha256": "8688d73bc519caedd0a03c44563d7ebd665d21f3384905b37a8850e3c47341ec",
+            "referenceScreenSha256": "a9c9454450c9e02077e855853b1c178b174a696ea8e491eb665654daed8be451",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:ender_chest",
+            "status": "success",
+            "exportPngSha256": "728394b5859090fa16228bf55c07d5b6e56227222f2c05927340467b0c0b9a5a",
+            "referenceCropSha256": "e9e3bf2d76ea3f5e18ecefc6ce20a4db798c0d9b97c4a9fb8bbae19ca02cc293",
+            "referenceScreenSha256": "957a68fc5f9cb62de8cfbe9dec199fe71cb473be062b99f35b15ad67067ad98e",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:gray_banner",
+            "status": "success",
+            "exportPngSha256": "a080b01727e8c482faec4cc74137fe388a82f7ab908b9387e8a1ab5f623549c8",
+            "referenceCropSha256": "e8affbd369b05250cb4ec8045010af14395672894ea072454cf2382eaef95dbb",
+            "referenceScreenSha256": "c4cfe5265fd7da9d75ac10380bc52432c956014c10ae5385230916395b2f6558",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:gray_bed",
+            "status": "success",
+            "exportPngSha256": "b1e7740df84f9fd475da29d2482153e11f9439e989e10892add9c946b6095a73",
+            "referenceCropSha256": "39a16d0b0e230f0c618f83dff838013328609413ba95e88541648abdd5ca69d8",
+            "referenceScreenSha256": "bba16657dc4cc92a96ed5e4e3ccfa0da8cdd03bb614876feb7c911e5b3a2434f",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:gray_shulker_box",
+            "status": "success",
+            "exportPngSha256": "7a46a1eca488d713def4dff62d6a80d8fa6facfc2afd0c5f29cf8c5cd5b2f93d",
+            "referenceCropSha256": "b599a1ac17168d391966b0d08cdc840a9529c15f13c91024d1d5817ee6d2aafe",
+            "referenceScreenSha256": "b834e4627e4920a3b31c84dcad1c6563edfb883ea27cef40ad23026513ebbd9b",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:green_banner",
+            "status": "success",
+            "exportPngSha256": "db1d6732ef09dd45287ef4d483e667c3a2051a92e3722625560a64096acc237e",
+            "referenceCropSha256": "1e8e7b96514dcf25bd6322c03f94744950456e2d0ad64f603ebeac185355929a",
+            "referenceScreenSha256": "d681548e6a8a32f67e3d046f23686fae16dcfc934e9b0f55976e75493fb1dabe",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:green_bed",
+            "status": "success",
+            "exportPngSha256": "614362180eccf63bc827a1539b15c9a8e5512d71a05af547acca997e5664091d",
+            "referenceCropSha256": "aa15675bf95dfb85905acde1e2365be0310f925d9ad58a0a34240bef022b4cdc",
+            "referenceScreenSha256": "5d399f68ee0cf3afa3c72c483c34c77bd8f03dab5bbe6c460a43d755a85ed65c",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:green_shulker_box",
+            "status": "success",
+            "exportPngSha256": "cadfb404f61f048bf89ac5eb51fdfab6f70e8c0331b0db233add51c4fd565195",
+            "referenceCropSha256": "96bfb86f9b3ff243ca3b4a11566c925b15fd903de7183c1fa790a0e08a894c0a",
+            "referenceScreenSha256": "77d45225091bfd9f6b43f276952c01406b19b1888f0557690cf24c845c2a03e5",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_blue_banner",
+            "status": "success",
+            "exportPngSha256": "3bc1c30b46a6030c97a3fedc540566f7871fad4dc506a8e94505dfb4d84f4a02",
+            "referenceCropSha256": "6972d1eae3c04aad0878a53fe948c3aa5d71a466514e4a2ff88458c1cab4bd47",
+            "referenceScreenSha256": "6cead0527ace87f9114cea3b3bcb529a3c66ad3185e6d3f57379a9a9297c51f2",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_blue_bed",
+            "status": "success",
+            "exportPngSha256": "cd1ba2f31133ba314d8b1e1fce82f589e5417cbf29d535c1f2e26efa2fbf3b6d",
+            "referenceCropSha256": "a9a2ec96859edaf5f062e50b8b2e9024de363358e7677b8f5fbb0e307edbf59e",
+            "referenceScreenSha256": "a03916e7c6279c75b7a7979b6f74aeb22349c0e5fe1e523c1cc6036a253a1f7a",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_blue_shulker_box",
+            "status": "success",
+            "exportPngSha256": "9bb1fe3831532ec3242647ad47958fea553864df92c4beacc3ca5a570d3da0ea",
+            "referenceCropSha256": "5907b411bd630e537b74878b4e39c3f769812459b9ca07bed9c6a935c5711ef9",
+            "referenceScreenSha256": "7fad524a017cfceab3a01c5a3c4d44150309c3424eb66e1b0c9197bb7f14378c",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_gray_banner",
+            "status": "success",
+            "exportPngSha256": "4fb25ea2832b9f5009ea08e74a78909e51b2d16d6fc1b7aa8812b214cce5dd53",
+            "referenceCropSha256": "99199b4bb5d23ced827adb0df4f44101f334326ab4834a15c46ece4b268e5056",
+            "referenceScreenSha256": "2a69b485d029c29899898daf5a24a74e2a06e88c6556a9a4133a1d58a261dd90",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_gray_bed",
+            "status": "success",
+            "exportPngSha256": "3aca4f4728544c6652aa4f706bc94dcf611fdfd615aba1c86e34a4225a461251",
+            "referenceCropSha256": "6ec79ba29c66f844550788c03b32f78215248a4b2a8bac4866f201bff0f0db3b",
+            "referenceScreenSha256": "451de88483ab49b27568c82db23218d1724f114a2bcf89c2288840023e1e45e1",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_gray_shulker_box",
+            "status": "success",
+            "exportPngSha256": "c87981503aa4c8a9b1fae3049dd25793eca7ef1e72b7a6c37275c81861493ada",
+            "referenceCropSha256": "e9f237c38dda675cf9b464dff6681902671d5047f00bbdd948009eb10f178034",
+            "referenceScreenSha256": "6a2b411152c1f1b9285d357fde844adc618ad01de2cc425e23498d24d3c0efed",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:lime_banner",
+            "status": "success",
+            "exportPngSha256": "2292c37beea0b5255727bd314fa5ecba726ae869550985860c0e5e1c02a7a9ac",
+            "referenceCropSha256": "4277469f3c93fe437cfaf115c2bb0024a638d137d4bc557de760f83c25e2b666",
+            "referenceScreenSha256": "68b84da25b90f52647f4c81a4131df4d53654f6f0714c1b6309a23403f2c4288",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:lime_bed",
+            "status": "success",
+            "exportPngSha256": "8ab227d28e06c8f294fb04819711b765b67693b6825759543c0ea68e8603942c",
+            "referenceCropSha256": "59b7f89647cf95e9d304c8c19f0d3c5973ee953f5f545d55d289c49778643da3",
+            "referenceScreenSha256": "c7fa0973e563d496a9fb7a4a8bc94f15d25b64cd1669c626725b40adad3e9494",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:lime_shulker_box",
+            "status": "success",
+            "exportPngSha256": "83468dc71139e136591d95a42277b0c8e9ab9aa946e872c2d235fdceed781d38",
+            "referenceCropSha256": "5f5d3790a37966aca26cf3f261882ea6ce6b2bc2023f6e7c12d50b958999d707",
+            "referenceScreenSha256": "ee414268de9a16adfd3ae641d5a6bd5e9440b85f47af3d187ffd635988571333",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:magenta_banner",
+            "status": "success",
+            "exportPngSha256": "3868b5724b8b6d21c0820f590d08506f4b76a7a036c4af22e726226364d6ca0b",
+            "referenceCropSha256": "aea847d47cea91c869382fbb15a080a62f53509851a644232a5c35ce9cc7a129",
+            "referenceScreenSha256": "86676e4f5e1a948c626fabf2a19c26bab1ad3ae6d608987daad5a7d43117d534",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:magenta_bed",
+            "status": "success",
+            "exportPngSha256": "442c0d3229336dacf2e200119d6fd2cfa91404d9fa182012bd4ff848e69c0617",
+            "referenceCropSha256": "ff310f4fc5af9fda180f225cdb28c6a780206cbf49853a35c9a20cd9cf065238",
+            "referenceScreenSha256": "6156cebfc8b87a78b2deb20817f89b13590b02449e7fa69c42ff37b82b0d430d",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:magenta_shulker_box",
+            "status": "success",
+            "exportPngSha256": "cce46a10ef8f7d3673216f4dc855553760ce90fb70854c3feac17ac872bda964",
+            "referenceCropSha256": "6c80b71e55761b98c133e562359801bce7e3c7b2993d63257e2f312626f93fed",
+            "referenceScreenSha256": "c2be60a1ac620b30cd6c40668fa6f1e5a877f62d5fa52b0cbf973cf0cea5ee27",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:orange_banner",
+            "status": "success",
+            "exportPngSha256": "9a70ebb10822379dad54d67cf4e4fff11dc2664c16f879c339876010a1a0e8ab",
+            "referenceCropSha256": "a6fcd47b6171c55c1f2bfd02820147016fdaaffa80b1ca95b2bcd17899f890c2",
+            "referenceScreenSha256": "9708d223ffb20933eec941dc27818563b6082e96f2e8cd0a5236af9cc853fdb1",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:orange_bed",
+            "status": "success",
+            "exportPngSha256": "0353c64c90d9361e31602418601a0aa975ba20f42e1030da8a161005f4aa5a03",
+            "referenceCropSha256": "802ebc5c95457edc7313b484d7e8adfb19e3e7b847b846a139c9da956b372a6e",
+            "referenceScreenSha256": "14a2280abb176cc0aa4a9d440b7fca25e7fbfd2cdc23d93cc89e2110b4987330",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:orange_shulker_box",
+            "status": "success",
+            "exportPngSha256": "1c3066952e5366ecfc5253e0be5b5c4eedcf00835eea4548c8839eb9c900d0e2",
+            "referenceCropSha256": "a0b4df5a909c6e4d264f4cc3047500ae209f4189f5ce6538b192cbc5716d4e31",
+            "referenceScreenSha256": "2b3d1763b49f81ad381a5f4accade2f06691185a803017a1bf9e8abaefd2f079",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:pink_banner",
+            "status": "success",
+            "exportPngSha256": "8d4ac2816ae7e3ba3a1d1c766b336678b2aec8660e4e86036dbfa70e110ca248",
+            "referenceCropSha256": "91fbf48a37c5987c2553919f4c33b53a69884217bc68bdce45ed487445efe2d8",
+            "referenceScreenSha256": "9d3ca4c47eafda9cd67e24a37471d2f10018b8939c19ee98f7b994d5f3e2cd07",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:pink_bed",
+            "status": "success",
+            "exportPngSha256": "61be43541cdcfffef6218cb227110269263ced6ea17a6804d0051eb2b1b00282",
+            "referenceCropSha256": "7989e4d188ec69da240774971214ae2c4435cf355e1f5489e434205c7787fc98",
+            "referenceScreenSha256": "c8cec02b4ed97934b568ca873a3bfadb5ff6d60f53d8f449759fe5b9472a08b4",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:pink_shulker_box",
+            "status": "success",
+            "exportPngSha256": "dd2e156391010afca25519a6ffa0bc6c73aaa8380cb1daf7c46bf57ee24df811",
+            "referenceCropSha256": "35c83e058f2818e2f8a9c001b857df95f9019d35c775e82df66331d4cfe99795",
+            "referenceScreenSha256": "2c69c827c9665cc7457b30dd1f974fe13fd56a791bbd8778298ee3acd69d6fd0",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:player_head",
+            "status": "success",
+            "exportPngSha256": "c807386445290d8657ca6843ccdcff8aeacddf4ba8cedbbb1efb9fdeb590b6af",
+            "referenceCropSha256": "8c53f93e710f8e1c7d1f86ec4ccc391736a4225b8d5a78ae728ab8559f288099",
+            "referenceScreenSha256": "f4a3f16dfff07e0167925a2d63271e8915defdfe483b215ce540d75b043d04b8",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:purple_banner",
+            "status": "success",
+            "exportPngSha256": "e78dd8dc27ba11656e9ea57287eaec9dc13e08acd9bf6c2ce2eb55e6642a675d",
+            "referenceCropSha256": "97496f1d3485facb7f4c36957c02393b449aba39e362764b7af495eb538e9b71",
+            "referenceScreenSha256": "dfacae53a39aaa6383889048da2b3919bbeab9d8a4b5a86219ee5e84f49ff426",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:purple_bed",
+            "status": "success",
+            "exportPngSha256": "b6c6ae35c35f574da33d67b976e49e5f750192da4dd6b8ed4f2c12f758759cbe",
+            "referenceCropSha256": "887b9d5266a2a9be01cb95cf2407ce45c4a1a5538ca729800c590e08a64bf73d",
+            "referenceScreenSha256": "4f8500f25370c0cde40cf0bd687b7bf0ae0be89c44ed0998065c527f06509dc4",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:purple_shulker_box",
+            "status": "success",
+            "exportPngSha256": "4c4c853f3793280770aa9ccd89333d8610b4ef501c2652d41a7daf8089a72ebd",
+            "referenceCropSha256": "20ce03cc2113d0a5d87c96132200403f37c653cbcf96e3c2d984e6125319826c",
+            "referenceScreenSha256": "8193ddb5005787116695ffb9a53c05a534dbfbae786193d0a695aaa79af9a1f8",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:red_banner",
+            "status": "success",
+            "exportPngSha256": "683096a21742f8cb49392979dc5a846ad94fb4e4d4fde41d23e3d2903324b96c",
+            "referenceCropSha256": "0ff2ff01cd0a5e8d3b2212ff557d33d58fc5aab0fb737223446727db0c2b7a4d",
+            "referenceScreenSha256": "a909a45f6514080c0588b042e6e1f6864ca7ee4f32b0d5f7463da766238706bd",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:red_bed",
+            "status": "success",
+            "exportPngSha256": "b3c7cbcbaf87a05288cb3434ce01189a02cafcc0677910f101a6c8ccaa56fe5a",
+            "referenceCropSha256": "1cae2d6bd550d75d9adfd7673ce0813c02e096d42d505e7a94ea6d875b3c9035",
+            "referenceScreenSha256": "5339c0b731ce264c660473f18999ae7e274bff2a59073441f346a24a524a1474",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:red_shulker_box",
+            "status": "success",
+            "exportPngSha256": "19995f09a0b82e444f67c54883d0466d8f0b98a7b5f5b9f53504c62f4211ad4c",
+            "referenceCropSha256": "e6a7c5b6f60fa879ed3678699a62d8361fe764957103b15be1a71be3c77c82eb",
+            "referenceScreenSha256": "36c4a5c1c775f5af3e008857f2d14ae1eb10fe6aa731cff91b408e8137942d6c",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:shulker_box",
+            "status": "success",
+            "exportPngSha256": "aeeba0ebc01af6179f5f5ba92c2cbad785746ee9caaa63a87831a3d6d4bc6577",
+            "referenceCropSha256": "0324c0ab4366f9403f0fb17280eb44b792759b02b4a71a475e7218c3dfd24f23",
+            "referenceScreenSha256": "2f41132441a50aa4cb5a4633bfccd4e24c187b9f9df62c1930bc099a10b6dcea",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:skeleton_skull",
+            "status": "success",
+            "exportPngSha256": "087f120d0e953c2f13f7bd818c2661fdd58ac36fcf1d7eafdcbbac90fab6269f",
+            "referenceCropSha256": "db98677f4216d0bec7420990af86d969ed1d165e064bbccd18d876d67608b35f",
+            "referenceScreenSha256": "1cb1b2612af3cb91b30561ff6cb62fcac6f74640bac4d48aaa5ec6149e70452e",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:trapped_chest",
+            "status": "success",
+            "exportPngSha256": "de27ec6e9f00cf341480379603d9554b21c467a8f5b50fb1551fa85543a9a5e9",
+            "referenceCropSha256": "768df07ff059d867dea41e012c6f39fd02d47edb1aefb6318b0980f6872e6eca",
+            "referenceScreenSha256": "74523c0e962e47abbbb704cb685b6ecfca6ebc6d3962d2ad8fe3241fb423a58d",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:wheat",
+            "status": "success",
+            "exportPngSha256": "b7a343d67606cbe3cbbabd59732720faa8c370bbec6eb416a62b3844f2b9fe64",
+            "referenceCropSha256": "9257fa579f13b483b64eb215c83bec585d259430a9159a2594f2505702eec178",
+            "referenceScreenSha256": "ea1edc74eae247c43f3772b5a655b3e005649183e7f1546225fff0943e27fe4d",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:white_banner",
+            "status": "success",
+            "exportPngSha256": "9b9fb90399c110cb8140437dd8c044a7de9b762b57a428b9edf9e27d1eadcb70",
+            "referenceCropSha256": "6257311242c647782612069b5c8756e2644c307764ec20aed707608c7bf4248a",
+            "referenceScreenSha256": "fdd64701dcb17b6171762c4ab90f830367fd76755cb1568dd764a5fee807239d",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:white_bed",
+            "status": "success",
+            "exportPngSha256": "4bb8c43d3afa5b40d8e25ad9b8c44d84f52eecd749a23d9fde19b4cb4ab6d0a3",
+            "referenceCropSha256": "dd296277b5faf12126c29110eccd013c4b95c18da47694aba2eb5873fae41035",
+            "referenceScreenSha256": "5915f7f42625d5a706906afbbc64b8419ee9dad1972f8cdd409083e87378d32a",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:white_shulker_box",
+            "status": "success",
+            "exportPngSha256": "0c1aad5d8fafb8bf806c6c5a59759c472891bde30d06c2ab0d9afa5167608c1f",
+            "referenceCropSha256": "4f68aafa85c23acb9eb764d03f23f4eeb228f0aaa09a039a269bf4fd2e2a6be6",
+            "referenceScreenSha256": "d09276eba017697058f0a3e216ca3b86acd3a9e4300db94fc20453934d155872",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:wither_skeleton_skull",
+            "status": "success",
+            "exportPngSha256": "1be54a552b489e89103448bb9071b6a532c8857a746c402288e502c7865ab741",
+            "referenceCropSha256": "3d8bb8c19dd615d91d63c76ac860d518e6115bbdb9d99403a6fc1ff7f69f150b",
+            "referenceScreenSha256": "411060ce03437120c1f708a2cefcab0babb53c682373685caaa90f13e5759c98",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:yellow_banner",
+            "status": "success",
+            "exportPngSha256": "f23c7e434db459bd0b37f5ab7d3f7e2a548346d683e9f509ec18121fcdb5ca0c",
+            "referenceCropSha256": "618e1ef27927854f4dfb75c6c7856c58bde05c1dcde6b02e2c34d6c74c8a1f26",
+            "referenceScreenSha256": "0144381e2b506987a44afa7a79811cdd730d2f2777f80964e4e3e36cf38498f0",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:yellow_bed",
+            "status": "success",
+            "exportPngSha256": "45740e4571ff4f5196f3659ab30f21987d2408c8f86c6c926af07e01a0e2f4e3",
+            "referenceCropSha256": "029641909fc246e58d6bdfb6040eb52fc8712350dee4418e8eec56721616d4a9",
+            "referenceScreenSha256": "6ee9a109395562233cfcbc5e263b9f69612fb7ee3ccf80f91c17ccbc4c76813c",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:yellow_shulker_box",
+            "status": "success",
+            "exportPngSha256": "27c9cbe9bdda94c8c8b79770dc6f4a8ac8d10217f1ab604f175eb57b6eb0c81f",
+            "referenceCropSha256": "ffd18be350b185ff36bed5540057c7e8ae65109f4d7b6c109e058a30b378f179",
+            "referenceScreenSha256": "5a50b725a876687242c4c6be2ca9c73df1cb69a53d965bc0cc94d390d00c4ea3",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:zombie_head",
+            "status": "success",
+            "exportPngSha256": "3bef5efa3bf06be8d7a96f2ef13a70076c248126db9cd08def71bd184e647df5",
+            "referenceCropSha256": "b91776e67522bc617e2a3e7abe45061d2783f05748c91ad6d36bd5bb89cc709a",
+            "referenceScreenSha256": "989335c2f7b9a804261624ff54685a13407e5f1880d4400f0f35bc4219adf772",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          }
+        ],
+        "capturedScreens": 60,
+        "passed": true
+      },
+      {
+        "version": "1.14.4",
+        "background": "206080",
+        "exitCode": 0,
+        "qaAgentSha256": "14ac33f566d48dd02f61674d5fc5ea3304940e1618338d181b7c17ab213f1d63",
+        "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+        "baselineAgentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "entries": [
+          {
+            "id": "minecraft:black_banner",
+            "status": "success",
+            "exportPngSha256": "79f237ee4d81bc634a98a8f0251ea1bb2949a0525e903574fddfc679a5e407ac",
+            "referenceCropSha256": "21f1e8196cedfd39b822ea15051169d49033f7f6ddbfddb6c7da76955c9aa677",
+            "referenceScreenSha256": "10ade77705eac3046885b7b69d86556bb86e781b0e043119de0f0cdd1ac3e139",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:black_bed",
+            "status": "success",
+            "exportPngSha256": "cc8a379ae73f30345917d25f982cc888e5dd0e189ce39fa32c45f6b3370653b3",
+            "referenceCropSha256": "aa063068dc27ceae6be61324e4f0a400abd11ee1df7c38546ef3793f4dbd931b",
+            "referenceScreenSha256": "daf7667dac43a557a011c23ccd0dee2d6941a52fbc58cff47ab98409763f848e",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:black_shulker_box",
+            "status": "success",
+            "exportPngSha256": "6579c4f67bc26fc3643f23b77d0841fcfe0f3895d1ee16a082ca884d645edfb3",
+            "referenceCropSha256": "a0135c70c55b8f847c2ff2d2c11a1645007053f44d7de8509ef863a49c4a095e",
+            "referenceScreenSha256": "e55fc5b1279d7a09d4b08bbe1bba3bb1105ccd9daaadfe36fc0b9ae40dea5ccc",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:blue_banner",
+            "status": "success",
+            "exportPngSha256": "c880b135a97ed8126029e71808212ed7c520ebba13d763e53d354148a0e82faf",
+            "referenceCropSha256": "84689235b30369299437a6dd34d1b62b232ebe11ce493c03e752c0fa229fd69a",
+            "referenceScreenSha256": "1419acd59c6e97b245c2cd2d64dac66392dfaa698f0815be2a2cc0fe78bce1ab",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:blue_bed",
+            "status": "success",
+            "exportPngSha256": "c5be1252b1b2eb87df3f32526281d312739931470cd841b260ea0ec75d070348",
+            "referenceCropSha256": "4519e00ca440f2258052fb69a40189f0124413cf30dc9944b76158a7d40fa71e",
+            "referenceScreenSha256": "8c09a2bed8b838ea53565980f8d2b8db86fdce42bcb74b5de856baa6b8bae75c",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:blue_shulker_box",
+            "status": "success",
+            "exportPngSha256": "83fc27deb587baa442d25d08b3e4a3dd5849bc1edb3f9a04acd116d94ed34c23",
+            "referenceCropSha256": "aabe23bf2fb6b3f4ee7dd0cac1f5fc5658397820c78f1185bed83a53f2f7e04f",
+            "referenceScreenSha256": "85f6a2b55731e94304d21d1c7887e8b5c104ae818c2ed4fe16995f66ace197fe",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:brown_banner",
+            "status": "success",
+            "exportPngSha256": "453744dd5c4fc48f861ed71a5651e05923fb8b5c5bb2d5c4a935afe1a3d4f607",
+            "referenceCropSha256": "229b84205b5e8f12619c341532ccecb7fcf98c9efd7889fa9c443ea541749116",
+            "referenceScreenSha256": "07d8131cf036d8166a4a92819c254e1c98c0b46fa97102c872824a42e2d5696e",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:brown_bed",
+            "status": "success",
+            "exportPngSha256": "6ee2ff1257f87ec25840d6cde6bd39c156e61b81d557773a1f67af0474b5c8ed",
+            "referenceCropSha256": "68e1d1e973d19f8b6ad9caf5bed34387336db94dd7dabb072d51f25b76eb1f7d",
+            "referenceScreenSha256": "89f7594c5b034a0273f72a93828b2f4ef34244f354d14e334e3313c891beff0c",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:brown_shulker_box",
+            "status": "success",
+            "exportPngSha256": "6e0e211a5e38573e3552dda0b8bb1d4aa965dfe9f3cc4e8e6371919fe97e3d85",
+            "referenceCropSha256": "f14e265a0e2fd3f3b505ef2f4cc08d4b6f23f6db1e7a9c759abbddba445d5905",
+            "referenceScreenSha256": "55770376b396639e4afd1c550c94c253fb22edfe82603b22f373acc40df7ec48",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:chest",
+            "status": "success",
+            "exportPngSha256": "97bd7a95c878409be93c3e19126d34d8029d7c420b42fe95dbe78cd84073ec15",
+            "referenceCropSha256": "c3fe7cd62bf70221e1061136b26161bdd43455bcfd60641981d21fb9635689e0",
+            "referenceScreenSha256": "a7aac880bbf62a96c5fcc5819daead04117ac7aea65da5f8791827226cb45d82",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:conduit",
+            "status": "success",
+            "exportPngSha256": "2ee4cbbc5c83c50df61aadcfc10bebbb675a37dd94089c70f7148fe1a8fd96ae",
+            "referenceCropSha256": "967e3f8e904df45ac3c13d1427d3a76e2096a42ca191d647e796a8492d0afaf9",
+            "referenceScreenSha256": "3291a685170162f1974360c69bdd9258d585d3af1cf01fcf58fc5e9186fbdaa0",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:creeper_head",
+            "status": "success",
+            "exportPngSha256": "71260fb40014731b1fdee79fcd307778028a7490d4422c88b634ac3e7b2923c9",
+            "referenceCropSha256": "f37044280b4005bd3fc5d00668a5cbc9c9226e67870c25fc0f2c5acef40f439f",
+            "referenceScreenSha256": "b9264594cd1d1313a9d3d2f2989b919f94d7dd731981225e16b3072d94417a0c",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:cyan_banner",
+            "status": "success",
+            "exportPngSha256": "0701fb617d19163168ad60b51031146eb9aeb0e871065af3644328d6c0fc2b3c",
+            "referenceCropSha256": "88c3c5011a9a781476d9a5c5b4d08643ca7c241fd555e03c60980cdef04596c7",
+            "referenceScreenSha256": "b595d33d41dcf057f3584cce451024a7094dd106704908493e2a7a29f84fe6cf",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:cyan_bed",
+            "status": "success",
+            "exportPngSha256": "a31560f74b02373fb4059f45b9447ffee79b065c47620a6bce75d8b8e62b4057",
+            "referenceCropSha256": "0641fbcf2ff307c8a16aea5f8f8156602ddee6944bc2cb81e091fc5177cc524b",
+            "referenceScreenSha256": "166745798830f5a4ba9b29abeb906f3bec6e94053c01dd520ec8614233911e7b",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:cyan_shulker_box",
+            "status": "success",
+            "exportPngSha256": "c262677aa5222134790f7b7e1306570a0fa946d68609d36f3e5a3b565fc554ca",
+            "referenceCropSha256": "9c0d48fc6109873e06db43723204a5359456db3acb66b5c51d3683ac8d5e4b9d",
+            "referenceScreenSha256": "17a66663925a4d4cad5764e1013f9bb686aa19892b2f87a8c44a9c6989803aa4",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:dragon_head",
+            "status": "success",
+            "exportPngSha256": "24f2231384328cb8612d0a8c79806f868241e62bc90e3ac462ae8d8cd4695c17",
+            "referenceCropSha256": "90b5e47da14532897d678f0ec05920ee92f5de87996d27747fddfb8b575b3780",
+            "referenceScreenSha256": "b8ede2901601f2a03a18e495c1b4ad0b434fd083f40bed9425524376449b4830",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:ender_chest",
+            "status": "success",
+            "exportPngSha256": "728394b5859090fa16228bf55c07d5b6e56227222f2c05927340467b0c0b9a5a",
+            "referenceCropSha256": "51a6794430d50d84853fcbd0792217e70f8a8f05a37613c9db1d5db7bc532919",
+            "referenceScreenSha256": "5eabca8886a4acf9d8e14d28aef4c6590543c397a66c4d83c385ad7c6c2adac5",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:gray_banner",
+            "status": "success",
+            "exportPngSha256": "a080b01727e8c482faec4cc74137fe388a82f7ab908b9387e8a1ab5f623549c8",
+            "referenceCropSha256": "db2273803228590d7de7e44e38066890646056944acc4a78f7f3fd8bb60438bb",
+            "referenceScreenSha256": "f248d3d045aeed6de726cd52c35671e36f38492274e27fedce137112283de2ac",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:gray_bed",
+            "status": "success",
+            "exportPngSha256": "b1e7740df84f9fd475da29d2482153e11f9439e989e10892add9c946b6095a73",
+            "referenceCropSha256": "3f0d9b72ce9eb00521e0235d73bb983367938851939b993bdb71611514a57be9",
+            "referenceScreenSha256": "cc2f5207104731e436027292597b903b8bbfcf625f551363c546dd360ad7c88e",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:gray_shulker_box",
+            "status": "success",
+            "exportPngSha256": "7a46a1eca488d713def4dff62d6a80d8fa6facfc2afd0c5f29cf8c5cd5b2f93d",
+            "referenceCropSha256": "d7d8dd0e5cfddc3f0202dacaffadbf835d4d120dcf5d47a25f5e5c5fe4ea3236",
+            "referenceScreenSha256": "7c9a7951a6a224931354fa8bdaf782a843bc93639c6475cafc684f2f62d13a60",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:green_banner",
+            "status": "success",
+            "exportPngSha256": "db1d6732ef09dd45287ef4d483e667c3a2051a92e3722625560a64096acc237e",
+            "referenceCropSha256": "b37183e28a79eee82a79efbabcf5172e1ae01d8de40490c02fa3f628f7edac8c",
+            "referenceScreenSha256": "87f6f1634d1211e00b6f2f63776fd534ebc6c101df1fd896b764dacf4696cc53",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:green_bed",
+            "status": "success",
+            "exportPngSha256": "614362180eccf63bc827a1539b15c9a8e5512d71a05af547acca997e5664091d",
+            "referenceCropSha256": "43f3964050ca3493450d3b29fddef6294bcbab3b1d890e4d53ecf6db70d429b1",
+            "referenceScreenSha256": "10af1d2c97adc92eb62ee0beeb60544e4d0abb2f3285c514df59998b6893c15a",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:green_shulker_box",
+            "status": "success",
+            "exportPngSha256": "cadfb404f61f048bf89ac5eb51fdfab6f70e8c0331b0db233add51c4fd565195",
+            "referenceCropSha256": "812a386ca16bbecb1b7f4765a65761ec2776eac9669737399302fcc2715f88e4",
+            "referenceScreenSha256": "48646c4a3e6fe0c3a1c1d8ae8750612e3f556310504fafa2ae511d5f74dcd199",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_blue_banner",
+            "status": "success",
+            "exportPngSha256": "3bc1c30b46a6030c97a3fedc540566f7871fad4dc506a8e94505dfb4d84f4a02",
+            "referenceCropSha256": "b4578e9180818386663c41f05e7e34013ae0a2bd9755f43e342df69b3a2d9e5d",
+            "referenceScreenSha256": "1c705966e943f328c52df7d296da6c1b541b007a7d3568f6c439777163b8c5db",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_blue_bed",
+            "status": "success",
+            "exportPngSha256": "cd1ba2f31133ba314d8b1e1fce82f589e5417cbf29d535c1f2e26efa2fbf3b6d",
+            "referenceCropSha256": "348dd1817940f3d6f0035589d609fbc0cba1f38bd2650eaa652e2968dadaab61",
+            "referenceScreenSha256": "8bc76071f93549b6b5000533da894101b654a9388d549996a22f8ce1b5107236",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_blue_shulker_box",
+            "status": "success",
+            "exportPngSha256": "9bb1fe3831532ec3242647ad47958fea553864df92c4beacc3ca5a570d3da0ea",
+            "referenceCropSha256": "657ea6cbf3a53ad884ec1057b6c629bb75a98715cd1e004197bb2884e257f9ed",
+            "referenceScreenSha256": "e2b7297abd8feb7f77031c4562f746597dc02f08fe981f359f78d1f3d7eccbcd",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_gray_banner",
+            "status": "success",
+            "exportPngSha256": "4fb25ea2832b9f5009ea08e74a78909e51b2d16d6fc1b7aa8812b214cce5dd53",
+            "referenceCropSha256": "60fea0cbd69a70cec91a25ccfdb6e27e6a1154a698c818fb02dd0dfcb5f44235",
+            "referenceScreenSha256": "e5f4a7a9996fed2fae814845c3f75851e19be23871cf38b7b61b153c543ffabe",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_gray_bed",
+            "status": "success",
+            "exportPngSha256": "3aca4f4728544c6652aa4f706bc94dcf611fdfd615aba1c86e34a4225a461251",
+            "referenceCropSha256": "23eaa7ce3119dc43d35034a906198dcf91f81c23725fca6e661495a89f090e3f",
+            "referenceScreenSha256": "05d127fbc331dbf80a4082d77d74094ed69929b208ce49237290641f6d9aa730",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:light_gray_shulker_box",
+            "status": "success",
+            "exportPngSha256": "c87981503aa4c8a9b1fae3049dd25793eca7ef1e72b7a6c37275c81861493ada",
+            "referenceCropSha256": "3ee4a89f1197295ca0e819c4cee9b5f549c3ca37942c1971c359934c259cc68c",
+            "referenceScreenSha256": "943689dd20d915348b108f25041b1608b7bb7bad5bdd0eb55bc633dc16999a78",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:lime_banner",
+            "status": "success",
+            "exportPngSha256": "2292c37beea0b5255727bd314fa5ecba726ae869550985860c0e5e1c02a7a9ac",
+            "referenceCropSha256": "395a8030e3ee186b0a9e42e469b8c65818ec848e8d6f859ce0e1729888fc4920",
+            "referenceScreenSha256": "3a353ad71456edc988b2100efcf608b03e5742cef8bfead7fa0ddb062053420f",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:lime_bed",
+            "status": "success",
+            "exportPngSha256": "8ab227d28e06c8f294fb04819711b765b67693b6825759543c0ea68e8603942c",
+            "referenceCropSha256": "4b74bb8236926e66a0e46e4ca9ee8b4436228459a1aa4f9044b2017c7452cef2",
+            "referenceScreenSha256": "2872884c775966406ffc867aa7ded403f1a75085879fa813b945f79bb4e66e4b",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:lime_shulker_box",
+            "status": "success",
+            "exportPngSha256": "83468dc71139e136591d95a42277b0c8e9ab9aa946e872c2d235fdceed781d38",
+            "referenceCropSha256": "607ddde0a92a15d2c41b6f2b8709414ae8987acce8a81ffe167967348d19b9a7",
+            "referenceScreenSha256": "a2c7bfde9046f657facc6e304d8223eb6bff9f6eb43d767451453b6fc70ccf9d",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:magenta_banner",
+            "status": "success",
+            "exportPngSha256": "3868b5724b8b6d21c0820f590d08506f4b76a7a036c4af22e726226364d6ca0b",
+            "referenceCropSha256": "0cf68d2384b82b29f21e3f857bf899a1f2620fbadab11240fb6a6761e9ff56fc",
+            "referenceScreenSha256": "dd294a0692954d1ffc84778d92d0a22bcdabad72aa9c86626acf2475347b50d4",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:magenta_bed",
+            "status": "success",
+            "exportPngSha256": "442c0d3229336dacf2e200119d6fd2cfa91404d9fa182012bd4ff848e69c0617",
+            "referenceCropSha256": "c976719d04ffbff47cd9b1c44502b7d9e7bb954b587f1916be2337bdc8c7d000",
+            "referenceScreenSha256": "abf6d22032f3440e72f078bbf355d652848040492c21f99bd1ee45e998155ba4",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:magenta_shulker_box",
+            "status": "success",
+            "exportPngSha256": "cce46a10ef8f7d3673216f4dc855553760ce90fb70854c3feac17ac872bda964",
+            "referenceCropSha256": "d178b5759cfd062d6feb9d3a8b8ff3d442762427a8f4ae159a77b0856a0d17a2",
+            "referenceScreenSha256": "b2b23273100752062497fe91db8d48db2741df705fe8b81097c9935dbc62da2b",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:orange_banner",
+            "status": "success",
+            "exportPngSha256": "9a70ebb10822379dad54d67cf4e4fff11dc2664c16f879c339876010a1a0e8ab",
+            "referenceCropSha256": "0fb61d7468e97093442c5d54556d7eca64fa0c18f5d40408b010f7bc8571d068",
+            "referenceScreenSha256": "35028950cea5b7413fd6378474d04ef6b5b11f93aa798b6926a856ac5a27fc57",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:orange_bed",
+            "status": "success",
+            "exportPngSha256": "0353c64c90d9361e31602418601a0aa975ba20f42e1030da8a161005f4aa5a03",
+            "referenceCropSha256": "db49b7e92e766a2c179023b010f4e69a6d21dc53ffa0d88c3650c9ce72dfe285",
+            "referenceScreenSha256": "4e7f677a69083c90683a3cf3602712ee44de25a8a7587c336170652529434dcd",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:orange_shulker_box",
+            "status": "success",
+            "exportPngSha256": "1c3066952e5366ecfc5253e0be5b5c4eedcf00835eea4548c8839eb9c900d0e2",
+            "referenceCropSha256": "bb6af43edd8c19a95127483781ade266b2c0fec2afe2c0788b428f45eac5429e",
+            "referenceScreenSha256": "793c94769f519625a0593bfdb54617364a793714114c8ff0c162b6e0966ca361",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:pink_banner",
+            "status": "success",
+            "exportPngSha256": "8d4ac2816ae7e3ba3a1d1c766b336678b2aec8660e4e86036dbfa70e110ca248",
+            "referenceCropSha256": "afbfa9e41b65f218220624a37aba9e56368adc23be7afe24736e31746af8c8a9",
+            "referenceScreenSha256": "5484b5b860fc9fb407d46bed0efc7ed315522f1a14cfeb8ba7eeb5427c616898",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:pink_bed",
+            "status": "success",
+            "exportPngSha256": "61be43541cdcfffef6218cb227110269263ced6ea17a6804d0051eb2b1b00282",
+            "referenceCropSha256": "7e5c9ab347906c677a22dc68fb08b074aaccb583c8a345dad4345577d8109ff0",
+            "referenceScreenSha256": "9df316e779d1f342066e3ebf5c07c9d6f7b52efe74e68b658995f3e1466d21b8",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:pink_shulker_box",
+            "status": "success",
+            "exportPngSha256": "dd2e156391010afca25519a6ffa0bc6c73aaa8380cb1daf7c46bf57ee24df811",
+            "referenceCropSha256": "819f1340ad503d90f677f96c59033f3b2668f27a11cd138dd8a30f3ab44cb104",
+            "referenceScreenSha256": "6ee3f168c21288307353e6ba0d2304a0c91c800f203a8c1c5383f41ca5778e9f",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:player_head",
+            "status": "success",
+            "exportPngSha256": "c807386445290d8657ca6843ccdcff8aeacddf4ba8cedbbb1efb9fdeb590b6af",
+            "referenceCropSha256": "bba7b997cf647cf98e72e3a1c0e2901e8779f694b380ee0f4a1f72b5f52f57d2",
+            "referenceScreenSha256": "ac00dfe48aa4bf071b84b5471298d53e7f5d81381e8cc7cd1096385a4b58b046",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:purple_banner",
+            "status": "success",
+            "exportPngSha256": "e78dd8dc27ba11656e9ea57287eaec9dc13e08acd9bf6c2ce2eb55e6642a675d",
+            "referenceCropSha256": "d83d401c3b9ce73f8395de3f8b3164ea3c7330c73a4d0ec3bb01792dfbbe5408",
+            "referenceScreenSha256": "3e3db5db1ca369f1af7570a34090e1a3c69f0eee6fd1af2300d4e9a01b43c6cb",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:purple_bed",
+            "status": "success",
+            "exportPngSha256": "b6c6ae35c35f574da33d67b976e49e5f750192da4dd6b8ed4f2c12f758759cbe",
+            "referenceCropSha256": "3a3c535a37e844d055cefaf070bc5d8386b9c485e6e669beddb973abe27ff2c8",
+            "referenceScreenSha256": "ab7fb4b6e7529b6f22c16509126fa0247622a1feeed76c32c6bb5f05ca55d1c8",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:purple_shulker_box",
+            "status": "success",
+            "exportPngSha256": "4c4c853f3793280770aa9ccd89333d8610b4ef501c2652d41a7daf8089a72ebd",
+            "referenceCropSha256": "9aea30654cd59777a13a12f2eaffd4e317265f7e419bec6ea25f1975b53ef11f",
+            "referenceScreenSha256": "56046c917817169432de78d65e53b0198504c169dfc614f0f7df3d4f9a603891",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:red_banner",
+            "status": "success",
+            "exportPngSha256": "683096a21742f8cb49392979dc5a846ad94fb4e4d4fde41d23e3d2903324b96c",
+            "referenceCropSha256": "8a872b721c779492a154debb8767be4f3460994e6f6dcb9632e61bc0bc2b624c",
+            "referenceScreenSha256": "b2b19a459e2afc34d990490260945eaeda2781748f8bb01866acf613959ead04",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:red_bed",
+            "status": "success",
+            "exportPngSha256": "b3c7cbcbaf87a05288cb3434ce01189a02cafcc0677910f101a6c8ccaa56fe5a",
+            "referenceCropSha256": "33aae9ac2bc0c9339a9a240d008693edb5e9209ddaed2c9102b4ce0df0d7b1c9",
+            "referenceScreenSha256": "eb6a77e3c769515a5952794788a29700ca8fdd34385aff9613ba980c37e10754",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:red_shulker_box",
+            "status": "success",
+            "exportPngSha256": "19995f09a0b82e444f67c54883d0466d8f0b98a7b5f5b9f53504c62f4211ad4c",
+            "referenceCropSha256": "677ccf4166d611270989be1e2b83481abd63e7e3a5fc3883ce6bc2698e1ff483",
+            "referenceScreenSha256": "0f33ab9029bdaec506c336f797330ce971bc7fb3b66e1ceb8db65f18debbb2d4",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:shulker_box",
+            "status": "success",
+            "exportPngSha256": "aeeba0ebc01af6179f5f5ba92c2cbad785746ee9caaa63a87831a3d6d4bc6577",
+            "referenceCropSha256": "2a6bb91eb375f95caa1899df5fb41b496b13467e6d6688f8c469d599395cb8f0",
+            "referenceScreenSha256": "823673ba83b27256ea183c1136cf4379971fc87ca0544e1959f3078358305041",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:skeleton_skull",
+            "status": "success",
+            "exportPngSha256": "087f120d0e953c2f13f7bd818c2661fdd58ac36fcf1d7eafdcbbac90fab6269f",
+            "referenceCropSha256": "e96bcf78832c3322fa7de45bf72eec2a3f6cb78cce89c696a692c14083cef952",
+            "referenceScreenSha256": "954d38e33ee1439c6a9fdd97110284d9f17db66ae27609b23ea047ee3edab9a5",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:trapped_chest",
+            "status": "success",
+            "exportPngSha256": "de27ec6e9f00cf341480379603d9554b21c467a8f5b50fb1551fa85543a9a5e9",
+            "referenceCropSha256": "00b09998f129c89eb9682c7317b9093a9d37ac4387b5edd38bbf9ac2d70bb31a",
+            "referenceScreenSha256": "6403739ea0d3b3fcba2ba8bc77bd7afe3725b174f7ba1ab260fca2b16f10885d",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:wheat",
+            "status": "success",
+            "exportPngSha256": "b7a343d67606cbe3cbbabd59732720faa8c370bbec6eb416a62b3844f2b9fe64",
+            "referenceCropSha256": "9d6ac2430f944a6d16a7e25aef3d16329524b969dca03faa210f119ee74dedcd",
+            "referenceScreenSha256": "880c0acae8853ad457fdcaea668407938bfe639ef00db346cc403242fa254c72",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:white_banner",
+            "status": "success",
+            "exportPngSha256": "9b9fb90399c110cb8140437dd8c044a7de9b762b57a428b9edf9e27d1eadcb70",
+            "referenceCropSha256": "aa1b42dbd7b59dce12fdcd5a57236210569527e8b8dab1eadf5d9736d78d1744",
+            "referenceScreenSha256": "53e9d70033a23943c89d85e1d4990f0e24208cfc9550025a27728cde9a94521e",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:white_bed",
+            "status": "success",
+            "exportPngSha256": "4bb8c43d3afa5b40d8e25ad9b8c44d84f52eecd749a23d9fde19b4cb4ab6d0a3",
+            "referenceCropSha256": "504c0211e5904a366f9b6efb3f1d12fc3a55e42ef97310dffcf3c38eb75fd6e3",
+            "referenceScreenSha256": "2ce56d48f17f2fbd8d38b1cf6a8cd9205c4e3cd894421c508f1b20cf272bbc11",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:white_shulker_box",
+            "status": "success",
+            "exportPngSha256": "0c1aad5d8fafb8bf806c6c5a59759c472891bde30d06c2ab0d9afa5167608c1f",
+            "referenceCropSha256": "0ae9decac35227c7597212ccf5eb53c4c58b133bf54b660a492a7adb418c3b81",
+            "referenceScreenSha256": "bc04a4c236e7319cf409104eff8170b5ad7ef4255bda323bdd9dde89805c38d1",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:wither_skeleton_skull",
+            "status": "success",
+            "exportPngSha256": "1be54a552b489e89103448bb9071b6a532c8857a746c402288e502c7865ab741",
+            "referenceCropSha256": "b54000ff3506491167c09e6e97243372f32548051ea9fd1c952e64ac509e06a3",
+            "referenceScreenSha256": "414c94144a6a8e0e0af08b6465b06596cdee46538984a84e9dcdd14593e86e39",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:yellow_banner",
+            "status": "success",
+            "exportPngSha256": "f23c7e434db459bd0b37f5ab7d3f7e2a548346d683e9f509ec18121fcdb5ca0c",
+            "referenceCropSha256": "c97b052f8eee7055fc8ca41b2ca36a77f90e25ae5a36a9f816648945a6fe84bd",
+            "referenceScreenSha256": "b7e6067e81e4bd8c379c9df3d74f0f1c3925b3923af78e018e9451faf7133ba3",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:yellow_bed",
+            "status": "success",
+            "exportPngSha256": "45740e4571ff4f5196f3659ab30f21987d2408c8f86c6c926af07e01a0e2f4e3",
+            "referenceCropSha256": "9ca66a637c83a5f66e93f4417e44b72ebd9a97c50e7186ad06936af603e0058d",
+            "referenceScreenSha256": "d804efb6c9561f1ad29b2078ffe25247a2911fbeee99d3e5a9d128ad393e2823",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:yellow_shulker_box",
+            "status": "success",
+            "exportPngSha256": "27c9cbe9bdda94c8c8b79770dc6f4a8ac8d10217f1ab604f175eb57b6eb0c81f",
+            "referenceCropSha256": "54b8e6cef30ff8110ded16ad7f9d730c8ec3a463aee30e2155aa6beac556c58b",
+            "referenceScreenSha256": "be6f91c1a4c1452b5aff84bd1ea2da6b3201c9dcd252ac8d272ddedc30f54d9f",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          },
+          {
+            "id": "minecraft:zombie_head",
+            "status": "success",
+            "exportPngSha256": "3bef5efa3bf06be8d7a96f2ef13a70076c248126db9cd08def71bd184e647df5",
+            "referenceCropSha256": "e2141f945b7549a0a661c297a9a2bc18d5e595cbcb76b4874a3ad33886e89d52",
+            "referenceScreenSha256": "bc2a1b67664f46bc78cdc13d8d14c058b287e5da00eee820996f60d61bf83c7a",
+            "maxChannelError": 0,
+            "meanChannelError": 0.0,
+            "pixelsOverTolerance": 0,
+            "nonOpaqueReferencePixels": 0,
+            "sourceMatchesBaseline": true,
+            "passed": true
+          }
+        ],
+        "capturedScreens": 60,
+        "passed": true
+      }
+    ],
+    "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb",
+    "productionAgentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2"
+  },
+  "resourceFaults": {
+    "productionAgentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+    "syntheticFaultInjection": false,
+    "officialInputsModified": false,
+    "injection": "resource-pack",
+    "harnessSourcesSha256": {
+      "scripts/verify-resource-faults.py": "6b4d92e4aac87e04b21848b03bb89517e59ee40f92d23bfa22031e017473552f",
+      "scripts/qa/ResourcePackFaultAgent.java": "82b0194edcee4d15b65d5b0be90d8667f2dabdafae6da94acb13657c0fd01855"
+    },
+    "injectionScope": {
+      "model": "選択したパックから破損モデルJSONを読み込む",
+      "texture": "選択したパックから破損PNGを読み込む",
+      "special-texture": "選択したパックから破損チェストPNGを読み込む",
+      "direct-texture": "選択したパックから破損ドラゴンPNGを直接読み込む"
+    },
+    "results": [
+      {
+        "version": "1.14.4",
+        "fault": "direct-texture",
+        "exitCode": 3,
+        "code": "MISSING_TEXTURE",
+        "diagnosticCodes": [],
+        "pngFiles": 1,
+        "counts": {
+          "failed": 1,
+          "noItemForm": 43,
+          "succeeded": 1
+        },
+        "continuedHealthyItem": true,
+        "fallbackPngWritten": false,
+        "qaAgentSha256": "d4274cdee78a550fd6466e23a1f0aae8b441f64d99c3fb85da4c8006c71dd929",
+        "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+        "healthyPngIntegrity": true,
+        "healthyRgbaMatchesBaseline": true,
+        "selectedId": "minecraft:dragon_head",
+        "sourceUnchanged": true,
+        "resourcePackSha256": "9190d7967e7fde4684c77ba830cb3489e219a95998b4abca515bc4e6a5defdf3",
+        "corruptResource": "assets/minecraft/textures/entity/enderdragon/dragon.png",
+        "originalResourceSha256": "132cc11b012a3a3531cd2f21fbbd3112cb444533925b49f9ba01ae217757dc87",
+        "packLoaded": true,
+        "ownedWorkerLogs": 1,
+        "preloadDirectTexture": false,
+        "preloadedBeforePass": null,
+        "expectedCodes": [
+          "MISSING_TEXTURE"
+        ],
+        "passed": true
+      },
+      {
+        "version": "1.14.4",
+        "fault": "special-texture",
+        "exitCode": 3,
+        "code": "MISSING_TEXTURE",
+        "diagnosticCodes": [],
+        "pngFiles": 1,
+        "counts": {
+          "failed": 1,
+          "noItemForm": 43,
+          "succeeded": 1
+        },
+        "continuedHealthyItem": true,
+        "fallbackPngWritten": false,
+        "qaAgentSha256": "ade3fd05e6d6ce6750f0b9a2ff040d1b675f9f9f166f078e6e04c264ba2f4d6b",
+        "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+        "healthyPngIntegrity": true,
+        "healthyRgbaMatchesBaseline": true,
+        "selectedId": "minecraft:chest",
+        "sourceUnchanged": true,
+        "resourcePackSha256": "8b5bafaf85485b638c007e8a265b87f38e4f39a4b33076e246400fa2941e6c28",
+        "corruptResource": "assets/minecraft/textures/entity/chest/normal.png",
+        "originalResourceSha256": "c3ddff38668a0a332eaf1f40f1ab2bcec8703c047526d16448672980cfa7b46b",
+        "packLoaded": true,
+        "ownedWorkerLogs": 1,
+        "preloadDirectTexture": false,
+        "preloadedBeforePass": null,
+        "expectedCodes": [
+          "MISSING_TEXTURE"
+        ],
+        "passed": true
+      }
+    ]
+  },
+  "cachedResourceFault": {
+    "productionAgentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+    "syntheticFaultInjection": false,
+    "officialInputsModified": false,
+    "injection": "resource-pack",
+    "harnessSourcesSha256": {
+      "scripts/verify-resource-faults.py": "6b4d92e4aac87e04b21848b03bb89517e59ee40f92d23bfa22031e017473552f",
+      "scripts/qa/ResourcePackFaultAgent.java": "db07240a303df087d16032792d37547828f782b5491b33165f8c841caddbac0c"
+    },
+    "injectionScope": {
+      "model": "選択したパックから破損モデルJSONを読み込む",
+      "texture": "選択したパックから破損PNGを読み込む",
+      "special-texture": "選択したパックから破損チェストPNGを読み込む",
+      "direct-texture": "選択したパックから破損ドラゴンPNGを直接読み込む"
+    },
+    "results": [
+      {
+        "version": "1.14.4",
+        "fault": "direct-texture",
+        "exitCode": 3,
+        "code": "MISSING_TEXTURE",
+        "diagnosticCodes": [],
+        "pngFiles": 1,
+        "counts": {
+          "failed": 1,
+          "noItemForm": 43,
+          "succeeded": 1
+        },
+        "continuedHealthyItem": true,
+        "fallbackPngWritten": false,
+        "qaAgentSha256": "72c7ebb1bd2a00012a366790f45393996c3bdd97325793fd05761d371f7412f3",
+        "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+        "healthyPngIntegrity": true,
+        "healthyRgbaMatchesBaseline": true,
+        "selectedId": "minecraft:dragon_head",
+        "sourceUnchanged": true,
+        "resourcePackSha256": "d657b49975158a176d771c6aa8e7152562d1d2ad66a24d1349a1a1521db54179",
+        "corruptResource": "assets/minecraft/textures/entity/enderdragon/dragon.png",
+        "originalResourceSha256": "132cc11b012a3a3531cd2f21fbbd3112cb444533925b49f9ba01ae217757dc87",
+        "packLoaded": true,
+        "ownedWorkerLogs": 1,
+        "preloadDirectTexture": true,
+        "preloadedBeforePass": true,
+        "expectedCodes": [
+          "MISSING_TEXTURE"
+        ],
+        "passed": true
+      }
+    ]
+  },
+  "cachedModernRegression": {
+    "productionAgentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+    "syntheticFaultInjection": false,
+    "officialInputsModified": false,
+    "injection": "resource-pack",
+    "harnessSourcesSha256": {
+      "scripts/verify-resource-faults.py": "6b4d92e4aac87e04b21848b03bb89517e59ee40f92d23bfa22031e017473552f",
+      "scripts/qa/ResourcePackFaultAgent.java": "db07240a303df087d16032792d37547828f782b5491b33165f8c841caddbac0c"
+    },
+    "injectionScope": {
+      "model": "選択したパックから破損モデルJSONを読み込む",
+      "texture": "選択したパックから破損PNGを読み込む",
+      "special-texture": "選択したパックから破損チェストPNGを読み込む",
+      "direct-texture": "選択したパックから破損ドラゴンPNGを直接読み込む"
+    },
+    "results": [
+      {
+        "version": "1.21.4",
+        "fault": "direct-texture",
+        "exitCode": 3,
+        "code": "MISSING_TEXTURE",
+        "diagnosticCodes": [],
+        "pngFiles": 1,
+        "counts": {
+          "failed": 1,
+          "noItemForm": 76,
+          "succeeded": 1
+        },
+        "continuedHealthyItem": true,
+        "fallbackPngWritten": false,
+        "qaAgentSha256": "65f94167e6d5060558dd0a593404f2234068ab7693ebcef565095380bfbba91e",
+        "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+        "healthyPngIntegrity": true,
+        "healthyRgbaMatchesBaseline": true,
+        "selectedId": "minecraft:dragon_head",
+        "sourceUnchanged": true,
+        "resourcePackSha256": "599cc783707bbc464ea5fdca32f1b65d087db35c99e42df6e48b3142179dc769",
+        "corruptResource": "assets/minecraft/textures/entity/enderdragon/dragon.png",
+        "originalResourceSha256": "a7d5bc7b373bfee01a5ec721914fd9f584dde5f7977303c63e857c48f99c42bf",
+        "packLoaded": true,
+        "ownedWorkerLogs": 1,
+        "preloadDirectTexture": true,
+        "preloadedBeforePass": true,
+        "expectedCodes": [
+          "MISSING_TEXTURE"
+        ],
+        "passed": true
+      }
+    ]
+  },
+  "qaPreloadCorrection": {
+    "before": {
+      "productionAgentSha256": "86becd778280dc6169a42e50770765e4a97dc4cf93315b65a04c1529b81acba2",
+      "syntheticFaultInjection": false,
+      "officialInputsModified": false,
+      "injection": "resource-pack",
+      "harnessSourcesSha256": {
+        "scripts/verify-resource-faults.py": "6b4d92e4aac87e04b21848b03bb89517e59ee40f92d23bfa22031e017473552f",
+        "scripts/qa/ResourcePackFaultAgent.java": "82b0194edcee4d15b65d5b0be90d8667f2dabdafae6da94acb13657c0fd01855"
+      },
+      "injectionScope": {
+        "model": "選択したパックから破損モデルJSONを読み込む",
+        "texture": "選択したパックから破損PNGを読み込む",
+        "special-texture": "選択したパックから破損チェストPNGを読み込む",
+        "direct-texture": "選択したパックから破損ドラゴンPNGを直接読み込む"
+      },
+      "results": [
+        {
+          "version": "1.14.4",
+          "fault": "direct-texture",
+          "exitCode": 3,
+          "code": "RENDER_FAILED",
+          "diagnosticCodes": [],
+          "pngFiles": 1,
+          "counts": {
+            "failed": 1,
+            "noItemForm": 43,
+            "succeeded": 1
+          },
+          "continuedHealthyItem": true,
+          "fallbackPngWritten": false,
+          "qaAgentSha256": "413b279ca92ade2878ed330f90ec32a0e3fce1a1de74bcb0a946c3b83d49a0a0",
+          "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+          "healthyPngIntegrity": true,
+          "healthyRgbaMatchesBaseline": true,
+          "selectedId": "minecraft:dragon_head",
+          "sourceUnchanged": true,
+          "resourcePackSha256": "a5faf91e49e3e50b65ebd9d3f1b3ad962b9ba398ac8bbaf18034f80deb65a2e3",
+          "corruptResource": "assets/minecraft/textures/entity/enderdragon/dragon.png",
+          "originalResourceSha256": "132cc11b012a3a3531cd2f21fbbd3112cb444533925b49f9ba01ae217757dc87",
+          "packLoaded": true,
+          "ownedWorkerLogs": 1,
+          "preloadDirectTexture": true,
+          "preloadedBeforePass": false,
+          "expectedCodes": [
+            "MISSING_TEXTURE"
+          ],
+          "passed": false
+        }
+      ]
+    },
+    "reason": "1.14.4のgetTextureはキャッシュ参照のみで事前ロードしないためQA fixtureをbindでロードするよう修正。最初の失敗を成功に数えない。"
+  },
+  "beforeControls": [
+    {
+      "agentSha256": "65388d5838d4f6d065777011b67ea2f52383809dfa315c6e74ecbf8157bf043c",
+      "audit": {
+        "version": "1.14.4",
+        "mode": "icons",
+        "audited": 1,
+        "registryPopulationVerified": false,
+        "transparentImages": 1,
+        "fractionalAlphaPixels": 0,
+        "failures": [
+          "minecraft:dragon_head: RENDER_FAILED"
+        ],
+        "compared": 1,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 3,
+        "elapsedSeconds": 57.7,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      "entries": [
+        {
+          "id": "minecraft:dragon_head",
+          "kind": "block",
+          "status": "failed",
+          "path": "assets/minecraft/textures/block/dragon_head.png",
+          "sha256": null,
+          "sourceSha256": null,
+          "auxiliary": {},
+          "code": "RENDER_FAILED",
+          "message": "Inventory icon export failed"
+        },
+        {
+          "id": "minecraft:wheat",
+          "kind": "item",
+          "status": "success",
+          "path": "assets/minecraft/textures/item/wheat.png",
+          "sha256": "b7a343d67606cbe3cbbabd59732720faa8c370bbec6eb416a62b3844f2b9fe64",
+          "sourceSha256": null,
+          "auxiliary": {},
+          "code": null,
+          "message": null
+        }
+      ]
+    },
+    {
+      "agentSha256": "11569d524371953f20281c8a0ac46d633e7f5c0e53d45921e8c992b6a60c60d5",
+      "audit": {
+        "version": "1.14.4",
+        "mode": "icons",
+        "audited": 1,
+        "registryPopulationVerified": false,
+        "transparentImages": 1,
+        "fractionalAlphaPixels": 0,
+        "failures": [
+          "minecraft:dragon_head: RENDER_FAILED"
+        ],
+        "compared": 1,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 3,
+        "elapsedSeconds": 46.31,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      "entries": [
+        {
+          "id": "minecraft:dragon_head",
+          "kind": "block",
+          "status": "failed",
+          "path": "assets/minecraft/textures/block/dragon_head.png",
+          "sha256": null,
+          "sourceSha256": null,
+          "auxiliary": {},
+          "code": "RENDER_FAILED",
+          "message": "Inventory icon export failed"
+        },
+        {
+          "id": "minecraft:wheat",
+          "kind": "item",
+          "status": "success",
+          "path": "assets/minecraft/textures/item/wheat.png",
+          "sha256": "b7a343d67606cbe3cbbabd59732720faa8c370bbec6eb416a62b3844f2b9fe64",
+          "sourceSha256": null,
+          "auxiliary": {},
+          "code": null,
+          "message": null
+        }
+      ]
+    }
+  ],
+  "review": {
+    "confirmedProblems": [],
+    "limits": [
+      "GUI参照fixtureも同じFixedRenderer constructorとfixed-v1のhookを共有するため、bootstrap自体の独立証明ではない。",
+      "通常native GUI projection・画面target・Screenshotを利用し、WorkerRenderer.renderとPngOutputの透明復元は利用しない。",
+      "無改変ワールド内inventory、全IDの単独起動、sRGB・glint・半透明などの最終画質受入は未完了。"
+    ]
+  }
+}
