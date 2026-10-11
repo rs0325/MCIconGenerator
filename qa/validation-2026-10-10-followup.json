@@ -1,0 +1,1441 @@
+{
+  "capturedAt": "2026-10-10T08:44:50.258911+00:00",
+  "implementationCommit": "b5380a7",
+  "rendererImplementationCommit": "9513d6a",
+  "baselineRecord": "qa/validation-2026-10-10.json",
+  "scope": "Local macOS Apple Silicon / Colima Rosetta / Linux amd64 Mesa. Numeric records only; assets remain untracked.",
+  "allAllRepeat": {
+    "passedVersions": 51,
+    "comparedIcons": 60265,
+    "sameWorkerBinary": true,
+    "versions": [
+      {
+        "version": "26.3",
+        "audited": 1657,
+        "compared": 1657,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 46.51,
+        "sourceSha256": "4508d006323f24fa02876310c192d739af56516eb259000ac50f0909a68c9a2d",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "26.2",
+        "audited": 1536,
+        "compared": 1536,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 44.77,
+        "sourceSha256": "40896ee9f1e2bec3c934daac7e93d41e9e3d9c2f8ae0ca366d52ffbfd1afa290",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "26.1.2",
+        "audited": 1505,
+        "compared": 1505,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 44.61,
+        "sourceSha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "26.1.1",
+        "audited": 1505,
+        "compared": 1505,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 45.48,
+        "sourceSha256": "8c109be6177f40d10d0afd820b06542f9609597874242b96e16c5b0dc9e1fef3",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "26.1",
+        "audited": 1505,
+        "compared": 1505,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 50.32,
+        "sourceSha256": "bc6194c61566b587f196090d730698f2191170f7580adb143e4ff839939d3840",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.11",
+        "audited": 1504,
+        "compared": 1504,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 49.12,
+        "sourceSha256": "1473c9489ac50fda3c435049a76a70d61a10b8610db27f5ba9d8756b686cd3bd",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.10",
+        "audited": 1487,
+        "compared": 1487,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 44.73,
+        "sourceSha256": "e65ca028bc58da12bf8413066c90ecd4d48c94fb351d9bbd22ecdff5c87f9482",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.9",
+        "audited": 1487,
+        "compared": 1487,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 45.48,
+        "sourceSha256": "40c0a32c46601f71f6a61dae9f126202ded5cc453cfb8da6e42ae73f2a3f5c1b",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.8",
+        "audited": 1415,
+        "compared": 1415,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 46.13,
+        "sourceSha256": "ea74e9c5e92d01f95f3d39196ddb734e19a077a58b4c433c34109487d600276f",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.7",
+        "audited": 1415,
+        "compared": 1415,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 47.17,
+        "sourceSha256": "6d0aa64c6a0aee3270253317f51e9e816f94cd3b16b44f5d605615c39fc62fb9",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.6",
+        "audited": 1414,
+        "compared": 1414,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 53.19,
+        "sourceSha256": "9592df8587d6d3ec0334c873ad432dc76006d6129afdce9a7eac52638339a24a",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.5",
+        "audited": 1395,
+        "compared": 1395,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 51.65,
+        "sourceSha256": "522672ad20b460c02c2e39b6c5035ef6a849af28eb11ab2ac7eb293d395a8c11",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.4",
+        "audited": 1384,
+        "compared": 1384,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 54.88,
+        "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.3",
+        "audited": 1374,
+        "compared": 1374,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 55.43,
+        "sourceSha256": "25190c556bc56d11070638ccab3b3c6efd76bb9684c92a2680a4de01c3c7138b",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.2",
+        "audited": 1374,
+        "compared": 1374,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 55.09,
+        "sourceSha256": "613091da0f62426ae8dcf9afb30eb639485f493b81cda3a2b96b1fb8a6b9976c",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21.1",
+        "audited": 1332,
+        "compared": 1332,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 56.72,
+        "sourceSha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.21",
+        "audited": 1332,
+        "compared": 1332,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 58.69,
+        "sourceSha256": "4b56bc9b44de7e88f9fbb52e716c18240da34469fcbafa5ed2e75b04d60617e8",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.20.6",
+        "audited": 1329,
+        "compared": 1329,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 58.18,
+        "sourceSha256": "02dfd345ac1ad55692d5dbc8486ac7e4fea72cd54ac494a79cd48963048e56b2",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.20.5",
+        "audited": 1329,
+        "compared": 1329,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 60.44,
+        "sourceSha256": "49d5949adbb1021a7eb00c1b949f9e39934b10249cbf86d25004774d1b3ff510",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.20.4",
+        "audited": 1311,
+        "compared": 1311,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 56.75,
+        "sourceSha256": "9221ab461a491bf9661cd8e773a5e662aaa43d600fa7970b8c12bbfb0431b838",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.20.3",
+        "audited": 1311,
+        "compared": 1311,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 53.61,
+        "sourceSha256": "bef21938224902dd925e2d89dcfe1d2540656d4cf7a5abd2b93e0402d135c655",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.20.2",
+        "audited": 1254,
+        "compared": 1254,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 53.62,
+        "sourceSha256": "fa1a19be56a506426308abbc1cad85f299a7fc6dae4335559351ba0246713fda",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.20.1",
+        "audited": 1254,
+        "compared": 1254,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 46.13,
+        "sourceSha256": "56b71336d2b4fdffd197f56595b0da93e32a946f78f382a299b8f4b92758bb0f",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.20",
+        "audited": 1254,
+        "compared": 1254,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 46.68,
+        "sourceSha256": "5ac9ead135746f5f27048f2e01d8d5bdc2dabc4d91422f73ef2435f4c3d24aff",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.19.4",
+        "audited": 1227,
+        "compared": 1227,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 63.03,
+        "sourceSha256": "0e79cf7f07c107e9a1fe22ed703e472372b44149e64114944f0811abbd25f3ec",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.19.3",
+        "audited": 1185,
+        "compared": 1185,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 80.74,
+        "sourceSha256": "b7228c23dbc8988129561af3918dd469577de842d2eb3c7dabe00316bf9a44d6",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.19.2",
+        "audited": 1151,
+        "compared": 1151,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 107.07,
+        "sourceSha256": "e1ac65de9b471b6916cc457fdcff00c1bafac17027aa79100c4df893b3d956db",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.19.1",
+        "audited": 1151,
+        "compared": 1151,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 108.92,
+        "sourceSha256": "146d4018cfed50c5e77483940653091f186d2eea9ad42fc40939f5c72d6b7f52",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.19",
+        "audited": 1151,
+        "compared": 1151,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 114.11,
+        "sourceSha256": "ffd4fb3037d4110085b4d3d2dc47b760695528eb14292c3e5f7c758983c6d764",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.18.2",
+        "audited": 1100,
+        "compared": 1100,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 120.68,
+        "sourceSha256": "1d09e3639644b6b2254499469d0765cc005a286d19f3fa595b0ed8fb07971ec7",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.18.1",
+        "audited": 1100,
+        "compared": 1100,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 113.86,
+        "sourceSha256": "737c28a56c8980fcd8574465c61538ebde8f511bdd035c69d0cbe27953f892aa",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.18",
+        "audited": 1100,
+        "compared": 1100,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 113.13,
+        "sourceSha256": "381e090ef22584526113bcccf26ae38a310a22094d14c2d0dec72b71fdf65aaa",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.17.1",
+        "audited": 1099,
+        "compared": 1099,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 111.18,
+        "sourceSha256": "a49b4a56c5bbe15c9ed9fe53efa9a591f265a1f5ba7d6aa9739a58ea7a92b79d",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.17",
+        "audited": 1099,
+        "compared": 1099,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 121.9,
+        "sourceSha256": "14122287d4e4256c2d65ec8c0ccfa3b56448495fa3ccabc87d0f0eeb4fa1c30f",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.16.5",
+        "audited": 975,
+        "compared": 975,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 103.63,
+        "sourceSha256": "00b5ebbc33e95ea88c1ab80601599c9827e9aa861d93ccc2cfcbbfd996e86263",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.16.4",
+        "audited": 975,
+        "compared": 975,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 99.71,
+        "sourceSha256": "d6740464ee2bdf37d285c5d368d2e16497492427fb5783e2db3482bbf0079ed0",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.16.3",
+        "audited": 975,
+        "compared": 975,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 85.99,
+        "sourceSha256": "da85197babd989a7de318774cf5d97bcef95e89a70c9fa9a4c8180463e9589fa",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.16.2",
+        "audited": 975,
+        "compared": 975,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 88.21,
+        "sourceSha256": "19960f4e3c60f2723f361844d2b4020b8bf2160bd91a1e1efde8ce5aea4ff73d",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.16.1",
+        "audited": 974,
+        "compared": 974,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 82.08,
+        "sourceSha256": "b4831e7b63b10588ff06ea86322108d916c536446f3aea3ae988b7fe3e1f66ef",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.16",
+        "audited": 974,
+        "compared": 974,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 89.31,
+        "sourceSha256": "00740ef4475d4cd0a1d7064f89602f759c45ff9afe29da9b0ee0b9037ebb2a71",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.15.2",
+        "audited": 883,
+        "compared": 883,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 63.46,
+        "sourceSha256": "4a73008a73f3824b7c711750a5a37556df8614f193c0a531e292dad159a73a7c",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.15.1",
+        "audited": 883,
+        "compared": 883,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 57.19,
+        "sourceSha256": "6e28ecd008d0ca5e1dcd346dbc2882430f02a77a78864d57acc49fc8bc1b5358",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.15",
+        "audited": 883,
+        "compared": 883,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 60.77,
+        "sourceSha256": "41eee66b4c8e76c018745a63a46a15097cc1c6482c94b38801054938a010b21b",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.14.4",
+        "audited": 876,
+        "compared": 876,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 58.56,
+        "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.14.3",
+        "audited": 876,
+        "compared": 876,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 56.39,
+        "sourceSha256": "4063062677433988e012fba53e42e4c21adb6919ac7f061f19f3c6e75b334e07",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.14.2",
+        "audited": 876,
+        "compared": 876,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 58.27,
+        "sourceSha256": "9b740c9fd4955981125ebd3cd086baa8b4392963d043a3480b5b942a96637c25",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.14.1",
+        "audited": 876,
+        "compared": 876,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 60.25,
+        "sourceSha256": "7194d1326cf796f62ac55f3cb56f851c232895639ae27510f3207d5a73f91814",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.14",
+        "audited": 876,
+        "compared": 876,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 60.71,
+        "sourceSha256": "93907cbf0655aa5f10d049efa4d745f4250eecc5d0d5d1268046eec3144f323a",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.13.2",
+        "audited": 789,
+        "compared": 789,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 43.29,
+        "sourceSha256": "3410887ba652f25792c7675bfaf9140e73b60e93cfbf113a803f8a98cb05c0f9",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.13.1",
+        "audited": 789,
+        "compared": 789,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 45.8,
+        "sourceSha256": "f0b4cf6d1a87ae150f87a535651138ca7b82bdad8853f76e7ddbff1dd610ac87",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      },
+      {
+        "version": "1.13",
+        "audited": 784,
+        "compared": 784,
+        "comparisonVerified": true,
+        "registryPopulationVerified": true,
+        "elapsedSeconds": 41.23,
+        "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+      }
+    ],
+    "method": "Independent full CLI jobs compared to the preceding full baseline. This is all/all, not every ID in a separate single-item process. The CLI snapshots were taken before the final API-lifecycle edits; renderer bytes were unchanged."
+  },
+  "rawFinalBuild": {
+    "passedVersions": 51,
+    "successfulPngs": 72638,
+    "versions": [
+      {
+        "version": "26.3",
+        "audited": 2131,
+        "exitCode": 0,
+        "elapsedSeconds": 3.02,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "26.2",
+        "audited": 2065,
+        "exitCode": 0,
+        "elapsedSeconds": 3.24,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "26.1.2",
+        "audited": 1904,
+        "exitCode": 0,
+        "elapsedSeconds": 2.99,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "26.1.1",
+        "audited": 1904,
+        "exitCode": 0,
+        "elapsedSeconds": 3.14,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "26.1",
+        "audited": 1904,
+        "exitCode": 0,
+        "elapsedSeconds": 2.89,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.11",
+        "audited": 1903,
+        "exitCode": 0,
+        "elapsedSeconds": 3.07,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.10",
+        "audited": 1878,
+        "exitCode": 0,
+        "elapsedSeconds": 2.93,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.9",
+        "audited": 1878,
+        "exitCode": 0,
+        "elapsedSeconds": 2.27,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.8",
+        "audited": 1830,
+        "exitCode": 0,
+        "elapsedSeconds": 2.43,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.7",
+        "audited": 1830,
+        "exitCode": 0,
+        "elapsedSeconds": 2.58,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.6",
+        "audited": 1829,
+        "exitCode": 0,
+        "elapsedSeconds": 2.91,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.5",
+        "audited": 1783,
+        "exitCode": 0,
+        "elapsedSeconds": 2.71,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.4",
+        "audited": 1683,
+        "exitCode": 0,
+        "elapsedSeconds": 2.72,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.3",
+        "audited": 1693,
+        "exitCode": 0,
+        "elapsedSeconds": 2.77,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.2",
+        "audited": 1693,
+        "exitCode": 0,
+        "elapsedSeconds": 2.6,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21.1",
+        "audited": 1617,
+        "exitCode": 0,
+        "elapsedSeconds": 2.21,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.21",
+        "audited": 1617,
+        "exitCode": 0,
+        "elapsedSeconds": 2.11,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.20.6",
+        "audited": 1614,
+        "exitCode": 0,
+        "elapsedSeconds": 2.15,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.20.5",
+        "audited": 1614,
+        "exitCode": 0,
+        "elapsedSeconds": 2.12,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.20.4",
+        "audited": 1577,
+        "exitCode": 0,
+        "elapsedSeconds": 2.02,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.20.3",
+        "audited": 1577,
+        "exitCode": 0,
+        "elapsedSeconds": 1.89,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.20.2",
+        "audited": 1510,
+        "exitCode": 0,
+        "elapsedSeconds": 1.82,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.20.1",
+        "audited": 1510,
+        "exitCode": 0,
+        "elapsedSeconds": 1.83,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.20",
+        "audited": 1510,
+        "exitCode": 0,
+        "elapsedSeconds": 2.11,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.19.4",
+        "audited": 1452,
+        "exitCode": 0,
+        "elapsedSeconds": 1.8,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.19.3",
+        "audited": 1394,
+        "exitCode": 0,
+        "elapsedSeconds": 1.7,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.19.2",
+        "audited": 1363,
+        "exitCode": 0,
+        "elapsedSeconds": 1.63,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.19.1",
+        "audited": 1363,
+        "exitCode": 0,
+        "elapsedSeconds": 1.69,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.19",
+        "audited": 1363,
+        "exitCode": 0,
+        "elapsedSeconds": 1.66,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.18.2",
+        "audited": 1275,
+        "exitCode": 0,
+        "elapsedSeconds": 1.91,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.18.1",
+        "audited": 1275,
+        "exitCode": 0,
+        "elapsedSeconds": 1.63,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.18",
+        "audited": 1275,
+        "exitCode": 0,
+        "elapsedSeconds": 1.61,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.17.1",
+        "audited": 1274,
+        "exitCode": 0,
+        "elapsedSeconds": 1.62,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.17",
+        "audited": 1274,
+        "exitCode": 0,
+        "elapsedSeconds": 1.62,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.16.5",
+        "audited": 1102,
+        "exitCode": 0,
+        "elapsedSeconds": 1.6,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.16.4",
+        "audited": 1102,
+        "exitCode": 0,
+        "elapsedSeconds": 1.61,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.16.3",
+        "audited": 1102,
+        "exitCode": 0,
+        "elapsedSeconds": 1.51,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.16.2",
+        "audited": 1102,
+        "exitCode": 0,
+        "elapsedSeconds": 1.5,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.16.1",
+        "audited": 1102,
+        "exitCode": 0,
+        "elapsedSeconds": 1.51,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.16",
+        "audited": 1102,
+        "exitCode": 0,
+        "elapsedSeconds": 1.51,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.15.2",
+        "audited": 1007,
+        "exitCode": 0,
+        "elapsedSeconds": 1.44,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.15.1",
+        "audited": 1007,
+        "exitCode": 0,
+        "elapsedSeconds": 1.49,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.15",
+        "audited": 1007,
+        "exitCode": 0,
+        "elapsedSeconds": 1.55,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.14.4",
+        "audited": 992,
+        "exitCode": 0,
+        "elapsedSeconds": 1.5,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.14.3",
+        "audited": 992,
+        "exitCode": 0,
+        "elapsedSeconds": 1.42,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.14.2",
+        "audited": 992,
+        "exitCode": 0,
+        "elapsedSeconds": 1.41,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.14.1",
+        "audited": 992,
+        "exitCode": 0,
+        "elapsedSeconds": 1.42,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.14",
+        "audited": 992,
+        "exitCode": 0,
+        "elapsedSeconds": 1.46,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.13.2",
+        "audited": 896,
+        "exitCode": 0,
+        "elapsedSeconds": 1.37,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.13.1",
+        "audited": 896,
+        "exitCode": 0,
+        "elapsedSeconds": 1.37,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      },
+      {
+        "version": "1.13",
+        "audited": 891,
+        "exitCode": 0,
+        "elapsedSeconds": 1.5,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137"
+      }
+    ],
+    "method": "Final core/CLI snapshots; each PNG and present mcmeta compared byte-for-byte to its official client JAR.",
+    "implementationCommit": "b5380a7"
+  },
+  "exportFaults": {
+    "cancel": {
+      "interruptedCounts": {
+        "failed": 888,
+        "succeeded": 3
+      },
+      "recovery": {
+        "version": "1.13",
+        "mode": "raw",
+        "audited": 891,
+        "registryPopulationVerified": false,
+        "transparentImages": 0,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "temporaryFiles": 0
+    },
+    "kill": {
+      "interruptedCounts": {
+        "failed": 891,
+        "succeeded": 0
+      },
+      "recovery": {
+        "version": "1.13",
+        "mode": "raw",
+        "audited": 891,
+        "registryPopulationVerified": false,
+        "transparentImages": 0,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "temporaryFiles": 0
+    },
+    "outputBusy": {
+      "exitCode": 1,
+      "manifestWritten": false
+    },
+    "atomicWriteKill": {
+      "orphanedTemporaryFiles": 1,
+      "temporaryFilesAfterResume": 0,
+      "synthetic": true,
+      "recovery": {
+        "version": "synthetic",
+        "mode": "raw",
+        "audited": 1,
+        "registryPopulationVerified": false,
+        "transparentImages": 0,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      }
+    },
+    "diskFull": {
+      "outputTmpfsBytes": 1048576,
+      "temporaryFiles": 0,
+      "exitWasNonzero": true,
+      "interruptedCounts": {
+        "failed": 795,
+        "succeeded": 96
+      },
+      "rootCause": "No space left on device",
+      "recovery": {
+        "version": "1.13",
+        "mode": "raw",
+        "audited": 891,
+        "registryPopulationVerified": false,
+        "transparentImages": 0,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "elapsedSeconds": 6.76
+    }
+  },
+  "nativeCoreSigkill": {
+    "coreSignal": "SIGKILL",
+    "checkpointAfterRendered": 3,
+    "interruptedCounts": {
+      "failed": 784,
+      "noItemForm": 46,
+      "succeeded": 0
+    },
+    "ownedWorkerExitedOnStdinEof": true,
+    "workerExitObservedSeconds": 3.16,
+    "recovery": {
+      "version": "1.13",
+      "mode": "icons",
+      "audited": 784,
+      "registryPopulationVerified": true,
+      "transparentImages": 768,
+      "fractionalAlphaPixels": 131821,
+      "failures": [],
+      "compared": 784,
+      "comparisonVerified": true,
+      "canonicalVerified": false
+    }
+  },
+  "syntheticGpuAlpha": {
+    "renderer": "llvmpipe (LLVM 20.1.2, 128 bits)",
+    "format": "RGBA8",
+    "framebufferSrgb": false,
+    "alphaMaxError": 0,
+    "rgbMaxErrorForAlphaAtLeast64": 2,
+    "grayRecompositeMaxError": 1,
+    "gameColorSpaceCertified": false,
+    "synthetic": true
+  },
+  "benchmark": {
+    "runs": [
+      {
+        "containerMemoryPeakBytesBeforeShutdown": 1213661184,
+        "elapsedSeconds": 38.68048425,
+        "size": 64,
+        "startToFirstIconSeconds": 27.619135,
+        "succeeded": 1384,
+        "version": "1.21.4",
+        "workerVmHwmBytesBeforeShutdown": 1216925696,
+        "run": "cold",
+        "audit": {
+          "version": "1.21.4",
+          "mode": "icons",
+          "audited": 1384,
+          "registryPopulationVerified": true,
+          "transparentImages": 1368,
+          "fractionalAlphaPixels": 120416,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "preparedCacheBytes": 211762689,
+        "preparedCacheFiles": 777
+      },
+      {
+        "containerMemoryPeakBytesBeforeShutdown": 1148538880,
+        "elapsedSeconds": 27.960719792,
+        "size": 64,
+        "startToFirstIconSeconds": 16.598409917,
+        "succeeded": 1384,
+        "version": "1.21.4",
+        "workerVmHwmBytesBeforeShutdown": 1152536576,
+        "run": "warm-1",
+        "audit": {
+          "version": "1.21.4",
+          "mode": "icons",
+          "audited": 1384,
+          "registryPopulationVerified": true,
+          "transparentImages": 1368,
+          "fractionalAlphaPixels": 120416,
+          "failures": [],
+          "compared": 1384,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        },
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "preparedCacheBytes": 211762689,
+        "preparedCacheFiles": 777
+      },
+      {
+        "containerMemoryPeakBytesBeforeShutdown": 1164394496,
+        "elapsedSeconds": 28.597959917,
+        "size": 64,
+        "startToFirstIconSeconds": 17.200014459,
+        "succeeded": 1384,
+        "version": "1.21.4",
+        "workerVmHwmBytesBeforeShutdown": 1167818752,
+        "run": "warm-2",
+        "audit": {
+          "version": "1.21.4",
+          "mode": "icons",
+          "audited": 1384,
+          "registryPopulationVerified": true,
+          "transparentImages": 1368,
+          "fractionalAlphaPixels": 120416,
+          "failures": [],
+          "compared": 1384,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        },
+        "agentSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+        "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+        "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+        "preparedCacheBytes": 211762689,
+        "preparedCacheFiles": 777
+      }
+    ],
+    "coldIncludesNetwork": true,
+    "warmUsesFreshOutput": true,
+    "memorySample": "kernel cumulative high-water marks after the final icon, before shutdown",
+    "performanceGuarantee": false,
+    "coldScope": "Empty application asset cache; Docker VM/image already prepared, OS page cache not flushed."
+  },
+  "unitTests": {
+    "tests": 47,
+    "failures": 0
+  },
+  "canonicalVerified": false,
+  "limitations": [
+    "All-ID single/all equivalence is still covered by representative IDs rather than separate processes for every ID.",
+    "Game reference imagery, exact game color space and missing model/texture detection remain incomplete.",
+    "Windows/Linux hosts, Docker Desktop, native backends and ARM64 images remain untested.",
+    "SIGKILL cleanup was observed on a healthy Docker daemon after handshake; immediate cleanup under a daemon/pipe failure is not guaranteed.",
+    "Memory high-water marks are sampled after the final icon before shutdown; timings include the bounded sampling call.",
+    "The benchmark covers 1.21.4 with one cold and two warm runs; it is not a cross-version or cross-machine performance guarantee.",
+    "The seven legacy versions were fully revalidated after the texture-manager fix. The preceding 51-version repetition and benchmark used the earlier worker; unchanged adapters were not re-run with the new aggregate JAR hash."
+  ],
+  "workerStartupCleanup": {
+    "implementationCommit": "64ff362",
+    "cases": [
+      {
+        "case": "timeout",
+        "exitCode": 1,
+        "agentSnapshotRemoved": true,
+        "temporaryIconPngs": 0
+      },
+      {
+        "case": "invalidAgent",
+        "exitCode": 1,
+        "agentSnapshotRemoved": true,
+        "temporaryIconPngs": 0
+      }
+    ]
+  },
+  "sizeBoundary": {
+    "passedJobs": 18,
+    "auditedIcons": 108,
+    "versions": [
+      {
+        "size": 16,
+        "version": "1.13",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb",
+        "elapsedSeconds": 19.04
+      },
+      {
+        "size": 16,
+        "version": "1.14.3",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 34.23
+      },
+      {
+        "size": 16,
+        "version": "1.16.5",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 44.26
+      },
+      {
+        "size": 16,
+        "version": "1.19.4",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 37.08
+      },
+      {
+        "size": 16,
+        "version": "1.21.4",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 35.17
+      },
+      {
+        "size": 16,
+        "version": "1.21.5",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 38.33
+      },
+      {
+        "size": 16,
+        "version": "1.21.6",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 37.93
+      },
+      {
+        "size": 16,
+        "version": "26.2",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 41.58
+      },
+      {
+        "size": 16,
+        "version": "26.3",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 45.94
+      },
+      {
+        "size": 512,
+        "version": "1.13",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 26.35
+      },
+      {
+        "size": 512,
+        "version": "1.14.3",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 33.14
+      },
+      {
+        "size": 512,
+        "version": "1.16.5",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 55.27
+      },
+      {
+        "size": 512,
+        "version": "1.19.4",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 33.44
+      },
+      {
+        "size": 512,
+        "version": "1.21.4",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 38.83
+      },
+      {
+        "size": 512,
+        "version": "1.21.5",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 38.16
+      },
+      {
+        "size": 512,
+        "version": "1.21.6",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 38.86
+      },
+      {
+        "size": 512,
+        "version": "26.2",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 43.89
+      },
+      {
+        "size": 512,
+        "version": "26.3",
+        "audited": 6,
+        "exitCode": 0,
+        "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "elapsedSeconds": 31.78
+      }
+    ],
+    "initialFailure": {
+      "version": "1.13",
+      "size": 16,
+      "code": "IO_FAILED",
+      "phase": "preparation",
+      "retryPassed": true,
+      "rootCause": "not yet reproduced; eight concurrent preparation calls subsequently passed"
+    },
+    "visualFinding": "Chest texture is visibly incorrect in legacy-1.13 and legacy-1.14; reproducibility and PNG integrity do not establish visual correctness."
+  },
+  "legacyTextureFix": {
+    "implementationCommit": "83d2382",
+    "cause": "Legacy block entity dispatcher textureManager remained null without entering a world; vanilla bindTexture then did nothing. Initialize the dependency with Minecraft.getTextureManager.",
+    "passedVersions": 7,
+    "successfulIcons": 5866,
+    "versions": [
+      {
+        "version": "1.13",
+        "audited": 784,
+        "elapsedSeconds": 31.88,
+        "agentSha256": "01c2c404257d95f4f969e08559455aa99c0baa21c7bff25987ea15bd806686d1",
+        "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      {
+        "version": "1.13.1",
+        "audited": 789,
+        "elapsedSeconds": 31.82,
+        "agentSha256": "01c2c404257d95f4f969e08559455aa99c0baa21c7bff25987ea15bd806686d1",
+        "sourceSha256": "f0b4cf6d1a87ae150f87a535651138ca7b82bdad8853f76e7ddbff1dd610ac87",
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      {
+        "version": "1.13.2",
+        "audited": 789,
+        "elapsedSeconds": 35.76,
+        "agentSha256": "01c2c404257d95f4f969e08559455aa99c0baa21c7bff25987ea15bd806686d1",
+        "sourceSha256": "3410887ba652f25792c7675bfaf9140e73b60e93cfbf113a803f8a98cb05c0f9",
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      {
+        "version": "1.14",
+        "audited": 876,
+        "elapsedSeconds": 42.5,
+        "agentSha256": "01c2c404257d95f4f969e08559455aa99c0baa21c7bff25987ea15bd806686d1",
+        "sourceSha256": "93907cbf0655aa5f10d049efa4d745f4250eecc5d0d5d1268046eec3144f323a",
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      {
+        "version": "1.14.1",
+        "audited": 876,
+        "elapsedSeconds": 45.33,
+        "agentSha256": "01c2c404257d95f4f969e08559455aa99c0baa21c7bff25987ea15bd806686d1",
+        "sourceSha256": "7194d1326cf796f62ac55f3cb56f851c232895639ae27510f3207d5a73f91814",
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      {
+        "version": "1.14.2",
+        "audited": 876,
+        "elapsedSeconds": 44.57,
+        "agentSha256": "01c2c404257d95f4f969e08559455aa99c0baa21c7bff25987ea15bd806686d1",
+        "sourceSha256": "9b740c9fd4955981125ebd3cd086baa8b4392963d043a3480b5b942a96637c25",
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      {
+        "version": "1.14.3",
+        "audited": 876,
+        "elapsedSeconds": 32.54,
+        "agentSha256": "01c2c404257d95f4f969e08559455aa99c0baa21c7bff25987ea15bd806686d1",
+        "sourceSha256": "4063062677433988e012fba53e42e4c21adb6919ac7f061f19f3c6e75b334e07",
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      }
+    ],
+    "visuallyReviewed": [
+      "1.13 chest: standard chest texture now bound"
+    ],
+    "fullGameReferenceCertified": false,
+    "previousAllAllRepeatUsesOlderWorker": true,
+    "representativeComparisons": [
+      {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 9,
+        "registryPopulationVerified": false,
+        "transparentImages": 9,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 9,
+        "comparisonVerified": true,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 18.46,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      },
+      {
+        "version": "1.14.3",
+        "mode": "icons",
+        "audited": 9,
+        "registryPopulationVerified": false,
+        "transparentImages": 9,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 9,
+        "comparisonVerified": true,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 24.24,
+        "cliCoreSha256": "533e69aef9aa47186f6a7b9035a6665ef2b7f9931e3a70fad1856d4fb84d6bdb"
+      }
+    ],
+    "comparedRepresentativeIcons": 18
+  },
+  "continuedBy": "qa/validation-2026-10-10-resource-guard.json"
+}

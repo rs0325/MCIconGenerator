@@ -1,0 +1,34 @@
+{
+  "1.13": {
+    "feather": "2ab6680fc17d589416b22a7feed00081306d9b9d",
+    "intermediary": "c48b0ac3c78d8013287fdd5400d7e15ef976a111"
+  },
+  "1.13.1": {
+    "feather": "8bc2006b84d9ecd1c8baec5928d71fc91a308b03",
+    "intermediary": "a5efb7fc2b2b2920dd2c7a6d9b54d9db490d0d1a"
+  },
+  "1.13.2": {
+    "feather": "431f8663d09185ac8a5910d4e8da74736fab7a1b",
+    "intermediary": "de83ec66b07efefa54f59b421e1bf6e5d0593714"
+  },
+  "1.14": {
+    "featherBuild": 9,
+    "feather": "ab8be3636e809ab7150eb60c32acf491292225bc",
+    "intermediary": "ea4ea7d808954023031672e166045d15b197592d"
+  },
+  "1.14.1": {
+    "featherBuild": 9,
+    "feather": "531c0d90b73019ae2ff5c4fec2c0ce1e5ead891a",
+    "intermediary": "f2cfffe5158ba5cf0a5f2f11054cf527575ec76e"
+  },
+  "1.14.2": {
+    "featherBuild": 9,
+    "feather": "766dbe24c66e551f288fefa61876bb763f2ba862",
+    "intermediary": "5512adf4892b4c710fe7e93d9fb3d96318255123"
+  },
+  "1.14.3": {
+    "featherBuild": 9,
+    "feather": "aee84959fa52fa631f0369fefce8568e92969d5a",
+    "intermediary": "5408bf6b0d6b9a157f6fe331a8e53be9433f7d25"
+  }
+}

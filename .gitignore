@@ -2,6 +2,8 @@
 .local/
 .mcicon-cache/
 logs/
+__pycache__/
+*.pyc
 **/build/
 out/
 *.log

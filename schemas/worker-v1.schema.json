@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MCIconGenerator worker protocol v1 message",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "protocolVersion",
+        "renderer",
+        "contextProfile",
+        "animationFrameZero"
+      ],
+      "properties": {
+        "type": {
+          "const": "ready"
+        },
+        "protocolVersion": {
+          "const": 1
+        },
+        "renderer": {
+          "type": "string"
+        },
+        "contextProfile": {
+          "const": "fixed-v1"
+        },
+        "animationFrameZero": {
+          "const": true
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "requestId",
+        "command"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "enum": [
+            "catalog",
+            "render",
+            "shutdown"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "size": {
+          "enum": [
+            16,
+            32,
+            64,
+            128,
+            256,
+            512
+          ]
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "render"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "id",
+              "size",
+              "path"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "required": [
+        "requestId",
+        "type"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "result"
+        },
+        "entries": {
+          "type": "array"
+        },
+        "result": {
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "requestId",
+        "type",
+        "code",
+        "message"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "error"
+        },
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  ]
+}

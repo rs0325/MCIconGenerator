@@ -1,0 +1,72 @@
+buildscript {
+    repositories { mavenCentral() }
+    dependencies { classpath 'org.ow2.asm:asm-commons:9.11' }
+}
+
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.commons.ClassRemapper
+import org.objectweb.asm.commons.Remapper
+import java.util.zip.ZipFile
+
+dependencies {
+    implementation 'org.ow2.asm:asm:9.11'
+    implementation 'com.google.code.gson:gson:2.13.2'
+}
+// Older vanilla clients bundle an ASM version that cannot read their own newer
+// class-file version. Keep the agent's transformer independent of the game ASM.
+def shadedAgent = layout.buildDirectory.dir('shaded-agent')
+tasks.register('shadeAgent') {
+    dependsOn classes
+    inputs.files(sourceSets.main.output, configurations.runtimeClasspath)
+    outputs.dir(shadedAgent)
+    doLast {
+        def destination = shadedAgent.get().asFile
+        delete destination
+        destination.mkdirs()
+        def remapper = new Remapper() {
+            @Override String map(String name) {
+                name.startsWith('org/objectweb/asm/') ? name.replace('org/objectweb/asm/', 'io/github/rs0325/mcicon/worker/shaded/asm/') : name
+            }
+        }
+        def writeEntry = { String name, byte[] bytes ->
+            if(name.startsWith('META-INF/versions/') || name.endsWith('module-info.class') || name.endsWith('.SF') || name.endsWith('.RSA') || name.endsWith('.DSA')) return
+            if(name.endsWith('.class')) {
+                def reader = new ClassReader(bytes)
+                def writer = new ClassWriter(0)
+                reader.accept(new ClassRemapper(writer, remapper), 0)
+                bytes = writer.toByteArray()
+                name = remapper.map(name.substring(0,name.length()-6)) + '.class'
+            }
+            def file = new File(destination, name)
+            if(!file.exists()) {file.parentFile.mkdirs(); file.bytes = bytes}
+        }
+        sourceSets.main.output.files.each { directory ->
+            if(directory.isDirectory()) directory.eachFileRecurse { file ->
+                if(file.isFile()) writeEntry(directory.toPath().relativize(file.toPath()).toString().replace('\\','/'), file.bytes)
+            }
+        }
+        configurations.runtimeClasspath.files.sort().each { jar ->
+            new ZipFile(jar).withCloseable { zip ->
+                zip.entries().each { entry ->
+                    if(!entry.directory) zip.getInputStream(entry).withCloseable { stream -> writeEntry(entry.name,stream.bytes) }
+                }
+            }
+        }
+    }
+}
+tasks.register('agentJar', Jar) {
+    dependsOn shadeAgent
+    archiveClassifier = 'agent'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from shadedAgent
+    from(rootProject.file('licenses')) { into 'META-INF/licenses' }
+    from(rootProject.file('LICENSE')) { into 'META-INF/mcicon' }
+    manifest { attributes('Premain-Class': 'io.github.rs0325.mcicon.worker.RenderAgent') }
+}
+assemble.dependsOn agentJar
+
+tasks.named('test') {
+    dependsOn agentJar
+    systemProperty 'mcicon.agentJar', tasks.named('agentJar').get().archiveFile.get().asFile.absolutePath
+}

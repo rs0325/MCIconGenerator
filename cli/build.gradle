@@ -1,0 +1,22 @@
+plugins { id 'application' }
+evaluationDependsOn(':worker')
+dependencies {
+    implementation project(':core')
+    implementation 'info.picocli:picocli:4.7.7'
+}
+application {
+    mainClass = 'io.github.rs0325.mcicon.cli.Main'
+    applicationName = 'mcicon'
+}
+distributions {
+    main {
+        contents {
+            from(project(':worker').tasks.named('agentJar')) { into 'worker'; rename { 'worker-agent.jar' } }
+            from(rootProject.file('LICENSE'))
+            from(rootProject.file('THIRD_PARTY_NOTICES.md'))
+            from(rootProject.file('licenses')) { into 'licenses' }
+            from(rootProject.file('docs')) { into 'docs' }
+            from(rootProject.file('qa')) { into 'qa' }
+        }
+    }
+}
