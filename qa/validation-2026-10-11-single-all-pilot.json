@@ -1,0 +1,189 @@
+{
+  "version": "1.21.4",
+  "size": 64,
+  "registryPopulation": 1384,
+  "selected": 8,
+  "independentCliAndGameProcessPerId": true,
+  "freshOutputPerJob": true,
+  "offline": true,
+  "concurrency": 2,
+  "allJob": {
+    "exitCode": 0,
+    "elapsedSeconds": 29.254,
+    "audit": {
+      "version": "1.21.4",
+      "mode": "icons",
+      "audited": 1384,
+      "registryPopulationVerified": true,
+      "transparentImages": 1368,
+      "fractionalAlphaPixels": 120416,
+      "failures": [],
+      "compared": 0,
+      "comparisonVerified": false,
+      "canonicalVerified": false
+    },
+    "manifestSha256": "efb88460ddee3c474b1de0afa8d6f4d52f63fe47ea80b11c39d525285120ff24"
+  },
+  "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+  "settings": {
+    "agentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+    "context": "fixed-v1",
+    "dockerImageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+    "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+    "metadataSha256": "74098a01467bea4aa019c714a7e199d64b9af89e104535bf62af1691cac9a91e",
+    "profile": "gui-1.21.4",
+    "size": 64
+  },
+  "context": {
+    "alphaMethod": "black-white-native-composite-v1",
+    "animationFrame": 0,
+    "count": 1,
+    "deterministic": false,
+    "epochMillis": 946684800000,
+    "guiItemAtlas": "reset-per-pass",
+    "lightmapFullBrightRgb": [
+      252,
+      252,
+      252
+    ],
+    "overlays": false,
+    "partialTick": 0.0,
+    "player": "absent",
+    "profile": "fixed-v1",
+    "randomSeed": 0,
+    "timeMillis": 1000,
+    "timeZone": "UTC",
+    "world": "absent"
+  },
+  "environment": {
+    "arch": "amd64",
+    "backend": "docker",
+    "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+    "os": "linux"
+  },
+  "scriptSha256": "b97f4156dde0cb167b16c860b54e2b3233e722d5bf6cf4f34ebc8262c012264e",
+  "auditScriptSha256": "28f30760fe20674d50787728b5d765b4c6b4333738187cc86f7ea5457c80d1fa",
+  "cliCoreSha256": "59055b33a765192fa3072d0e7d7162b1dd921cf6984f3d7d96f44c68dc352b35",
+  "entries": [
+    {
+      "id": "minecraft:chest",
+      "index": 0,
+      "exitCode": 0,
+      "elapsedSeconds": 25.999,
+      "comparisonVerified": true,
+      "path": "assets/minecraft/textures/block/chest.png",
+      "pngSha256": "3630e176f7c0587989b8ba232a985172c9741a9db19f66982b50a69b920a5b4e",
+      "rgbaSha256": "8d1dea6785a46715fbf24c5aab06a3727ffb30b125b050684de0c6a4ed4fd5ef",
+      "width": 64,
+      "height": 64,
+      "manifestSha256": "e0064678806f018d671a25677fcfebab3c6418c3dd6fa07fcab7155fb9f7a817"
+    },
+    {
+      "id": "minecraft:clock",
+      "index": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 25.996,
+      "comparisonVerified": true,
+      "path": "assets/minecraft/textures/item/clock.png",
+      "pngSha256": "57925fe4c3f5161b250f5f7e8167f801d55a0efa54a9177796147836835f4d1b",
+      "rgbaSha256": "a2a03c50d36f405294bee5d6096735984b1fcc239e97aeb0a18737c3eee5e2e6",
+      "width": 64,
+      "height": 64,
+      "manifestSha256": "30fa2a7e14e747764792862088dd32c816a1cd254d56fd58447f1b865ad306ab"
+    },
+    {
+      "id": "minecraft:compass",
+      "index": 2,
+      "exitCode": 0,
+      "elapsedSeconds": 24.932,
+      "comparisonVerified": true,
+      "path": "assets/minecraft/textures/item/compass.png",
+      "pngSha256": "176053d98cc4f758bdfc2e101f5a577c06e69819ce151948f8191fcefd144ae3",
+      "rgbaSha256": "94c1656e5a1e9366d13cf1e5726e35d1f98483ff9501dbc8b61eefe6049e5916",
+      "width": 64,
+      "height": 64,
+      "manifestSha256": "89df2a496cffb7772d6d680f1e8e131b89ca6a5aa297103dc94a33b80a15502b"
+    },
+    {
+      "id": "minecraft:diamond",
+      "index": 3,
+      "exitCode": 0,
+      "elapsedSeconds": 25.046,
+      "comparisonVerified": true,
+      "path": "assets/minecraft/textures/item/diamond.png",
+      "pngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+      "rgbaSha256": "a1158bc8c6409c39d6b5d0e59a46783732f68adff9a5bc4eb3f547aa2dd3ec78",
+      "width": 64,
+      "height": 64,
+      "manifestSha256": "bb3d1555046f9fb49cc043307c9c62207ce325166fee0788be76a8fed4ba368a"
+    },
+    {
+      "id": "minecraft:dragon_head",
+      "index": 4,
+      "exitCode": 0,
+      "elapsedSeconds": 26.22,
+      "comparisonVerified": true,
+      "path": "assets/minecraft/textures/block/dragon_head.png",
+      "pngSha256": "dbca9c76fcc04a6158c046f8863087fdb4b4cb40f21894bd375a6c27be1099d1",
+      "rgbaSha256": "1363ebedcfb9dbaba3960bdeb2504123adeb0bfbf927a253849151567c5c7c5e",
+      "width": 64,
+      "height": 64,
+      "manifestSha256": "42b493997849c4832a56c1f57b90343faf757e50750750bd87f7d45006b3a3c0"
+    },
+    {
+      "id": "minecraft:enchanted_book",
+      "index": 5,
+      "exitCode": 0,
+      "elapsedSeconds": 26.708,
+      "comparisonVerified": true,
+      "path": "assets/minecraft/textures/item/enchanted_book.png",
+      "pngSha256": "d3f5616a91ed985481ea885f58c8ea1a03adfcbeeb9a7a8c90dd25351d505ddd",
+      "rgbaSha256": "3ef0d844dcba1859eff4d26d7364b7c11a906875495346e9d3e55c0a96694b4e",
+      "width": 64,
+      "height": 64,
+      "manifestSha256": "171ba430a8a408a6fa8b05dabbd5cb43886863da5026bd0a5e7276b6c880a3aa"
+    },
+    {
+      "id": "minecraft:glass",
+      "index": 6,
+      "exitCode": 0,
+      "elapsedSeconds": 26.031,
+      "comparisonVerified": true,
+      "path": "assets/minecraft/textures/block/glass.png",
+      "pngSha256": "04aa57745283aa0d513540db40e6f4d89fb09842a490f2b2b7980aceadb84a67",
+      "rgbaSha256": "6077f5c60837448b6e10890d4822c35e6adc2fa3af6ae9830ad105f35b8aef86",
+      "width": 64,
+      "height": 64,
+      "manifestSha256": "bb6b67e5535befbe371e502a781f868b530e5f9b8fb12a16acb27f41cd5fe3c3"
+    },
+    {
+      "id": "minecraft:oak_fence",
+      "index": 7,
+      "exitCode": 0,
+      "elapsedSeconds": 26.242,
+      "comparisonVerified": true,
+      "path": "assets/minecraft/textures/block/oak_fence.png",
+      "pngSha256": "c7f9018b723b97c2212691e117a1a49bcf8b5a2a67c806b0b7db86c016bf44cd",
+      "rgbaSha256": "0ed4d47c3b9bfb7b49895fc2e61d590b5c6303e03abfc108551c0827b1832c7a",
+      "width": 64,
+      "height": 64,
+      "manifestSha256": "b3c9e4b0c4bc95c0587919e29707de868ec79b4b54e7af32a222e38c9f05d7dd"
+    }
+  ],
+  "allIdsVerified": false,
+  "completed": 8,
+  "failed": 0,
+  "elapsedSeconds": 133.916,
+  "scope": "1.21.4/64pxの全件1,384PNGと、各々独立したCLI・ゲームプロセスで起動した代表8IDの個別出力を比較。全IDの個別比較は別ジョブで進行中。",
+  "qaTests": {
+    "command": "python3 scripts/test-single-all.py",
+    "passed": 7,
+    "sourceSha256": "58cb7f1466396baa6cafb5b4efcdc34d6e3a0b5bf1083bf6421071ceb3228ed5"
+  },
+  "junit": {
+    "tests": 61,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}
