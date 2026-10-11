@@ -40,6 +40,31 @@ public final class ResourceCapabilityProbe {
                 if(!members(jar,s,missingTexture).fields.containsKey(s.fieldName(missingTexture,"texture")))failures.add("旧版missing textureの保持フィールドがありません");
                 checked+=2;
             }
+            String direct=legacy?"net.minecraft.client.render.texture.Texture":"net.minecraft.client.renderer.texture.AbstractTexture";
+            Members dm=members(jar,s,direct);
+            if(!legacy) {
+                String tm="net.minecraft.client.renderer.texture.TextureManager";
+                requireMethod(members(jar,s,tm),s.methodName(tm,"getTexture",1),1,"TextureManager.getTexture",failures);
+                if(s.hasMethod(direct,"getId",0))requireMethod(dm,s.methodName(direct,"getId",0),0,"AbstractTexture.getId",failures);
+                else {
+                    requireMethod(dm,s.methodName(direct,"getTexture",0),0,"AbstractTexture.getTexture",failures);
+                    if(s.hasMethod(direct,"getTextureView",0)||dm.methods.stream().anyMatch(m->m.startsWith("getTextureView()")))requireMethod(dm,s.methodName(direct,"getTextureView",0),0,"AbstractTexture.getTextureView",failures);
+                }
+                checked+=2;
+            }
+            String contents="net.minecraft.client.renderer.texture.TextureContents";
+            if(jar.getEntry(s.actualClass(contents).replace('.','/')+".class")!=null) {
+                Members cm=members(jar,s,contents);
+                if(!cm.methods.contains(s.methodName(contents,"createMissing",0)+"()"+descriptor(s,contents)))failures.add("代替TextureContentsの生成メソッドがありません");
+                String reloadable="net.minecraft.client.renderer.texture.ReloadableTexture";
+                if(!members(jar,s,reloadable).methods.contains(s.methodName(reloadable,"apply",1)+"("+descriptor(s,contents)+")V"))failures.add("ReloadableTexture.applyの型が一致しません");
+                checked+=2;
+            } else if(!legacy) {
+                String missingTexture="net.minecraft.client.renderer.texture.MissingTextureAtlasSprite";
+                Members mm=members(jar,s,missingTexture);
+                if(!mm.fields.containsKey(s.fieldName(missingTexture,"missingTexture")))failures.add("modernのmissing texture保持フィールドがありません");
+                requireMethod(mm,s.methodName(missingTexture,"getTexture",0),0,"MissingTextureAtlasSprite.getTexture",failures);checked++;
+            }
             String quad=legacy?"net.minecraft.client.resource.model.BakedQuad":"net.minecraft.client.renderer.block.model.BakedQuad";
             if(jar.getEntry(s.actualClass(quad).replace('.','/')+".class")!=null) {
                 Members qm=members(jar,s,quad);String field=s.fieldName(quad,"sprite");

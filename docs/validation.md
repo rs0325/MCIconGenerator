@@ -135,6 +135,26 @@ python3 scripts/verify-resource-faults.py --injection resource-pack \
 
 最終workerの27破損ケースで、全て期待した欠損診断とPNG未出力、同じworkerで続くwheatの基準RGBA一致を確認しました。既存の観測値置換fixtureも3版・6件で回帰確認し、missing spriteを描画passの前に取得することでQA自身がatlas観測へ再入しないようにしました。正常全51版・60,265枚は基準のRGBAと出力パスが一致し、PNG監査も成功しました。入力・worker・QA helperのhashと版別結果は[数値記録](../qa/validation-2026-10-11-resource-pack.json)に保存しています。JUnit56件、実bytecodeの依存照合51/51版は成功しています。重点反証で指摘された旧版getterの遅延生成による再帰と並列QAログの混入は修正しました。版によって起動ログが省略されたりSTDERRにprefixが付くため、パック選択の証明は取得Resourceの提供元で行います。modernの直接非atlasテクスチャ、全てのキャッシュ済み特殊描画、画像の意味・色空間の受入は引き続き未完了です。
 
+## 直接テクスチャの欠損とキャッシュ取得（2026-10-11）
+
+Issue #6 / PR #16の継続で、起点はb317c60です。1.21.4・1.21.5・26.3で、ドラゴンの頭が使用するtextures/entity/enderdragon/dragon.pngを破損させると、以前のworkerは代替画像を成功PNGとして返しました。modernではTextureContents.createMissingの内容を元のtextureへ適用するため、atlas sprite名や共有missing textureとの比較だけでは識別できません。
+
+生成された代替内容と適用先textureを弱参照で追跡し、requested passのTextureManager取得・直接bind・GPU getterでMISSING_TEXTUREを記録します。状態はpass間で保持し、render executorでの正常な内容の適用で解除します。取得後のバニラ処理と戻り値は維持し、対象PNGを出力せず、同じworkerのwheatは継続します。描画前に破損textureをロードするQAでは、ロード時には失敗判定せず、キャッシュからの取得を対象passで検出します。
+
+```sh
+python3 scripts/verify-resource-faults.py --injection resource-pack \
+  --faults direct-texture --versions 1.21.4 1.21.5 26.3 \
+  --out .local/direct-texture-check --compare .local/qa-output
+python3 scripts/verify-resource-faults.py --injection resource-pack \
+  --preload-direct-texture --faults direct-texture \
+  --versions 1.21.4 1.21.5 26.3 --out .local/direct-texture-cached-check \
+  --compare .local/qa-output
+```
+
+JUnit59件と実bytecodeの依存照合51/51版は成功しました。1.21.5はGPU view getterをまだ持たないため、実際に存在するgetterだけを照合します。直接PNGの破損9境界版、事前ロード3版、既存の欠損診断12件、観測値置換6件は成功しました。全30件で対象PNGの未出力と同じworkerのwheat成功・基準RGBA一致を確認しています。正常全51版・60,265枚は基準のRGBAと出力パスが一致し、PNG監査も成功しました。入力・worker・QA helperのhashと版別結果は[数値記録](../qa/validation-2026-10-11-direct-texture.json)に保存しています。
+
+1.14.4のdragon_headは破損パックあり・なしの個別描画でともにEmpty inventory iconとなり、同じworkerのwheatは基準と一致しました。以前の65388d58 workerでも正常個別描画の失敗を再現したため、今回の観測追加による回帰ではなく既存問題と確認しました。欠損診断成功には数えません。全件基準には成功PNGがあり、個別と全件の差および原因は未解決です。非render threadからapplyだけを呼んでGPU適用を後送する外部経路との並行性、全てのGPU cache・特殊リソース、無改変ワールド内の画像・色空間の受入は未完了です。全版experimental/deterministic=falseを維持します。
+
 ## 未完了の受入検証
 
 - 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、無改変のワールド内inventory基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。

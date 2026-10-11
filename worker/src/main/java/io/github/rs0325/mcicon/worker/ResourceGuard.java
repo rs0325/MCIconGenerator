@@ -1,9 +1,15 @@
 package io.github.rs0325.mcicon.worker;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 /** Records vanilla fallback resources only inside a requested inventory pass. */
 public final class ResourceGuard {
     private static final ThreadLocal<String> failure=new ThreadLocal<String>();
     private static final ThreadLocal<Object> manager=new ThreadLocal<Object>();
+    private static final Set<Object> missingContents=Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<Object,Boolean>()));
+    private static final Set<Object> missingTextures=Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<Object,Boolean>()));
     private ResourceGuard() {}
     static void begin() {failure.remove();manager.remove();}
     static void end() {failure.remove();manager.remove();}
@@ -44,11 +50,21 @@ public final class ResourceGuard {
             if("minecraft:missingno".equals(String.valueOf(name))&&failure.get()==null)failure.set("MISSING_TEXTURE");
         } catch(Exception e) {throw new IllegalStateException("Cannot inspect drawn vanilla sprite",e);}
     }
-    /** 旧版のbind対象を検査し、描画pass内の保持済みmissing textureなら失敗を記録する。 */ public static void texture(Object value) {
+    /** バニラが生成した代替内容を追跡する。reload用スレッドからも呼ばれる。 */
+    public static void missingContents(Object value) {missingContents.add(value);}
+    /** 適用内容を記録し、正常なreloadでは以前の欠損状態を解除する。 */
+    public static void appliedTexture(Object texture,Object contents) {
+        if(missingContents.contains(contents))missingTextures.add(texture);else missingTextures.remove(texture);
+    }
+    /** 描画pass内で取得・bindしたテクスチャの代替状態を検査する。 */
+    public static void texture(Object value) {
         if(!CanonicalContext.active())return;
         try {
-            Object missing=RenderAgent.symbols.field("net.minecraft.client.render.texture.MissingTextureAtlasSprite","texture",null);
-            if(value==missing&&failure.get()==null)failure.set("MISSING_TEXTURE");
+            Symbols s=RenderAgent.symbols;
+            boolean missing=missingTextures.contains(value);
+            if(RenderAgent.config.get("profile").getAsString().startsWith("legacy-"))missing=value==s.field("net.minecraft.client.render.texture.MissingTextureAtlasSprite","texture",null);
+            else if(s.hasField("net.minecraft.client.renderer.texture.MissingTextureAtlasSprite","missingTexture"))missing=value==s.field("net.minecraft.client.renderer.texture.MissingTextureAtlasSprite","missingTexture",null);
+            if(missing&&failure.get()==null)failure.set("MISSING_TEXTURE");
         } catch(Exception e) {throw new IllegalStateException("バニラのbind済みテクスチャを検査できません",e);}
     }
     public static void quad(Object value) {

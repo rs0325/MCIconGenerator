@@ -65,6 +65,14 @@ public final class ResourcePackFaultAgent {
                 String method=legacy||s.hasMethod(owner,"getSourceName",0)?"getSourceName":"sourcePackId";
                 Object pack=s.call(owner,method,value);
                 System.err.println("[mcicon QA] resource source: "+resource+" = "+pack);
+                try(InputStream preload=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-preload-texture.txt")) {
+                    if(preload!=null) {
+                        Object textures=s.call("net.minecraft.client.Minecraft","getTextureManager",minecraft);
+                        Object texture=s.call("net.minecraft.client.renderer.texture.TextureManager","getTexture",textures,id);
+                        if(texture==null)throw new IllegalStateException("QA用直接テクスチャを事前ロードできません");
+                        System.err.println("[mcicon QA] direct texture cached: "+resource);
+                    }
+                }
             } finally {if(value instanceof AutoCloseable)((AutoCloseable)value).close();}
         } catch(Exception e) {throw new IllegalStateException("QAリソースの提供パックを確認できません",e);}
     }
