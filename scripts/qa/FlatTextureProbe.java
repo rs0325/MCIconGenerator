@@ -5,10 +5,11 @@ import java.nio.file.*;
 import java.io.*;
 import java.security.MessageDigest;
 import java.util.zip.*;
+import java.util.Arrays;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-/** ゲーム・GPUを使わず、不透明・透明のgenerated textureと定数tintを照合する。 */
+/** ゲーム・GPUを使わず、generated textureと定数tint・既定の針モデルを照合する。 */
 public final class FlatTextureProbe {
     public static void main(String[] args) throws Exception {
         String version=args[0];Path client=Paths.get(args[1]),folder=Paths.get(args[2]);
@@ -26,6 +27,23 @@ public final class FlatTextureProbe {
                     if(!item.equals("diamond"))throw new IllegalArgumentException("Legacy oracle only covers diamond");
                 } else {
                     JsonObject definition=json(resource(jar,"assets/minecraft/items/"+item+".json",inputs)).getAsJsonObject("model");
+                    if(version.equals("1.21.4")&&(item.equals("clock")||item.equals("compass")||item.equals("recovery_compass"))) {
+                        // NeedleDirectionHelper.getはentityもstackのentity表現もない場合、0を返す。
+                        resource(jar,"hcs.class",inputs);
+                        if(item.equals("compass")) {
+                            if(!definition.get("component").getAsString().equals("minecraft:lodestone_tracker"))throw new IllegalArgumentException("Unexpected compass component");
+                            definition=definition.getAsJsonObject("on_false");
+                        }
+                        if(!item.equals("recovery_compass")) {
+                            if(!definition.get("property").getAsString().equals("minecraft:context_dimension"))throw new IllegalArgumentException("Unexpected context selector");
+                            definition=definition.getAsJsonObject("fallback");
+                        }
+                        if(!definition.get("type").getAsString().equals("minecraft:range_dispatch"))throw new IllegalArgumentException("Unexpected needle model");
+                        JsonObject selected=null;
+                        for(JsonElement e:definition.getAsJsonArray("entries"))if(e.getAsJsonObject().get("threshold").getAsFloat()<=0)selected=e.getAsJsonObject().getAsJsonObject("model");
+                        if(selected==null)throw new IllegalArgumentException("No model for zero needle direction");
+                        definition=selected;
+                    }
                     if(!definition.get("type").getAsString().equals("minecraft:model"))throw new IllegalArgumentException("Non-simple item definition");
                     modelId=definition.get("model").getAsString();
                     if(definition.has("tints"))tints=definition.getAsJsonArray("tints");
@@ -56,14 +74,15 @@ public final class FlatTextureProbe {
                 if(entry==null||!entry.get("status").getAsString().equals("success"))throw new IOException("Baseline lacks "+id);
                 byte[] bytes=Files.readAllBytes(folder.resolve(entry.get("path").getAsString()));
                 if(!hash(bytes).equals(entry.get("sha256").getAsString()))throw new IOException("Baseline PNG hash mismatch");
-                BufferedImage output=ImageIO.read(new ByteArrayInputStream(bytes));if(output.getWidth()!=64||output.getHeight()!=64)throw new IOException("Expected 64px output");
+                BufferedImage output=ImageIO.read(new ByteArrayInputStream(bytes));int size=output.getWidth();
+                if(!Arrays.asList(16,32,64,128,256,512).contains(size)||output.getHeight()!=size)throw new IOException("Expected supported square output");
                 int colorError=0,alphaError=0,bad=0;
-                for(int y=0;y<64;y++)for(int x=0;x<64;x++) {
-                    int a=expected.getRGB(x/4,y/4),b=output.getRGB(x,y),error=0;
+                for(int y=0;y<size;y++)for(int x=0;x<size;x++) {
+                    int a=expected.getRGB(x*16/size,y*16/size),b=output.getRGB(x,y),error=0;
                     for(int shift:new int[]{0,8,16})error=Math.max(error,Math.abs(((a>>>shift)&255)-((b>>>shift)&255)));
                     int da=Math.abs((a>>>24)-(b>>>24));colorError=Math.max(colorError,error);alphaError=Math.max(alphaError,da);if(error>1||da>0)bad++;
                 }
-                JsonObject result=new JsonObject();result.addProperty("id",id);result.addProperty("model",modelId);result.add("tints",tints);result.add("resourceInputs",inputs);result.addProperty("exportPngSha256",hash(bytes));result.addProperty("maxRgbError",colorError);result.addProperty("maxAlphaError",alphaError);result.addProperty("pixelsOverTolerance",bad);result.addProperty("passed",bad==0);results.add(result);passed&=bad==0;
+                JsonObject result=new JsonObject();result.addProperty("id",id);result.addProperty("model",modelId);result.addProperty("size",size);result.add("tints",tints);result.add("resourceInputs",inputs);result.addProperty("exportPngSha256",hash(bytes));result.addProperty("maxRgbError",colorError);result.addProperty("maxAlphaError",alphaError);result.addProperty("pixelsOverTolerance",bad);result.addProperty("passed",bad==0);results.add(result);passed&=bad==0;
             }
         }
         JsonObject report=new JsonObject();report.addProperty("version",version);report.addProperty("fullBrightLightmap",light);report.addProperty("sourceSha256",sourceHash);report.addProperty("baselineAgentSha256",manifest.getAsJsonObject("settings").get("agentSha256").getAsString());report.addProperty("gameClassesLoaded",false);report.add("results",results);report.addProperty("passed",passed);

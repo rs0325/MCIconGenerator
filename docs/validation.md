@@ -222,6 +222,28 @@ python3 scripts/verify-world-inventory.py --out .local/world-inventory \
 
 数値・入力hash・QA helper hashは[照明変更後の記録](../qa/validation-2026-10-11-inventory-lighting.json)に保存します。通常GUI fixtureはfixed-v1とbootstrapを共有し、通常ワールド28種類の独立比較と区別します。全51版の全件再実行、他版の実ワールド照明、全ID・動的表現・他GPUの受入は未完了で、全版experimental/deterministic=falseを維持します。
 
+## 1.21.4の固定条件と診断理由の検証（2026-10-11）
+
+起点はmainのb7c8c69です。workerの具体的な例外messageをcoreが汎用文へ置き換えていたため、McIconExceptionの理由をAPI・manifestへ保持します。空モデルは「IOException: Empty inventory icon」、drawItem入口での例外は「IllegalStateException: MCIcon QA: inventory draw failure」としてRENDER_FAILEDに記録され、同じworkerの次のwheatは正常な基準RGBAと一致しました。JUnit61件が成功しました。描画workerのhashは照明変更後の8a33d62aのままで、正常PNGの計算は変更していません。
+
+通常ワールドの追加38種類は36種類が厳密比較に成功し、oak_fenceの輪郭2画素と時刻に依存するend_crystalが不一致でした。通常InventoryScreenのglint時計1箇所を1000msへ指定すると、glint3種類とdiamond対照の4比較は最大誤差1/255以内です。別のQAパックで49枚の元PNGを変更せず、animation metadataのframesを初期frame1件、interpolateをfalseへ指定した16比較は誤差0でした。最終的に両条件を併用した56種類は55種類が成功し、oak_fenceの2画素は厳密比較でFAILのままです。輪郭の許容変更は導入していません。productionの固定化・bootstrapコードは共有しませんが、動的状態を指定した参照であり、無計装ワールドの動的表示との一致とは区別します。撮影後にscopeの説明文を補足し、実行時のhelper hashはそのまま記録します。
+
+world/playerのない既定stackで時計・コンパス類の針計算が0を返すことを実bytecodeで確認し、clock_00・compass_16・recovery_compass_16の元PNGを独立oracleで照合しました。6サイズ×9種類の54PNGは監査に成功しました。diamond・creeper_spawn_egg・時計・コンパス・リカバリーコンパスの16〜256px計25ケースは元PNGの整数拡大とRGBA一致ですが、512pxの5ケースは不一致でした。512pxではテクセル境界の移動が観測され、atlas UV・生成モデルを含む実GUI拡大との照合は未実施です。原因は未確定で、512pxの画質受入を成功とはしません。残る立体4種類はPNG監査のみです。
+
+モデル・atlas・特殊チェスト・直接ドラゴンPNGの欠損4ケースは修正前coreと同じworkerで成功しました。具体理由の保存は修正後coreで空モデル・描画例外の2ケースを別途確認しています。描画例外はtarget/projection設定後のdrawItem入口へ注入したもので、native bufferを部分使用した後の復旧は未検証です。入力・helper・worker hashと失敗を含む比較値は[数値記録](../qa/validation-2026-10-11-canonical-inventory.json)に保存します。Issue #6は継続中で、全版experimental/deterministic=falseを維持します。
+
+```sh
+python3 scripts/verify-world-inventory.py --frame-zero --fixed-glint \
+  --ids oak_fence end_crystal prismarine clock compass \
+  --out .local/canonical-world --compare .local/inventory-lighting-normal
+python3 scripts/verify-resource-faults.py --versions 1.21.4 \
+  --injection resource-pack --faults empty-model \
+  --out .local/empty-model --compare .local/inventory-lighting-normal
+python3 scripts/verify-resource-faults.py --versions 1.21.4 \
+  --injection observer --faults render-error \
+  --out .local/render-error --compare .local/inventory-lighting-normal
+```
+
 ## 未完了の受入検証
 
 - 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、1.21.4以外の照明基準、完全な無計装clientの基準画像、通常ワールド比較の対象拡張、glint・時計/コンパス・animated textureの意味的な比較。

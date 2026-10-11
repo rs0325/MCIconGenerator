@@ -26,11 +26,33 @@ public final class WorldInventoryAgent {
         s=new Symbols(Paths.get(config.get("mappings").getAsString()));
         output=Paths.get(config.get("output").getAsString());
         report.addProperty("version","1.21.4");report.addProperty("productionRendererUsed",false);
-        report.addProperty("canonicalHooksUsed",false);report.addProperty("renderMethodsTransformed",false);
+        report.addProperty("canonicalHooksUsed",false);report.addProperty("renderMethodsTransformed",config.has("fixedGlintMillis"));
         report.add("captures",captures);
         final String owner=s.actualClass(MC).replace('.','/'),method=s.methodName(MC,"runTick",1);
+        final String glintOwner=s.actualClass("net.minecraft.client.renderer.RenderStateShard").replace('.','/');
+        final String glintMethod=s.methodName("net.minecraft.client.renderer.RenderStateShard","setupGlintTexturing",1);
+        final String timeOwner=s.actualClass("net.minecraft.Util").replace('.','/'),timeMethod=s.methodName("net.minecraft.Util","getMillis",0);
         instrumentation.addTransformer(new ClassFileTransformer() {
             public byte[] transform(ClassLoader loader,String name,Class<?> redef,ProtectionDomain domain,byte[] bytes) {
+                if(config.has("fixedGlintMillis")&&name.equals(glintOwner)) {
+                    final int[] calls={0};ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
+                    reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
+                        public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
+                            MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
+                            if(!name.equals(glintMethod)||!desc.equals("(F)V"))return target;
+                            return new MethodVisitor(Opcodes.ASM9,target) {
+                                public void visitMethodInsn(int opcode,String owner,String name,String desc,boolean itf) {
+                                    if(opcode==Opcodes.INVOKESTATIC&&owner.equals(timeOwner)&&name.equals(timeMethod)&&desc.equals("()J")) {
+                                        super.visitLdcInsn(config.get("fixedGlintMillis").getAsLong());calls[0]++;return;
+                                    }
+                                    super.visitMethodInsn(opcode,owner,name,desc,itf);
+                                }
+                            };
+                        }
+                    },0);
+                    report.addProperty("glintClockCallSites",calls[0]);report.addProperty("fixedGlintMillis",config.get("fixedGlintMillis").getAsLong());
+                    return writer.toByteArray();
+                }
                 if(!name.equals(owner))return null;
                 ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                 reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
@@ -57,6 +79,15 @@ public final class WorldInventoryAgent {
             if(stage==0) {
                 if(!Boolean.TRUE.equals(s.call(MC,"isGameLoadFinished",minecraft))||s.call(MC,"getOverlay",minecraft)!=null||!s.type("net.minecraft.client.gui.screens.TitleScreen").isInstance(screen))return;
                 if(++frames<60)return;
+                if(config.has("frameZeroResources")) {
+                    JsonObject sources=new JsonObject();Object manager=s.call(MC,"getResourceManager",minecraft);
+                    for(JsonElement e:config.getAsJsonArray("frameZeroResources")) {
+                        String id=e.getAsString();Object location=s.call("net.minecraft.resources.ResourceLocation","parse",null,id);
+                        Object resource=((Optional<?>)s.call("net.minecraft.server.packs.resources.ResourceManager","getResource",manager,location)).get();
+                        sources.addProperty(id,String.valueOf(s.call("net.minecraft.server.packs.resources.Resource","sourcePackId",resource)));
+                    }
+                    report.add("frameZeroResourceSources",sources);writeReport();
+                }
                 s.call(CREATE,"openFresh",null,minecraft,screen);stage=1;frames=0;return;
             }
             if(stage==1) {
@@ -110,6 +141,7 @@ public final class WorldInventoryAgent {
             int top=((Number)s.field("net.minecraft.client.gui.screens.inventory.AbstractContainerScreen","topPos",screen)).intValue();
             capture.addProperty("xGui",left+8);capture.addProperty("yGui",top+84);
             capture.addProperty("count",((Number)s.call("net.minecraft.world.item.ItemStack","getCount",stack)).intValue());
+            capture.addProperty("hasFoil",(Boolean)s.call("net.minecraft.world.item.ItemStack","hasFoil",stack));
             capture.addProperty("fullBrightArgb",fullBright);
             capture.addProperty("gameTime",((Number)s.call("net.minecraft.world.level.Level","getGameTime",level)).longValue());
             captures.add(capture);writeReport();System.err.println("[mcicon QA world] captured "+id);

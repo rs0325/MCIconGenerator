@@ -5,7 +5,7 @@ import io.github.rs0325.mcicon.worker.shaded.asm.*;
 import java.lang.instrument.*;
 import java.security.ProtectionDomain;
 
-/** QA-only wrapper: substitute a resolved model or consumed-sprite observer input. */
+/** 解決済みモデル・sprite観測値の置換と、描画途中の例外注入を行うQA wrapper。 */
 public final class ResourceFaultAgent {
     private static String fault;
     private static boolean legacy;
@@ -36,6 +36,21 @@ public final class ResourceFaultAgent {
                                 public void visitCode() {
                                     super.visitCode();super.visitVarInsn(Opcodes.ALOAD,0);
                                     super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/ResourceFaultAgent","select","(Lcom/google/gson/JsonObject;)V",false);
+                                }
+                            };
+                        }
+                    },0);
+                    return writer.toByteArray();
+                }
+                if(fault.equals("render-error")&&name.equals("io/github/rs0325/mcicon/worker/ModernRenderer")) {
+                    ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
+                    reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
+                        public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
+                            MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
+                            if(!name.equals("drawItem")||!desc.equals("(Ljava/lang/Object;)V"))return target;
+                            return new MethodVisitor(Opcodes.ASM9,target) {
+                                public void visitCode() {
+                                    super.visitCode();super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/ResourceFaultAgent","failDraw","()V",false);
                                 }
                             };
                         }
@@ -88,6 +103,12 @@ public final class ResourceFaultAgent {
     public static void select(com.google.gson.JsonObject request) {
         selected.set(request.get("id").getAsString().equals("minecraft:stone"));
         if(fault.equals("texture")&&Boolean.TRUE.equals(selected.get())&&missingSprite==null)missingSprite=findMissingSprite();
+    }
+    public static void failDraw() {
+        if(Boolean.TRUE.equals(selected.get())) {
+            System.err.println("[mcicon QA] render error injected");
+            throw new IllegalStateException("MCIcon QA: inventory draw failure");
+        }
     }
     public static Object model(Object original) {
         if(!CanonicalContext.active()||!Boolean.TRUE.equals(selected.get()))return original;
