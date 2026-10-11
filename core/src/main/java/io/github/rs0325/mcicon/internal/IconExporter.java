@@ -59,7 +59,7 @@ public final class IconExporter {
                             entries.put(entry.id(),new ExportResult.Entry(entry.id(),entry.kind(),"success",path,FilesSupport.hash(data),null,Map.of(),null,null));
                         }finally{Files.deleteIfExists(image);}
                     } catch(Exception e) {
-                        entries.put(entry.id(),new ExportResult.Entry(entry.id(),entry.kind(),"failed",path,null,null,Map.of(),e instanceof McIconException m?m.code():"RENDER_FAILED","Inventory icon export failed"));
+                        entries.put(entry.id(),new ExportResult.Entry(entry.id(),entry.kind(),"failed",path,null,null,Map.of(),e instanceof McIconException m?m.code():"RENDER_FAILED",e instanceof McIconException m?m.getMessage():"Inventory icon export failed"));
                         if(request.failFast()||token.isCancelled())aborted=true;
                     }
                     progress.onProgress(new ProgressListener.ProgressEvent("render",entry.id(),++completed,selected.size()));

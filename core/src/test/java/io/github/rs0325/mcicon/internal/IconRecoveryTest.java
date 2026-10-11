@@ -53,6 +53,22 @@ class IconRecoveryTest {
             assertFalse(result.complete());assertEquals("OUTPUT_EXISTS",result.entries().getFirst().code());assertArrayEquals(original,Files.readAllBytes(file));
         }
     }
+    @Test void preservesWorkerFailureDetailsAndContinuesHealthyItems() throws Exception {
+        FakeWorker worker=new FakeWorker(-1) {
+            public Path render(String id,int size) throws Exception {
+                if(id.endsWith("00"))throw new McIconException("RENDER_FAILED","IOException: Empty inventory icon",3);
+                if(id.endsWith("01"))throw new McIconException("RENDER_FAILED","IllegalStateException: inventory draw failure",3);
+                return super.render(id,size);
+            }
+        };
+        var result=new IconExporter(new CancellationToken(),ProgressListener.NONE).export(runtime(),worker,catalog(3),request());
+        assertFalse(result.complete());assertEquals(1,result.succeeded());assertEquals(2,result.failed());
+        var entries=Json.MAPPER.readTree(Path.of(result.manifest()).toFile()).path("entries");
+        assertEquals("RENDER_FAILED",entries.get(0).path("code").asText());
+        assertEquals("IOException: Empty inventory icon",entries.get(0).path("message").asText());
+        assertEquals("IllegalStateException: inventory draw failure",entries.get(1).path("message").asText());
+        assertEquals("success",entries.get(2).path("status").asText());
+    }
     @Test void cancellationLeavesPlannedEntriesAndCanResumeWithANewToken() throws Exception {
         var runtime=runtime();CancellationToken token=new CancellationToken();
         ProgressListener listener=event->{if(event.completed()==3)token.cancel();};

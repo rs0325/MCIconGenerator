@@ -222,10 +222,62 @@ python3 scripts/verify-world-inventory.py --out .local/world-inventory \
 
 数値・入力hash・QA helper hashは[照明変更後の記録](../qa/validation-2026-10-11-inventory-lighting.json)に保存します。通常GUI fixtureはfixed-v1とbootstrapを共有し、通常ワールド28種類の独立比較と区別します。全51版の全件再実行、他版の実ワールド照明、全ID・動的表現・他GPUの受入は未完了で、全版experimental/deterministic=falseを維持します。
 
+## 1.21.4の固定条件と診断理由の検証（2026-10-11）
+
+起点はmainのb7c8c69です。workerの具体的な例外messageをcoreが汎用文へ置き換えていたため、McIconExceptionの理由をAPI・manifestへ保持します。空モデルは「IOException: Empty inventory icon」、drawItem入口での例外は「IllegalStateException: MCIcon QA: inventory draw failure」としてRENDER_FAILEDに記録され、同じworkerの次のwheatは正常な基準RGBAと一致しました。JUnit61件が成功しました。描画workerのhashは照明変更後の8a33d62aのままで、正常PNGの計算は変更していません。
+
+通常ワールドの追加38種類は36種類が厳密比較に成功し、oak_fenceの輪郭2画素と時刻に依存するend_crystalが不一致でした。通常InventoryScreenのglint時計1箇所を1000msへ指定すると、glint3種類とdiamond対照の4比較は最大誤差1/255以内です。別のQAパックで49枚の元PNGを変更せず、animation metadataのframesを初期frame1件、interpolateをfalseへ指定した16比較は誤差0でした。最終的に両条件を併用した56種類は55種類が成功し、oak_fenceの2画素は厳密比較でFAILのままです。輪郭の許容変更は導入していません。productionの固定化・bootstrapコードは共有しませんが、動的状態を指定した参照であり、無計装ワールドの動的表示との一致とは区別します。撮影後にscopeの説明文を補足し、実行時のhelper hashはそのまま記録します。
+
+world/playerのない既定stackで時計・コンパス類の針計算が0を返すことを実bytecodeで確認し、clock_00・compass_16・recovery_compass_16の元PNGを独立oracleで照合しました。6サイズ×9種類の54PNGは監査に成功しました。diamond・creeper_spawn_egg・時計・コンパス・リカバリーコンパスの16〜256px計25ケースは元PNGの整数拡大とRGBA一致ですが、512pxの5ケースは不一致でした。512pxではテクセル境界の移動が観測され、atlas UV・生成モデルを含む実GUI拡大との照合は未実施です。原因は未確定で、512pxの画質受入を成功とはしません。残る立体4種類はPNG監査のみです。
+
+モデル・atlas・特殊チェスト・直接ドラゴンPNGの欠損4ケースは修正前coreと同じworkerで成功しました。具体理由の保存は修正後coreで空モデル・描画例外の2ケースを別途確認しています。描画例外はtarget/projection設定後のdrawItem入口へ注入したもので、native bufferを部分使用した後の復旧は未検証です。入力・helper・worker hashと失敗を含む比較値は[数値記録](../qa/validation-2026-10-11-canonical-inventory.json)に保存します。Issue #6は継続中で、全版experimental/deterministic=falseを維持します。
+
+```sh
+python3 scripts/verify-world-inventory.py --frame-zero --fixed-glint \
+  --ids oak_fence end_crystal prismarine clock compass \
+  --out .local/canonical-world --compare .local/inventory-lighting-normal
+python3 scripts/verify-resource-faults.py --versions 1.21.4 \
+  --injection resource-pack --faults empty-model \
+  --out .local/empty-model --compare .local/inventory-lighting-normal
+python3 scripts/verify-resource-faults.py --versions 1.21.4 \
+  --injection observer --faults render-error \
+  --out .local/render-error --compare .local/inventory-lighting-normal
+```
+
+## 確認済みの輪郭差の許容（2026-10-11）
+
+ユーザーがoak_fenceの64px原寸・拡大比較を確認し、輪郭2画素の差を許容しました。単一ScreenshotのRGBだけでは、背景と同じ色の不透明pixelや半透明を透明背景と区別できないため、一般的な輪郭判定へは広げません。許容は同じID・出力PNG hash・参照RGBA hash・背景RGBA hash・2座標が一致する確認済み画像だけです。他ID、変更された出力・参照・背景・差分座標、内部穴の隣の背景色pixelや半透明の反例を拒否する10テストが成功しました。
+
+初期animation frameとglint時刻を指定した通常InventoryScreen56種類を再撮影し、その保存画像を最終の確認済み画像条件で再比較しました。comparisonPassedは56/56です。厳密なrawPassedは55/56のままで、oak_fenceの(40,46)・(42,47)だけが許容されます。元誤差の最大104/255と2画素の記録を残します。productionの描画・PNG・worker hashは変更していません。runと比較helperのhashは[輪郭判定の数値記録](../qa/validation-2026-10-11-inventory-edge.json)に保存します。
+
+512pxの整数拡大oracleとの不一致5ケースへこの許容を適用したわけではなく、その受入は未完了です。以前の厳密FAILを含む記録は撮影当時の結果として維持します。Issue #6は継続中、全版experimental/deterministic=falseを維持します。
+
+## 512pxの平面テクスチャ比較の補正（2026-10-11）
+
+512pxの5種類が単純整数拡大oracleに不一致だった原因は、比較計算にバニラのUV縮小が含まれていなかったことです。1.21.4の公式FaceBakeryはUVを中心8へ縮め、TextureAtlasSpriteの縮小率は静的16pxテクスチャでは4/max(atlas幅,高さ)です。実workerのblock atlasは1024×512で、縮小率は1/256です。低い出力解像度では同じテクセルが選ばれ、512pxでは境界付近の選択が変わります。
+
+FlatTextureProbeに1.21.4限定の--atlas-logを追加し、実ログのatlas寸法を入力として元PNG・定数tint・針モデルからRGBAを計算します。ゲームクラス・GPU・production描画は計算に使わず、公式class bytesとログのhashを記録します。ログと既存PNGの対応は実行順、版/profile、最後のPNGからログへのmtime差で確認しており、job識別子による直接照合ではありません。
+
+diamond・creeper_spawn_egg・時計・コンパス・リカバリーコンパスの6サイズ計30ケースはRGB・alpha誤差0でした。誤ったatlas寸法512×512を与える負対照では、512pxの5ケースとも失敗します。wrapperのオプションあり/なしの各8ケースも成功しました。他版の対照は既存PNGの再比較であり、新規native描画ではありません。PNG・worker・許容誤差は変更していません。以前の512px FAILは比較方式の不足として履歴に残します。
+
+```sh
+# 比較PNGを生成した1.21.4 workerのworker.logを指定する。
+python3 scripts/verify-flat-textures.py --out .local/flat-uv \
+  --compare .local/qa-output --atlas-log /path/to/worker.log
+```
+
+対象は静的16pxのgenerated texture5種類です。立体4種類の指定サイズはPNG監査のみで、全model・全版・他GPUの画質受入とは区別します。入力、公式bytecode、実ログとconfig、負対照、以前のFAILを含む値は[UV比較の数値記録](../qa/validation-2026-10-11-inventory-uv.json)に保存します。全版experimental/deterministic=falseを維持します。
+
+## Issue #6の1.21.4実装・検証の完了（2026-10-11）
+
+1.21.4の描画backendについて、Issue #6の完成条件を実装・検証し、重点反証で未修正の確定問題は見つかりませんでした。render threadとworker再利用、指定6サイズとGUI transform、RGBA8/sRGB/straight alpha・半透明・反転・透明背景、着色・針モデル・特殊モデル・初期animation frame・固定glint、欠損・空画像・描画例外の診断を確認しています。61件のJUnit、単一workerの全1,384PNG監査、既知RGBA8,192pixel、GUI42比較、管理条件の通常InventoryScreen56比較、平面UV30ケース、欠損4経路と空モデル/描画例外2ケースが根拠です。輪郭の許容はユーザー確認済みの同一の柵画像に限定します。
+
+これは1.21.4のcanonicalな既定stackと明記した検証環境・基準の完了であり、全版・全model・他GPUの画質や完全に無計装のclient表示、linear-light合成まで保証しません。全IDの個別/all一致はIssue #8、全版・対応OS・より広い画質と障害受入はIssue #13で継続します。PR #17はmainへ統合するためのReady PRで、実装・検証の完了とmerge・Issue closeを区別します。全版experimental/deterministic=falseを維持し、マイルストーンは未完了です。
+
 ## 未完了の受入検証
 
-- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、1.21.4以外の照明基準、完全な無計装clientの基準画像、通常ワールド比較の対象拡張、glint・時計/コンパス・animated textureの意味的な比較。
-- sRGB・半透明・alpha復元の色精度、missing texture/modelの完全検出。
+- Issue #8: 全IDの個別/all一致。Issue #13: 一過性の準備IO_FAILEDの原因特定、1.21.4以外の照明基準、完全な無計装clientの基準画像、全版/全modelへの比較拡張と動的表現の受入。
+- Issue #13: 今回の1.21.4のRGBA8/sRGB/straight alpha・既知合成サンプルを超える色精度/linear-lightの検証、全リソース経路の欠損監査とnative buffer部分使用後の復旧。
 - Windows/Linux host、Docker Desktop、native、ARM64 image。
 - daemon障害・書き込み経路の競合など、今回のSIGKILL/ENOSPC/lock試験を超える障害受入。
 - 1.21.4以外の版・別環境でのcold/warmとメモリ・cache容量の追加測定。

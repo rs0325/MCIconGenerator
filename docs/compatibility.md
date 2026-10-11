@@ -69,3 +69,11 @@ iconsのPNGへsRGB Perceptualの指定を追加しました。最終workerで1.2
 ホストmacOS Apple Silicon＋Colima/Rosetta上のLinux amd64 containerを検証しています。Windows/Linux host、Docker Desktop、host native、Linux ARM64 imageは未検証です。GitHub Actionsは使用しません。
 
 1.21.4のlightmapを実インベントリのRGB252へ合わせた後、通常ワールドの静的28種類はPNGのRGB補正なしで全件成功（最大誤差1/255）しました。新workerの全1,384枚を監査し、1,382枚のRGBAが変更前から変わります。透明領域のmaskと出力パスは不変ですが、alphaには最大1/255の量子化差があります。以前のiconsは新しい出力先で再生成してください。他9境界版の代表54枚は既存RGBA・パスと一致しました。[照明変更後の数値記録](../qa/validation-2026-10-11-inventory-lighting.json)は以前の全51版記録と区別します。他版の照明、全ID・動的表現の独立受入は未完了です。
+
+1.21.4の初期animation frameとglint時刻を指定した通常InventoryScreen比較56種類は、55種類が厳密比較に成功し、oak_fenceの輪郭2画素は不一致です。6サイズの54PNGは監査成功ですが、512pxの元テクスチャ整数拡大との比較5ケースは不一致で、画質受入は未完了です。描画の具体的な診断理由の保存と正常アイテムの継続はJUnit61件・実描画2ケースで確認しました。[固定条件・診断の数値記録](../qa/validation-2026-10-11-canonical-inventory.json)を参照してください。experimental/deterministic=falseを維持します。
+
+ユーザー確認後、同じID・出力PNG・参照RGBA・背景RGBAのhashと2座標が一致する柵の画像だけを許容し、固定条件の通常InventoryScreen56比較は全件成功しました。他の画像へ許容を一般化しません。厳密比較では柵の2画素が不一致のままです。[輪郭判定の数値記録](../qa/validation-2026-10-11-inventory-edge.json)を参照してください。512pxの画質受入とexperimental/deterministic=falseは変更しません。
+
+512pxの平面5種類の差は、比較計算がバニラのUV縮小を含めていなかったためでした。1.21.4の観測atlas寸法を入力にして公式UV式を計算すると、6サイズ×5種類の30ケースでRGB・alpha誤差0です。PNGや描画worker、許容誤差は変更していません。[UV比較の数値記録](../qa/validation-2026-10-11-inventory-uv.json)を参照してください。立体モデル全般・他版・別GPUの画質受入とは区別します。
+
+Issue #6の1.21.4描画backendの実装・指定範囲の検証は完了し、重点反証で未修正の確定問題は見つかりませんでした。PR #17のmainへのmerge・Issue closeは別の段階です。全IDの個別/all一致はIssue #8、全版/全model・他OS/GPU等の品質受入はIssue #13で継続し、experimental/deterministic=falseを維持します。

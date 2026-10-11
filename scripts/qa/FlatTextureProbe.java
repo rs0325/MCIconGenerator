@@ -5,10 +5,12 @@ import java.nio.file.*;
 import java.io.*;
 import java.security.MessageDigest;
 import java.util.zip.*;
+import java.util.Arrays;
+import java.util.regex.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-/** ゲーム・GPUを使わず、不透明・透明のgenerated textureと定数tintを照合する。 */
+/** ゲーム・GPUを使わず、generated textureと定数tint・既定の針モデルを照合する。 */
 public final class FlatTextureProbe {
     public static void main(String[] args) throws Exception {
         String version=args[0];Path client=Paths.get(args[1]),folder=Paths.get(args[2]);
@@ -16,9 +18,23 @@ public final class FlatTextureProbe {
         String sourceHash=hash(Files.readAllBytes(client));
         if(!sourceHash.equals(manifest.get("sourceSha256").getAsString()))throw new IOException("Client/baseline hash mismatch");
         int light=version.equals("1.21.4")?252:255;
+        int firstItem=3;float shrink=0;JsonObject atlas=null;JsonArray uvInputs=new JsonArray();
+        if(args.length>3&&args[3].equals("--atlas-log")) {
+            if(!version.equals("1.21.4"))throw new IllegalArgumentException("UV oracle is limited to 1.21.4");
+            byte[] log=Files.readAllBytes(Paths.get(args[4]));
+            Matcher match=Pattern.compile("Created: ([0-9]+)x([0-9]+)x[0-9]+ minecraft:textures/atlas/blocks\\.png-atlas").matcher(new String(log,"UTF-8"));
+            if(!match.find())throw new IOException("Block atlas dimensions absent from log");
+            int width=Integer.parseInt(match.group(1)),height=Integer.parseInt(match.group(2));
+            if(match.find())throw new IOException("Multiple block atlas creations in log");
+            shrink=4f/Math.max(width,height);firstItem=5;
+            atlas=new JsonObject();atlas.addProperty("width",width);atlas.addProperty("height",height);atlas.addProperty("uvShrinkRatio",shrink);atlas.addProperty("logSha256",hash(log));
+        }
         JsonArray results=new JsonArray();boolean passed=true;
         try(ZipFile jar=new ZipFile(client.toFile())) {
-            for(int i=3;i<args.length;i++) {
+            if(atlas!=null) {
+                resource(jar,"gnn.class",uvInputs);resource(jar,"het.class",uvInputs);
+            }
+            for(int i=firstItem;i<args.length;i++) {
                 String item=args[i];String id="minecraft:"+item;
                 JsonArray inputs=new JsonArray();JsonArray tints=new JsonArray();String modelId="minecraft:item/"+item;
                 if(version.equals("1.13")) {
@@ -26,6 +42,23 @@ public final class FlatTextureProbe {
                     if(!item.equals("diamond"))throw new IllegalArgumentException("Legacy oracle only covers diamond");
                 } else {
                     JsonObject definition=json(resource(jar,"assets/minecraft/items/"+item+".json",inputs)).getAsJsonObject("model");
+                    if(version.equals("1.21.4")&&(item.equals("clock")||item.equals("compass")||item.equals("recovery_compass"))) {
+                        // NeedleDirectionHelper.getはentityもstackのentity表現もない場合、0を返す。
+                        resource(jar,"hcs.class",inputs);
+                        if(item.equals("compass")) {
+                            if(!definition.get("component").getAsString().equals("minecraft:lodestone_tracker"))throw new IllegalArgumentException("Unexpected compass component");
+                            definition=definition.getAsJsonObject("on_false");
+                        }
+                        if(!item.equals("recovery_compass")) {
+                            if(!definition.get("property").getAsString().equals("minecraft:context_dimension"))throw new IllegalArgumentException("Unexpected context selector");
+                            definition=definition.getAsJsonObject("fallback");
+                        }
+                        if(!definition.get("type").getAsString().equals("minecraft:range_dispatch"))throw new IllegalArgumentException("Unexpected needle model");
+                        JsonObject selected=null;
+                        for(JsonElement e:definition.getAsJsonArray("entries"))if(e.getAsJsonObject().get("threshold").getAsFloat()<=0)selected=e.getAsJsonObject().getAsJsonObject("model");
+                        if(selected==null)throw new IllegalArgumentException("No model for zero needle direction");
+                        definition=selected;
+                    }
                     if(!definition.get("type").getAsString().equals("minecraft:model"))throw new IllegalArgumentException("Non-simple item definition");
                     modelId=definition.get("model").getAsString();
                     if(definition.has("tints"))tints=definition.getAsJsonArray("tints");
@@ -56,17 +89,21 @@ public final class FlatTextureProbe {
                 if(entry==null||!entry.get("status").getAsString().equals("success"))throw new IOException("Baseline lacks "+id);
                 byte[] bytes=Files.readAllBytes(folder.resolve(entry.get("path").getAsString()));
                 if(!hash(bytes).equals(entry.get("sha256").getAsString()))throw new IOException("Baseline PNG hash mismatch");
-                BufferedImage output=ImageIO.read(new ByteArrayInputStream(bytes));if(output.getWidth()!=64||output.getHeight()!=64)throw new IOException("Expected 64px output");
+                BufferedImage output=ImageIO.read(new ByteArrayInputStream(bytes));int size=output.getWidth();
+                if(!Arrays.asList(16,32,64,128,256,512).contains(size)||output.getHeight()!=size)throw new IOException("Expected supported square output");
                 int colorError=0,alphaError=0,bad=0;
-                for(int y=0;y<64;y++)for(int x=0;x<64;x++) {
-                    int a=expected.getRGB(x/4,y/4),b=output.getRGB(x,y),error=0;
+                for(int y=0;y<size;y++)for(int x=0;x<size;x++) {
+                    // FaceBakeryはUVを中心へ縮める。比率はTextureAtlasSpriteの4/max(atlas幅,高さ)。
+                    float u=(x+.5f)*16/size,v=(y+.5f)*16/size;
+                    u+=(8f-u)*shrink;v+=(8f-v)*shrink;
+                    int a=expected.getRGB((int)u,(int)v),b=output.getRGB(x,y),error=0;
                     for(int shift:new int[]{0,8,16})error=Math.max(error,Math.abs(((a>>>shift)&255)-((b>>>shift)&255)));
                     int da=Math.abs((a>>>24)-(b>>>24));colorError=Math.max(colorError,error);alphaError=Math.max(alphaError,da);if(error>1||da>0)bad++;
                 }
-                JsonObject result=new JsonObject();result.addProperty("id",id);result.addProperty("model",modelId);result.add("tints",tints);result.add("resourceInputs",inputs);result.addProperty("exportPngSha256",hash(bytes));result.addProperty("maxRgbError",colorError);result.addProperty("maxAlphaError",alphaError);result.addProperty("pixelsOverTolerance",bad);result.addProperty("passed",bad==0);results.add(result);passed&=bad==0;
+                JsonObject result=new JsonObject();result.addProperty("id",id);result.addProperty("model",modelId);result.addProperty("size",size);result.add("tints",tints);result.add("resourceInputs",inputs);result.addProperty("exportPngSha256",hash(bytes));result.addProperty("maxRgbError",colorError);result.addProperty("maxAlphaError",alphaError);result.addProperty("pixelsOverTolerance",bad);result.addProperty("passed",bad==0);results.add(result);passed&=bad==0;
             }
         }
-        JsonObject report=new JsonObject();report.addProperty("version",version);report.addProperty("fullBrightLightmap",light);report.addProperty("sourceSha256",sourceHash);report.addProperty("baselineAgentSha256",manifest.getAsJsonObject("settings").get("agentSha256").getAsString());report.addProperty("gameClassesLoaded",false);report.add("results",results);report.addProperty("passed",passed);
+        JsonObject report=new JsonObject();report.addProperty("version",version);report.addProperty("fullBrightLightmap",light);report.addProperty("sourceSha256",sourceHash);report.addProperty("baselineAgentSha256",manifest.getAsJsonObject("settings").get("agentSha256").getAsString());report.addProperty("gameClassesLoaded",false);if(atlas!=null){report.add("atlas",atlas);report.add("uvResourceInputs",uvInputs);}report.add("results",results);report.addProperty("passed",passed);
         System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(report));if(!passed)System.exit(1);
     }
     private static byte[] resource(ZipFile jar,String name,JsonArray inputs) throws Exception {

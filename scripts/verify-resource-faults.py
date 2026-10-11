@@ -11,12 +11,14 @@ p.add_argument('--cli',type=Path,default=repo/'cli/build/install/mcicon/bin/mcic
 p.add_argument('--docker-context',default='colima-mcicon')
 p.add_argument('--docker-image',default='mcicon-render:dev')
 p.add_argument('--compare',type=Path,help='Optional normal full-export baseline for the healthy item')
-p.add_argument('--faults',nargs='+',choices=['model','texture','special-texture','direct-texture'],default=['model','texture'])
+p.add_argument('--faults',nargs='+',choices=['model','texture','special-texture','direct-texture','empty-model','render-error'],default=['model','texture'])
 p.add_argument('--preload-direct-texture',action='store_true',help='直接テクスチャを描画passの前にロードし、キャッシュ再取得を検証する')
 p.add_argument('--injection',choices=['observer','resource-pack'],default='observer',help='resource-pack は描画・観測を変更せず破損ファイルをゲームに読み込ませる')
 a=p.parse_args();out=a.out.resolve();out.mkdir(parents=True,exist_ok=False)
 if len(a.faults)!=len(set(a.faults)) or len(a.versions)!=len(set(a.versions)):p.error('Use unique faults and versions')
 if any(f in a.faults for f in ['special-texture','direct-texture']) and a.injection!='resource-pack':p.error('特殊・直接テクスチャは resource-pack 専用です')
+if 'empty-model' in a.faults and (a.injection!='resource-pack' or a.versions!=['1.21.4']):p.error('空モデルは1.21.4の resource-pack 専用です')
+if 'render-error' in a.faults and (a.injection!='observer' or a.versions!=['1.21.4']):p.error('描画例外は1.21.4の observer 専用です')
 helper='ResourcePackFaultAgent' if a.injection=='resource-pack' else 'ResourceFaultAgent'
 sources={str(path.relative_to(repo)):hashlib.sha256(path.read_bytes()).hexdigest() for path in [Path(__file__).resolve(),repo/('scripts/qa/'+helper+'.java')]}
 def resource_pack(client,fault):
@@ -27,21 +29,22 @@ def resource_pack(client,fault):
    elif 'resource' in version:pack={'pack_format':version['resource']}
    else:pack={'min_format':[version['resource_major'],version['resource_minor']],'max_format':[version['resource_major'],version['resource_minor']]}
   else:pack=json.loads(jar.read('pack.mcmeta'))['pack']
-  pack['description']='MCIconGenerator QA: 破損リソース'
-  path={'model':'assets/minecraft/models/item/stone.json','texture':'assets/minecraft/textures/block/stone.png','special-texture':'assets/minecraft/textures/entity/chest/normal.png','direct-texture':'assets/minecraft/textures/entity/enderdragon/dragon.png'}[fault]
+  pack['description']='MCIconGenerator QA: 描画診断'
+  path={'model':'assets/minecraft/models/item/stone.json','texture':'assets/minecraft/textures/block/stone.png','special-texture':'assets/minecraft/textures/entity/chest/normal.png','direct-texture':'assets/minecraft/textures/entity/enderdragon/dragon.png','empty-model':'assets/minecraft/models/block/stone.json'}[fault]
   if fault=='model' and path not in jar.namelist():
    path='assets/minecraft/items/stone.json'
   original=jar.read(path)
  data=io.BytesIO()
  with zipfile.ZipFile(data,'w',compression=zipfile.ZIP_DEFLATED) as target:
   target.writestr('pack.mcmeta',json.dumps({'pack':pack},ensure_ascii=False).encode())
-  target.writestr(path,b'{' if fault=='model' else b'MCIconGenerator QA: invalid PNG')
+  target.writestr(path,json.dumps({'elements':[],'textures':{'particle':'minecraft:block/stone'}}).encode() if fault=='empty-model' else b'{' if fault=='model' else b'MCIconGenerator QA: invalid PNG')
  return data.getvalue(),path,hashlib.sha256(original).hexdigest()
 results=[]
 spec=importlib.util.spec_from_file_location('audit_export',repo/'scripts/audit-export.py');audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit)
 with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
  distribution=Path(temporary)/'mcicon';shutil.copytree(a.cli.resolve().parent.parent,distribution)
  agent=distribution/'worker/worker-agent.jar';agent_hash=hashlib.sha256(agent.read_bytes()).hexdigest()
+ core_hash=hashlib.sha256(next((distribution/'lib').glob('core-*.jar')).read_bytes()).hexdigest()
  classes=out/'classes';classes.mkdir()
  subprocess.run(['javac','--release','8','-cp',str(agent),'-d',str(classes),str(repo/('scripts/qa/'+helper+'.java'))],check=True)
  for fault in a.faults:
@@ -70,20 +73,24 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
     run=subprocess.run([str(distribution/'bin/mcicon'),'render','--version',v,'--cache',str(a.cache.resolve()),'--offline','--id',selected,'--id','wheat','--allow-experimental','--out',str(root),'--worker-jar',str(injected),'--docker-context',a.docker_context,'--docker-image',a.docker_image,'--json'],stdout=stdout,stderr=stderr)
    manifest=root/'java'/v/'icons/manifest.json'
    m=json.loads(manifest.read_text()) if manifest.exists() else {}
-   entries={e['id']:e for e in m.get('entries',[])};e=entries.get('minecraft:'+selected,{});healthy=entries.get('minecraft:wheat',{});expected='MISSING_MODEL' if fault=='model' else 'MISSING_TEXTURE'
+   entries={e['id']:e for e in m.get('entries',[])};e=entries.get('minecraft:'+selected,{});healthy=entries.get('minecraft:wheat',{});expected='RENDER_FAILED' if fault in ['empty-model','render-error'] else 'MISSING_MODEL' if fault=='model' else 'MISSING_TEXTURE'
    diagnostics=e.get('diagnostics',[])
    codes=[d.get('code') for d in diagnostics]
    expected_codes=[expected,'MISSING_TEXTURE'] if pack and fault=='model' else [expected]
    record={'version':v,'fault':fault,'exitCode':run.returncode,'code':e.get('code'),'diagnosticCodes':codes,'pngFiles':len(list(root.rglob('*.png'))),'counts':m.get('counts'),'continuedHealthyItem':healthy.get('status')=='success','fallbackPngWritten':(manifest.parent/e.get('path','absent.png')).is_file()}
+   if fault in ['empty-model','render-error']:record['failureMessage']=e.get('message')
    record.update(qaAgentSha256=m.get('settings',{}).get('agentSha256'),sourceSha256=m.get('sourceSha256'),healthyPngIntegrity=False,healthyRgbaMatchesBaseline=None)
    candidates=set(a.cache.resolve().glob('worker-*'))-old_runs
    if pack:
     candidates={run for run in candidates if (run/'game/resourcepacks/mcicon-qa.zip').is_file() and hashlib.sha256((run/'game/resourcepacks/mcicon-qa.zip').read_bytes()).hexdigest()==hashlib.sha256(pack).hexdigest()}
-   else:candidates={run for run in candidates if (run/'worker.log').is_file() and '[mcicon QA]' in (run/'worker.log').read_text(errors='replace')}
+   else:candidates={run for run in candidates if (run/'worker.log').is_file() and ('[mcicon QA] render error injected' if fault=='render-error' else '[mcicon QA]') in (run/'worker.log').read_text(errors='replace')}
    logs=[run/'worker.log' for run in candidates if (run/'worker.log').is_file()]
    native_log='\n'.join(log.read_text(errors='replace') for log in logs);(root/'worker.log').write_text(native_log)
    record.update(selectedId='minecraft:'+selected,sourceUnchanged=source_hash==hashlib.sha256(client.read_bytes()).hexdigest(),resourcePackSha256=hashlib.sha256(pack).hexdigest() if pack else None,corruptResource=path,originalResourceSha256=original_hash,packLoaded=any('[mcicon QA] resource source: minecraft:'+path.removeprefix('assets/minecraft/')+' = ' in line and line.endswith('mcicon-qa.zip') for line in native_log.splitlines()) if pack else None)
    record['ownedWorkerLogs']=len(logs)
+   if fault=='empty-model':record['emptyModelResource']=record.pop('corruptResource')
+   if fault in ['empty-model','render-error']:
+    record['triggerConfirmed']=len(logs)==1 and ('Empty inventory icon' if fault=='empty-model' else 'MCIcon QA: inventory draw failure') in native_log
    record['preloadDirectTexture']=a.preload_direct_texture and fault=='direct-texture'
    record['preloadedBeforePass']=any('[mcicon QA] direct texture cached: minecraft:'+path.removeprefix('assets/minecraft/') in line for line in native_log.splitlines()) if record['preloadDirectTexture'] else None
    if record['continuedHealthyItem']:
@@ -97,6 +104,7 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
     except Exception as error:record['healthyAuditError']=str(error)
    record['expectedCodes']=expected_codes
    record['passed']=run.returncode==3 and record['pngFiles']==1 and not record['fallbackPngWritten'] and record['continuedHealthyItem'] and record['healthyPngIntegrity'] and record['sourceUnchanged'] and (not pack or record['packLoaded'] and len(logs)==1) and (not a.compare or record['healthyRgbaMatchesBaseline']) and (not record['preloadDirectTexture'] or record['preloadedBeforePass']) and any(code==record['code'] or code in codes for code in expected_codes) and m.get('counts',{}).get('succeeded')==1 and m.get('counts',{}).get('failed')==1
-   results.append(record);(out/'report.json').write_text(json.dumps({'productionAgentSha256':agent_hash,'syntheticFaultInjection':a.injection=='observer','officialInputsModified':False,'injection':a.injection,'harnessSourcesSha256':sources,'injectionScope':{'model':'選択したパックから破損モデルJSONを読み込む','texture':'選択したパックから破損PNGを読み込む','special-texture':'選択したパックから破損チェストPNGを読み込む','direct-texture':'選択したパックから破損ドラゴンPNGを直接読み込む'} if pack else {'model':'Resolved item model replaced with vanilla fallback','texture':'Consumed sprite observer input replaced with vanilla missing atlas sprite'},'results':results},ensure_ascii=False,indent=2)+'\n')
+   if fault in ['empty-model','render-error']:record['passed']=record['passed'] and record['triggerConfirmed'] and ('Empty inventory icon' if fault=='empty-model' else 'MCIcon QA: inventory draw failure') in (record['failureMessage'] or '')
+   results.append(record);(out/'report.json').write_text(json.dumps({'productionAgentSha256':agent_hash,'cliCoreSha256':core_hash,'syntheticFaultInjection':a.injection=='observer','officialInputsModified':False,'injection':a.injection,'harnessSourcesSha256':sources,'injectionScope':{'model':'選択したパックから破損モデルJSONを読み込む','texture':'選択したパックから破損PNGを読み込む','special-texture':'選択したパックから破損チェストPNGを読み込む','direct-texture':'選択したパックから破損ドラゴンPNGを直接読み込む','empty-model':'有効なelements空配列のstoneモデルを読み込む'} if pack else {'model':'Resolved item model replaced with vanilla fallback','texture':'Consumed sprite observer input replaced with vanilla missing atlas sprite','render-error':'ModernRenderer.drawItemでstoneだけ例外を注入する'},'results':results},ensure_ascii=False,indent=2)+'\n')
    print(v,fault,'PASS' if record['passed'] else 'FAIL',flush=True)
 raise SystemExit(any(not r['passed'] for r in results))
