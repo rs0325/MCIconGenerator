@@ -47,7 +47,7 @@
 | 1.15.2 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） | 全件一致 |
 | 1.15.1 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） | 全件一致 |
 | 1.15 | gui-fixed | 8 | 883 成功 / 0 失敗（passed） | 全件一致 |
-| 1.14.4 | gui-fixed | 8 | 876 成功 / 0 失敗（passed） | 全件一致 |
+| 1.14.4 | gui-fixed | 8 | 876 成功 / 0 失敗（passed） | 旧基準から特殊59件を修正 |
 | 1.14.3 | legacy-1.14 | 8 | 876 成功 / 0 失敗（passed） | 全件一致 |
 | 1.14.2 | legacy-1.14 | 8 | 876 成功 / 0 失敗（passed） | 全件一致 |
 | 1.14.1 | legacy-1.14 | 8 | 876 成功 / 0 失敗（passed） | 全件一致 |
@@ -59,5 +59,7 @@
 全件成功数はairを除く登録アイテム数です。no_item_formのブロックは別に記録します。実測値と入力hashは[初回記録](../qa/validation-2026-10-10.json)と[追加検証記録](../qa/validation-2026-10-10-followup.json)に保存します。独立全件比較はall/allの反復です。個別/all比較は21版・25代表IDの別検証で、全IDの個別比較とは区別します。
 
 追加修正83d2382で、legacy-1.13 / legacy-1.14のBlockEntity dispatcherへTextureManagerを供給し、チェスト等にitem atlasが誤って使われる問題を修正しました。修正後の全51版・60,265枚を再生成・PNG監査し、さらに521302cのfallback観測を加えたworkerでも全件がdecoded RGBA・パス一致しました。[新workerの数値記録](../qa/validation-2026-10-10-resource-guard.json)に異なるagent hashと版別入力hashを保存します。表の独立反復と代表ID比較は以前のworkerの記録も含み、全IDの個別/all比較や画質・missing resource完全検出の受入とは区別します。画質の受入が完了するまでexperimentalを維持します。
+
+1.14.4では同じ参照補完が抜けていたため、特殊59種類が直前のテクスチャへ依存していました。修正後の876件を監査し、影響59種類とwheatの個別指定・全件比較、および通常GUI fixtureの2背景比較が成功しました。以前の全件反復一致は画像の正しさを保証するものではありません。版別結果と対象IDは[1.14.4初期化の数値記録](../qa/validation-2026-10-11-classic-bootstrap.json)を参照してください。
 
 ホストmacOS Apple Silicon＋Colima/Rosetta上のLinux amd64 containerを検証しています。Windows/Linux host、Docker Desktop、host native、Linux ARM64 imageは未検証です。GitHub Actionsは使用しません。

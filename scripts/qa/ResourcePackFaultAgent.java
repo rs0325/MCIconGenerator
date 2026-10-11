@@ -68,6 +68,8 @@ public final class ResourcePackFaultAgent {
                 try(InputStream preload=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-preload-texture.txt")) {
                     if(preload!=null) {
                         Object textures=s.call("net.minecraft.client.Minecraft","getTextureManager",minecraft);
+                        // TextureObject世代のgetTextureはキャッシュ参照だけなのでbindでロードする。
+                        if(s.hasClass("net.minecraft.client.renderer.texture.TextureObject"))s.call("net.minecraft.client.renderer.texture.TextureManager","bind",textures,id);
                         Object texture=s.call("net.minecraft.client.renderer.texture.TextureManager","getTexture",textures,id);
                         if(texture==null)throw new IllegalStateException("QA用直接テクスチャを事前ロードできません");
                         System.err.println("[mcicon QA] direct texture cached: "+resource);

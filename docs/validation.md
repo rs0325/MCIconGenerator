@@ -153,7 +153,25 @@ python3 scripts/verify-resource-faults.py --injection resource-pack \
 
 JUnit59件と実bytecodeの依存照合51/51版は成功しました。1.21.5はGPU view getterをまだ持たないため、実際に存在するgetterだけを照合します。直接PNGの破損9境界版、事前ロード3版、既存の欠損診断12件、観測値置換6件は成功しました。全30件で対象PNGの未出力と同じworkerのwheat成功・基準RGBA一致を確認しています。正常全51版・60,265枚は基準のRGBAと出力パスが一致し、PNG監査も成功しました。入力・worker・QA helperのhashと版別結果は[数値記録](../qa/validation-2026-10-11-direct-texture.json)に保存しています。
 
-1.14.4のdragon_headは破損パックあり・なしの個別描画でともにEmpty inventory iconとなり、同じworkerのwheatは基準と一致しました。以前の65388d58 workerでも正常個別描画の失敗を再現したため、今回の観測追加による回帰ではなく既存問題と確認しました。欠損診断成功には数えません。全件基準には成功PNGがあり、個別と全件の差および原因は未解決です。非render threadからapplyだけを呼んでGPU適用を後送する外部経路との並行性、全てのGPU cache・特殊リソース、無改変ワールド内の画像・色空間の受入は未完了です。全版experimental/deterministic=falseを維持します。
+1.14.4のdragon_headは破損パックあり・なしの個別描画でともにEmpty inventory iconとなり、同じworkerのwheatは基準と一致しました。以前の65388d58 workerでも正常個別描画の失敗を再現したため、今回の観測追加による回帰ではなく既存問題と確認しました。欠損診断成功には数えません。この時点の全件基準には成功PNGがありました。個別と全件の差は下記の1.14.4初期化修正で調査・解消しています。非render threadからapplyだけを呼んでGPU適用を後送する外部経路との並行性、全てのGPU cache・特殊リソース、無改変ワールド内の画像・色空間の受入は未完了です。全版experimental/deterministic=falseを維持します。
+
+## 1.14.4の特殊描画の初期化（2026-10-11）
+
+Issue #6 / PR #16の継続で、起点は1a5f394です。以前のworkerでは正常なdragon_headの個別描画がEmpty inventory iconとなり、全件では直前のテクスチャが特殊アイテムへ貼られていました。1.14.4実JARのBlockEntityRenderer.bindTextureはdispatcher.textureManagerがnullなら切り替えを省略します。バニラのワールド開始時に渡す同じTextureManagerをFixedRendererの初期化で供給します。bindTextureを持つgui-fixed版だけに適用し、現行対象は1.14.4のみです。
+
+最終workerで1.14.4・1.15.2・1.16.5の全2,734枚を生成・PNG監査しました。1.14.4の59種類の特殊アイテムは誤テクスチャから修正され、残り817種類と全パスは以前の基準と一致します。1.15.2の883枚・1.16.5の975枚も以前のRGBA・パスと一致しました。影響59種類とwheatを個別指定した60件、およびdragon_headだけを最初に描画した単独起動は、新しい全件出力とRGBA・パスが一致しました。
+
+通常GUI fixtureを1.14.4へ拡張し、影響59種類とwheatの2背景・120件で、透明PNGを再合成したRGBと画面からのcropとの差が全て0でした。通常のnative GUI projection・画面target・Screenshotを使い、WorkerRenderer.renderやPngOutputは使いません。ただし同じFixedRenderer constructorとfixed-v1 hookを共有するため、bootstrap自体の独立証明や無改変ワールド内inventoryの最終受入には数えません。実bytecodeでの原因確認、正常個別・全件の一致、画像の確認を合わせた限定検証です。
+
+```sh
+python3 scripts/verify-matrix.py --offline --versions 1.14.4 \
+  --ids dragon_head --out .local/classic-single --compare .local/qa-output
+python3 scripts/verify-gui-reference.py --versions 1.14.4 \
+  --ids dragon_head chest white_bed white_banner shield player_head white_shulker_box \
+  --out .local/classic-gui --compare .local/qa-output
+```
+
+破損ドラゴンPNG・チェストPNG、および描画前にロード済みの破損ドラゴンPNGの3ケースはMISSING_TEXTURE、対象PNG未出力、同じworkerのwheat成功・基準RGBA一致を確認しました。事前ロードfixtureは古いgetTextureがキャッシュ参照だけだったためbindによるロードへ修正し、1.21.4でも事前ロードの回帰を確認しました。最初のfixture失敗は成功に数えず記録します。公式入力は変更していません。JUnit59件とCLIビルドは成功し、重点反証では新しい確定問題は見つかりませんでした。対象ID・入力・worker・QA helper・画像hashは[数値記録](../qa/validation-2026-10-11-classic-bootstrap.json)に保存しています。最新workerでの全51版再実行は行っておらず、以前の51版記録と今回の3版検証を区別します。全版experimental/deterministic=falseを維持します。
 
 ## 未完了の受入検証
 
