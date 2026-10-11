@@ -94,6 +94,9 @@ except (subprocess.TimeoutExpired,KeyboardInterrupt) as error:
  report['timedOut']=isinstance(error,subprocess.TimeoutExpired);report['interrupted']=isinstance(error,KeyboardInterrupt);save();raise
 save()
 spec=importlib.util.spec_from_file_location('audit_export',repo/'scripts/audit-export.py');audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit)
+spec=importlib.util.spec_from_file_location('inventory_comparison',repo/'scripts/inventory-comparison.py');comparison=importlib.util.module_from_spec(spec);spec.loader.exec_module(comparison)
+report['comparisonSourceSha256']=sha(repo/'scripts/inventory-comparison.py')
+report['edgePolicy']={'approvedReference':comparison.APPROVED,'scope':'ユーザーが画像確認したoak_fenceの同一PNG・参照RGBA・背景RGBA・2座標だけを許容。他画像へ自動的に一般化しない。'}
 capture=json.loads((out/'capture.json').read_text());report['capture']=capture
 if a.frame_zero:
  sources=capture.get('frameZeroResourceSources',{})
@@ -109,15 +112,13 @@ background=slot(empty)
 for c in capture['captures'][1:]:
  e=entries[c['id']];path=manifest.parent/e['path'];assert sha(path)==e['sha256']
  w,h,rgba=audit.rgba_png(path.read_bytes());assert (w,h)==(64,64)
- native=slot(c);errors=[];bad=0
+ native=slot(c)
  light=[(c['fullBrightArgb']>>shift)&255 for shift in (16,8,0)]
- for i in range(0,len(rgba),4):
-  delta=[abs((rgba[i+k]*rgba[i+3]+background[i+k]*(255-rgba[i+3])+127)//255-native[i+k]) for k in range(3)]
-  errors.extend(delta);bad+=max(delta)>2
+ metrics=comparison.compare(rgba,native,background,item_id=c['id'],export_sha=e['sha256'])
  opaque=all(native[i]==255 and background[i]==255 for i in range(3,len(native),4))
- entry={'id':c['id'],'exportPngSha256':e['sha256'],'screenSha256':sha(out/c['screen']),'maxChannelError':max(errors),'meanChannelError':sum(errors)/len(errors),'pixelsOverTolerance':bad,'count':c['count'],'fullBrightRgb':light,'opaqueReference':opaque,'rawPassed':bad==0 and c['count']==1 and opaque,'lightmapMatches':light==report['baselineFullBrightRgb']}
- report['entries'].append(entry);print(c['id'],'PASS' if entry['rawPassed'] and entry['lightmapMatches'] else 'FAIL',max(errors),flush=True)
+ entry={'id':c['id'],'exportPngSha256':e['sha256'],'screenSha256':sha(out/c['screen']),**metrics,'count':c['count'],'fullBrightRgb':light,'opaqueReference':opaque,'rawPassed':metrics['pixelsOverTolerance']==0 and c['count']==1 and opaque,'lightmapMatches':light==report['baselineFullBrightRgb']}
+ report['entries'].append(entry);print(c['id'],'PASS' if entry['comparisonPassed'] and entry['count']==1 and entry['lightmapMatches'] and opaque else 'FAIL',metrics['maxChannelError'],flush=True)
 report['officialInputsModified']=sha(client)!=source_hash
 complete=run.returncode==0 and capture.get('completed',False) and len(report['entries'])==len(ids) and not report['officialInputsModified']
-report['passed']=complete and all(e['rawPassed'] and e['lightmapMatches'] for e in report['entries']) and (not a.frame_zero or report['frameZeroPack']['sourcesConfirmed']) and (not a.fixed_glint or capture.get('glintClockCallSites')==1 and capture.get('fixedGlintMillis')==1000)
+report['passed']=complete and all(e['comparisonPassed'] and e['count']==1 and e['opaqueReference'] and e['lightmapMatches'] for e in report['entries']) and (not a.frame_zero or report['frameZeroPack']['sourcesConfirmed']) and (not a.fixed_glint or capture.get('glintClockCallSites')==1 and capture.get('fixedGlintMillis')==1000)
 save();raise SystemExit(not report['passed'])

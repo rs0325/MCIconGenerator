@@ -244,6 +244,14 @@ python3 scripts/verify-resource-faults.py --versions 1.21.4 \
   --out .local/render-error --compare .local/inventory-lighting-normal
 ```
 
+## 確認済みの輪郭差の許容（2026-10-11）
+
+ユーザーがoak_fenceの64px原寸・拡大比較を確認し、輪郭2画素の差を許容しました。単一ScreenshotのRGBだけでは、背景と同じ色の不透明pixelや半透明を透明背景と区別できないため、一般的な輪郭判定へは広げません。許容は同じID・出力PNG hash・参照RGBA hash・背景RGBA hash・2座標が一致する確認済み画像だけです。他ID、変更された出力・参照・背景・差分座標、内部穴の隣の背景色pixelや半透明の反例を拒否する10テストが成功しました。
+
+初期animation frameとglint時刻を指定した通常InventoryScreen56種類を再撮影し、その保存画像を最終の確認済み画像条件で再比較しました。comparisonPassedは56/56です。厳密なrawPassedは55/56のままで、oak_fenceの(40,46)・(42,47)だけが許容されます。元誤差の最大104/255と2画素の記録を残します。productionの描画・PNG・worker hashは変更していません。runと比較helperのhashは[輪郭判定の数値記録](../qa/validation-2026-10-11-inventory-edge.json)に保存します。
+
+512pxの整数拡大oracleとの不一致5ケースへこの許容を適用したわけではなく、その受入は未完了です。以前の厳密FAILを含む記録は撮影当時の結果として維持します。Issue #6は継続中、全版experimental/deterministic=falseを維持します。
+
 ## 未完了の受入検証
 
 - 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、1.21.4以外の照明基準、完全な無計装clientの基準画像、通常ワールド比較の対象拡張、glint・時計/コンパス・animated textureの意味的な比較。
