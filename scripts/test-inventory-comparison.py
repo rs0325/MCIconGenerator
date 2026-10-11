@@ -61,15 +61,28 @@ class ComparisonTest(unittest.TestCase):
         self.assertFalse(self.result()['comparisonPassed'])
 
     def test_rejects_background_colored_internal_pixel_next_to_hole(self):
+        self.put(self.native, 6, 3, [139, 139, 139, 255])
+        self.put(self.rgba, 3, 6, [0, 0, 0, 0])
         self.put(self.rgba, 4, 3, [0, 0, 0, 0])
         self.put(self.native, 4, 3, [139, 139, 139, 255])
         self.put(self.native, 3, 3, [139, 139, 139, 255])
-        self.assertFalse(self.result()['comparisonPassed'])
+        result = self.result()
+        self.assertEqual(1, result['pixelsOverTolerance'])
+        self.assertFalse(result['comparisonPassed'])
 
     def test_rejects_translucent_reference_difference(self):
+        self.put(self.native, 6, 3, [139, 139, 139, 255])
+        self.put(self.rgba, 3, 6, [0, 0, 0, 0])
+        self.put(self.rgba, 4, 3, [0, 0, 0, 0])
+        self.put(self.native, 4, 3, [139, 139, 139, 255])
+        self.put(self.rgba, 3, 2, [197, 197, 197, 255])
+        self.put(self.native, 3, 2, [197, 197, 197, 255])
         self.put(self.native, 3, 3, [197, 197, 197, 255])
         self.put(self.rgba, 3, 3, [0, 0, 0, 0])
-        self.assertFalse(self.result()['comparisonPassed'])
+        result = self.result()
+        self.assertEqual(1, result['pixelsOverTolerance'])
+        self.assertEqual(58, result['maxChannelError'])
+        self.assertFalse(result['comparisonPassed'])
 
     def test_accepts_strict_match_without_reference_identity(self):
         self.put(self.native, 6, 3, [139, 139, 139, 255])

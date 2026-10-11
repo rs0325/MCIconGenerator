@@ -8,7 +8,8 @@
   "unitTests": {
     "tests": 10,
     "failures": 0,
-    "sourceSha256": "297fdfbc435b27e536abf7da07773aa38d0535f5ee4dcc5017165b3fd459b7c1"
+    "sourceSha256": "fce753b829f398e4869424e559a99d2b2bc06c99ed03400670e745bd422e138c",
+    "counterexampleScope": "内部穴に隣接した誤色、参照の半透明欠損を、それぞれ他の差がない単独1画素の反例として拒否。"
   },
   "world": {
     "scope": "通常ワールドのInventoryScreenでglint用のUtil.getMillis呼び出し1箇所だけを1000msへ指定するQA。productionの固定化・bootstrap・PNG復元は共有しない。glint時刻を変更した管理下の参照画像である。 animationの元PNGを保持し、metadataのframesを最初のframe1件、interpolateをfalseにするQAパックを使用する。",
