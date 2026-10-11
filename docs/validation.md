@@ -195,9 +195,26 @@ python3 scripts/verify-gui-reference.py --versions 1.21.4 --framebuffer-probe \
 
 framebuffer観測は通常GUIの描画後に行い、GL bindingや描画設定を変えません。glGetErrorはerror flagを読むため、観測時に0であることも受入条件にします。通常GUI fixtureはfixed-v1 hookとbootstrapを共有し、無改変ワールド内inventoryの独立基準ではありません。sRGB指定と通常GUIとのbyte RGB一致を、物理的に正しいlinear-light合成や全モデル・GPU・driverの色保証として扱いません。全版experimental/deterministic=falseとIssueの未完了条件を維持します。
 
+## 1.21.4のワールド内インベントリと照明差（2026-10-11）
+
+43eff9bのPNGを、通常のローカルflatワールドのInventoryScreenと比較しました。QA用agentはMinecraft.runTick末尾に画面操作・撮影callbackだけを追加し、ワールド作成画面からseed=0のflatを作成します。通常の既定stackをinventory slot 9へ入れ、空スロットと各アイテムをnative Screenshotで撮影します。GUI scale=4、1280×960画面から64pxのスロット領域を比較します。
+
+standalone QA JARにはJSON・ASM・Symbolsによるreflectionと画面操作helperだけを含め、RenderAgent、描画renderer、CanonicalTransformer、CanonicalContext、ResourceTransformer、Bridge、PngOutputを除きます。InventoryScreen・GameRenderer・item shaderの描画メソッドを変更せず、productionのbootstrap・時刻固定・透過復元を呼びません。完全な無計装clientとは区別します。cacheは読み取り専用mount、専用game/outputだけを書き込み、ネットワークは無効です。
+
+```sh
+python3 scripts/verify-world-inventory.py --out .local/world-inventory \
+  --compare .local/qa-output
+```
+
+スクリプトの既定は18種類です。最終検証では、色違いのbed/banner/shulker、各種head、trapped_chest、blue_stained_glassを加えた静的28種類を比較しました。生RGBでは17種類が許容誤差2/255以内、11種類が不一致で、最大誤差は4/255でした。全撮影のfull-bright lightmap texelはRGB 252/252/252でした。バニラのLightTexture constructorは白255で初期化し、ワールド入場後のlightmap shaderは最後にcolorを0.75へ0.04混合します。fixed-v1のworldなし描画と実ワールドの照明差を確認しました。
+
+別の診断として、生成PNGのRGBへ各撮影で読み取ったlightmap値を乗算してから空スロット背景へbyte RGB合成すると、28種類すべてが最大誤差2/255以内で一致しました。diamondは誤差0、iceは最大2、その他は最大1でした。生RGBのpassed=falseとlightmapAdjustedPassed=trueを分けて記録します。スクリプトは生比較の不一致に対してexit 1を返し、補正比較だけを全体成功に数えません。確認前の18種類の対照も成功扱いへ書き換えません。
+
+この補正は照明差の原因を調べるもので、productionのPNGを変更していません。正式canonicalの照明基準は確認待ちです。glint、時計・コンパス、アニメーション、全ID・全版、別背景・GPUの受入は継続します。入力・QA helper・通常画面・shaderのhashと各比較結果は[数値記録](../qa/validation-2026-10-11-world-inventory.json)に保存しています。重点反証では新しい確定問題は見つからず、timeout・中断の停止処理はコード確認のみで障害注入は未実施です。ゲーム画像、worldデータ、QA agentは公開配布物に含めません。
+
 ## 未完了の受入検証
 
-- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、無改変のワールド内inventory基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。
+- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、正式canonicalの照明基準、完全な無計装clientの基準画像、通常ワールド比較の対象拡張、glint・時計/コンパス・animated textureの意味的な比較。
 - sRGB・半透明・alpha復元の色精度、missing texture/modelの完全検出。
 - Windows/Linux host、Docker Desktop、native、ARM64 image。
 - daemon障害・書き込み経路の競合など、今回のSIGKILL/ENOSPC/lock試験を超える障害受入。

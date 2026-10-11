@@ -64,4 +64,6 @@
 
 iconsのPNGへsRGB Perceptualの指定を追加しました。最終workerで1.21.4全1,384枚と9描画境界版の代表54枚のdecoded RGBA・パスが以前の正しい基準と一致し、PNG bytes・hashはmetadata追加で変わります。通常GUIの6背景比較と既知RGBAの検証は[色・alphaの数値記録](../qa/validation-2026-10-11-alpha-srgb.json)を参照してください。全51版の全件再実行や全モデルの色空間受入とは区別します。
 
+1.21.4の通常ワールドのInventoryScreenと、productionのbootstrap・固定化を共有しないQAで静的28種類を比較しました。生RGBは11種類が許容値を超え、worldなしlightmap初期値255と実ワールドのfull-bright値252の差を確認しました。実測lightmapを乗算した診断では全28種類が誤差2/255以内でした。生比較の成功やcanonicalの受入完了とは扱いません。[ワールド内比較の数値記録](../qa/validation-2026-10-11-world-inventory.json)を参照してください。出力は変更せず、全版experimental/deterministic=falseを維持します。
+
 ホストmacOS Apple Silicon＋Colima/Rosetta上のLinux amd64 containerを検証しています。Windows/Linux host、Docker Desktop、host native、Linux ARM64 imageは未検証です。GitHub Actionsは使用しません。

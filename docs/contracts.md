@@ -50,6 +50,8 @@ countsはそのmanifestに蓄積した成功/失敗の数です。選択IDは書
 
 fixed-v1はcount=1、既定ItemStack、overlayなし、world/playerなし、partialTick=0です。ゲーム内の暦日を2000-01-01 UTCにし、描画中の経過時刻を1000msに固定します。0msでは初期化を時刻で判定するバニラcacheに影響するため、正の定数を使います。worker自身のtimeout時計は固定しません。
 
+1.21.4のworldなしlightmapはバニラの初期値である白255です。通常ワールドのInventoryScreenではfull-bright texelも252になることを確認しました。実ワールドとの色比較では、この照明差を生RGBの一致と区別して記録します。正式canonicalの照明基準は未確定で、fixed-v1の出力は変更していません。
+
 atlasのanimation更新を抑止し、初期フレームを保持します。時計・コンパス等の動的property乱数を各描画passでseed=0に戻します。モデルが明示的にseedを設定するquad用乱数はバニラのまま保持します。ゲームJAR内の対象呼び出しだけをagentで変換し、依存JARは変換しません。ASMはagent専用packageへrelocateし、ゲーム同梱ASMとの衝突を避けます。
 
 deferred GUIでは各passのアトラス割当を初期化し、単品・全件で同じスロット位置を使用します。アトラスのGPU textureは再利用し、色・深度を消去します。GPU fence完了後にGUI frameと動的uniform storageを終了・resetします。

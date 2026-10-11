@@ -1,0 +1,1003 @@
+{
+  "date": "2026-10-11",
+  "basisCommit": "43eff9b92961596daa193b91499b8dd5788ded2e",
+  "productionCodeChanged": false,
+  "semanticAcceptanceComplete": false,
+  "observations": {
+    "rawSuccess": 17,
+    "rawFailed": 11,
+    "maxRawChannelError": 4,
+    "adjustedSuccess": 28,
+    "maxAdjustedChannelError": 2,
+    "observedFullBrightRgb": [
+      252,
+      252,
+      252
+    ],
+    "baselineInitialLightmapRgb": [
+      255,
+      255,
+      255
+    ]
+  },
+  "final": {
+    "scope": "通常のローカルflatワールドのInventoryScreen。QA callbackはMinecraft.runTick末尾のみで、ゲーム状態・画面操作とnative Screenshotを使用する。描画メソッド、production初期化、canonical hook、透過復元を共有しない。完全な無計装clientではない。",
+    "version": "1.21.4",
+    "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+    "baselineAgentSha256": "2a606e157caa0420a64d875c82d6cf577fb28ba02f090864647f82c6907b14ee",
+    "qaAgentSha256": "a342c8090692ed1fc2d0871a5d4b2477399d7bb98376f77eb19347bd3fa1a490",
+    "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+    "harnessSourcesSha256": {
+      "scripts/verify-world-inventory.py": "a0c08a70162ed2804f54d8090f86fe940894874fb040a344732991fe99d20fa2",
+      "scripts/qa/WorldInventoryAgent.java": "142dd17faf2e0756d98e0c897d6db32067c68cc7dae4a0a04ae7cccf21e2bb2c"
+    },
+    "windowPixels": [
+      1280,
+      960
+    ],
+    "guiScale": 4,
+    "worldPreset": "flat",
+    "seed": "0",
+    "slot": 9,
+    "excludedProductionClasses": [
+      "RenderAgent",
+      "CanonicalTransformer",
+      "CanonicalContext",
+      "ResourceTransformer",
+      "ModernRenderer",
+      "PngOutput",
+      "Bridge"
+    ],
+    "maxAllowedChannelError": 2,
+    "lightmapComparison": "生RGBの比較と、実際のfull-bright lightmap texelを乗算した比較を別々に記録する。fixed-v1のworldなしlightmap初期値は白255。",
+    "entries": [
+      {
+        "id": "minecraft:stone",
+        "exportPngSha256": "8b1c8eba0c16669fa52a965233e6806241abdc02f45dbbbc50174a71ae989f64",
+        "screenSha256": "b9fe2045e6da9807888b846395d9eb9951a0e63663479f6cb7155b2c82e23783",
+        "maxChannelError": 2,
+        "meanChannelError": 0.584228515625,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.141845703125,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:diamond",
+        "exportPngSha256": "47bc10a457edd60968476dab038eba3f3d9de127d7f94399ee2bdbf5b7135828",
+        "screenSha256": "4213f45ef8340928187512b3908e0c7b9723b4b3dfd2be7043fbd592265a66c7",
+        "maxChannelError": 3,
+        "meanChannelError": 0.82421875,
+        "pixelsOverTolerance": 864,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:chest",
+        "exportPngSha256": "a21bcd1b21ad7a6e190cac499ac72338b9cbadeaba53eefa4d6736bf6b34a1f1",
+        "screenSha256": "a14ad2e7be3799bd8525ca2668de62e5c98d311d07c6e7442efec0cb420839ca",
+        "maxChannelError": 2,
+        "meanChannelError": 0.30419921875,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.08854166666666667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:ender_chest",
+        "exportPngSha256": "841e8b110857598c5b75eefc45f75e7362a508ff8dd78ef6e5d37bc9772edd4e",
+        "screenSha256": "0aee19826effeca86b482a058d0588ea9bc94304b3cc779ffc1ae05464936e2b",
+        "maxChannelError": 3,
+        "meanChannelError": 0.18986002604166666,
+        "pixelsOverTolerance": 6,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.06486002604166667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:white_bed",
+        "exportPngSha256": "017cc86d8e557f8e80433282672ad2041825b8e9c4c41ade82ea3205f23e3b03",
+        "screenSha256": "3369878e02c0713ef60a40d8d21e7adbf7defd22213e9e59fdf91a335765d4ae",
+        "maxChannelError": 3,
+        "meanChannelError": 0.920654296875,
+        "pixelsOverTolerance": 914,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.017578125,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:white_banner",
+        "exportPngSha256": "abeba884029819223271c2434d44ee2467c87ac39b380f5894f2161df9cce6cc",
+        "screenSha256": "2cd55be34b810cd08b3acc64df79d5fbd901c6f4204bd0d5ecd5bddaee06c57d",
+        "maxChannelError": 3,
+        "meanChannelError": 0.753662109375,
+        "pixelsOverTolerance": 986,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.08194986979166667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:shield",
+        "exportPngSha256": "6a1abbaa4c72a96ff59939c6c0cabc15edf40c21c93ad39c2cb288a7f409d7b6",
+        "screenSha256": "7d1bb460fcfb6d0b6d39ab83b7ef6905232eb621526ac83e1382578f83c6a9fb",
+        "maxChannelError": 2,
+        "meanChannelError": 0.4165852864583333,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.06705729166666667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:player_head",
+        "exportPngSha256": "d3792f0dcd4712e66d56c84bfe892c3d9fc105241178a2907e7da6a42058151d",
+        "screenSha256": "c13ed22953f29646be3c468a64e12ecae61d0e30e340f194df102f3f30d3483f",
+        "maxChannelError": 2,
+        "meanChannelError": 0.15974934895833334,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.060546875,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:dragon_head",
+        "exportPngSha256": "08e77fc0a626b40f0cb650b64332fe8c8433b7ef45271e5b8c12946285846a8b",
+        "screenSha256": "9c54978230355073aa5390016516ef4a0fd68c5a6485411075a9c3a5648683f0",
+        "maxChannelError": 1,
+        "meanChannelError": 0.067626953125,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.05419921875,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:white_shulker_box",
+        "exportPngSha256": "f4d0d112339bc4023627c435698241e002fc9ac517af14087b8308e583a023cb",
+        "screenSha256": "b0b4352fb0f80d14d84c094b4e1f05b4d53607e2512925e40c27091d0266b0c1",
+        "maxChannelError": 3,
+        "meanChannelError": 1.1424967447916667,
+        "pixelsOverTolerance": 592,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.10750325520833333,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:glass",
+        "exportPngSha256": "3fc571c46ce16355ea3e400a8a083ae44ed9c3288a91ddcfc8244bd86dc7dc9b",
+        "screenSha256": "717db916edcdc0d168519995a4cb70ae7ee2c40e317ce4b0db1d7eaf249f05b3",
+        "maxChannelError": 3,
+        "meanChannelError": 0.2867838541666667,
+        "pixelsOverTolerance": 145,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.012125651041666666,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:white_stained_glass",
+        "exportPngSha256": "c94456d7ff7605a2a8f7f33ae7ea4610bf648a9b0238b08cb66fc8a430236188",
+        "screenSha256": "50d7d67218ec6a3b9641daf03992263fd57775de7c06435983f5f2155e6dcc80",
+        "maxChannelError": 2,
+        "meanChannelError": 0.620849609375,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.23583984375,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:ice",
+        "exportPngSha256": "911fd0f53eacaf69ff25304b75d8a9a089be3ef14c410f5b7870e8750f502ffd",
+        "screenSha256": "5f176738c7ca283b2d129002643ed8c25decdd3ca4689a266c838f56d52c4793",
+        "maxChannelError": 4,
+        "meanChannelError": 1.0396321614583333,
+        "pixelsOverTolerance": 817,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 2,
+          "meanChannelError": 0.427734375,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:grass_block",
+        "exportPngSha256": "7c2b19fc45ad99e6ae8c6560e0a2f03b5b930d7dd20370e53e855689eed5f899",
+        "screenSha256": "1d88f383a4243dc5abc5e69ca1f14de3e2bbc1d7acd0e7ecf468f8414e44a9c5",
+        "maxChannelError": 2,
+        "meanChannelError": 0.455078125,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.2537434895833333,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:oak_leaves",
+        "exportPngSha256": "e09f37578613bba350af62dca1ba351dd346e1e8881b09e3e937c1cc78efb731",
+        "screenSha256": "2a39e65c08d2bf95859be77174299af79e4a3e60692ed20913602bf0aa4c0ca7",
+        "maxChannelError": 2,
+        "meanChannelError": 0.10660807291666667,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.10563151041666667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:potion",
+        "exportPngSha256": "4a34e60928a9c07a8ce3b52af3042f664ff3238a7c6930753a5fdb36ca3ba9ae",
+        "screenSha256": "c9c0fca3e1c0bc76562c8e982baf5f979afa19ca914e1ab33ee4a4c0037d0248",
+        "maxChannelError": 3,
+        "meanChannelError": 0.4309895833333333,
+        "pixelsOverTolerance": 224,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.059895833333333336,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:creeper_spawn_egg",
+        "exportPngSha256": "9dc36fa15b2a92f5581e1cf34e26ff030388afc0174e9d4b346cb9442278d44a",
+        "screenSha256": "a514b03047d0e43ca519219709646af165dce88c111ce7c0b08cf1b7238f4c14",
+        "maxChannelError": 2,
+        "meanChannelError": 0.15104166666666666,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.037760416666666664,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:leather_chestplate",
+        "exportPngSha256": "b52f62ef6e827d2db49536f76d4339a56f8050f640cee61c55f2e0c767412b89",
+        "screenSha256": "c63025622f8d128981017782b26c8849bdc33b56cf33dc27a01fc10a60a83699",
+        "maxChannelError": 2,
+        "meanChannelError": 0.39453125,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.09635416666666667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:red_bed",
+        "exportPngSha256": "03fd87aee1c6bfef5b4f1b9879c7a6053e16bc79fce406ed229f9ed11e04d583",
+        "screenSha256": "7118b5052f04c706ee89a6e6caffbfb746cf9feb180d369a455ed799f69f17bc",
+        "maxChannelError": 3,
+        "meanChannelError": 0.4431966145833333,
+        "pixelsOverTolerance": 184,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.027180989583333332,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:black_banner",
+        "exportPngSha256": "b15ebabdd668eb0cdf8c44bcdaf79ce3f71c9d568c4284199eb053db1cc244e7",
+        "screenSha256": "414f4ab038e1de3ab251fe793110a7913e546450dd9dd24afc88e6542161c4cf",
+        "maxChannelError": 2,
+        "meanChannelError": 0.11409505208333333,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.10335286458333333,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:red_shulker_box",
+        "exportPngSha256": "43d5d038367f917357cd0e94dd111a7a179ae65156700472d8764247557b5fee",
+        "screenSha256": "0aa3f97fab566635bdcd318ca0465aaa3336d04d08aa35be899bd775814ec421",
+        "maxChannelError": 2,
+        "meanChannelError": 0.3091634114583333,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.09944661458333333,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:skeleton_skull",
+        "exportPngSha256": "502680d9b271c3728585d2589b87d002178aadf5d6f32a01b8699bc94c7ce51f",
+        "screenSha256": "1de15860af2b487a0514cc4f4488e60971fb97c65a49b912b3127d3502409ba5",
+        "maxChannelError": 2,
+        "meanChannelError": 0.5568033854166666,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.016438802083333332,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:wither_skeleton_skull",
+        "exportPngSha256": "64d5e2205a0fda25fd31d10285b730d57785c9652eaa2e136330e4895a4dc128",
+        "screenSha256": "c36175921fde79c7b50fb053fe83c293d72ed97d675eb840905618ea709aba33",
+        "maxChannelError": 1,
+        "meanChannelError": 0.165771484375,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.082763671875,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:zombie_head",
+        "exportPngSha256": "47cd9ce84b80272c5f6d60745038dc9dd21b04aceb218b0c2e2ede2425748f4b",
+        "screenSha256": "a34c1a630e3564b27805d216ccf89614f50e5318a205c9772e3bec577da5ee5a",
+        "maxChannelError": 1,
+        "meanChannelError": 0.241455078125,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.06884765625,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:piglin_head",
+        "exportPngSha256": "ac4a72fcffb78ca851d279eef6ce9b29e4d16f05a394f070149c7eff26d2784b",
+        "screenSha256": "5e08851d78b0401992d50228cb13dc2ba00ffa00d97cbb2d20093af44162660c",
+        "maxChannelError": 3,
+        "meanChannelError": 0.712890625,
+        "pixelsOverTolerance": 828,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.08927408854166667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:creeper_head",
+        "exportPngSha256": "4a87084207148f92a31417bfbbaad7c7ba3031cd60ab398de7716856d7da76c0",
+        "screenSha256": "3e479acbd450061d9ddc59acf25b0315b235b46b8057eedcc692735fc78ee304",
+        "maxChannelError": 3,
+        "meanChannelError": 0.4502766927083333,
+        "pixelsOverTolerance": 140,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": false,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.0791015625,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:trapped_chest",
+        "exportPngSha256": "61f44e8a15a48c9ab611a22e22e3eebe323e5adf40ec0c6f97aca33c7b4f977c",
+        "screenSha256": "a0c05de95d3b103b42f9b2be0d0d40cfa0da4c8c14935970282c2b8b01c53818",
+        "maxChannelError": 2,
+        "meanChannelError": 0.30322265625,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.08512369791666667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "minecraft:blue_stained_glass",
+        "exportPngSha256": "83e2cb3220549de5a1db5b3c27b22cfe730a1261333a3aec94cff9df9684d8e4",
+        "screenSha256": "acf0e43b913cf827e8097fac067d90b2a039bd42139faedb25ae04e99a361b1b",
+        "maxChannelError": 2,
+        "meanChannelError": 0.2314453125,
+        "pixelsOverTolerance": 0,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapAdjusted": {
+          "maxChannelError": 1,
+          "meanChannelError": 0.12467447916666667,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      }
+    ],
+    "passed": false,
+    "exitCode": 0,
+    "capture": {
+      "version": "1.21.4",
+      "productionRendererUsed": false,
+      "canonicalHooksUsed": false,
+      "renderMethodsTransformed": false,
+      "captures": [
+        {
+          "id": "empty",
+          "screen": "empty-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 0,
+          "fullBrightArgb": -197380,
+          "gameTime": 124
+        },
+        {
+          "id": "minecraft:stone",
+          "screen": "minecraft_stone-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 149
+        },
+        {
+          "id": "minecraft:diamond",
+          "screen": "minecraft_diamond-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 173
+        },
+        {
+          "id": "minecraft:chest",
+          "screen": "minecraft_chest-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 198
+        },
+        {
+          "id": "minecraft:ender_chest",
+          "screen": "minecraft_ender_chest-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 221
+        },
+        {
+          "id": "minecraft:white_bed",
+          "screen": "minecraft_white_bed-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 244
+        },
+        {
+          "id": "minecraft:white_banner",
+          "screen": "minecraft_white_banner-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 271
+        },
+        {
+          "id": "minecraft:shield",
+          "screen": "minecraft_shield-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 293
+        },
+        {
+          "id": "minecraft:player_head",
+          "screen": "minecraft_player_head-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 318
+        },
+        {
+          "id": "minecraft:dragon_head",
+          "screen": "minecraft_dragon_head-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 341
+        },
+        {
+          "id": "minecraft:white_shulker_box",
+          "screen": "minecraft_white_shulker_box-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 365
+        },
+        {
+          "id": "minecraft:glass",
+          "screen": "minecraft_glass-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 390
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "screen": "minecraft_white_stained_glass-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 413
+        },
+        {
+          "id": "minecraft:ice",
+          "screen": "minecraft_ice-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 436
+        },
+        {
+          "id": "minecraft:grass_block",
+          "screen": "minecraft_grass_block-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 461
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "screen": "minecraft_oak_leaves-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 484
+        },
+        {
+          "id": "minecraft:potion",
+          "screen": "minecraft_potion-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 509
+        },
+        {
+          "id": "minecraft:creeper_spawn_egg",
+          "screen": "minecraft_creeper_spawn_egg-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 531
+        },
+        {
+          "id": "minecraft:leather_chestplate",
+          "screen": "minecraft_leather_chestplate-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 555
+        },
+        {
+          "id": "minecraft:red_bed",
+          "screen": "minecraft_red_bed-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 579
+        },
+        {
+          "id": "minecraft:black_banner",
+          "screen": "minecraft_black_banner-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 602
+        },
+        {
+          "id": "minecraft:red_shulker_box",
+          "screen": "minecraft_red_shulker_box-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 625
+        },
+        {
+          "id": "minecraft:skeleton_skull",
+          "screen": "minecraft_skeleton_skull-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 649
+        },
+        {
+          "id": "minecraft:wither_skeleton_skull",
+          "screen": "minecraft_wither_skeleton_skull-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 672
+        },
+        {
+          "id": "minecraft:zombie_head",
+          "screen": "minecraft_zombie_head-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 696
+        },
+        {
+          "id": "minecraft:piglin_head",
+          "screen": "minecraft_piglin_head-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 720
+        },
+        {
+          "id": "minecraft:creeper_head",
+          "screen": "minecraft_creeper_head-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 744
+        },
+        {
+          "id": "minecraft:trapped_chest",
+          "screen": "minecraft_trapped_chest-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 766
+        },
+        {
+          "id": "minecraft:blue_stained_glass",
+          "screen": "minecraft_blue_stained_glass-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "fullBrightArgb": -197380,
+          "gameTime": 790
+        }
+      ],
+      "completed": true
+    },
+    "officialInputsModified": false,
+    "lightmapAdjustedPassed": true
+  },
+  "controls": [
+    {
+      "run": "world-inventory-initial",
+      "reportSha256": "41868b2cc0e5391c198a4f23383d85f10a8fad66105225aff4d4e14000aa135a",
+      "qaAgentSha256": "8504565ce57f29a58f5f664dd0ff6a272edbf5597be81f76747e06c6cd374313",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "fba2395e5c548506997ff5cf82b62688c6dc1e979256e8dc1cb9ca33b1559679",
+        "scripts/qa/WorldInventoryAgent.java": "906f7ad86d3b7ab5a4fd3c3965ab4a5faea60338277388b3e8e1c8cfff8952aa"
+      },
+      "entryCount": 18,
+      "passed": false,
+      "rawSuccess": 10,
+      "maxRawChannelError": 4,
+      "lightmapAdjustedPassed": null,
+      "maxAdjustedChannelError": null
+    },
+    {
+      "run": "world-inventory-lightmap",
+      "reportSha256": "db78391ebc08120ed79f738cd45e91c1ed7b0c9878db12db088431fb76fb1c75",
+      "qaAgentSha256": "aa9607f38cfbad8d656ee9b475f7cbb6728124c032a1e9d6c3ced2f51c07e373",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "d924b1c4d007aeeab74a4eb766ca81642b9ee1aef53e5543c91b7411de914a2c",
+        "scripts/qa/WorldInventoryAgent.java": "142dd17faf2e0756d98e0c897d6db32067c68cc7dae4a0a04ae7cccf21e2bb2c"
+      },
+      "entryCount": 18,
+      "passed": false,
+      "rawSuccess": 10,
+      "maxRawChannelError": 4,
+      "lightmapAdjustedPassed": true,
+      "maxAdjustedChannelError": 2
+    }
+  ],
+  "limitations": [
+    "Minecraft.runTick末尾に画面操作・撮影callbackを挿入したclientで、完全な無計装clientではない。",
+    "fixed-v1のworld/playerなし・初期lightmapと実ワールドの照明は異なる。生RGBの不一致を補正比較の成功で置き換えない。",
+    "1.21.4・64px・flat seed=0・既定stack・静的28IDの通常inventory背景だけを比較。glint・時計・コンパス・アニメーションや全ID/全版を含めない。",
+    "各撮影のgameTime・player spawn位置は固定せず、productionの時刻・乱数・暦日hookを使用しない。",
+    "linear-lightの背景合成、sRGB色管理、全GPU/driverの受入ではない。",
+    "正式canonicalの照明基準は確認待ち。全版experimental/deterministic=falseを維持する。"
+  ],
+  "vanillaEvidenceSha256": {
+    "assets/minecraft/shaders/core/lightmap.fsh": "4d69ad4a71bbbf3bee2e84966c729cad8b75b61fc88643f3c6406eaee4f72ba7",
+    "assets/minecraft/shaders/core/rendertype_item_entity_translucent_cull.vsh": "f4e499d25818e665522d01e9744809b49af56ccae8c193e1bdea43fddb5fe694",
+    "glx.class": "87157f53e1d532cc9813387ad678163bc71c1d93acdac81367a05a0f485faab6",
+    "fls.class": "9b1d69cbacfaf57d40b00cd5755c0476b428732bff8800d5456a48fc8509f6b4"
+  },
+  "review": {
+    "scope": "QA helper・launcher・実bytecode・shader・28IDの数値記録・3文書",
+    "confirmedProblems": [],
+    "independenceAndLightmapCoordinatesConfirmed": true,
+    "faultInjectionNotRun": [
+      "timeout",
+      "KeyboardInterrupt"
+    ],
+    "productionTests": "production変更なし。43eff9bのJUnit60件を再利用し、今回のQA helperはJava 8 bytecodeへcompileして実clientで確認。",
+    "distribution": "ZIP 28 files。production worker hash不変、ゲーム画像/world/QAクラスは非混入。"
+  }
+}
