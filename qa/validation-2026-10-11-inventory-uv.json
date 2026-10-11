@@ -1,0 +1,3159 @@
+{
+  "date": "2026-10-11",
+  "basisCommit": "5fb13e9",
+  "productionChange": false,
+  "flatTextureAcceptanceComplete": true,
+  "issue6State": "1.21.4の明記した完成条件の実装・検証・重点反証は完了。PR17未merge、Issue6未close。",
+  "cause": "512pxの単純整数拡大oracleは、バニラFaceBakeryの中心8へのUV縮小を計算していなかった。実測atlas1024x512の比率4/1024を使うと5種類の全RGBAが一致する。PNGの計算や許容値は変更していない。",
+  "scope": "観測したatlas寸法を入力とする独立数値照合。計算中にゲームクラス・GPU・production描画を使わない。atlas寸法の入力は既存native workerのログから取得する。",
+  "logAssociation": "既存6サイズの実行順と、version/profileが一致するagent.json、最後のPNGとworker logのmtime差0.005〜0.020秒で対応を確認した。job識別子による直接照合ではない。ログ・config SHAを記録する。",
+  "uvValidation": {
+    "probeSourceSha256": "67b609fdbad557574d00fcd723c8bc8f1b9b86119bfbeb1b98385d1c7e12d021",
+    "productionAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+    "gameWorkersStarted": 0,
+    "scope": "既存6サイズの正常PNGを再計算。各実workerログのatlas寸法と公式bytecodeのUV縮小式を使い、ゲームクラス・GPU・production描画を呼ばない。PNG自体は再生成しない。",
+    "sizes": [
+      {
+        "size": 16,
+        "exitCode": 0,
+        "workerConfigSha256": "86424f8a73635cdcd5f8867e0569709ceab1fd62c336a592d6c7715617c8aa6e",
+        "workerLogAfterLastPngSeconds": 0.005091667175292969,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "atlas": {
+            "width": 1024,
+            "height": 512,
+            "uvShrinkRatio": 0.00390625,
+            "logSha256": "c155d0fb7eef88f2fd2a1ed1f7b79c429fb4e985ac05024c566425c7d184f6bf"
+          },
+          "uvResourceInputs": [
+            {
+              "path": "gnn.class",
+              "sha256": "c3ad9bb33704ab540c18a6938d111cb2e8f5a5e59d9279a0e84adae871dd385e"
+            },
+            {
+              "path": "het.class",
+              "sha256": "01e63e69fc0d7be45301d68916e59b0022a7c023791b94f7d8eb7da1eb65c6cb"
+            }
+          ],
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 16,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "80c4deab1cf4cef001128ed4c0f2cfb5df64484306177f12ab020c3b35449a3f",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 16,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "230c8e887591971886aaef97779e6f6902b6bfd19e3bbc02f796d23e874428fe",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 16,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "f36f33139c0f7f7d443b5d2a0e2b1e1cfd62dc13046e998a5c7d8dda54a1395b",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 16,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "363a4ce9f8250c0e5ef34f68e32a04d008857df180b99a79b7696dabeb87c83c",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 16,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "777bc344ae49582565181a647099d9e3dcffef64ab79cd428d443d5f09f48424",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 32,
+        "exitCode": 0,
+        "workerConfigSha256": "86424f8a73635cdcd5f8867e0569709ceab1fd62c336a592d6c7715617c8aa6e",
+        "workerLogAfterLastPngSeconds": 0.004606008529663086,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "atlas": {
+            "width": 1024,
+            "height": 512,
+            "uvShrinkRatio": 0.00390625,
+            "logSha256": "16e429318c0e22eb2ca6f505c676e048b83b8904b41e854c392e1b5567efa72d"
+          },
+          "uvResourceInputs": [
+            {
+              "path": "gnn.class",
+              "sha256": "c3ad9bb33704ab540c18a6938d111cb2e8f5a5e59d9279a0e84adae871dd385e"
+            },
+            {
+              "path": "het.class",
+              "sha256": "01e63e69fc0d7be45301d68916e59b0022a7c023791b94f7d8eb7da1eb65c6cb"
+            }
+          ],
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 32,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "b34361ca12d7fff9c118024a720420a6eb7276e561869a852551ab80ab462dc8",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 32,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "17c9c4cdefe069e5a0816312d3e3619edfdcb802af388a063fd48d3dc0d50570",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 32,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "aa962a2aa77d6ee7746fd9f93b65c493cb4981bfe8206ac08067a93febf72ff3",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 32,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "2198d7a3dfd1277aa6465ec7eddc74ecc7b8756d0a803e9ffbe95f1cacbcbe45",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 32,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "e30e5a56d58517582545b8be7ed928cf5d28904d8205e43198e810bdf71d041c",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 64,
+        "exitCode": 0,
+        "workerConfigSha256": "86424f8a73635cdcd5f8867e0569709ceab1fd62c336a592d6c7715617c8aa6e",
+        "workerLogAfterLastPngSeconds": 0.007402896881103516,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "atlas": {
+            "width": 1024,
+            "height": 512,
+            "uvShrinkRatio": 0.00390625,
+            "logSha256": "f5bc61c15cd57d5ad500474a943e67f2805ca1b1a4f2a8610c516f2593e4c4ae"
+          },
+          "uvResourceInputs": [
+            {
+              "path": "gnn.class",
+              "sha256": "c3ad9bb33704ab540c18a6938d111cb2e8f5a5e59d9279a0e84adae871dd385e"
+            },
+            {
+              "path": "het.class",
+              "sha256": "01e63e69fc0d7be45301d68916e59b0022a7c023791b94f7d8eb7da1eb65c6cb"
+            }
+          ],
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 64,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "6191d96ee7248060f966d4a3ad5cd6b5c1ecc758d302d9e447ab57407d77ad00",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "57925fe4c3f5161b250f5f7e8167f801d55a0efa54a9177796147836835f4d1b",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "176053d98cc4f758bdfc2e101f5a577c06e69819ce151948f8191fcefd144ae3",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "a57316fc48e092ed564a3e398d4e07a16c1e32fc91fcb4409b1dabf207a7b1d1",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 128,
+        "exitCode": 0,
+        "workerConfigSha256": "86424f8a73635cdcd5f8867e0569709ceab1fd62c336a592d6c7715617c8aa6e",
+        "workerLogAfterLastPngSeconds": 0.005445957183837891,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "atlas": {
+            "width": 1024,
+            "height": 512,
+            "uvShrinkRatio": 0.00390625,
+            "logSha256": "2d110c227d8490525c59a65f40336305366c21ce35e0f9efe80ff2043f0039f5"
+          },
+          "uvResourceInputs": [
+            {
+              "path": "gnn.class",
+              "sha256": "c3ad9bb33704ab540c18a6938d111cb2e8f5a5e59d9279a0e84adae871dd385e"
+            },
+            {
+              "path": "het.class",
+              "sha256": "01e63e69fc0d7be45301d68916e59b0022a7c023791b94f7d8eb7da1eb65c6cb"
+            }
+          ],
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 128,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "280bce43d567dbc79f165163f92aa71302a4e4dbc12c79b43e3347171942de6e",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 128,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "03cd6baa5d37e74ae780d239e70d2038c3ae47667770e0fd6ae151d1f776cac8",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 128,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "7ed194a3a70c88f9409fbac9a6303edd8b73c1c6f930bf0b54824789acb9dda5",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 128,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "18596b7cf743fc7044c784caf7b3c24bf1ac72195133f62f0d070a880c15c783",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 128,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "f6b923d647d4dd46fc07d7a38572d4036e861841af7585d6bb124930f90718fc",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 256,
+        "exitCode": 0,
+        "workerConfigSha256": "86424f8a73635cdcd5f8867e0569709ceab1fd62c336a592d6c7715617c8aa6e",
+        "workerLogAfterLastPngSeconds": 0.009075641632080078,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "atlas": {
+            "width": 1024,
+            "height": 512,
+            "uvShrinkRatio": 0.00390625,
+            "logSha256": "ac3bde4c1a3f3cd086136255f242b1a32f44bf4651b469c3a4cd7d149bc3562a"
+          },
+          "uvResourceInputs": [
+            {
+              "path": "gnn.class",
+              "sha256": "c3ad9bb33704ab540c18a6938d111cb2e8f5a5e59d9279a0e84adae871dd385e"
+            },
+            {
+              "path": "het.class",
+              "sha256": "01e63e69fc0d7be45301d68916e59b0022a7c023791b94f7d8eb7da1eb65c6cb"
+            }
+          ],
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 256,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "7a14b5641a447647bc10aaa42f18df6f12bfd8ddd2efdcfbd6e9e6a8a6da06c7",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 256,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "634cf7a43ffed6bca6042a31c36c3734575b28f0738bbb364730bf1855cbb8f4",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 256,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "410a2c9aa353f9ba54a822377d66e99782120069e1738cc875b73fd754d6249e",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 256,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "70fb90005966081f4b97e489fc41295ac5d673bca8175762406536e86ce7c010",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 256,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "0f1e9d02b9f2f8d14505d4066579a91e6ecfb0875aaa205744d16d688b7e74b6",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 512,
+        "exitCode": 0,
+        "workerConfigSha256": "86424f8a73635cdcd5f8867e0569709ceab1fd62c336a592d6c7715617c8aa6e",
+        "workerLogAfterLastPngSeconds": 0.020326852798461914,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "atlas": {
+            "width": 1024,
+            "height": 512,
+            "uvShrinkRatio": 0.00390625,
+            "logSha256": "1919bf5088203f7dfa267fe6e565b29c2fa6dfa6dd036e44fee51f11c7753c99"
+          },
+          "uvResourceInputs": [
+            {
+              "path": "gnn.class",
+              "sha256": "c3ad9bb33704ab540c18a6938d111cb2e8f5a5e59d9279a0e84adae871dd385e"
+            },
+            {
+              "path": "het.class",
+              "sha256": "01e63e69fc0d7be45301d68916e59b0022a7c023791b94f7d8eb7da1eb65c6cb"
+            }
+          ],
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 512,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "08751ea14f8a3e7f24527378b2f37ec26908e2bf9bd1b5e87fcafc516ef1c5d8",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 512,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "4e18118159c2048964c8504521a8468c48b724760b772b34b96471a1592bb8eb",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 512,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "b6b360d3b1b18264bb35bde315e2694d3ef8a6d9683bd2c5cbbf1f2025f32659",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 512,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "0800df2b14a0fdb683b71337b9362eb347bc4a233502eebcf0938c8ccef9fbb3",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 512,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "5f60f3723bb29944628372b3e7cc0218723a7d96f85c1944200781e7366aaea8",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      }
+    ],
+    "wrongAtlasNegativeControl": {
+      "syntheticLog": true,
+      "exitCode": 1,
+      "flatOracle": {
+        "version": "1.21.4",
+        "fullBrightLightmap": 252,
+        "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+        "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+        "gameClassesLoaded": false,
+        "atlas": {
+          "width": 512,
+          "height": 512,
+          "uvShrinkRatio": 0.0078125,
+          "logSha256": "47207a5262c0ab0030d870057e6a4ae83951906e9d1d8040c93dcd479f602e59"
+        },
+        "uvResourceInputs": [
+          {
+            "path": "gnn.class",
+            "sha256": "c3ad9bb33704ab540c18a6938d111cb2e8f5a5e59d9279a0e84adae871dd385e"
+          },
+          {
+            "path": "het.class",
+            "sha256": "01e63e69fc0d7be45301d68916e59b0022a7c023791b94f7d8eb7da1eb65c6cb"
+          }
+        ],
+        "results": [
+          {
+            "id": "minecraft:diamond",
+            "model": "minecraft:item/diamond",
+            "size": 512,
+            "tints": [],
+            "resourceInputs": [
+              {
+                "path": "assets/minecraft/items/diamond.json",
+                "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+              },
+              {
+                "path": "assets/minecraft/models/item/diamond.json",
+                "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+              },
+              {
+                "path": "assets/minecraft/models/item/generated.json",
+                "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+              },
+              {
+                "path": "assets/minecraft/textures/item/diamond.png",
+                "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+              }
+            ],
+            "exportPngSha256": "08751ea14f8a3e7f24527378b2f37ec26908e2bf9bd1b5e87fcafc516ef1c5d8",
+            "maxRgbError": 235,
+            "maxAlphaError": 255,
+            "pixelsOverTolerance": 3398,
+            "passed": false
+          },
+          {
+            "id": "minecraft:creeper_spawn_egg",
+            "model": "minecraft:item/template_spawn_egg",
+            "size": 512,
+            "tints": [
+              {
+                "type": "minecraft:constant",
+                "value": -15882485
+              },
+              {
+                "type": "minecraft:constant",
+                "value": -16777216
+              }
+            ],
+            "resourceInputs": [
+              {
+                "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+              },
+              {
+                "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+              },
+              {
+                "path": "assets/minecraft/models/item/generated.json",
+                "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+              },
+              {
+                "path": "assets/minecraft/textures/item/spawn_egg.png",
+                "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+              },
+              {
+                "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+              }
+            ],
+            "exportPngSha256": "4e18118159c2048964c8504521a8468c48b724760b772b34b96471a1592bb8eb",
+            "maxRgbError": 157,
+            "maxAlphaError": 255,
+            "pixelsOverTolerance": 2436,
+            "passed": false
+          },
+          {
+            "id": "minecraft:clock",
+            "model": "minecraft:item/clock_00",
+            "size": 512,
+            "tints": [],
+            "resourceInputs": [
+              {
+                "path": "assets/minecraft/items/clock.json",
+                "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+              },
+              {
+                "path": "hcs.class",
+                "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+              },
+              {
+                "path": "assets/minecraft/models/item/clock_00.json",
+                "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+              },
+              {
+                "path": "assets/minecraft/models/item/generated.json",
+                "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+              },
+              {
+                "path": "assets/minecraft/textures/item/clock_00.png",
+                "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+              }
+            ],
+            "exportPngSha256": "b6b360d3b1b18264bb35bde315e2694d3ef8a6d9683bd2c5cbbf1f2025f32659",
+            "maxRgbError": 250,
+            "maxAlphaError": 255,
+            "pixelsOverTolerance": 4101,
+            "passed": false
+          },
+          {
+            "id": "minecraft:compass",
+            "model": "minecraft:item/compass_16",
+            "size": 512,
+            "tints": [],
+            "resourceInputs": [
+              {
+                "path": "assets/minecraft/items/compass.json",
+                "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+              },
+              {
+                "path": "hcs.class",
+                "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+              },
+              {
+                "path": "assets/minecraft/models/item/compass_16.json",
+                "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+              },
+              {
+                "path": "assets/minecraft/models/item/generated.json",
+                "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+              },
+              {
+                "path": "assets/minecraft/textures/item/compass_16.png",
+                "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+              }
+            ],
+            "exportPngSha256": "0800df2b14a0fdb683b71337b9362eb347bc4a233502eebcf0938c8ccef9fbb3",
+            "maxRgbError": 206,
+            "maxAlphaError": 255,
+            "pixelsOverTolerance": 3147,
+            "passed": false
+          },
+          {
+            "id": "minecraft:recovery_compass",
+            "model": "minecraft:item/recovery_compass_16",
+            "size": 512,
+            "tints": [],
+            "resourceInputs": [
+              {
+                "path": "assets/minecraft/items/recovery_compass.json",
+                "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+              },
+              {
+                "path": "hcs.class",
+                "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+              },
+              {
+                "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+              },
+              {
+                "path": "assets/minecraft/models/item/generated.json",
+                "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+              },
+              {
+                "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+              }
+            ],
+            "exportPngSha256": "5f60f3723bb29944628372b3e7cc0218723a7d96f85c1944200781e7366aaea8",
+            "maxRgbError": 219,
+            "maxAlphaError": 255,
+            "pixelsOverTolerance": 4641,
+            "passed": false
+          }
+        ],
+        "passed": false
+      }
+    }
+  },
+  "wrapperCompatibility": {
+    "wrapper": {
+      "scope": "元の16px generated texture、定数tint、および1.21.4のentityなし・向き0の針モデルを比較する。ゲームクラス・GPU・固定化hook・PNG合成は使わない。一般のモデルrendererではない。--atlas-log指定時は1.21.4の実測atlas寸法と公式FaceBakery/TextureAtlasSpriteのUV縮小を計算する。",
+      "gameWorkersStarted": 0,
+      "qaClasspathAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+      "maxAllowedRgbError": 1,
+      "maxAllowedAlphaError": 0,
+      "harnessSourcesSha256": {
+        "scripts/verify-flat-textures.py": "aa5d7010a7c93d88a9f00459bb435e4528098bdc21fbfcdbd1b9bbf400517987",
+        "scripts/qa/FlatTextureProbe.java": "67b609fdbad557574d00fcd723c8bc8f1b9b86119bfbeb1b98385d1c7e12d021"
+      },
+      "versions": [
+        {
+          "version": "1.13",
+          "fullBrightLightmap": 255,
+          "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+          "baselineAgentSha256": "11569d524371953f20281c8a0ac46d633e7f5c0e53d45921e8c992b6a60c60d5",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "5ece419d04ec386d460fdf2f8626dbb59edeaa883244b583160d3ba94f2a84b3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "84ddcde65b0fbd83fe26c94fd2dfbbe32e35458f5392aa1f5950781b395b2b99"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "3653a07d6801b6dd13a25d8508f1862ea76594cea8cd216ec2b2cf9662ef7091"
+                }
+              ],
+              "exportPngSha256": "ab632f96c7563fd693dac291fc2886a87a43006534ad4c3ea4dbd313392b35ac",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "exitCode": 0
+        },
+        {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "atlas": {
+            "width": 1024,
+            "height": 512,
+            "uvShrinkRatio": 0.00390625,
+            "logSha256": "f5bc61c15cd57d5ad500474a943e67f2805ca1b1a4f2a8610c516f2593e4c4ae"
+          },
+          "uvResourceInputs": [
+            {
+              "path": "gnn.class",
+              "sha256": "c3ad9bb33704ab540c18a6938d111cb2e8f5a5e59d9279a0e84adae871dd385e"
+            },
+            {
+              "path": "het.class",
+              "sha256": "01e63e69fc0d7be45301d68916e59b0022a7c023791b94f7d8eb7da1eb65c6cb"
+            }
+          ],
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 64,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "6191d96ee7248060f966d4a3ad5cd6b5c1ecc758d302d9e447ab57407d77ad00",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "57925fe4c3f5161b250f5f7e8167f801d55a0efa54a9177796147836835f4d1b",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "176053d98cc4f758bdfc2e101f5a577c06e69819ce151948f8191fcefd144ae3",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "a57316fc48e092ed564a3e398d4e07a16c1e32fc91fcb4409b1dabf207a7b1d1",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "exitCode": 0
+        },
+        {
+          "version": "26.3",
+          "fullBrightLightmap": 255,
+          "sourceSha256": "4508d006323f24fa02876310c192d739af56516eb259000ac50f0909a68c9a2d",
+          "baselineAgentSha256": "11569d524371953f20281c8a0ac46d633e7f5c0e53d45921e8c992b6a60c60d5",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "fd11635ec666c3febb9e6dd6d3ec49cdfb4d16a2a1d595ebd10e56b302417d08"
+                }
+              ],
+              "exportPngSha256": "1a124099976df9e23985fa3c4ff0161e4417d76b1fa992dd076e4786a3ba2ac1",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/creeper_spawn_egg",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "d98f738235b1c38542e07a293ee1b18a10d8a57154f8f06849776484dea534d6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/creeper_spawn_egg.json",
+                  "sha256": "b006be60f46a3969e27c2de5c551bb986bbcd490f4130e3bfa3416bffaef0b9b"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/creeper_spawn_egg.png",
+                  "sha256": "2283799812c0b0931e5a566a09f805d4a041eb06fb3ed8d0580dd236e140c5a9"
+                }
+              ],
+              "exportPngSha256": "1c1af25f881667d3f85e12a621f6199bf67ec2795db9c3e1b26a353e628b3487",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "exitCode": 0
+        }
+      ]
+    },
+    "default": {
+      "scope": "元の16px generated texture、定数tint、および1.21.4のentityなし・向き0の針モデルを比較する。ゲームクラス・GPU・固定化hook・PNG合成は使わない。一般のモデルrendererではない。--atlas-log指定時は1.21.4の実測atlas寸法と公式FaceBakery/TextureAtlasSpriteのUV縮小を計算する。",
+      "gameWorkersStarted": 0,
+      "qaClasspathAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+      "maxAllowedRgbError": 1,
+      "maxAllowedAlphaError": 0,
+      "harnessSourcesSha256": {
+        "scripts/verify-flat-textures.py": "aa5d7010a7c93d88a9f00459bb435e4528098bdc21fbfcdbd1b9bbf400517987",
+        "scripts/qa/FlatTextureProbe.java": "67b609fdbad557574d00fcd723c8bc8f1b9b86119bfbeb1b98385d1c7e12d021"
+      },
+      "versions": [
+        {
+          "version": "1.13",
+          "fullBrightLightmap": 255,
+          "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+          "baselineAgentSha256": "11569d524371953f20281c8a0ac46d633e7f5c0e53d45921e8c992b6a60c60d5",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "5ece419d04ec386d460fdf2f8626dbb59edeaa883244b583160d3ba94f2a84b3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "84ddcde65b0fbd83fe26c94fd2dfbbe32e35458f5392aa1f5950781b395b2b99"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "3653a07d6801b6dd13a25d8508f1862ea76594cea8cd216ec2b2cf9662ef7091"
+                }
+              ],
+              "exportPngSha256": "ab632f96c7563fd693dac291fc2886a87a43006534ad4c3ea4dbd313392b35ac",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "exitCode": 0
+        },
+        {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 64,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "6191d96ee7248060f966d4a3ad5cd6b5c1ecc758d302d9e447ab57407d77ad00",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "57925fe4c3f5161b250f5f7e8167f801d55a0efa54a9177796147836835f4d1b",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "176053d98cc4f758bdfc2e101f5a577c06e69819ce151948f8191fcefd144ae3",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "a57316fc48e092ed564a3e398d4e07a16c1e32fc91fcb4409b1dabf207a7b1d1",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "exitCode": 0
+        },
+        {
+          "version": "26.3",
+          "fullBrightLightmap": 255,
+          "sourceSha256": "4508d006323f24fa02876310c192d739af56516eb259000ac50f0909a68c9a2d",
+          "baselineAgentSha256": "11569d524371953f20281c8a0ac46d633e7f5c0e53d45921e8c992b6a60c60d5",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "fd11635ec666c3febb9e6dd6d3ec49cdfb4d16a2a1d595ebd10e56b302417d08"
+                }
+              ],
+              "exportPngSha256": "1a124099976df9e23985fa3c4ff0161e4417d76b1fa992dd076e4786a3ba2ac1",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/creeper_spawn_egg",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "d98f738235b1c38542e07a293ee1b18a10d8a57154f8f06849776484dea534d6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/creeper_spawn_egg.json",
+                  "sha256": "b006be60f46a3969e27c2de5c551bb986bbcd490f4130e3bfa3416bffaef0b9b"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/creeper_spawn_egg.png",
+                  "sha256": "2283799812c0b0931e5a566a09f805d4a041eb06fb3ed8d0580dd236e140c5a9"
+                }
+              ],
+              "exportPngSha256": "1c1af25f881667d3f85e12a621f6199bf67ec2795db9c3e1b26a353e628b3487",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "exitCode": 0
+        }
+      ]
+    }
+  },
+  "previousIntegerExpansion": {
+    "sizes": [
+      {
+        "size": 16,
+        "passed": true,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 16,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "80c4deab1cf4cef001128ed4c0f2cfb5df64484306177f12ab020c3b35449a3f",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 16,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "230c8e887591971886aaef97779e6f6902b6bfd19e3bbc02f796d23e874428fe",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 16,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "f36f33139c0f7f7d443b5d2a0e2b1e1cfd62dc13046e998a5c7d8dda54a1395b",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 16,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "363a4ce9f8250c0e5ef34f68e32a04d008857df180b99a79b7696dabeb87c83c",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 16,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "777bc344ae49582565181a647099d9e3dcffef64ab79cd428d443d5f09f48424",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 32,
+        "passed": true,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 32,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "b34361ca12d7fff9c118024a720420a6eb7276e561869a852551ab80ab462dc8",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 32,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "17c9c4cdefe069e5a0816312d3e3619edfdcb802af388a063fd48d3dc0d50570",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 32,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "aa962a2aa77d6ee7746fd9f93b65c493cb4981bfe8206ac08067a93febf72ff3",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 32,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "2198d7a3dfd1277aa6465ec7eddc74ecc7b8756d0a803e9ffbe95f1cacbcbe45",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 32,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "e30e5a56d58517582545b8be7ed928cf5d28904d8205e43198e810bdf71d041c",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 64,
+        "passed": true,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 64,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "6191d96ee7248060f966d4a3ad5cd6b5c1ecc758d302d9e447ab57407d77ad00",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "57925fe4c3f5161b250f5f7e8167f801d55a0efa54a9177796147836835f4d1b",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "176053d98cc4f758bdfc2e101f5a577c06e69819ce151948f8191fcefd144ae3",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 64,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "a57316fc48e092ed564a3e398d4e07a16c1e32fc91fcb4409b1dabf207a7b1d1",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 128,
+        "passed": true,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 128,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "280bce43d567dbc79f165163f92aa71302a4e4dbc12c79b43e3347171942de6e",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 128,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "03cd6baa5d37e74ae780d239e70d2038c3ae47667770e0fd6ae151d1f776cac8",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 128,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "7ed194a3a70c88f9409fbac9a6303edd8b73c1c6f930bf0b54824789acb9dda5",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 128,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "18596b7cf743fc7044c784caf7b3c24bf1ac72195133f62f0d070a880c15c783",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 128,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "f6b923d647d4dd46fc07d7a38572d4036e861841af7585d6bb124930f90718fc",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 256,
+        "passed": true,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 256,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "7a14b5641a447647bc10aaa42f18df6f12bfd8ddd2efdcfbd6e9e6a8a6da06c7",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 256,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "634cf7a43ffed6bca6042a31c36c3734575b28f0738bbb364730bf1855cbb8f4",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 256,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "410a2c9aa353f9ba54a822377d66e99782120069e1738cc875b73fd754d6249e",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 256,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "70fb90005966081f4b97e489fc41295ac5d673bca8175762406536e86ce7c010",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 256,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "0f1e9d02b9f2f8d14505d4066579a91e6ecfb0875aaa205744d16d688b7e74b6",
+              "maxRgbError": 0,
+              "maxAlphaError": 0,
+              "pixelsOverTolerance": 0,
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      },
+      {
+        "size": 512,
+        "passed": false,
+        "flatOracle": {
+          "version": "1.21.4",
+          "fullBrightLightmap": 252,
+          "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+          "baselineAgentSha256": "8a33d62ad65a8b9934d69720e39ce4e3e12c51ff88e2900b266515d764e55d2c",
+          "gameClassesLoaded": false,
+          "results": [
+            {
+              "id": "minecraft:diamond",
+              "model": "minecraft:item/diamond",
+              "size": 512,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/diamond.json",
+                  "sha256": "e04c3b0294e1dfb85627534d471b95e8e8f0cd544a986d405ff26d4e948f3ae3"
+                },
+                {
+                  "path": "assets/minecraft/models/item/diamond.json",
+                  "sha256": "4cd2c9a5a8181d7a133888b2ecafb04ea998b422ca48d2e4988af5e2c8dd31b7"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/diamond.png",
+                  "sha256": "b27b081fde6a794dfb52d37f4ab2a86931ce127323f786a27cea41d2dbe913a2"
+                }
+              ],
+              "exportPngSha256": "08751ea14f8a3e7f24527378b2f37ec26908e2bf9bd1b5e87fcafc516ef1c5d8",
+              "maxRgbError": 248,
+              "maxAlphaError": 255,
+              "pixelsOverTolerance": 2724,
+              "passed": false
+            },
+            {
+              "id": "minecraft:creeper_spawn_egg",
+              "model": "minecraft:item/template_spawn_egg",
+              "size": 512,
+              "tints": [
+                {
+                  "type": "minecraft:constant",
+                  "value": -15882485
+                },
+                {
+                  "type": "minecraft:constant",
+                  "value": -16777216
+                }
+              ],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/creeper_spawn_egg.json",
+                  "sha256": "7e989d6b3df079d7e7e2dc4e8852d56441074fb277dcbd76d83bf7b9802a467d"
+                },
+                {
+                  "path": "assets/minecraft/models/item/template_spawn_egg.json",
+                  "sha256": "2aa28f3dfc96c06980df9a6242eca2a375b18e9c5f4fa68771de3c88dcbe4e1f"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg.png",
+                  "sha256": "f6b985a0094408770f4b0ba919c2cb6365c6e8b65080334b33617518be2089c1"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/spawn_egg_overlay.png",
+                  "sha256": "df0075d5081a1f49f0f4de1e1f004764446ecb3233416f7cd027c58823190747"
+                }
+              ],
+              "exportPngSha256": "4e18118159c2048964c8504521a8468c48b724760b772b34b96471a1592bb8eb",
+              "maxRgbError": 148,
+              "maxAlphaError": 255,
+              "pixelsOverTolerance": 2212,
+              "passed": false
+            },
+            {
+              "id": "minecraft:clock",
+              "model": "minecraft:item/clock_00",
+              "size": 512,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/clock.json",
+                  "sha256": "ab89aa3e4f3bc9ae23e55ec1485b23c28ba12c1b24120527d456010b624c1df0"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/clock_00.json",
+                  "sha256": "2cb5ef073e180cea4c44b6a1bc579bf98d732e510ae3bc0823f544b1fbfd526c"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/clock_00.png",
+                  "sha256": "52652043a299f6d27da9229f1ccadd64e94018e6126c0bb2cbdf283bec114d87"
+                }
+              ],
+              "exportPngSha256": "b6b360d3b1b18264bb35bde315e2694d3ef8a6d9683bd2c5cbbf1f2025f32659",
+              "maxRgbError": 230,
+              "maxAlphaError": 255,
+              "pixelsOverTolerance": 4988,
+              "passed": false
+            },
+            {
+              "id": "minecraft:compass",
+              "model": "minecraft:item/compass_16",
+              "size": 512,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/compass.json",
+                  "sha256": "28e656fec02774eacf03c7b7f9f6d0b1628ee4d45a93d23b7820696297402717"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/compass_16.json",
+                  "sha256": "f429445890459c750a022f62fccb93a28dd92bda22fabf1ca9511769fcd004bb"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/compass_16.png",
+                  "sha256": "0b14eabd82b84a1273057baac58cff50279329e15260b16b711e5a49ffdc56a4"
+                }
+              ],
+              "exportPngSha256": "0800df2b14a0fdb683b71337b9362eb347bc4a233502eebcf0938c8ccef9fbb3",
+              "maxRgbError": 190,
+              "maxAlphaError": 255,
+              "pixelsOverTolerance": 3396,
+              "passed": false
+            },
+            {
+              "id": "minecraft:recovery_compass",
+              "model": "minecraft:item/recovery_compass_16",
+              "size": 512,
+              "tints": [],
+              "resourceInputs": [
+                {
+                  "path": "assets/minecraft/items/recovery_compass.json",
+                  "sha256": "17782909b6678ce23fb39b4a61dd7c2c5ba90da7bb2169b98ae7fe019a61389e"
+                },
+                {
+                  "path": "hcs.class",
+                  "sha256": "1e452c998450b8771a42742a09815699896bcdc0617ff281a9966eb1f0b061e6"
+                },
+                {
+                  "path": "assets/minecraft/models/item/recovery_compass_16.json",
+                  "sha256": "052ed0cea9471e26a661e44f19a7af5c86724245eaf1fb3e3dcf21b7937a1332"
+                },
+                {
+                  "path": "assets/minecraft/models/item/generated.json",
+                  "sha256": "63190611202e75ad7b812bc9a4b31bd53f3e186895d7b53e5e280b0d1e30a67a"
+                },
+                {
+                  "path": "assets/minecraft/textures/item/recovery_compass_16.png",
+                  "sha256": "bbd324b55c2eed05e8f1aa5a33907990e58743b3ba205e01bd1f3e117d2944a6"
+                }
+              ],
+              "exportPngSha256": "5f60f3723bb29944628372b3e7cc0218723a7d96f85c1944200781e7366aaea8",
+              "maxRgbError": 233,
+              "maxAlphaError": 255,
+              "pixelsOverTolerance": 4957,
+              "passed": false
+            }
+          ],
+          "passed": false
+        }
+      }
+    ]
+  },
+  "limits": [
+    "対象は1.21.4の静的16px generated texture、定数tint、entityなしの針モデル5種類。geometry4種類の各サイズは既存PNG監査であり、独立の全画素geometry oracleではない。",
+    "1.13/26.3のwrapper対照は既存PNGを再比較し、その版の新しいnative描画ではない。",
+    "全51版・全IDの画質保証、他OS/GPUの受入は含まない。experimental/deterministic=falseを維持する。"
+  ]
+}
