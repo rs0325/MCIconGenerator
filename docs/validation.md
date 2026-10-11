@@ -119,6 +119,22 @@ python3 scripts/verify-flat-textures.py --out .local/flat-texture-repeat \
   --compare .local/qa-output
 ```
 
+## 実際の破損リソースパックによる検証（2026-10-11）
+
+Issue #6の継続作業です。起点はPR #15の593c745、担当ブランチはfeature/issue-6です。描画・欠損観測を置き換えず、QA専用パックに破損したモデルJSONまたはPNGを配置して、ゲーム自身の読み込みとfallback処理を通します。パック形式は元JARのversion.jsonまたはpack.mcmetaから取得します。取得Resourceの提供元がQAパックであること、所有runのパックSHA、公式入力JARが変化しないことを確認します。ゲーム素材・QA agent・破損パックは公開配布物へ含めません。
+
+初期workerでは1.13 / 1.21.4 / 26.3の破損チェストを代替画像のまま成功出力していました。通常quadの観測に加え、TextureAtlasのsprite取得、26.xのAtlasManagerのcached sprite取得、旧版Textureの直接bindを観測します。旧版のmissing textureは保持フィールドで比較し、生成getterを呼んで初回bindへ再入しないようにします。失敗は描画処理終了後に通知し、同じworkerの正常アイテムの継続を検証します。
+
+モデルJSONが破損した場合も版によりMISSING_MODELまたはMISSING_TEXTUREとなります。バニラがmissing spriteを持つ代替形状へ解決した場合は後者です。この検証はfallback PNGを成功として返さないことを確認し、元ファイルの破損種別を常に識別する保証にはしません。
+
+```sh
+python3 scripts/verify-resource-faults.py --injection resource-pack \
+  --faults model texture special-texture --out .local/resource-pack-check \
+  --compare .local/qa-output
+```
+
+最終workerの27破損ケースで、全て期待した欠損診断とPNG未出力、同じworkerで続くwheatの基準RGBA一致を確認しました。既存の観測値置換fixtureも3版・6件で回帰確認し、missing spriteを描画passの前に取得することでQA自身がatlas観測へ再入しないようにしました。正常全51版・60,265枚は基準のRGBAと出力パスが一致し、PNG監査も成功しました。入力・worker・QA helperのhashと版別結果は[数値記録](../qa/validation-2026-10-11-resource-pack.json)に保存しています。JUnit56件、実bytecodeの依存照合51/51版は成功しています。重点反証で指摘された旧版getterの遅延生成による再帰と並列QAログの混入は修正しました。版によって起動ログが省略されたりSTDERRにprefixが付くため、パック選択の証明は取得Resourceの提供元で行います。modernの直接非atlasテクスチャ、全てのキャッシュ済み特殊描画、画像の意味・色空間の受入は引き続き未完了です。
+
 ## 未完了の受入検証
 
 - 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、無改変のワールド内inventory基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。

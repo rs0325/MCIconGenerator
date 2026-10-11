@@ -25,6 +25,21 @@ public final class ResourceCapabilityProbe {
                 requireMethod(members(jar,s,"net.minecraft.client.renderer.texture.SpriteContents"),s.methodName("net.minecraft.client.renderer.texture.SpriteContents","name",0),0,"SpriteContents.name",failures);
             }
             checked++;
+            String atlas=legacy?"net.minecraft.client.render.texture.TextureAtlas":"net.minecraft.client.renderer.texture.TextureAtlas";
+            Members am=members(jar,s,atlas);
+            if(!am.methods.stream().anyMatch(m->m.startsWith(s.methodName(atlas,"getSprite",1)+"(")&&Type.getArgumentTypes(m.substring(m.indexOf('('))).length==1&&Type.getReturnType(m.substring(m.indexOf('('))).getDescriptor().equals(descriptor(s,sprite))))failures.add("特殊描画のatlas sprite取得メソッドがありません");
+            checked++;
+            String atlasManager="net.minecraft.client.resources.model.sprite.AtlasManager";
+            if(jar.getEntry(s.actualClass(atlasManager).replace('.','/')+".class")!=null) {
+                requireMethod(members(jar,s,atlasManager),s.methodName(atlasManager,"get",1),1,"AtlasManager.get",failures);checked++;
+            }
+            if(legacy) {
+                String texture="net.minecraft.client.render.texture.Texture";
+                requireMethod(members(jar,s,texture),s.methodName(texture,"bind",0),0,"Texture.bind",failures);
+                String missingTexture="net.minecraft.client.render.texture.MissingTextureAtlasSprite";
+                if(!members(jar,s,missingTexture).fields.containsKey(s.fieldName(missingTexture,"texture")))failures.add("旧版missing textureの保持フィールドがありません");
+                checked+=2;
+            }
             String quad=legacy?"net.minecraft.client.resource.model.BakedQuad":"net.minecraft.client.renderer.block.model.BakedQuad";
             if(jar.getEntry(s.actualClass(quad).replace('.','/')+".class")!=null) {
                 Members qm=members(jar,s,quad);String field=s.fieldName(quad,"sprite");

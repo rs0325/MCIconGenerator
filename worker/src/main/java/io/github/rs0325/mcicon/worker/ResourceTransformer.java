@@ -4,7 +4,7 @@ import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 import org.objectweb.asm.*;
 
-/** Observe fallback models and sprites consumed by vanilla quad rendering. */
+/** インベントリ描画のモデル・atlas sprite・旧版の直接bindを観測する。 */
 final class ResourceTransformer implements ClassFileTransformer {
     private static final String GUARD="io/github/rs0325/mcicon/worker/ResourceGuard";
     private final Symbols symbols;
@@ -24,7 +24,10 @@ final class ResourceTransformer implements ClassFileTransformer {
         final boolean geometry=source.equals("net.minecraft.client.resources.model.geometry.BakedQuad");
         final boolean itemRenderer=source.equals(legacy?"net.minecraft.client.render.entity.ItemRenderer":"net.minecraft.client.renderer.entity.ItemRenderer")
             &&(legacy||symbols.hasMethod(source,"getModel",3)||symbols.hasMethod(source,"getModel",4));
-        if(!quad&&!manager&&!missing&&!geometry&&!itemRenderer)return null;
+        final boolean atlas=source.equals(legacy?"net.minecraft.client.render.texture.TextureAtlas":"net.minecraft.client.renderer.texture.TextureAtlas");
+        final boolean atlasManager=source.equals("net.minecraft.client.resources.model.sprite.AtlasManager");
+        final boolean texture=legacy&&source.equals("net.minecraft.client.render.texture.Texture");
+        if(!quad&&!manager&&!missing&&!geometry&&!itemRenderer&&!atlas&&!atlasManager&&!texture)return null;
         final String spriteMethod=symbols.methodName(source,symbols.hasMethod(source,"getSprite",0)||legacy?"getSprite":"sprite",0);
         final String modelMethod=symbols.methodName(source,"getModel",1);
         final String updateMethod=symbols.methodName(source,"update",7);
@@ -41,7 +44,9 @@ final class ResourceTransformer implements ClassFileTransformer {
                 final boolean inspectVertices=quad&&method.equals(verticesMethod)&&desc.equals("()[I");
                 final boolean inspectMaterial=geometry&&method.equals("materialInfo")&&desc.startsWith("()L");
                 final boolean inspectItem=itemRenderer&&method.equals(symbols.methodName(source,"getModel",Type.getArgumentTypes(desc).length))&&Type.getReturnType(desc).getDescriptor().equals(modelDescriptor);
-                if(!inspectSprite&&!inspectModel&&!inspectMissing&&!inspectVertices&&!inspectMaterial&&!inspectItem)return target;
+                final boolean inspectAtlas=(atlas||atlasManager)&&method.equals(symbols.methodName(source,atlas?"getSprite":"get",1))&&Type.getArgumentTypes(desc).length==1&&Type.getReturnType(desc).getDescriptor().equals(spriteDescriptor);
+                final boolean inspectTexture=texture&&method.equals(symbols.methodName(source,"bind",0))&&desc.equals("()V");
+                if(!inspectSprite&&!inspectModel&&!inspectMissing&&!inspectVertices&&!inspectMaterial&&!inspectItem&&!inspectAtlas&&!inspectTexture)return target;
                 return new MethodVisitor(Opcodes.ASM9,target) {
                     public void visitCode() {
                         super.visitCode();
@@ -55,9 +60,13 @@ final class ResourceTransformer implements ClassFileTransformer {
                             super.visitVarInsn(Opcodes.ALOAD,0);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC,GUARD,"quad","(Ljava/lang/Object;)V",false);
                         }
+                        if(inspectTexture) {
+                            super.visitVarInsn(Opcodes.ALOAD,0);
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC,GUARD,"texture","(Ljava/lang/Object;)V",false);
+                        }
                     }
                     public void visitInsn(int opcode) {
-                        if(opcode==Opcodes.ARETURN&&(inspectSprite||inspectModel||inspectMaterial||inspectItem)) {
+                        if(opcode==Opcodes.ARETURN&&(inspectSprite||inspectModel||inspectMaterial||inspectItem||inspectAtlas)) {
                             super.visitInsn(Opcodes.DUP);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC,GUARD,inspectModel?"model":inspectItem?"itemModel":inspectMaterial?"material":"sprite","(Ljava/lang/Object;)V",false);
                         }

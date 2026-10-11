@@ -44,6 +44,13 @@ public final class ResourceGuard {
             if("minecraft:missingno".equals(String.valueOf(name))&&failure.get()==null)failure.set("MISSING_TEXTURE");
         } catch(Exception e) {throw new IllegalStateException("Cannot inspect drawn vanilla sprite",e);}
     }
+    /** 旧版のbind対象を検査し、描画pass内の保持済みmissing textureなら失敗を記録する。 */ public static void texture(Object value) {
+        if(!CanonicalContext.active())return;
+        try {
+            Object missing=RenderAgent.symbols.field("net.minecraft.client.render.texture.MissingTextureAtlasSprite","texture",null);
+            if(value==missing&&failure.get()==null)failure.set("MISSING_TEXTURE");
+        } catch(Exception e) {throw new IllegalStateException("バニラのbind済みテクスチャを検査できません",e);}
+    }
     public static void quad(Object value) {
         if(!CanonicalContext.active())return;
         try {
