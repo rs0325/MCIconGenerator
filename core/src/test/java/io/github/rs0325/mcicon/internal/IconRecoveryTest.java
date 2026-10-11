@@ -41,6 +41,7 @@ class IconRecoveryTest {
         assertTrue(Files.exists(manifest.getParent().resolve("assets/minecraft/textures/item/sample_07.png")));
         var resumed=exporter.export(runtime,new FakeWorker(-1),catalog,request());
         assertTrue(resumed.complete());assertEquals(20,resumed.succeeded());assertEquals(0,resumed.failed());
+        assertEquals(Json.MAPPER.valueToTree(List.of(252,252,252)),Json.MAPPER.readTree(manifest.toFile()).path("context").path("lightmapFullBrightRgb"));
         FakeWorker cached=new FakeWorker(-1);assertTrue(exporter.export(runtime,cached,catalog,request()).complete());assertEquals(0,cached.calls);
     }
     @Test void repeatedResumeNeverClaimsUnownedOutput() throws Exception {

@@ -16,6 +16,7 @@ alpha=[0,1,16,25,26,32,64,96,127,128,160,192,224,254,255,255]
 colors=[(0,0,0),(255,255,255),(255,0,0),(0,255,0),(0,0,255),(128,128,128),(32,64,128),(200,50,150),(17,83,219),(240,180,60),(64,192,128),(127,128,129),(1,2,3),(254,253,252),(20,200,240),(220,40,80)]
 base=[(*colors[y],alpha[x]) for y in range(16) for x in range(16)]
 overlay=[(*colors[15-y],alpha[15-x]) for y in range(16) for x in range(16)]
+lightmap=[252,252,252]
 
 def sha(data):return hashlib.sha256(data).hexdigest()
 def png(pixels):
@@ -37,7 +38,7 @@ with zipfile.ZipFile(pack,'w',compression=zipfile.ZIP_DEFLATED) as z:
   z.writestr('assets/minecraft/items/'+item+'.json',json.dumps({'model':{'type':'minecraft:model','model':'minecraft:item/'+item}}))
   z.writestr('assets/minecraft/models/item/'+item+'.json',json.dumps({'parent':'minecraft:item/generated','textures':textures}))
 
-report={'scope':'1.21.4のQAパックで静的16px generated-modelの1層・2層を通常shaderで描画する。数値oracleはゲームクラス・GPU・PngOutputを使用しない。通常GUI比較はfixed-v1 hookとbootstrapを共有する。バニラ全モデルやlinear-light合成の受入ではない。','syntheticResources':True,'officialInputsModified':False,'sourceSha256':source_hash,'resourcePackSha256':sha(pack.read_bytes()),'shaderSha256':sha(shader),'sourceAlpha':alpha,'sourceColors':colors,'shaderAlphaCutoff':0.1,'comparisonEncoding':'byte RGBのsource-over。sRGB EOTFで線形化した合成とは区別する。','harnessSourcesSha256':{str(f.relative_to(repo)):sha(f.read_bytes()) for f in [Path(__file__).resolve(),repo/'scripts/qa/ResourcePackFaultAgent.java']},'oracleResults':[]}
+report={'scope':'1.21.4のQAパックで静的16px generated-modelの1層・2層を通常shaderで描画する。数値oracleはゲームクラス・GPU・PngOutputを使用しない。通常GUI比較はfixed-v1 hookとbootstrapを共有する。バニラ全モデルやlinear-light合成の受入ではない。','syntheticResources':True,'officialInputsModified':False,'sourceSha256':source_hash,'resourcePackSha256':sha(pack.read_bytes()),'shaderSha256':sha(shader),'sourceAlpha':alpha,'sourceColors':colors,'fullBrightLightmapRgb':lightmap,'shaderAlphaCutoff':0.1,'comparisonEncoding':'byte RGBのsource-over。sRGB EOTFで線形化した合成とは区別する。','harnessSourcesSha256':{str(f.relative_to(repo)):sha(f.read_bytes()) for f in [Path(__file__).resolve(),repo/'scripts/qa/ResourcePackFaultAgent.java']},'oracleResults':[]}
 with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
  distribution=Path(temporary)/'mcicon';shutil.copytree(a.cli.resolve().parent.parent,distribution)
  agent=distribution/'worker/worker-agent.jar';report['productionAgentSha256']=sha(agent.read_bytes())
@@ -61,6 +62,8 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
  report['packSourceConfirmed']=len(runs)==1 and any('[mcicon QA] resource source: minecraft:textures/item/diamond.png = ' in line and line.endswith('mcicon-qa.zip') for line in log.splitlines())
  manifest=folder/'java/1.21.4/icons/manifest.json';m=json.loads(manifest.read_text());report['qaAgentSha256']=m['settings']['agentSha256'];report['imageId']=m['settings']['dockerImageId'];report['exportAudit']=audit.audit(manifest,require_all=False)
  entries={e['id']:e for e in m['entries']}
+ report['manifestFullBrightRgb']=m['context']['lightmapFullBrightRgb']
+ if report['manifestFullBrightRgb']!=lightmap:raise ValueError('manifestの照明が数値oracleと不一致です')
  for item,layers in [('diamond',[base]),('emerald',[base,overlay])]:
   e=entries['minecraft:'+item];data=(manifest.parent/e['path']).read_bytes();w,h,rgba=audit.rgba_png(data)
   assert w==h==64 and sha(data)==e['sha256']
@@ -70,7 +73,7 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=out) as temporary:
     expected_alpha=0.;premult=[0.,0.,0.]
     for layer in layers:
      pixel=layer[(y//4)*16+x//4];opacity=pixel[3]/255 if pixel[3]/255>=0.1 else 0
-     premult=[pixel[c]*opacity+premult[c]*(1-opacity) for c in range(3)];expected_alpha=opacity+expected_alpha*(1-opacity)
+     premult=[pixel[c]*lightmap[c]/255*opacity+premult[c]*(1-opacity) for c in range(3)];expected_alpha=opacity+expected_alpha*(1-opacity)
     offset=(y*64+x)*4;actual=rgba[offset:offset+4];da=abs(actual[3]-expected_alpha*255);max_alpha=max(max_alpha,da)
     weighted=max(abs(actual[c]*actual[3]/255-premult[c]) for c in range(3));max_weighted=max(max_weighted,weighted)
     if expected_alpha:

@@ -210,11 +210,21 @@ python3 scripts/verify-world-inventory.py --out .local/world-inventory \
 
 別の診断として、生成PNGのRGBへ各撮影で読み取ったlightmap値を乗算してから空スロット背景へbyte RGB合成すると、28種類すべてが最大誤差2/255以内で一致しました。diamondは誤差0、iceは最大2、その他は最大1でした。生RGBのpassed=falseとlightmapAdjustedPassed=trueを分けて記録します。スクリプトは生比較の不一致に対してexit 1を返し、補正比較だけを全体成功に数えません。確認前の18種類の対照も成功扱いへ書き換えません。
 
-この補正は照明差の原因を調べるもので、productionのPNGを変更していません。正式canonicalの照明基準は確認待ちです。glint、時計・コンパス、アニメーション、全ID・全版、別背景・GPUの受入は継続します。入力・QA helper・通常画面・shaderのhashと各比較結果は[数値記録](../qa/validation-2026-10-11-world-inventory.json)に保存しています。重点反証では新しい確定問題は見つからず、timeout・中断の停止処理はコード確認のみで障害注入は未実施です。ゲーム画像、worldデータ、QA agentは公開配布物に含めません。
+この時点の補正は照明差の原因を調べるもので、productionのPNGは変更していません。後続作業ではユーザー確認により実インベントリの照明を固定基準に選びました。glint、時計・コンパス、アニメーション、全ID・全版、別背景・GPUの受入は継続します。入力・QA helper・通常画面・shaderのhashと各比較結果は[変更前の数値記録](../qa/validation-2026-10-11-world-inventory.json)に保存しています。重点反証では新しい確定問題は見つからず、timeout・中断の停止処理はコード確認のみで障害注入は未実施です。ゲーム画像、worldデータ、QA agentは公開配布物に含めません。
+
+## 実インベントリの照明への適合（2026-10-11）
+
+ユーザー指定により、1.21.4の描画前lightmapをRGB252へ初期化しました。通常ワールドの静的28種類は、保存PNGのRGBを補正せず背景へ合成した比較で全件成功し、最大誤差は1/255でした。実ワールドの観測lightmapも全撮影でRGB252です。ワールド・プレイヤー・時刻・天候はproductionへ導入しません。
+
+新workerの1.21.4全1,384枚をPNG監査し、8bit RGBA・sRGB Perceptualを確認しました。変更前と出力パスは同一で、1,382枚のRGBAが変わります。透明領域のmaskは不変ですが、8bit量子化により930pixelのalphaが最大1/255変わります。以前のiconsは新しい出力先で再生成してください。
+
+照明を変更しない9境界版（1.13、1.14.3、1.14.4、1.19.4、1.21.3、1.21.5、1.21.6、26.2、26.3）の代表6種類・計54枚は既存基準とRGBA・パス一致しました。既知RGBAの1層・2層8,192pixelは量子化上限内、6背景の通常GUI18比較と着色・透過・glintの2背景24比較は誤差2/255以内です。独立flat oracleの5ケースは誤差0ですが、1.13・26.3の入力は以前の基準出力です。欠損モデル・直接テクスチャの2ケースで対象PNG未出力と正常wheatの継続・基準一致を確認しました。JUnit60件は成功しました。
+
+数値・入力hash・QA helper hashは[照明変更後の記録](../qa/validation-2026-10-11-inventory-lighting.json)に保存します。通常GUI fixtureはfixed-v1とbootstrapを共有し、通常ワールド28種類の独立比較と区別します。全51版の全件再実行、他版の実ワールド照明、全ID・動的表現・他GPUの受入は未完了で、全版experimental/deterministic=falseを維持します。
 
 ## 未完了の受入検証
 
-- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、正式canonicalの照明基準、完全な無計装clientの基準画像、通常ワールド比較の対象拡張、glint・時計/コンパス・animated textureの意味的な比較。
+- 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、1.21.4以外の照明基準、完全な無計装clientの基準画像、通常ワールド比較の対象拡張、glint・時計/コンパス・animated textureの意味的な比較。
 - sRGB・半透明・alpha復元の色精度、missing texture/modelの完全検出。
 - Windows/Linux host、Docker Desktop、native、ARM64 image。
 - daemon障害・書き込み経路の競合など、今回のSIGKILL/ENOSPC/lock試験を超える障害受入。

@@ -18,6 +18,7 @@ ids=['minecraft:'+i if ':' not in i else i for i in a.ids]
 if len(ids)!=len(set(ids)):p.error('IDは重複できません')
 manifest=a.compare.resolve()/'java/1.21.4/icons/manifest.json';baseline=json.loads(manifest.read_text())
 entries={e['id']:e for e in baseline['entries']}
+if baseline['context'].get('lightmapFullBrightRgb')!=[252,252,252]:p.error('実インベントリ照明を反映した1.21.4のPNGを再生成してください')
 if baseline['settings']['size']!=64 or any(i not in entries or entries[i]['status']!='success' for i in ids):p.error('比較元に64pxの成功画像が必要です')
 sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
 client=version/'client.jar';source_hash=sha(client)
@@ -54,7 +55,7 @@ active=subprocess.run(['docker','--context',a.docker_context,'ps','--format','{{
 if sum(n.startswith(('mcicon-worker-','mcicon-world-qa-')) for n in active)>=2:raise RuntimeError('native clientの同時実行は2つまでです')
 container='mcicon-world-qa-'+str(uuid.uuid4())
 command=['docker','--context',a.docker_context,'run','--rm','--name',container,'--platform','linux/amd64','--network','none','--memory','3g','--cpus','4','-v',str(cache)+':/mcicon/cache:ro','-v',str(out)+':/mcicon/qa',image,'/opt/java/java21/bin/java','-Xmx2G','-Djava.awt.headless=true','-Duser.timezone=UTC','-Djava.library.path=/mcicon/cache/versions/1.21.4/natives-linux','-javaagent:/mcicon/qa/world-reference.jar=/mcicon/qa/agent.json','-cp',':'.join(['/mcicon/cache/versions/1.21.4/client.jar']+libraries),meta['mainClass'],'--username','MCIconGenerator','--version','1.21.4','--gameDir','/mcicon/qa/game','--assetsDir','/mcicon/cache/assets','--assetIndex',meta['assetIndex']['id'],'--accessToken','0','--uuid','00000000000000000000000000000000','--userType','legacy','--width','1280','--height','960','--disableMultiplayer']
-report={'scope':'通常のローカルflatワールドのInventoryScreen。QA callbackはMinecraft.runTick末尾のみで、ゲーム状態・画面操作とnative Screenshotを使用する。描画メソッド、production初期化、canonical hook、透過復元を共有しない。完全な無計装clientではない。','version':'1.21.4','sourceSha256':source_hash,'baselineAgentSha256':baseline['settings']['agentSha256'],'qaAgentSha256':sha(agent),'imageId':image,'harnessSourcesSha256':{str(f.relative_to(repo)):sha(f) for f in [Path(__file__).resolve(),repo/'scripts/qa/WorldInventoryAgent.java']},'windowPixels':[1280,960],'guiScale':4,'worldPreset':'flat','seed':'0','slot':9,'excludedProductionClasses':excluded,'maxAllowedChannelError':2,'lightmapComparison':'生RGBの比較と、実際のfull-bright lightmap texelを乗算した比較を別々に記録する。fixed-v1のworldなしlightmap初期値は白255。','entries':[],'passed':False}
+report={'scope':'通常のローカルflatワールドのInventoryScreen。QA callbackはMinecraft.runTick末尾のみで、ゲーム状態・画面操作とnative Screenshotを使用する。描画メソッド、production初期化、canonical hook、透過復元を共有しない。完全な無計装clientではない。','version':'1.21.4','sourceSha256':source_hash,'baselineAgentSha256':baseline['settings']['agentSha256'],'qaAgentSha256':sha(agent),'imageId':image,'harnessSourcesSha256':{str(f.relative_to(repo)):sha(f) for f in [Path(__file__).resolve(),repo/'scripts/qa/WorldInventoryAgent.java']},'windowPixels':[1280,960],'guiScale':4,'worldPreset':'flat','seed':'0','slot':9,'excludedProductionClasses':excluded,'maxAllowedChannelError':2,'baselineFullBrightRgb':baseline['context']['lightmapFullBrightRgb'],'entries':[],'passed':False}
 save=lambda:(out/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 save()
 try:
@@ -77,18 +78,15 @@ background=slot(empty)
 for c in capture['captures'][1:]:
  e=entries[c['id']];path=manifest.parent/e['path'];assert sha(path)==e['sha256']
  w,h,rgba=audit.rgba_png(path.read_bytes());assert (w,h)==(64,64)
- native=slot(c);errors=[];bad=0;adjusted=[];adjusted_bad=0
+ native=slot(c);errors=[];bad=0
  light=[(c['fullBrightArgb']>>shift)&255 for shift in (16,8,0)]
  for i in range(0,len(rgba),4):
   delta=[abs((rgba[i+k]*rgba[i+3]+background[i+k]*(255-rgba[i+3])+127)//255-native[i+k]) for k in range(3)]
   errors.extend(delta);bad+=max(delta)>2
-  delta=[abs((rgba[i+k]*light[k]*rgba[i+3]+background[i+k]*(255-rgba[i+3])*255+32512)//65025-native[i+k]) for k in range(3)]
-  adjusted.extend(delta);adjusted_bad+=max(delta)>2
  opaque=all(native[i]==255 and background[i]==255 for i in range(3,len(native),4))
- entry={'id':c['id'],'exportPngSha256':e['sha256'],'screenSha256':sha(out/c['screen']),'maxChannelError':max(errors),'meanChannelError':sum(errors)/len(errors),'pixelsOverTolerance':bad,'count':c['count'],'fullBrightRgb':light,'opaqueReference':opaque,'rawPassed':bad==0 and c['count']==1 and opaque,'lightmapAdjusted':{'maxChannelError':max(adjusted),'meanChannelError':sum(adjusted)/len(adjusted),'pixelsOverTolerance':adjusted_bad,'passed':adjusted_bad==0 and c['count']==1 and opaque}}
- report['entries'].append(entry);print(c['id'],'raw',entry['rawPassed'],max(errors),'lightmap',entry['lightmapAdjusted']['passed'],max(adjusted),flush=True)
+ entry={'id':c['id'],'exportPngSha256':e['sha256'],'screenSha256':sha(out/c['screen']),'maxChannelError':max(errors),'meanChannelError':sum(errors)/len(errors),'pixelsOverTolerance':bad,'count':c['count'],'fullBrightRgb':light,'opaqueReference':opaque,'rawPassed':bad==0 and c['count']==1 and opaque,'lightmapMatches':light==report['baselineFullBrightRgb']}
+ report['entries'].append(entry);print(c['id'],'PASS' if entry['rawPassed'] and entry['lightmapMatches'] else 'FAIL',max(errors),flush=True)
 report['officialInputsModified']=sha(client)!=source_hash
 complete=run.returncode==0 and capture.get('completed',False) and len(report['entries'])==len(ids) and not report['officialInputsModified']
-report['passed']=complete and all(e['rawPassed'] for e in report['entries'])
-report['lightmapAdjustedPassed']=complete and all(e['lightmapAdjusted']['passed'] for e in report['entries'])
+report['passed']=complete and all(e['rawPassed'] and e['lightmapMatches'] for e in report['entries'])
 save();raise SystemExit(not report['passed'])
