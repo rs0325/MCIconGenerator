@@ -12,27 +12,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-/** ゲーム起動前にQA専用の破損リソースパックを選択する。描画・欠損観測は変更しない。 */
+/** ゲーム起動前にQAリソースパックを選択する。描画・欠損観測は変更しない。 */
 public final class ResourcePackFaultAgent {
     private static String resource;
     private static boolean reported;
     public static void premain(String argument,Instrumentation instrumentation) throws Exception {
-        Path game=Paths.get(argument).getParent().resolve("game");
-        Path packs=game.resolve("resourcepacks");Files.createDirectories(packs);
-        try(InputStream input=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-resource-pack.zip")) {
-            Files.copy(input,packs.resolve("mcicon-qa.zip"));
-        }
-        try(InputStream input=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-resource-pack-options.txt")) {
-            java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();byte[] buffer=new byte[1024];int count;
-            while((count=input.read(buffer))!=-1)out.write(buffer,0,count);
-            Files.write(game.resolve("options.txt"),out.toByteArray(),StandardOpenOption.APPEND);
-        }
-        System.err.println("[mcicon QA] 破損リソースパックを配置: mcicon-qa.zip");
-        try(InputStream input=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-resource-path.txt")) {
-            java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();int value;
-            while((value=input.read())!=-1)out.write(value);
-            resource=new String(out.toByteArray(),"UTF-8");
-        }
+        installPack(Paths.get(argument).getParent().resolve("game"));
         instrumentation.addTransformer(new ClassFileTransformer() {
             public byte[] transform(ClassLoader loader,String name,Class<?> type,ProtectionDomain domain,byte[] bytes) {
                 if(!name.equals("io/github/rs0325/mcicon/worker/Bridge"))return null;
@@ -49,6 +34,24 @@ public final class ResourcePackFaultAgent {
             }
         });
         RenderAgent.premain(argument,instrumentation);
+    }
+    /** 新規workerのgameへ同梱QAパックを配置し、optionsへ選択状態を追記する。 */
+    public static void installPack(Path game) throws Exception {
+        Path packs=game.resolve("resourcepacks");Files.createDirectories(packs);
+        try(InputStream input=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-resource-pack.zip")) {
+            Files.copy(input,packs.resolve("mcicon-qa.zip"));
+        }
+        try(InputStream input=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-resource-pack-options.txt")) {
+            java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();byte[] buffer=new byte[1024];int count;
+            while((count=input.read(buffer))!=-1)out.write(buffer,0,count);
+            Files.write(game.resolve("options.txt"),out.toByteArray(),StandardOpenOption.APPEND);
+        }
+        System.err.println("[mcicon QA] QAリソースパックを配置: mcicon-qa.zip");
+        try(InputStream input=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-resource-path.txt")) {
+            java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();int value;
+            while((value=input.read())!=-1)out.write(value);
+            resource=new String(out.toByteArray(),"UTF-8");
+        }
     }
     public static void reportPack() {
         if(reported)return;reported=true;

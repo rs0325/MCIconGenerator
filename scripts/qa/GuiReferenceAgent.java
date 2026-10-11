@@ -33,6 +33,7 @@ public final class GuiReferenceAgent {
         fixed=config.get("version").getAsString().equals("1.14.4");
         if(!legacy&&!fixed&&!pearl&&!config.get("version").getAsString().equals("1.21.4"))throw new IllegalArgumentException("対応する参照fixtureは1.13、1.14.4、1.21.4、26.3です");
         Files.write(Paths.get(argument).getParent().resolve("game/options.txt"),"soundCategory_master:0.0\nguiScale:4\nmaxFps:30\nfullscreen:false\nonboardAccessibility:false\n".getBytes("UTF-8"));
+        if(fixture.has("resourcePack"))ResourcePackFaultAgent.installPack(Paths.get(argument).getParent().resolve("game"));
         final String title=legacy?"net.minecraft.client.gui.screen.TitleScreen":"net.minecraft.client.gui.screens.TitleScreen";
         final String screen=legacy?"net.minecraft.client.gui.screen.Screen":"net.minecraft.client.gui.screens.Screen";
         final String screenMethod=symbols.methodName(pearl?title:screen,pearl?"extractRenderState":"render",legacy||fixed?3:4);
@@ -96,6 +97,7 @@ public final class GuiReferenceAgent {
                 if(pearl&&symbols.call("net.minecraft.client.gui.Gui","overlay",symbols.field("net.minecraft.client.Minecraft","gui",minecraft))!=null)return;
                 // Share only registry/bootstrap initialization, never export target/view/render methods.
                 catalog=legacy?new LegacyRenderer(symbols,minecraft):fixed?new FixedRenderer(symbols,minecraft):pearl?new LatestRenderer(symbols,minecraft):new ModernRenderer(symbols,minecraft);
+                if(fixture.has("resourcePack"))ResourcePackFaultAgent.reportPack();
                 JsonObject hello=new JsonObject();hello.addProperty("type","ready");hello.addProperty("protocolVersion",1);hello.addProperty("renderer","QA native screen / "+catalog.environment());hello.addProperty("animationFrameZero",animationHook());hello.addProperty("contextProfile","fixed-v1");emit(hello);ready=true;
             }
             if(pending!=null)return;
@@ -133,8 +135,24 @@ public final class GuiReferenceAgent {
                 symbols.call(owner,pearl?"item":"renderItem",graphics,stack,x,y);
                 if(!pearl)symbols.call(owner,"flush",graphics);
             }
+            if(fixture.has("framebufferProbe"))recordFramebuffer();
             drawn=true;
         }catch(Throwable e){fail(e);}
+    }
+    private static void recordFramebuffer() throws Exception {
+        Path path=Paths.get(fixture.get("captureFolder").getAsString()).resolve("framebuffer.json");
+        if(Files.exists(path))return;
+        String gl="org.lwjgl.opengl.GL11",gl30="org.lwjgl.opengl.GL30";
+        JsonObject state=new JsonObject();
+        state.addProperty("framebuffer",((Number)symbols.call(gl,"glGetInteger",null,36006)).intValue());
+        state.addProperty("srgbEnabled",(Boolean)symbols.call(gl,"glIsEnabled",null,36281));
+        String[] channels={"red","green","blue","alpha"};
+        for(int i=0;i<channels.length;i++) {
+            state.addProperty(channels[i]+"Bits",((Number)symbols.call(gl30,"glGetFramebufferAttachmentParameteri",null,36160,36064,0x8212+i)).intValue());
+        }
+        state.addProperty("colorEncoding",((Number)symbols.call(gl30,"glGetFramebufferAttachmentParameteri",null,36160,36064,33296)).intValue());
+        state.addProperty("glError",((Number)symbols.call(gl,"glGetError",null)).intValue());
+        Files.createDirectories(path.getParent());Files.write(path,new Gson().toJson(state).getBytes("UTF-8"));
     }
     private static Object stack(String id) throws Exception {
         if(legacy) {

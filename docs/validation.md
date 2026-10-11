@@ -173,6 +173,28 @@ python3 scripts/verify-gui-reference.py --versions 1.14.4 \
 
 破損ドラゴンPNG・チェストPNG、および描画前にロード済みの破損ドラゴンPNGの3ケースはMISSING_TEXTURE、対象PNG未出力、同じworkerのwheat成功・基準RGBA一致を確認しました。事前ロードfixtureは古いgetTextureがキャッシュ参照だけだったためbindによるロードへ修正し、1.21.4でも事前ロードの回帰を確認しました。最初のfixture失敗は成功に数えず記録します。公式入力は変更していません。JUnit59件とCLIビルドは成功し、重点反証では新しい確定問題は見つかりませんでした。対象ID・入力・worker・QA helper・画像hashは[数値記録](../qa/validation-2026-10-11-classic-bootstrap.json)に保存しています。最新workerでの全51版再実行は行っておらず、以前の51版記録と今回の3版検証を区別します。全版experimental/deterministic=falseを維持します。
 
+## 1.21.4の色・alpha復元とsRGB指定（2026-10-11）
+
+Issue #6 / PR #16の継続で、起点は2e280f5です。PNGの画素はRGBA8でしたが色空間の指定がなかったため、共通保存処理でsRGB chunk（Perceptual）を付けます。RGB・alphaの計算やraw抽出は変えません。PNG bytes・SHA-256は変わるため、以前のiconsを使う場合は新しい出力先で再生成してください。既存manifestは新しいagent/settings digestと区別されます。
+
+1.21.4のガラス・氷・スライム・ハチミツ・着色・glint等15種類を黒、白、灰、青緑、赤系、緑系の6背景で通常GUIと比較します。さらに16pxの既知RGBAを持つQAパックで、1層と2層のgenerated-modelを通常のitem shaderへ渡します。実shaderのalpha<0.1 discardを含むsource-overを、ゲームクラス・GPU・PngOutputを使わない数値oracleで計算します。透明画素の隠れたRGB、上下方向、低alphaでのstraight RGB量子化、重ね順を検証します。許容範囲は今回の固定パレット・2層までのfixtureに限ります。
+
+```sh
+python3 scripts/verify-alpha-textures.py --out .local/alpha-calibration
+python3 scripts/verify-gui-reference.py --versions 1.21.4 --framebuffer-probe \
+  --ids glass ice slime_block honey_block enchanted_book \
+  --backgrounds 000000 ffffff 7f7f7f 206080 c02040 20c040 \
+  --out .local/alpha-vanilla --compare .local/qa-output
+```
+
+最終workerの1.21.4全1,384枚と9描画境界版の代表54枚は、以前の正しい基準とdecoded RGBA・パスが一致しました。全1,438枚のIHDR 8bit RGBA、sRGB Perceptual、PNG integrityを確認しました。全51版の全件再実行とは区別します。1.21.4の全件比較元は1a5f394時点のworker、1.14.4の比較元は初期化修正後の2e280f5です。
+
+バニラ15種類×6背景の90比較、既知RGBAの2種類＋正常wheat×6背景の18比較は、全て最大RGB誤差2/255以内でした。独立数値oracleの8,192pixelでは、1層のalpha誤差0・最大straight RGB誤差5、2層のalpha誤差0.875未満・最大straight RGB誤差2.021未満です。alphaが小さいと8bit readbackの量子化を除算で拡大するため、straight RGBだけの固定誤差上限では判定しません。alpha誤差は1段階以内、premultiplied RGB誤差は最大1.245未満で、各pixelが今回の量子化上限内でした。shaderでdiscardされる透明画素のRGBも0でした。RGBA各8bit・GL_LINEARのframebufferで、sRGB変換は無効、観測GL errorは全て0でした。
+
+共用QAパック配置を使う欠損モデル・直接テクスチャの2ケースも成功し、対象PNGの未出力と正常wheatの基準一致を確認しました。JUnit60件とCLIビルドは成功しました。重点反証で指摘された提供元のfile/ prefix判定と、GUI失敗時に全成功を残し得るQA記録は修正しました。入力・shader・worker・QA helper・画像hashと修正前の対照は[数値記録](../qa/validation-2026-10-11-alpha-srgb.json)に保存します。
+
+framebuffer観測は通常GUIの描画後に行い、GL bindingや描画設定を変えません。glGetErrorはerror flagを読むため、観測時に0であることも受入条件にします。通常GUI fixtureはfixed-v1 hookとbootstrapを共有し、無改変ワールド内inventoryの独立基準ではありません。sRGB指定と通常GUIとのbyte RGB一致を、物理的に正しいlinear-light合成や全モデル・GPU・driverの色保証として扱いません。全版experimental/deterministic=falseとIssueの未完了条件を維持します。
+
 ## 未完了の受入検証
 
 - 一過性の準備IO_FAILEDの原因特定、全IDの個別/all一致、無改変のワールド内inventory基準画像、特殊モデル・着色・glint・時計/コンパスの意味的な比較。

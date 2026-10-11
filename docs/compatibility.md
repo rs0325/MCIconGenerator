@@ -62,4 +62,6 @@
 
 1.14.4では同じ参照補完が抜けていたため、特殊59種類が直前のテクスチャへ依存していました。修正後の876件を監査し、影響59種類とwheatの個別指定・全件比較、および通常GUI fixtureの2背景比較が成功しました。以前の全件反復一致は画像の正しさを保証するものではありません。版別結果と対象IDは[1.14.4初期化の数値記録](../qa/validation-2026-10-11-classic-bootstrap.json)を参照してください。
 
+iconsのPNGへsRGB Perceptualの指定を追加しました。最終workerで1.21.4全1,384枚と9描画境界版の代表54枚のdecoded RGBA・パスが以前の正しい基準と一致し、PNG bytes・hashはmetadata追加で変わります。通常GUIの6背景比較と既知RGBAの検証は[色・alphaの数値記録](../qa/validation-2026-10-11-alpha-srgb.json)を参照してください。全51版の全件再実行や全モデルの色空間受入とは区別します。
+
 ホストmacOS Apple Silicon＋Colima/Rosetta上のLinux amd64 containerを検証しています。Windows/Linux host、Docker Desktop、host native、Linux ARM64 imageは未検証です。GitHub Actionsは使用しません。
