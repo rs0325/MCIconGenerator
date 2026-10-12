@@ -123,6 +123,33 @@ class ResourceGuardTest {
             ResourceGuard.end();CanonicalContext.end();
         }
     }
+    @Test void packedQuadAccessorsPreserveDataAndObserveMissingSprite() throws Exception {
+        symbols(false);Path mapping=directory.resolve("mappings.txt");String owner="fixture/PackedQuad",parent=Type.getInternalName(FieldOnlyQuad.class),sprite=Type.getInternalName(Sprite.class);
+        Files.write(mapping,("net.minecraft.client.renderer.block.model.BakedQuad -> "+FieldOnlyQuad.class.getName()+":\n"
+            +"    net.minecraft.client.renderer.texture.TextureAtlasSprite sprite -> sprite\n"
+            +"    org.joml.Vector3fc position(int) -> p\n    long packedUV(int) -> u\n"
+            +"org.joml.Vector3fc -> java.lang.Object:\n").getBytes("UTF-8"),StandardOpenOption.APPEND);
+        Symbols symbols=new Symbols(mapping);RenderAgent.symbols=symbols;ClassWriter writer=new ClassWriter(0);
+        writer.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,owner,null,parent,null);
+        MethodVisitor method=writer.visitMethod(Opcodes.ACC_PUBLIC,"<init>","(L"+sprite+";)V",null,null);
+        method.visitCode();method.visitVarInsn(Opcodes.ALOAD,0);method.visitMethodInsn(Opcodes.INVOKESPECIAL,parent,"<init>","()V",false);
+        method.visitVarInsn(Opcodes.ALOAD,0);method.visitVarInsn(Opcodes.ALOAD,1);method.visitFieldInsn(Opcodes.PUTFIELD,parent,"sprite","L"+sprite+";");method.visitInsn(Opcodes.RETURN);method.visitMaxs(2,2);method.visitEnd();
+        method=writer.visitMethod(Opcodes.ACC_PUBLIC,"p","(I)Ljava/lang/Object;",null,null);method.visitCode();
+        method.visitVarInsn(Opcodes.ALOAD,0);method.visitFieldInsn(Opcodes.GETFIELD,parent,"sprite","L"+sprite+";");method.visitInsn(Opcodes.ARETURN);method.visitMaxs(1,2);method.visitEnd();
+        method=writer.visitMethod(Opcodes.ACC_PUBLIC,"u","(I)J",null,null);method.visitCode();
+        method.visitVarInsn(Opcodes.ILOAD,1);method.visitInsn(Opcodes.I2L);method.visitLdcInsn(17L);method.visitInsn(Opcodes.LADD);method.visitInsn(Opcodes.LRETURN);method.visitMaxs(4,2);method.visitEnd();writer.visitEnd();
+        final byte[] bytes=new ResourceTransformer(symbols,false).transformGameClass(parent,writer.toByteArray());
+        Class<?> type=new ClassLoader(){Class<?> define(){return defineClass(null,bytes,0,bytes.length);}}.define();
+        Sprite missing=new Sprite("minecraft:missingno"),normal=new Sprite("minecraft:block/stone");
+        Object bad=type.getConstructor(Sprite.class).newInstance(missing),healthy=type.getConstructor(Sprite.class).newInstance(normal);
+        Method position=type.getMethod("p",int.class),uv=type.getMethod("u",int.class);ResourceGuard.begin();
+        assertSame(missing,position.invoke(bad,0));assertEquals(19L,uv.invoke(bad,2));ResourceGuard.check();
+        CanonicalContext.begin();assertSame(normal,position.invoke(healthy,0));assertEquals(19L,uv.invoke(healthy,2));ResourceGuard.check();
+        assertSame(missing,position.invoke(bad,0));
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+        ResourceGuard.end();ResourceGuard.begin();assertEquals(19L,uv.invoke(bad,2));
+        assertEquals("MISSING_TEXTURE",assertThrows(ResourceGuard.MissingResourceException.class,ResourceGuard::check).code);
+    }
     @Test void specialAtlasLookupPreservesTheSpriteAndDetectsFallback() throws Exception {
         Symbols symbols=symbols(false);Path mapping=directory.resolve("mappings.txt");
         Files.write(mapping,("net.minecraft.client.renderer.texture.TextureAtlas -> fixture.Atlas:\n"

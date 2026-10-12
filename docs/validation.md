@@ -356,6 +356,39 @@ python3 scripts/verify-gui-reference.py --versions 26.3 --cache .local/cache \
   --ids copper_chest copper_golem_statue copper_chestplate copper_spear straw_bed
 ```
 
+## Issue #12の正式51版カバレッジ受入（2026-10-12）
+
+PR #20をmergeしたmainの507e372を起点に、固定した正式51版の登録集合・欠損・空画像を検証しました。修正後のworkerで全60,265PNGを新規生成し、登録母集団・no_item_form・件数・ID/パス重複・PNG hash/CRC・RGBA8・size・隠れた透明RGB・空画像を監査しました。#10/#11の正常基準とdecoded RGBA・PNG hash・パスが厳密一致し、入力・catalog・context・環境・rendererも一致しました。
+
+catalogの重複判定は(id,kind)を単位にします。以前の(id,kind,status)では、同じ種別・IDの状態だけが違う重複を見逃しました。未知のkind/statusもskipせず拒否します。1.13・1.13.1・1.13.2のwheat/nether_wartには、登録itemとno_item_form blockが同じIDで別kindを持つ正常なケースがあるため、IDだけの一律重複判定は使いません。available itemのID重複はkindにかかわらず拒否します。正常な種別横断ID、同種別の状態違い、未知状態、登録アイテム欠落、重複ID/パス、PNG差し替え、全画素透明PNGを確認する9テストが成功しました。
+
+実bytecodeでの欠損観測APIの依存照合は51版すべて成功しました。実際の破損パックで、atlasのstone PNGと直接参照されるdragon PNGを各51版で破損させ、欠損診断を確認しました。さらに12境界版で破損モデルJSON、特殊チェストPNG、空モデル、直接textureの事前ロード後のキャッシュ取得を確認しています。合計150ケースで、選択対象のPNG未出力・診断・公式入力不変・QAパック由来・同じworkerのwheat継続と正常基準RGBA/パス一致が成功しました。描画や欠損observerを置換するfixtureではなく、ゲーム自身にパックを読み込ませます。モデル破損の診断は、バニラが選んだfallbackによりMISSING_MODELまたはMISSING_TEXTUREになります。
+
+初回のatlas/直接textureには、1.17〜1.18.1でQAの提供元確認に失敗した各4版を保存します。getResourceの宣言元ResourceProviderへmappingsを適用する修正後、該当4版を各faultで再実行して成功しました。さらに1.21.11のatlasでは、実際に破損stone PNGのfallbackを正常出力してしまうproductionの欠損検出漏れが見つかりました。同版のBakedQuadは頂点配列getterを持たず、position(int)/packedUV(int)を消費します。これらの入口でも保持spriteを観測する修正で、MISSING_TEXTURE・対象PNG未出力・正常wheatの継続とRGBA一致を確認しました。元の戻り値と描画処理は維持します。
+
+150成功ケースは初回93成功と、提供元QA修正後8ケース、production修正後の1.21.11再試験1ケース、12境界版の初回47成功と事前ロードQA修正後1ケースを集約します。初回失敗10ケースを含む実行数は160です。1.16.5ではgetTextureがキャッシュ参照だけでも型がAbstractTextureへ変わっていたため、QAの事前ロードをTextureManager.bindの有無で選択するよう修正しました。実bytecode照合で追加getterの対象は1.21.11だけと確認し、他版の変更していない観測経路では初回成功を再利用します。ケースごとのworker/helper hashと初回FAILを保存し、全ケースを新workerで実行したとは扱いません。新workerの正常全件生成は51版すべて再実行しています。
+
+空画像の判定は全画素alpha=0です。空モデルのnative描画ではRENDER_FAILEDの具体理由を確認し、PNGを残さず正常アイテムへ継続します。部分的な輪郭や透明領域の意味的な誤りを、空画像判定で検出できるとは扱いません。QAは1.21.11のIdentifier改名と、旧版のbind/getによる事前ロードへ対応し、空モデル検証の版制限を外しました。coreは変更していません。正常PNG bytes・RGBA・パスは不変ですが、worker hashとsettingsDigestが変わるため、以前のmanifestへ再開せず新しい出力先で再生成してください。未リリースのため旧設定への互換処理は追加しません。
+
+JUnit62件とCLI buildが成功しました。[版別登録・除外・bytecode・正常PNG・破損パックの数値記録](../qa/validation-2026-10-12-release-coverage.json)に根拠を保存します。全版experimental/deterministic=false・verified版0を維持します。全model/状態/サイズ・無計装world・画像の意味・全GPU cache/OS経路・色精度・障害受入は#13等で継続し、マイルストーンは未完了です。実装・検証の完了とPR公開・merge・Issue closeは区別します。
+
+```sh
+python3 scripts/test-export-audit.py
+python3 scripts/verify-resource-capabilities.py --cache .local/cache --out .local/coverage-capabilities
+# 入力cache・CLI・Docker imageを事前準備し、compareへ現workerの正常全件出力を指定する。
+python3 scripts/verify-resource-faults.py --injection resource-pack \
+  --faults texture direct-texture --out .local/coverage-textures \
+  --versions 1.13 1.14.4 1.21.11 26.3 --compare .local/coverage-normal
+python3 scripts/verify-resource-faults.py --injection resource-pack \
+  --faults model special-texture empty-model --out .local/coverage-models \
+  --versions 1.13 1.14.4 1.21.4 26.3 --compare .local/coverage-normal
+python3 scripts/verify-resource-faults.py --injection resource-pack --preload-direct-texture \
+  --faults direct-texture --out .local/coverage-cached \
+  --versions 1.13 1.14.4 1.21.4 26.3 --compare .local/coverage-normal
+```
+
+上のnativeコマンドは部分集合の再実行例です。全51版と12境界版のexact IDは数値記録に保存します。欠損対象のCLI終了値3を期待するテストであり、通常生成の成功とは区別します。画像・公式入力・破損パック・QA agent・workerログは公開配布物に含めません。実測環境はmacOS Apple Silicon＋Colima/Rosetta・Linux amd64・Mesa llvmpipeです。
+
 ## 未完了の受入検証
 
 - Issue #13: 一過性の準備IO_FAILED・起動WORKER_TIMEOUTの原因特定、1.21.4以外の照明基準、完全な無計装clientの基準画像、全版/全modelへの比較拡張と動的表現の受入。

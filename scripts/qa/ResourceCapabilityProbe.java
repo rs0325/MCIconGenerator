@@ -15,7 +15,7 @@ public final class ResourceCapabilityProbe {
     }
     public static void main(String[] args) throws Exception {
         boolean legacy=Boolean.parseBoolean(args[3]);Symbols s=new Symbols(args[2].equals("-")?null:Path.of(args[2]));
-        List<String> failures=new ArrayList<>();int checked=0;boolean removedGetter=false;
+        List<String> failures=new ArrayList<>();List<String> packedAccessors=new ArrayList<>();int checked=0;boolean removedGetter=false;
         try(ZipFile jar=new ZipFile(args[1])) {
             String sprite=legacy?"net.minecraft.client.render.texture.TextureAtlasSprite":"net.minecraft.client.renderer.texture.TextureAtlasSprite";
             Members sm=members(jar,s,sprite);
@@ -69,6 +69,8 @@ public final class ResourceCapabilityProbe {
             if(jar.getEntry(s.actualClass(quad).replace('.','/')+".class")!=null) {
                 Members qm=members(jar,s,quad);String field=s.fieldName(quad,"sprite");
                 if(!descriptor(s,sprite).equals(qm.fields.get(field)))failures.add("Missing quad sprite field or wrong descriptor");
+                if(qm.methods.contains(s.methodName(quad,"position",1)+"(I)"+descriptor(s,"org.joml.Vector3fc")))packedAccessors.add("position(int)");
+                if(qm.methods.contains(s.methodName(quad,"packedUV",1)+"(I)J"))packedAccessors.add("packedUV(int)");
                 if(legacy||s.hasMethod(quad,"getSprite",0))removedGetter=!qm.methods.contains(s.methodName(quad,"getSprite",0)+"()"+descriptor(s,sprite));
                 checked++;
             } else {
@@ -90,7 +92,7 @@ public final class ResourceCapabilityProbe {
                 requireMethod(members(jar,s,missing),s.methodName(missing,"update",7),7,"MissingItemModel.update",failures);checked++;
             }
         }
-        System.out.println(new Gson().toJson(Map.of("version",args[0],"checkedClasses",checked,"mappedQuadGetterRemoved",removedGetter,"failures",failures)));
+        System.out.println(new Gson().toJson(Map.of("version",args[0],"checkedClasses",checked,"mappedQuadGetterRemoved",removedGetter,"packedQuadAccessors",packedAccessors,"failures",failures)));
         if(!failures.isEmpty())System.exit(1);
     }
     private static String descriptor(Symbols s,String name){return "L"+s.actualClass(name).replace('.','/')+";";}

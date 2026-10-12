@@ -17,7 +17,7 @@ p.add_argument('--injection',choices=['observer','resource-pack'],default='obser
 a=p.parse_args();out=a.out.resolve();out.mkdir(parents=True,exist_ok=False)
 if len(a.faults)!=len(set(a.faults)) or len(a.versions)!=len(set(a.versions)):p.error('Use unique faults and versions')
 if any(f in a.faults for f in ['special-texture','direct-texture']) and a.injection!='resource-pack':p.error('特殊・直接テクスチャは resource-pack 専用です')
-if 'empty-model' in a.faults and (a.injection!='resource-pack' or a.versions!=['1.21.4']):p.error('空モデルは1.21.4の resource-pack 専用です')
+if 'empty-model' in a.faults and a.injection!='resource-pack':p.error('空モデルは resource-pack 専用です')
 if 'render-error' in a.faults and (a.injection!='observer' or a.versions!=['1.21.4']):p.error('描画例外は1.21.4の observer 専用です')
 helper='ResourcePackFaultAgent' if a.injection=='resource-pack' else 'ResourceFaultAgent'
 sources={str(path.relative_to(repo)):hashlib.sha256(path.read_bytes()).hexdigest() for path in [Path(__file__).resolve(),repo/('scripts/qa/'+helper+'.java')]}
