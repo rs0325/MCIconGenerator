@@ -294,6 +294,35 @@ python3 scripts/verify-single-all.py --version 1.21.4 --size 64 \
 
 事前にCLIをbuildし、同じworktreeのcacheへ公式入力を準備してください。検証はofflineで実行し、途中結果は指定出力先の`report.json`へ原子的に保存します。画像・ゲーム入力・workerログは公開リポジトリへ含めません。2並列はこの検証に使った上限で、他環境の速度・メモリ保証ではありません。今回の受入は1.21.4・64px・ローカルDocker/Linux amd64/Mesaに限定し、全版・全サイズ・他OS/GPUの品質受入と区別します。experimental/deterministic=falseを維持します。実装・検証の完了と、PR公開・merge・Issue closeは別の段階です。
 
+## Issue #10の旧38版adapterの受入（2026-10-12）
+
+PR #18をmergeしたmainのa51bf0aを起点に、1.13〜1.21.3の正式38版を検証しました。現workerで全41,056PNGを生成し、全版の登録アイテム数・出力・RGBA8/sRGB・透過を監査しました。代表26種類を別のCLI・ゲームプロセスで版ごとに再生成し、988PNGすべてが全件基準とdecoded RGBA・PNG hash・パスの厳密一致です。入力・設定・固定context・環境・renderer・catalogも一致しました。これは各IDごとにゲームを起動する全ID個別比較とは区別します。
+
+通常GUI参照をlegacy、fixed、classic、GuiGraphicsの実API差へ対応させました。GUI原点(0,0)、guiScale4、1280×960画面、64px、灰色・青色の2背景で、38版×26種類×2背景の1,976比較が成功しました。PNGを背景へbyte RGB合成し、各channel誤差2/255以内・参照alpha255を条件とします。参照はproductionの固定化とregistry/bootstrapだけを共有し、exportのtarget・view・render・PNG保存を使いません。既定stackのbow、時計・コンパス・animation・glint、着色、半透明、GUI transformと特殊モデルを含みます。任意のNBT/componentsや引き絞り状態、実ワールド・無計装clientの一致は保証しません。
+
+参照QAの初回では1.14.3のoverlayフェードと1.17.1の背景へのshader色の持ち越しが不一致を起こしました。overlay終了待ちと、公式InventoryScreenと同じ背景描画前の白shader色設定で解消しました。productionの描画・出力PNG・workerは変更していません。初回の失敗、修正時点のhelper hash、再検証を区別して保存します。
+
+1.20.6のplayer_headはGUI位置(32,32)で33画素、最大78/255の色差があり、輪郭は同じです。原点の比較は成功しました。ユーザーが提示画像を確認し、この確認済みの位置差を許容して#10を原点基準で受け入れました。位置(32,32)のraw FAILは維持し、原因は未確定です。比較の許容値や一般的な例外条件は変更せず、他位置・実ワールド・GPUの比較は#13に残します。
+
+元JARの無着色diamondを、ゲームクラス・GPU・固定化hookを使わず計算した38ケースもRGB・alpha誤差0でした。既定3版の計算8ケースは成功しましたが、26.3は以前のworkerの保存PNGを再比較した回帰確認で、現workerの26.3 native受入とは区別します。通常GUIの既存1.21.4・26.3は2背景80比較が成功しました。26.3のmappingsなし分岐を旧版用の照合条件へ混ぜた初回失敗を保存し、専用分岐を復元しました。最終helperでも旧版3境界の各20種類・灰色背景60比較が成功しました。全38版の比較時と最終helperのhashを分けて記録します。JUnit61件とCLI buildが成功しています。[版別入力・監査・比較・初回失敗の数値記録](../qa/validation-2026-10-12-classic-adapter-acceptance.json)に根拠を保存します。
+
+```sh
+# 最新版を流用せず、固定した正式版一覧から対象38版を選ぶ。
+python3 - <<'PY'
+import json, subprocess
+from pathlib import Path
+releases = [v['id'] for v in json.loads(Path('adapters/releases.json').read_text())['versions']]
+versions = list(reversed(releases[releases.index('1.21.3'):]))
+ids = 'stone cobblestone_stairs oak_slab oak_fence diamond bow chest ender_chest white_bed white_banner shield player_head dragon_head white_shulker_box glass white_stained_glass ice grass_block oak_leaves potion creeper_spawn_egg leather_chestplate clock compass enchanted_book prismarine'.split()
+subprocess.run(['python3', 'scripts/verify-matrix.py', '--offline', '--cache', '.local/cache', '--out', '.local/classic-all', '--versions', *versions], check=True)
+subprocess.run(['python3', 'scripts/verify-matrix.py', '--offline', '--cache', '.local/cache', '--out', '.local/classic-repeat', '--compare', '.local/classic-all', '--versions', *versions, '--ids', *['minecraft:' + i for i in ids]], check=True)
+subprocess.run(['python3', 'scripts/verify-gui-reference.py', '--cache', '.local/cache', '--out', '.local/classic-gui', '--compare', '.local/classic-all', '--position', '0', '0', '--versions', *versions, '--ids', *ids], check=True)
+subprocess.run(['python3', 'scripts/verify-flat-textures.py', '--cache', '.local/cache', '--out', '.local/classic-flat', '--compare', '.local/classic-all', '--versions', *versions], check=True)
+PY
+```
+
+CLIを事前にbuildし、各版の公式入力とDocker imageを同じworktreeへ準備してください。出力先は新規に指定します。今回の実測環境はmacOS Apple Silicon・Colima/Rosetta・Linux amd64・Mesa llvmpipeです。全版experimental/deterministic=false、verified版0を維持し、実装・検証の完了とPR公開・merge・Issue closeは別の段階です。
+
 ## 未完了の受入検証
 
 - Issue #13: 一過性の準備IO_FAILED・起動WORKER_TIMEOUTの原因特定、1.21.4以外の照明基準、完全な無計装clientの基準画像、全版/全modelへの比較拡張と動的表現の受入。

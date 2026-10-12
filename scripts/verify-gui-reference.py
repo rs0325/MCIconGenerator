@@ -8,8 +8,10 @@ PngOutput. This is not an uninstrumented in-world inventory screenshot.
 import argparse,hashlib,importlib.util,json,shutil,subprocess,tempfile,uuid,zipfile
 from pathlib import Path
 repo=Path(__file__).resolve().parents[1]
+releases=[v['id'] for v in json.loads((repo/'adapters/releases.json').read_text())['versions']]
+reference_versions=releases[releases.index('1.21.4'):]+['26.3']
 p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True)
-p.add_argument('--versions',nargs='+',choices=['1.13','1.14.4','1.21.4','26.3'],default=['1.13','1.21.4','26.3'])
+p.add_argument('--versions',nargs='+',choices=reference_versions,default=['1.13','1.21.4','26.3'])
 p.add_argument('--cache',type=Path,default=repo/'.local/cache')
 p.add_argument('--cli',type=Path,default=repo/'cli/build/install/mcicon/bin/mcicon')
 p.add_argument('--compare',type=Path,required=True,help='64px transparent full-export baseline')
