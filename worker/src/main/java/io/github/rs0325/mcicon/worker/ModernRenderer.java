@@ -9,19 +9,28 @@ import java.util.*;
 public class ModernRenderer implements WorkerRenderer {
     protected final Symbols s;
     protected final Object minecraft,items,blocks;
+    private final boolean inventoryView;
     public ModernRenderer(Symbols symbols,Object minecraft) throws Exception {
         this.s=symbols; this.minecraft=minecraft;
         String registries=(RenderAgent.config.get("version").getAsString().startsWith("26.")||s.hasField("net.minecraft.core.registries.BuiltInRegistries","ITEM"))?"net.minecraft.core.registries.BuiltInRegistries":"net.minecraft.core.Registry";
         items=s.field(registries,"ITEM",null);
         blocks=s.field(registries,"BLOCK",null);
-        if(RenderAgent.config.get("version").getAsString().equals("1.21.4")) {
+        String version=RenderAgent.config.get("version").getAsString();
+        inventoryView=version.equals("1.20.6");
+        if(version.equals("1.20.6")||version.equals("1.21.4")) {
             Object gameRenderer=s.field("net.minecraft.client.Minecraft","gameRenderer",minecraft);
             Object light=s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",gameRenderer);
-            Object target=s.field("net.minecraft.client.renderer.LightTexture","target",light);
             // 実ワールドのfull-bright lightmapと同じ252/255へ初期化する。
-            s.call("com.mojang.blaze3d.pipeline.RenderTarget","setClearColor",target,0.99f,0.99f,0.99f,1f);
-            s.call("com.mojang.blaze3d.pipeline.RenderTarget","clear",target);
-            bindTarget(s.call("net.minecraft.client.Minecraft","getMainRenderTarget",minecraft));
+            if(version.equals("1.20.6")) {
+                Object pixels=s.field("net.minecraft.client.renderer.LightTexture","lightPixels",light);
+                for(int y=0;y<16;y++)for(int x=0;x<16;x++)s.call("com.mojang.blaze3d.platform.NativeImage","setPixelRGBA",pixels,x,y,0xfffcfcfc);
+                s.call("net.minecraft.client.renderer.texture.DynamicTexture","upload",s.field("net.minecraft.client.renderer.LightTexture","lightTexture",light));
+            } else {
+                Object target=s.field("net.minecraft.client.renderer.LightTexture","target",light);
+                s.call("com.mojang.blaze3d.pipeline.RenderTarget","setClearColor",target,0.99f,0.99f,0.99f,1f);
+                s.call("com.mojang.blaze3d.pipeline.RenderTarget","clear",target);
+                bindTarget(s.call("net.minecraft.client.Minecraft","getMainRenderTarget",minecraft));
+            }
         }
     }
     public String environment() throws Exception {
@@ -72,6 +81,11 @@ public class ModernRenderer implements WorkerRenderer {
             s.setField("net.minecraft.client.Minecraft","mainRenderTarget",minecraft,target);
             clearTarget(target,oldTarget);
             bindTarget(target);
+            if(inventoryView) {
+                int scale=size/16;
+                // 通常インベントリの投影・スロット位置を、小さな描画先へ切り出す。
+                s.call("org.lwjgl.opengl.GL11","glViewport",null,-80*scale,-103*scale,320*scale,240*scale);
+            }
             view=setupView(oldTarget);
             setupLighting();
             drawItem(stack);
@@ -92,7 +106,7 @@ public class ModernRenderer implements WorkerRenderer {
         if(s.hasClass("com.mojang.math.Matrix4f"))projection=s.call("com.mojang.math.Matrix4f","orthographic",null,16f,-16f,1000f,21000f);
         else {
             projection=s.construct("org.joml.Matrix4f");
-            s.call("org.joml.Matrix4f","setOrtho",projection,0f,16f,16f,0f,1000f,21000f);
+            s.call("org.joml.Matrix4f","setOrtho",projection,0f,inventoryView?320f:16f,inventoryView?240f:16f,0f,1000f,21000f);
         }
         if(s.hasMethod("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",1))s.call("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",null,projection);
         else {
@@ -125,7 +139,7 @@ public class ModernRenderer implements WorkerRenderer {
         Object buffers=s.call("net.minecraft.client.Minecraft","renderBuffers",minecraft);
         Object source=s.call("net.minecraft.client.renderer.RenderBuffers","bufferSource",buffers);
         Object graphics=s.construct("net.minecraft.client.gui.GuiGraphics",minecraft,source);
-        s.call("net.minecraft.client.gui.GuiGraphics","renderItem",graphics,stack,0,0);
+        s.call("net.minecraft.client.gui.GuiGraphics","renderItem",graphics,stack,inventoryView?80:0,inventoryView?121:0);
         s.call("net.minecraft.client.gui.GuiGraphics","flush",graphics);
     }
     protected Object createTarget(int size,boolean oldTarget) throws Exception {

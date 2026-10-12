@@ -20,6 +20,8 @@ exit 0=成功、1=起動/IO等の致命エラー、2=不正な引数/版/ID、3=
 
 UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1、contextProfile=fixed-v1、animationFrameZero=trueであることを要求します。profile/hookの不一致はWORKER_CONTEXT_MISMATCHです。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致は致命エラーにします。requestは1MiB、responseは16MiBを上限とします。待受ポートは使いません。
 
+requestは整形なしでserializeし、文字列内の改行はJSON escapeで保持します。WindowsのCRLFもJSONの途中へ混入させず、行末だけに使います。
+
 ```json
 {"type":"ready","protocolVersion":1,"renderer":"llvmpipe / OpenGL","contextProfile":"fixed-v1","animationFrameZero":true}
 {"requestId":"1","command":"catalog"}
@@ -46,11 +48,17 @@ countsはそのmanifestに蓄積した成功/失敗の数です。選択IDは書
 
 再開は元JAR、settings digest、renderer、保存PNG/sidecar hashを照合し、一致した成功だけ再利用します。iconsのsettingsにはversion metadata・mappings・agentのSHA-256とDocker image IDを含めます。Dockerのtagは起動前にimage IDへ解決し、そのIDでworkerを起動します。旧版mappingsは固定SHA-1のTinyを毎回検証・合成します。
 
+metadataと設定のhashに使う整形JSONはUTF-8・LFでserializeし、同じ入力がホストの改行形式だけで別のhashにならないようにします。以前のWindows出力はhashが変わるため、新しい出力先へ再生成してください。以前のMac/LinuxのLF形式は維持します。
+
 ## fixed-v1とcanonical-v1の受入
 
 fixed-v1はcount=1、既定ItemStack、overlayなし、world/playerなし、partialTick=0です。ゲーム内の暦日を2000-01-01 UTCにし、描画中の経過時刻を1000msに固定します。0msでは初期化を時刻で判定するバニラcacheに影響するため、正の定数を使います。worker自身のtimeout時計は固定しません。
 
-1.21.4のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。以前の1.21.4はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
+Dockerfileはsoftware描画に加え、Mesa llvmpipeの`LP_NATIVE_VECTOR_WIDTH=128`と`GALLIUM_OVERRIDE_CPU_CAPS=sse4.1`を指定します。CPUによる最適化の差を抑えるための条件で、[Mesaの環境変数](https://docs.mesa3d.org/envvars.html)と[llvmpipeの指定](https://docs.mesa3d.org/drivers/llvmpipe.html)に従います。実行CPUまたはエミュレーションにSSE4.1が必要です。Docker image更新でsettings digestが変わるため、以前のiconsは新しい出力先へ再生成してください。任意のMesa/LLVM版・CPU・GPUでのRGBA一致を保証するものではありません。
+
+1.20.6と1.21.4のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。以前の1.20.6と1.21.4はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
+
+1.20.6はGUI 320×240のインベントリ位置(80,121)を固定基準にします。出力sizeに対して16 GUI単位のアイコンを拡大し、同じ投影・モデル位置のままviewportを移動してsize四方へ切り出します。512pxではviewport 10240×7680が必要です。検証したMesa環境の上限は16384×16384で、設定値と元viewportへの復帰を観測しました。バニラのGUI原点と他位置では浮動小数点演算・テクスチャ参照が変わるため、すべてのGUI位置との一致は保証しません。以前の原点基準とは画像・context・agent hashが変わるため、新しい出力先へ再生成してください。PNGへの色補正や差分許容の追加は行いません。
 
 通常インベントリとの64px比較では、RGB各channelの誤差2/255を基準とします。ユーザーが画像で確認したoak_fenceの輪郭2画素だけは、同じID・出力PNG hash・参照RGBA hash・背景RGBA hash・差分座標が揃う場合に許容します。輪郭の上下左右1画素以内という見た目だけでは、背景と同じ色の不透明pixelや半透明を区別できないため、他画像へ自動的に一般化しません。厳密比較のrawPassedと誤差を残し、確認済み画像の条件を含むcomparisonPassedを別に記録します。productionの描画やPNGはこの判定で変更しません。
 

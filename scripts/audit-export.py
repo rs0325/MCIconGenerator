@@ -77,12 +77,12 @@ def rgba_png(data):
 
 
 def audit(manifest_path, source_jar=None, compare=None, require_all=False):
-    manifest = json.loads(manifest_path.read_text())
+    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     failures = []
     compared = 0
     comparison_entries = {}
     if compare:
-        previous=json.loads(compare.read_text())
+        previous=json.loads(compare.read_text(encoding='utf-8'))
         if previous.get("version")!=manifest.get("version") or previous.get("mode")!=manifest.get("mode"):
             failures.append("Comparison version or mode differs")
         comparison_entries={e["id"]:e for e in previous["entries"] if e["status"]=="success"}

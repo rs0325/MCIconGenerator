@@ -1,6 +1,7 @@
 package io.github.rs0325.mcicon.internal;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.github.rs0325.mcicon.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -103,7 +104,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
     }
     private JsonNode request(Map<String,Object> values) throws Exception {
         Map<String,Object> request=new TreeMap<>(values);String id=UUID.randomUUID().toString();request.put("requestId",id);
-        output.write(Json.MAPPER.writeValueAsString(request).replace("\n",""));output.newLine();output.flush();
+        output.write(Json.MAPPER.writer().without(SerializationFeature.INDENT_OUTPUT).writeValueAsString(request));output.newLine();output.flush();
         JsonNode result=await(options.itemTimeout());
         if(!result.path("requestId").asText().equals(id))throw new IOException("Mismatched worker request ID");
         if(result.path("type").asText().equals("error"))throw new McIconException(result.path("code").asText(),result.path("message").asText(),3);
