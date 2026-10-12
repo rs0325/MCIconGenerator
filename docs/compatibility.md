@@ -2,6 +2,8 @@
 
 2026-10-10の公式manifestから固定した正式51版。全版のexact adapterを実装しています。rawは元JARのPNG抽出です。iconsはすべてexperimentalで、画質・再現性の受入を完了したverified版は0です。実行待ちと検査成功を区別します。新しい版はdiscoveredから個別に追加します。
 
+legacy-1.13のexact 3版（1.13・1.13.1・1.13.2）は、通常flatワールドの静的7種類を64pxで追加照合し、各版とも最大channel誤差0でした。Linux amd64・固定Mesa Dockerのインベントリ位置(80,121)での結果です。描画・照明・固定contextを変更せず、verifiedへの昇格は行っていません。[条件と失敗を含む記録](validation.md#issue-22のlegacy-113通常ワールド検証2026-10-13)を参照してください。
+
 | Version | Adapter | Java | 64px全件生成・PNG監査 | 独立全件のRGBA比較 |
 | --- | --- | --- | --- | --- |
 | 26.3 | gui-26.3 | 25 | 1,657 成功 / 0 失敗（passed） | 全件一致 |

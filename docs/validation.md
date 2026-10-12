@@ -482,3 +482,44 @@ worker SHA-256は#13と同じ`50961e54de759da4397cb5ad5da2c6fdbdf0f09edeb803788e
 Windows Java21の展開済みmcicon.batでもchecksum・help/version・offline raw全1,614枚が成功し、元JAR bytesと一致しました。stone/player_head/enchanted_bookの描画3枚は透過・manifest/hashを監査し、Mac出力にRGBA/パスが厳密一致しました。context・renderer・agent hashも一致します。Windowsは既存#13 imageを使用したため、Macの新build imageとはimage IDとsettings digestが異なります。
 
 初回とDocker起動後の別SSH接続ではdaemonが不在でDOCKER_IMAGE_UNAVAILABLEとなり、同一接続内で既存Docker Desktopの起動から描画まで実行すると成功しました。接続終了後にdaemonが利用できなくなる機序までは特定していません。失敗ログを保持し、成功した再試験は新規出力先で実行しました。softwareの導入・OS再起動・既存出力の上書きは行っていません。
+
+## Issue #22のlegacy-1.13通常ワールド検証（2026-10-13）
+
+起点はmainの17835349（#2のmerge）、依存#13の確定commitはf6f0b82です。通常のflatワールドを各版のバニラAPIで作成し、SurvivalInventoryScreenのslot9を撮影しました。1.13・1.13.1・1.13.2のstone、diamond、grass_block、oak_leaves、chest、player_head、glassは、1280×960・GUI scale4・GUI位置(80,121)・count1・既定stackで、64pxのexport PNGを空スロットの背景へ合成した21比較すべてが最大channel誤差0でした。判定基準は既存の2/255のままで、今回の7種類には許容例外を使っていません。
+
+QA agentはproduction renderer、canonical hook、透過復元を含みません。通常フレーム末尾でゲーム状態・画面・撮影を操作し、対象スロットと同じItemStackのモデル描画入口でlightmap texture unitの有効状態だけを読み取ります。active texture unitとGPU texel読取時のbindingはfinallyで復帰します。完全な無計装clientとの比較は#31に残します。描画入口の観測からモデル内部の全描画状態を保証しません。
+
+3版のfull-bright texelはCPU/GPUともRGBA(252,252,252,255)で、対象スロットの描画入口ではlightmap texture unitが無効でした。旧QAの「manifestに値がなければGUIも白255」という推定はこの経路に適合しません。1.13.2の初回は画像誤差0でも照明判定がFAILでした。この失敗と、1.13のIdRegistry.get/1を呼んで撮影が中断したQAエラーを保持しています。レジストリ列挙で実IDを取得し、対象スロットに限定した観測で再試験しました。productionの照明・投影・PNG・manifest/contextは変更していません。
+
+64px全件2,362枚（784/789/789）の登録集合・PNG hash/CRC・RGBA8/sRGB・透過・空画像監査に成功しました。別プロセスの7種類一括生成21枚と、各IDを別CLI・ゲームプロセスで生成した21枚は、全件出力のdecoded RGBA・PNG hash・パス・設定/context/rendererと厳密一致しました。全IDの個別生成や全件の独立再生成をこの試験で行ったとは扱いません。
+
+16/512pxの各版7種類・計42枚はPNG監査とworker exit0に成功しました。これはサイズ境界の生成・透過・終了試験で、World画像のサイズ別比較ではありません。最初のサイズ試験は別試験と同じcacheを共有したため、終了監視が他workerも所有対象へ数え、1.13.1の512pxがFAILになりました。PNG監査・CLI exit0・観測した終了exit0の記録は保持し、workerディレクトリを複製しない専用cacheで全6ジョブを再試験しました。終了監視を使う試験中は同じcacheの別workerを起動しないでください。
+
+既存1.20.6の撮影経路も、同じ7種類で最大誤差0・client exit0でした。[数値・入力/worker/QA hash・初回失敗と再試験](../qa/validation-2026-10-13-legacy-world.json)に条件を残します。公開記録にはゲーム画像、worldデータ、JAR、個人パスを含めません。全版experimental/deterministic=false・verified版0を維持します。その他adapter・動的状態・全モデル・他GPUのWorld受入は残作業です。
+
+```sh
+python3 scripts/verify-matrix.py --versions 1.13 1.13.1 1.13.2 \
+  --cache .local/cache --out .local/legacy-all --offline \
+  --docker-image mcicon-render:0.1.0-preview.1
+
+# versionごとに、別の出力先で代表7種類を生成してからWorldと照合する。
+python3 scripts/verify-matrix.py --versions 1.13.1 \
+  --ids stone diamond grass_block oak_leaves chest player_head glass \
+  --cache .local/cache --out .local/legacy-selected-1.13.1 --offline \
+  --compare .local/legacy-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-world-inventory.py --version 1.13.1 \
+  --ids stone diamond grass_block oak_leaves chest player_head glass \
+  --cache .local/cache --out .local/legacy-world-1.13.1 \
+  --compare .local/legacy-selected-1.13.1 --docker-image mcicon-render:0.1.0-preview.1
+
+# IDごと・versionごとに別CLIとゲームプロセスを起動して全件と照合する。
+python3 scripts/verify-matrix.py --versions 1.13.1 --ids player_head \
+  --cache .local/cache --out .local/legacy-single-1.13.1-player-head --offline \
+  --compare .local/legacy-all --docker-image mcicon-render:0.1.0-preview.1
+
+# このcacheを使う別workerが動いていない状態で実行する。
+python3 scripts/verify-worker-lifecycle.py --versions 1.13 1.13.1 1.13.2 \
+  --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass \
+  --cache .local/size-cache --out .local/legacy-size-boundaries \
+  --docker-image mcicon-render:0.1.0-preview.1
+```
