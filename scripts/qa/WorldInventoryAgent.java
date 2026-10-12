@@ -31,7 +31,7 @@ public final class WorldInventoryAgent {
         report.addProperty("version",config.get("version").getAsString());report.addProperty("productionRendererUsed",false);
         report.addProperty("canonicalHooksUsed",false);report.addProperty("fullBrightPackedLight",15728880);report.addProperty("renderMethodsTransformed",config.has("fixedGlintMillis"));
         report.add("captures",captures);
-        legacy=config.get("version").getAsString().matches("1\\.13(?:\\.[12])?");
+        legacy=config.get("version").getAsString().matches("1\\.(?:13(?:\\.[12])?|14(?:\\.[123])?)");
         if(legacy){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",true);}
         final String owner=s.actualClass(MC).replace('.','/'),method=s.methodName(MC,legacy?"m_0520165":"runTick",1);
         final String itemOwner=s.actualClass("net.minecraft.client.render.entity.ItemRenderer").replace('.','/');
@@ -202,7 +202,7 @@ public final class WorldInventoryAgent {
     private static void frameLegacy() throws Exception {
         String playerType="net.minecraft.entity.living.player.PlayerEntity",inventoryType="net.minecraft.inventory.Inventory";
         String inventoryScreen="net.minecraft.client.gui.screen.inventory.menu.SurvivalInventoryScreen";
-        String imageType="net.minecraft.client.render.platform.NativeImage";
+        String imageType=config.get("version").getAsString().startsWith("1.13")?"net.minecraft.client.render.platform.NativeImage":"com.mojang.blaze3d.platform.NativeImage";
         if(minecraft==null)minecraft=s.call(MC,"getInstance",null);
         Object screen=s.field(MC,"screen",minecraft);
         if(stage==0) {
@@ -272,11 +272,15 @@ public final class WorldInventoryAgent {
         s.call(inventoryType,"setItem",inventory,9,next);
         final UUID uuid=(UUID)s.call("net.minecraft.entity.Entity","getUuid",player);
         final Object server=s.call(MC,"getServer",minecraft);
-        s.call("net.minecraft.server.MinecraftServer","execute",server,new java.util.concurrent.Callable<Object>() {public Object call() throws Exception {
+        final java.util.concurrent.Callable<Object> update=new java.util.concurrent.Callable<Object>() {public Object call() throws Exception {
             Object list=s.call("net.minecraft.server.MinecraftServer","getPlayerManager",server);
             Object serverPlayer=s.call("net.minecraft.server.PlayerManager","get",list,uuid);
             s.call("net.minecraft.inventory.Inventory","setItem",s.field("net.minecraft.entity.living.player.PlayerEntity","inventory",serverPlayer),9,s.call("net.minecraft.item.ItemStack","copy",next));
             return null;
+        }};
+        if(config.get("version").getAsString().startsWith("1.13"))s.call("net.minecraft.server.MinecraftServer","execute",server,update);
+        else ((java.util.concurrent.Executor)server).execute(new Runnable() {public void run() {
+            try{update.call();}catch(Exception e){throw new IllegalStateException("server側のスロットを更新できません",e);}
         }});
     }
     public static void observeLegacyGui(Object stack) {

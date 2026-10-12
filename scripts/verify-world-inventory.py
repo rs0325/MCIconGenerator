@@ -6,7 +6,7 @@ from pathlib import Path
 repo=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser()
 p.add_argument('--out',type=Path,required=True)
-p.add_argument('--version',choices=['1.13','1.13.1','1.13.2','1.20.6','1.21.4'],default='1.21.4')
+p.add_argument('--version',choices=['1.13','1.13.1','1.13.2','1.14','1.14.1','1.14.2','1.14.3','1.20.6','1.21.4'],default='1.21.4')
 p.add_argument('--cache',type=Path,default=repo/'.local/cache')
 p.add_argument('--compare',type=Path,required=True,help='指定版の64px出力を含むディレクトリ')
 p.add_argument('--ids',nargs='+',default=['stone','diamond','chest','ender_chest','white_bed','white_banner','shield','player_head','dragon_head','white_shulker_box','glass','white_stained_glass','ice','grass_block','oak_leaves','potion','creeper_spawn_egg','leather_chestplate'])
@@ -15,8 +15,8 @@ p.add_argument('--docker-image',default='mcicon-render:dev')
 p.add_argument('--frame-zero',action='store_true',help='元PNGの初期animation frameだけを選ぶQAパックで固定フレームを照合する')
 p.add_argument('--fixed-glint',action='store_true',help='通常GUIのglint時刻だけを1000msへ指定して固定条件を照合する')
 a=p.parse_args()
-legacy=a.version in ['1.13','1.13.1','1.13.2']
-if legacy and (a.frame_zero or a.fixed_glint):p.error('1.13系の撮影は通常の静的アイテムに限定します')
+legacy=a.version in ['1.13','1.13.1','1.13.2','1.14','1.14.1','1.14.2','1.14.3']
+if legacy and (a.frame_zero or a.fixed_glint):p.error('legacy系の撮影は通常の静的アイテムに限定します')
 out=a.out.resolve();out.mkdir(parents=True,exist_ok=False)
 cache=a.cache.resolve();version=cache/'versions'/a.version;meta=json.loads((version/'version.json').read_text())
 ids=['minecraft:'+i if ':' not in i else i for i in a.ids]

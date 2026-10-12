@@ -523,3 +523,17 @@ python3 scripts/verify-worker-lifecycle.py --versions 1.13 1.13.1 1.13.2 \
   --cache .local/size-cache --out .local/legacy-size-boundaries \
   --docker-image mcicon-render:0.1.0-preview.1
 ```
+
+## Issue #23のlegacy-1.14通常ワールド検証（2026-10-13）
+
+起点はmainの00d33e8（#22のmerge）、依存#13の確定commitはf6f0b82です。独立World QAを1.14・1.14.1・1.14.2・1.14.3へ対応し、NativeImageのクラス名変更と、サーバー側スロット更新のExecutor APIを各版の実mapping・bytecodeで確認しました。1.13系は従来のCallable APIを維持します。production renderer・canonical hook・透過復元を共有しません。
+
+通常flatワールドのSurvivalInventoryScreen・slot9、1280×960・GUI scale4・GUI位置(80,121)・count1・既定stackで、stone、diamond、grass_block、oak_leaves、chest、player_head、glassを撮影しました。64pxのexport PNGを空スロット背景へ合成した28比較は、すべて最大channel誤差0でした。比較基準2/255を維持し、許容例外は使っていません。CPU/GPU full-bright texelはともにRGBA(252,252,252,255)で、対象スロットのモデル描画入口ではlightmap texture unitが無効です。active textureとbindingは観測後に復帰し、モデル内部の全描画状態の保証とは区別します。完全な無計装clientは#31に残ります。
+
+描画・照明・PNG・manifest/contextは変更不要でした。64px全件3,504 PNG（各版876枚）の登録集合・PNG hash/CRC・RGBA8/sRGB・透過・空画像監査が成功しました。別プロセスの7種類一括28枚と、各ID別CLI・ゲームプロセスの28枚は、全件出力のdecoded RGBA・PNG hash・パス・source/設定/context/renderer/catalogが厳密一致しました。全IDの個別生成・全件の独立再生成ではありません。
+
+16/512px・各版7種類・計56枚は、専用cacheでPNG・透過とworker exit0を確認しました。サイズ別のWorld画像比較ではありません。既存1.13.2の独立World QAも同じ7種類で誤差0でした。今回は初回から成功し、失敗を消して成功へ書き換える再試験はありません。公式入力670ファイル×2cacheのhashは不変です。
+
+CLI installDist、Java8対象QAコンパイル、Python構文確認が成功し、最終反証で新しい確定問題は見つかりませんでした。production変更がないため、JUnitは今回は再実行していません。[各版の数値・入力/worker/QA hash](../qa/validation-2026-10-13-legacy-114-world.json)に条件を保存します。ゲーム画像・worldデータ・JAR・個人パスは公開記録へ含めません。全版experimental/deterministic=false・verified版0を維持します。全モデル・動的状態・全サイズ・他GPUのWorld受入は残ります。
+
+再現手順は上記#22と同じhelperを使用します。`--versions`は1.14・1.14.1・1.14.2・1.14.3、World撮影の`--version`はそのexact版へ替え、試験ごとに新しい出力先を指定してください。終了監視中は同じcacheで別workerを起動せず、Docker image IDと公式入力を揃えます。

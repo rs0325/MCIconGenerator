@@ -58,7 +58,7 @@ Dockerfileはsoftware描画に加え、Mesa llvmpipeの`LP_NATIVE_VECTOR_WIDTH=1
 
 1.20.6と1.21.4のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。以前の1.20.6と1.21.4はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
 
-1.13・1.13.1・1.13.2は、通常flatワールドのインベントリ位置(80,121)、GUI scale4、64pxで静的7種類を照合し、最大channel誤差0でした。対象スロットのモデル描画入口ではlightmap texture unitが無効で、観測したCPU/GPUのfull-bright texelはともにRGBA(252,252,252,255)です。このtexelをexportへ適用する変更は行いません。lightmap値がmanifestにないことからGUIの使用値を白255と推定せず、描画入口の状態と画像差分を分けて記録します。全モデルの内部描画状態・全サイズ・他GPUのWorld一致へ一般化しません。
+legacy-1.13の3版（1.13・1.13.1・1.13.2）とlegacy-1.14の4版（1.14・1.14.1・1.14.2・1.14.3）は、通常flatワールドのインベントリ位置(80,121)、GUI scale4、64pxで静的7種類を照合し、最大channel誤差0でした。対象スロットのモデル描画入口ではlightmap texture unitが無効で、観測したCPU/GPUのfull-bright texelはともにRGBA(252,252,252,255)です。このtexelをexportへ適用する変更は行いません。lightmap値がmanifestにないことからGUIの使用値を白255と推定せず、描画入口の状態と画像差分を分けて記録します。全モデルの内部描画状態・全サイズ・他GPUのWorld一致へ一般化しません。
 
 1.20.6はGUI 320×240のインベントリ位置(80,121)を固定基準にします。出力sizeに対して16 GUI単位のアイコンを拡大し、同じ投影・モデル位置のままviewportを移動してsize四方へ切り出します。512pxではviewport 10240×7680が必要です。検証したMesa環境の上限は16384×16384で、設定値と元viewportへの復帰を観測しました。バニラのGUI原点と他位置では浮動小数点演算・テクスチャ参照が変わるため、すべてのGUI位置との一致は保証しません。以前の原点基準とは画像・context・agent hashが変わるため、新しい出力先へ再生成してください。PNGへの色補正や差分許容の追加は行いません。
 
