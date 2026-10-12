@@ -1,0 +1,195 @@
+{
+  "date": "2026-10-12",
+  "issue": 14,
+  "baseCommit": "f6f0b82e22aca3ee3b374aec167e432b96caf55a",
+  "candidateVersion": "0.1.0-preview.1",
+  "status": "ローカル配布候補の実利用・監査・重点レビューを完了。初回形式はGitHubプレリリース＋Maven形式ZIPに確定。Git公開とreleaseは未実施。",
+  "scope": "配布構成・build version・CLIとMaven形式ZIPの実利用。workerは#13と同一で、全51版の品質再試験ではない。",
+  "binarySha256": {
+    "core": "effeb1ec9b2bc08b8a320a41b240e5ff34d4d4d9629d95ad5e6f525b833edc25",
+    "cli": "8b50d7c4daf217614da70b51374ba3465bea3aeae87e6157dfc894acd5bb1f53",
+    "worker": "50961e54de759da4397cb5ad5da2c6fdbdf0f09edeb803788e375f9981bf56af"
+  },
+  "dockerFromCliZip": {
+    "built": true,
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+    "imageIdDiffersFromIssue13": true,
+    "sampleRgbaAndPathsEqualToIssue13": true,
+    "sampleIds": [
+      "minecraft:stone",
+      "minecraft:player_head",
+      "minecraft:enchanted_book"
+    ],
+    "initialBuildxPluginLookupFailed": true,
+    "documentedDirectBuildxInvocationPassed": true
+  },
+  "tests": {
+    "junitPassed": 63,
+    "distributionAuditCasesPassed": 10,
+    "snapshotRepeatedPublicationPassed": true,
+    "unsafeVersionRejectedBeforeCleanup": true
+  },
+  "macosCli": {
+    "java": "21.0.9",
+    "launcher": "bin/mcicon",
+    "help": true,
+    "version": true,
+    "versionsOffline": true,
+    "doctor": true,
+    "rawAll": {
+      "version": "1.20.6",
+      "mode": "raw",
+      "audited": 1614,
+      "registryPopulationVerified": false,
+      "transparentImages": 0,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 0,
+      "comparisonVerified": false,
+      "canonicalVerified": false
+    },
+    "icons": {
+      "version": "1.20.6",
+      "mode": "icons",
+      "audited": 3,
+      "registryPopulationVerified": false,
+      "transparentImages": 3,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 3,
+      "comparisonVerified": true,
+      "canonicalVerified": false
+    },
+    "rawSingleId": "minecraft:item/diamond",
+    "toolVersionMatches": true
+  },
+  "mavenConsumer": {
+    "independentProject": true,
+    "resolvedFromExtractedMavenRepository": true,
+    "exampleCompiled": true,
+    "exampleRun": true,
+    "raw": {
+      "version": "1.20.6",
+      "mode": "raw",
+      "audited": 1,
+      "registryPopulationVerified": false,
+      "transparentImages": 0,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 0,
+      "comparisonVerified": false,
+      "canonicalVerified": false
+    },
+    "icons": {
+      "version": "1.20.6",
+      "mode": "icons",
+      "audited": 2,
+      "registryPopulationVerified": false,
+      "transparentImages": 2,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 2,
+      "comparisonVerified": true,
+      "canonicalVerified": false
+    },
+    "usesSeparateWorkerJar": true,
+    "toolVersionMatches": true
+  },
+  "linuxCli": {
+    "environment": "Colima VM内Linux amd64 container",
+    "java": 21,
+    "help": true,
+    "version": true,
+    "raw": {
+      "version": "1.20.6",
+      "mode": "raw",
+      "audited": 1,
+      "registryPopulationVerified": false,
+      "transparentImages": 0,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 0,
+      "comparisonVerified": false,
+      "canonicalVerified": false
+    },
+    "toolVersionMatches": true,
+    "newLauncherRenderNotExecuted": true
+  },
+  "windowsCli": {
+    "date": "2026-10-13",
+    "java": 21,
+    "launcher": "bin/mcicon.bat",
+    "checksumVerified": true,
+    "help": true,
+    "version": true,
+    "rawAll": {
+      "version": "1.20.6",
+      "mode": "raw",
+      "audited": 1614,
+      "registryPopulationVerified": false,
+      "transparentImages": 0,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 0,
+      "comparisonVerified": false,
+      "canonicalVerified": false
+    },
+    "icons": {
+      "version": "1.20.6",
+      "mode": "icons",
+      "audited": 3,
+      "registryPopulationVerified": false,
+      "transparentImages": 3,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 3,
+      "comparisonVerified": true,
+      "canonicalVerified": false
+    },
+    "toolVersionMatches": true,
+    "imageId": "sha256:64c2a99ca5ee94105277fbeaace3ed7ba1eb80b710a02111ec2476e8c2e7f09c",
+    "usesExistingIssue13Image": true,
+    "imageIdDiffersFromMacosCandidateBuild": true,
+    "settingsDigestDiffersFromMacosCandidateBuild": true,
+    "contextAndRendererEqualToMacos": true,
+    "workerHashMatches": true,
+    "initialIconsExitCode": 1,
+    "separateConnectionRetryIconsExitCode": 1,
+    "successfulRetryIconsExitCode": 0,
+    "retryInSameConnectionAsDockerStart": true
+  },
+  "initialFailures": {
+    "javadocRecordThrowsTag": "record本体の@throwsは無効だったためconstructorへ移し、生成成功",
+    "javadocPngAudit": "JDK文書UI画像をゲームPNGと誤判定。JDK21 module内bytesのhashを照合し、javadocに限り区別",
+    "review": "SNAPSHOT旧成果物残留・QA namespace未検出・不足launcher/workerのJSON診断を修正し回帰成功",
+    "windowsDocker": "初回とDocker起動後の別SSH接続ではdaemon不在。同一接続内で既存Docker Desktopの起動から描画まで実行し成功。停止機序は未特定。失敗ログと各出力を保持。"
+  },
+  "assetSeparation": {
+    "gameAssetsIncluded": false,
+    "credentialsIncluded": false,
+    "qaAgentsIncluded": false,
+    "javadocUiImages": "JDK21標準画像2枚のみhashで区別し、legal文書を保持"
+  },
+  "archiveHashes": "配布物に添付するSHA256SUMSで確定。記録を含むZIPへの自己参照hashは保存しない。",
+  "releasePublished": false,
+  "sourceHashes": {
+    "build.gradle": "e2d33640fcf1d103bb2e36c18652340b9c92188022f5c007e2b20f1ad8a5dda1",
+    "core/build.gradle": "fcc5fbf660cc30aad8d2192ce48c11c70cf47911b6e0c9d535aca3963e2970c7",
+    "cli/build.gradle": "b72c1c4594b8c73ffc84a8dc6fd114413017d9542de5ea2cbe70cb83f41c29f4",
+    "cli/src/main/java/io/github/rs0325/mcicon/cli/Main.java": "3fbcf590d3e7d38200506380b7f6e8fbc6f2dde7f4966227e21cfba7beebc013",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/IconExporter.java": "6b61ad7024163b24e8553645da7e911145b5cb5cf060275cb5978bc36c9a7c5a",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/RawExporter.java": "2e202e8eafe27c5d76dfd7dc00486046c4cf4b42be6b5c4eac8a32c00cd01fe3",
+    "scripts/audit-distribution.py": "18de673a896609c6c21c60abd5b6d2ab6b96d1807c8640b7b2f02a498b66a38c",
+    "scripts/test-distribution-audit.py": "40b98a791e1aa04a5aef094c281361da5afb96844be5837e135403649cde02ba",
+    "examples/ExportExample.java": "5e53bef22ea15c127be6ddb3100e800594474c50ac1baa1a9f14009e1195decd"
+  },
+  "lastUpdated": "2026-10-13",
+  "distributionFormat": {
+    "version": "0.1.0-preview.1",
+    "githubPrerelease": true,
+    "library": "Maven形式ZIP",
+    "publicMavenRepository": false,
+    "userApprovedFormat": true
+  }
+}

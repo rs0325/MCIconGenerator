@@ -75,7 +75,7 @@ public final class IconExporter {
     private void save(Path path,RuntimePreparer.Prepared runtime,IconWorker worker,Map<String,Object> settings,String digest,String source,TreeMap<String,ExportResult.Entry> entries,boolean complete,List<CatalogEntry> catalog) throws IOException {
         Map<String,Object> manifest=new TreeMap<>();
         manifest.put("schemaVersion",1);manifest.put("edition","java");manifest.put("version",runtime.version().id());manifest.put("mode","icons");
-        manifest.put("toolVersion","0.1.0-SNAPSHOT");manifest.put("adapterVersion",runtime.profile()+"/0.1");manifest.put("sourceSha256",source);
+        manifest.put("toolVersion",ToolVersion.VERSION);manifest.put("adapterVersion",runtime.profile()+"/0.1");manifest.put("sourceSha256",source);
         manifest.put("settings",settings);manifest.put("settingsDigest",digest);manifest.put("renderer",worker.renderer());manifest.put("javaMajor",runtime.javaMajor());
         manifest.put("environment",Map.of("os","linux","arch","amd64","backend","docker","imageId",worker.imageId()));
         Map<String,Object> context=new TreeMap<>();

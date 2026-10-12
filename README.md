@@ -4,7 +4,9 @@ Minecraft Java Editionの元テクスチャと、インベントリ表示の透�
 
 開発中です。元PNG抽出、CLI・Java API、ローカルDockerでのバニラGUI描画を実装しています。固定集合の全51版に描画adapterを実装しています。全件生成とPNG監査の結果は版ごとに記録し、未完了の検査を公開しています。描画contextはfixed-v1ですが、画質と再現性の受入検証が残るため、すべてexperimentalです。設計・進捗は[Issue #1](https://github.com/rs0325/MCIconGenerator/issues/1)、実測結果は[検証記録](docs/validation.md)で管理しています。
 
-Java 21以上でビルドします。描画にはDockerのLinux amd64コンテナを使い、版に応じてJava 8/17/21/25を別プロセスで起動します。GitHub Actionsは使用しません。
+インストールとJavaライブラリの利用は[配布ガイド](docs/distribution.md)、操作例は[利用ガイド](docs/usage.md)を参照してください。公開された版は[GitHub Releases](https://github.com/rs0325/MCIconGenerator/releases)で確認できます。
+
+ソースからはJava 21以上でビルドします。描画にはDockerのLinux amd64コンテナを使い、版に応じてJava 8/17/21/25を別プロセスで起動します。GitHub Actionsは使用しません。
 
 ```sh
 ./gradlew test :cli:installDist

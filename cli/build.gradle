@@ -13,10 +13,15 @@ distributions {
         contents {
             from(project(':worker').tasks.named('agentJar')) { into 'worker'; rename { 'worker-agent.jar' } }
             from(rootProject.file('LICENSE'))
+            from(rootProject.file('README.md'))
             from(rootProject.file('THIRD_PARTY_NOTICES.md'))
             from(rootProject.file('licenses')) { into 'licenses' }
             from(rootProject.file('docs')) { into 'docs' }
             from(rootProject.file('qa')) { into 'qa' }
+            from(rootProject.file('docker')) { into 'docker' }
+            from(rootProject.file('schemas')) { into 'schemas' }
+            from(rootProject.file('examples')) { into 'examples' }
+            from(rootProject.file('adapters/releases.json')) { into 'adapters' }
         }
     }
 }

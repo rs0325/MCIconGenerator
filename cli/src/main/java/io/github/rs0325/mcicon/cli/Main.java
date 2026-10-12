@@ -2,6 +2,7 @@ package io.github.rs0325.mcicon.cli;
 
 import io.github.rs0325.mcicon.*;
 import io.github.rs0325.mcicon.internal.Json;
+import io.github.rs0325.mcicon.internal.ToolVersion;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 import java.nio.file.Path;
@@ -9,7 +10,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.time.Duration;
 
-@Command(name="mcicon", version="MCIconGenerator 0.1.0-SNAPSHOT", mixinStandardHelpOptions=true,
+@Command(name="mcicon", version="MCIconGenerator " + ToolVersion.VERSION, mixinStandardHelpOptions=true,
         description="Export vanilla Minecraft Java textures and inventory icons.",
         subcommands={Main.Versions.class,Main.Extract.class,Main.Render.class,Main.Catalog.class,Main.Doctor.class,Main.Cache.class})
 public final class Main implements Runnable {

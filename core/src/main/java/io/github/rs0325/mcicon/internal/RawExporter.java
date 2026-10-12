@@ -162,7 +162,7 @@ public final class RawExporter {
         long successful=entries.values().stream().filter(e->e.status().equals("success")).count();
         Map<String,Object> manifest=new TreeMap<>();
         manifest.put("schemaVersion",1);manifest.put("edition","java");manifest.put("version",version);manifest.put("mode","raw");
-        manifest.put("toolVersion","0.1.0-SNAPSHOT");manifest.put("sourceSha256",source);manifest.put("settings",settings);manifest.put("settingsDigest",digest);
+        manifest.put("toolVersion",ToolVersion.VERSION);manifest.put("sourceSha256",source);manifest.put("settings",settings);manifest.put("settingsDigest",digest);
         manifest.put("entries",entries.values());manifest.put("complete",complete);
         manifest.put("reservedAuxiliary",reservedAuxiliary);
         manifest.put("counts",Map.of("succeeded",successful,"failed",entries.size()-successful));

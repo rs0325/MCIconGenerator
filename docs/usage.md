@@ -9,7 +9,7 @@ core/CLIにはJava 21以上が必要です。ゲーム資産は実行時に公�
 docker buildx build --platform linux/amd64 --load -t mcicon-render:dev -f docker/Dockerfile .
 ```
 
-macOS Apple Siliconでは、今回の検証にColima・Virtualization.framework・Rosettaを使っています。Docker Desktopが既にある場合はそのcontextも指定できますが、まだ検証していません。
+macOS Apple Siliconでは、今回の検証にColima・Virtualization.framework・Rosettaを使っています。Windows 11のDocker Desktop Linux backendも確認しています。ホスト別の実測範囲は[対応表](compatibility.md)を参照してください。
 
 ```sh
 brew install colima docker docker-buildx
@@ -22,7 +22,7 @@ buildx pluginがCLIから見つからないHomebrew環境では `/opt/homebrew/l
 
 ## CLI
 
-以下では `cli/build/install/mcicon/bin/mcicon` を `mcicon` と表記します。全コマンドで `--help` を使えます。既定cacheは `.mcicon-cache` です。
+配布ZIPのインストール・Maven形式ライブラリの使い方は[配布ガイド](distribution.md)を参照してください。以下では配布物の `bin/mcicon`（Windowsでは `bin/mcicon.bat`）、またはソースbuildの `cli/build/install/mcicon/bin/mcicon` を `mcicon` と表記します。全コマンドで `--help` を使えます。既定cacheは `.mcicon-cache` です。
 
 ```sh
 mcicon versions --json
@@ -81,4 +81,4 @@ try (var generator = new MCIconGenerator(Path.of("cache"), false, ProgressListen
 ./gradlew :cli:distZip :core:publishCorePublicationToLocalBuildRepository
 ```
 
-CLI zipはcli/build/distributions、ライブラリのローカルMaven repositoryはcore/build/mavenに生成します。予定座標は `io.github.rs0325.mcicon:mcicon-core:0.1.0-SNAPSHOT`、公開Maven repository・正式releaseはまだありません。1.0以前のAPIは変更される可能性があります。Minecraftクラスは公開APIに露出しません。配布物のworker JARは本プロジェクトのagentとASM/Gsonだけを含みます。
+CLI zipはcli/build/distributions、ライブラリのローカルMaven repositoryはcore/build/maven/<version>に生成します。開発時の座標は `io.github.rs0325.mcicon:mcicon-core:0.1.0-SNAPSHOT` です。配布候補の形式と公開状況は[配布ガイド](distribution.md)で説明します。1.0以前のAPIは変更される可能性があります。Minecraftクラスは公開APIに露出しません。配布物のworker JARは本プロジェクトのagentとASM/Gsonだけを含みます。
