@@ -85,3 +85,9 @@ Issue #10では1.13〜1.21.3の正式38版・64pxの全41,056PNGを現workerで�
 Issue #11では1.21.4〜26.3の正式13版・64pxの全19,209PNGを現workerで監査し、代表35種類の独立版別再生成455PNGが全件基準と厳密RGBA・PNG hash・パス、入力/設定/context/環境/renderer/catalog一致しました。原点GUIの共通35種類・2背景910比較と、銅のチェスト/ゴーレム像/装備・槍・straw_bed等の登録済み部分集合62比較は最大誤差2/255以内です。元JARのitem definitionsから計算した29比較はRGB・alpha誤差0でした。
 
 1.21.11のIdentifier改名を選択できなかった初回QAの2背景失敗と前後helper hashを保存し、修正後の再比較と対照1.21.6の比較が成功しました。[新13版の数値記録](../qa/validation-2026-10-12-modern-adapter-acceptance.json)は初回12版の成功と修正後1.21.11の成功を集約し、初回のraw FAILは維持します。production描画は変更せず、全版experimental/deterministic=false・verified版0を維持します。任意のcomponents・全分岐/状態/サイズ・他位置・実ワールド照明・無計装client・別OS/GPU等の受入とは区別します。
+
+## 正式51版の登録集合・欠損受入（2026-10-12）
+
+修正後workerで固定正式51版・60,265PNGを新規生成し、登録母集団・除外理由・ID/パス重複・hash/CRC・RGBA8・透過・空画像の監査と、#10/#11の正常基準へのRGBA・PNG hash・パス比較が成功しました。1.21.11で破損stone PNGの代替画像を成功出力する検出漏れを、BakedQuadのposition/packedUV消費時のsprite観測で修正しました。選択された破損atlas/直接textureを各51版、モデル・チェスト・空モデル・事前ロード済み直接textureを各12境界版で受け入れました。150成功は複数実行の集約であり、初回失敗10ケースと各worker/helper hashを保存します。[検証範囲と再実行方法](validation.md)・[数値記録](../qa/validation-2026-10-12-release-coverage.json)を参照してください。
+
+正常PNG bytes・RGBA・パスは不変ですが、worker hashとsettingsDigestは変わります。旧manifestへ再開せず、新しい出力先で再生成してください。全版experimental/deterministic=false・verified版0を維持し、全状態・サイズ・world・OS/GPUなどの受入は#13等で継続します。

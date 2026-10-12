@@ -57,11 +57,12 @@ public final class ResourcePackFaultAgent {
         if(reported)return;reported=true;
         try {
             Symbols s=RenderAgent.symbols;boolean legacy=RenderAgent.config.get("profile").getAsString().startsWith("legacy-");
-            String identifier=legacy?"net.minecraft.resource.Identifier":RenderAgent.config.get("version").getAsString().startsWith("26.")?"net.minecraft.resources.Identifier":"net.minecraft.resources.ResourceLocation";
+            String identifier=legacy?"net.minecraft.resource.Identifier":(RenderAgent.config.get("version").getAsString().startsWith("26.")||s.hasClass("net.minecraft.resources.Identifier"))?"net.minecraft.resources.Identifier":"net.minecraft.resources.ResourceLocation";
             Object id=s.hasMethod(identifier,"parse",1)||identifier.equals("net.minecraft.resources.Identifier")?s.call(identifier,"parse",null,resource):s.construct(identifier,resource);
             Object minecraft=s.call("net.minecraft.client.Minecraft","getInstance",null);
             Object manager=s.call("net.minecraft.client.Minecraft","getResourceManager",minecraft);
-            Object value=s.call(legacy?"net.minecraft.resource.manager.ResourceManager":"net.minecraft.server.packs.resources.ResourceManager","getResource",manager,id);
+            String resourceManager=legacy?"net.minecraft.resource.manager.ResourceManager":s.hasMethod("net.minecraft.server.packs.resources.ResourceProvider","getResource",1)?"net.minecraft.server.packs.resources.ResourceProvider":"net.minecraft.server.packs.resources.ResourceManager";
+            Object value=s.call(resourceManager,"getResource",manager,id);
             if(value instanceof java.util.Optional)value=((java.util.Optional<?>)value).get();
             try {
                 String owner=legacy?"net.minecraft.resource.Resource":"net.minecraft.server.packs.resources.Resource";
@@ -71,9 +72,10 @@ public final class ResourcePackFaultAgent {
                 try(InputStream preload=ResourcePackFaultAgent.class.getResourceAsStream("/mcicon-preload-texture.txt")) {
                     if(preload!=null) {
                         Object textures=s.call("net.minecraft.client.Minecraft","getTextureManager",minecraft);
-                        // TextureObject世代のgetTextureはキャッシュ参照だけなのでbindでロードする。
-                        if(s.hasClass("net.minecraft.client.renderer.texture.TextureObject"))s.call("net.minecraft.client.renderer.texture.TextureManager","bind",textures,id);
-                        Object texture=s.call("net.minecraft.client.renderer.texture.TextureManager","getTexture",textures,id);
+                        // getTextureがキャッシュ参照だけの世代ではbindでロードする。
+                        String textureManager=legacy?"net.minecraft.client.render.texture.TextureManager":"net.minecraft.client.renderer.texture.TextureManager";
+                        if(legacy||s.hasMethod(textureManager,"bind",1))s.call(textureManager,"bind",textures,id);
+                        Object texture=s.call(textureManager,legacy?"get":"getTexture",textures,id);
                         if(texture==null)throw new IllegalStateException("QA用直接テクスチャを事前ロードできません");
                         System.err.println("[mcicon QA] direct texture cached: "+resource);
                     }

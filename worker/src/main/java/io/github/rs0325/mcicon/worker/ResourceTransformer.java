@@ -45,7 +45,9 @@ final class ResourceTransformer implements ClassFileTransformer {
                 final boolean inspectSprite=quad&&method.equals(spriteMethod)&&desc.equals("()"+spriteDescriptor);
                 final boolean inspectModel=manager&&method.equals(modelMethod)&&Type.getArgumentTypes(desc).length==1&&Type.getReturnType(desc).getDescriptor().equals(modelDescriptor);
                 final boolean inspectMissing=missing&&method.equals(updateMethod)&&Type.getArgumentTypes(desc).length==7&&desc.endsWith(")V");
-                final boolean inspectVertices=quad&&method.equals(verticesMethod)&&desc.equals("()[I");
+                final boolean inspectQuadData=quad&&(method.equals(verticesMethod)&&desc.equals("()[I")
+                    ||method.equals(symbols.methodName(source,"position",1))&&desc.equals("(I)L"+symbols.actualClass("org.joml.Vector3fc").replace('.','/')+";")
+                    ||method.equals(symbols.methodName(source,"packedUV",1))&&desc.equals("(I)J"));
                 final boolean inspectMaterial=geometry&&method.equals("materialInfo")&&desc.startsWith("()L");
                 final boolean inspectItem=itemRenderer&&method.equals(symbols.methodName(source,"getModel",Type.getArgumentTypes(desc).length))&&Type.getReturnType(desc).getDescriptor().equals(modelDescriptor);
                 final boolean inspectAtlas=(atlas||atlasManager)&&method.equals(symbols.methodName(source,atlas?"getSprite":"get",1))&&Type.getArgumentTypes(desc).length==1&&Type.getReturnType(desc).getDescriptor().equals(spriteDescriptor);
@@ -57,7 +59,7 @@ final class ResourceTransformer implements ClassFileTransformer {
                     ||missingTexture&&method.equals(symbols.methodName(source,"getTexture",0))&&Type.getArgumentTypes(desc).length==0)&&Type.getReturnType(desc).getSort()==Type.OBJECT;
                 final boolean inspectContents=contents&&method.equals(symbols.methodName(source,"createMissing",0))&&desc.equals("()L"+name+";");
                 final boolean inspectApply=reloadable&&method.equals(symbols.methodName(source,"apply",1))&&desc.equals("(L"+symbols.actualClass("net.minecraft.client.renderer.texture.TextureContents").replace('.','/')+";)V");
-                if(!inspectSprite&&!inspectModel&&!inspectMissing&&!inspectVertices&&!inspectMaterial&&!inspectItem&&!inspectAtlas&&!inspectTexture&&!inspectTextureReturn&&!inspectContents&&!inspectApply)return target;
+                if(!inspectSprite&&!inspectModel&&!inspectMissing&&!inspectQuadData&&!inspectMaterial&&!inspectItem&&!inspectAtlas&&!inspectTexture&&!inspectTextureReturn&&!inspectContents&&!inspectApply)return target;
                 return new MethodVisitor(Opcodes.ASM9,target) {
                     public void visitCode() {
                         super.visitCode();
@@ -67,7 +69,7 @@ final class ResourceTransformer implements ClassFileTransformer {
                             super.visitVarInsn(Opcodes.ALOAD,0);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC,GUARD,"modelManager","(Ljava/lang/Object;)V",false);
                         }
-                        if(inspectVertices) {
+                        if(inspectQuadData) {
                             super.visitVarInsn(Opcodes.ALOAD,0);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC,GUARD,"quad","(Ljava/lang/Object;)V",false);
                         }

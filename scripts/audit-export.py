@@ -100,9 +100,11 @@ def audit(manifest_path, source_jar=None, compare=None, require_all=False):
     registry_checked = False
     if manifest['mode'] == 'icons':
         catalog = manifest['catalog']
-        catalog_ids = [(e['id'], e['kind'], e['status']) for e in catalog]
+        catalog_ids = [(e['id'], e['kind']) for e in catalog]
         if len(catalog_ids) != len(set(catalog_ids)):
             failures.append('Duplicate catalog IDs')
+        if any(e['kind'] not in ('item', 'block') or e['status'] not in ('available', 'no_item_form') for e in catalog):
+            failures.append('Unknown catalog kind or status')
         excluded = [e for e in catalog if e['status'] == 'no_item_form']
         if len(excluded) != manifest['counts']['noItemForm'] or any(e['kind'] != 'block' or e['blocks'] for e in excluded):
             failures.append('no_item_form records disagree')
