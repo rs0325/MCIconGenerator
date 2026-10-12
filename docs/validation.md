@@ -323,6 +323,39 @@ PY
 
 CLIを事前にbuildし、各版の公式入力とDocker imageを同じworktreeへ準備してください。出力先は新規に指定します。今回の実測環境はmacOS Apple Silicon・Colima/Rosetta・Linux amd64・Mesa llvmpipeです。全版experimental/deterministic=false、verified版0を維持し、実装・検証の完了とPR公開・merge・Issue closeは別の段階です。
 
+## Issue #11の新13版adapterの受入（2026-10-12）
+
+PR #19をmergeしたmainの1671c2aを起点に、1.21.4〜26.3の正式13版を検証しました。現workerで全19,209PNGを生成し、登録数・RGBA8・透過・sRGB Perceptualを監査しました。代表35種類を版ごとに別のCLI・ゲームプロセスで再生成した455PNGは、全件基準とdecoded RGBA・PNG hash・パスが厳密一致し、入力・設定・context・環境・renderer・catalogも一致しました。各IDごとの独立起動や全ID個別比較とは区別します。
+
+通常GUI参照を1.21.5のGPU即時描画、1.21.6以降のdeferred描画、26.xのGuiGraphicsExtractor、26.2/26.3のmainRenderTarget・overlay APIと非同期Screenshotへ対応させました。参照は固定化とregistry/bootstrapだけを共有し、exportのtarget・view・render・PNG保存を使いません。既定stack・fixed-v1・64px・GUI原点(0,0)・guiScale4・1280×960画面で、13版×共通35種類×2背景の910比較がchannel誤差2/255以内・参照alpha255の条件で成功しました。形状・着色・半透明・GUI transform、チェスト・頭・盾・bed/banner/shulker・decorated_pot/conduit・時計/コンパス・animation/glint等を含みます。
+
+追加モデルは、1.21.9以降8版に登録されているcopper_chest、copper_golem_statue、copper_chestplate、copper_spear、straw_bedの各版の部分集合を、同じ2背景で62比較しました。全件成功し、全35種類の910比較とは別に版別IDとhashを保存します。任意のcomponentsや選択条件の全分岐、手持ち状態・全model/サイズ・他GUI位置・実ワールド・無計装client・別OS/GPUの受入ではありません。
+
+ゲームクラス・GPU・固定化hookを使わない元JARの計算29ケースも、RGB・alpha誤差0です。item definitionsの単純model・定数tintを対象版自身の定義から選び、元のgenerated textureを比較します。1.21.4の時計・コンパス類だけは既存のentityなし・向き0の針モデル計算を含みます。他版の動的modelを一般化して計算するoracleではありません。境界5版の初期GUI100比較は成功しましたが、26.xは以前のworkerの保存PNG基準を使ったQA動作確認です。13版の受入は、現workerの全件基準へ新規比較した上記の結果によります。
+
+初回の通常GUI比較では、1.21.11でResourceLocationからIdentifierへの改名をQAが選択できず、2背景とも描画前に失敗しました。対象mappingsのクラス名に従って選択するよう修正し、1.21.11と対照1.21.6を最終helperで各35種類・2背景再比較して成功しました。上記910比較は初回12版の840成功比較と、修正後1.21.11の70成功比較の集約です。初回のraw FAIL・終了結果と前後のhelper hashを維持し、他12版の分岐結果は変わりません。
+
+JUnit61件・CLI buildが成功し、production描画/core/workerは変更していません。[版別入力・監査・GUI・再生成・元テクスチャの数値記録](../qa/validation-2026-10-12-modern-adapter-acceptance.json)を参照してください。全版experimental/deterministic=false・verified版0を維持します。実ワールド照明・無計装client・全状態/サイズ・他OS/GPU・色空間精度・障害受入は#13等で継続し、マイルストーンは未完了です。実装・検証の完了とPR公開・merge・Issue closeは区別します。
+
+```sh
+# 公式入力とCLI/Docker imageを事前に準備し、新しい出力先へ再実行する。
+python3 - <<'PY'
+import json, subprocess
+from pathlib import Path
+releases = [v['id'] for v in json.loads(Path('adapters/releases.json').read_text())['versions']]
+versions = list(reversed(releases[:releases.index('1.21.4') + 1]))
+ids = 'stone cobblestone_stairs oak_slab oak_fence diamond bow chest ender_chest white_bed white_banner shield player_head dragon_head white_shulker_box glass white_stained_glass ice grass_block oak_leaves potion creeper_spawn_egg leather_chestplate clock compass enchanted_book prismarine decorated_pot conduit armor_stand trident spyglass bundle end_crystal pale_oak_leaves copper_door'.split()
+subprocess.run(['python3', 'scripts/verify-matrix.py', '--offline', '--cache', '.local/cache', '--out', '.local/modern-all', '--versions', *versions], check=True)
+subprocess.run(['python3', 'scripts/verify-matrix.py', '--offline', '--cache', '.local/cache', '--out', '.local/modern-repeat', '--compare', '.local/modern-all', '--versions', *versions, '--ids', *['minecraft:' + i for i in ids]], check=True)
+subprocess.run(['python3', 'scripts/verify-gui-reference.py', '--cache', '.local/cache', '--out', '.local/modern-gui', '--compare', '.local/modern-all', '--position', '0', '0', '--versions', *versions, '--ids', *ids], check=True)
+subprocess.run(['python3', 'scripts/verify-flat-textures.py', '--cache', '.local/cache', '--out', '.local/modern-flat', '--compare', '.local/modern-all', '--versions', *versions], check=True)
+PY
+# 追加modelの例。他版は数値記録の登録済みIDを指定する。
+python3 scripts/verify-gui-reference.py --versions 26.3 --cache .local/cache \
+  --out .local/modern-additions --compare .local/modern-all --position 0 0 \
+  --ids copper_chest copper_golem_statue copper_chestplate copper_spear straw_bed
+```
+
 ## 未完了の受入検証
 
 - Issue #13: 一過性の準備IO_FAILED・起動WORKER_TIMEOUTの原因特定、1.21.4以外の照明基準、完全な無計装clientの基準画像、全版/全modelへの比較拡張と動的表現の受入。

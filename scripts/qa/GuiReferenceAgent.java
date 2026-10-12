@@ -17,7 +17,7 @@ public final class GuiReferenceAgent {
     private static final String SELF="io/github/rs0325/mcicon/qa/GuiReferenceAgent";
     private static final BlockingQueue<JsonObject> requests=new LinkedBlockingQueue<JsonObject>(128);
     private static Symbols symbols;
-    private static boolean legacy,earlyLegacy,fixed,classic,pearl,ready,drawn;
+    private static boolean legacy,earlyLegacy,fixed,classic,immediate,deferred,extracted,latest,pearl,ready,drawn;
     private static volatile boolean capturing;
     private static volatile JsonObject pending;
     private static JsonObject fixture;
@@ -33,14 +33,16 @@ public final class GuiReferenceAgent {
         legacy=profile.equals("legacy-1.13")||profile.equals("legacy-1.14");
         earlyLegacy=profile.equals("legacy-1.13");
         fixed=profile.equals("gui-fixed");classic=profile.equals("gui-classic");pearl=profile.equals("gui-26.3");
-        if(!legacy&&!fixed&&!classic&&!pearl&&!profile.equals("gui-1.21.4"))throw new IllegalArgumentException("対応する参照fixtureではありません: "+profile);
+        immediate=profile.equals("gui-1.21.5");deferred=profile.equals("gui-deferred");
+        extracted=config.get("version").getAsString().startsWith("26.");latest=profile.equals("gui-26.2")||pearl;
+        if(!legacy&&!fixed&&!classic&&!immediate&&!deferred&&!latest&&!profile.equals("gui-1.21.4"))throw new IllegalArgumentException("対応する参照fixtureではありません: "+profile);
         Files.write(Paths.get(argument).getParent().resolve("game/options.txt"),"soundCategory_master:0.0\nguiScale:4\nmaxFps:30\nfullscreen:false\nonboardAccessibility:false\n".getBytes("UTF-8"));
         if(fixture.has("resourcePack"))ResourcePackFaultAgent.installPack(Paths.get(argument).getParent().resolve("game"));
         final String title=legacy?"net.minecraft.client.gui.screen.TitleScreen":"net.minecraft.client.gui.screens.TitleScreen";
         final String screen=legacy?"net.minecraft.client.gui.screen.Screen":"net.minecraft.client.gui.screens.Screen";
         final boolean flatScreen=legacy||fixed&&symbols.hasMethod(screen,"render",3);
-        final String screenMethod=symbols.methodName(pearl?title:screen,pearl?"extractRenderState":"render",flatScreen?3:4);
-        final String graphics=fixed||classic?"com.mojang.blaze3d.vertex.PoseStack":pearl?"net.minecraft.client.gui.GuiGraphicsExtractor":"net.minecraft.client.gui.GuiGraphics";
+        final String screenMethod=symbols.methodName(extracted?title:screen,extracted?"extractRenderState":"render",flatScreen?3:4);
+        final String graphics=fixed||classic?"com.mojang.blaze3d.vertex.PoseStack":extracted?"net.minecraft.client.gui.GuiGraphicsExtractor":"net.minecraft.client.gui.GuiGraphics";
         final String screenDesc=flatScreen?"(IIF)V":"(L"+symbols.actualClass(graphics).replace('.','/')+";IIF)V";
         final String renderer=legacy?"net.minecraft.client.render.GameRenderer":"net.minecraft.client.renderer.GameRenderer";
         final int renderArguments=pearl?0:symbols.hasMethod(renderer,"render",3)?3:2;
@@ -97,11 +99,11 @@ public final class GuiReferenceAgent {
             if(!ready) {
                 minecraft=symbols.call("net.minecraft.client.Minecraft","getInstance",null);
                 if(legacy&&!earlyLegacy&&symbols.field("net.minecraft.client.Minecraft","overlay",minecraft)!=null)return;
-                if((pearl||symbols.hasMethod("net.minecraft.client.Minecraft","isGameLoadFinished",0))&&!Boolean.TRUE.equals(symbols.call("net.minecraft.client.Minecraft","isGameLoadFinished",minecraft)))return;
-                if(!pearl&&symbols.hasMethod("net.minecraft.client.Minecraft","getOverlay",0)&&symbols.call("net.minecraft.client.Minecraft","getOverlay",minecraft)!=null)return;
-                if(pearl&&symbols.call("net.minecraft.client.gui.Gui","overlay",symbols.field("net.minecraft.client.Minecraft","gui",minecraft))!=null)return;
+                if((extracted||symbols.hasMethod("net.minecraft.client.Minecraft","isGameLoadFinished",0))&&!Boolean.TRUE.equals(symbols.call("net.minecraft.client.Minecraft","isGameLoadFinished",minecraft)))return;
+                if(!latest&&(extracted||symbols.hasMethod("net.minecraft.client.Minecraft","getOverlay",0))&&symbols.call("net.minecraft.client.Minecraft","getOverlay",minecraft)!=null)return;
+                if(latest&&symbols.call("net.minecraft.client.gui.Gui","overlay",symbols.field("net.minecraft.client.Minecraft","gui",minecraft))!=null)return;
                 // Share only registry/bootstrap initialization, never export target/view/render methods.
-                catalog=legacy?new LegacyRenderer(symbols,minecraft):fixed?new FixedRenderer(symbols,minecraft):classic?new ClassicRenderer(symbols,minecraft):pearl?new LatestRenderer(symbols,minecraft):new ModernRenderer(symbols,minecraft);
+                catalog=legacy?new LegacyRenderer(symbols,minecraft):fixed?new FixedRenderer(symbols,minecraft):classic?new ClassicRenderer(symbols,minecraft):latest?new LatestRenderer(symbols,minecraft):deferred?new DeferredRenderer(symbols,minecraft):immediate?new GpuImmediateRenderer(symbols,minecraft):new ModernRenderer(symbols,minecraft);
                 if(fixture.has("resourcePack"))ResourcePackFaultAgent.reportPack();
                 JsonObject hello=new JsonObject();hello.addProperty("type","ready");hello.addProperty("protocolVersion",1);hello.addProperty("renderer","QA native screen / "+catalog.environment());hello.addProperty("animationFrameZero",animationHook());hello.addProperty("contextProfile","fixed-v1");emit(hello);ready=true;
             }
@@ -140,10 +142,10 @@ public final class GuiReferenceAgent {
                 else symbols.call(itemRenderer,"renderGuiItem",renderer,stack,x,y);
                 if(symbols.hasMethod(lighting,"turnOff",0))symbols.call(lighting,"turnOff",null);
             } else {
-                String owner=pearl?"net.minecraft.client.gui.GuiGraphicsExtractor":"net.minecraft.client.gui.GuiGraphics";
+                String owner=extracted?"net.minecraft.client.gui.GuiGraphicsExtractor":"net.minecraft.client.gui.GuiGraphics";
                 symbols.call(owner,"fill",graphics,0,0,320,240,color);
-                symbols.call(owner,pearl?"item":"renderItem",graphics,stack,x,y);
-                if(!pearl)symbols.call(owner,"flush",graphics);
+                symbols.call(owner,extracted?"item":"renderItem",graphics,stack,x,y);
+                if(!deferred&&!latest)symbols.call(owner,"flush",graphics);
             }
             if(fixture.has("framebufferProbe"))recordFramebuffer();
             drawn=true;
@@ -172,18 +174,18 @@ public final class GuiReferenceAgent {
             for(Object item:(Iterable<?>)items)if(id.equals(String.valueOf(symbols.call(registry,"getKey",items,item))))return symbols.call("net.minecraft.item.Item","defaultItem",item);
             throw new IllegalArgumentException("Unknown item "+id);
         }
-        Object items=symbols.field(pearl||symbols.hasField("net.minecraft.core.registries.BuiltInRegistries","ITEM")?"net.minecraft.core.registries.BuiltInRegistries":"net.minecraft.core.Registry","ITEM",null);
-        String identifier=pearl?"net.minecraft.resources.Identifier":"net.minecraft.resources.ResourceLocation";
-        Object location=pearl||symbols.hasMethod(identifier,"parse",1)?symbols.call(identifier,"parse",null,id):symbols.construct(identifier,id);
-        Object item=symbols.call("net.minecraft.core.Registry",pearl||symbols.hasMethod("net.minecraft.core.Registry","getValue",1)?"getValue":"get",items,location);
+        Object items=symbols.field(extracted||symbols.hasField("net.minecraft.core.registries.BuiltInRegistries","ITEM")?"net.minecraft.core.registries.BuiltInRegistries":"net.minecraft.core.Registry","ITEM",null);
+        String identifier=extracted||symbols.hasClass("net.minecraft.resources.Identifier")?"net.minecraft.resources.Identifier":"net.minecraft.resources.ResourceLocation";
+        Object location=extracted||symbols.hasMethod(identifier,"parse",1)?symbols.call(identifier,"parse",null,id):symbols.construct(identifier,id);
+        Object item=symbols.call("net.minecraft.core.Registry",extracted||symbols.hasMethod("net.minecraft.core.Registry","getValue",1)?"getValue":"get",items,location);
         return symbols.call("net.minecraft.world.item.Item","getDefaultInstance",item);
     }
     public static void capture() {
         if(!drawn||capturing||pending==null)return;
         capturing=true;
         try {
-            Object target=legacy?symbols.call("net.minecraft.client.Minecraft","getRenderTarget",minecraft):pearl?symbols.call("net.minecraft.client.renderer.GameRenderer","mainRenderTarget",symbols.field("net.minecraft.client.Minecraft","gameRenderer",minecraft)):symbols.call("net.minecraft.client.Minecraft","getMainRenderTarget",minecraft);
-            if(pearl)symbols.call("net.minecraft.client.Screenshot","takeScreenshot",null,target,new Consumer<Object>(){public void accept(Object image){save(image);}});
+            Object target=legacy?symbols.call("net.minecraft.client.Minecraft","getRenderTarget",minecraft):latest?symbols.call("net.minecraft.client.renderer.GameRenderer","mainRenderTarget",symbols.field("net.minecraft.client.Minecraft","gameRenderer",minecraft)):symbols.call("net.minecraft.client.Minecraft","getMainRenderTarget",minecraft);
+            if(immediate||deferred||latest)symbols.call("net.minecraft.client.Screenshot","takeScreenshot",null,target,new Consumer<Object>(){public void accept(Object image){save(image);}});
             else save(legacy?symbols.call("net.minecraft.client.Screenshot","take",null,1280,960,target):symbols.hasMethod("net.minecraft.client.Screenshot","takeScreenshot",3)?symbols.call("net.minecraft.client.Screenshot","takeScreenshot",null,1280,960,target):symbols.call("net.minecraft.client.Screenshot","takeScreenshot",null,target));
         }catch(Throwable e){fail(e);}finally{CanonicalContext.end();}
     }

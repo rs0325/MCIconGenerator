@@ -81,3 +81,7 @@ Issue #6の1.21.4描画backendはPR #17でmainへmergeされ、Issueはcloseさ�
 Issue #10では1.13〜1.21.3の正式38版・64pxの全41,056PNGを現workerで監査しました。代表26種類を版ごとに別のCLI・ゲームプロセスで再生成した988PNGは、全件基準とdecoded RGBA・PNG hash・パス、入力/設定/context/環境/catalogが一致しました。GUI原点(0,0)の2背景1,976比較は最大誤差2/255以内、元JARから計算した無着色diamondの38比較はRGB・alpha誤差0です。これは各IDごとの独立起動や全状態の受入とは区別します。
 
 1.20.6のplayer_headはGUI位置(32,32)で33画素・最大78/255の色差を確認しました。ユーザーが画像を確認してこの位置差を許容し、#10を原点基準で受け入れました。原因は未確定、位置(32,32)のraw FAILと比較許容値は維持します。他位置・実ワールド・OS/GPUの比較は#13で継続します。[旧38版の数値記録](../qa/validation-2026-10-12-classic-adapter-acceptance.json)に版別入力・初回失敗とQA修正・最終helper回帰を保存し、全版experimental/deterministic=false・verified版0を維持します。
+
+Issue #11では1.21.4〜26.3の正式13版・64pxの全19,209PNGを現workerで監査し、代表35種類の独立版別再生成455PNGが全件基準と厳密RGBA・PNG hash・パス、入力/設定/context/環境/renderer/catalog一致しました。原点GUIの共通35種類・2背景910比較と、銅のチェスト/ゴーレム像/装備・槍・straw_bed等の登録済み部分集合62比較は最大誤差2/255以内です。元JARのitem definitionsから計算した29比較はRGB・alpha誤差0でした。
+
+1.21.11のIdentifier改名を選択できなかった初回QAの2背景失敗と前後helper hashを保存し、修正後の再比較と対照1.21.6の比較が成功しました。[新13版の数値記録](../qa/validation-2026-10-12-modern-adapter-acceptance.json)は初回12版の成功と修正後1.21.11の成功を集約し、初回のraw FAILは維持します。production描画は変更せず、全版experimental/deterministic=false・verified版0を維持します。任意のcomponents・全分岐/状態/サイズ・他位置・実ワールド照明・無計装client・別OS/GPU等の受入とは区別します。
