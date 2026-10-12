@@ -77,3 +77,7 @@ iconsのPNGへsRGB Perceptualの指定を追加しました。最終workerで1.2
 512pxの平面5種類の差は、比較計算がバニラのUV縮小を含めていなかったためでした。1.21.4の観測atlas寸法を入力にして公式UV式を計算すると、6サイズ×5種類の30ケースでRGB・alpha誤差0です。PNGや描画worker、許容誤差は変更していません。[UV比較の数値記録](../qa/validation-2026-10-11-inventory-uv.json)を参照してください。立体モデル全般・他版・別GPUの画質受入とは区別します。
 
 Issue #6の1.21.4描画backendはPR #17でmainへmergeされ、Issueはcloseされました。Issue #8では1.21.4・64pxの全1,384IDを別々のCLI・ゲームプロセスで個別生成し、全件出力とdecoded RGBA・パスの厳密一致を確認しました。初回の起動WORKER_TIMEOUT 1件を保存し、同条件の単独再実行を初回基準へ照合しています。[全ID比較の数値記録](../qa/validation-2026-10-11-single-all.json)は他版・他サイズの受入とは区別します。全版/全model・他OS/GPU等の品質と起動障害の受入はIssue #13で継続し、experimental/deterministic=falseを維持します。
+
+Issue #10では1.13〜1.21.3の正式38版・64pxの全41,056PNGを現workerで監査しました。代表26種類を版ごとに別のCLI・ゲームプロセスで再生成した988PNGは、全件基準とdecoded RGBA・PNG hash・パス、入力/設定/context/環境/catalogが一致しました。GUI原点(0,0)の2背景1,976比較は最大誤差2/255以内、元JARから計算した無着色diamondの38比較はRGB・alpha誤差0です。これは各IDごとの独立起動や全状態の受入とは区別します。
+
+1.20.6のplayer_headはGUI位置(32,32)で33画素・最大78/255の色差を確認しました。ユーザーが画像を確認してこの位置差を許容し、#10を原点基準で受け入れました。原因は未確定、位置(32,32)のraw FAILと比較許容値は維持します。他位置・実ワールド・OS/GPUの比較は#13で継続します。[旧38版の数値記録](../qa/validation-2026-10-12-classic-adapter-acceptance.json)に版別入力・初回失敗とQA修正・最終helper回帰を保存し、全版experimental/deterministic=false・verified版0を維持します。

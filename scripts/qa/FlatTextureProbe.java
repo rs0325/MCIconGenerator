@@ -37,9 +37,9 @@ public final class FlatTextureProbe {
             for(int i=firstItem;i<args.length;i++) {
                 String item=args[i];String id="minecraft:"+item;
                 JsonArray inputs=new JsonArray();JsonArray tints=new JsonArray();String modelId="minecraft:item/"+item;
-                if(version.equals("1.13")) {
-                    // Legacy ItemColors are runtime callbacks; only untinted diamond is in this oracle.
-                    if(!item.equals("diamond"))throw new IllegalArgumentException("Legacy oracle only covers diamond");
+                if(!version.equals("1.21.4")&&!version.equals("26.3")) {
+                    // 旧版のItemColorsは実行時callbackのため、無着色diamondだけを計算する。
+                    if(!item.equals("diamond"))throw new IllegalArgumentException("旧モデル形式の比較対象はdiamondだけです");
                 } else {
                     JsonObject definition=json(resource(jar,"assets/minecraft/items/"+item+".json",inputs)).getAsJsonObject("model");
                     if(version.equals("1.21.4")&&(item.equals("clock")||item.equals("compass")||item.equals("recovery_compass"))) {
