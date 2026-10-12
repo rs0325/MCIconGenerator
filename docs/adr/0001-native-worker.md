@@ -13,3 +13,7 @@ Linux amd64のDocker、Java 8/17/21/25、Xvfb、Mesa llvmpipeでホストARMと�
 rendererを呼べた事実だけでは画質・再現性の保証にならない。時刻・暦日・動的property乱数・初期atlasを固定し、黒白背景の2passからalphaを復元する。deferred GUIでは各passのアトラスの割当だけを初期化し、GPU textureを再利用してslot位置を固定する。読み戻しのfence完了後にGUI frameと動的uniform storageを終了・resetする。26.2/26.3ではcommand encoderのsubmitを明示する。16リクエストごとに通常のバニラフレームへ戻り、presentとGPUの遅延解放を進める。色空間、半透明blend、missing model、時計/コンパス・特殊モデルの基準画像、独立起動のRGBA比較の受入は引き続き版ごとに記録する。host nativeのWindows/macOS/LinuxやDocker ARM64 imageは公表対応にしない。
 
 GitHub Actionsは利用せず、利用者の指定によりローカルDockerで検証する。ベースJDK imageのdigestを固定したが、aptのMesaパッケージはbuild日時によって変わる。固定環境の比較には実際に使用したローカルimageとrendererを保存する。
+
+## 描画外の時計と終了処理
+
+1.13.2はGLFW初期化後にUtilsの時計供給元をGLFW経過時刻へ切り替える。通常フレームの秒単位の追従処理は、この基準と初期値0を前提とする。描画外までSystem.nanoTimeへ置換すると反復が増え、PNG生成後にshutdownを送っても終了待機を超過する。時計呼び出しの結果を受け取り、描画中だけfixed-v1の固定値を選ぶ。終了待機の延長やゲーム終了処理の迂回は追加しない。

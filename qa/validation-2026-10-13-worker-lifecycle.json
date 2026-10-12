@@ -1,0 +1,2039 @@
+{
+  "date": "2026-10-13",
+  "issue": 2,
+  "baseCommit": "c6824f5b560e25ff142914478ff71d070c8991d0",
+  "scope": "4代表版・Linux amd64 Mesa Dockerの技術成立と正常終了。画質全体・canonical昇格・native/GPU/ARM backendは対象外。",
+  "workerSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+  "unitTests": {
+    "core": {
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "cli": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "worker": {
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "beforeFix": {
+    "issue": 2,
+    "version": "1.13.2",
+    "scope": "Linux amd64 Mesa Dockerの技術成立確認。World画質受入ではない。",
+    "inputs": {
+      "baseCommit": "c6824f5b560e25ff142914478ff71d070c8991d0",
+      "version": "1.13.2",
+      "verifiedOfficialFilesCopied": 287,
+      "workerSha256": "50961e54de759da4397cb5ad5da2c6fdbdf0f09edeb803788e375f9981bf56af"
+    },
+    "jobs": [
+      {
+        "size": 16,
+        "exitCode": 0,
+        "observedOwnedWorkers": 1,
+        "ownedWorkerDieExitCodes": [
+          "137"
+        ],
+        "elapsedSeconds": 25.081,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 5,
+          "registryPopulationVerified": false,
+          "transparentImages": 5,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "50961e54de759da4397cb5ad5da2c6fdbdf0f09edeb803788e375f9981bf56af",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "66d513dddb0672b4b01c431908a99ee6dc85d2e6465759c34aa33d10306a2039",
+          "metadataSha256": "f733792d4b21edb07a03658117c270f149e0ad6dcaf9ecc64725de8ebae5cf58",
+          "profile": "legacy-1.13",
+          "size": 16
+        },
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 124,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 138,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 221,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:shield",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 154,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": false
+      }
+    ],
+    "passed": false
+  },
+  "shutdownDiagnosis": {
+    "cliExitCode": 0,
+    "cliStack": "WorkerClient.close:151 -> ProcessImpl.waitFor",
+    "workerStack": "cft.c -> adu.b -> GLFW.glfwGetVideoMode",
+    "events": [
+      {
+        "action": "kill",
+        "signal": "9",
+        "exitCode": null
+      },
+      {
+        "action": "die",
+        "signal": null,
+        "exitCode": "137"
+      }
+    ],
+    "shutdownAcknowledged": true,
+    "normalExit": false,
+    "explanation": "描画外のUtils時計をSystem.nanoTimeへ変更したため、GLFW経過時刻前提の通常フレーム追従処理が長く反復。10秒待機後に専用containerを強制回収。"
+  },
+  "afterFixSizes": [
+    {
+      "size": 16,
+      "exitCode": 0,
+      "observedOwnedWorkers": 1,
+      "ownedWorkerDieExitCodes": [
+        "0"
+      ],
+      "elapsedSeconds": 17.434,
+      "audit": {
+        "version": "1.13.2",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 176,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "66d513dddb0672b4b01c431908a99ee6dc85d2e6465759c34aa33d10306a2039",
+        "metadataSha256": "f733792d4b21edb07a03658117c270f149e0ad6dcaf9ecc64725de8ebae5cf58",
+        "profile": "legacy-1.13",
+        "size": 16
+      },
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 124,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 138,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 221,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 154,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 80,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 80,
+          "fractionalAlphaPixels": 176
+        }
+      ],
+      "passed": true,
+      "expectedIdsVerified": true,
+      "forcedTerminationEvents": []
+    },
+    {
+      "size": 64,
+      "exitCode": 0,
+      "observedOwnedWorkers": 1,
+      "ownedWorkerDieExitCodes": [
+        "0"
+      ],
+      "elapsedSeconds": 17.381,
+      "audit": {
+        "version": "1.13.2",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 2744,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "66d513dddb0672b4b01c431908a99ee6dc85d2e6465759c34aa33d10306a2039",
+        "metadataSha256": "f733792d4b21edb07a03658117c270f149e0ad6dcaf9ecc64725de8ebae5cf58",
+        "profile": "legacy-1.13",
+        "size": 64
+      },
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2208,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 3345,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2450,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 2744
+        }
+      ],
+      "passed": true,
+      "expectedIdsVerified": true,
+      "forcedTerminationEvents": []
+    },
+    {
+      "size": 512,
+      "exitCode": 0,
+      "observedOwnedWorkers": 1,
+      "ownedWorkerDieExitCodes": [
+        "0"
+      ],
+      "elapsedSeconds": 16.87,
+      "audit": {
+        "version": "1.13.2",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 176280,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "66d513dddb0672b4b01c431908a99ee6dc85d2e6465759c34aa33d10306a2039",
+        "metadataSha256": "f733792d4b21edb07a03658117c270f149e0ad6dcaf9ecc64725de8ebae5cf58",
+        "profile": "legacy-1.13",
+        "size": 512
+      },
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 126910,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 141312,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 213694,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 156974,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 85864,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 85864,
+          "fractionalAlphaPixels": 176280
+        }
+      ],
+      "passed": true,
+      "expectedIdsVerified": true,
+      "forcedTerminationEvents": []
+    },
+    {
+      "version": "1.13",
+      "size": 16,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 16.327,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 124,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 138,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 221,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 154,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 80,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 80,
+          "fractionalAlphaPixels": 176
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 176,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+        "metadataSha256": "1116fb9184b9f49922759dbc7fd0b6022c4cc4e87096a25be128939cd9764eaa",
+        "profile": "legacy-1.13",
+        "size": 16
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "1.13",
+      "size": 64,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 16.865,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2208,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 3345,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2450,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 2744
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 2744,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+        "metadataSha256": "1116fb9184b9f49922759dbc7fd0b6022c4cc4e87096a25be128939cd9764eaa",
+        "profile": "legacy-1.13",
+        "size": 64
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "1.13",
+      "size": 512,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 16.255,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 126910,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 141312,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 213694,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 156974,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 85864,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 85864,
+          "fractionalAlphaPixels": 176280
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 176280,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+        "metadataSha256": "1116fb9184b9f49922759dbc7fd0b6022c4cc4e87096a25be128939cd9764eaa",
+        "profile": "legacy-1.13",
+        "size": 512
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "1.21.4",
+      "size": 16,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 18.44,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 124,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 136,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 231,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 154,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 80,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 80,
+          "fractionalAlphaPixels": 176
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 176,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "lightmapFullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "74098a01467bea4aa019c714a7e199d64b9af89e104535bf62af1691cac9a91e",
+        "profile": "gui-1.21.4",
+        "size": 16
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "1.21.4",
+      "size": 64,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 18.392,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2176,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 3418,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2450,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 2744
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 2744,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "lightmapFullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "74098a01467bea4aa019c714a7e199d64b9af89e104535bf62af1691cac9a91e",
+        "profile": "gui-1.21.4",
+        "size": 64
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "1.21.4",
+      "size": 512,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 18.892,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 126910,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 138044,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 218919,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 156977,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 85864,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 85864,
+          "fractionalAlphaPixels": 176280
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 176280,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "lightmapFullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "74098a01467bea4aa019c714a7e199d64b9af89e104535bf62af1691cac9a91e",
+        "profile": "gui-1.21.4",
+        "size": 512
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "26.3",
+      "size": 16,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 23.93,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 124,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 136,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 229,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 154,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 80,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 16,
+          "height": 16,
+          "backgroundAlphaZeroPixels": 80,
+          "fractionalAlphaPixels": 176
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "26.3",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 176,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "named",
+        "metadataSha256": "741494344121b3a33afcaf58c5474dcc5820ab935d3ae08a81bcb99e43c21521",
+        "profile": "gui-26.3",
+        "size": 16
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "26.3",
+      "size": 64,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 23.338,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2176,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 3422,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2450,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 2744
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "26.3",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 2744,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "named",
+        "metadataSha256": "741494344121b3a33afcaf58c5474dcc5820ab935d3ae08a81bcb99e43c21521",
+        "profile": "gui-26.3",
+        "size": 64
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "26.3",
+      "size": 512,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 24.937,
+      "images": [
+        {
+          "id": "minecraft:chest",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 126910,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 139264,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 217631,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 156977,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 85864,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 512,
+          "height": 512,
+          "backgroundAlphaZeroPixels": 85864,
+          "fractionalAlphaPixels": 176280
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "26.3",
+        "mode": "icons",
+        "audited": 6,
+        "registryPopulationVerified": false,
+        "transparentImages": 6,
+        "fractionalAlphaPixels": 176280,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "named",
+        "metadataSha256": "741494344121b3a33afcaf58c5474dcc5820ab935d3ae08a81bcb99e43c21521",
+        "profile": "gui-26.3",
+        "size": 512
+      },
+      "expectedIdsVerified": true
+    }
+  ],
+  "continuousRegression": [
+    {
+      "version": "1.13",
+      "size": 64,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 17.973,
+      "images": [
+        {
+          "id": "minecraft:bow",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2976,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:clock",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1248,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:cobblestone_stairs",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1597,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:compass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1856,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:creeper_spawn_egg",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2304,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2208,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:dragon_head",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2043,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1648,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:ender_chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 3345,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:grass_block",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:leather_chestplate",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1952,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_fence",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2861,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2446,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_slab",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2332,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:player_head",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2302,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:potion",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2880,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:prismarine",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2450,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_banner",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2686,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_bed",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2203,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_shulker_box",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 2744
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 25,
+        "registryPopulationVerified": false,
+        "transparentImages": 25,
+        "fractionalAlphaPixels": 2744,
+        "failures": [],
+        "compared": 25,
+        "comparisonVerified": true,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+        "metadataSha256": "1116fb9184b9f49922759dbc7fd0b6022c4cc4e87096a25be128939cd9764eaa",
+        "profile": "legacy-1.13",
+        "size": 64
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "1.21.4",
+      "size": 64,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 19.489,
+      "images": [
+        {
+          "id": "minecraft:bow",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2976,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:clock",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1280,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:cobblestone_stairs",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1597,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:compass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1856,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:creeper_spawn_egg",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2304,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2176,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:dragon_head",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2043,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1664,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:ender_chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 3418,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:grass_block",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:leather_chestplate",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1888,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_fence",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2821,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2266,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_slab",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2332,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:player_head",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2302,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:potion",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2912,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:prismarine",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2450,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_banner",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2686,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_bed",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2219,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_shulker_box",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 2744
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "audited": 25,
+        "registryPopulationVerified": false,
+        "transparentImages": 25,
+        "fractionalAlphaPixels": 2744,
+        "failures": [],
+        "compared": 25,
+        "comparisonVerified": true,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "lightmapFullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "74098a01467bea4aa019c714a7e199d64b9af89e104535bf62af1691cac9a91e",
+        "profile": "gui-1.21.4",
+        "size": 64
+      },
+      "expectedIdsVerified": true
+    },
+    {
+      "version": "26.3",
+      "size": 64,
+      "exitCode": 0,
+      "timedOut": false,
+      "ownedWorkers": 1,
+      "workerExitCodes": [
+        "0"
+      ],
+      "forcedTerminationEvents": [],
+      "elapsedSeconds": 23.739,
+      "images": [
+        {
+          "id": "minecraft:bow",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2976,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:clock",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1280,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:cobblestone_stairs",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1597,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:compass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1856,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:creeper_spawn_egg",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1952,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:diamond",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2176,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:dragon_head",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2043,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1664,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:ender_chest",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1972,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 3422,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:grass_block",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:leather_chestplate",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1888,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_fence",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2821,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2262,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:oak_slab",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2332,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:player_head",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2302,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:potion",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2912,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:prismarine",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:shield",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2450,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:stone",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_banner",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2686,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_bed",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 2219,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_shulker_box",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 0
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "width": 64,
+          "height": 64,
+          "backgroundAlphaZeroPixels": 1352,
+          "fractionalAlphaPixels": 2744
+        }
+      ],
+      "passed": true,
+      "audit": {
+        "version": "26.3",
+        "mode": "icons",
+        "audited": 25,
+        "registryPopulationVerified": false,
+        "transparentImages": 25,
+        "fractionalAlphaPixels": 2744,
+        "failures": [],
+        "compared": 25,
+        "comparisonVerified": true,
+        "canonicalVerified": false
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "named",
+        "metadataSha256": "741494344121b3a33afcaf58c5474dcc5820ab935d3ae08a81bcb99e43c21521",
+        "profile": "gui-26.3",
+        "size": 64
+      },
+      "expectedIdsVerified": true
+    }
+  ],
+  "beforeAfterRgba16": [
+    {
+      "id": "minecraft:chest",
+      "rgbaIdentical": true
+    },
+    {
+      "id": "minecraft:diamond",
+      "rgbaIdentical": true
+    },
+    {
+      "id": "minecraft:glass",
+      "rgbaIdentical": true
+    },
+    {
+      "id": "minecraft:shield",
+      "rgbaIdentical": true
+    },
+    {
+      "id": "minecraft:stone",
+      "rgbaIdentical": true
+    }
+  ],
+  "previousHostEvidence": {
+    "record": "qa/validation-2026-10-12-host-lighting.json",
+    "scope": "macOS Apple Silicon・Linux x86_64・Windows AMD64のJava＋Linux amd64 Docker。新workerをWindows/Linuxホストで再試験した記録ではない。",
+    "nativeGpuBackend": "未対応",
+    "linuxArm64Image": "未対応"
+  },
+  "limitations": [
+    "全版experimental・deterministic=false・verified=0を維持。",
+    "plain glassのalphaは0/255。半透明の受入にはwhite_stained_glassを使用。",
+    "旧agentからhashが変わり、既存iconsのsettings digestと不一致になる。新しい出力先へ再生成する。",
+    "経過時間は診断用であり性能測定ではない。",
+    "ゲーム資産・生成PNG・thread dump・Docker生ログはローカルのみ保持。"
+  ],
+  "passed": true
+}

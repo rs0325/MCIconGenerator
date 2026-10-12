@@ -23,10 +23,10 @@ public final class CanonicalContext {
     public static void begin() {random.set(new Random(0));}
     public static void end() {random.remove();background.remove();probeImage.remove();}
     public static boolean active() {return random.get()!=null;}
-    // Positive elapsed time also initializes vanilla's lazy property caches.
-    public static long elapsedMillis() {return active()?1000L:System.nanoTime()/1000000L;}
-    public static long nanos() {return active()?1000000000L:System.nanoTime();}
-    public static long epochMillis() {return active()?EPOCH_MILLIS:System.currentTimeMillis();}
+    // 描画外ではバニラの時計供給元と時刻の基準を維持する。
+    public static long elapsedMillis(long original) {return active()?1000L:original;}
+    public static long nanos(long original) {return active()?1000000000L:original;}
+    public static long epochMillis(long original) {return active()?EPOCH_MILLIS:original;}
     public static double mathRandom() {return active()?random.get().nextDouble():Math.random();}
     public static void fixCalendar(Object calendar) {
         try {

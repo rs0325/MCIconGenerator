@@ -9,14 +9,14 @@ import org.objectweb.asm.*;
 class CanonicalContextTest {
     @Test void renderClockAndRandomResetWithoutChangingWorkerClock() {
         assertFalse(CanonicalContext.active());
-        long real=CanonicalContext.epochMillis();
+        long real=CanonicalContext.epochMillis(System.currentTimeMillis());
         assertTrue(Math.abs(real-System.currentTimeMillis())<1000);
         Random original=new Random(44),reference=new Random(44);
         assertEquals(reference.nextInt(100),CanonicalContext.nextInt(original,100));
         CanonicalContext.begin();
         try {
-            assertEquals(1000,CanonicalContext.elapsedMillis());
-            assertEquals(CanonicalContext.EPOCH_MILLIS,CanonicalContext.epochMillis());
+            assertEquals(1000,CanonicalContext.elapsedMillis(23));
+            assertEquals(CanonicalContext.EPOCH_MILLIS,CanonicalContext.epochMillis(23));
             double first=CanonicalContext.mathRandom();
             int second=CanonicalContext.nextInt(original,100);
             CanonicalContext.begin();
@@ -25,6 +25,30 @@ class CanonicalContextTest {
         } finally {CanonicalContext.end();}
         assertFalse(CanonicalContext.active());
         assertEquals(reference.nextInt(100),CanonicalContext.nextInt(original,100));
+    }
+    @Test void preservesVanillaClockOriginOutsideRendering() throws Exception {
+        ClassWriter writer=new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        String owner="net/minecraft/util/Utils";
+        writer.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,owner,null,"java/lang/Object",null);
+        String[] names={"getTimeMillis","getTimeNanos","getEpochMillis"};
+        for(int i=0;i<names.length;i++) {
+            MethodVisitor method=writer.visitMethod(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC,names[i],"()J",null,null);
+            method.visitCode();method.visitLdcInsn(23L+i);method.visitInsn(Opcodes.LRETURN);method.visitMaxs(0,0);method.visitEnd();
+            method=writer.visitMethod(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC,"clock"+i,"()J",null,null);
+            method.visitCode();method.visitMethodInsn(Opcodes.INVOKESTATIC,owner,names[i],"()J",false);
+            method.visitInsn(Opcodes.LRETURN);method.visitMaxs(0,0);method.visitEnd();
+        }
+        writer.visitEnd();
+        final byte[] bytes=new CanonicalTransformer(new Symbols(null),true).transformGameClass(owner,writer.toByteArray());
+        Class<?> type=new ClassLoader() {Class<?> define(){return defineClass(null,bytes,0,bytes.length);}}.define();
+        long[] fixed={1000L,1000000000L,CanonicalContext.EPOCH_MILLIS};
+        for(int i=0;i<names.length;i++) {
+            Method method=type.getMethod("clock"+i);
+            assertEquals(23L+i,method.invoke(null));
+            CanonicalContext.begin();
+            try {assertEquals(fixed[i],method.invoke(null));} finally {CanonicalContext.end();}
+            assertEquals(23L+i,method.invoke(null));
+        }
     }
     @Test void rewrittenDateCalendarAndRandomExecuteValidBytecode() throws Exception {
         final byte[] transformed=new CanonicalTransformer(new Symbols(null),false).transformGameClass("net/minecraft/client/renderer/item/properties/numeric/Time",fixture());

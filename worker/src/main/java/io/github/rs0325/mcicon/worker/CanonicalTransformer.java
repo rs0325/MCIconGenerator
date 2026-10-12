@@ -59,10 +59,12 @@ final class CanonicalTransformer implements ClassFileTransformer {
                     public void visitMethodInsn(int opcode,String owner,String method,String descriptor,boolean itf) {
                         String clock=clocks.get(owner+"#"+method);
                         if(opcode==Opcodes.INVOKESTATIC&&descriptor.equals("()J")&&clock!=null) {
-                            super.visitMethodInsn(opcode,CONTEXT,clock,descriptor,false);return;
+                            super.visitMethodInsn(opcode,owner,method,descriptor,itf);
+                            super.visitMethodInsn(opcode,CONTEXT,clock,"(J)J",false);return;
                         }
                         if(owner.equals("java/lang/System")&&opcode==Opcodes.INVOKESTATIC&&descriptor.equals("()J")&&(method.equals("nanoTime")||method.equals("currentTimeMillis"))) {
-                            super.visitMethodInsn(opcode,CONTEXT,method.equals("nanoTime")?"nanos":"epochMillis",descriptor,false);return;
+                            super.visitMethodInsn(opcode,owner,method,descriptor,itf);
+                            super.visitMethodInsn(opcode,CONTEXT,method.equals("nanoTime")?"nanos":"epochMillis","(J)J",false);return;
                         }
                         if(owner.equals("java/lang/Math")&&method.equals("random")&&descriptor.equals("()D")) {
                             super.visitMethodInsn(opcode,CONTEXT,"mathRandom",descriptor,false);return;
