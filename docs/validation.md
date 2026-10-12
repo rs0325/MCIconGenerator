@@ -1,5 +1,22 @@
 # ローカル検証記録
 
+## 描画workerの成立条件と正常終了（2026-10-13、#2）
+
+1.13.2の公開済みpreview workerはPNG生成・監査には成功しましたが、shutdown応答後の10秒待機を超え、DockerのSIGKILL・終了137で回収されました。親CLIのthread dumpはWorkerClient.closeのprocess.waitFor、workerは通常フレームの秒単位の追従処理を示しました。描画外のUtils時計をGLFW経過時刻からSystem.nanoTimeへ変更していたためです。元の時計の戻り値を維持し、描画中だけ固定値を選ぶよう修正しました。
+
+修正workerで1.13・1.13.2・1.21.4・26.3、16/64/512pxの各6種類を生成し、12ジョブ・72PNGの監査、背景alpha=0、指定サイズ、着色ガラスの半透明、worker終了0を確認しました。OOM・SIGKILLイベントはありません。通常のglassはalpha 0/255の素材なので、半透明の受入にはwhite_stained_glassを使います。1.13.2の16px・5種類は修正前のPNGとRGBAが完全一致しました。
+
+1.13・1.21.4・26.3では25種類を連続生成し、16リクエスト後の通常フレーム復帰を含む3ジョブも終了0でした。75PNGは旧workerの全件基準とRGBAが完全一致しました。JUnit64件が成功し、独自の時計供給元の値を描画外で維持し、描画中だけ固定する実bytecode変換も検証しました。初回FAIL、版別入力hash・renderer・contextと再検証結果は[数値記録](../qa/validation-2026-10-13-worker-lifecycle.json)へ保存しています。
+
+ホスト成立範囲は既存#13のmacOS Apple Silicon・Linux x86_64・Windows AMD64のJava＋Linux amd64 Mesa Docker検証を参照します。今回の新workerをWindows/Linuxホストで再実行した結果ではありません。ホストnative/GPU描画とLinux ARM64 imageは未対応です。画質全体とcanonical昇格は別の受入条件であり、全版experimental・deterministic=false・verified=0を維持します。agent hashが変わるため、以前のiconsは新しい出力先へ再生成してください。
+
+専用の準備済みcacheを使い、同じcacheを使う他のworkerを動かさずに実行します。出力先は新規ディレクトリです。ゲーム資産・生成PNG・thread dump・Docker生ログは公開しません。
+
+```sh
+python3 scripts/verify-worker-lifecycle.py --cache .local/cache \
+  --out .local/worker-lifecycle --docker-image mcicon-render:0.1.0-preview.1
+```
+
 実施日: 2026-10-10。GitHub Actionsは使用していません。
 
 環境: macOS 15.7.7 / Apple Silicon、Colima mcicon / Virtualization.framework / Rosetta、Linux amd64 container、VM 4 CPU / 6GiB。worker上限heap 2GiB / container memory 3GiB。core Java21.0.9、game Java8/17/21/25。Java16最低要件の1.17系はJava17 LTSで実行します。最大2 workerを並行実行しました。
