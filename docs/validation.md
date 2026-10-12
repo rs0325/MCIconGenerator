@@ -537,3 +537,29 @@ python3 scripts/verify-worker-lifecycle.py --versions 1.13 1.13.1 1.13.2 \
 CLI installDist、Java8対象QAコンパイル、Python構文確認が成功し、最終反証で新しい確定問題は見つかりませんでした。production変更がないため、JUnitは今回は再実行していません。[各版の数値・入力/worker/QA hash](../qa/validation-2026-10-13-legacy-114-world.json)に条件を保存します。ゲーム画像・worldデータ・JAR・個人パスは公開記録へ含めません。全版experimental/deterministic=false・verified版0を維持します。全モデル・動的状態・全サイズ・他GPUのWorld受入は残ります。
 
 再現手順は上記#22と同じhelperを使用します。`--versions`は1.14・1.14.1・1.14.2・1.14.3、World撮影の`--version`はそのexact版へ替え、試験ごとに新しい出力先を指定してください。終了監視中は同じcacheで別workerを起動せず、Docker image IDと公式入力を揃えます。
+
+## Issue #24のgui-fixed通常ワールド検証（2026-10-13）
+
+対象exact releaseは1.14.4、1.15、1.15.1、1.15.2、1.16、1.16.1、1.16.2、1.16.3、1.16.4、1.16.5です。起点はmainの96c365b236841b9aa4cfeef92851e35657ff036a（#23 merge）、依存#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。Linux amd64・同一Mesa Dockerで検証しました。
+
+通常flatワールド・slot9・1280×960・GUI scale4・GUI位置(80,121)・count1・既定stack・overlayなしで、stone、diamond、grass_block、oak_leaves、chest、player_head、glassを撮影しました。最終QAの64px・70比較は、すべて最大channel誤差0です。許容値2/255と既存の限定例外を広げず、今回の例外使用は0画素です。全モデル・全状態・全サイズ・他GPUとのWorld一致へ一般化しません。
+
+初回1.14.4は誤差0でしたが、1.15・1.16.5のdiamondは864画素で最大3/255となりFAILでした。WorldのCPU/GPU full-bright texelはともにRGBA(252,252,252,255)、worldなしproductionは初期白255です。1.15以降のItemRendererはbuffer内部のLightmapStateShardでlightmapを有効にします。1.15〜1.16.5の9版だけ描画前NativeImageを252へ初期化・uploadし、context.lightmapFullBrightRgbへ記録しました。1.20.6の既存初期化と同じ処理を共有します。1.14.4のrender/2経路、投影・モデル位置・PNGの透過復元は変更しません。PNG保存後のRGB補正は行っていません。
+
+QAの初期observerは一律texture unit1を読んでいましたが、1.14.4のLightTextureはunit1、1.15以降はunit2です。全10版の公式client bytecodeで対応を確認し、正しいunit番号も撮影記録へ追加しました。旧observerの画像誤差0は色の診断として保持し、誤ったunitの観測を照明の最終受入へ流用しません。対象スロットだけを観測し、active texture/bindingを復帰します。描画入口の状態はモデル内部の全状態を示しません。buffer経路の照明判定はCPU/GPUとmanifest252の一致、1.14.4とlegacyは正しいunit1の入口無効状態を使います。
+
+また、1.16系のWorldGenSettings.createはPropertiesのseed「0」をランダム扱いするため、初回1.16.5の保存seedは-2749481002061984119でした。この撮影をseed0条件の受入とは扱いません。withSeed(false, OptionalLong.of(0))で明示設定し、作成前のseed/flatと最終全10版の保存level.datを確認しました。完全な無計装clientとの照合は#31です。
+
+全件9,373 PNG（1.14.4:876、1.15系各883、1.16/1.16.1各974、1.16.2〜1.16.5各975）の登録集合・hash/CRC・RGBA8/sRGB・透過・空画像監査が成功しました。選択一括70枚と、各IDを別CLI・ゲームプロセスから生成した70枚は全件基準へ厳密RGBA、PNG hash、パス、source、settings/digest、context、renderer、catalogが一致しました。16/512px・各7種類・20ジョブ・140枚ではworker exit0、強制終了なし、PNG監査が成功しました。サイズ境界はWorld画像比較ではありません。
+
+修正前後の代表70枚では1.14.4の7枚が同一、1.15以降の63枚が色変化し、alphaと透明領域は不変でした。これは代表画像の結果であり、全モデルのalpha不変を保証しません。worker JAR全体のhashが変わるため、照明変更のない版も旧agentのiconsへ再開できません。新しい出力先へ再生成してください。全版experimental/deterministic=false・verified版0を維持します。
+
+JUnit64件、CLI installDist、Java8対象QA compile、Python構文確認が成功しました。共有処理の1.20.6とlegacyの1.14.3は、同じ7種類のWorld回帰で誤差0でした。[数値・入力/worker/helper hash・初回FAILと観測修正の記録](../qa/validation-2026-10-13-fixed-world.json)へ保存しています。JAR・assets・World・画像・個人パスは公開記録に含めません。
+
+既存cacheで対象版を準備した後、再現例は次のとおりです。単品比較は各IDを別CLI呼び出しで出力し、audit-export.pyへ全件manifestを渡します。終了試験には別cacheを使用します。
+
+```sh
+python3 scripts/verify-matrix.py --versions 1.14.4 1.15 1.15.1 1.15.2 1.16 1.16.1 1.16.2 1.16.3 1.16.4 1.16.5 --offline --out .local/fixed-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-world-inventory.py --version 1.16.5 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/fixed-all --out .local/fixed-world/1.16.5 --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-worker-lifecycle.py --versions 1.14.4 1.15 1.15.1 1.15.2 1.16 1.16.1 1.16.2 1.16.3 1.16.4 1.16.5 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/fixed-sizes --docker-image mcicon-render:0.1.0-preview.1
+```
