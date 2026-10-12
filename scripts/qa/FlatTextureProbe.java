@@ -37,7 +37,7 @@ public final class FlatTextureProbe {
             for(int i=firstItem;i<args.length;i++) {
                 String item=args[i];String id="minecraft:"+item;
                 JsonArray inputs=new JsonArray();JsonArray tints=new JsonArray();String modelId="minecraft:item/"+item;
-                if(!version.equals("1.21.4")&&!version.equals("26.3")) {
+                if(!version.startsWith("26.")&&!(version.startsWith("1.21.")&&Integer.parseInt(version.substring(5))>=4)) {
                     // 旧版のItemColorsは実行時callbackのため、無着色diamondだけを計算する。
                     if(!item.equals("diamond"))throw new IllegalArgumentException("旧モデル形式の比較対象はdiamondだけです");
                 } else {
