@@ -17,7 +17,7 @@
     "renderer": {"type": "string"},
     "javaMajor": {"type": "integer", "minimum": 8},
     "environment": {"type": "object"},
-    "context": {"type": "object", "required": ["profile", "deterministic"], "properties": {"profile": {"type": "string"}, "deterministic": {"type": "boolean"}, "lightmapFullBrightRgb": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 0, "maximum": 255}, "description": "描画前に固定したfull-bright lightmapのRGB8値"}}},
+    "context": {"type": "object", "required": ["profile", "deterministic"], "properties": {"profile": {"type": "string"}, "deterministic": {"type": "boolean"}, "lightmapFullBrightRgb": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 0, "maximum": 255}, "description": "描画前に固定したfull-bright lightmapのRGB8値"}, "guiReference": {"type": "object", "required": ["width", "height", "x", "y"], "properties": {"width": {"type": "integer", "minimum": 16}, "height": {"type": "integer", "minimum": 16}, "x": {"type": "integer", "minimum": 0}, "y": {"type": "integer", "minimum": 0}}, "description": "アイコンを切り出す固定GUIの大きさと描画位置。出力pixelではなくGUI単位"}}},
     "catalog": {"type": "array", "items": {"type": "object", "required": ["id", "kind", "status", "blocks"], "properties": {
       "id": {"$ref": "#/$defs/id"}, "kind": {"enum": ["block", "item"]},
       "status": {"enum": ["available", "no_item_form"]}, "blocks": {"type": "array", "items": {"$ref": "#/$defs/id"}, "uniqueItems": true}

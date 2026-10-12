@@ -82,7 +82,8 @@ public final class IconExporter {
         context.put("profile","fixed-v1");context.put("alphaMethod","black-white-native-composite-v1");context.put("deterministic",false);context.put("count",1);context.put("overlays",false);
         context.put("guiItemAtlas","reset-per-pass");context.put("animationFrame",0);context.put("randomSeed",0);context.put("timeMillis",1000);context.put("epochMillis",946684800000L);
         context.put("partialTick",0.0);context.put("world","absent");context.put("player","absent");context.put("timeZone","UTC");
-        if(runtime.version().id().equals("1.21.4"))context.put("lightmapFullBrightRgb",List.of(252,252,252));
+        if(runtime.version().id().equals("1.20.6")||runtime.version().id().equals("1.21.4"))context.put("lightmapFullBrightRgb",List.of(252,252,252));
+        if(runtime.version().id().equals("1.20.6"))context.put("guiReference",Map.of("width",320,"height",240,"x",80,"y",121));
         manifest.put("context",context);
         manifest.put("entries",entries.values());manifest.put("complete",complete);
         manifest.put("catalog",catalog);long success=entries.values().stream().filter(e->e.status().equals("success")).count();

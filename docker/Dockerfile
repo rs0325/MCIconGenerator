@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxi6 libxrender1 libxtst6 libxxf86vm1 libopenal1 python3 curl \
     && rm -rf /var/lib/apt/lists/*
 ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV LP_NATIVE_VECTOR_WIDTH=128
+ENV GALLIUM_OVERRIDE_CPU_CAPS=sse4.1
 ENV ALSOFT_DRIVERS=null
 WORKDIR /workspace
 COPY docker/entrypoint.sh /usr/local/bin/mcicon-display

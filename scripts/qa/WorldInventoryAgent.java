@@ -9,7 +9,7 @@ import java.nio.file.*;
 import java.io.*;
 import java.util.*;
 
-/** 1.21.4のワールド・画面操作と撮影のみを行う。描画・固定化処理は呼ばない。 */
+/** ワールド・画面操作と撮影のみを行う。描画・固定化処理は呼ばない。 */
 public final class WorldInventoryAgent {
     private static final String MC="net.minecraft.client.Minecraft";
     private static final String CREATE="net.minecraft.client.gui.screens.worldselection.CreateWorldScreen";
@@ -25,8 +25,8 @@ public final class WorldInventoryAgent {
         config=new JsonParser().parse(new String(Files.readAllBytes(Paths.get(argument)),"UTF-8")).getAsJsonObject();
         s=new Symbols(Paths.get(config.get("mappings").getAsString()));
         output=Paths.get(config.get("output").getAsString());
-        report.addProperty("version","1.21.4");report.addProperty("productionRendererUsed",false);
-        report.addProperty("canonicalHooksUsed",false);report.addProperty("renderMethodsTransformed",config.has("fixedGlintMillis"));
+        report.addProperty("version",config.get("version").getAsString());report.addProperty("productionRendererUsed",false);
+        report.addProperty("canonicalHooksUsed",false);report.addProperty("fullBrightPackedLight",15728880);report.addProperty("renderMethodsTransformed",config.has("fixedGlintMillis"));
         report.add("captures",captures);
         final String owner=s.actualClass(MC).replace('.','/'),method=s.methodName(MC,"runTick",1);
         final String glintOwner=s.actualClass("net.minecraft.client.renderer.RenderStateShard").replace('.','/');
@@ -82,7 +82,7 @@ public final class WorldInventoryAgent {
                 if(config.has("frameZeroResources")) {
                     JsonObject sources=new JsonObject();Object manager=s.call(MC,"getResourceManager",minecraft);
                     for(JsonElement e:config.getAsJsonArray("frameZeroResources")) {
-                        String id=e.getAsString();Object location=s.call("net.minecraft.resources.ResourceLocation","parse",null,id);
+                        String id=e.getAsString();Object location=location(id);
                         Object resource=((Optional<?>)s.call("net.minecraft.server.packs.resources.ResourceManager","getResource",manager,location)).get();
                         sources.addProperty(id,String.valueOf(s.call("net.minecraft.server.packs.resources.Resource","sourcePackId",resource)));
                     }
@@ -128,10 +128,17 @@ public final class WorldInventoryAgent {
             String id=index<0?"empty":config.getAsJsonArray("ids").get(index).getAsString();
             Object renderer=s.field(MC,"gameRenderer",minecraft);
             Object light=s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",renderer);
-            Object lightImage=s.call("net.minecraft.client.Screenshot","takeScreenshot",null,s.field("net.minecraft.client.renderer.LightTexture","target",light));
             int fullBright;
-            try{fullBright=((Number)s.call("com.mojang.blaze3d.platform.NativeImage","getPixel",lightImage,15,0)).intValue();}
-            finally{s.call("com.mojang.blaze3d.platform.NativeImage","close",lightImage);}
+            if(s.hasField("net.minecraft.client.renderer.LightTexture","lightPixels")) {
+                Object pixels=s.field("net.minecraft.client.renderer.LightTexture","lightPixels",light);
+                fullBright=((Number)s.call("com.mojang.blaze3d.platform.NativeImage","getPixelRGBA",pixels,15,15)).intValue();
+                report.addProperty("lightmapProbe","cpu-lightPixels");
+            } else {
+                Object lightImage=s.call("net.minecraft.client.Screenshot","takeScreenshot",null,s.field("net.minecraft.client.renderer.LightTexture","target",light));
+                try{fullBright=((Number)s.call("com.mojang.blaze3d.platform.NativeImage","getPixel",lightImage,15,0)).intValue();}
+                finally{s.call("com.mojang.blaze3d.platform.NativeImage","close",lightImage);}
+                report.addProperty("lightmapProbe","gpu-target");
+            }
             Object target=s.call(MC,"getMainRenderTarget",minecraft);
             Object image=s.call("net.minecraft.client.Screenshot","takeScreenshot",null,target);
             Path path=output.resolve(id.replace(':','_')+"-screen.png");
@@ -164,8 +171,12 @@ public final class WorldInventoryAgent {
     }
     private static Object stack(String id) throws Exception {
         Object items=s.field("net.minecraft.core.registries.BuiltInRegistries","ITEM",null);
-        Object item=s.call("net.minecraft.core.Registry","getValue",items,s.call("net.minecraft.resources.ResourceLocation","parse",null,id));
+        Object item=s.call("net.minecraft.core.Registry",s.hasMethod("net.minecraft.core.Registry","getValue",1)?"getValue":"get",items,location(id));
         return s.call("net.minecraft.world.item.Item","getDefaultInstance",item);
+    }
+    private static Object location(String id) throws Exception {
+        String owner="net.minecraft.resources.ResourceLocation";
+        return s.hasMethod(owner,"parse",1)?s.call(owner,"parse",null,id):s.construct(owner,id);
     }
     private static void writeReport() throws IOException {Files.write(output.resolve("capture.json"),new GsonBuilder().setPrettyPrinting().create().toJson(report).getBytes("UTF-8"));}
 }

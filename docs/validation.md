@@ -389,12 +389,61 @@ python3 scripts/verify-resource-faults.py --injection resource-pack --preload-di
 
 上のnativeコマンドは部分集合の再実行例です。全51版と12境界版のexact IDは数値記録に保存します。欠損対象のCLI終了値3を期待するテストであり、通常生成の成功とは区別します。画像・公式入力・破損パック・QA agent・workerログは公開配布物に含めません。実測環境はmacOS Apple Silicon＋Colima/Rosetta・Linux amd64・Mesa llvmpipeです。
 
-## 未完了の受入検証
+## Issue #13のホスト移植性と1.20.6インベントリ基準（2026-10-12）
 
-- Issue #13: 一過性の準備IO_FAILED・起動WORKER_TIMEOUTの原因特定、1.21.4以外の照明基準、完全な無計装clientの基準画像、全版/全modelへの比較拡張と動的表現の受入。
-- Issue #13: 今回の1.21.4のRGBA8/sRGB/straight alpha・既知合成サンプルを超える色精度/linear-lightの検証、全リソース経路の欠損監査とnative buffer部分使用後の復旧。
-- Windows/Linux host、Docker Desktop、native、ARM64 image。
-- daemon障害・書き込み経路の競合など、今回のSIGKILL/ENOSPC/lock試験を超える障害受入。
-- 1.21.4以外の版・別環境でのcold/warmとメモリ・cache容量の追加測定。
+[数値記録](../qa/validation-2026-10-12-host-lighting.json)に、失敗から修正までのbinary・image・入力hash、ホスト、比較条件、件数を保存します。画像・公式入力・QAパック・接続先・個人の絶対パスは含めません。GitHub Actionsは使用していません。
 
-fixed-v1の固定処理を実装しても、受入が完了するまでdeterministic=falseと--allow-experimentalを維持します。マイルストーンは完了にしません。
+Windowsのprotocolはpretty JSONのCRLFからLFだけを除去してCRを残していたため、workerが1行のJSONを読めずcatalog待機で失敗しました。protocol writerだけcompact JSONに変えます。さらにmanifest/settingsのpretty JSONをUTF-8/LFに固定し、OS改行によるsettings digest差を解消しました。以前のWindows出力は新規出力先へ再生成してください。Mac/LinuxのLF形式は維持します。
+
+Macのllvmpipe 128bitとWindowsの256bitで、26.3のwritten_bookの1画素にRGB 1/255差がありました。vector幅128だけでは残り、CPU capsをSSE4.1へ固定して解消しました。SSE2はMacのglint色を最大4/255変えるため採用しません。SSE4.1条件は修正前Macの3版3,825枚と照明修正後1.20.6の1,329枚をRGBA/パス一致で維持します。image更新でsettings digestが変わるため新規出力先へ再生成してください。任意のCPU/Mesa/LLVMやGPUの一致保証ではありません。
+
+1.20.6のlightmapは実ワールドのfull-bright RGB252へ初期化しました。その段階で残ったplayer_headの85画素・最大76/255差は、通常GUIを同じ位置(80,121)にしても再現します。原点では誤差0、位置(32,32)では33画素の差です。同位置のGUIとWorldの不透明1,794画素は完全一致しました。UV識別色のQAパックでは106画素の参照が変わり、色差85画素すべてがその中に含まれます。同じモデルのUV・投影・model-view matrixは不変ですが、位置の平行移動を差し引いたfloat32頂点座標には最大約2.1e-5 GUI単位の差を観測しました。GPU補間と丸め各段階の寄与までは分離していません。
+
+ユーザー指定の固定基準を1.20.6のGUI 320×240・インベントリ位置(80,121)とし、モデル位置と投影をそろえました。size四方のFBOと移動したviewportでそのスロットを切り出し、PNGへのRGB補正や新たな差分許容は追加しません。512pxで必要なviewport 10240×7680はMac/WindowsのMesa上限16384×16384以内です。実設定値、GL error=0、元viewportへの復帰もQA observerで確認しました。原点や任意位置へ同じPNGを完全一致させる保証はありません。agent hash/contextが変わるため旧出力へ再開せず、新規出力先へ再生成してください。
+
+修正後に実ワールドで24種類を再撮影しました。head・stairs/slab/fence・半透明・着色・特殊モデル等20種類は誤差0、glint付き4種類は最大1/255で比較基準2/255以内です。glintだけQAで時刻1000msへ指定し、production rendererや他canonical hooksは使いません。元PNGの初期フレームを保持するQAパックではprismarine/sea_lanternも誤差0でした。公式JARは不変です。初回FAILは修正前の根拠として保持し、以前のGUI(32,32)やoak_fenceの許容をheadへ流用していません。
+
+1.20.6全1,329枚の登録集合・透過・hash/CRC・空画像監査、16/32/64/128/256/512px各6種類の監査が成功しました。フルサイズGUI FBOの私有試作と切り出しviewportの1,325枚は厳密RGBA一致です。glint4種類の5画素は最大1/255・alpha不変で、実ワールド比較でも同じ基準内です。他host/独立反復では許容値を広げずRGBAを厳密比較します。
+
+最終binaryの各hostでraw6,319 PNG、icons5,154 PNG、独立反復96 PNGを確認しました。Linux/Windowsの全件はMac基準へRGBA/パス・設定/context/digest/rendererが厳密一致しました。最終workerで1.13/1.21.4/26.3の全3,825枚が以前の正常基準とRGBA/パス一致し、24種類×3版の独立反復も一致しました。JUnit63件、host監査7件、既存PNG監査9件、実manifest 9件のJSON Schema検証が成功しています。照明・投影の変更は1.20.6だけで、他版の通常ワールド照明を確認したとは扱いません。
+
+core SHA-256: `b13da0531c544e300879bc6d476d2a892aaba94a35e7de1d36f8b91afc200a8c`。worker SHA-256: `50961e54de759da4397cb5ad5da2c6fdbdf0f09edeb803788e375f9981bf56af`。Docker image ID: `sha256:64c2a99ca5ee94105277fbeaace3ed7ba1eb80b710a02111ec2476e8c2e7f09c`。
+
+```sh
+# 同じbinary・imageで生成した64px全件出力をcompareへ渡す。
+python3 scripts/verify-host.py --versions 1.13 1.20.6 1.21.4 26.3 \
+  --out .local/host-repeat --compare .local/normal --cache .local/cache \
+  --docker-context colima-mcicon --docker-image mcicon-render:qa
+python3 scripts/verify-world-inventory.py --version 1.20.6 \
+  --out .local/world-repeat --compare .local/normal --cache .local/cache \
+  --docker-image mcicon-render:qa --ids stone player_head chest
+```
+
+Windowsは既存Java21を明示し、Docker DesktopのLinux backendで実行します。SSHでは既存credential helperのセッション条件で匿名pullが失敗したため、タスク専用匿名configでDockerfileをビルドしました。既存資格情報は変更していません。Linux確認はColima VM上のLinux amd64 container内Javaであり、bare-metal全distributionやnative/ARM64描画の保証ではありません。
+
+## 分離した追加受入検証
+
+ユーザー承認により、#13の完成範囲は上記3ホスト・4代表版の全件/反復、1.20.6のWorld比較、既存受入記録との整合性に確定しました。以前の残件は次の独立Issueへ分離し、各Issueに設計・完成条件・検証方法を記載します。分離先の実装は未着手です。
+
+| World基準・照明のadapter | Issue |
+| --- | --- |
+| legacy-1.13 | [#22](https://github.com/rs0325/MCIconGenerator/issues/22) |
+| legacy-1.14 | [#23](https://github.com/rs0325/MCIconGenerator/issues/23) |
+| gui-fixed | [#24](https://github.com/rs0325/MCIconGenerator/issues/24) |
+| gui-classic | [#25](https://github.com/rs0325/MCIconGenerator/issues/25) |
+| gui-1.21.4 | [#26](https://github.com/rs0325/MCIconGenerator/issues/26) |
+| gui-1.21.5 | [#27](https://github.com/rs0325/MCIconGenerator/issues/27) |
+| gui-deferred | [#28](https://github.com/rs0325/MCIconGenerator/issues/28) |
+| gui-26.2 | [#29](https://github.com/rs0325/MCIconGenerator/issues/29) |
+| gui-26.3 | [#30](https://github.com/rs0325/MCIconGenerator/issues/30) |
+
+- [非計装clientの基準画像と固定状態の比較条件を確定する（#31）](https://github.com/rs0325/MCIconGenerator/issues/31)
+- [RGBA8・sRGB・straight alphaの色精度を追加検証する（#32）](https://github.com/rs0325/MCIconGenerator/issues/32)
+- [一過性の準備IO_FAILEDの原因を特定する（#33）](https://github.com/rs0325/MCIconGenerator/issues/33)
+- [一過性のworker起動WORKER_TIMEOUTを切り分ける（#34）](https://github.com/rs0325/MCIconGenerator/issues/34)
+- [特殊rendererの直接texture・GPU cache監査範囲を確定する（#35）](https://github.com/rs0325/MCIconGenerator/issues/35)
+- [native描画の途中失敗後の継続・資源解放を検証する（#36）](https://github.com/rs0325/MCIconGenerator/issues/36)
+- [Docker daemon切断時の終了・再開を検証する（#37）](https://github.com/rs0325/MCIconGenerator/issues/37)
+- [境界版のcold/warm時間・メモリ・cache容量を測定する（#38）](https://github.com/rs0325/MCIconGenerator/issues/38)
+
+#13完了は全51版・全model/状態/サイズの無計装World比較、任意のGPU/native/ARM64 backend、全色精度や全障害の保証を意味しません。全版experimental/deterministic=false・verified版0を維持します。マイルストーンは未完了で、releaseは実施しません。

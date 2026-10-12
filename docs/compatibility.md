@@ -66,7 +66,7 @@ iconsのPNGへsRGB Perceptualの指定を追加しました。最終workerで1.2
 
 1.21.4の通常ワールドのInventoryScreenと、productionのbootstrap・固定化を共有しないQAで静的28種類を比較しました。変更前は生RGBで11種類が許容値を超え、worldなしlightmap初期値255と実ワールドのfull-bright値252の差を確認しました。実測lightmapを乗算した診断では全28種類が誤差2/255以内でした。補正診断を生比較の成功やcanonicalの受入完了とは扱いません。[変更前のワールド内比較記録](../qa/validation-2026-10-11-world-inventory.json)を参照してください。後続作業では実インベントリの照明を固定基準に選び、1.21.4だけ描画時に反映します。全版experimental/deterministic=falseを維持します。
 
-ホストmacOS Apple Silicon＋Colima/Rosetta上のLinux amd64 containerを検証しています。Windows/Linux host、Docker Desktop、host native、Linux ARM64 imageは未検証です。GitHub Actionsは使用しません。
+この時点の確認はmacOS Apple Silicon＋Colima/Rosetta上のLinux amd64 containerです。後続のホスト検証は末尾のIssue #13の記録を参照してください。GitHub Actionsは使用しません。
 
 1.21.4のlightmapを実インベントリのRGB252へ合わせた後、通常ワールドの静的28種類はPNGのRGB補正なしで全件成功（最大誤差1/255）しました。新workerの全1,384枚を監査し、1,382枚のRGBAが変更前から変わります。透明領域のmaskと出力パスは不変ですが、alphaには最大1/255の量子化差があります。以前のiconsは新しい出力先で再生成してください。他9境界版の代表54枚は既存RGBA・パスと一致しました。[照明変更後の数値記録](../qa/validation-2026-10-11-inventory-lighting.json)は以前の全51版記録と区別します。他版の照明、全ID・動的表現の独立受入は未完了です。
 
@@ -80,7 +80,7 @@ Issue #6の1.21.4描画backendはPR #17でmainへmergeされ、Issueはcloseさ�
 
 Issue #10では1.13〜1.21.3の正式38版・64pxの全41,056PNGを現workerで監査しました。代表26種類を版ごとに別のCLI・ゲームプロセスで再生成した988PNGは、全件基準とdecoded RGBA・PNG hash・パス、入力/設定/context/環境/catalogが一致しました。GUI原点(0,0)の2背景1,976比較は最大誤差2/255以内、元JARから計算した無着色diamondの38比較はRGB・alpha誤差0です。これは各IDごとの独立起動や全状態の受入とは区別します。
 
-1.20.6のplayer_headはGUI位置(32,32)で33画素・最大78/255の色差を確認しました。ユーザーが画像を確認してこの位置差を許容し、#10を原点基準で受け入れました。原因は未確定、位置(32,32)のraw FAILと比較許容値は維持します。他位置・実ワールド・OS/GPUの比較は#13で継続します。[旧38版の数値記録](../qa/validation-2026-10-12-classic-adapter-acceptance.json)に版別入力・初回失敗とQA修正・最終helper回帰を保存し、全版experimental/deterministic=false・verified版0を維持します。
+1.20.6のplayer_headはGUI位置(32,32)で33画素・最大78/255の色差を確認しました。ユーザーが画像を確認してこの位置差を許容し、#10を原点基準で受け入れました。当時は原因未確定で、位置(32,32)のraw FAILと比較許容値を維持しました。後続#13の位置・投影調査と新たな固定基準は末尾に記録します。[旧38版の数値記録](../qa/validation-2026-10-12-classic-adapter-acceptance.json)に版別入力・初回失敗とQA修正・最終helper回帰を保存し、全版experimental/deterministic=false・verified版0を維持します。
 
 Issue #11では1.21.4〜26.3の正式13版・64pxの全19,209PNGを現workerで監査し、代表35種類の独立版別再生成455PNGが全件基準と厳密RGBA・PNG hash・パス、入力/設定/context/環境/renderer/catalog一致しました。原点GUIの共通35種類・2背景910比較と、銅のチェスト/ゴーレム像/装備・槍・straw_bed等の登録済み部分集合62比較は最大誤差2/255以内です。元JARのitem definitionsから計算した29比較はRGB・alpha誤差0でした。
 
@@ -91,3 +91,19 @@ Issue #11では1.21.4〜26.3の正式13版・64pxの全19,209PNGを現workerで�
 修正後workerで固定正式51版・60,265PNGを新規生成し、登録母集団・除外理由・ID/パス重複・hash/CRC・RGBA8・透過・空画像の監査と、#10/#11の正常基準へのRGBA・PNG hash・パス比較が成功しました。1.21.11で破損stone PNGの代替画像を成功出力する検出漏れを、BakedQuadのposition/packedUV消費時のsprite観測で修正しました。選択された破損atlas/直接textureを各51版、モデル・チェスト・空モデル・事前ロード済み直接textureを各12境界版で受け入れました。150成功は複数実行の集約であり、初回失敗10ケースと各worker/helper hashを保存します。[検証範囲と再実行方法](validation.md)・[数値記録](../qa/validation-2026-10-12-release-coverage.json)を参照してください。
 
 正常PNG bytes・RGBA・パスは不変ですが、worker hashとsettingsDigestは変わります。旧manifestへ再開せず、新しい出力先で再生成してください。全版experimental/deterministic=false・verified版0を維持し、全状態・サイズ・world・OS/GPUなどの受入は#13等で継続します。
+
+## Issue #13のホスト・照明検証（2026-10-12）
+
+描画backendはLinux amd64・Mesa llvmpipeのDockerに限定します。ホストJavaは21以上、CPUまたはエミュレーションにはSSE4.1が必要です。ホストnative/GPU描画、Linux ARM64 imageは未対応です。
+
+| ホスト検証環境 | CLIとDocker | 1.13 / 1.20.6 / 1.21.4 / 26.3 |
+| --- | --- | --- |
+| macOS 15.7.7 / Apple Silicon | Java 21.0.9 / Colima・Rosetta / Docker 29.5.2 | raw 6,319・icons 5,154・反復96を生成・監査。1.13/1.21.4/26.3は旧基準RGBA一致、1.20.6は下記の新基準 |
+| Colima Linux VM内のamd64 container | Java 21 / Docker 29.5.2 | raw 6,319・icons 5,154・反復96が成功。Mac全件RGBA・設定・renderer一致 |
+| Windows 11 Pro build 26200 / AMD64 | Java 21.0.9 / WSL 3.0.1 / Docker Desktop 4.94.0、Engine 29.8.2 | raw 6,319・icons 5,154・反復96が成功。Mac全件RGBA・設定・renderer一致 |
+
+対象exact versionは1.13/1.20.6/1.21.4/26.3です。最終binaryで確認し、未完了の他版World照明・色精度拡張・一過性障害調査はユーザー承認で別Issueへ分離します。Linuxの確認はローカルVM内のcontainerでJava CLIを動かす経路です。任意のLinuxディストリビューションやbare metalを検証したとは扱いません。比較用の同一image IDと公式入力でホスト差を確認し、独立反復ではrenderer・settingsDigestも一致させます。新しくbuildしたDocker imageや別Mesa/LLVM/CPUでのRGBA一致へ保証を広げません。
+
+WindowsでJSON Linesの内部改行が残って描画がtimeoutになる不具合と、metadata/settings hashがCRLFに依存する不具合を修正しました。Mesaの128bit指定だけでは残るCPU最適化の量子化差を、SSE4.1指定と合わせて抑えます。以前のWindows出力と旧Docker imageのiconsは新しい出力先で再生成してください。
+
+1.20.6のlightmapも実測RGB252へ合わせました。全1,329枚を監査し、変更前から1,327枚のRGBAが変わります。可視alpha mask・パスは不変、alpha量子化差は最大1/255です。保存した通常ワールド画像とのstone/diamond/grass_block/oak_leaves/chest比較は誤差0ですが、player_headの85画素・最大76/255の差は、GUI位置に伴うテクスチャ参照の変化として再現しました。ユーザー指定のGUI 320×240・インベントリ位置(80,121)へ投影とモデル位置を合わせ、再撮影した通常ワールドとの24種類比較が成功しました。headを含む20種類は誤差0、glint付き4種類は最大1/255（基準2/255以内）です。初回FAILは修正前の記録として保持します。最終binaryの4代表版で全件・反復と3ホスト比較が成功しました。以前に許容されたGUI(32,32)の33画素差とは別の記録です。全版experimental/deterministic=false・verified版0を維持します。
