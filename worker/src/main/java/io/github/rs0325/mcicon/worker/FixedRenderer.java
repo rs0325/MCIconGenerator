@@ -11,6 +11,10 @@ public final class FixedRenderer extends ClassicRenderer {
             Object dispatcher=s.field(dispatcherClass,"instance",null);
             s.setField(dispatcherClass,"textureManager",dispatcher,s.call("net.minecraft.client.Minecraft","getTextureManager",minecraft));
         }
+        if(s.hasMethod("net.minecraft.client.renderer.entity.ItemRenderer","render",8)) {
+            Object renderer=s.field("net.minecraft.client.Minecraft","gameRenderer",minecraft);
+            initializeLightPixels(s.field("net.minecraft.client.renderer.GameRenderer","lightTexture",renderer));
+        }
         gl=s.hasMethod("com.mojang.blaze3d.platform.GlStateManager","matrixMode",1)?"com.mojang.blaze3d.platform.GlStateManager":"com.mojang.blaze3d.systems.RenderSystem";
     }
     protected Object createTarget(int size,boolean ignored) throws Exception {

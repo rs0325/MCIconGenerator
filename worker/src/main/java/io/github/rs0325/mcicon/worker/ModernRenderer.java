@@ -22,9 +22,7 @@ public class ModernRenderer implements WorkerRenderer {
             Object light=s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",gameRenderer);
             // 実ワールドのfull-bright lightmapと同じ252/255へ初期化する。
             if(version.equals("1.20.6")) {
-                Object pixels=s.field("net.minecraft.client.renderer.LightTexture","lightPixels",light);
-                for(int y=0;y<16;y++)for(int x=0;x<16;x++)s.call("com.mojang.blaze3d.platform.NativeImage","setPixelRGBA",pixels,x,y,0xfffcfcfc);
-                s.call("net.minecraft.client.renderer.texture.DynamicTexture","upload",s.field("net.minecraft.client.renderer.LightTexture","lightTexture",light));
+                initializeLightPixels(light);
             } else {
                 Object target=s.field("net.minecraft.client.renderer.LightTexture","target",light);
                 s.call("com.mojang.blaze3d.pipeline.RenderTarget","setClearColor",target,0.99f,0.99f,0.99f,1f);
@@ -32,6 +30,11 @@ public class ModernRenderer implements WorkerRenderer {
                 bindTarget(s.call("net.minecraft.client.Minecraft","getMainRenderTarget",minecraft));
             }
         }
+    }
+    protected void initializeLightPixels(Object light) throws Exception {
+        Object pixels=s.field("net.minecraft.client.renderer.LightTexture","lightPixels",light);
+        for(int y=0;y<16;y++)for(int x=0;x<16;x++)s.call("com.mojang.blaze3d.platform.NativeImage","setPixelRGBA",pixels,x,y,0xfffcfcfc);
+        s.call("net.minecraft.client.renderer.texture.DynamicTexture","upload",s.field("net.minecraft.client.renderer.LightTexture","lightTexture",light));
     }
     public String environment() throws Exception {
         return s.call("org.lwjgl.opengl.GL11","glGetString",null,7937)+" / "+s.call("org.lwjgl.opengl.GL11","glGetString",null,7938);

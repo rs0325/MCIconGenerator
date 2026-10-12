@@ -22,7 +22,8 @@ public final class WorldInventoryAgent {
     private static Object minecraft;
     private static Path output;
     private static int stage,frames,index=-1;
-    private static boolean legacy;
+    private static boolean legacy,fixed;
+    private static int guiLightmapUnit=1;
     private static Boolean guiLightmapEnabled;
     public static void premain(String argument,Instrumentation instrumentation) throws Exception {
         config=new JsonParser().parse(new String(Files.readAllBytes(Paths.get(argument)),"UTF-8")).getAsJsonObject();
@@ -32,20 +33,24 @@ public final class WorldInventoryAgent {
         report.addProperty("canonicalHooksUsed",false);report.addProperty("fullBrightPackedLight",15728880);report.addProperty("renderMethodsTransformed",config.has("fixedGlintMillis"));
         report.add("captures",captures);
         legacy=config.get("version").getAsString().matches("1\\.(?:13(?:\\.[12])?|14(?:\\.[123])?)");
-        if(legacy){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",true);}
+        fixed=config.get("version").getAsString().matches("1\\.(?:14\\.4|15(?:\\.[12])?|16(?:\\.[1-5])?)");
+        if(legacy||fixed){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",true);}
         final String owner=s.actualClass(MC).replace('.','/'),method=s.methodName(MC,legacy?"m_0520165":"runTick",1);
-        final String itemOwner=s.actualClass("net.minecraft.client.render.entity.ItemRenderer").replace('.','/');
-        final String guiMethod=s.methodName("net.minecraft.client.render.entity.ItemRenderer","renderGuiItemModel",4);
-        final String drawMethod=s.methodName("net.minecraft.client.render.entity.ItemRenderer","renderItem",2);
-        final String stackType="L"+s.actualClass("net.minecraft.item.ItemStack").replace('.','/')+";";
-        final String modelType="L"+s.actualClass("net.minecraft.client.resource.model.BakedModel").replace('.','/')+";";
-        final String drawDescriptor="("+stackType+modelType+")V",guiDescriptor="("+stackType+"II"+modelType+")V";
+        final String itemClass=legacy?"net.minecraft.client.render.entity.ItemRenderer":"net.minecraft.client.renderer.entity.ItemRenderer";
+        final String itemOwner=s.actualClass(itemClass).replace('.','/');
+        final String guiMethod=s.methodName(itemClass,legacy?"renderGuiItemModel":"renderGuiItem",4);
+        final boolean pose=fixed&&s.hasMethod(itemClass,"render",8);
+        guiLightmapUnit=pose?2:1;
+        final String drawMethod=s.methodName(itemClass,legacy?"renderItem":"render",pose?8:2);
+        final String stackType=descriptor(legacy?"net.minecraft.item.ItemStack":"net.minecraft.world.item.ItemStack");
+        final String modelType=descriptor(legacy?"net.minecraft.client.resource.model.BakedModel":"net.minecraft.client.resources.model.BakedModel");
+        final String drawDescriptor="("+stackType+(pose?descriptor("net.minecraft.client.renderer.block.model.ItemTransforms$TransformType")+"Z"+descriptor("com.mojang.blaze3d.vertex.PoseStack")+descriptor("net.minecraft.client.renderer.MultiBufferSource")+"II":"")+modelType+")V",guiDescriptor="("+stackType+"II"+modelType+")V";
         final String glintOwner=s.actualClass("net.minecraft.client.renderer.RenderStateShard").replace('.','/');
         final String glintMethod=s.methodName("net.minecraft.client.renderer.RenderStateShard","setupGlintTexturing",1);
         final String timeOwner=s.actualClass("net.minecraft.Util").replace('.','/'),timeMethod=s.methodName("net.minecraft.Util","getMillis",0);
         instrumentation.addTransformer(new ClassFileTransformer() {
             public byte[] transform(ClassLoader loader,String name,Class<?> redef,ProtectionDomain domain,byte[] bytes) {
-                if(legacy&&name.equals(itemOwner)) {
+                if((legacy||fixed)&&name.equals(itemOwner)) {
                     ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                     reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
                         public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
@@ -55,7 +60,7 @@ public final class WorldInventoryAgent {
                                 public void visitMethodInsn(int opcode,String owner,String name,String desc,boolean itf) {
                                     if(owner.equals(itemOwner)&&name.equals(drawMethod)&&desc.equals(drawDescriptor)) {
                                         super.visitVarInsn(Opcodes.ALOAD,1);
-                                        super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/WorldInventoryAgent","observeLegacyGui","(Ljava/lang/Object;)V",false);
+                                        super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/WorldInventoryAgent","observeGui","(Ljava/lang/Object;)V",false);
                                     }
                                     super.visitMethodInsn(opcode,owner,name,desc,itf);
                                 }
@@ -107,8 +112,9 @@ public final class WorldInventoryAgent {
             if(minecraft==null)minecraft=s.call(MC,"getInstance",null);
             Object screen=s.field(MC,"screen",minecraft);
             if(stage==0) {
-                if(!Boolean.TRUE.equals(s.call(MC,"isGameLoadFinished",minecraft))||s.call(MC,"getOverlay",minecraft)!=null||!s.type("net.minecraft.client.gui.screens.TitleScreen").isInstance(screen))return;
+                if((!fixed&&!Boolean.TRUE.equals(s.call(MC,"isGameLoadFinished",minecraft)))||s.call(MC,"getOverlay",minecraft)!=null||!s.type("net.minecraft.client.gui.screens.TitleScreen").isInstance(screen))return;
                 if(++frames<60)return;
+                if(fixed){createFixedWorld();return;}
                 if(config.has("frameZeroResources")) {
                     JsonObject sources=new JsonObject();Object manager=s.call(MC,"getResourceManager",minecraft);
                     for(JsonElement e:config.getAsJsonArray("frameZeroResources")) {
@@ -149,15 +155,15 @@ public final class WorldInventoryAgent {
             if(stage!=3)return;
             if(!s.type("net.minecraft.client.gui.screens.inventory.InventoryScreen").isInstance(screen))throw new IllegalStateException("inventory画面が閉じられました");
             if(++frames<30)return;
-            Object inventory=s.call("net.minecraft.world.entity.player.Player","getInventory",player);
+            Object inventory=inventory(player);
             Object stack=s.call(INVENTORY,"getItem",inventory,9);
             if(index>=0) {
-                String actual=String.valueOf(s.call("net.minecraft.core.Registry","getKey",s.field("net.minecraft.core.registries.BuiltInRegistries","ITEM",null),s.call("net.minecraft.world.item.ItemStack","getItem",stack)));
+                String actual=String.valueOf(s.call("net.minecraft.core.Registry","getKey",items(),s.call("net.minecraft.world.item.ItemStack","getItem",stack)));
                 if(!actual.equals(config.getAsJsonArray("ids").get(index).getAsString()))throw new IllegalStateException("スロットのアイテムが不一致: "+actual);
             }
             String id=index<0?"empty":config.getAsJsonArray("ids").get(index).getAsString();
             Object renderer=s.field(MC,"gameRenderer",minecraft);
-            Object light=s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",renderer);
+            Object light=fixed?s.field("net.minecraft.client.renderer.GameRenderer","lightTexture",renderer):s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",renderer);
             int fullBright;
             if(s.hasField("net.minecraft.client.renderer.LightTexture","lightPixels")) {
                 Object pixels=s.field("net.minecraft.client.renderer.LightTexture","lightPixels",light);
@@ -170,7 +176,7 @@ public final class WorldInventoryAgent {
                 report.addProperty("lightmapProbe","gpu-target");
             }
             Object target=s.call(MC,"getMainRenderTarget",minecraft);
-            Object image=s.call("net.minecraft.client.Screenshot","takeScreenshot",null,target);
+            Object image=fixed?s.call("net.minecraft.client.Screenshot","takeScreenshot",null,1280,960,target):s.call("net.minecraft.client.Screenshot","takeScreenshot",null,target);
             Path path=output.resolve(id.replace(':','_')+"-screen.png");
             try{s.call("com.mojang.blaze3d.platform.NativeImage","writeToFile",image,path);}finally{s.call("com.mojang.blaze3d.platform.NativeImage","close",image);}
             JsonObject capture=new JsonObject();capture.addProperty("id",id);capture.addProperty("screen",path.getFileName().toString());
@@ -180,9 +186,10 @@ public final class WorldInventoryAgent {
             capture.addProperty("count",((Number)s.call("net.minecraft.world.item.ItemStack","getCount",stack)).intValue());
             capture.addProperty("hasFoil",(Boolean)s.call("net.minecraft.world.item.ItemStack","hasFoil",stack));
             capture.addProperty("fullBrightArgb",fullBright);
+            if(fixed){observeFixedLight(light,fullBright,capture);}
             capture.addProperty("gameTime",((Number)s.call("net.minecraft.world.level.Level","getGameTime",level)).longValue());
             captures.add(capture);writeReport();System.err.println("[mcicon QA world] captured "+id);
-            index++;frames=0;
+            index++;frames=0;guiLightmapEnabled=null;
             if(index==config.getAsJsonArray("ids").size()) {report.addProperty("completed",true);writeReport();stage=4;s.call(MC,"stop",minecraft);return;}
             final Object next=stack(config.getAsJsonArray("ids").get(index).getAsString());
             s.call(INVENTORY,"setItem",inventory,9,next);
@@ -192,7 +199,7 @@ public final class WorldInventoryAgent {
             s.call("net.minecraft.util.thread.BlockableEventLoop","execute",server,new Runnable(){public void run(){try {
                 Object list=s.call("net.minecraft.server.MinecraftServer","getPlayerList",server);
                 Object serverPlayer=s.call("net.minecraft.server.players.PlayerList","getPlayer",list,uuid);
-                s.call(INVENTORY,"setItem",s.call("net.minecraft.world.entity.player.Player","getInventory",serverPlayer),9,s.call("net.minecraft.world.item.ItemStack","copy",next));
+                s.call(INVENTORY,"setItem",inventory(serverPlayer),9,s.call("net.minecraft.world.item.ItemStack","copy",next));
             }catch(Exception e){throw new RuntimeException(e);}}});
         }catch(Throwable e) {
             e.printStackTrace(System.err);report.addProperty("error",e.toString());
@@ -236,13 +243,7 @@ public final class WorldInventoryAgent {
         Object pixels=s.field("net.minecraft.client.render.LightMap","pixels",light);
         int fullBright=((Number)s.call(imageType,"getPixelRGBA",pixels,15,15)).intValue();
         Object texture=s.field("net.minecraft.client.render.LightMap","texture",light);
-        int textureId=((Number)s.call("net.minecraft.client.render.texture.Texture","getGlId",texture)).intValue();
-        ByteBuffer gpu=ByteBuffer.allocateDirect(16*16*4);
-        int previous=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,32873)).intValue();
-        try {
-            s.call("org.lwjgl.opengl.GL11","glBindTexture",null,3553,textureId);
-            s.call("org.lwjgl.opengl.GL11","glGetTexImage",null,3553,0,6408,5121,gpu);
-        } finally {s.call("org.lwjgl.opengl.GL11","glBindTexture",null,3553,previous);}
+        ByteBuffer gpu=readLightTexture(texture,"net.minecraft.client.render.texture.Texture","getGlId");
         Object image=s.call("net.minecraft.client.Screenshot","take",null,1280,960,s.call(MC,"getRenderTarget",minecraft));
         Path path=output.resolve(id.replace(':','_')+"-screen.png");
         try{s.call(imageType,"write",image,path);}finally{s.call(imageType,"close",image);}
@@ -256,6 +257,7 @@ public final class WorldInventoryAgent {
         if(index>=0) {
             if(guiLightmapEnabled==null)throw new IllegalStateException("GUIのlightmap状態を観測できませんでした");
             capture.addProperty("guiLightmapTextureEnabled",guiLightmapEnabled);
+            capture.addProperty("guiLightmapTextureUnit",1);
         }
         JsonArray cpuRgba=new JsonArray(),gpuRgba=new JsonArray();
         for(int channel=0;channel<4;channel++){cpuRgba.add((fullBright>>(channel*8))&255);gpuRgba.add(gpu.get((15*16+15)*4+channel)&255);}
@@ -283,23 +285,66 @@ public final class WorldInventoryAgent {
             try{update.call();}catch(Exception e){throw new IllegalStateException("server側のスロットを更新できません",e);}
         }});
     }
-    public static void observeLegacyGui(Object stack) {
+    public static void observeGui(Object stack) {
         if(stage!=3||index<0)return;
         try {
             Object player=s.field(MC,"player",minecraft);
-            Object inventory=s.field("net.minecraft.entity.living.player.PlayerEntity","inventory",player);
-            if(stack!=s.call("net.minecraft.inventory.Inventory","getItem",inventory,9))return;
+            Object inventory=legacy?s.field("net.minecraft.entity.living.player.PlayerEntity","inventory",player):inventory(player);
+            if(stack!=s.call(legacy?"net.minecraft.inventory.Inventory":INVENTORY,"getItem",inventory,9))return;
             int active=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,34016)).intValue();
             try {
-                s.call("org.lwjgl.opengl.GL13","glActiveTexture",null,33985);
+                s.call("org.lwjgl.opengl.GL13","glActiveTexture",null,33984+guiLightmapUnit);
                 guiLightmapEnabled=(Boolean)s.call("org.lwjgl.opengl.GL11","glIsEnabled",null,3553);
             } finally {s.call("org.lwjgl.opengl.GL13","glActiveTexture",null,active);}
         }catch(Exception e){throw new IllegalStateException("GUIのlightmap状態を取得できません",e);}
     }
     private static Object stack(String id) throws Exception {
-        Object items=s.field("net.minecraft.core.registries.BuiltInRegistries","ITEM",null);
+        Object items=items();
         Object item=s.call("net.minecraft.core.Registry",s.hasMethod("net.minecraft.core.Registry","getValue",1)?"getValue":"get",items,location(id));
         return s.call("net.minecraft.world.item.Item","getDefaultInstance",item);
+    }
+    private static Object items() throws Exception {return s.field(fixed?"net.minecraft.core.Registry":"net.minecraft.core.registries.BuiltInRegistries","ITEM",null);}
+    private static Object inventory(Object player) throws Exception {return fixed?s.field("net.minecraft.world.entity.player.Player","inventory",player):s.call("net.minecraft.world.entity.player.Player","getInventory",player);}
+    private static String descriptor(String owner) {return "L"+s.actualClass(owner).replace('.','/')+";";}
+    private static void createFixedWorld() throws Exception {
+        Object survival=s.field("net.minecraft.world.level.GameType","SURVIVAL",null);
+        stage=2;frames=0;
+        if(s.hasMethod(MC,"selectLevel",3)) {
+            Object settings=s.construct("net.minecraft.world.level.LevelSettings",0L,survival,false,false,s.field("net.minecraft.world.level.LevelType","FLAT",null));
+            s.call("net.minecraft.world.level.LevelSettings","enableSinglePlayerCommands",settings);
+            s.call(MC,"selectLevel",minecraft,"mcicon-qa","MCIcon QA",settings);
+        } else {
+            Object registries=s.call("net.minecraft.core.RegistryAccess","builtin",null);
+            Object settings=s.construct("net.minecraft.world.level.LevelSettings","MCIcon QA",survival,false,s.field("net.minecraft.world.Difficulty","PEACEFUL",null),true,s.construct("net.minecraft.world.level.GameRules"),s.field("net.minecraft.world.level.DataPackConfig","DEFAULT",null));
+            Properties properties=new Properties();properties.setProperty("level-seed","0");properties.setProperty("level-type","flat");properties.setProperty("generate-structures","false");
+            String generation="net.minecraft.world.level.levelgen.WorldGenSettings";
+            Object world=s.hasMethod(generation,"create",1)?s.call(generation,"create",null,properties):s.call(generation,"create",null,registries,properties);
+            world=s.call(generation,"withSeed",world,false,OptionalLong.of(0L));
+            if(((Number)s.call(generation,"seed",world)).longValue()!=0L||!Boolean.TRUE.equals(s.call(generation,"isFlatWorld",world)))throw new IllegalStateException("ワールドのseed/flat設定が不一致です");
+            report.addProperty("worldSeed",0L);report.addProperty("worldIsFlat",true);
+            s.call(MC,"createLevel",minecraft,"mcicon-qa",settings,registries,world);
+        }
+    }
+    private static void observeFixedLight(Object light,int fullBright,JsonObject capture) throws Exception {
+        Object texture=s.field("net.minecraft.client.renderer.LightTexture","lightTexture",light);
+        ByteBuffer gpu=readLightTexture(texture,"net.minecraft.client.renderer.texture.AbstractTexture","getId");
+        JsonArray cpuRgba=new JsonArray(),gpuRgba=new JsonArray();
+        for(int channel=0;channel<4;channel++){cpuRgba.add((fullBright>>(channel*8))&255);gpuRgba.add(gpu.get((15*16+15)*4+channel)&255);}
+        capture.add("fullBrightCpuRgba",cpuRgba);capture.add("fullBrightGpuRgba",gpuRgba);
+        if(index>=0) {
+            if(guiLightmapEnabled==null)throw new IllegalStateException("GUIのlightmap状態を観測できませんでした");
+            capture.addProperty("guiLightmapTextureEnabled",guiLightmapEnabled);
+            capture.addProperty("guiLightmapTextureUnit",guiLightmapUnit);
+        }
+        report.addProperty("lightmapProbe","cpu-lightPixels-and-gpu-texture");
+    }
+    private static ByteBuffer readLightTexture(Object texture,String type,String method) throws Exception {
+        int id=((Number)s.call(type,method,texture)).intValue();
+        ByteBuffer gpu=ByteBuffer.allocateDirect(16*16*4);
+        int previous=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,32873)).intValue();
+        try {s.call("org.lwjgl.opengl.GL11","glBindTexture",null,3553,id);s.call("org.lwjgl.opengl.GL11","glGetTexImage",null,3553,0,6408,5121,gpu);}
+        finally {s.call("org.lwjgl.opengl.GL11","glBindTexture",null,3553,previous);}
+        return gpu;
     }
     private static Object location(String id) throws Exception {
         String owner="net.minecraft.resources.ResourceLocation";
