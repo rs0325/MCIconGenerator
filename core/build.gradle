@@ -2,6 +2,26 @@ plugins { id 'maven-publish' }
 dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
 }
+def toolVersion = project.version.toString()
+def versionSources = layout.buildDirectory.dir('generated/sources/toolVersion/java/main')
+tasks.register('generateToolVersion') {
+    inputs.property('version', toolVersion)
+    outputs.dir(versionSources)
+    doLast {
+        def source = new File(versionSources.get().asFile, 'io/github/rs0325/mcicon/internal/ToolVersion.java')
+        source.parentFile.mkdirs()
+        source.setText("""package io.github.rs0325.mcicon.internal;
+
+public final class ToolVersion {
+    private ToolVersion() {}
+    public static final String VERSION = ${groovy.json.JsonOutput.toJson(toolVersion)};
+}
+""", 'UTF-8')
+    }
+}
+sourceSets.main.java.srcDir(versionSources)
+tasks.named('compileJava') { dependsOn 'generateToolVersion' }
+tasks.named('sourcesJar') { dependsOn 'generateToolVersion' }
 tasks.named('processResources') {
     from(rootProject.file('adapters')) { into 'adapters' }
 }
@@ -12,11 +32,17 @@ publishing {
             artifactId = 'mcicon-core'
             pom {
                 name = 'MCIconGenerator Core'
-                description = 'Vanilla Minecraft texture and inventory icon export API'
+                description = 'バニラMinecraftのテクスチャとインベントリアイコンを取得するJava API'
                 url = 'https://github.com/rs0325/MCIconGenerator'
                 licenses { license { name = 'MIT License'; url = 'https://opensource.org/license/mit' } }
             }
         }
     }
-    repositories { maven { name = 'localBuild'; url = layout.buildDirectory.dir('maven') } }
+    repositories { maven { name = 'localBuild'; url = layout.buildDirectory.dir("maven/${project.version}") } }
+}
+tasks.register('cleanLocalPublication', Delete) {
+    delete layout.buildDirectory.dir("maven/${project.version}")
+}
+tasks.named('publishCorePublicationToLocalBuildRepository') {
+    dependsOn 'cleanLocalPublication'
 }

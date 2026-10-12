@@ -447,3 +447,21 @@ Windowsは既存Java21を明示し、Docker DesktopのLinux backendで実行し�
 - [境界版のcold/warm時間・メモリ・cache容量を測定する（#38）](https://github.com/rs0325/MCIconGenerator/issues/38)
 
 #13完了は全51版・全model/状態/サイズの無計装World比較、任意のGPU/native/ARM64 backend、全色精度や全障害の保証を意味しません。全版experimental/deterministic=false・verified版0を維持します。マイルストーンは未完了で、releaseは実施しません。
+
+## Issue #14のローカル配布候補（2026-10-12）
+
+#13のmerge commit f6f0b82を起点に、`0.1.0-preview.1`の配布候補をローカル生成しました。[配布ガイド](distribution.md)と[数値記録](../qa/validation-2026-10-12-distribution.json)を参照してください。2026-10-13にWindowsの新しい配布launcherも確認し、ユーザー指定の初回配布形式をGitHubプレリリース＋Maven形式ZIPに確定しました。releaseはまだ行っていません。
+
+CLI ZIPへDockerfile/entrypoint・schema・利用例を加え、ソースbuildなしで環境を用意できます。別のMaven形式ZIPにcoreのbinary/sources/javadoc/POMと文書をまとめ、worker agentは単独でも用意します。GradleのreleaseVersionからCLI表示とicons/raw manifestのtoolVersionを生成します。既定の開発版は0.1.0-SNAPSHOTです。
+
+展開済みCLIのMac Java21でhelp/version・offline versions・doctor、1.20.6 raw全1,614 PNG・diamond単品・stone/player_head/enchanted_bookの描画3 PNGが成功しました。描画3枚は#13の基準へRGBA/パスが厳密一致しました。配布物のDockerfileから新しいimageをビルドできました。新image IDは#13と異なるため、同じimageだとは扱いません。任意の別buildでのRGBA一致へ保証を広げません。Homebrewの初回buildx plugin検出失敗はガイドの直接呼出手順で解消しました。
+
+独立Gradle consumerはZIPのMaven repositoryからcore、Maven Central由来のcacheからJackson依存を解決し、同梱ExportExample.javaをコンパイル・実行できました。diamond raw1枚とstone/player_headのicons2枚がCLIのbytes/RGBA・パスと一致し、CLI/API/manifestはすべて候補版番号を記録しました。Linux amd64 container内のJava21でもPOSIX launcherのhelp/version/offline raw1枚が成功しました。Linuxの新launcher経由の描画はこの配布試験では実行していません。
+
+JUnit63件、配布監査の正常候補1件と実改変9ケースが成功しました。checksum改変、ゲームPNG/class、QA agent追加、Dockerfile/launcher/worker欠落、POM版不一致、偽のjavadoc画像を拒否します。JDK21文書用UI画像2枚はmodule内のbytesとhashを照合し、javadoc JARに限り区別します。元のlegal文書も保持します。SNAPSHOT再publishで旧timestamp JARが混入した点は、版専用のbuild/maven出力をpublish前に清掃して修正し、連続2回生成後のPOM1件・JAR3件を監査しました。清掃先に使う不正な版名は書き込み前に拒否します。
+
+worker SHA-256は#13と同じ`50961e54de759da4397cb5ad5da2c6fdbdf0f09edeb803788e375f9981bf56af`です。描画実装・固定contextは変えていません。全51版を候補版で再生成したとは扱わず、全版experimental/deterministic=false・verified版0を維持します。配布ZIPのhashは添付SHA256SUMSで管理し、ZIP内の数値記録へ自己参照hashを埋めません。元ゲーム入力・生成PNG・QA agent・個人パス・接続先は公開配布へ含めません。
+
+Windows Java21の展開済みmcicon.batでもchecksum・help/version・offline raw全1,614枚が成功し、元JAR bytesと一致しました。stone/player_head/enchanted_bookの描画3枚は透過・manifest/hashを監査し、Mac出力にRGBA/パスが厳密一致しました。context・renderer・agent hashも一致します。Windowsは既存#13 imageを使用したため、Macの新build imageとはimage IDとsettings digestが異なります。
+
+初回とDocker起動後の別SSH接続ではdaemonが不在でDOCKER_IMAGE_UNAVAILABLEとなり、同一接続内で既存Docker Desktopの起動から描画まで実行すると成功しました。接続終了後にdaemonが利用できなくなる機序までは特定していません。失敗ログを保持し、成功した再試験は新規出力先で実行しました。softwareの導入・OS再起動・既存出力の上書きは行っていません。

@@ -2,9 +2,13 @@ plugins {
     id 'base'
 }
 
+def buildVersion = providers.gradleProperty('releaseVersion').getOrElse('0.1.0-SNAPSHOT')
+if (!(buildVersion ==~ /[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?/)) {
+    throw new GradleException('releaseVersionはmajor.minor.patchまたはそのプレリリース形式で指定してください')
+}
 allprojects {
     group = 'io.github.rs0325.mcicon'
-    version = '0.1.0-SNAPSHOT'
+    version = buildVersion
     repositories { mavenCentral() }
 }
 
@@ -25,4 +29,43 @@ subprojects {
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
     tasks.withType(Test).configureEach { useJUnitPlatform() }
+}
+
+evaluationDependsOn(':core')
+evaluationDependsOn(':cli')
+evaluationDependsOn(':worker')
+
+tasks.register('libraryZip', Zip) {
+    dependsOn ':core:publishCorePublicationToLocalBuildRepository'
+    archiveFileName = "mcicon-library-${project.version}.zip"
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+    into("mcicon-library-${project.version}") {
+        from(project(':core').layout.buildDirectory.dir("maven/${project.version}")) { into 'maven' }
+        from('LICENSE', 'THIRD_PARTY_NOTICES.md')
+        from('licenses') { into 'licenses' }
+        from('docs') { into 'docs' }
+        from('schemas') { into 'schemas' }
+        from('examples') { into 'examples' }
+        from('adapters/releases.json') { into 'adapters' }
+        from('docker') { into 'docker' }
+        from('qa') { into 'qa' }
+    }
+}
+
+def releaseArtifacts = [project(':cli').tasks.named('distZip').flatMap { it.archiveFile },
+                        project(':worker').tasks.named('agentJar').flatMap { it.archiveFile },
+                        tasks.named('libraryZip').flatMap { it.archiveFile }]
+
+tasks.register('prepareRelease', Sync) {
+    dependsOn ':cli:distZip', ':worker:agentJar', 'libraryZip'
+    into layout.buildDirectory.dir('release')
+    from(releaseArtifacts)
+    doLast {
+        def directory = destinationDir
+        def files = releaseArtifacts.collect { it.get().asFile.name }.sort()
+        new File(directory, 'SHA256SUMS').text = files.collect { name ->
+            def hash = java.security.MessageDigest.getInstance('SHA-256').digest(new File(directory, name).bytes).encodeHex()
+            "${hash}  ${name}\n"
+        }.join('')
+    }
 }
