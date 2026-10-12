@@ -58,6 +58,8 @@ Dockerfileはsoftware描画に加え、Mesa llvmpipeの`LP_NATIVE_VECTOR_WIDTH=1
 
 1.20.6と1.21.4のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。以前の1.20.6と1.21.4はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
 
+1.13・1.13.1・1.13.2は、通常flatワールドのインベントリ位置(80,121)、GUI scale4、64pxで静的7種類を照合し、最大channel誤差0でした。対象スロットのモデル描画入口ではlightmap texture unitが無効で、観測したCPU/GPUのfull-bright texelはともにRGBA(252,252,252,255)です。このtexelをexportへ適用する変更は行いません。lightmap値がmanifestにないことからGUIの使用値を白255と推定せず、描画入口の状態と画像差分を分けて記録します。全モデルの内部描画状態・全サイズ・他GPUのWorld一致へ一般化しません。
+
 1.20.6はGUI 320×240のインベントリ位置(80,121)を固定基準にします。出力sizeに対して16 GUI単位のアイコンを拡大し、同じ投影・モデル位置のままviewportを移動してsize四方へ切り出します。512pxではviewport 10240×7680が必要です。検証したMesa環境の上限は16384×16384で、設定値と元viewportへの復帰を観測しました。バニラのGUI原点と他位置では浮動小数点演算・テクスチャ参照が変わるため、すべてのGUI位置との一致は保証しません。以前の原点基準とは画像・context・agent hashが変わるため、新しい出力先へ再生成してください。PNGへの色補正や差分許容の追加は行いません。
 
 通常インベントリとの64px比較では、RGB各channelの誤差2/255を基準とします。ユーザーが画像で確認したoak_fenceの輪郭2画素だけは、同じID・出力PNG hash・参照RGBA hash・背景RGBA hash・差分座標が揃う場合に許容します。輪郭の上下左右1画素以内という見た目だけでは、背景と同じ色の不透明pixelや半透明を区別できないため、他画像へ自動的に一般化しません。厳密比較のrawPassedと誤差を残し、確認済み画像の条件を含むcomparisonPassedを別に記録します。productionの描画やPNGはこの判定で変更しません。

@@ -1,0 +1,2599 @@
+{
+  "date": "2026-10-13",
+  "issue": 22,
+  "baseCommit": "17835349d1305bcc73fb499fc51f42e4bc11f53c",
+  "dependencyCommit": "f6f0b82e22aca3ee3b374aec167e432b96caf55a",
+  "scope": "legacy-1.13のexact 3版、通常flat Worldの静的7種類64px。Linux amd64固定Mesa Docker。完全な無計装clientではない。",
+  "productionChanges": false,
+  "workerSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+  "windowPixels": [
+    1280,
+    960
+  ],
+  "guiScale": 4,
+  "slot": 9,
+  "worldPreset": "flat",
+  "seed": 0,
+  "inputVerification": {
+    "filesPerCache": 507,
+    "cacheCopiesChecked": 2,
+    "originalInputHashesUnchanged": true
+  },
+  "worldAcceptance": [
+    {
+      "version": "1.13",
+      "scope": "通常のローカルflatワールドのSurvivalInventoryScreen。通常フレーム末尾で画面操作・native Screenshot・CPU/GPU照明値を読み取る。対象スロットのGUIモデル描画直前にlightmap texture unitの有効状態だけを観測し、元のactive textureを復帰する。production描画・固定化・透過復元を共有しない。完全な無計装clientではない。",
+      "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+      "baselineAgentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+      "qaAgentSha256": "cc182c284ce5948cc27fb6e85fa2a1c9901270b79b55a33f63deabf90280b7da",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "d196168351ef6e76d9ec9968409fca78bbb20baf015fdeebaa25103465f23860",
+        "scripts/qa/WorldInventoryAgent.java": "aa81dfa2ad386acb255990b861f666636cedb3c90cfade9764a63dc5cd730bd9"
+      },
+      "comparisonSourceSha256": "58fb0dec3074b3013e7907f35624c19f54a7b668a5d0043b4fb9d4ae7b8edcae",
+      "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+      "excludedProductionClasses": [
+        "RenderAgent",
+        "CanonicalTransformer",
+        "CanonicalContext",
+        "ResourceTransformer",
+        "ModernRenderer",
+        "LegacyRenderer",
+        "PngOutput",
+        "Bridge"
+      ],
+      "maxAllowedChannelError": 2,
+      "baselineFullBrightRgb": null,
+      "baselineLightmapSource": "対象スロットのモデル描画入口でlightmap texture unit無効を実測する。GUI内部の全描画状態を保証する値ではない。",
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+          "screenSha256": "115a3507fce2e86c18ea66aef7b9a4e8fad17ea165f3f8312d24491ca420c34a",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "58109a8f4f2d2096803c5097ad446842aa744e9b9f196f028221975b91d2ee14",
+          "screenSha256": "4f2342863ebd578ca6f4b405eaa154c72ed692413e9b0a1c04b1930f23060c17",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:grass_block",
+          "exportPngSha256": "5bf91b0af11685ceca435656bd722baef8de33acfd85862fe93db091e44c492a",
+          "screenSha256": "bb6820e11f874218f03835df7a0b314a22ac59ff7b90f31701a6bb726779aa8f",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "exportPngSha256": "77d51359cd828c656ac9cd308558604df7ea54a756e12b49725260cc51f691b4",
+          "screenSha256": "38bcc3ee6c5b4f4685817134ff2dc69b19b4e60fdc0b33617bf18997df8902a1",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:chest",
+          "exportPngSha256": "4fca72be4999498f78a2f9a90bf0785a3648980a44d9ea77165d44312839aa24",
+          "screenSha256": "88d2f072fb07b5d4fc28616dfac83761d89b9fce6a172845e114ac54835c40a0",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:player_head",
+          "exportPngSha256": "a2ea18a3ce52762ea748125d2c26a8fac6c51fe24ca0dfb074c5e0b8b642c8a9",
+          "screenSha256": "6150a3001cbda69a1b979d18433df3f93cdbe0dc2397bb54b71d1e52132bc0f7",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:glass",
+          "exportPngSha256": "6fd8e09a55eecd0265ad22e0c7b78da3a4e2ca669eacb95892ec93458af2255f",
+          "screenSha256": "4f34eb0fb7c0d748566d75f75919b5c9222ed959c393eab11048ddad994b37e0",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        }
+      ],
+      "exitCode": 0,
+      "officialInputsModified": false,
+      "passed": true,
+      "slotPositions": [
+        {
+          "id": "empty",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:stone",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:diamond",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:grass_block",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:chest",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:player_head",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:glass",
+          "gui": [
+            80,
+            121
+          ]
+        }
+      ],
+      "emptyScreenSha256": "d57ff67139073f76b1dea218f8f8e8533f2ea8ea3d7a6cfe1cef069df01d6831"
+    },
+    {
+      "version": "1.13.1",
+      "scope": "通常のローカルflatワールドのSurvivalInventoryScreen。通常フレーム末尾で画面操作・native Screenshot・CPU/GPU照明値を読み取る。対象スロットのGUIモデル描画直前にlightmap texture unitの有効状態だけを観測し、元のactive textureを復帰する。production描画・固定化・透過復元を共有しない。完全な無計装clientではない。",
+      "sourceSha256": "f0b4cf6d1a87ae150f87a535651138ca7b82bdad8853f76e7ddbff1dd610ac87",
+      "baselineAgentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+      "qaAgentSha256": "fa0b94efee4426ec989fb73a5c4b362c65f6ab081226eb3919f0027ee550cae4",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "d196168351ef6e76d9ec9968409fca78bbb20baf015fdeebaa25103465f23860",
+        "scripts/qa/WorldInventoryAgent.java": "aa81dfa2ad386acb255990b861f666636cedb3c90cfade9764a63dc5cd730bd9"
+      },
+      "comparisonSourceSha256": "58fb0dec3074b3013e7907f35624c19f54a7b668a5d0043b4fb9d4ae7b8edcae",
+      "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+      "excludedProductionClasses": [
+        "RenderAgent",
+        "CanonicalTransformer",
+        "CanonicalContext",
+        "ResourceTransformer",
+        "ModernRenderer",
+        "LegacyRenderer",
+        "PngOutput",
+        "Bridge"
+      ],
+      "maxAllowedChannelError": 2,
+      "baselineFullBrightRgb": null,
+      "baselineLightmapSource": "対象スロットのモデル描画入口でlightmap texture unit無効を実測する。GUI内部の全描画状態を保証する値ではない。",
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+          "screenSha256": "8b377fd123a5e8f5c7e44984ffdc37b70f494bab7d67ad3c552c78304e40476e",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "58109a8f4f2d2096803c5097ad446842aa744e9b9f196f028221975b91d2ee14",
+          "screenSha256": "7e131d2f6146cdd6a0a9b39144d533d7adf4db08f268a10ffa0432b6b928648d",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:grass_block",
+          "exportPngSha256": "5bf91b0af11685ceca435656bd722baef8de33acfd85862fe93db091e44c492a",
+          "screenSha256": "ff17ef0176ce3a4e9cf97228344e30c1214c0cee30465d0658539e5e03f5c44f",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "exportPngSha256": "77d51359cd828c656ac9cd308558604df7ea54a756e12b49725260cc51f691b4",
+          "screenSha256": "c89374b955f8d5909d0f2643f42ad1c195592a650057a199cd7cf8f9193951ee",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:chest",
+          "exportPngSha256": "4fca72be4999498f78a2f9a90bf0785a3648980a44d9ea77165d44312839aa24",
+          "screenSha256": "3ec4b0c77b9686773cebc5a0c065cd128f888bd51a471adef435c3d34d296034",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:player_head",
+          "exportPngSha256": "a2ea18a3ce52762ea748125d2c26a8fac6c51fe24ca0dfb074c5e0b8b642c8a9",
+          "screenSha256": "0719139f6e8b732e7cf169afb0e48a6acd7c9fb76afed910b2781ea90ecbfe5e",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:glass",
+          "exportPngSha256": "6fd8e09a55eecd0265ad22e0c7b78da3a4e2ca669eacb95892ec93458af2255f",
+          "screenSha256": "1f8b02f0c4e8f64cad0bfcb6541b99cf5e1b3a53b3671b5022c0cd1d53ed473a",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        }
+      ],
+      "exitCode": 0,
+      "officialInputsModified": false,
+      "passed": true,
+      "slotPositions": [
+        {
+          "id": "empty",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:stone",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:diamond",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:grass_block",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:chest",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:player_head",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:glass",
+          "gui": [
+            80,
+            121
+          ]
+        }
+      ],
+      "emptyScreenSha256": "a57586fd5c315fcb0ef07e7a73bdf041c6f96a78a388d7c58b8d24d9ce8c2c88"
+    },
+    {
+      "version": "1.13.2",
+      "scope": "通常のローカルflatワールドのSurvivalInventoryScreen。通常フレーム末尾で画面操作・native Screenshot・CPU/GPU照明値を読み取る。対象スロットのGUIモデル描画直前にlightmap texture unitの有効状態だけを観測し、元のactive textureを復帰する。production描画・固定化・透過復元を共有しない。完全な無計装clientではない。",
+      "sourceSha256": "3410887ba652f25792c7675bfaf9140e73b60e93cfbf113a803f8a98cb05c0f9",
+      "baselineAgentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+      "qaAgentSha256": "291f449190b3186d7459b44eed49e724998fe6b7f78e86eae1e4c674fa2c93f8",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "d196168351ef6e76d9ec9968409fca78bbb20baf015fdeebaa25103465f23860",
+        "scripts/qa/WorldInventoryAgent.java": "aa81dfa2ad386acb255990b861f666636cedb3c90cfade9764a63dc5cd730bd9"
+      },
+      "comparisonSourceSha256": "58fb0dec3074b3013e7907f35624c19f54a7b668a5d0043b4fb9d4ae7b8edcae",
+      "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+      "excludedProductionClasses": [
+        "RenderAgent",
+        "CanonicalTransformer",
+        "CanonicalContext",
+        "ResourceTransformer",
+        "ModernRenderer",
+        "LegacyRenderer",
+        "PngOutput",
+        "Bridge"
+      ],
+      "maxAllowedChannelError": 2,
+      "baselineFullBrightRgb": null,
+      "baselineLightmapSource": "対象スロットのモデル描画入口でlightmap texture unit無効を実測する。GUI内部の全描画状態を保証する値ではない。",
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+          "screenSha256": "35c5d06119878756c218b047274efab966f05d3827d35c36e54ca2a454039a6f",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "58109a8f4f2d2096803c5097ad446842aa744e9b9f196f028221975b91d2ee14",
+          "screenSha256": "9f42e81e1d9fe6b56f5a2915415ea21651163ecfaa1e4d41af41191c1dae7cbd",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:grass_block",
+          "exportPngSha256": "5bf91b0af11685ceca435656bd722baef8de33acfd85862fe93db091e44c492a",
+          "screenSha256": "d2bef2528d3fc42b682e085f65fda26ddff23837341090c39e1fcddc92d59fec",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "exportPngSha256": "77d51359cd828c656ac9cd308558604df7ea54a756e12b49725260cc51f691b4",
+          "screenSha256": "eec49445d446cd72e508e4cbbaaa33f3f978d41bcf15c96b329ce8844c042835",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:chest",
+          "exportPngSha256": "4fca72be4999498f78a2f9a90bf0785a3648980a44d9ea77165d44312839aa24",
+          "screenSha256": "9393b646ac757791c712643b35b96ed2b84dc42ea8cf981faa2d2ca512587d19",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:player_head",
+          "exportPngSha256": "a2ea18a3ce52762ea748125d2c26a8fac6c51fe24ca0dfb074c5e0b8b642c8a9",
+          "screenSha256": "e91ec52c3619b3abd3f1477f0f72e951eadeecb928d0a67b7a568675d06499f6",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:glass",
+          "exportPngSha256": "6fd8e09a55eecd0265ad22e0c7b78da3a4e2ca669eacb95892ec93458af2255f",
+          "screenSha256": "d01161d0553fe69a278343d727d944788e29da0b9f473255ad1d9fa2e4740bcf",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            252,
+            252,
+            252
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapGpuMatchesCpu": true,
+          "guiLightmapTextureEnabled": false,
+          "lightingCompatible": true
+        }
+      ],
+      "exitCode": 0,
+      "officialInputsModified": false,
+      "passed": true,
+      "slotPositions": [
+        {
+          "id": "empty",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:stone",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:diamond",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:grass_block",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:chest",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:player_head",
+          "gui": [
+            80,
+            121
+          ]
+        },
+        {
+          "id": "minecraft:glass",
+          "gui": [
+            80,
+            121
+          ]
+        }
+      ],
+      "emptyScreenSha256": "ab2ea150ef6eda1537f27eca2444da8fad56cd3a983d47ee58c34c6d55317779"
+    }
+  ],
+  "earlierAttempts": [
+    {
+      "version": "1.13.2",
+      "sourceSha256": "3410887ba652f25792c7675bfaf9140e73b60e93cfbf113a803f8a98cb05c0f9",
+      "qaAgentSha256": "f3b9403e99dad4ce76882bbeb1907dbcd0f9a15fa90cf8f83e9251b4d05dd03a",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "e181526cfbd9f77c9991a546d1f67464f7bd5ee1965e5be82b9ed1a15d861033",
+        "scripts/qa/WorldInventoryAgent.java": "e5aa923fe9dec93e38c2a35737b9917ef0b0ba5444c30f74d54c51ba7da6d5cc"
+      },
+      "passed": false,
+      "exitCode": 0,
+      "reason": "画像誤差0だが、manifestの照明値欠落を白255と推定したQA判定でFAIL",
+      "comparisons": 7,
+      "maximumChannelError": 0
+    },
+    {
+      "version": "1.13.2",
+      "sourceSha256": "3410887ba652f25792c7675bfaf9140e73b60e93cfbf113a803f8a98cb05c0f9",
+      "qaAgentSha256": "f9de1a798a7198298ab306f53f2ac0d4e9ad3cca3aab1754f6ba814c94c6c988",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "e181526cfbd9f77c9991a546d1f67464f7bd5ee1965e5be82b9ed1a15d861033",
+        "scripts/qa/WorldInventoryAgent.java": "01b37a9f168c3743a8a0b4b95254d23e2c217f29b26a5919701ab856832fe07b"
+      },
+      "passed": false,
+      "exitCode": 0,
+      "reason": "描画入口の無効状態を観測したが旧照明判定はFAILのまま",
+      "comparisons": 7,
+      "maximumChannelError": 0
+    },
+    {
+      "version": "1.13",
+      "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+      "qaAgentSha256": "33ca1729bf89720daada499186d4f80259fe1f276c152e32000afc4e8c445878",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "470d93f84432519b58e17c7060b28adc034d94424e2cda28474d0f423aa82d57",
+        "scripts/qa/WorldInventoryAgent.java": "4b9f746147f295ff4252daef209aa99a57ca9dbb445fdc82e0d6917cba9a4865"
+      },
+      "passed": false,
+      "exitCode": 1,
+      "reason": "QAのIdRegistry.get/1呼出が存在せず空スロット撮影後に中断",
+      "comparisons": 0,
+      "maximumChannelError": null,
+      "qaError": "java.lang.NoSuchMethodException: net.minecraft.util.registry.IdRegistry.get/1"
+    }
+  ],
+  "preliminaryAcceptanceBeforeSlotFiltering": [
+    {
+      "version": "1.13",
+      "passed": true,
+      "qaAgentSha256": "721d8edbb93d3f798c032ddb47775a79e9312df4a4d275746c6b0794e64be520",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "470d93f84432519b58e17c7060b28adc034d94424e2cda28474d0f423aa82d57",
+        "scripts/qa/WorldInventoryAgent.java": "a4ee89d191d2678f97f889fa38475015421350c1e6b2e35f1f354162f17c23b5"
+      },
+      "compared": 7,
+      "slotIdentityFiltered": false
+    },
+    {
+      "version": "1.13.1",
+      "passed": true,
+      "qaAgentSha256": "5d5e808c45b90240a9eb73c3a952c3dd50f1c7a87e060c427a0e20fa23aa0200",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "470d93f84432519b58e17c7060b28adc034d94424e2cda28474d0f423aa82d57",
+        "scripts/qa/WorldInventoryAgent.java": "a4ee89d191d2678f97f889fa38475015421350c1e6b2e35f1f354162f17c23b5"
+      },
+      "compared": 7,
+      "slotIdentityFiltered": false
+    },
+    {
+      "version": "1.13.2",
+      "passed": true,
+      "qaAgentSha256": "b7e1547c3a7c1ccb0d1be37746eba95f603bf2d4116f4262eba2770f317ab3d0",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "470d93f84432519b58e17c7060b28adc034d94424e2cda28474d0f423aa82d57",
+        "scripts/qa/WorldInventoryAgent.java": "a4ee89d191d2678f97f889fa38475015421350c1e6b2e35f1f354162f17c23b5"
+      },
+      "compared": 7,
+      "slotIdentityFiltered": false
+    }
+  ],
+  "allExports": [
+    {
+      "version": "1.13",
+      "manifestSha256": "bfd665e4868da4965834d28cf11ea77699691519573c348606053ee161faa593",
+      "audit": {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 784,
+        "registryPopulationVerified": true,
+        "transparentImages": 768,
+        "fractionalAlphaPixels": 114928,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 22.75,
+        "cliCoreSha256": "dfd8d0f952fe79553ccde53ca6a506ebb1b1bd5dae3a414aeb326fe9c3dbd211"
+      },
+      "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+      "settingsDigest": "6374aa4060fad862cd250dc1cade412102ac831bfbfcd7e97fe2652c870099df",
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+        "metadataSha256": "1116fb9184b9f49922759dbc7fd0b6022c4cc4e87096a25be128939cd9764eaa",
+        "profile": "legacy-1.13",
+        "size": 64
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4"
+    },
+    {
+      "version": "1.13.1",
+      "manifestSha256": "dfbdfa80bf3223723a3f3f123b82459cfa6529275bbcce4263217e4a655e1a62",
+      "audit": {
+        "version": "1.13.1",
+        "mode": "icons",
+        "audited": 789,
+        "registryPopulationVerified": true,
+        "transparentImages": 773,
+        "fractionalAlphaPixels": 114928,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 22.09,
+        "cliCoreSha256": "dfd8d0f952fe79553ccde53ca6a506ebb1b1bd5dae3a414aeb326fe9c3dbd211"
+      },
+      "sourceSha256": "f0b4cf6d1a87ae150f87a535651138ca7b82bdad8853f76e7ddbff1dd610ac87",
+      "settingsDigest": "3ef51e6188b186ddfa1cb1ae7249da2a50b308fbda5a73f7c558ab008af0156f",
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "cd1c386538992efb9137688fef920a3b1d0a6dc1db99e315cab72d9865599d2b",
+        "metadataSha256": "32989ad1245f84d1875e5a18b9f7c826f3d4e8c2c20cb28783dba15623e250c0",
+        "profile": "legacy-1.13",
+        "size": 64
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4"
+    },
+    {
+      "version": "1.13.2",
+      "manifestSha256": "16a1471be0d38fda6fc53a199559e1edd97ef9dca7f58443670702e3049d131c",
+      "audit": {
+        "version": "1.13.2",
+        "mode": "icons",
+        "audited": 789,
+        "registryPopulationVerified": true,
+        "transparentImages": 773,
+        "fractionalAlphaPixels": 114928,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 22.07,
+        "cliCoreSha256": "dfd8d0f952fe79553ccde53ca6a506ebb1b1bd5dae3a414aeb326fe9c3dbd211"
+      },
+      "sourceSha256": "3410887ba652f25792c7675bfaf9140e73b60e93cfbf113a803f8a98cb05c0f9",
+      "settingsDigest": "d79fa51584a5ea9f7e3a0abb4a2adf6ed067f1a75b50b4883824a9d3bb0973d7",
+      "settings": {
+        "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "mappingsSha256": "66d513dddb0672b4b01c431908a99ee6dc85d2e6465759c34aa33d10306a2039",
+        "metadataSha256": "f733792d4b21edb07a03658117c270f149e0ad6dcaf9ecc64725de8ebae5cf58",
+        "profile": "legacy-1.13",
+        "size": 64
+      },
+      "context": {
+        "alphaMethod": "black-white-native-composite-v1",
+        "animationFrame": 0,
+        "count": 1,
+        "deterministic": false,
+        "epochMillis": 946684800000,
+        "guiItemAtlas": "reset-per-pass",
+        "overlays": false,
+        "partialTick": 0.0,
+        "player": "absent",
+        "profile": "fixed-v1",
+        "randomSeed": 0,
+        "timeMillis": 1000,
+        "timeZone": "UTC",
+        "world": "absent"
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4"
+    }
+  ],
+  "singleAllComparison": {
+    "selectedBatchAudits": [
+      {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 7,
+        "registryPopulationVerified": false,
+        "transparentImages": 7,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 7,
+        "comparisonVerified": true,
+        "canonicalVerified": false
+      },
+      {
+        "version": "1.13.1",
+        "mode": "icons",
+        "audited": 7,
+        "registryPopulationVerified": false,
+        "transparentImages": 7,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 7,
+        "comparisonVerified": true,
+        "canonicalVerified": false
+      },
+      {
+        "version": "1.13.2",
+        "mode": "icons",
+        "audited": 7,
+        "registryPopulationVerified": false,
+        "transparentImages": 7,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 7,
+        "comparisonVerified": true,
+        "canonicalVerified": false
+      }
+    ],
+    "individualProcessJobs": [
+      {
+        "version": "1.13",
+        "id": "minecraft:stone",
+        "exitCode": 0,
+        "elapsedSeconds": 24.078,
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13",
+        "id": "minecraft:diamond",
+        "exitCode": 0,
+        "elapsedSeconds": 16.771,
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13",
+        "id": "minecraft:grass_block",
+        "exitCode": 0,
+        "elapsedSeconds": 16.87,
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13",
+        "id": "minecraft:oak_leaves",
+        "exitCode": 0,
+        "elapsedSeconds": 16.477,
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13",
+        "id": "minecraft:chest",
+        "exitCode": 0,
+        "elapsedSeconds": 23.162,
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13",
+        "id": "minecraft:player_head",
+        "exitCode": 0,
+        "elapsedSeconds": 25.46,
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13",
+        "id": "minecraft:glass",
+        "exitCode": 0,
+        "elapsedSeconds": 21.275,
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.1",
+        "id": "minecraft:stone",
+        "exitCode": 0,
+        "elapsedSeconds": 27.318,
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.1",
+        "id": "minecraft:diamond",
+        "exitCode": 0,
+        "elapsedSeconds": 24.329,
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.1",
+        "id": "minecraft:grass_block",
+        "exitCode": 0,
+        "elapsedSeconds": 29.275,
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.1",
+        "id": "minecraft:oak_leaves",
+        "exitCode": 0,
+        "elapsedSeconds": 30.334,
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.1",
+        "id": "minecraft:chest",
+        "exitCode": 0,
+        "elapsedSeconds": 20.322,
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.1",
+        "id": "minecraft:player_head",
+        "exitCode": 0,
+        "elapsedSeconds": 17.648,
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.1",
+        "id": "minecraft:glass",
+        "exitCode": 0,
+        "elapsedSeconds": 20.118,
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.2",
+        "id": "minecraft:stone",
+        "exitCode": 0,
+        "elapsedSeconds": 30.351,
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.2",
+        "id": "minecraft:diamond",
+        "exitCode": 0,
+        "elapsedSeconds": 29.792,
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.2",
+        "id": "minecraft:grass_block",
+        "exitCode": 0,
+        "elapsedSeconds": 30.331,
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.2",
+        "id": "minecraft:oak_leaves",
+        "exitCode": 0,
+        "elapsedSeconds": 31.773,
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.2",
+        "id": "minecraft:chest",
+        "exitCode": 0,
+        "elapsedSeconds": 33.219,
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.2",
+        "id": "minecraft:player_head",
+        "exitCode": 0,
+        "elapsedSeconds": 32.71,
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "1.13.2",
+        "id": "minecraft:glass",
+        "exitCode": 0,
+        "elapsedSeconds": 18.982,
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      }
+    ],
+    "metadataAndPngChecks": [
+      {
+        "version": "1.13",
+        "selectedBatchCompared": 7,
+        "individualProcessesCompared": 7,
+        "pngSha256PathSettingsContextRendererCatalogMatch": true
+      },
+      {
+        "version": "1.13.1",
+        "selectedBatchCompared": 7,
+        "individualProcessesCompared": 7,
+        "pngSha256PathSettingsContextRendererCatalogMatch": true
+      },
+      {
+        "version": "1.13.2",
+        "selectedBatchCompared": 7,
+        "individualProcessesCompared": 7,
+        "pngSha256PathSettingsContextRendererCatalogMatch": true
+      }
+    ]
+  },
+  "sizeBoundaryInitialAttempt": {
+    "scope": "同cacheの別描画試験を並行実行し、監視が別workerを所有対象へ数えた。失敗記録を保持する。",
+    "passed": false,
+    "jobs": [
+      {
+        "version": "1.13",
+        "size": 16,
+        "exitCode": 0,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "passed": true
+      },
+      {
+        "version": "1.13",
+        "size": 512,
+        "exitCode": 0,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "passed": true
+      },
+      {
+        "version": "1.13.1",
+        "size": 16,
+        "exitCode": 0,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "passed": true
+      },
+      {
+        "version": "1.13.1",
+        "size": 512,
+        "exitCode": 0,
+        "ownedWorkers": 2,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "passed": false
+      }
+    ]
+  },
+  "sizeBoundaryIsolatedRetry": {
+    "scope": "Linux amd64 Mesa Dockerの描画・透過・正常終了。World画質受入ではない。",
+    "workerSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+    "jobs": [
+      {
+        "version": "1.13",
+        "size": 16,
+        "exitCode": 0,
+        "timedOut": false,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "elapsedSeconds": 30.565,
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 124,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 138,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 221,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:grass_block",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 148,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:player_head",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 136,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+          "metadataSha256": "1116fb9184b9f49922759dbc7fd0b6022c4cc4e87096a25be128939cd9764eaa",
+          "profile": "legacy-1.13",
+          "size": 16
+        }
+      },
+      {
+        "version": "1.13",
+        "size": 512,
+        "exitCode": 0,
+        "timedOut": false,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "elapsedSeconds": 30.414,
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 126910,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 141312,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 213694,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:grass_block",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 85864,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 155313,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:player_head",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 149200,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 85864,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": true,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+          "metadataSha256": "1116fb9184b9f49922759dbc7fd0b6022c4cc4e87096a25be128939cd9764eaa",
+          "profile": "legacy-1.13",
+          "size": 512
+        }
+      },
+      {
+        "version": "1.13.1",
+        "size": 16,
+        "exitCode": 0,
+        "timedOut": false,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "elapsedSeconds": 31.056,
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 124,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 138,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 221,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:grass_block",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 148,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:player_head",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 136,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "cd1c386538992efb9137688fef920a3b1d0a6dc1db99e315cab72d9865599d2b",
+          "metadataSha256": "32989ad1245f84d1875e5a18b9f7c826f3d4e8c2c20cb28783dba15623e250c0",
+          "profile": "legacy-1.13",
+          "size": 16
+        }
+      },
+      {
+        "version": "1.13.1",
+        "size": 512,
+        "exitCode": 0,
+        "timedOut": false,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "elapsedSeconds": 32.833,
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 126910,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 141312,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 213694,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:grass_block",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 85864,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 155313,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:player_head",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 149200,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 85864,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": true,
+        "audit": {
+          "version": "1.13.1",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "cd1c386538992efb9137688fef920a3b1d0a6dc1db99e315cab72d9865599d2b",
+          "metadataSha256": "32989ad1245f84d1875e5a18b9f7c826f3d4e8c2c20cb28783dba15623e250c0",
+          "profile": "legacy-1.13",
+          "size": 512
+        }
+      },
+      {
+        "version": "1.13.2",
+        "size": 16,
+        "exitCode": 0,
+        "timedOut": false,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "elapsedSeconds": 33.194,
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 124,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 138,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 221,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:grass_block",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 148,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:player_head",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 136,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "66d513dddb0672b4b01c431908a99ee6dc85d2e6465759c34aa33d10306a2039",
+          "metadataSha256": "f733792d4b21edb07a03658117c270f149e0ad6dcaf9ecc64725de8ebae5cf58",
+          "profile": "legacy-1.13",
+          "size": 16
+        }
+      },
+      {
+        "version": "1.13.2",
+        "size": 512,
+        "exitCode": 0,
+        "timedOut": false,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "elapsedSeconds": 33.897,
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 126910,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 141312,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 213694,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:grass_block",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 85864,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 155313,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:player_head",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 149200,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 85864,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": true,
+        "audit": {
+          "version": "1.13.2",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "20c2e509d38a648dbbd69f3f485b0d7ddfd5bd56d1aa5a105a5cddbd7b849cfa",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "66d513dddb0672b4b01c431908a99ee6dc85d2e6465759c34aa33d10306a2039",
+          "metadataSha256": "f733792d4b21edb07a03658117c270f149e0ad6dcaf9ecc64725de8ebae5cf58",
+          "profile": "legacy-1.13",
+          "size": 512
+        }
+      }
+    ],
+    "passed": true
+  },
+  "modernQaRegression": {
+    "version": "1.20.6",
+    "baselineAgentSha256": "50961e54de759da4397cb5ad5da2c6fdbdf0f09edeb803788e375f9981bf56af",
+    "qaAgentSha256": "5f7e65ffc4fa9062c4fdc63af212bf21e79c1df9fc277e93851fb83f2ad56a90",
+    "harnessSourcesSha256": {
+      "scripts/verify-world-inventory.py": "470d93f84432519b58e17c7060b28adc034d94424e2cda28474d0f423aa82d57",
+      "scripts/qa/WorldInventoryAgent.java": "4b9f746147f295ff4252daef209aa99a57ca9dbb445fdc82e0d6917cba9a4865"
+    },
+    "comparisonSourceSha256": "58fb0dec3074b3013e7907f35624c19f54a7b668a5d0043b4fb9d4ae7b8edcae",
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "entries": [
+      {
+        "id": "minecraft:stone",
+        "exportPngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "screenSha256": "b0cac93189b2f6f88a0de22bd6cafe8e471987f6a362886a3e3c1afcaa966d59",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": true
+      },
+      {
+        "id": "minecraft:diamond",
+        "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+        "screenSha256": "a8d68dfab2aa31a2b47813a3efc8030567fc9f1779c80748e9d17c55c7c0f9ae",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": true
+      },
+      {
+        "id": "minecraft:grass_block",
+        "exportPngSha256": "6431a2e1f0ccef4dc9a956217881ecf374fe4a26045b673173cfcf237e6fb08b",
+        "screenSha256": "4e7a7937cc3a95bcb159993f94163cc2ee6ea235ed61304ca9c02254548d6a4c",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": true
+      },
+      {
+        "id": "minecraft:oak_leaves",
+        "exportPngSha256": "23e0d90582ecbf14982e4e173363a5944fc1f6c94e7dd814f39688c27e1e8d64",
+        "screenSha256": "466a6d565214e370232fdbd90b15f06e44d76db776c5406f48c61be1bd0eab2f",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": true
+      },
+      {
+        "id": "minecraft:chest",
+        "exportPngSha256": "3630e176f7c0587989b8ba232a985172c9741a9db19f66982b50a69b920a5b4e",
+        "screenSha256": "8cee2bcf8de4d65f442609597d15e513371e1f260d9af5b642502ef9044efd3d",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": true
+      },
+      {
+        "id": "minecraft:player_head",
+        "exportPngSha256": "038c9ae04f143a713d7642ef175f842a88d5e1025bc7ddff6c8a1a28c2a61b6f",
+        "screenSha256": "8775a314b25e659f95bc42702e7bfe543e816d4af36559f9f885087f7dc20542",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": true
+      },
+      {
+        "id": "minecraft:glass",
+        "exportPngSha256": "04aa57745283aa0d513540db40e6f4d89fb09842a490f2b2b7980aceadb84a67",
+        "screenSha256": "8d78771c9cca4680a909f0fa3bd24287a4a741fa0a959e9d2f80ac11f805c99f",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": true
+      }
+    ],
+    "exitCode": 0,
+    "passed": true
+  },
+  "modernQaRegressionScope": "slot限定観測追加前のQA source hashを保持。追加はlegacy経路だけで、modern撮影経路は変更していない。比較PNGは既存50961e54の基準。",
+  "limitations": [
+    "全モデル・動的状態・全サイズ・他GPUのWorld受入ではない。",
+    "16/512pxはPNG/透過/終了の監査でWorld画像照合ではない。",
+    "draw入口のlightmap状態からモデル内部の全描画状態を保証しない。",
+    "JUnitはこのQA変更で再実行していない。CLI installDistとnative QAを実行した。",
+    "全版experimental/deterministic=false・verified版0を維持する。"
+  ],
+  "passed": true,
+  "auditSourcesSha256": {
+    "scripts/verify-matrix.py": "9274f5a5157d0678043223566b6e24753c1355734d45fd288a57f896b56351d5",
+    "scripts/verify-worker-lifecycle.py": "0dd9fe67f4a529b75b8f7037a7cd4b38eddf61587151b8e977b11e2b61712fce",
+    "scripts/audit-export.py": "d1e81cc8843b1bc2b05684c8f45b7553a2dc1754a06699beaae16f2bb9a87c84"
+  }
+}

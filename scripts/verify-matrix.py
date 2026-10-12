@@ -25,6 +25,8 @@ parser.add_argument('--compare',type=Path)
 parser.add_argument('--ids',nargs='+',help='Item IDs (icons) or texture IDs (raw) instead of all entries')
 parser.add_argument('--offline',action='store_true')
 parser.add_argument('--overwrite',action='store_true')
+parser.add_argument('--docker-context',default='colima-mcicon')
+parser.add_argument('--docker-image',default='mcicon-render:dev')
 args=parser.parse_args()
 versions=args.versions or [v['id'] for v in json.loads((repo/'adapters/releases.json').read_text())['versions']]
 known={v["id"] for v in json.loads((repo/"adapters/releases.json").read_text())["versions"]}
@@ -43,7 +45,7 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=args.out) as tempor
     core_hash=hashlib.sha256(core_jars[0].read_bytes()).hexdigest()
     for version in versions:
         command=[str(cli),'render' if args.mode=='icons' else 'extract','--version',version,'--cache',str(args.cache.resolve()),'--out',str(args.out),'--json']
-        if args.mode=='icons':command+=['--allow-experimental','--size',str(args.size)]
+        if args.mode=='icons':command+=['--allow-experimental','--size',str(args.size),'--docker-context',args.docker_context,'--docker-image',args.docker_image]
         if args.ids:
             for item in args.ids:command+=['--id' if args.mode=='icons' else '--texture',item]
         else:command+=['--all']
