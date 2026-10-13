@@ -93,6 +93,8 @@ Issue #11では1.21.4〜26.3の正式13版・64pxの全19,209PNGを現workerで�
 
 1.21.11のIdentifier改名を選択できなかった初回QAの2背景失敗と前後helper hashを保存し、修正後の再比較と対照1.21.6の比較が成功しました。[新13版の数値記録](../qa/validation-2026-10-12-modern-adapter-acceptance.json)は初回12版の成功と修正後1.21.11の成功を集約し、初回のraw FAILは維持します。production描画は変更せず、全版experimental/deterministic=false・verified版0を維持します。任意のcomponents・全分岐/状態/サイズ・他位置・実ワールド照明・無計装client・別OS/GPU等の受入とは区別します。
 
+gui-classicのexact 10版（1.17・1.17.1・1.18・1.18.1・1.18.2・1.19・1.19.1・1.19.2・1.19.3・1.19.4）は、通常flatワールドの静的7種類を64pxで照合し、最大channel誤差0でした。描画前lightmapを実測252へ合わせ、manifestに記録します。全件11,363 PNGを監査し、独立した選択一括・ID別プロセスの各70枚は全件基準へ厳密一致しました。旧agentのiconsは新しい出力先へ再生成してください。[初回画像FAIL・QAエラー・OOMを含む記録](validation.md#issue-25のgui-classic通常ワールド検証2026-10-13)を参照してください。
+
 ## 正式51版の登録集合・欠損受入（2026-10-12）
 
 修正後workerで固定正式51版・60,265PNGを新規生成し、登録母集団・除外理由・ID/パス重複・hash/CRC・RGBA8・透過・空画像の監査と、#10/#11の正常基準へのRGBA・PNG hash・パス比較が成功しました。1.21.11で破損stone PNGの代替画像を成功出力する検出漏れを、BakedQuadのposition/packedUV消費時のsprite観測で修正しました。選択された破損atlas/直接textureを各51版、モデル・チェスト・空モデル・事前ロード済み直接textureを各12境界版で受け入れました。150成功は複数実行の集約であり、初回失敗10ケースと各worker/helper hashを保存します。[検証範囲と再実行方法](validation.md)・[数値記録](../qa/validation-2026-10-12-release-coverage.json)を参照してください。
