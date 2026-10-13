@@ -563,3 +563,31 @@ python3 scripts/verify-matrix.py --versions 1.14.4 1.15 1.15.1 1.15.2 1.16 1.16.
 python3 scripts/verify-world-inventory.py --version 1.16.5 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/fixed-all --out .local/fixed-world/1.16.5 --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-worker-lifecycle.py --versions 1.14.4 1.15 1.15.1 1.15.2 1.16 1.16.1 1.16.2 1.16.3 1.16.4 1.16.5 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/fixed-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
+
+## Issue #25のgui-classic通常ワールド検証（2026-10-13）
+
+対象exact releaseは1.17、1.17.1、1.18、1.18.1、1.18.2、1.19、1.19.1、1.19.2、1.19.3、1.19.4です。起点はmainの48ff61847f535338d9ad8fa5b602e551fddc4dd7（#24 merge）、依存#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。同一Linux amd64・Mesa Docker、ゲームJava17で検証しました。
+
+通常flatワールド・SurvivalのInventoryScreen・seed0・slot9・1280×960・GUI scale4・GUI位置(80,121)・count1・既定stack・overlayなしで、stone、diamond、grass_block、oak_leaves、chest、player_head、glassを撮影しました。保存level.datのseed/flat・GameTypeも全10版で確認し、64px・70比較はすべて最大channel誤差0です。許容値2/255を維持し、例外使用は0画素です。全モデル・動的状態・全サイズ・他GPU・完全な無計装clientとのWorld一致へ一般化しません。
+
+初回の代表1.17・1.18.2・1.19.4は、diamond864画素、glass145画素で許容値を超える最大3/255でした。WorldのCPU/GPU full-bright texelはともにRGBA(252,252,252,255)、worldなしproductionは初期白255です。gui-classicの10版だけ描画前NativeImageを252へ初期化・uploadし、context.lightmapFullBrightRgbへ記録します。既存初期化を共有し、ClassicRendererを継承するgui-fixedにはprofile条件で適用を避けます。投影・モデル位置・PNGの透過復元は変更せず、保存後のRGB補正も行いません。
+
+QAは版別のWorld作成API、registry、Screenshotに対応し、1.19.4の5引数GUIメソッドではItemStackのlocal 2を観測します。全10版の公式bytecodeでlightmapのshader texture番号2を確認し、RenderSystem.getShaderTexture(2)の描画入口値を記録しました。この値はbuffer内部でのbindingや全描画状態を保証しません。固定機能GL_TEXTURE_2Dの有効状態をcore profileの照明判定へ流用せず、CPU/GPUとmanifest252の一致、実画像比較を受入の根拠にします。production renderer・canonical hook・透過復元はQA agentへ同梱しません。
+
+初回1.19.4 QAは、存在しないsetAllowCommandsを呼んで撮影前にexit1となりました。実APIのsetAllowCheatsへ変更し、未完了captureの比較を停止します。また1.17は並行試験と単独再試験で撮影前のcontainer OOM・exit137を確認しました。両失敗を保存し、gui-classic World QAだけ最大heapを2GiBから1GiBへ変更、container上限3GiBのまま単独実行しました。production workerのheapは変更しません。APIエラーのcaptureが存在する場合はerrorをreportへ保持し、native終了でcaptureが未作成の場合も二次例外なく失敗を保存します。2種類の故障注入を実native受入とは分けて確認しました。
+
+64px全件11,363 PNG（1.17系各1,099、1.18系各1,100、1.19〜1.19.2各1,151、1.19.3は1,185、1.19.4は1,227）の登録集合・hash/CRC・RGBA8/sRGB・透過・空画像監査が成功しました。独立した選択一括70枚と各ID別CLI・ゲームプロセスの70枚は、全件基準へ厳密RGBA・PNG hash・パス・source・settings/digest・context・renderer・catalogが一致しました。全IDの単品生成や全件の独立再生成ではありません。
+
+16/512px・各7種類・20ジョブ・140枚では専用cacheでworker exit0、強制終了なし、PNG監査が成功しました。サイズ境界はWorld画像比較ではありません。gui-fixedの1.16.5とmodernの1.20.6は、通常World14比較が誤差0、新workerの代表14 PNGは旧workerとRGBA・PNG hash・パスが一致しました。
+
+修正前後の代表3版・21枚では色が変わり、alpha・透明領域は不変でした。全モデルのalpha不変の保証ではありません。入力とsidecar 2,208ファイル×2cache、回帰用1,096ファイルのhashは不変です。worker JARのhashが変わるため、照明を変更しない版も旧agentのiconsへ再開できません。新しい出力先へ再生成してください。
+
+JUnit64件、CLI installDist、Java8対象QA compile、Python構文確認が成功しました。[各版の数値・入力/worker/helper hash・初回FAIL/OOM](../qa/validation-2026-10-13-classic-world.json)を記録します。JAR・assets・World・画像・個人パスは公開記録に含めません。全版experimental/deterministic=false・verified版0を維持します。
+
+既存cacheで対象版を準備した後、再現例は次のとおりです。World試験はnative clientを単独で実行し、終了試験には別cacheを使用します。単品比較は各IDを別CLI呼び出しで出力し、audit-export.pyへ全件manifestを渡します。
+
+```sh
+python3 scripts/verify-matrix.py --versions 1.17 1.17.1 1.18 1.18.1 1.18.2 1.19 1.19.1 1.19.2 1.19.3 1.19.4 --offline --out .local/classic-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-world-inventory.py --version 1.19.4 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/classic-all --out .local/classic-world/1.19.4 --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-worker-lifecycle.py --versions 1.17 1.17.1 1.18 1.18.1 1.18.2 1.19 1.19.1 1.19.2 1.19.3 1.19.4 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/classic-sizes --docker-image mcicon-render:0.1.0-preview.1
+```

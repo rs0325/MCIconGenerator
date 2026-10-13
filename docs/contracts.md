@@ -56,7 +56,7 @@ fixed-v1はcount=1、既定ItemStack、overlayなし、world/playerなし、part
 
 Dockerfileはsoftware描画に加え、Mesa llvmpipeの`LP_NATIVE_VECTOR_WIDTH=128`と`GALLIUM_OVERRIDE_CPU_CAPS=sse4.1`を指定します。CPUによる最適化の差を抑えるための条件で、[Mesaの環境変数](https://docs.mesa3d.org/envvars.html)と[llvmpipeの指定](https://docs.mesa3d.org/drivers/llvmpipe.html)に従います。実行CPUまたはエミュレーションにSSE4.1が必要です。Docker image更新でsettings digestが変わるため、以前のiconsは新しい出力先へ再生成してください。任意のMesa/LLVM版・CPU・GPUでのRGBA一致を保証するものではありません。
 
-gui-fixedの1.15〜1.16.5の9版と、1.20.6・1.21.4のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。照明反映前のこれら11版はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
+gui-fixedの1.15〜1.16.5の9版、gui-classicの1.17〜1.19.4の10版と、1.20.6・1.21.4のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。照明反映前のこれら21版はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
 
 legacy-1.13の3版（1.13・1.13.1・1.13.2）とlegacy-1.14の4版（1.14・1.14.1・1.14.2・1.14.3）は、通常flatワールドのインベントリ位置(80,121)、GUI scale4、64pxで静的7種類を照合し、最大channel誤差0でした。対象スロットのモデル描画入口ではlightmap texture unitが無効で、観測したCPU/GPUのfull-bright texelはともにRGBA(252,252,252,255)です。このtexelをexportへ適用する変更は行いません。lightmap値がmanifestにないことからGUIの使用値を白255と推定せず、描画入口の状態と画像差分を分けて記録します。全モデルの内部描画状態・全サイズ・他GPUのWorld一致へ一般化しません。
 
