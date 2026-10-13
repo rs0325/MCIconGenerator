@@ -670,6 +670,38 @@ python3 scripts/verify-worker-lifecycle.py --versions 1.21.6 1.21.7 1.21.8 1.21.
 ```
 
 
+## Issue #33の一過性準備IO_FAILED調査（2026-10-13）
+
+#13のmerge結果f6f0b82を含む最新main、6f38fb902a7cea1b6b977876244a7c4415c6408dを起点に調査しました。結論は**未再現・根本原因未確定**です。[数値記録](../qa/validation-2026-10-13-prepare-io.json)に初回障害、QAの別障害、修正後の結果を分けて保存します。#33の原因特定・完成条件は未達で、Issueを閉じる根拠にはしません。
+
+過去chatの実行コマンド・初回stderrから、初回はofflineの16px/512pxの2ジョブが同じcacheを並行使用していたと確認しました。公開記録には1.13/16pxの準備IO_FAILEDと再試験成功が残りますが、根本例外と失敗時cache/input snapshotは残っていません。個別ログ・結果は再実行で置き換わっており、並行実行との因果関係は確定できません。表示された「prepare」はruntime準備だけでなくworker起動/catalog取得にも先行するため、失敗した個別段階は不明です。#13のWindows JSON/catalog・metadata転送問題とも同一視しません。
+
+AssetStoreの入力単位FileLock・hash/size検証・checksum確定、LegacyMappingsのatomic確定、RuntimePreparerのnative展開・asset並行取得、FilesSupportのpart/moveを確認しました。本番準備処理に根拠のないretry・例外抑制・lock変更は加えていません。
+
+専用cacheのoffline試験で、既存QAの準備後native列挙が3ラウンド目にNoSuchFileExceptionで失敗しました。Files.walkはfilterより前に属性を取得するため、他JVMが確定して消失した`.mcicon-*.part`をfilterでは除外できません。QAをwalkFileTreeへ変更し、ツール専用partの消失だけを許容しました。確定ファイルの消失や他のI/O例外は引き続き失敗です。これは準備成功後のQA障害であり、元のIO_FAILEDの原因特定として扱いません。
+
+修正後の独立JVM準備は2並列×10回、4並列×10回の計60回成功しました。各系列の基準準備2回を別に数え、各ラウンドの全確定ファイルhash・準備結果が一致、終了後の残留partは0でした。macOS 15.7.7/arm64・Java21.0.9で、1.13の入力277件を既存cacheから専用cacheへ複製し、派生ファイルを準備しています。この60回はオンライン取得・他OS・disk fullの保証には広げません。別調査CLIと時間帯が重なる可能性のある探索系列40回は受入60回から除外して保全し、4並列系列は別の専用cacheで実行しました。
+
+#13の固定Mesa imageで1.13の16px/512pxを同じ専用cacheから同時生成し、stone/diamond/chestの計6PNGが透過・CRC/hash・RGBA8・サイズ等の監査に成功しました。native検証の最初の2ジョブはコマンドのworker JAR指定誤りでWORKER_NOT_FOUNDとなり、そのログを保全して正しいパスで再実行しました。準備IO_FAILEDと区別します。JUnit64件・ビルドとQA回帰4件が成功。cacheを通常ファイルにした合成失敗ではexit1、根本FileSystemExceptionとreportが残ることも確認しました。
+
+verify-matrix.pyはQAのCLI呼び出しに常時`--debug`を付け、同じ出力先で再試験する前に既存のresult/cli log/auditを`reports/<version>-previous-*/`へ保存します。通常ファイルcacheの合成失敗2回で、初回根本例外と元ログの保持を確認しました。変更後の通常matrixによる1.13/16px・3PNG生成も成功しています。
+
+初回coreとSHA-256が一致するprivate snapshotも確認できました。AssetStore/RuntimePreparer/FilesSupport/LegacyMappings/VersionServiceは現coreとbytecodeが一致します。このcoreと、並行512px成功時のmanifestに一致するworker/imageでofflineの16px/512pxを最大2並列・3ラウンド再試験しました。6ジョブがruntime準備・worker起動・catalog取得・exportを通過し、36PNGが当時の各サイズの成功基準へRGBA/パス一致しました。当時のhost Java詳細と初回失敗時cacheは未保存であり、完全に同一の環境を再現したとは扱いません。
+
+追加探索として現core/当時coreの公式HTTPS更新を含む準備も各2並列×4回と各基準1回で成功しました。これは初回offline障害の再現試験とは区別します。
+
+並行QAは配布物をsnapshotし、最大同時数・回数・timeoutを固定します。各JVMの開始時刻・終了コード・JSON・例外stack、OS/Java・binary/probe hash、基準前と各ラウンド前後のcache hash/partを指定出力先へ保持します。既定はofflineで、`--online`は公式HTTPSから更新/不足入力を取得します。保存済み配布物は`--cli <distribution>/bin/mcicon`で指定できます。状態採取はJVM終了後であり、失敗瞬間のpart状態を完全に記録するものではありません。失敗またはtimeoutで後続ラウンドを止め、試験結果を成功へ書き換えません。出力にはprivateな絶対パス・入力情報があるため、公開リポジトリへ含めません。
+
+```sh
+# CLIを事前buildし、1.13の検証済み入力を専用cacheへ複製してから実行する。
+# Pythonは3.11以上、Java/Javacは21以上。新しい出力先を指定する。
+python3 scripts/verify-concurrent-prepare.py --cache .local/prepare-cache \
+  --out .local/prepare-io-2 --version 1.13 --rounds 10 --concurrency 2 --timeout 120
+python3 scripts/test-concurrent-prepare.py
+```
+
+再発時は初回からCLIの`--debug`を有効にし、再試験を別出力先へ保存してください。根本例外のcause、操作・同時数・開始終了時刻、OS/Java、入力/core/worker/QA/image hashを保存し、cacheの他利用JVMが終了した後に確定hashとpart状態を採取します。取得・checksum・mapping/native確定のどこで失敗したかを例外から特定し、その発生条件に対応した回帰を追加する必要があります。初回証拠を失った今回の再試験成功だけでは原因確定としません。
+
 ## #29: gui-26.2の通常World照明
 
 起点は#28のmerge commit 82d529f023c1e44ad8eb2cbbe57fbdf3af483cbe、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。exact release 26.2のstone・diamond・grass_block・oak_leaves・chest・player_head・glassを、Linux amd64・固定Mesa llvmpipe Dockerで検証しました。通常flat World、保存seed0・minecraft:flat・SURVIVAL、window1280×960、GUI scale4、slot9の実座標(80,121)、count1・既定stack・overlayなし・64pxです。最終7比較は最大channel誤差0、許容2/255超過0、輪郭例外0でした。level.datとdata/minecraft/world_gen_settings.datを読んで保存条件を確認し、両hashを保持します。
