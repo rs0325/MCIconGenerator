@@ -125,3 +125,5 @@ WindowsでJSON Linesの内部改行が残って描画がtimeoutになる不具�
 
 
 Issue #29ではgui-26.2のexact release 26.2を通常flat Worldの静的7種類・64pxで照合し、実インベントリ位置(80,121)との7比較は誤差0でした。GUI専用UiLightmapのCPU/GPU白255と実使用Sampler2 textureを確認し、production描画・照明・原点基準・contextは変更しません。全1,536 PNGと独立全件反復1,536 PNG、各ID別7 PNG、16/512pxの14 PNGを監査し、全件反復・代表一括・個別のRGBA/hashと設定が厳密一致しました。サイズ境界はPNG・終了検証で、World画質の受入ではありません。26.1.2の回帰7 PNGと独立World7比較も成功しました。26.2の画面・描画先API移動に伴う初回QA2失敗と再撮影を分けて[数値記録](../qa/validation-2026-10-13-latest-world.json)へ保存します。worker/settingsDigestは不変で再生成は不要です。全モデル・動的状態・全サイズ・他GPUへ一般化せず、全版experimental/deterministic=false・verified版0を維持します。
+
+Issue #30ではgui-26.3のexact release 26.3を通常flat Worldの静的7種類・64pxで照合し、実インベントリ位置(80,121)との7比較は誤差0でした。RenderPearlのSampler2観測に独立QAを対応させ、GUI専用UiLightmapの1×1 CPU/GPU白255と実使用textureを確認しました。production描画・照明・原点基準・contextは変更していません。全1,657 PNGと独立全件反復1,657 PNG、各ID別7 PNG、16/512pxの14 PNGを監査し、全件反復・個別のRGBA/hashと設定が厳密一致しました。サイズ境界はPNG・終了検証で、World画質の受入ではありません。26.2の回帰7 PNGと独立World7比較も成功しました。[条件と数値記録](validation.md#30-gui-263の通常world照明)を参照してください。worker/settingsDigestは不変で再生成は不要です。全モデル・動的状態・全サイズ・他GPUへ一般化せず、全版experimental/deterministic=false・verified版0を維持します。
