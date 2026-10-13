@@ -56,7 +56,7 @@ fixed-v1はcount=1、既定ItemStack、overlayなし、world/playerなし、part
 
 Dockerfileはsoftware描画に加え、Mesa llvmpipeの`LP_NATIVE_VECTOR_WIDTH=128`と`GALLIUM_OVERRIDE_CPU_CAPS=sse4.1`を指定します。CPUによる最適化の差を抑えるための条件で、[Mesaの環境変数](https://docs.mesa3d.org/envvars.html)と[llvmpipeの指定](https://docs.mesa3d.org/drivers/llvmpipe.html)に従います。実行CPUまたはエミュレーションにSSE4.1が必要です。Docker image更新でsettings digestが変わるため、以前のiconsは新しい出力先へ再生成してください。任意のMesa/LLVM版・CPU・GPUでのRGBA一致を保証するものではありません。
 
-gui-fixedの1.15〜1.16.5の9版、gui-classicの1.17〜1.19.4の10版、gui-1.21.4の1.20〜1.21.4の12版、gui-1.21.5の1.21.5のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。照明反映前のこれら32版はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
+gui-fixedの1.15〜1.16.5の9版、gui-classicの1.17〜1.19.4の10版、gui-1.21.4の1.20〜1.21.4の12版、gui-1.21.5の1.21.5、gui-deferredの1.21.6〜1.21.11の6版のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。照明反映前のこれら38版はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
 
 legacy-1.13の3版（1.13・1.13.1・1.13.2）とlegacy-1.14の4版（1.14・1.14.1・1.14.2・1.14.3）は、通常flatワールドのインベントリ位置(80,121)、GUI scale4、64pxで静的7種類を照合し、最大channel誤差0でした。対象スロットのモデル描画入口ではlightmap texture unitが無効で、観測したCPU/GPUのfull-bright texelはともにRGBA(252,252,252,255)です。このtexelをexportへ適用する変更は行いません。lightmap値がmanifestにないことからGUIの使用値を白255と推定せず、描画入口の状態と画像差分を分けて記録します。全モデルの内部描画状態・全サイズ・他GPUのWorld一致へ一般化しません。
 
@@ -69,6 +69,8 @@ legacy-1.13の3版（1.13・1.13.1・1.13.2）とlegacy-1.14の4版（1.14・1.1
 1.21.4の時計・コンパス・リカバリーコンパスは、entityなしのバニラNeedleDirectionHelperが返す向き0で選ばれます。時計はclock_00、コンパスとリカバリーコンパスはそれぞれcompass_16・recovery_compass_16です。実ワールドの時刻・方角を表す画像ではありません。
 
 atlasのanimation更新を抑止し、初期フレームを保持します。時計・コンパス等の動的property乱数を各描画passでseed=0に戻します。モデルが明示的にseedを設定するquad用乱数はバニラのまま保持します。ゲームJAR内の対象呼び出しだけをagentで変換し、依存JARは変換しません。ASMはagent専用packageへrelocateし、ゲーム同梱ASMとの衝突を避けます。
+
+gui-deferredの1.21.6〜1.21.11ではLightTextureのGpuTextureViewが指すtextureを描画前にRGBA(252,252,252,255)へ初期化します。26.1・26.1.1・26.1.2は照明を変更しません。通常WorldのGUIは独立した1×1のUiLightmapを使用し、CPU/GPUで白255を観測しました。各9版の静的7種類・64pxは実インベントリ位置(80,121)との比較で誤差0でした。productionの既存原点基準とatlas初期化を維持し、guiReferenceは追加しません。CPU画像が存在しない1.21系はGPU値だけを記録します。全モデル・動的状態・全サイズ・他GPUへの保証は拡張しません。
 
 deferred GUIでは各passのアトラス割当を初期化し、単品・全件で同じスロット位置を使用します。アトラスのGPU textureは再利用し、色・深度を消去します。GPU fence完了後にGUI frameと動的uniform storageを終了・resetします。
 

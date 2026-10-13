@@ -440,7 +440,7 @@ Windowsは既存Java21を明示し、Docker DesktopのLinux backendで実行し�
 
 ## 分離した追加受入検証
 
-ユーザー承認により、#13の完成範囲は上記3ホスト・4代表版の全件/反復、1.20.6のWorld比較、既存受入記録との整合性に確定しました。以前の残件は次の独立Issueへ分離し、各Issueに設計・完成条件・検証方法を記載します。分離先の実装は未着手です。
+ユーザー承認により、#13の完成範囲は上記3ホスト・4代表版の全件/反復、1.20.6のWorld比較、既存受入記録との整合性に確定しました。以前の残件は次の独立Issueへ分離し、各Issueに設計・完成条件・検証方法を記載します。この一覧は分離時点の計画です。追加受入の結果は本書後半のIssue別記録を参照してください。
 
 | World基準・照明のadapter | Issue |
 | --- | --- |
@@ -643,4 +643,28 @@ python3 scripts/verify-matrix.py --versions 1.21.5 --offline --out .local/gpu-al
 python3 scripts/verify-world-inventory.py --version 1.21.5 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/gpu-all --out .local/gpu-world/1.21.5 --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-matrix.py --versions 1.21.5 --offline --out .local/gpu-repeat --compare .local/gpu-all --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-worker-lifecycle.py --versions 1.21.5 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/gpu-sizes --docker-image mcicon-render:0.1.0-preview.1
+```
+
+## #28: gui-deferredの通常World照明
+
+起点は#27のmerge commit 0f1aaf898a2bc18dc0d21fb209e2490a14dd0cef、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。exact 9版（1.21.6・1.21.7・1.21.8・1.21.9・1.21.10・1.21.11・26.1・26.1.1・26.1.2）のstone・diamond・grass_block・oak_leaves・chest・player_head・glassを、Linux amd64・固定Mesa llvmpipe Dockerで検証しました。通常flat World、保存seed0・minecraft:flat・SURVIVAL、window1280×960、GUI scale4、slot9の実座標(80,121)、count1・既定stack・overlayなし・64pxです。最終63比較は最大channel誤差0、許容2/255超過0、輪郭例外0でした。26.1系ではworld生成設定がlevel.datからdata/minecraft/world_gen_settings.datへ分かれるため、両保存ファイルを読んで条件を確認し、hashを保持します。
+
+変更前の1.21.6はworldなし初期白255と通常GUIのfull-bright252が異なり、最大3/255の色差がありました。1.21系6版のLightTexture.getTextureViewが指すGPU textureを描画前に252へ初期化し、manifestへlightmapFullBrightRgbを記録します。PNG保存後の色補正やQA側の照明変更は行いません。26.1系3版の通常GUIは独立したUiLightmapの1×1白255を使用し、実使用GPU texelとCPU画像が一致します。productionの既存照明を維持して実画像へ一致したため、26.1系へ252を適用しません。確認した変更前後の1.21.6/1.21.11の各7画像はalpha値・透過maskが不変で、26.1.2の7画像はRGBAが不変でした。全9版でproduction原点のPNGが実インベントリ位置(80,121)と一致し、GUI投影基準やguiReferenceは変更しません。
+
+独立QAはproduction renderer・canonical hook・PngOutputを含まず、通常フレーム末尾の画面操作とバニラの非同期Screenshotを使います。画像callbackを受け取るまでスロットを維持し、保存・close後に次IDへ進みます。ItemModelResolver.updateForTopItemのstackがslot9のstackと同じobjectであることを照合し、そのstateのatlasモデル描画中にSampler2へ指定されたGpuTextureViewを観測します。1.21系はGuiRenderer.renderItemToAtlas、26.1系はGuiItemAtlas.drawToSlotを対象とし、名前とdescriptorを厳密に限定します。bindSamplerまたはbindTextureで観測したtexture IDと、LightTextureまたはUiLightmapのtexture IDが一致することを確認します。CPU画像が存在しない1.21系ではGPU値だけを記録し、26.1系のLevel照明と実使用GUI照明を分けます。指定されたsamplerの観測であり、全draw内部状態の保証ではありません。ASM計装を使うため完全な無計装clientではありません。GL読み戻しではpack buffer・alignment・row length・skip状態とtexture bindingを復帰し、Screenshot後のrow length1280の残存にも対応します。
+
+初回のresolver戻り点計装は空のstack map frameでlocal変数を読んでVerifyErrorになり、入口計装へ修正しました。26.1.2のopenFresh引数がScreenからRunnableへ、1.21.11のgetGameTime所有型がLevelからLevelAccessorへ変わったQA APIエラーも失敗として保持します。反証では難読化名a・5引数がatlasモデル描画とblitで共通する点を指摘され、descriptorを厳密化した後に9版のWorldを最終再撮影しました。途中の成功と修正後の最終成功を分け、初回のnative失敗や変更前画像FAILを成功へ書き換えません。
+
+最終workerで全件13,237 PNGと独立反復13,237 PNGを監査し、登録母集団・除外理由・ID/パス重複・CRC/hash・RGBA8・透過・空画像を確認しました。独立全件反復、代表一括63枚、各IDを別CLI・ゲームプロセスで生成した63枚は、decoded RGBA・PNG hash・パス・source・settings/digest・context・renderer・catalogへ厳密一致しました。16/512pxの126枚はPNG監査とworker終了0・強制終了なしの確認で、World画質受入ではありません。隣接1.21.5/26.2の14枚は旧workerへ厳密一致（agent hash/settingsDigest差を除く）、1.21.5の独立Worldハーネス回帰7比較も誤差0でした。JUnit64件・build/installDistが成功しています。
+
+[数値・入力/worker/helper hash・初回失敗](../qa/validation-2026-10-13-deferred-world.json)を公開し、JAR・assets・World・画像・個人パスはprivateに保持します。worker/settingsDigestが変わるため、照明を変更しない版を含め以前のiconsは新しい出力先へ再生成してください。raw出力は不変です。全モデル・動的状態・全サイズ・他GPUへ一般化せず、experimental/deterministic=false・verified版0を維持します。
+
+
+再実行例です。World撮影は`--version`を各exact版へ変えて9回実行し、比較元はその版の64px全件出力を指定します。各ID別の比較は、同じ全件基準へIDを1つずつ指定した別CLI起動で行います。サイズ検証用cacheは他ジョブのcacheから分離してください。
+
+```sh
+python3 scripts/verify-matrix.py --versions 1.21.6 1.21.7 1.21.8 1.21.9 1.21.10 1.21.11 26.1 26.1.1 26.1.2 --offline --out .local/deferred-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-world-inventory.py --version 26.1.2 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/deferred-all --out .local/deferred-world/26.1.2 --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-matrix.py --versions 1.21.6 1.21.7 1.21.8 1.21.9 1.21.10 1.21.11 26.1 26.1.1 26.1.2 --offline --out .local/deferred-repeat --compare .local/deferred-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-worker-lifecycle.py --versions 1.21.6 1.21.7 1.21.8 1.21.9 1.21.10 1.21.11 26.1 26.1.1 26.1.2 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/deferred-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
