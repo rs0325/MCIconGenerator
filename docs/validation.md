@@ -690,6 +690,12 @@ verify-matrix.pyはQAのCLI呼び出しに常時`--debug`を付け、同じ出�
 
 追加探索として現core/当時coreの公式HTTPS更新を含む準備も各2並列×4回と各基準1回で成功しました。これは初回offline障害の再現試験とは区別します。
 
+基準準備後の並行試験に加え、当時coreによる初回同時作成も調べました。277件の元入力とchecksumだけでmapping/nativeの派生がない554ファイルのcache、さらにmanifest検証用1件を除くchecksumもない278ファイルのcacheをそれぞれ新規作成し、基準準備なしで4独立JVM×2ラウンドずつ、計16回を実行しました。全準備結果・終了後575確定ファイルhashが既存基準に一致し、残留partは0でした。過去の失敗時cache自体を再現したものではありません。
+
+当時のcacheに残る526 workerディレクトリも調べました。初回開始17:44:14.641 JSTからの時間帯に1.13のworkerは17:44:15.929作成の1つだけで、並行成功512pxと時系列上整合します。16px再試験のworkerは17:52:52.617でした。当時coreもworkerディレクトリ自体を削除しないため、16pxが作成前に失敗した可能性を支持しますが、外部削除や失敗時の別cache状態は否定できません。作成前にはruntime準備のほかagent読み込み・Docker image検査もあり、準備処理だけに限定しません。現存する入力9,005ファイルのbirth/mtimeに17:43..17:45の一致はありませんでしたが、後の置換・削除まで復元できず、当時の入力整合性を証明しません。
+
+IO_FAILEDはIOExceptionの証拠でもありません。asset objectsの並列取得ではFuture.getが実行時例外をExecutionExceptionに包み、MCIconGeneratorがgeneric IO_FAILEDへ変換します。当時CLI/coreでasset objectを1件欠落させた場合とDocker実行ファイルがない場合の制御実験は、いずれもexit1・「prepare 1.13 0/1 → IO_FAILED」となり、workerディレクトリ作成前に失敗しました。当時CLIにはdebugオプションがないため、各制御条件のcauseは同じ当時coreを現CLI経由で別に採取し、OFFLINE_CACHE_MISSとプロセス起動IOExceptionを区別しました。最初の当時CLIへのdebug指定は引数エラーとして保全し、成功した診断実験から除外します。これらは異なる原因で初回表示が一致することの確認であり、初回事象の原因として採用しません。再試験回数を増やしても、消失した初回cause chainを復元する証拠にはなりません。
+
 並行QAは配布物をsnapshotし、最大同時数・回数・timeoutを固定します。各JVMの開始時刻・終了コード・JSON・例外stack、OS/Java・binary/probe hash、基準前と各ラウンド前後のcache hash/partを指定出力先へ保持します。既定はofflineで、`--online`は公式HTTPSから更新/不足入力を取得します。保存済み配布物は`--cli <distribution>/bin/mcicon`で指定できます。状態採取はJVM終了後であり、失敗瞬間のpart状態を完全に記録するものではありません。失敗またはtimeoutで後続ラウンドを止め、試験結果を成功へ書き換えません。出力にはprivateな絶対パス・入力情報があるため、公開リポジトリへ含めません。
 
 ```sh

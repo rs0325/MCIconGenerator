@@ -214,7 +214,8 @@
     "ゲーム資産・画像・実行コマンド・絶対パス・個別ログはprivateに保持する。",
     "初回はofflineだったと過去chatで確認。online試験は追加探索であり、初回の再現試験とは区別する。",
     "元のprepare表示はworker起動/catalog取得も含み、runtime準備で失敗したとは確定できない。",
-    "当時のhost Java詳細・失敗時cache状態は未保存。historical native replayの一致を根本原因の証拠にはしない。"
+    "当時のhost Java詳細・失敗時cache状態は未保存。historical native replayの一致を根本原因の証拠にはしない。",
+    "asset objectsの並列Future.getはExecutionExceptionを経由するため、IO_FAILEDはIOExceptionに限定されない。制御したasset欠落とdocker不在で同じ初回表示になり、表示だけでは実根本原因を一意に選べない。"
   ],
   "nextEvidence": [
     "初回からCLI --debugを有効にし、再試験を別出力先へ保存する。",
@@ -533,5 +534,118 @@
     "scripts/verify-concurrent-prepare.py": "22ed014896cbc58ff5b5946c852142d38b73d2e73b2804dd927e6b4d02f19463",
     "scripts/verify-matrix.py": "3cfb4b3be4f36ee530463e65535e5ba3571fdf357f3d8f8d1b490bccb4b0b86b",
     "scripts/test-concurrent-prepare.py": "c06be016ec423d19b049d70332c09ff87ef983538c5b2681fb3d889939df33be"
+  },
+  "coldPreparationRuns": {
+    "coreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+    "probeSha256": "0d269b456e46d331ed42937c7b0f5835acdffd9523e0ad4c4ef6430025c8260b",
+    "offline": true,
+    "baselinePreparationBeforeParallel": false,
+    "concurrency": 4,
+    "roundsPerMode": 2,
+    "independentJvmProcesses": 16,
+    "timeoutSeconds": 120,
+    "java": "openjdk version \"21.0.9\" 2025-10-21 LTS\nOpenJDK Runtime Environment Temurin-21.0.9+10 (build 21.0.9+10-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.9+10 (build 21.0.9+10-LTS, mixed mode, sharing)\n",
+    "sourceInputFileCount": 277,
+    "modes": [
+      {
+        "mode": "derived-absent",
+        "beforeFileCount": 554,
+        "afterFileCount": 575,
+        "rounds": 2,
+        "processes": 8,
+        "allPreparedResultsMatchHistoricalAcceptedBaseline": true,
+        "allInputAndDerivedBytesMatch": true,
+        "residualParts": 0,
+        "afterCacheStateSha256": "7b76e158a174384011f9cf3cdffe211c0eea1016a7a5a9c5a7cc1ae9ced7e566",
+        "elapsedSeconds": [
+          1.373,
+          1.323,
+          1.427,
+          1.428,
+          1.502,
+          1.413,
+          1.502,
+          1.502
+        ]
+      },
+      {
+        "mode": "checksums-and-derived-absent",
+        "beforeFileCount": 278,
+        "afterFileCount": 575,
+        "rounds": 2,
+        "processes": 8,
+        "allPreparedResultsMatchHistoricalAcceptedBaseline": true,
+        "allInputAndDerivedBytesMatch": true,
+        "residualParts": 0,
+        "afterCacheStateSha256": "7b76e158a174384011f9cf3cdffe211c0eea1016a7a5a9c5a7cc1ae9ced7e566",
+        "elapsedSeconds": [
+          1.411,
+          1.421,
+          1.309,
+          1.4,
+          1.308,
+          1.457,
+          1.384,
+          1.377
+        ]
+      }
+    ],
+    "checksumAbsenceException": "SHA-1を持たないversion manifestのoffline検証用checksumは残す。"
+  },
+  "retainedEvidenceReview": {
+    "cacheWorkerDirectoriesInspected": 526,
+    "retainedInitialWindow113WorkerDirectories": 1,
+    "initialWindowWorkerCreatedJst": "2026-10-10T17:44:15.929377",
+    "initialWindowWorkerLogSha256": "1c1cd790ec54b6cc296e96817385c788bba081d8755aaa479c299aaa041a7006",
+    "retryWorkerCreatedJst": "2026-10-10T17:52:52.617840",
+    "retryWorkerLogSha256": "7a8925e20c761d46747a8f77018d72946f200322cf5cde905d54d2db7a70537a",
+    "productDoesNotDeleteWorkerDirectory": true,
+    "inputFilesInspected": 9005,
+    "retainedInputFilesWithBirthOrModificationInInitialWindow": 0,
+    "inputWindowJst": "2026-10-10 17:43..17:45 JST",
+    "inference": "1.13の初回時間帯に残るworkerは並行成功512pxと時系列上整合し、16pxはworker directory作成前の失敗を支持する。外部削除・過去の別cache状態を否定する記録はなく、確定段階とはしない。",
+    "workerDirectoryPrecededBy": [
+      "RuntimePreparer.prepare",
+      "WorkerClient.readAgent",
+      "WorkerClient.resolveImage"
+    ],
+    "currentCacheTimestampsDoNotEstablishPastInputIntegrity": true,
+    "reviewWindowJst": "2026-10-10 17:43..17:54",
+    "initialFailureWindowJstApproximate": "2026-10-10 17:44:14.64..17:44:16.22"
+  },
+  "ambiguousDisplayChecks": {
+    "synthetic": true,
+    "originalFailureIdentityEstablished": false,
+    "historicalCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+    "exactHistoricalCliUsedForVisibleError": true,
+    "debugTraceUsesCurrentCliWithHistoricalCore": true,
+    "currentCliSha256": "008a6f0094502089161c07266ef16388670473694a18df5bffe399df0f2b24bc",
+    "initialHarnessUnknownDebugOptionExcluded": true,
+    "checks": [
+      {
+        "condition": "missing-asset-object",
+        "exitCode": 1,
+        "visibleStderr": [
+          "prepare 1.13 0/1",
+          "IO_FAILED: Input/output operation failed"
+        ],
+        "causeChain": [
+          "ExecutionException → McIconException（OFFLINE_CACHE_MISS）"
+        ],
+        "workerDirectoriesCreated": 0
+      },
+      {
+        "condition": "docker-executable-unavailable",
+        "exitCode": 1,
+        "visibleStderr": [
+          "prepare 1.13 0/1",
+          "IO_FAILED: Input/output operation failed"
+        ],
+        "causeChain": [
+          "IOException（dockerプロセス起動、実行ファイルなし）"
+        ],
+        "workerDirectoriesCreated": 0
+      }
+    ]
   }
 }
