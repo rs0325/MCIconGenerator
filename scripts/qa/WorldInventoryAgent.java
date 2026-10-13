@@ -22,7 +22,7 @@ public final class WorldInventoryAgent {
     private static Object minecraft;
     private static Path output;
     private static int stage,frames,index=-1;
-    private static boolean legacy,fixed,classic;
+    private static boolean legacy,fixed,classic,modern;
     private static int guiLightmapUnit=1;
     private static Boolean guiLightmapEnabled;
     private static Integer guiLightmapShaderTexture;
@@ -36,34 +36,39 @@ public final class WorldInventoryAgent {
         legacy=config.get("version").getAsString().matches("1\\.(?:13(?:\\.[12])?|14(?:\\.[123])?)");
         fixed=config.get("version").getAsString().matches("1\\.(?:14\\.4|15(?:\\.[12])?|16(?:\\.[1-5])?)");
         classic=config.get("version").getAsString().matches("1\\.(?:17(?:\\.1)?|18(?:\\.[12])?|19(?:\\.[1-4])?)");
-        if(legacy||fixed||classic){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",true);}
+        modern=config.get("version").getAsString().matches("1\\.(?:20(?:\\.[1-5])?|21(?:\\.[1-3])?)");
+        if(legacy||fixed||classic||modern){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",true);}
         final String owner=s.actualClass(MC).replace('.','/'),method=s.methodName(MC,legacy?"m_0520165":"runTick",1);
         final String itemClass=legacy?"net.minecraft.client.render.entity.ItemRenderer":"net.minecraft.client.renderer.entity.ItemRenderer";
         final String itemOwner=s.actualClass(itemClass).replace('.','/');
         final boolean guiPose=classic&&s.hasMethod(itemClass,"renderGuiItem","com.mojang.blaze3d.vertex.PoseStack","net.minecraft.world.item.ItemStack","int","int","net.minecraft.client.resources.model.BakedModel");
         final String guiMethod=s.methodName(itemClass,legacy?"renderGuiItemModel":"renderGuiItem",guiPose?5:4);
-        final boolean pose=(fixed||classic)&&s.hasMethod(itemClass,"render",8);
+        final boolean pose=(fixed||classic||modern)&&s.hasMethod(itemClass,"render",8);
         guiLightmapUnit=pose?2:1;
         final String drawMethod=s.methodName(itemClass,legacy?"renderItem":"render",pose?8:2);
         final String stackType=descriptor(legacy?"net.minecraft.item.ItemStack":"net.minecraft.world.item.ItemStack");
         final String modelType=descriptor(legacy?"net.minecraft.client.resource.model.BakedModel":"net.minecraft.client.resources.model.BakedModel");
         final String transformType=s.hasClass("net.minecraft.world.item.ItemDisplayContext")?"net.minecraft.world.item.ItemDisplayContext":"net.minecraft.client.renderer.block.model.ItemTransforms$TransformType";
         final String drawDescriptor="("+stackType+(pose?descriptor(transformType)+"Z"+descriptor("com.mojang.blaze3d.vertex.PoseStack")+descriptor("net.minecraft.client.renderer.MultiBufferSource")+"II":"")+modelType+")V",guiDescriptor="("+(guiPose?descriptor("com.mojang.blaze3d.vertex.PoseStack"):"")+stackType+"II"+modelType+")V";
+        final String guiOwner=modern?s.actualClass("net.minecraft.client.gui.GuiGraphics").replace('.','/'):itemOwner;
+        final String modernGuiMethod=s.methodName("net.minecraft.client.gui.GuiGraphics","renderItem",7);
+        final String modernGuiDescriptor="("+descriptor("net.minecraft.world.entity.LivingEntity")+descriptor("net.minecraft.world.level.Level")+stackType+"IIII)V";
+        final String modernDrawDescriptor=drawDescriptor.replace(")V",descriptor("net.minecraft.world.level.Level")+descriptor("net.minecraft.world.entity.LivingEntity")+"I)V");
         final String glintOwner=s.actualClass("net.minecraft.client.renderer.RenderStateShard").replace('.','/');
         final String glintMethod=s.methodName("net.minecraft.client.renderer.RenderStateShard","setupGlintTexturing",1);
         final String timeOwner=s.actualClass("net.minecraft.Util").replace('.','/'),timeMethod=s.methodName("net.minecraft.Util","getMillis",0);
         instrumentation.addTransformer(new ClassFileTransformer() {
             public byte[] transform(ClassLoader loader,String name,Class<?> redef,ProtectionDomain domain,byte[] bytes) {
-                if((legacy||fixed||classic)&&name.equals(itemOwner)) {
+                if((legacy||fixed||classic||modern)&&name.equals(guiOwner)) {
                     ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                     reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
                         public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
                             MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
-                            if(!name.equals(guiMethod)||!desc.equals(guiDescriptor))return target;
+                            if(!name.equals(modern?modernGuiMethod:guiMethod)||!desc.equals(modern?modernGuiDescriptor:guiDescriptor))return target;
                             return new MethodVisitor(Opcodes.ASM9,target) {
                                 public void visitMethodInsn(int opcode,String owner,String name,String desc,boolean itf) {
-                                    if(owner.equals(itemOwner)&&name.equals(drawMethod)&&desc.equals(drawDescriptor)) {
-                                        super.visitVarInsn(Opcodes.ALOAD,guiPose?2:1);
+                                    if(owner.equals(itemOwner)&&name.equals(drawMethod)&&(desc.equals(drawDescriptor)||modern&&desc.equals(modernDrawDescriptor))) {
+                                        super.visitVarInsn(Opcodes.ALOAD,modern?3:guiPose?2:1);
                                         super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/WorldInventoryAgent","observeGui","(Ljava/lang/Object;)V",false);
                                     }
                                     super.visitMethodInsn(opcode,owner,name,desc,itf);
@@ -116,7 +121,7 @@ public final class WorldInventoryAgent {
             if(minecraft==null)minecraft=s.call(MC,"getInstance",null);
             Object screen=s.field(MC,"screen",minecraft);
             if(stage==0) {
-                if((!fixed&&!classic&&!Boolean.TRUE.equals(s.call(MC,"isGameLoadFinished",minecraft)))||s.call(MC,"getOverlay",minecraft)!=null||!s.type("net.minecraft.client.gui.screens.TitleScreen").isInstance(screen))return;
+                if((!fixed&&!classic&&s.hasMethod(MC,"isGameLoadFinished",0)&&!Boolean.TRUE.equals(s.call(MC,"isGameLoadFinished",minecraft)))||s.call(MC,"getOverlay",minecraft)!=null||!s.type("net.minecraft.client.gui.screens.TitleScreen").isInstance(screen))return;
                 if(++frames<60)return;
                 if(fixed||(classic&&s.hasMethod(MC,"createLevel",4))){createDirectWorld();return;}
                 if(config.has("frameZeroResources")) {
@@ -135,7 +140,7 @@ public final class WorldInventoryAgent {
                 if(classic&&!s.hasMethod(CREATE,"getUiState",0)){configureClassicWorld(screen);s.call(CREATE,"onCreate",screen);stage=2;frames=0;return;}
                 Object state=s.call(CREATE,"getUiState",screen);
                 s.call(STATE,"setName",state,"MCIcon QA");s.call(STATE,"setSeed",state,"0");
-                s.call(STATE,classic?"setAllowCheats":"setAllowCommands",state,true);
+                s.call(STATE,s.hasMethod(STATE,"setAllowCheats",1)?"setAllowCheats":"setAllowCommands",state,true);
                 s.call(STATE,"setDifficulty",state,s.field("net.minecraft.world.Difficulty","PEACEFUL",null));
                 Object flat=s.field("net.minecraft.world.level.levelgen.presets.WorldPresets","FLAT",null);
                 boolean selected=false;
@@ -176,7 +181,7 @@ public final class WorldInventoryAgent {
                 report.addProperty("lightmapProbe","cpu-lightPixels");
             } else {
                 Object lightImage=s.call("net.minecraft.client.Screenshot","takeScreenshot",null,s.field("net.minecraft.client.renderer.LightTexture","target",light));
-                try{fullBright=((Number)s.call("com.mojang.blaze3d.platform.NativeImage","getPixel",lightImage,15,0)).intValue();}
+                try{fullBright=((Number)s.call("com.mojang.blaze3d.platform.NativeImage",s.hasMethod("com.mojang.blaze3d.platform.NativeImage","getPixel",2)?"getPixel":"getPixelRGBA",lightImage,15,0)).intValue();}
                 finally{s.call("com.mojang.blaze3d.platform.NativeImage","close",lightImage);}
                 report.addProperty("lightmapProbe","gpu-target");
             }
@@ -191,7 +196,7 @@ public final class WorldInventoryAgent {
             capture.addProperty("count",((Number)s.call("net.minecraft.world.item.ItemStack","getCount",stack)).intValue());
             capture.addProperty("hasFoil",(Boolean)s.call("net.minecraft.world.item.ItemStack","hasFoil",stack));
             capture.addProperty("fullBrightArgb",fullBright);
-            if(fixed||classic){observeLightTexture(light,fullBright,capture);}
+            if(fixed||classic||modern){observeLightTexture(light,fullBright,capture);}
             capture.addProperty("gameTime",((Number)s.call("net.minecraft.world.level.Level","getGameTime",level)).longValue());
             captures.add(capture);writeReport();System.err.println("[mcicon QA world] captured "+id);
             index++;frames=0;guiLightmapEnabled=null;guiLightmapShaderTexture=null;
@@ -296,7 +301,7 @@ public final class WorldInventoryAgent {
             Object player=s.field(MC,"player",minecraft);
             Object inventory=legacy?s.field("net.minecraft.entity.living.player.PlayerEntity","inventory",player):inventory(player);
             if(stack!=s.call(legacy?"net.minecraft.inventory.Inventory":INVENTORY,"getItem",inventory,9))return;
-            if(classic){guiLightmapShaderTexture=((Number)s.call("com.mojang.blaze3d.systems.RenderSystem","getShaderTexture",null,guiLightmapUnit)).intValue();return;}
+            if(classic||modern){guiLightmapShaderTexture=((Number)s.call("com.mojang.blaze3d.systems.RenderSystem","getShaderTexture",null,guiLightmapUnit)).intValue();return;}
             int active=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,34016)).intValue();
             try {
                 s.call("org.lwjgl.opengl.GL13","glActiveTexture",null,33984+guiLightmapUnit);
@@ -346,13 +351,17 @@ public final class WorldInventoryAgent {
         s.call("net.minecraft.client.gui.components.EditBox","setValue",s.field(componentType,"seedEdit",component),"0");
     }
     private static void observeLightTexture(Object light,int fullBright,JsonObject capture) throws Exception {
-        Object texture=s.field("net.minecraft.client.renderer.LightTexture","lightTexture",light);
-        ByteBuffer gpu=readLightTexture(texture,"net.minecraft.client.renderer.texture.AbstractTexture","getId");
+        boolean cpu=s.hasField("net.minecraft.client.renderer.LightTexture","lightPixels");
+        Object texture=s.field("net.minecraft.client.renderer.LightTexture",cpu?"lightTexture":"target",light);
+        ByteBuffer gpu=readLightTexture(texture,cpu?"net.minecraft.client.renderer.texture.AbstractTexture":"com.mojang.blaze3d.pipeline.RenderTarget",cpu?"getId":"getColorTextureId");
         JsonArray cpuRgba=new JsonArray(),gpuRgba=new JsonArray();
         for(int channel=0;channel<4;channel++){cpuRgba.add((fullBright>>(channel*8))&255);gpuRgba.add(gpu.get((15*16+15)*4+channel)&255);}
-        capture.add("fullBrightCpuRgba",cpuRgba);capture.add("fullBrightGpuRgba",gpuRgba);
+        capture.addProperty("lightmapCpuAvailable",cpu);
+        if(cpu)capture.add("fullBrightCpuRgba",cpuRgba);
+        capture.add("fullBrightGpuRgba",gpuRgba);
+        if(!cpu)capture.add("fullBrightScreenshotRgba",cpuRgba);
         if(index>=0) {
-            if(classic) {
+            if(classic||modern) {
                 if(guiLightmapShaderTexture==null)throw new IllegalStateException("GUIのshader textureを観測できませんでした");
                 capture.addProperty("guiLightmapShaderTexture",guiLightmapShaderTexture);
             } else {
@@ -361,7 +370,7 @@ public final class WorldInventoryAgent {
             }
             capture.addProperty("guiLightmapTextureUnit",guiLightmapUnit);
         }
-        report.addProperty("lightmapProbe","cpu-lightPixels-and-gpu-texture");
+        report.addProperty("lightmapProbe",cpu?"cpu-lightPixels-and-gpu-texture":"gpu-target-screenshot-and-texture");
     }
     private static ByteBuffer readLightTexture(Object texture,String type,String method) throws Exception {
         int id=((Number)s.call(type,method,texture)).intValue();
