@@ -5,7 +5,17 @@ import java.util.function.Supplier;
 
 /** Immediate GUI with the original Blaze3D GPU API introduced in 1.21.5. */
 public class GpuImmediateRenderer extends ModernRenderer {
-    public GpuImmediateRenderer(Symbols symbols,Object minecraft) throws Exception {super(symbols,minecraft);}
+    public GpuImmediateRenderer(Symbols symbols,Object minecraft) throws Exception {
+        super(symbols,minecraft);
+        if(RenderAgent.config.get("profile").getAsString().equals("gui-1.21.5")) {
+            Object renderer=s.field("net.minecraft.client.Minecraft","gameRenderer",minecraft);
+            Object light=s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",renderer);
+            Object texture=s.call("net.minecraft.client.renderer.LightTexture","getTarget",light);
+            Object gpu=s.call("com.mojang.blaze3d.systems.RenderSystem","getDevice",null);
+            Object encoder=s.call("com.mojang.blaze3d.systems.GpuDevice","createCommandEncoder",gpu);
+            s.call("com.mojang.blaze3d.systems.CommandEncoder","clearColorTexture",encoder,texture,0xfffcfcfc);
+        }
+    }
     protected Object createTarget(int size,boolean ignored) throws Exception {
         return s.construct("com.mojang.blaze3d.pipeline.TextureTarget","mcicon",size,size,true);
     }

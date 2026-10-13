@@ -97,6 +97,8 @@ gui-classicのexact 10版（1.17・1.17.1・1.18・1.18.1・1.18.2・1.19・1.19
 
 Issue #26ではgui-1.21.4の1.20・1.20.1・1.20.2・1.20.3・1.20.4・1.20.5・1.21・1.21.1・1.21.2・1.21.3を、通常flat Worldの静的7種類・64pxで検証しました。ユーザーが承認したGUI 320×240・インベントリ位置(80,121)を固定基準とし、70比較は誤差0でした。CPU lightPixelsの8版はCPU/GPU、GPU targetの2版はScreenshot/GPUのfull-bright RGBA(252,252,252,255)が一致します。全件13,125 PNGを監査し、独立した代表一括70枚と各ID別CLI・ゲームプロセス70枚は全件へ厳密一致しました。16/512pxの140 PNGは画像監査・終了検証で、World比較ではありません。既存1.20.6の基準と1.21.4の原点基準を維持し、1.19.4・1.20.6・1.21.4の回帰21画像は旧workerへ厳密一致、World21比較は誤差0です。[数値記録](../qa/validation-2026-10-13-modern-world.json)を参照してください。context/worker hashが変わるため新しい出力先へ再生成し、全版experimental/deterministic=false・verified版0を維持します。
 
+Issue #27ではgui-1.21.5の1.21.5を通常flat Worldの静的7種類・64pxで照合し、描画前lightmapを実測RGB252へ合わせた後は誤差0でした。実インベントリ位置(80,121)へ一致したため、productionの既存原点基準を維持します。GPU texelと描画時に指定されたSampler2 textureを観測し、CPU画像の値は作成しません。全1,395 PNGと独立全件反復1,395 PNGを監査し、decoded RGBA・PNG hash・パス・source・settings/digest・context・renderer・catalogが厳密一致しました。各ID別7 PNG、16/512pxの14 PNG、隣接1.21.4/1.21.6の回帰14 PNGと1.21.4のWorld7比較も成功しました。初回QA読戻し失敗と、単品生成での起動WORKER_EXITED 1件（根本原因未確定・同条件7件の明示再試験は成功）は成功記録と分けて保全します。[数値記録](../qa/validation-2026-10-13-gpu-immediate-world.json)を参照してください。worker/settingsDigestが変わるため以前のiconsを新しい出力先へ再生成し、全版experimental/deterministic=false・verified版0を維持します。
+
 ## 正式51版の登録集合・欠損受入（2026-10-12）
 
 修正後workerで固定正式51版・60,265PNGを新規生成し、登録母集団・除外理由・ID/パス重複・hash/CRC・RGBA8・透過・空画像の監査と、#10/#11の正常基準へのRGBA・PNG hash・パス比較が成功しました。1.21.11で破損stone PNGの代替画像を成功出力する検出漏れを、BakedQuadのposition/packedUV消費時のsprite観測で修正しました。選択された破損atlas/直接textureを各51版、モデル・チェスト・空モデル・事前ロード済み直接textureを各12境界版で受け入れました。150成功は複数実行の集約であり、初回失敗10ケースと各worker/helper hashを保存します。[検証範囲と再実行方法](validation.md)・[数値記録](../qa/validation-2026-10-12-release-coverage.json)を参照してください。

@@ -617,3 +617,30 @@ python3 scripts/verify-matrix.py --versions 1.20 1.20.1 1.20.2 1.20.3 1.20.4 1.2
 python3 scripts/verify-world-inventory.py --version 1.21.3 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/modern-all --out .local/modern-world/1.21.3 --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-worker-lifecycle.py --versions 1.20 1.20.1 1.20.2 1.20.3 1.20.4 1.20.5 1.21 1.21.1 1.21.2 1.21.3 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/modern-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
+
+## #27: gui-1.21.5の通常World照明
+
+起点は#26のmerge commit ff79e38ace908cacac4afae051819650104dd619、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。exact release 1.21.5のstone・diamond・grass_block・oak_leaves・chest・player_head・glassを、Linux amd64・固定Mesa llvmpipe Dockerで検証しました。通常flat World、保存seed0・minecraft:flat・SURVIVAL、window 1280×960、GUI scale4、slot9の実座標(80,121)、count1・既定stack・overlayなし・64pxです。最終7比較は最大channel誤差0、許容2/255超過0、輪郭例外0でした。
+
+worldなしproductionのLightTextureは初期白255で、通常WorldのGPU full-bright texelはRGBA(252,252,252,255)でした。照明変更前はdiamond864画素・glass145画素が最大3/255のFAIL、他5種類は最大2/255・超過0です。1.21.5のGPU textureを描画前に252へclearし、manifest contextへ記録する修正だけで全7種類が誤差0になりました。既存のGUI原点基準を維持し、投影・位置の変更、PNG保存後のRGB補正、許容値や輪郭例外の追加は行いません。1.21.6以降のDeferredRendererへ照明変更は適用しません。
+
+QAはproduction renderer・canonical hook・PngOutputを含まず、通常フレーム末尾の画面操作・バニラの非同期Screenshotを使用します。画像callbackを受け取るまでスロットを維持し、保存・close後に次IDへ進みます。1.21.5ではCPU lightmap画像が存在しないため、GlTextureからGPU texelを読みます。対象stackのItemStackRenderState.render入口ではshader texture番号2が0でしたが、後続flushでGlRenderPass.bindSamplerへ指定されたSampler2はLightTextureと同じtexture IDでした。入口だけで照明が未使用と判断しません。bindSamplerへの指定を観測した結果で、全draw内部状態の保証ではありません。GUI入口・samplerの値をID切替時にnullへ戻し、前IDの観測で欠測を通過させる検出漏れを反証で修正した後、最終World撮影を再実行しました。ASMによる観測があるため完全な無計装clientではありません。
+
+初回QAは照明のGL読戻し後にnative SIGSEGVを記録し、不完全な修正試行も同じ失敗でした。公式GlCommandEncoderのScreenshot転送がPACK_ROW_LENGTHを画面幅に設定して残す実装を確認しました。PIXEL_PACK_BUFFER、PACK_ALIGNMENT/ROW_LENGTH/SKIP_ROWS/SKIP_PIXELSを保存し、16×16の読み取り用に正規化してから全状態を復帰することで撮影が完了しました。最終試験では読戻し前ROW_LENGTH=1280と復帰成功を確認しました。異常後に所有containerだけをstopした2試行のexit137・途中capture・log・実行時sourceを保全し、productionの描画画像FAILや正常終了成功と混同しません。pack修正後の照明変更前Worldはexit0・画像FAIL、照明変更後の中間/最終Worldはexit0・誤差0です。
+
+64px全1,395 PNGの登録集合・hash/CRC・RGBA8/sRGB・透過・空画像監査と、別CLI・ゲームプロセスでの独立全件反復1,395 PNGが成功しました。独立代表一括7枚と各ID別CLI・ゲームプロセス7枚は全件へ、全件反復は初回全件へ、decoded RGBA・PNG hash・パス・source・settings/digest・context・renderer・catalogが厳密一致しました。全IDの個別生成ではありません。16/512px・2ジョブ14枚は専用cacheでPNG監査とworker exit0・強制終了なしを確認し、World画像比較とは区別します。
+
+初回単品試験はstoneが成功し、続くdiamondがready/PNG前のWORKER_EXITEDで終了しました。worker logにはUnknownHostExceptionとstdout broken pipeがありますが、根本原因は未確定で、このログだけから因果を断定しません。初回失敗を保全し、同条件・同workerの7件を明示的に再試験して全件と厳密一致しました。自動retryや例外抑制は実装しておらず、起動障害の解消を証明する結果ではありません。
+
+隣接adapterの1.21.4・1.21.6の回帰14 PNGは旧workerとRGBA・PNG hash・パス・source、agent以外のsettings、context・renderer・catalogが厳密一致しました。既存QA経路の1.21.4 World7比較は誤差0です。1.21.6のWorld対応・受入はこのIssueに含めません。入力/sidecar606ファイル×3cacheのhashは不変、JUnit64件・CLI installDist・Java8対象QA compile・Python構文・差分確認に成功しました。
+
+[数値・入力/worker/helper hash・初回失敗](../qa/validation-2026-10-13-gpu-immediate-world.json)を公開し、JAR・assets・World・画像・個人パスはprivateに保持します。照明/context・worker/settingsDigestが変わるため、照明を変更していない版を含め以前のiconsは新しい出力先へ再生成してください。raw出力は不変です。全モデル・動的状態・全サイズ・他GPUのWorld受入、起動障害の原因特定・解消へ一般化せず、experimental/deterministic=false・verified版0を維持します。
+
+既存cacheで版を準備した後、再現例は次のとおりです。Worldは単独client、終了検証は専用cacheを使用します。全件反復は別出力先で再生成し、各ID別比較は別CLI呼び出しを使ってaudit-export.pyへ全件manifestを渡します。
+
+```sh
+python3 scripts/verify-matrix.py --versions 1.21.5 --offline --out .local/gpu-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-world-inventory.py --version 1.21.5 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/gpu-all --out .local/gpu-world/1.21.5 --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-matrix.py --versions 1.21.5 --offline --out .local/gpu-repeat --compare .local/gpu-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-worker-lifecycle.py --versions 1.21.5 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/gpu-sizes --docker-image mcicon-render:0.1.0-preview.1
+```
