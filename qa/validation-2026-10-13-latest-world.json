@@ -1,0 +1,4479 @@
+{
+  "issue": 29,
+  "baseCommit": "82d529f023c1e44ad8eb2cbbe57fbdf3af483cbe",
+  "dependencyCommit": "f6f0b82e22aca3ee3b374aec167e432b96caf55a",
+  "versions": [
+    "26.2"
+  ],
+  "scope": "Linux amd64・固定Mesa Docker、通常flat World、保存seed0・SURVIVAL、GUI320×240・slot9(80,121)、count1・既定stack・静的7種類64px。全状態・全サイズ・他GPUのWorld一致は保証しない。",
+  "workerSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+  "workerUnchanged": true,
+  "productionRenderingUnchanged": true,
+  "helperSourcesSha256": {
+    "scripts/qa/WorldInventoryAgent.java": "c521813596e304fbad3656fdc50c6f71231d69187cdd1da856857160a6a18255",
+    "scripts/verify-world-inventory.py": "c52c76358b6520b1f55544bda8568a31e17cf36793f72e78ce0c1c9d3686a2b3"
+  },
+  "productionSourceSha256": {
+    "worker/src/main/java/io/github/rs0325/mcicon/worker/LatestRenderer.java": "d2701e57b7f46a5be3f390437f2a1dcdd01706fe4829c90df58cf8ae2c916753"
+  },
+  "worlds": [
+    {
+      "scope": "通常flat Worldを非同期Screenshotで撮影する。Inventory slot 9のstackとItemModelResolverのstateを同一性で照合し、そのstateのatlas描画中にSampler2のGpuTextureViewを観測する。Levelと実使用GUIのGPU texelを分け、UiLightmap版ではGUI CPU画像も読む。production描画・照明初期化・固定化・透過復元は共有しない。完全な無計装clientではない。",
+      "version": "26.2",
+      "sourceSha256": "40896ee9f1e2bec3c934daac7e93d41e9e3d9c2f8ae0ca366d52ffbfd1afa290",
+      "baselineAgentSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+      "qaAgentSha256": "6d7fb42869713d0564b19c19f70d1b8895891e42b76dd9abc0b4525ebc159cb4",
+      "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "c52c76358b6520b1f55544bda8568a31e17cf36793f72e78ce0c1c9d3686a2b3",
+        "scripts/qa/WorldInventoryAgent.java": "c521813596e304fbad3656fdc50c6f71231d69187cdd1da856857160a6a18255"
+      },
+      "windowPixels": [
+        1280,
+        960
+      ],
+      "guiScale": 4,
+      "worldPreset": "flat",
+      "seed": "0",
+      "slot": 9,
+      "excludedProductionClasses": [
+        "RenderAgent",
+        "CanonicalTransformer",
+        "CanonicalContext",
+        "ResourceTransformer",
+        "ModernRenderer",
+        "ClassicRenderer",
+        "FixedRenderer",
+        "LegacyRenderer",
+        "DeferredRenderer",
+        "GpuImmediateRenderer",
+        "LatestRenderer",
+        "PngOutput",
+        "Bridge"
+      ],
+      "maxAllowedChannelError": 2,
+      "baselineFullBrightRgb": [
+        255,
+        255,
+        255
+      ],
+      "baselineLightmapSource": "client-constructor-default-white",
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+          "screenSha256": "5f7d26c94d6b50c16aed5e19698a92bad20db88c0826727c729f131cffcd11da",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            255,
+            255,
+            255
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapSource": "UiLightmap",
+          "guiLightmapTextureId": 4,
+          "declaredGuiLightmapTextureId": 4,
+          "guiLightmapSize": [
+            1,
+            1
+          ],
+          "lightmapCpuAvailable": true,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "47bc10a457edd60968476dab038eba3f3d9de127d7f94399ee2bdbf5b7135828",
+          "screenSha256": "b140caee6c38195f1735616778fabe05eb6f0f2fc816ce2dc93de2b6987d27f2",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            255,
+            255,
+            255
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapSource": "UiLightmap",
+          "guiLightmapTextureId": 4,
+          "declaredGuiLightmapTextureId": 4,
+          "guiLightmapSize": [
+            1,
+            1
+          ],
+          "lightmapCpuAvailable": true,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:grass_block",
+          "exportPngSha256": "500498ce5e2eb6c694dc3212c14af4ab51a4f39021c0651b7c1fd86f3287b07e",
+          "screenSha256": "694e561a5099fabfbd95ea3162e0cc7f824da567d75fff01091f26d8b4c2c9e0",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            255,
+            255,
+            255
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapSource": "UiLightmap",
+          "guiLightmapTextureId": 4,
+          "declaredGuiLightmapTextureId": 4,
+          "guiLightmapSize": [
+            1,
+            1
+          ],
+          "lightmapCpuAvailable": true,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "exportPngSha256": "d065e3c72fcf6e025d808cf3bc023316ed18da442a2d60e5b701da463fa06716",
+          "screenSha256": "5f539404d56e555e3bc3326c5d623060fa8dc6c750ffeb52a678573e51fbc7ef",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            255,
+            255,
+            255
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapSource": "UiLightmap",
+          "guiLightmapTextureId": 4,
+          "declaredGuiLightmapTextureId": 4,
+          "guiLightmapSize": [
+            1,
+            1
+          ],
+          "lightmapCpuAvailable": true,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:chest",
+          "exportPngSha256": "a21bcd1b21ad7a6e190cac499ac72338b9cbadeaba53eefa4d6736bf6b34a1f1",
+          "screenSha256": "dbff3a6656d011b5c3ba9f70c6f82c710e69a5881d4060ee8f95d3a7f998c3d5",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            255,
+            255,
+            255
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapSource": "UiLightmap",
+          "guiLightmapTextureId": 4,
+          "declaredGuiLightmapTextureId": 4,
+          "guiLightmapSize": [
+            1,
+            1
+          ],
+          "lightmapCpuAvailable": true,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:player_head",
+          "exportPngSha256": "d3792f0dcd4712e66d56c84bfe892c3d9fc105241178a2907e7da6a42058151d",
+          "screenSha256": "b54c534101a2fe011d6d0599bade6a89a4f041429c4baab55e375851c742d477",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            255,
+            255,
+            255
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapSource": "UiLightmap",
+          "guiLightmapTextureId": 4,
+          "declaredGuiLightmapTextureId": 4,
+          "guiLightmapSize": [
+            1,
+            1
+          ],
+          "lightmapCpuAvailable": true,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightingCompatible": true
+        },
+        {
+          "id": "minecraft:glass",
+          "exportPngSha256": "9543cc6b7651bf36a9f4a516a228100b975f1f4c3a6e10dd5d26731ca21aa896",
+          "screenSha256": "922b5e039263594e75a33dc4c5c51a4780865b65052d48439f983f782b87eabf",
+          "maxChannelError": 0,
+          "meanChannelError": 0.0,
+          "pixelsOverTolerance": 0,
+          "edgePixels": [],
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true,
+          "count": 1,
+          "fullBrightRgb": [
+            255,
+            255,
+            255
+          ],
+          "opaqueReference": true,
+          "rawPassed": true,
+          "lightmapMatches": null,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapSource": "UiLightmap",
+          "guiLightmapTextureId": 4,
+          "declaredGuiLightmapTextureId": 4,
+          "guiLightmapSize": [
+            1,
+            1
+          ],
+          "lightmapCpuAvailable": true,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightingCompatible": true
+        }
+      ],
+      "passed": true,
+      "resourceLimits": {
+        "heapMiB": 1024,
+        "containerMiB": 3072
+      },
+      "exitCode": 0,
+      "comparisonSourceSha256": "58fb0dec3074b3013e7907f35624c19f54a7b668a5d0043b4fb9d4ae7b8edcae",
+      "edgePolicy": {
+        "approvedReference": {
+          "id": "minecraft:oak_fence",
+          "exportPngSha256": "c7f9018b723b97c2212691e117a1a49bcf8b5a2a67c806b0b7db86c016bf44cd",
+          "nativeRgbaSha256": "a1dfbffdc2078fff47da3816abb60242ead94e7842e9b1929aa1270ee857bbf2",
+          "backgroundRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "pixels": [
+            [
+              40,
+              46
+            ],
+            [
+              42,
+              47
+            ]
+          ]
+        },
+        "scope": "ユーザーが画像確認したoak_fenceの同一PNG・参照RGBA・背景RGBA・2座標だけを許容。他画像へ自動的に一般化しない。"
+      },
+      "capture": {
+        "version": "26.2",
+        "productionRendererUsed": false,
+        "canonicalHooksUsed": false,
+        "renderMethodsTransformed": true,
+        "captures": [
+          {
+            "id": "empty",
+            "screen": "empty-screen.png",
+            "xGui": 80,
+            "yGui": 121,
+            "count": 0,
+            "hasFoil": false,
+            "fullBrightArgb": -1,
+            "levelFullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "levelLightmapCpuAvailable": false,
+            "gameTime": 260
+          },
+          {
+            "id": "minecraft:stone",
+            "screen": "minecraft_stone-screen.png",
+            "xGui": 80,
+            "yGui": 121,
+            "count": 1,
+            "hasFoil": false,
+            "fullBrightArgb": -1,
+            "levelFullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "levelLightmapCpuAvailable": false,
+            "fullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "guiLightmapTextureId": 4,
+            "guiLightmapWidth": 1,
+            "guiLightmapHeight": 1,
+            "declaredGuiLightmapTextureId": 4,
+            "guiStateMatchedInventoryStack": true,
+            "fullBrightCpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "lightmapCpuAvailable": true,
+            "guiLightmapSource": "UiLightmap",
+            "gameTime": 322
+          },
+          {
+            "id": "minecraft:diamond",
+            "screen": "minecraft_diamond-screen.png",
+            "xGui": 80,
+            "yGui": 121,
+            "count": 1,
+            "hasFoil": false,
+            "fullBrightArgb": -1,
+            "levelFullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "levelLightmapCpuAvailable": false,
+            "fullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "guiLightmapTextureId": 4,
+            "guiLightmapWidth": 1,
+            "guiLightmapHeight": 1,
+            "declaredGuiLightmapTextureId": 4,
+            "guiStateMatchedInventoryStack": true,
+            "fullBrightCpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "lightmapCpuAvailable": true,
+            "guiLightmapSource": "UiLightmap",
+            "gameTime": 374
+          },
+          {
+            "id": "minecraft:grass_block",
+            "screen": "minecraft_grass_block-screen.png",
+            "xGui": 80,
+            "yGui": 121,
+            "count": 1,
+            "hasFoil": false,
+            "fullBrightArgb": -1,
+            "levelFullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "levelLightmapCpuAvailable": false,
+            "fullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "guiLightmapTextureId": 4,
+            "guiLightmapWidth": 1,
+            "guiLightmapHeight": 1,
+            "declaredGuiLightmapTextureId": 4,
+            "guiStateMatchedInventoryStack": true,
+            "fullBrightCpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "lightmapCpuAvailable": true,
+            "guiLightmapSource": "UiLightmap",
+            "gameTime": 437
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "screen": "minecraft_oak_leaves-screen.png",
+            "xGui": 80,
+            "yGui": 121,
+            "count": 1,
+            "hasFoil": false,
+            "fullBrightArgb": -1,
+            "levelFullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "levelLightmapCpuAvailable": false,
+            "fullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "guiLightmapTextureId": 4,
+            "guiLightmapWidth": 1,
+            "guiLightmapHeight": 1,
+            "declaredGuiLightmapTextureId": 4,
+            "guiStateMatchedInventoryStack": true,
+            "fullBrightCpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "lightmapCpuAvailable": true,
+            "guiLightmapSource": "UiLightmap",
+            "gameTime": 504
+          },
+          {
+            "id": "minecraft:chest",
+            "screen": "minecraft_chest-screen.png",
+            "xGui": 80,
+            "yGui": 121,
+            "count": 1,
+            "hasFoil": false,
+            "fullBrightArgb": -1,
+            "levelFullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "levelLightmapCpuAvailable": false,
+            "fullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "guiLightmapTextureId": 4,
+            "guiLightmapWidth": 1,
+            "guiLightmapHeight": 1,
+            "declaredGuiLightmapTextureId": 4,
+            "guiStateMatchedInventoryStack": true,
+            "fullBrightCpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "lightmapCpuAvailable": true,
+            "guiLightmapSource": "UiLightmap",
+            "gameTime": 556
+          },
+          {
+            "id": "minecraft:player_head",
+            "screen": "minecraft_player_head-screen.png",
+            "xGui": 80,
+            "yGui": 121,
+            "count": 1,
+            "hasFoil": false,
+            "fullBrightArgb": -1,
+            "levelFullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "levelLightmapCpuAvailable": false,
+            "fullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "guiLightmapTextureId": 4,
+            "guiLightmapWidth": 1,
+            "guiLightmapHeight": 1,
+            "declaredGuiLightmapTextureId": 4,
+            "guiStateMatchedInventoryStack": true,
+            "fullBrightCpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "lightmapCpuAvailable": true,
+            "guiLightmapSource": "UiLightmap",
+            "gameTime": 608
+          },
+          {
+            "id": "minecraft:glass",
+            "screen": "minecraft_glass-screen.png",
+            "xGui": 80,
+            "yGui": 121,
+            "count": 1,
+            "hasFoil": false,
+            "fullBrightArgb": -1,
+            "levelFullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "levelLightmapCpuAvailable": false,
+            "fullBrightGpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "guiLightmapTextureId": 4,
+            "guiLightmapWidth": 1,
+            "guiLightmapHeight": 1,
+            "declaredGuiLightmapTextureId": 4,
+            "guiStateMatchedInventoryStack": true,
+            "fullBrightCpuRgba": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "lightmapCpuAvailable": true,
+            "guiLightmapSource": "UiLightmap",
+            "gameTime": 672
+          }
+        ],
+        "renderStateObservedOnly": true,
+        "gpuPackRowLengthBefore": 1280,
+        "gpuPackBufferBefore": 0,
+        "gpuPackStateRestored": true,
+        "lightmapProbe": "gpu-texture-view-gl-readback",
+        "completed": true
+      },
+      "officialInputsModified": false
+    }
+  ],
+  "worldSeeds": [
+    {
+      "version": "26.2",
+      "actualWorldSeed": 0,
+      "actualGameType": 0,
+      "actualOverworldType": "minecraft:flat",
+      "levelDatSha256": "40d57bea440c085136362680c67365e809609a7f2e2f8df06ebd92e257d2e2c6",
+      "worldGenSettingsSha256": "1999079eb63ca266eed6e11faf90b4769b09965a3e25466d3613fe8c71d79c5a"
+    },
+    {
+      "version": "26.1.2",
+      "actualWorldSeed": 0,
+      "actualGameType": 0,
+      "actualOverworldType": "minecraft:flat",
+      "levelDatSha256": "f1529b95e4bd6051c2dba99cbd7d93dd9f6c27e73514da59b00925cc55a1ea57",
+      "worldGenSettingsSha256": "8c73face0259d3920e5d37c97244c4b6cf197910523c23040d2a84357d89b41d"
+    }
+  ],
+  "initialQaFailures": [
+    {
+      "version": "26.2",
+      "kind": "独立QAのAPI対応エラー",
+      "reason": "Minecraft.screenがGui.screenへ移動してNoSuchFieldException。",
+      "error": "java.lang.NoSuchFieldException: screen",
+      "exitCode": 1,
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "7e67d370a7935dc150e58c6949950c162bd7c3877d8d83085bea4d755750f5c2",
+        "scripts/qa/WorldInventoryAgent.java": "85092da2509e44cf4591f286530d5d2fb15935fa304d8139f09cbf66690d7bfb"
+      },
+      "qaAgentSha256": "8f9bd0b520dbe2797f0f80908385a9cea4c552456cc54e03daf83694bd3c1b01",
+      "reportSha256": "880165dfc1f53f486d6a9cb36190762b4be5602d7badcd3fdb89264aaf8ed970",
+      "clientLogSha256": "5d132b02a9faed70f3ef8146e77402c8d2d79687dc0bfc530b58c58b9e9a2836",
+      "productionImageFailure": false
+    },
+    {
+      "version": "26.2",
+      "kind": "独立QAのAPI対応エラー",
+      "reason": "Minecraft.getMainRenderTargetがGameRenderer.mainRenderTargetへ移動してNoSuchMethodException。",
+      "error": "java.lang.NoSuchMethodException: net.minecraft.client.Minecraft.getMainRenderTarget/0",
+      "exitCode": 1,
+      "harnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "7e67d370a7935dc150e58c6949950c162bd7c3877d8d83085bea4d755750f5c2",
+        "scripts/qa/WorldInventoryAgent.java": "95233e74469fa4c91784119a7607a593dd6dfc72767f99af2193948fbfa007f8"
+      },
+      "qaAgentSha256": "86947386d184da82b1abbe2bb00df9fe3f648ce20469cf0763e4de2dee913042",
+      "reportSha256": "1ccc0c062ba453b363a8ca01eef99ee97f270bca798eb5f55ea72131da7b5c5d",
+      "clientLogSha256": "1a05818d0147dadb68fe5bc38c70b95e429bb582a392163cd6b65852a1269429",
+      "productionImageFailure": false
+    }
+  ],
+  "intermediateWorld": {
+    "reportSha256": "3365c4c87d3d2fc8930e3a3eb4e048d023455357b9f9b4cf81ec14f7914c20d1",
+    "harnessSourcesSha256": {
+      "scripts/verify-world-inventory.py": "7e67d370a7935dc150e58c6949950c162bd7c3877d8d83085bea4d755750f5c2",
+      "scripts/qa/WorldInventoryAgent.java": "0f7744b6b132d461a449cf8183debc96a14dcd4e228b87722ddd98c5bfb5cff4"
+    },
+    "passed": true,
+    "maxChannelError": 0,
+    "note": "private field取得で照明・画像一致後、公式public accessorへ変更して最終再撮影。"
+  },
+  "all": [
+    {
+      "version": "26.2",
+      "mode": "icons",
+      "audited": 1536,
+      "registryPopulationVerified": true,
+      "transparentImages": 1520,
+      "fractionalAlphaPixels": 120416,
+      "failures": [],
+      "compared": 0,
+      "comparisonVerified": false,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 38.61,
+      "cliCoreSha256": "7499f8eda717719e950f936b0b7a9e69d584ea803cd81efd8149f78e90c9ecbb"
+    }
+  ],
+  "independentFullRepeat": [
+    {
+      "version": "26.2",
+      "mode": "icons",
+      "audited": 1536,
+      "registryPopulationVerified": true,
+      "transparentImages": 1520,
+      "fractionalAlphaPixels": 120416,
+      "failures": [],
+      "compared": 1536,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 37.43,
+      "cliCoreSha256": "7499f8eda717719e950f936b0b7a9e69d584ea803cd81efd8149f78e90c9ecbb"
+    }
+  ],
+  "strictComparison": {
+    "versions": [
+      {
+        "version": "26.2",
+        "selectedAll": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 7,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        },
+        "fullRepeat": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 1536,
+          "registryPopulationVerified": false,
+          "transparentImages": 1520,
+          "fractionalAlphaPixels": 120416,
+          "failures": [],
+          "compared": 1536,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        },
+        "singles": [
+          {
+            "id": "minecraft:chest",
+            "audit": {
+              "version": "26.2",
+              "mode": "icons",
+              "audited": 1,
+              "registryPopulationVerified": false,
+              "transparentImages": 1,
+              "fractionalAlphaPixels": 0,
+              "failures": [],
+              "compared": 1,
+              "comparisonVerified": true,
+              "canonicalVerified": false
+            }
+          },
+          {
+            "id": "minecraft:diamond",
+            "audit": {
+              "version": "26.2",
+              "mode": "icons",
+              "audited": 1,
+              "registryPopulationVerified": false,
+              "transparentImages": 1,
+              "fractionalAlphaPixels": 0,
+              "failures": [],
+              "compared": 1,
+              "comparisonVerified": true,
+              "canonicalVerified": false
+            }
+          },
+          {
+            "id": "minecraft:glass",
+            "audit": {
+              "version": "26.2",
+              "mode": "icons",
+              "audited": 1,
+              "registryPopulationVerified": false,
+              "transparentImages": 1,
+              "fractionalAlphaPixels": 0,
+              "failures": [],
+              "compared": 1,
+              "comparisonVerified": true,
+              "canonicalVerified": false
+            }
+          },
+          {
+            "id": "minecraft:grass_block",
+            "audit": {
+              "version": "26.2",
+              "mode": "icons",
+              "audited": 1,
+              "registryPopulationVerified": false,
+              "transparentImages": 1,
+              "fractionalAlphaPixels": 0,
+              "failures": [],
+              "compared": 1,
+              "comparisonVerified": true,
+              "canonicalVerified": false
+            }
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "audit": {
+              "version": "26.2",
+              "mode": "icons",
+              "audited": 1,
+              "registryPopulationVerified": false,
+              "transparentImages": 1,
+              "fractionalAlphaPixels": 0,
+              "failures": [],
+              "compared": 1,
+              "comparisonVerified": true,
+              "canonicalVerified": false
+            }
+          },
+          {
+            "id": "minecraft:player_head",
+            "audit": {
+              "version": "26.2",
+              "mode": "icons",
+              "audited": 1,
+              "registryPopulationVerified": false,
+              "transparentImages": 1,
+              "fractionalAlphaPixels": 0,
+              "failures": [],
+              "compared": 1,
+              "comparisonVerified": true,
+              "canonicalVerified": false
+            }
+          },
+          {
+            "id": "minecraft:stone",
+            "audit": {
+              "version": "26.2",
+              "mode": "icons",
+              "audited": 1,
+              "registryPopulationVerified": false,
+              "transparentImages": 1,
+              "fractionalAlphaPixels": 0,
+              "failures": [],
+              "compared": 1,
+              "comparisonVerified": true,
+              "canonicalVerified": false
+            }
+          }
+        ]
+      }
+    ],
+    "regressions": [
+      {
+        "version": "26.1.2",
+        "audit": {
+          "version": "26.1.2",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 7,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      }
+    ],
+    "manifestHashes": {
+      ".local/selected/java/26.2/icons/manifest.json": "adf6fafcc8d3b71f2504c7b602b27270602e60e36227dc91e66175ce6d8ae09a",
+      ".local/all/java/26.2/icons/manifest.json": "23f51bd30aeb3305b179d2273bd28120095db98e77d40cb3621bb43689300ee4",
+      ".local/repeat/java/26.2/icons/manifest.json": "23f51bd30aeb3305b179d2273bd28120095db98e77d40cb3621bb43689300ee4",
+      ".local/reg-after/java/26.1.2/icons/manifest.json": "0e5d8f270737e10452939df63095992c28f28a8e7e1b20928775be0dfcffb7ef",
+      ".local/reg-before/java/26.1.2/icons/manifest.json": "0e5d8f270737e10452939df63095992c28f28a8e7e1b20928775be0dfcffb7ef"
+    },
+    "passed": true
+  },
+  "singleFinal": {
+    "versions": [
+      "26.2"
+    ],
+    "scope": "各IDを別CLI・ゲームプロセスで生成し全件へ厳密比較",
+    "jobs": [
+      {
+        "version": "26.2",
+        "id": "minecraft:stone",
+        "exitCode": 0,
+        "elapsedSeconds": 23.929,
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "26.2",
+        "id": "minecraft:diamond",
+        "exitCode": 0,
+        "elapsedSeconds": 24.884,
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "26.2",
+        "id": "minecraft:grass_block",
+        "exitCode": 0,
+        "elapsedSeconds": 30.093,
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "26.2",
+        "id": "minecraft:oak_leaves",
+        "exitCode": 0,
+        "elapsedSeconds": 30.206,
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "26.2",
+        "id": "minecraft:chest",
+        "exitCode": 0,
+        "elapsedSeconds": 22.36,
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "26.2",
+        "id": "minecraft:player_head",
+        "exitCode": 0,
+        "elapsedSeconds": 23.203,
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "version": "26.2",
+        "id": "minecraft:glass",
+        "exitCode": 0,
+        "elapsedSeconds": 40.665,
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 1,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      }
+    ],
+    "passed": true
+  },
+  "boundaries": {
+    "scope": "Linux amd64 Mesa Dockerの描画・透過・正常終了。World画質受入ではない。",
+    "workerSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+    "jobs": [
+      {
+        "version": "26.2",
+        "size": 16,
+        "exitCode": 0,
+        "timedOut": false,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "elapsedSeconds": 43.237,
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 124,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 136,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 229,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:grass_block",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 144,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:player_head",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 136,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 16,
+            "height": 16,
+            "backgroundAlphaZeroPixels": 80,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "named",
+          "metadataSha256": "36d5e22e7ed5e74c6243ebb76174a1772dcf4df30728aba9d3443309435fc3e4",
+          "profile": "gui-26.2",
+          "size": 16
+        }
+      },
+      {
+        "version": "26.2",
+        "size": 512,
+        "exitCode": 0,
+        "timedOut": false,
+        "ownedWorkers": 1,
+        "workerExitCodes": [
+          "0"
+        ],
+        "forcedTerminationEvents": [],
+        "elapsedSeconds": 43.391,
+        "images": [
+          {
+            "id": "minecraft:chest",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 126910,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:diamond",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 139264,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:glass",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 217631,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:grass_block",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 85864,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:oak_leaves",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 143766,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:player_head",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 149200,
+            "fractionalAlphaPixels": 0
+          },
+          {
+            "id": "minecraft:stone",
+            "width": 512,
+            "height": 512,
+            "backgroundAlphaZeroPixels": 85864,
+            "fractionalAlphaPixels": 0
+          }
+        ],
+        "passed": true,
+        "audit": {
+          "version": "26.2",
+          "mode": "icons",
+          "audited": 7,
+          "registryPopulationVerified": false,
+          "transparentImages": 7,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+        "context": {
+          "alphaMethod": "black-white-native-composite-v1",
+          "animationFrame": 0,
+          "count": 1,
+          "deterministic": false,
+          "epochMillis": 946684800000,
+          "guiItemAtlas": "reset-per-pass",
+          "overlays": false,
+          "partialTick": 0.0,
+          "player": "absent",
+          "profile": "fixed-v1",
+          "randomSeed": 0,
+          "timeMillis": 1000,
+          "timeZone": "UTC",
+          "world": "absent"
+        },
+        "settings": {
+          "agentSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "mappingsSha256": "named",
+          "metadataSha256": "36d5e22e7ed5e74c6243ebb76174a1772dcf4df30728aba9d3443309435fc3e4",
+          "profile": "gui-26.2",
+          "size": 512
+        }
+      }
+    ],
+    "passed": true
+  },
+  "regressionWorld": {
+    "scope": "通常flat Worldを非同期Screenshotで撮影する。Inventory slot 9のstackとItemModelResolverのstateを同一性で照合し、そのstateのatlas描画中にSampler2のGpuTextureViewを観測する。Levelと実使用GUIのGPU texelを分け、UiLightmap版ではGUI CPU画像も読む。production描画・照明初期化・固定化・透過復元は共有しない。完全な無計装clientではない。",
+    "version": "26.1.2",
+    "sourceSha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0",
+    "baselineAgentSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+    "qaAgentSha256": "ce18d93d80abd6cef80bf3b60d8b3b9f9496d4a0114a127152c655663471d741",
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "harnessSourcesSha256": {
+      "scripts/verify-world-inventory.py": "c52c76358b6520b1f55544bda8568a31e17cf36793f72e78ce0c1c9d3686a2b3",
+      "scripts/qa/WorldInventoryAgent.java": "c521813596e304fbad3656fdc50c6f71231d69187cdd1da856857160a6a18255"
+    },
+    "windowPixels": [
+      1280,
+      960
+    ],
+    "guiScale": 4,
+    "worldPreset": "flat",
+    "seed": "0",
+    "slot": 9,
+    "excludedProductionClasses": [
+      "RenderAgent",
+      "CanonicalTransformer",
+      "CanonicalContext",
+      "ResourceTransformer",
+      "ModernRenderer",
+      "ClassicRenderer",
+      "FixedRenderer",
+      "LegacyRenderer",
+      "DeferredRenderer",
+      "GpuImmediateRenderer",
+      "LatestRenderer",
+      "PngOutput",
+      "Bridge"
+    ],
+    "maxAllowedChannelError": 2,
+    "baselineFullBrightRgb": [
+      255,
+      255,
+      255
+    ],
+    "baselineLightmapSource": "client-constructor-default-white",
+    "entries": [
+      {
+        "id": "minecraft:stone",
+        "exportPngSha256": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+        "screenSha256": "045f7dd8185fba3ae5e20087fa28866cbf1abbb02903af8a002f2a9a217e3461",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          255,
+          255,
+          255
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "levelFullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "fullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "guiLightmapSource": "UiLightmap",
+        "guiLightmapTextureId": 6,
+        "declaredGuiLightmapTextureId": 6,
+        "guiLightmapSize": [
+          1,
+          1
+        ],
+        "lightmapCpuAvailable": true,
+        "guiStateMatchedInventoryStack": true,
+        "fullBrightCpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "lightingCompatible": true
+      },
+      {
+        "id": "minecraft:diamond",
+        "exportPngSha256": "47bc10a457edd60968476dab038eba3f3d9de127d7f94399ee2bdbf5b7135828",
+        "screenSha256": "ef086b663db21e9e01b65aece048d7c420efcc448cd1d44b7baeef39c141a76a",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          255,
+          255,
+          255
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "levelFullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "fullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "guiLightmapSource": "UiLightmap",
+        "guiLightmapTextureId": 6,
+        "declaredGuiLightmapTextureId": 6,
+        "guiLightmapSize": [
+          1,
+          1
+        ],
+        "lightmapCpuAvailable": true,
+        "guiStateMatchedInventoryStack": true,
+        "fullBrightCpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "lightingCompatible": true
+      },
+      {
+        "id": "minecraft:grass_block",
+        "exportPngSha256": "500498ce5e2eb6c694dc3212c14af4ab51a4f39021c0651b7c1fd86f3287b07e",
+        "screenSha256": "452329493aed79bace8889d04ddadf48dfb0565a4108e2cca07f457c0f42d310",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          255,
+          255,
+          255
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "levelFullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "fullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "guiLightmapSource": "UiLightmap",
+        "guiLightmapTextureId": 6,
+        "declaredGuiLightmapTextureId": 6,
+        "guiLightmapSize": [
+          1,
+          1
+        ],
+        "lightmapCpuAvailable": true,
+        "guiStateMatchedInventoryStack": true,
+        "fullBrightCpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "lightingCompatible": true
+      },
+      {
+        "id": "minecraft:oak_leaves",
+        "exportPngSha256": "d065e3c72fcf6e025d808cf3bc023316ed18da442a2d60e5b701da463fa06716",
+        "screenSha256": "7f8a1403f00c6606ccad878fb7a4f73e69a3f88df63ad56991772f6a23115e13",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          255,
+          255,
+          255
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "levelFullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "fullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "guiLightmapSource": "UiLightmap",
+        "guiLightmapTextureId": 6,
+        "declaredGuiLightmapTextureId": 6,
+        "guiLightmapSize": [
+          1,
+          1
+        ],
+        "lightmapCpuAvailable": true,
+        "guiStateMatchedInventoryStack": true,
+        "fullBrightCpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "lightingCompatible": true
+      },
+      {
+        "id": "minecraft:chest",
+        "exportPngSha256": "a21bcd1b21ad7a6e190cac499ac72338b9cbadeaba53eefa4d6736bf6b34a1f1",
+        "screenSha256": "f841df54fb5a714420d4150058531c7af4b465224db29c0910e588fd902d33ad",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          255,
+          255,
+          255
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "levelFullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "fullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "guiLightmapSource": "UiLightmap",
+        "guiLightmapTextureId": 6,
+        "declaredGuiLightmapTextureId": 6,
+        "guiLightmapSize": [
+          1,
+          1
+        ],
+        "lightmapCpuAvailable": true,
+        "guiStateMatchedInventoryStack": true,
+        "fullBrightCpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "lightingCompatible": true
+      },
+      {
+        "id": "minecraft:player_head",
+        "exportPngSha256": "d3792f0dcd4712e66d56c84bfe892c3d9fc105241178a2907e7da6a42058151d",
+        "screenSha256": "e04769ad9603d17fcd9534e144036c89a75b4855b6338113cec829f81d10a26a",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          255,
+          255,
+          255
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "levelFullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "fullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "guiLightmapSource": "UiLightmap",
+        "guiLightmapTextureId": 6,
+        "declaredGuiLightmapTextureId": 6,
+        "guiLightmapSize": [
+          1,
+          1
+        ],
+        "lightmapCpuAvailable": true,
+        "guiStateMatchedInventoryStack": true,
+        "fullBrightCpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "lightingCompatible": true
+      },
+      {
+        "id": "minecraft:glass",
+        "exportPngSha256": "9543cc6b7651bf36a9f4a516a228100b975f1f4c3a6e10dd5d26731ca21aa896",
+        "screenSha256": "da0b9662ce4642c796e8d61c4b8450753e3469c56f5c683253f5793fdd0795fd",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          255,
+          255,
+          255
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "levelFullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "fullBrightGpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "guiLightmapSource": "UiLightmap",
+        "guiLightmapTextureId": 6,
+        "declaredGuiLightmapTextureId": 6,
+        "guiLightmapSize": [
+          1,
+          1
+        ],
+        "lightmapCpuAvailable": true,
+        "guiStateMatchedInventoryStack": true,
+        "fullBrightCpuRgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "lightingCompatible": true
+      }
+    ],
+    "passed": true,
+    "resourceLimits": {
+      "heapMiB": 1024,
+      "containerMiB": 3072
+    },
+    "exitCode": 0,
+    "comparisonSourceSha256": "58fb0dec3074b3013e7907f35624c19f54a7b668a5d0043b4fb9d4ae7b8edcae",
+    "edgePolicy": {
+      "approvedReference": {
+        "id": "minecraft:oak_fence",
+        "exportPngSha256": "c7f9018b723b97c2212691e117a1a49bcf8b5a2a67c806b0b7db86c016bf44cd",
+        "nativeRgbaSha256": "a1dfbffdc2078fff47da3816abb60242ead94e7842e9b1929aa1270ee857bbf2",
+        "backgroundRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+        "pixels": [
+          [
+            40,
+            46
+          ],
+          [
+            42,
+            47
+          ]
+        ]
+      },
+      "scope": "ユーザーが画像確認したoak_fenceの同一PNG・参照RGBA・背景RGBA・2座標だけを許容。他画像へ自動的に一般化しない。"
+    },
+    "capture": {
+      "version": "26.1.2",
+      "productionRendererUsed": false,
+      "canonicalHooksUsed": false,
+      "renderMethodsTransformed": true,
+      "captures": [
+        {
+          "id": "empty",
+          "screen": "empty-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 0,
+          "hasFoil": false,
+          "fullBrightArgb": -1,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "levelLightmapCpuAvailable": false,
+          "gameTime": 187
+        },
+        {
+          "id": "minecraft:stone",
+          "screen": "minecraft_stone-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "hasFoil": false,
+          "fullBrightArgb": -1,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "levelLightmapCpuAvailable": false,
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapTextureId": 6,
+          "guiLightmapWidth": 1,
+          "guiLightmapHeight": 1,
+          "declaredGuiLightmapTextureId": 6,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightmapCpuAvailable": true,
+          "guiLightmapSource": "UiLightmap",
+          "gameTime": 224
+        },
+        {
+          "id": "minecraft:diamond",
+          "screen": "minecraft_diamond-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "hasFoil": false,
+          "fullBrightArgb": -1,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "levelLightmapCpuAvailable": false,
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapTextureId": 6,
+          "guiLightmapWidth": 1,
+          "guiLightmapHeight": 1,
+          "declaredGuiLightmapTextureId": 6,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightmapCpuAvailable": true,
+          "guiLightmapSource": "UiLightmap",
+          "gameTime": 259
+        },
+        {
+          "id": "minecraft:grass_block",
+          "screen": "minecraft_grass_block-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "hasFoil": false,
+          "fullBrightArgb": -1,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "levelLightmapCpuAvailable": false,
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapTextureId": 6,
+          "guiLightmapWidth": 1,
+          "guiLightmapHeight": 1,
+          "declaredGuiLightmapTextureId": 6,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightmapCpuAvailable": true,
+          "guiLightmapSource": "UiLightmap",
+          "gameTime": 290
+        },
+        {
+          "id": "minecraft:oak_leaves",
+          "screen": "minecraft_oak_leaves-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "hasFoil": false,
+          "fullBrightArgb": -1,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "levelLightmapCpuAvailable": false,
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapTextureId": 6,
+          "guiLightmapWidth": 1,
+          "guiLightmapHeight": 1,
+          "declaredGuiLightmapTextureId": 6,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightmapCpuAvailable": true,
+          "guiLightmapSource": "UiLightmap",
+          "gameTime": 321
+        },
+        {
+          "id": "minecraft:chest",
+          "screen": "minecraft_chest-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "hasFoil": false,
+          "fullBrightArgb": -1,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "levelLightmapCpuAvailable": false,
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapTextureId": 6,
+          "guiLightmapWidth": 1,
+          "guiLightmapHeight": 1,
+          "declaredGuiLightmapTextureId": 6,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightmapCpuAvailable": true,
+          "guiLightmapSource": "UiLightmap",
+          "gameTime": 351
+        },
+        {
+          "id": "minecraft:player_head",
+          "screen": "minecraft_player_head-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "hasFoil": false,
+          "fullBrightArgb": -1,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "levelLightmapCpuAvailable": false,
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapTextureId": 6,
+          "guiLightmapWidth": 1,
+          "guiLightmapHeight": 1,
+          "declaredGuiLightmapTextureId": 6,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightmapCpuAvailable": true,
+          "guiLightmapSource": "UiLightmap",
+          "gameTime": 382
+        },
+        {
+          "id": "minecraft:glass",
+          "screen": "minecraft_glass-screen.png",
+          "xGui": 80,
+          "yGui": 121,
+          "count": 1,
+          "hasFoil": false,
+          "fullBrightArgb": -1,
+          "levelFullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "levelLightmapCpuAvailable": false,
+          "fullBrightGpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "guiLightmapTextureId": 6,
+          "guiLightmapWidth": 1,
+          "guiLightmapHeight": 1,
+          "declaredGuiLightmapTextureId": 6,
+          "guiStateMatchedInventoryStack": true,
+          "fullBrightCpuRgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "lightmapCpuAvailable": true,
+          "guiLightmapSource": "UiLightmap",
+          "gameTime": 423
+        }
+      ],
+      "renderStateObservedOnly": true,
+      "gpuPackRowLengthBefore": 1280,
+      "gpuPackBufferBefore": 0,
+      "gpuPackStateRestored": true,
+      "lightmapProbe": "gpu-texture-view-gl-readback",
+      "completed": true
+    },
+    "officialInputsModified": false
+  },
+  "junit": {
+    "tests": 64,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": true,
+    "files": [
+      {
+        "path": "cli/build/test-results/test/TEST-io.github.rs0325.mcicon.cli.CliArgumentsTest.xml",
+        "sha256": "e5ea3be8af851531eda7ed983c4d431dd66e2f2c943282e0832d075e85dd26f1"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.CacheAndVersionsTest.xml",
+        "sha256": "3910ad05edc9fb8f8f8b0f5e2d60733ee2a0517d991b07a6441ed0727a2fb1e4"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.CacheDiagnosticsTest.xml",
+        "sha256": "a8831fa624359b2890a4e139c9b8d6c0b4c3ab5c0532c992fcc00829926e16f4"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.CatalogPlanningTest.xml",
+        "sha256": "e6de27dcb23fcfe1e5fa61e643515b9dc9e2cf47f63a154087727533b37375b8"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.ExportIntegrityTest.xml",
+        "sha256": "0094140ebcb667d031c8aed55df2dc150ec94591dfd58b354d3c4a1799f8e5b1"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.GeneratorLifecycleTest.xml",
+        "sha256": "8e07cfce989e9a609545a3b3b8bb4f7a986b9cca7b517a5178b6ede6d861338d"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.internal.ExportTemporaryCleanupTest.xml",
+        "sha256": "ba74859b99e479cf40d059e58382700c486f091d81bd9c39e9dd54e8f4de7b8f"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.internal.IconRecoveryTest.xml",
+        "sha256": "7c83b7375a70bbf2d43b35171e3e65124db56ebc17847d3a9696c5d65339e473"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.internal.JsonTest.xml",
+        "sha256": "ec80639f09768d6af0008e87f92dd0ce38fb0051cf4cbd4ebbe94ff4d6754634"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.internal.LegacyMappingsTest.xml",
+        "sha256": "446cc6d312dc1bc0d5a16feba74a847b1066008b322a6e11d54670fbf9690983"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.internal.RuntimeProfilesTest.xml",
+        "sha256": "57b4ca9104c0af05846c1656726b740014217112ac7b051c4557e85af265f3d1"
+      },
+      {
+        "path": "core/build/test-results/test/TEST-io.github.rs0325.mcicon.internal.WorkerSnapshotTest.xml",
+        "sha256": "2a70a1cd9e7be2e205ee061510cff1b20e5ee93f3a82a184c09e1572461ba962"
+      },
+      {
+        "path": "worker/build/test-results/test/TEST-io.github.rs0325.mcicon.worker.AgentPackagingTest.xml",
+        "sha256": "1ce2a191cbb97d9be5b8434c7e3fb8b3ad4f122f7c43a6f2ed482623b2d23319"
+      },
+      {
+        "path": "worker/build/test-results/test/TEST-io.github.rs0325.mcicon.worker.CanonicalContextTest.xml",
+        "sha256": "c3c3cd38fb3c1793127e12923896d6774a45d597994ca05f80c8105a0e2abecf"
+      },
+      {
+        "path": "worker/build/test-results/test/TEST-io.github.rs0325.mcicon.worker.PngOutputTest.xml",
+        "sha256": "e5d32bfb48736318c49a7c0db02c3f4fad35f4efbd9d49069901f816075f0b42"
+      },
+      {
+        "path": "worker/build/test-results/test/TEST-io.github.rs0325.mcicon.worker.ResourceGuardTest.xml",
+        "sha256": "75aa7146ab94980a6157144a78ef183b3e8565b2af6a5ae3f570aaca1410f142"
+      },
+      {
+        "path": "worker/build/test-results/test/TEST-io.github.rs0325.mcicon.worker.SymbolsCapabilitiesTest.xml",
+        "sha256": "d98cd8c24099da54ba5fe6c268b6374d9a4c25d2faca0e74017b20018e611196"
+      }
+    ]
+  },
+  "inputs": {
+    "filesPerCache": 594,
+    "caches": 3,
+    "unchanged": true,
+    "inventory": [
+      {
+        "path": "assets/indexes/30.json",
+        "sha256": "80f9212e8c798e9d855e187094bb0b5bf5ee03d7b0ca461c2ec1edc99388b933"
+      },
+      {
+        "path": "assets/indexes/30.json.sha256",
+        "sha256": "e70c05ee9809c7cbb86cb367fe426b27d86e52182908e3e962becfaa3368c9da"
+      },
+      {
+        "path": "assets/indexes/32.json",
+        "sha256": "957fc71aae47d44099285bfd32ea9f2896bfff1b1ff7b3f6a74abdbe0ffb8973"
+      },
+      {
+        "path": "assets/indexes/32.json.sha256",
+        "sha256": "fe3f55ba1d4906d03eae1aa8b27fa3e80ba3d979a2940a4c4cde237b5cbd768d"
+      },
+      {
+        "path": "assets/objects/00/00dcd1377eecaf510a79582308236003bcfe0eec",
+        "sha256": "00d1a0979c6fdd396826b2dca613dd1105cdc04e0cc432542ac508396a215953"
+      },
+      {
+        "path": "assets/objects/00/00dcd1377eecaf510a79582308236003bcfe0eec.sha256",
+        "sha256": "2311046a940624d9edca253a0a231384674e9b82630f8ad32e2f39305be26ec1"
+      },
+      {
+        "path": "assets/objects/01/01564e4a93458fdc78544743528f31bd0ee1335e",
+        "sha256": "8b7602fae66ac831c479d4a476ebf1bcc7f93296c933c52b716e1d1661b9c407"
+      },
+      {
+        "path": "assets/objects/01/01564e4a93458fdc78544743528f31bd0ee1335e.sha256",
+        "sha256": "51afb6cf0b3c04d9c229f606e95c7c5f36ce6758ba672fd3ea70022f01c26198"
+      },
+      {
+        "path": "assets/objects/01/01a08107261cb5044b252adaba2d598e087a920a",
+        "sha256": "21e345c9c3a4b6355c63b662d6586aa9189057373bf321f82f91543b2927fcce"
+      },
+      {
+        "path": "assets/objects/01/01a08107261cb5044b252adaba2d598e087a920a.sha256",
+        "sha256": "b6822a9bc2d68c6bb19d6215fdd0a04f517c244c0b73df699480f1e99eaab8cc"
+      },
+      {
+        "path": "assets/objects/04/04b575c76e0132db48572fbf58068b6aabb69dd4",
+        "sha256": "271b51421efcaa4907f82574c55a49a8a14ccea1756da7ebb55fac56d4a3af0b"
+      },
+      {
+        "path": "assets/objects/04/04b575c76e0132db48572fbf58068b6aabb69dd4.sha256",
+        "sha256": "d6e8379ab720eae52e6221c2808316480d6f70fba746cfe8bb093b4af94e5f41"
+      },
+      {
+        "path": "assets/objects/05/051b162271644662742fe78523b31ef50d9960fc",
+        "sha256": "750012c6077a2f230dca98107d2497071a07f60751c7e40cee971a1e48e63681"
+      },
+      {
+        "path": "assets/objects/05/051b162271644662742fe78523b31ef50d9960fc.sha256",
+        "sha256": "23cca33d68b1559a8acffff423c689c7814ca95bdb287e91cd00d6cebbeaef9f"
+      },
+      {
+        "path": "assets/objects/08/080a7922af59868012adea22e1bf106953240a15",
+        "sha256": "90fbcdcae10434f0475c9934605852741e59614a617304fa592f8fae4454b1dd"
+      },
+      {
+        "path": "assets/objects/08/080a7922af59868012adea22e1bf106953240a15.sha256",
+        "sha256": "1988fa7b6da83ecad96d6db784953b7c14a87df57528963e5f46857d6c3230ed"
+      },
+      {
+        "path": "assets/objects/09/096757eb00022b1ad62f4a9978755cc958a421c1",
+        "sha256": "bc12424c7a14151a86262016f7e9e4ce0d2eec1e8d6e63ee76a9ff73b953e7e6"
+      },
+      {
+        "path": "assets/objects/09/096757eb00022b1ad62f4a9978755cc958a421c1.sha256",
+        "sha256": "c1efe0450528fa39f74464309dae954b328248cf9f21903eade0946bdf6fb9a8"
+      },
+      {
+        "path": "assets/objects/09/09fc4bb8b59416d1bd941aa1f3cda0e58d8b1e38",
+        "sha256": "0cdf0d2defa568d670d0a098dbf06e69ef042cec259073a7434f56eb48847733"
+      },
+      {
+        "path": "assets/objects/09/09fc4bb8b59416d1bd941aa1f3cda0e58d8b1e38.sha256",
+        "sha256": "9416efa8c4cdb239dccf43fe3a8f74eb57d74728bb455451ab4cfacd149b5351"
+      },
+      {
+        "path": "assets/objects/0a/0aba9b4ffd7b033bfca760e5e654ec9e3040ccb4",
+        "sha256": "06453fb770542ac923a43510aa8f752b6053da8971f3950258e87b6baffda442"
+      },
+      {
+        "path": "assets/objects/0a/0aba9b4ffd7b033bfca760e5e654ec9e3040ccb4.sha256",
+        "sha256": "b0efdea7b591bc9820df8df3d6bac29e7060864f894d244c79c3524732ec49a5"
+      },
+      {
+        "path": "assets/objects/0b/0b7af8e22f2cdff0aa8112b86705b99e2659afb1",
+        "sha256": "b1639f8d0c1e1f12b8eaaa54d187a93fb3967b57dc88ef58f7dabba49a4be5fd"
+      },
+      {
+        "path": "assets/objects/0b/0b7af8e22f2cdff0aa8112b86705b99e2659afb1.sha256",
+        "sha256": "f9a313ce9dd250989406d209d3de8fd65b152e83ce063a0e6682881e3b7ed49f"
+      },
+      {
+        "path": "assets/objects/0c/0c79ce4acc0a33a8204d97f05e1eb49f0b7b0b56",
+        "sha256": "7522944fb071d411ea1907b789e46214337e86958a7d4c5c490d2f8729c38d00"
+      },
+      {
+        "path": "assets/objects/0c/0c79ce4acc0a33a8204d97f05e1eb49f0b7b0b56.sha256",
+        "sha256": "b2a512d544180f259cd135f82826b6cb962767fb6214e7afdd5264e1932055b0"
+      },
+      {
+        "path": "assets/objects/0c/0c7f5d259522879a5234eb1241a24713894c10c6",
+        "sha256": "c90fd3ff33591d195343c404e4691f51812c2357ac50b12a32a6a7968ec5731f"
+      },
+      {
+        "path": "assets/objects/0c/0c7f5d259522879a5234eb1241a24713894c10c6.sha256",
+        "sha256": "15dac1bb28242932e41ba0a198c2b2b7c8d3987b1b64727ef82ffdf647e07800"
+      },
+      {
+        "path": "assets/objects/0d/0d05ea3de196f4fcd2b0039d28b4d2ab7ae7b4c8",
+        "sha256": "763f14cd1544fb515af6e6f7dc85740f6530bb6c2b9b41a0747f76877940f6ef"
+      },
+      {
+        "path": "assets/objects/0d/0d05ea3de196f4fcd2b0039d28b4d2ab7ae7b4c8.sha256",
+        "sha256": "989802533340e55137c46f0e9f63e62224aca531da714ce07ef79993f7b32c86"
+      },
+      {
+        "path": "assets/objects/0e/0e4685b9f92b6162d9b1915a3f706dc064dbeab3",
+        "sha256": "5c2e911f81f8d51db031953ab0db0a7a9b921242e28149bfa3b074e3ef61e224"
+      },
+      {
+        "path": "assets/objects/0e/0e4685b9f92b6162d9b1915a3f706dc064dbeab3.sha256",
+        "sha256": "10dce47a7b2bc9bba25f383aad1b87429734370daa0683358990dbf491f81d66"
+      },
+      {
+        "path": "assets/objects/0e/0e50652f439813c33253e48e4cfdc0fbd04d8095",
+        "sha256": "8d84ca36500fb060c7f95026824a1762ff49fd0650fafbe330e13f783ad68390"
+      },
+      {
+        "path": "assets/objects/0e/0e50652f439813c33253e48e4cfdc0fbd04d8095.sha256",
+        "sha256": "cce3f0e3ef563bf405828a8ecae0718cb484c5351bb72066d6dd7ce765f3def7"
+      },
+      {
+        "path": "assets/objects/0f/0f66c27917abf3b05c61c58e79e012b87ff87bcb",
+        "sha256": "ac8ca92b3b1fce7d11e16509b845c0528c73eac7627a4a0c1271e6707f800365"
+      },
+      {
+        "path": "assets/objects/0f/0f66c27917abf3b05c61c58e79e012b87ff87bcb.sha256",
+        "sha256": "a26a398ea77681aa882a03a9f4a4e7e4d273bf09085a1a9e4fd1337fed6050f2"
+      },
+      {
+        "path": "assets/objects/12/126b7ccb28f0d4248cb22b2f974351bf2373fdeb",
+        "sha256": "26e218eed1d2cbce082447b62532dcebb10e0b247623955a48814e9661d922f2"
+      },
+      {
+        "path": "assets/objects/12/126b7ccb28f0d4248cb22b2f974351bf2373fdeb.sha256",
+        "sha256": "1b059ff28094b1c7a45581bf9ba3f13d968c3f00f01bd78d5c00b68c11b2315d"
+      },
+      {
+        "path": "assets/objects/15/15c8e87c9ace8c279dffaf86d05dda43dd51d933",
+        "sha256": "9075fe2fb0153531ca5e0a43cedd4902861f0dae82af8506a1afad142663aa73"
+      },
+      {
+        "path": "assets/objects/15/15c8e87c9ace8c279dffaf86d05dda43dd51d933.sha256",
+        "sha256": "ba8bc6ac3fd12b967256e202fb3b81cca6441c7581aabc2b6bc3e5e93ef7ed32"
+      },
+      {
+        "path": "assets/objects/16/1635239f9aed4048709e4791b4dca73cafdf8ef6",
+        "sha256": "6025ae85d6ed4f4e08758d552fe39bbbf3f8f1bb5c01bdb0fdcee25d280500e1"
+      },
+      {
+        "path": "assets/objects/16/1635239f9aed4048709e4791b4dca73cafdf8ef6.sha256",
+        "sha256": "d8929b57e88ca24095f5af266efb8b89325da3912f3813a35f7db3628a73cd61"
+      },
+      {
+        "path": "assets/objects/18/182af5bb332cdf80dbcebd581e31878f34b1b50a",
+        "sha256": "49b25ecdaa0fc02f610c5dacdd6f48ee236417e580abe18996b5395719fdfacf"
+      },
+      {
+        "path": "assets/objects/18/182af5bb332cdf80dbcebd581e31878f34b1b50a.sha256",
+        "sha256": "1526417c6ac21624432b0dc667bf3cfd2e3ed40916b5130c48ea2cf5b771ca3f"
+      },
+      {
+        "path": "assets/objects/1b/1b92076ec0cf796ebfb5618858f4130ecdd2a9a1",
+        "sha256": "61097c38e45caf560e503cec6727b2274f1f4b02639041842f29f6ba0facb299"
+      },
+      {
+        "path": "assets/objects/1b/1b92076ec0cf796ebfb5618858f4130ecdd2a9a1.sha256",
+        "sha256": "a20f52f62a6beb534783e1a3040bfd94b6868301a154a833f935296019f678d6"
+      },
+      {
+        "path": "assets/objects/1d/1d8eb3f824e8e17c0834a17cf39b9e55b8479c2e",
+        "sha256": "6a9871cf3c92bb946351186456d13f5b9f5d3d0d7a1f4c36aca215aa7eae7e40"
+      },
+      {
+        "path": "assets/objects/1d/1d8eb3f824e8e17c0834a17cf39b9e55b8479c2e.sha256",
+        "sha256": "8819006906429f7d4fc14b8f8bc20f3e54cb8d209ef351d78079aaf9d8c7dbf7"
+      },
+      {
+        "path": "assets/objects/1e/1e6c0ba6d6431337fef455536fb2199f065547e8",
+        "sha256": "bdef203b85f4793a9e803c0727fdeee0fa58749c5e201dacebef026578f27f4e"
+      },
+      {
+        "path": "assets/objects/1e/1e6c0ba6d6431337fef455536fb2199f065547e8.sha256",
+        "sha256": "0e9f66b51de625bfb118b334feea626719298db63bb2951e18bc5e71a4354c5f"
+      },
+      {
+        "path": "assets/objects/24/2470fc9200f3632718c67bd24c9732730979ec67",
+        "sha256": "d0cba9877b9030ad9739758cbd77830faf1031278164fb1ae7fcaead2944750a"
+      },
+      {
+        "path": "assets/objects/24/2470fc9200f3632718c67bd24c9732730979ec67.sha256",
+        "sha256": "0974dd603e74af2e13053242f7119f7c7b631d0b664aa1bb7d478130dec74c05"
+      },
+      {
+        "path": "assets/objects/25/256dfeddee55e7ecf4a866d3f45210de48e92393",
+        "sha256": "c922b518635aa4d329d991b377a02f9d0aa7a6ed6344c7306a885c19e78b794b"
+      },
+      {
+        "path": "assets/objects/25/256dfeddee55e7ecf4a866d3f45210de48e92393.sha256",
+        "sha256": "b0f98c8bf30efa48898f9c39108dc22d1ccdac8e1795e6c196e798a7d266e3f7"
+      },
+      {
+        "path": "assets/objects/25/25d9158df3f821b8849d619fa1da670c3c1bd975",
+        "sha256": "3d7c520b1ffee16223c974592d9c3c847157c6e0992fa15fef044cf834a77503"
+      },
+      {
+        "path": "assets/objects/25/25d9158df3f821b8849d619fa1da670c3c1bd975.sha256",
+        "sha256": "1aeda048ddc8b26c5c3506840943e005b526a28dc04a97cf6c4be8ebcf40f9cc"
+      },
+      {
+        "path": "assets/objects/26/26ad18d9f4ef0a71255459b5f01b738b81dbc7dc",
+        "sha256": "17d0e586c6a70665333d7672c8c54577dfd48ad1d94f61def92e20103347947c"
+      },
+      {
+        "path": "assets/objects/26/26ad18d9f4ef0a71255459b5f01b738b81dbc7dc.sha256",
+        "sha256": "c899aea629d8aca4069ba6a1eae888f62e6198843cf41bdb40fa0125733c7a9d"
+      },
+      {
+        "path": "assets/objects/27/27b522309f4eb4066b57901d5a5d249da837ef70",
+        "sha256": "edbb397d2c33d629d6a5e49310dfee28d009e6c95dc8f5aed11f1f7610bf9f0d"
+      },
+      {
+        "path": "assets/objects/27/27b522309f4eb4066b57901d5a5d249da837ef70.sha256",
+        "sha256": "da83911175a996ba784ea5e6d62dcd3757af8fec29086f7194f25f3561f344b2"
+      },
+      {
+        "path": "assets/objects/27/27c7eaa56ad656a9c9d25dc850a3d2bfcfdd7520",
+        "sha256": "59b5608dec710a9344a0fe6cfa8555e86e38bdf4f4f2819785b7b4fbfa84b83b"
+      },
+      {
+        "path": "assets/objects/27/27c7eaa56ad656a9c9d25dc850a3d2bfcfdd7520.sha256",
+        "sha256": "82f7f83e2e63fece0e35b5d827426dd4c8ef15ed026ed223ce05f2a78d70ad4f"
+      },
+      {
+        "path": "assets/objects/2a/2ae757ebdf8f5ac7d1c357fff88abd622a8e50c1",
+        "sha256": "f91bdb29a4cc635e8883576ce999968a6b9888b05efafaa11767ce7645da4a85"
+      },
+      {
+        "path": "assets/objects/2a/2ae757ebdf8f5ac7d1c357fff88abd622a8e50c1.sha256",
+        "sha256": "37302843b315d229842193a4d05b33c79cdf3a75e08cde30589a2e2ab0181b41"
+      },
+      {
+        "path": "assets/objects/2c/2c3f94a8bd83b8da9212cfdbd3b8b31263cd4bbc",
+        "sha256": "0539106deaab756705804d19b0cadd2960fb254ddd37e234fa92f5c7258bf1c7"
+      },
+      {
+        "path": "assets/objects/2c/2c3f94a8bd83b8da9212cfdbd3b8b31263cd4bbc.sha256",
+        "sha256": "d36c92873cd67d882cda47ba3fbc0a6ac10955916c2dd4e168ca91927a35bdd4"
+      },
+      {
+        "path": "assets/objects/2d/2d888ac14e51d7cab64b5e735456d25bf000720e",
+        "sha256": "97882d5c754c4e1e3a0b7a2e93eef67da3efc97f0ae98e8deec5623d10a04555"
+      },
+      {
+        "path": "assets/objects/2d/2d888ac14e51d7cab64b5e735456d25bf000720e.sha256",
+        "sha256": "1c2869195b3cedc3c5ea18a432c897aec240edd57187bad0f23c231a70d3787e"
+      },
+      {
+        "path": "assets/objects/2d/2d92be9cc3e8b9d59f644fe72a28b9a0132ccc23",
+        "sha256": "3622c04e1324881ad91cf29930d0965dc9d9838efc1eaa60e58ad61e8790f458"
+      },
+      {
+        "path": "assets/objects/2d/2d92be9cc3e8b9d59f644fe72a28b9a0132ccc23.sha256",
+        "sha256": "c4e5e66b3ad161694c3dcc3290729ba880c0cd307ce3102bd389a6997284c943"
+      },
+      {
+        "path": "assets/objects/2e/2ecd1f41977e72de7891785ce4ee08599834ad3f",
+        "sha256": "3273f228da13afc6045efa7cdbedfa3f0b44285e2917e8d3b0136dfab2d8ceb7"
+      },
+      {
+        "path": "assets/objects/2e/2ecd1f41977e72de7891785ce4ee08599834ad3f.sha256",
+        "sha256": "61501f662bc2223628c3f962211189066ec73c115a7101401a711132192263d7"
+      },
+      {
+        "path": "assets/objects/30/3001e71efcf0e7555c3fb2ed174e67c0ea32c5fd",
+        "sha256": "7a98146a94088763d5680ef47cd9b26d323ef475305c2c413c55df92ff6ee846"
+      },
+      {
+        "path": "assets/objects/30/3001e71efcf0e7555c3fb2ed174e67c0ea32c5fd.sha256",
+        "sha256": "7e266f17ae99d6ecdf6d7f4367f7f4f585796a8fdf5051132859298051108d38"
+      },
+      {
+        "path": "assets/objects/32/3262f89c3612bc145713db035ae8935f89b36363",
+        "sha256": "9f0c617f3bb87c5b1e8cf336ebb9be1d5a70411f7919ece7a7e187a4b78d7246"
+      },
+      {
+        "path": "assets/objects/32/3262f89c3612bc145713db035ae8935f89b36363.sha256",
+        "sha256": "549d9087e9d5cbfab86dd843880222c5d9da58bf198f541e87ff2cabc661e99a"
+      },
+      {
+        "path": "assets/objects/33/336893bbefe50a7f039cba0d7b2c77f4b2fdc7cf",
+        "sha256": "de71b092bb0a6ae957e0bd7ffef77b5600cbd66232d9e4602bd705521217d322"
+      },
+      {
+        "path": "assets/objects/33/336893bbefe50a7f039cba0d7b2c77f4b2fdc7cf.sha256",
+        "sha256": "07afc8b54bef0e68adda2d93f4cfb2f3abbfb5d3fa68a00876686439213dae6e"
+      },
+      {
+        "path": "assets/objects/38/3887a74562a96f9af9031e3a2dd1f878708ec7ff",
+        "sha256": "b57ba00438ba9a4da8b0d0f23700de9964c8864c90de8a02497f562ce06fc325"
+      },
+      {
+        "path": "assets/objects/38/3887a74562a96f9af9031e3a2dd1f878708ec7ff.sha256",
+        "sha256": "ae47765d2bbf2363653294b01f016d0b7d4155b0e88a88123118cf13244cc772"
+      },
+      {
+        "path": "assets/objects/3c/3c1a6e6c941c547d2ec8b6990c8201d6585e3d59",
+        "sha256": "f3d1ae6e1a16655739f8e2ae28ba77c31b2f7138d725abf7979d044b3235ad2f"
+      },
+      {
+        "path": "assets/objects/3c/3c1a6e6c941c547d2ec8b6990c8201d6585e3d59.sha256",
+        "sha256": "55dd06ad43a97ea7f133e84fc050d802330a79c4ec5beef1f6f38eac53e8622a"
+      },
+      {
+        "path": "assets/objects/3c/3ca45b3c5c0db479cfffe83c663ca117efe3cde7",
+        "sha256": "98815bb19d6d9f94c2daac2e256970e479dffb5eb04be7d3abb358ce14f9b6ad"
+      },
+      {
+        "path": "assets/objects/3c/3ca45b3c5c0db479cfffe83c663ca117efe3cde7.sha256",
+        "sha256": "cd308311a385af6ca7166caa85da1116e20e27346ebfaa4b8afb987b82b95a4e"
+      },
+      {
+        "path": "assets/objects/3d/3d5f7f7d4d8de799caa9a3d6d462f6fc02de71b8",
+        "sha256": "f08fa69f1a67d9ed69c066d67fd6f7a1d0a1610fdd002e53d010a7e2677e77b4"
+      },
+      {
+        "path": "assets/objects/3d/3d5f7f7d4d8de799caa9a3d6d462f6fc02de71b8.sha256",
+        "sha256": "e5e41b02382a7b6c0f6f75b17eeae8dd3f87a69152b5f98ac3cedf95ee7844f7"
+      },
+      {
+        "path": "assets/objects/3d/3d9f7275202fcbc3d1e7002afd6092d567df0ed6",
+        "sha256": "aaf2a880889364d415447da360a60d7fcdc88105b7ce3b4159717076a9761ecd"
+      },
+      {
+        "path": "assets/objects/3d/3d9f7275202fcbc3d1e7002afd6092d567df0ed6.sha256",
+        "sha256": "07fc589e6c3eef6fc59b69a3e5d33e7ff5e808187540d395137d7bb339baf082"
+      },
+      {
+        "path": "assets/objects/3e/3e673831a0424abb8f3f03b9408438532661af25",
+        "sha256": "05989b12c2123cd2d4d3d6e5e7335900c88bb4a972cafc358441436c2564b3cf"
+      },
+      {
+        "path": "assets/objects/3e/3e673831a0424abb8f3f03b9408438532661af25.sha256",
+        "sha256": "9480566722ca46c3c8d89aad9b306a4953b944624be017d94033c72064730266"
+      },
+      {
+        "path": "assets/objects/3e/3ebbeb78d9507effab38fda9697d9c6eb43d9b5a",
+        "sha256": "ead5ea5ef7e44397889776de40fe5e39886dde7ef6ff1f1d457f9d334ac3ae80"
+      },
+      {
+        "path": "assets/objects/3e/3ebbeb78d9507effab38fda9697d9c6eb43d9b5a.sha256",
+        "sha256": "a7b6b09a85e5edb13d3f6a9c99e133d8e38ab36fb39253ae2d62ea08b66c08e6"
+      },
+      {
+        "path": "assets/objects/40/401a9164121dd9f76427e01936e81924de1baffc",
+        "sha256": "c70e2f7f4939c42e50b0cbcc70144f05e61892c45a6cb764d49a54b02cc5e663"
+      },
+      {
+        "path": "assets/objects/40/401a9164121dd9f76427e01936e81924de1baffc.sha256",
+        "sha256": "5b9fe68cfeca6efcb1784b5259740b668ac3da45fae968a97da6d1f559d3db6c"
+      },
+      {
+        "path": "assets/objects/40/402ded0eebd448033ef415e861a17513075f80e7",
+        "sha256": "8b0624ab98ad3e6d4038b581f3cc83c497587a92e764da7784f7a4dfd528c1be"
+      },
+      {
+        "path": "assets/objects/40/402ded0eebd448033ef415e861a17513075f80e7.sha256",
+        "sha256": "0373a667db7caf48b9d16761c7b8da7b8168ac311a86062a68b08099feaf1566"
+      },
+      {
+        "path": "assets/objects/40/4035bd38218d0660c76d4abc6464ae04ee7ae615",
+        "sha256": "d7250dd5810d45f12c013b9f6d6637537b52836df1d78f21b94d420607e46a33"
+      },
+      {
+        "path": "assets/objects/40/4035bd38218d0660c76d4abc6464ae04ee7ae615.sha256",
+        "sha256": "3f0fdddf40cde50d53f6f5f182812b2c3e8ba9ef641c2d1fa008723faa9a63a3"
+      },
+      {
+        "path": "assets/objects/40/4047618109deb7ed1bbcc4f9cfc71365db8cd3e6",
+        "sha256": "b412466e6c0b690b709a8f9f7e38d2dac432119767ecf185f9c37af2a09d621b"
+      },
+      {
+        "path": "assets/objects/40/4047618109deb7ed1bbcc4f9cfc71365db8cd3e6.sha256",
+        "sha256": "30156b81232b05656dacc9fb0b01607812dcefc3c33fd60a7f46a2eafe71e0fb"
+      },
+      {
+        "path": "assets/objects/42/424efd3714d623b4c89131e3b2916435e76d183d",
+        "sha256": "77741af4e19bcb2eb5c5068ebdc4cb9e2489672c5b29da7953e0dcdf1e5da64b"
+      },
+      {
+        "path": "assets/objects/42/424efd3714d623b4c89131e3b2916435e76d183d.sha256",
+        "sha256": "332ce9f83d500d391b3b09c140cf344bf7f622230cab98ad0a45b0b843c8abe9"
+      },
+      {
+        "path": "assets/objects/43/4326014429e1a164dafafbaf9be0fce564dea28c",
+        "sha256": "a1b6be508efb79087afc2689738cca1bbe1bb88d88145841cf9054a5633778dc"
+      },
+      {
+        "path": "assets/objects/43/4326014429e1a164dafafbaf9be0fce564dea28c.sha256",
+        "sha256": "6c312ef7eb4d3d474764b3f5efb6423c34e9afac20f3c2edf494abeb5852ff6a"
+      },
+      {
+        "path": "assets/objects/43/434b5a54c238f1ce9f4ba973264cbea70686c9f0",
+        "sha256": "c337699e3ee8679618968a4e1eb324634b009d9d4ed6773edafc2ddef067c7a2"
+      },
+      {
+        "path": "assets/objects/43/434b5a54c238f1ce9f4ba973264cbea70686c9f0.sha256",
+        "sha256": "3ade57eccd949c0e9532867b2e4aeaaefddc12c1c652bbe4f482fb6f86754507"
+      },
+      {
+        "path": "assets/objects/44/44f46567ae7329a71a2e9bfa8702662ba9e8be38",
+        "sha256": "3dd25a8cc7dce7ac2359975b099b56357918f07b686789794863a5c1715a506d"
+      },
+      {
+        "path": "assets/objects/44/44f46567ae7329a71a2e9bfa8702662ba9e8be38.sha256",
+        "sha256": "c8c247adb823658ad0708fb132e5d9abc695d32b5193e91c12d1fdcadff9565a"
+      },
+      {
+        "path": "assets/objects/45/4574e4b3a592117b019e05088947ee26bc55e697",
+        "sha256": "4390c74c5770f56e8c92c8a596ef51cc04a44e97965904bc88200358cd100cc8"
+      },
+      {
+        "path": "assets/objects/45/4574e4b3a592117b019e05088947ee26bc55e697.sha256",
+        "sha256": "b2ebe6d64d5fc26b4bc2ea1515deeeda2a17eb613775cf4e6109a01fba31b0c1"
+      },
+      {
+        "path": "assets/objects/46/46c167859bc5b840524093d9d68603073e2cf628",
+        "sha256": "9a4dd4bf2b9cb10df4495aff244e9f2d999db1ff2ac6d63867cf507c54e4ca76"
+      },
+      {
+        "path": "assets/objects/46/46c167859bc5b840524093d9d68603073e2cf628.sha256",
+        "sha256": "5d2e60b293abf2de408a11e34e51cc23483b6fd5d0e7f49b8a775294e0caa106"
+      },
+      {
+        "path": "assets/objects/47/47d008368e8393461f779d1b6ac0d3967dbf8f18",
+        "sha256": "368842d7b5ba4f75a78cfb64887008a8e6fc3e4c83d34c8e11ceff6f070ddafd"
+      },
+      {
+        "path": "assets/objects/47/47d008368e8393461f779d1b6ac0d3967dbf8f18.sha256",
+        "sha256": "ccbf118838290ad4b3f2a3886e266cfe43639101bd0c480181529203c7e042e2"
+      },
+      {
+        "path": "assets/objects/4a/4a101c336082c530e93945b0e31ac818cfbf78a0",
+        "sha256": "3e466bdbd58aa726379a63bca098341ab9950f790e3db7e6af2f091b981d2a21"
+      },
+      {
+        "path": "assets/objects/4a/4a101c336082c530e93945b0e31ac818cfbf78a0.sha256",
+        "sha256": "473d5f31e51dd1087ee2668bf295ab541bf37a5a8d96e836437a31c92f46835a"
+      },
+      {
+        "path": "assets/objects/4a/4a8493454b4307e330501892058541ed0bf228da",
+        "sha256": "7b1373783a46dde953a640d8d4dfc33d02a9e370d3242299f64a27a2bef0e6d9"
+      },
+      {
+        "path": "assets/objects/4a/4a8493454b4307e330501892058541ed0bf228da.sha256",
+        "sha256": "f1430b2d4b20f787aba9972fbc84849ea8dcd1416bbdb9d31beb0aab5e85b499"
+      },
+      {
+        "path": "assets/objects/4b/4be2b7dd74e4a15f42c69ca9cda14ef229264864",
+        "sha256": "5dfb4a744efe6a962c28b4d2562bb585d7f2c23fac869429967a6f55f225d700"
+      },
+      {
+        "path": "assets/objects/4b/4be2b7dd74e4a15f42c69ca9cda14ef229264864.sha256",
+        "sha256": "085366a93e4991ab7b50e7638f41cade41d468725c186c895ea8a9def548d55a"
+      },
+      {
+        "path": "assets/objects/50/506cf32775338a5f5f1f40390fe01d9495cd93c3",
+        "sha256": "1271097944f24ad133ce4c81a1d6ae2fc9a5f0bd671062adfff113a66dd8620b"
+      },
+      {
+        "path": "assets/objects/50/506cf32775338a5f5f1f40390fe01d9495cd93c3.sha256",
+        "sha256": "64823aa140c457a31e78efd89d34b8525218c1cf7acff6c1ce0aa203f10798c6"
+      },
+      {
+        "path": "assets/objects/50/5090245a76dca83b5863c2fd879801e174b791b1",
+        "sha256": "74f53daa3432bfee76b75e04d7614a14d822974c8e0d735db760a57cf0aca943"
+      },
+      {
+        "path": "assets/objects/50/5090245a76dca83b5863c2fd879801e174b791b1.sha256",
+        "sha256": "652b471a92b612718b2a0240b015e293c423a6c3428fb33f9ad01885f292ad5d"
+      },
+      {
+        "path": "assets/objects/51/51fc9e682823d839dbe53c67b32ae59350517926",
+        "sha256": "0705b0cd23ddfb0f74ac107d4f2889d3fcf1740c76a2ef6a452fd73ae1af9d7f"
+      },
+      {
+        "path": "assets/objects/51/51fc9e682823d839dbe53c67b32ae59350517926.sha256",
+        "sha256": "bbc68a3b10401cbbf1ad143c1d2609ac9255d9c091e45b2030204063ac16d544"
+      },
+      {
+        "path": "assets/objects/52/528bd408860546720caa31f2c1bfb04db962b91d",
+        "sha256": "0667b504d75a3f1d5baeb095ebd84c825504781601ba9b9f64a4aa511c76014a"
+      },
+      {
+        "path": "assets/objects/52/528bd408860546720caa31f2c1bfb04db962b91d.sha256",
+        "sha256": "5e444080830731c1a9c656e773ae477da1e8076e9f176b94deefcae28763145b"
+      },
+      {
+        "path": "assets/objects/52/529e4602466f3752d66bf34eb8e5b92f7d602ccc",
+        "sha256": "c8a97304c80695c23d8fd6acb20f9f86556947c3c221a516a072a5e67b656a84"
+      },
+      {
+        "path": "assets/objects/52/529e4602466f3752d66bf34eb8e5b92f7d602ccc.sha256",
+        "sha256": "9a43a9acf77a039decd41f4ab6aa9e31d27012248f89e565208d257beb597ad3"
+      },
+      {
+        "path": "assets/objects/54/544d83a63c87479abd6741c32f435d21808c1ba7",
+        "sha256": "626edf14d71a4ab174c802057d9f9e0b9c13f70480765f3ada33b1f50d2dbd13"
+      },
+      {
+        "path": "assets/objects/54/544d83a63c87479abd6741c32f435d21808c1ba7.sha256",
+        "sha256": "0d898cee0c24969c902b39b321a183eb9668cbde210a5541c44f4affe64ac013"
+      },
+      {
+        "path": "assets/objects/54/549dc55cbec4f28616dc3dc388939b5caa3b33c4",
+        "sha256": "55752b17b46a5bfa2d18bc441d120b7b306ec8dbfe68b47afe81daac054bae0c"
+      },
+      {
+        "path": "assets/objects/54/549dc55cbec4f28616dc3dc388939b5caa3b33c4.sha256",
+        "sha256": "35bf419b369500946bf6c671b450e99d5a94d5a204a19acca44ca8942c38c545"
+      },
+      {
+        "path": "assets/objects/55/555093dce0271c0d5f893aa202f04002bcf40cea",
+        "sha256": "aa9a2d6db5799ba922c6053138cae77fb80aa09b91918447d63fcb2de32bea8f"
+      },
+      {
+        "path": "assets/objects/55/555093dce0271c0d5f893aa202f04002bcf40cea.sha256",
+        "sha256": "23115ed7123f5ecc33077c1e2785c1fc4a8da2cda1a53abc9d28eefd643ba4cd"
+      },
+      {
+        "path": "assets/objects/57/57c76aca4a8a68b349536263dfbe6f775209119a",
+        "sha256": "50ecaef2114cefebe4c966d10d0eee26864aae36ce9a0128c7900fa356482ee5"
+      },
+      {
+        "path": "assets/objects/57/57c76aca4a8a68b349536263dfbe6f775209119a.sha256",
+        "sha256": "902e330a3a0768da083b5bec709d814cc80808fa0c297f4d5c33fbc6ec01d1f2"
+      },
+      {
+        "path": "assets/objects/59/590470ab0f17afb73a4e41d9cb56fdbe069d275a",
+        "sha256": "a14d2da4f452442691791c834cf55aae43f8b435a4736eea44cb327435bca20e"
+      },
+      {
+        "path": "assets/objects/59/590470ab0f17afb73a4e41d9cb56fdbe069d275a.sha256",
+        "sha256": "85859c3895036ec0548b13a98646fffa931a94739eb8a91eb9498f02ca1afa8f"
+      },
+      {
+        "path": "assets/objects/5c/5c432d427ad91e33d1813fce170bc994f09f4409",
+        "sha256": "ae1cbae012148e3b3f14a3e8b7ac57c8850aa54984b91e75ca22f9fd6c243c6d"
+      },
+      {
+        "path": "assets/objects/5c/5c432d427ad91e33d1813fce170bc994f09f4409.sha256",
+        "sha256": "40042cfc39594d7305ded13f0b5174d031d84772bb3a58fce3a721b9054f0200"
+      },
+      {
+        "path": "assets/objects/5c/5ccbe23720e5cb2e17ac7c9e18d8d0cc5067a903",
+        "sha256": "2ab06030cfc3e549828b5874f59c463b9947e2a8b821c3f552073c1c8b121c4f"
+      },
+      {
+        "path": "assets/objects/5c/5ccbe23720e5cb2e17ac7c9e18d8d0cc5067a903.sha256",
+        "sha256": "cfe6e3f8ad274a480ef2589fc77c26c9a5ed364873666f0d378d909c002938c5"
+      },
+      {
+        "path": "assets/objects/5d/5d4d95afbcabbdfbfc337ad4b2431eab240b617b",
+        "sha256": "c18f65f1b95661af1479befd1544ac5dc52b7024a482c31d5bf064e61da0a3db"
+      },
+      {
+        "path": "assets/objects/5d/5d4d95afbcabbdfbfc337ad4b2431eab240b617b.sha256",
+        "sha256": "52988b81d0b60fb8eaea75e6c6618b455f61204e768e94a2653f002f321a658c"
+      },
+      {
+        "path": "assets/objects/5f/5fceced7add042d8bd0c2b48dbf705b3f34c7b79",
+        "sha256": "086ffb1cbdbae165ec782646854bf4e4e5022eaeda67de3482cb0afc04cb4c55"
+      },
+      {
+        "path": "assets/objects/5f/5fceced7add042d8bd0c2b48dbf705b3f34c7b79.sha256",
+        "sha256": "1dd031aefb6a1259892ddc878a086853fa48e79102e7d6c0b0ba6cbc095fa5be"
+      },
+      {
+        "path": "assets/objects/5f/5ff04807c356f1beed0b86ccf659b44b9983e3fa",
+        "sha256": "23a0e228c33a2353d625d9ebfc62997a227d7b7f463ab0d9f9d9d98a424f7de8"
+      },
+      {
+        "path": "assets/objects/5f/5ff04807c356f1beed0b86ccf659b44b9983e3fa.sha256",
+        "sha256": "767a8b0ef79aa71bacf53754cdfd5b621bd2599a803f5851e52e2796a7015921"
+      },
+      {
+        "path": "assets/objects/60/6017a7523efdfc94114073726075cc5011852479",
+        "sha256": "66ab48b4076c8a2b5d71ea8e21e34ccf6010f9ccf19b4e5f32392abed029af1c"
+      },
+      {
+        "path": "assets/objects/60/6017a7523efdfc94114073726075cc5011852479.sha256",
+        "sha256": "25c0f7ce39c438d4b9283591ef707a5b7c75d776f66053436a9ccd5187e442c2"
+      },
+      {
+        "path": "assets/objects/61/616e9e15e6bbed6f5a5beba38ee44ff19a9a0235",
+        "sha256": "7addb2bc605d72ca66a9ebe090b968daf8848b47d9bdf16a6f9ec40b2232264f"
+      },
+      {
+        "path": "assets/objects/61/616e9e15e6bbed6f5a5beba38ee44ff19a9a0235.sha256",
+        "sha256": "b2c4eb0261d4bdb0e6d91023c572f31ac5e28577e3e4c3a85fab2f7660d981cb"
+      },
+      {
+        "path": "assets/objects/61/61a9e30fc5f94a0d5b2b5dd656c46fab7a5df4cb",
+        "sha256": "5b8c59145a1e7637faa1f7a289fabfbd0e4200a03085c6b8ebc9ff3e0bf9747c"
+      },
+      {
+        "path": "assets/objects/61/61a9e30fc5f94a0d5b2b5dd656c46fab7a5df4cb.sha256",
+        "sha256": "91995c3e2b06deb401109f07eb7d34b907542b0f9de37d1c5c07d53940c40fc1"
+      },
+      {
+        "path": "assets/objects/62/62243d8ae9145052704d880673eb26a7f90e9651",
+        "sha256": "a63073159485c54ae89e7b2d501d65a59bc69e5d0dbb956fe8c73bb00b571f67"
+      },
+      {
+        "path": "assets/objects/62/62243d8ae9145052704d880673eb26a7f90e9651.sha256",
+        "sha256": "844bb70c8e462a7e28c84905e64bab7964b5570edcca986987d8f0026a64823a"
+      },
+      {
+        "path": "assets/objects/63/636dd75e55e0b4f2fa3b8e28d293d0cada6d8db0",
+        "sha256": "ab8fc2fbdd8ddd5aabb10c87896661c179f506daef9f33597b9cc494c949af67"
+      },
+      {
+        "path": "assets/objects/63/636dd75e55e0b4f2fa3b8e28d293d0cada6d8db0.sha256",
+        "sha256": "7104c7217e56feb650cdbfa44a3d0ace994b1b786585a5f556882bcb1b54e722"
+      },
+      {
+        "path": "assets/objects/64/643a6f5e841f803f31fd15470c5071ee6c4ab5c3",
+        "sha256": "5d2ab2e135425292c44321f3a25fb59a355c935d1c8a2cd84ae521ec79de7a21"
+      },
+      {
+        "path": "assets/objects/64/643a6f5e841f803f31fd15470c5071ee6c4ab5c3.sha256",
+        "sha256": "92b13af94877d11b2cd77cd126af3d02edc55190d9856a1512a0c9a69dc23b17"
+      },
+      {
+        "path": "assets/objects/65/65a629cde46432a30e002d91c34e46ac01923e7f",
+        "sha256": "e4b691d2d2ddd59cc9858cd063f12c44fe3630681c97a19bb96cadc8e50270b2"
+      },
+      {
+        "path": "assets/objects/65/65a629cde46432a30e002d91c34e46ac01923e7f.sha256",
+        "sha256": "66a262cc88227641d42c514881c5a802383d3ffe20d10a7918ab137d4149365e"
+      },
+      {
+        "path": "assets/objects/65/65b2e6239d319b394c46c6dc1afa32a5355ac0f1",
+        "sha256": "88d2e89abb7a31e663eae8c3deccc35bddf9ef1fad79cda57ccf07b083db0e51"
+      },
+      {
+        "path": "assets/objects/65/65b2e6239d319b394c46c6dc1afa32a5355ac0f1.sha256",
+        "sha256": "95e1388821e195a070e6b794ba577b51632c223746953fadc740a1e15d8224ef"
+      },
+      {
+        "path": "assets/objects/65/65ebca3306ccd6d7f9d5de8f1cc7a1216d80246d",
+        "sha256": "37b81379aed67ded9763079ba256d9740353f97f5b455b79e67c43873df4ce93"
+      },
+      {
+        "path": "assets/objects/65/65ebca3306ccd6d7f9d5de8f1cc7a1216d80246d.sha256",
+        "sha256": "c03464acf72a3a83d88c25cbf20b70f5582fb59f0513db92c73578dd4eaf4886"
+      },
+      {
+        "path": "assets/objects/6b/6b73118e2cac26ac36a406e96d345bf1c9b3e3c4",
+        "sha256": "4f97e42b6935a449213b9bd7f2129583438d952bde2bda6029f1400fade4ad44"
+      },
+      {
+        "path": "assets/objects/6b/6b73118e2cac26ac36a406e96d345bf1c9b3e3c4.sha256",
+        "sha256": "6ecdebb6ad1001e74aeb5551a87d11a41ab5c2acbf75eb3c4ab11228612e2552"
+      },
+      {
+        "path": "assets/objects/6b/6b751dfe45dc1974a94afeff200a1ecae9230fd1",
+        "sha256": "57066d35b3bcf0a55e631033afcbdea269ad95c050bd366c2c650c075ab6a21d"
+      },
+      {
+        "path": "assets/objects/6b/6b751dfe45dc1974a94afeff200a1ecae9230fd1.sha256",
+        "sha256": "7658e8f377a4595a77ca2e7fd486a826612ef949eaad1b9455b5de9717075e6e"
+      },
+      {
+        "path": "assets/objects/6c/6c0efecf0ddfdb81012f092b22169ce656c58107",
+        "sha256": "b61bc3ebb6a8aff738654cb2872b2560eb90fb5f2e66f02c3c8baba3f7c55ccb"
+      },
+      {
+        "path": "assets/objects/6c/6c0efecf0ddfdb81012f092b22169ce656c58107.sha256",
+        "sha256": "73bbd04c23aae735ae1a5bf84d5b08ee8a6f67fa8739df3f4b542e193068c866"
+      },
+      {
+        "path": "assets/objects/6c/6c0fd87c46c18a3c1dc1d920507bd884bdb3c5f4",
+        "sha256": "b894e69f136c752044e8f6d67f7f005f742a15d559a7f889035bb9e65b92fe0e"
+      },
+      {
+        "path": "assets/objects/6c/6c0fd87c46c18a3c1dc1d920507bd884bdb3c5f4.sha256",
+        "sha256": "52f2623c72b49e2c24bec93ad7ff167273e4c8b3ef2a96afbedc096b8f689cc6"
+      },
+      {
+        "path": "assets/objects/6c/6cb57c8bf7f43ecb75339be01e23b5be0c83f0c9",
+        "sha256": "0ee61a9687e3e1941324b333012b68f19dc79790326c7c6ad784491139bfb095"
+      },
+      {
+        "path": "assets/objects/6c/6cb57c8bf7f43ecb75339be01e23b5be0c83f0c9.sha256",
+        "sha256": "0df3dd818fd210eb171fd9fede65ba99d8e1922471f1427a1238a021dab1440f"
+      },
+      {
+        "path": "assets/objects/6d/6d03ae92f540f09c6440c7e299770dc987d2d75c",
+        "sha256": "67c632dd9cf1f66c39c59963b83079a65f702e4df9d4d831c8ba1e2659011afd"
+      },
+      {
+        "path": "assets/objects/6d/6d03ae92f540f09c6440c7e299770dc987d2d75c.sha256",
+        "sha256": "8407c270621c46258cfd3da12e17f467fe173dde1db2f4ac0d40c46c991a5a4a"
+      },
+      {
+        "path": "assets/objects/6d/6d0c38628d4b4f1f2c602414b63c0454e4329b76",
+        "sha256": "b8a2d6f985f54a7fb36807050fe38ae655277bcea1c7df973edf5ed7a3de0b05"
+      },
+      {
+        "path": "assets/objects/6d/6d0c38628d4b4f1f2c602414b63c0454e4329b76.sha256",
+        "sha256": "dd4cf3fde6d90fa7af374fd927b0ab963eee401ee494d5fee9b60e416ac4b9d7"
+      },
+      {
+        "path": "assets/objects/6e/6e7092af52154818a246e0267817dd18bb0cec1d",
+        "sha256": "8f6963ac544b84acf422b7885516922e1e3b2b47706d38e3d32cf35e7d3200ae"
+      },
+      {
+        "path": "assets/objects/6e/6e7092af52154818a246e0267817dd18bb0cec1d.sha256",
+        "sha256": "c8b86ba625b8df8e9b6b0d10f39566241eac047850366a5e992e786786cbadac"
+      },
+      {
+        "path": "assets/objects/70/70b9ac280fee46fac5dde2f93e33fcbc39237eda",
+        "sha256": "f5e8106f2eb2b9f7fc30aa6e6e957ca5266def24126b4c138867863b10f274d4"
+      },
+      {
+        "path": "assets/objects/70/70b9ac280fee46fac5dde2f93e33fcbc39237eda.sha256",
+        "sha256": "745b53be35ea2bc8265186cc00e950abab7541588fe242d576ef8668f430aabf"
+      },
+      {
+        "path": "assets/objects/72/72374030118f6e6f268f236be95a7b5297e0e622",
+        "sha256": "16b7ab446e2921555c978a97a0a4954c29554eb8f6c46b70c00570563913cb1b"
+      },
+      {
+        "path": "assets/objects/72/72374030118f6e6f268f236be95a7b5297e0e622.sha256",
+        "sha256": "175475eff6beaaac28bbe98439ca46208a5b4c5aa41b014444bdd1a8e509f727"
+      },
+      {
+        "path": "assets/objects/72/7291028bb5b67d73c8beb82644fcd26f31e4bc9c",
+        "sha256": "ad9d1ae1d143d1b2897bff2da8f65636fed21e23084e7ef4187329d387a4b3c8"
+      },
+      {
+        "path": "assets/objects/72/7291028bb5b67d73c8beb82644fcd26f31e4bc9c.sha256",
+        "sha256": "ae0e54453a4543a536f605fd5c33a69a65c72b66ceada99abbdf28169ccca848"
+      },
+      {
+        "path": "assets/objects/76/766975253e4de94ffc2e7e6d3b10b209da2f52c4",
+        "sha256": "88f5d195b54864a98fefdf8b0595780a51d558dff6bb3cdb2275cd8cc7cedeb4"
+      },
+      {
+        "path": "assets/objects/76/766975253e4de94ffc2e7e6d3b10b209da2f52c4.sha256",
+        "sha256": "aa802e296cae755f6f5243f27db0401763ce50a17976715eda73e6dfa760b30c"
+      },
+      {
+        "path": "assets/objects/7a/7ab8769e69eb8a6edf48c2304a18a1652c5833aa",
+        "sha256": "7131e4ad63499bdc0968b46a6997b55dd46980ecbe08b4ed73bf33593ce769db"
+      },
+      {
+        "path": "assets/objects/7a/7ab8769e69eb8a6edf48c2304a18a1652c5833aa.sha256",
+        "sha256": "8093b2efba4ab895f36316becbfbd35eb1fe4e3c9d4c796a8dc7ba737b40bd02"
+      },
+      {
+        "path": "assets/objects/7b/7b07d541557d2ecc03194036299b4dedce8c149b",
+        "sha256": "fa584fb3076dd0cf7b283a0e8c471925fc49b81dc6fe1ea96208674fdaba2e4e"
+      },
+      {
+        "path": "assets/objects/7b/7b07d541557d2ecc03194036299b4dedce8c149b.sha256",
+        "sha256": "83d4709400b01acccbe992b0f5d9cebfaaf4910ea51253c5937ad103e37b75e6"
+      },
+      {
+        "path": "assets/objects/7d/7d5f6faae749e21e84dd1c2568e4184f7e4d1926",
+        "sha256": "e3b672cd45a7f2fc0bd2c973e9b5e3481ad04745399ab1453ea08e394bfb5df9"
+      },
+      {
+        "path": "assets/objects/7d/7d5f6faae749e21e84dd1c2568e4184f7e4d1926.sha256",
+        "sha256": "fca4d01ee58de3f472dc50d45b5f9bf5fe17cd98315ce0ad24d53e13731a333f"
+      },
+      {
+        "path": "assets/objects/7e/7eed27f04c07c11f28c8500f3bfe768efcce4ccb",
+        "sha256": "6f093258b3726555fa0dadddc2d01fc5d2c9b060e0ad7ad9ae05c193339d8bcf"
+      },
+      {
+        "path": "assets/objects/7e/7eed27f04c07c11f28c8500f3bfe768efcce4ccb.sha256",
+        "sha256": "1b9265455d8731da9b99dc6b233d7b67ebcb84086e63715d747f39ddf87e4ea3"
+      },
+      {
+        "path": "assets/objects/7f/7f3c5a247cfd9a47071b13a7e5ef8085de639abb",
+        "sha256": "4a5a87bfd27198ee20fdf615980f9d9a5b0b5f844f4cf3b89e3359aec0664f68"
+      },
+      {
+        "path": "assets/objects/7f/7f3c5a247cfd9a47071b13a7e5ef8085de639abb.sha256",
+        "sha256": "9ee8129abfefef2bc6d54dfba0ea7e76a72e5138bbd17afbb8fe1236e20bb41d"
+      },
+      {
+        "path": "assets/objects/80/800e77c908f1693316238ca737374fd8757fa63f",
+        "sha256": "97387a6b39747f6306efafb2cf14bad700d8dbe7ed98df03c787b12e3a75f651"
+      },
+      {
+        "path": "assets/objects/80/800e77c908f1693316238ca737374fd8757fa63f.sha256",
+        "sha256": "8518a354e06d9dbb043d84368fd4f1743ed8116370c405bde10ae13839ca8017"
+      },
+      {
+        "path": "assets/objects/80/8030dd9dc315c0381d52c4782ea36c6baf6e8135",
+        "sha256": "5b5df681f08a229566125e8974191a1252b136309ad39132c616763b3e56e4e4"
+      },
+      {
+        "path": "assets/objects/80/8030dd9dc315c0381d52c4782ea36c6baf6e8135.sha256",
+        "sha256": "e22478f77d7b327fddd0bb912febbfce748d8da53d2ce2e06f985b3670343ee9"
+      },
+      {
+        "path": "assets/objects/80/8050c9d4672d92264a2915a15f8614062dc613d8",
+        "sha256": "fb971d8b79ca45fa58db5bcee9f7aeff3f9ce2057f52a8ecd1fc6fb0364dffb3"
+      },
+      {
+        "path": "assets/objects/80/8050c9d4672d92264a2915a15f8614062dc613d8.sha256",
+        "sha256": "340a67934a71c7d1653a3172559e0ac2c56e531d97cf9ee8b680145e462a2068"
+      },
+      {
+        "path": "assets/objects/81/81dedcb3d42b47306fde0d47e7388c62792b5fd3",
+        "sha256": "706243e7ceb857690adfb23e210939ab589164210b45ead721be9b1382cd91f0"
+      },
+      {
+        "path": "assets/objects/81/81dedcb3d42b47306fde0d47e7388c62792b5fd3.sha256",
+        "sha256": "886a1d79c41216be5c7bcaf264f8e86f8ac00a1d5652c90d9de78d1a17939485"
+      },
+      {
+        "path": "assets/objects/82/82c52a4b7813d0eb36ba34a3f8150a42b63caff7",
+        "sha256": "fab908f55f1914a850e61511bcfb2325760695d4402d76ce6e74a3388c45da42"
+      },
+      {
+        "path": "assets/objects/82/82c52a4b7813d0eb36ba34a3f8150a42b63caff7.sha256",
+        "sha256": "c02a4e03ad00ab76bbe18dc9254396d4fcd8e706d1989d6433e081238508049b"
+      },
+      {
+        "path": "assets/objects/89/894dbd30f3c467d78629927b6ec89d9838412415",
+        "sha256": "77cae2f983ea7655526201602c5e2e01932213d84d6d7290a7dd281b54b0ad60"
+      },
+      {
+        "path": "assets/objects/89/894dbd30f3c467d78629927b6ec89d9838412415.sha256",
+        "sha256": "6ab21e8a7c044acac067083fb022169bfae3db8a4dacb3ae12e1cb856e6d7dda"
+      },
+      {
+        "path": "assets/objects/89/89c52645eb5ab0cf5039d922f3a50e518f70858a",
+        "sha256": "979957a02ee9801ed61f7bae62859b280ea08b4d08e49488d3f247bbc6d3446f"
+      },
+      {
+        "path": "assets/objects/89/89c52645eb5ab0cf5039d922f3a50e518f70858a.sha256",
+        "sha256": "28d9bb92407e6b91ad6aa8baaf7f37e70e37a4cec0ae993b4a1165ea115ebcb8"
+      },
+      {
+        "path": "assets/objects/8b/8b2920ff4bca7b7a5bd68915738b7bca1adce154",
+        "sha256": "146b3ea45910c57f0042da263f28674a15a52e595a42799ef8098704557759cf"
+      },
+      {
+        "path": "assets/objects/8b/8b2920ff4bca7b7a5bd68915738b7bca1adce154.sha256",
+        "sha256": "d8ece485d19e723725846f4b9209bcd68eb93e4e36ea3d2e91b5f37668954924"
+      },
+      {
+        "path": "assets/objects/8d/8df82aea7a08d2d8637a2bc69ece28b6dda3fc93",
+        "sha256": "9015b074e864abb13ec2eab36d3ef2261127e1b03cdc55638d9db7364530434b"
+      },
+      {
+        "path": "assets/objects/8d/8df82aea7a08d2d8637a2bc69ece28b6dda3fc93.sha256",
+        "sha256": "af09987d7587fc39b4397b5900af51862b05e88e917007ae63382a93bdd6db12"
+      },
+      {
+        "path": "assets/objects/8f/8f4d8911a2ac772ffc6bddf7f9723225d5de06ab",
+        "sha256": "58bbe55c4b4962d092536213547448c1e09f994dc4884b947d6c9b1040dbaed0"
+      },
+      {
+        "path": "assets/objects/8f/8f4d8911a2ac772ffc6bddf7f9723225d5de06ab.sha256",
+        "sha256": "a08ca0c011dcd1b84ed657dc7d22b46cd37a959a534e271af5013478b33c9947"
+      },
+      {
+        "path": "assets/objects/91/919c37160bf0aad246bf24b245358233cf2b6882",
+        "sha256": "85ac274d3a66ee54c749b8d41d215ce74170324a6b1d61477334e89669ecb94f"
+      },
+      {
+        "path": "assets/objects/91/919c37160bf0aad246bf24b245358233cf2b6882.sha256",
+        "sha256": "15e2323ad5da2ece2810b79c6110485b016d4ebee6f37d7b5c7be687e102ba08"
+      },
+      {
+        "path": "assets/objects/92/9237b8b6fa22ed862ab084c8c9941f9a10f831ac",
+        "sha256": "f426939f78c45cbdab1bd831805c967bd8c6f3ba33921c95b39e3689aa9934d1"
+      },
+      {
+        "path": "assets/objects/92/9237b8b6fa22ed862ab084c8c9941f9a10f831ac.sha256",
+        "sha256": "cfb01be6b8218a4c37f24d1cfe8673295e0d855de7ed85849ac7a635aa9cc77c"
+      },
+      {
+        "path": "assets/objects/94/949afe72d4d3d785dab52d8baaefeb0e38b3c067",
+        "sha256": "978da5860e5eba38e1884b285492c2d752ad7fc662373e20c12dbbbda132f842"
+      },
+      {
+        "path": "assets/objects/94/949afe72d4d3d785dab52d8baaefeb0e38b3c067.sha256",
+        "sha256": "203e16a1256ba01fc51c4c6779bfff1840e6c693b624da4640400be42b59ddf1"
+      },
+      {
+        "path": "assets/objects/95/958d57021d8009de55d6e9e19957a72545e3c30c",
+        "sha256": "c21c036fbfeb945b660f7cefdba805755127104f0fe1ca583a8943d3d6d9606e"
+      },
+      {
+        "path": "assets/objects/95/958d57021d8009de55d6e9e19957a72545e3c30c.sha256",
+        "sha256": "2fef99b5f539dd972872f38c479be3fb53dc42c34f0e48211f03242a3b83506e"
+      },
+      {
+        "path": "assets/objects/96/96e924576d218283090d661ae90c2d8e4e3bf530",
+        "sha256": "80b7b51a5a764c0e3b5ab44250d8204a3433eed0a78099e32e2b2e7a3242f634"
+      },
+      {
+        "path": "assets/objects/96/96e924576d218283090d661ae90c2d8e4e3bf530.sha256",
+        "sha256": "0debf18d856458dec1c02f005e27244164e5cd9bd6b75180a74f4bc524baeb98"
+      },
+      {
+        "path": "assets/objects/97/97c1f961fe225f6cc25750f542ab489fb7434f97",
+        "sha256": "477a15062daf25e52726b9c21ead40c5248c12b93a15c2a9db51c6583aab27d4"
+      },
+      {
+        "path": "assets/objects/97/97c1f961fe225f6cc25750f542ab489fb7434f97.sha256",
+        "sha256": "701cf67fcca065113006bf5fd820197822fcf8aabb413fe8d3502e7ad59e8dae"
+      },
+      {
+        "path": "assets/objects/97/97e5f6fc51216e41bb2bf06ebd9eb7c426567e75",
+        "sha256": "91eb7149b7798e1da203e5a1f0fd1dccbe0a26383a029215a7f5a2c744537f1c"
+      },
+      {
+        "path": "assets/objects/97/97e5f6fc51216e41bb2bf06ebd9eb7c426567e75.sha256",
+        "sha256": "3ffec68abba82b3d0c05e7a770dcc7ad9f6b8ff682611de776dc27def0e28d93"
+      },
+      {
+        "path": "assets/objects/99/991b5c515f770a6a43766ea4a739e7d12221116d",
+        "sha256": "dc965209e5efd38a32280df72216dcbe197f957261085b510180ea7ef725dd6e"
+      },
+      {
+        "path": "assets/objects/99/991b5c515f770a6a43766ea4a739e7d12221116d.sha256",
+        "sha256": "b162162d6d040620b377d86e85d689f8394ca4187e3ceb1afcb391bc6e761e54"
+      },
+      {
+        "path": "assets/objects/9a/9a90c3e205f51e5d721bb3ffd7551f952602b505",
+        "sha256": "d384ea31d44bf2217ecba94540850a666b96645ecbe1835961ff4490409cac94"
+      },
+      {
+        "path": "assets/objects/9a/9a90c3e205f51e5d721bb3ffd7551f952602b505.sha256",
+        "sha256": "f984f5fe2d7ee4ce7bab7bdeec8382d0aa28cb3bac25d52cdc261e81b09ca27e"
+      },
+      {
+        "path": "assets/objects/9a/9ac006d5537ed0fa4a7bcd1eccfc505155847686",
+        "sha256": "84fe52cea79f67441ac00df61836e15d5c9ae98c406cebba557213b80f59c3b5"
+      },
+      {
+        "path": "assets/objects/9a/9ac006d5537ed0fa4a7bcd1eccfc505155847686.sha256",
+        "sha256": "0df70d4bd3198c9be6ea7afee281d78a9d31d4f3f5545557da6882aaea395da4"
+      },
+      {
+        "path": "assets/objects/9c/9cabeb6519b602c27785d548752ffb9c8901c828",
+        "sha256": "cfc3a8e41e957da0a86c7cb32d07ccef1aa7413709971ff7d51c15127d649c0b"
+      },
+      {
+        "path": "assets/objects/9c/9cabeb6519b602c27785d548752ffb9c8901c828.sha256",
+        "sha256": "914c941d802fc225e807297c511a41a4243168caa09eb6f76dc37f02d2232403"
+      },
+      {
+        "path": "assets/objects/9c/9cf7432d7cf6ac9e1d67cb72fb3606860fdbca65",
+        "sha256": "9997a14ffded8fb053515d924c6028c8e1cc1b0696a2e69f86baf6d3cc24f7e3"
+      },
+      {
+        "path": "assets/objects/9c/9cf7432d7cf6ac9e1d67cb72fb3606860fdbca65.sha256",
+        "sha256": "50642d4dc294617d3b80e2d81696480ccf1a88bd4acc3cc70b67e6c410f1be4e"
+      },
+      {
+        "path": "assets/objects/9d/9d5e8f41656bac45ef7840e4676e11a7837ed9ff",
+        "sha256": "3e5689d50840f31873b16bba90b7dd2e97746bf536c2e84d4f237ca386ec8c64"
+      },
+      {
+        "path": "assets/objects/9d/9d5e8f41656bac45ef7840e4676e11a7837ed9ff.sha256",
+        "sha256": "021c00f0737c8420390b0f87d18d0ee36d5f70913c95debbfadf22efceecb62e"
+      },
+      {
+        "path": "assets/objects/9d/9dd32387135eefa7ab95996d52a5ca4cec8a3b30",
+        "sha256": "4cabea349b45c137de6ab4472303fb20fb94b07a119c8926aa54575ffbab91e6"
+      },
+      {
+        "path": "assets/objects/9d/9dd32387135eefa7ab95996d52a5ca4cec8a3b30.sha256",
+        "sha256": "0451d17a3c4ed85292dcece5b04e0483d28a4a46a9772cc2f5421882c01091ee"
+      },
+      {
+        "path": "assets/objects/9f/9f84f917a09facacf1235eed3fa77789e4554afb",
+        "sha256": "c816c4b5554c88e6f049b308a6b6c97916819395dab72133fdf45ab15fd40d52"
+      },
+      {
+        "path": "assets/objects/9f/9f84f917a09facacf1235eed3fa77789e4554afb.sha256",
+        "sha256": "6d3d3ebfd312a4a09d63502cbbcfcf40c69c95cc4a42bf35a24a198436672979"
+      },
+      {
+        "path": "assets/objects/9f/9fb900d1120e18c9afeda02c5bfd80d7333d4e22",
+        "sha256": "66fc54509293f6d43eb8bd80ff71486217045794bfe63994e8034da14201adc9"
+      },
+      {
+        "path": "assets/objects/9f/9fb900d1120e18c9afeda02c5bfd80d7333d4e22.sha256",
+        "sha256": "f5ac2e119ecebcd9bcb5713a66ef20d6d1a6c6471a129ced5d5d3ddc6dab02d9"
+      },
+      {
+        "path": "assets/objects/a1/a1260ad0107b49e9ea070a1ed87934b50d6caefd",
+        "sha256": "967cfc9062517ea3d0c6e293fb4acc8c9fb6121bcd369bf9937106b7f4b55316"
+      },
+      {
+        "path": "assets/objects/a1/a1260ad0107b49e9ea070a1ed87934b50d6caefd.sha256",
+        "sha256": "14e2649f85a396ca2272ffbb835c881a17bb71a9b7e020dc64b12ed605800cbb"
+      },
+      {
+        "path": "assets/objects/a2/a21e66584e0cf85dadd699f9303ccc4b6302be4c",
+        "sha256": "765f377f653fcbf4c557a639fe7c7b60325246ae8498b6eb122bca15c3326148"
+      },
+      {
+        "path": "assets/objects/a2/a21e66584e0cf85dadd699f9303ccc4b6302be4c.sha256",
+        "sha256": "3c8e36cbe2daf645ccd10b43ffa8abd872afea446de3ad54a8f84ed8cc2582c5"
+      },
+      {
+        "path": "assets/objects/a4/a449a2395b194c67b17ce2cba15b1e2958130f11",
+        "sha256": "b51f7fcae86ba8a03df46470799a4692f3256604bad49a89f42d7b5354b9c419"
+      },
+      {
+        "path": "assets/objects/a4/a449a2395b194c67b17ce2cba15b1e2958130f11.sha256",
+        "sha256": "e56766cfd699f1bdfd31d2dcc678bad799a630c83d29763e3f9f04fda7a3598a"
+      },
+      {
+        "path": "assets/objects/a5/a5186225abe04a0010bc0d76f1586908d4088a5b",
+        "sha256": "cf622dff4f2a0ced1578a129eb5880835a012f2716f53a3deefc203cdce58e8a"
+      },
+      {
+        "path": "assets/objects/a5/a5186225abe04a0010bc0d76f1586908d4088a5b.sha256",
+        "sha256": "51aa4c9ed75e410669a5822f0bda68c324925047e492bb77cd7f8f9d6a2b256a"
+      },
+      {
+        "path": "assets/objects/a5/a54e2e7b9fe77c775e0ce1f0ed234a377b1c8926",
+        "sha256": "872b352b68d061fe5370b63c79c1735a655d2b7e7800fc7040da85890d1695f3"
+      },
+      {
+        "path": "assets/objects/a5/a54e2e7b9fe77c775e0ce1f0ed234a377b1c8926.sha256",
+        "sha256": "105f5ea19c891ed69dbac213cdae5f24c4a65a6fec1b7b55c4423436bbff32df"
+      },
+      {
+        "path": "assets/objects/a5/a58e59ce12f89a1a9b1ca4db0de990854727668b",
+        "sha256": "a6c6ad115d7a1de96647af6c749325569de04e6956ee2754828b865a53a94b72"
+      },
+      {
+        "path": "assets/objects/a5/a58e59ce12f89a1a9b1ca4db0de990854727668b.sha256",
+        "sha256": "38b09d0cbf3e006c52ba8e1890a72c754f02f98d8c913e6a637bf3626a3fd438"
+      },
+      {
+        "path": "assets/objects/a6/a69c478840bda10432420c9cd57469320cf33a3b",
+        "sha256": "e0b7c1da75643d7068e1dbb449a695468b914913b0de7e5acdf1aab8f1edfb76"
+      },
+      {
+        "path": "assets/objects/a6/a69c478840bda10432420c9cd57469320cf33a3b.sha256",
+        "sha256": "a51f818507785b3defefc97318081aff4bfa845510e0972e5ec51cc74a908b67"
+      },
+      {
+        "path": "assets/objects/a6/a6bef0ec1d2436ec71917d47175d194235833d74",
+        "sha256": "3c8cac65344a14f51bbdc5841b6c62fd0ca13e5fbe0deb1e9940dbf331857b0e"
+      },
+      {
+        "path": "assets/objects/a6/a6bef0ec1d2436ec71917d47175d194235833d74.sha256",
+        "sha256": "1c6188cbf66b07040a195181daf01f127168fe43212484c6e4b8215a1d89c799"
+      },
+      {
+        "path": "assets/objects/a8/a80437d8d0f77167b2fc3e1963cb0e7cd5817262",
+        "sha256": "a79f790909fccb4e14be5110a1fb1b2c0f85f1a614d662ad852ff27f621d5143"
+      },
+      {
+        "path": "assets/objects/a8/a80437d8d0f77167b2fc3e1963cb0e7cd5817262.sha256",
+        "sha256": "9706931ac2ba449114d6048718cfb4e08821ce189665be7a1861b7bdd6e99bab"
+      },
+      {
+        "path": "assets/objects/a8/a8be85d083704a6fc293ab4808e50afc4a0e43fd",
+        "sha256": "d79787b477681ac7add24ff8a90dd2768efc92e4cdedf3b78c132f207f6bb697"
+      },
+      {
+        "path": "assets/objects/a8/a8be85d083704a6fc293ab4808e50afc4a0e43fd.sha256",
+        "sha256": "a3ae155f491642a501188f8ae4ba37d7f5c8388d5e105aab564e0d53bb5638ec"
+      },
+      {
+        "path": "assets/objects/a8/a8ea007e29eecf242dd1497d9eab1c233bf09b33",
+        "sha256": "f9915956573680483368f8c43fc3593810d3e781e8820c2bd3ff8f1c8b7144a1"
+      },
+      {
+        "path": "assets/objects/a8/a8ea007e29eecf242dd1497d9eab1c233bf09b33.sha256",
+        "sha256": "0bb62dd2dd5476503edafd4a1f6029f96f23317a9f31618f2eb45b173b6e312a"
+      },
+      {
+        "path": "assets/objects/ad/ad265196a6854bac46ea212b2569ca45bd550378",
+        "sha256": "961cde00edd411e7027cf467d1ae1ea4132efd56e94cf7ac5bbbd37f6bdb4127"
+      },
+      {
+        "path": "assets/objects/ad/ad265196a6854bac46ea212b2569ca45bd550378.sha256",
+        "sha256": "c026f2b8c2f9ce3079b151be2baf43b2a5f2bd3c25ac48462ef77f29a68b472a"
+      },
+      {
+        "path": "assets/objects/af/af96f55a90eaf11b327f1b5f8834a051027dc506",
+        "sha256": "580ba697b652aa80088d23126ae3ecbd45c2d9e26979511f445dbc6a71845b27"
+      },
+      {
+        "path": "assets/objects/af/af96f55a90eaf11b327f1b5f8834a051027dc506.sha256",
+        "sha256": "9d6f5a835b833a6624c2db719a29e0bef8bcb7c0899662006b2c898d33e3628b"
+      },
+      {
+        "path": "assets/objects/b1/b1b1ffde0727a421f15b736c85b5bc6605ec1cc2",
+        "sha256": "2fd612d9c43912c0ce2143d2c8d918e4d11a498270a69fa05dfb5e8d7c63859d"
+      },
+      {
+        "path": "assets/objects/b1/b1b1ffde0727a421f15b736c85b5bc6605ec1cc2.sha256",
+        "sha256": "f2c2814937a9df9133bfca0aa8aad5eaccf8be8e634e4f7a28593aca09aad372"
+      },
+      {
+        "path": "assets/objects/b2/b2358bd3f17adc3244bc6c811e52ac01f932654e",
+        "sha256": "737497fa40bc1a6d0233b75e88ea2e53c2ce8ea734bf8d9ba645c14175e1abc2"
+      },
+      {
+        "path": "assets/objects/b2/b2358bd3f17adc3244bc6c811e52ac01f932654e.sha256",
+        "sha256": "cd13cd64a69b6f7dccfe4a2c5cb2d18383da08e83c224bb2b7511b5f7a7956fc"
+      },
+      {
+        "path": "assets/objects/b3/b34f9321acd9a79c8dbb1bdc204243faac80f662",
+        "sha256": "858852c8c9cb360ec27468768cebefbc14beedfd748aca1d2f2df607ec436c71"
+      },
+      {
+        "path": "assets/objects/b3/b34f9321acd9a79c8dbb1bdc204243faac80f662.sha256",
+        "sha256": "b5c20d1fd532b04e4c320d453e0112d4c15c2f520720fdaf2d046f078bd4ecdc"
+      },
+      {
+        "path": "assets/objects/b3/b3c651cbe8b0e28a0edd3d1f5ecb180c0b39ffbb",
+        "sha256": "e9850542a447e0eadd9b16239569251fedc71ab92270b6d169adcfb3eec09a44"
+      },
+      {
+        "path": "assets/objects/b3/b3c651cbe8b0e28a0edd3d1f5ecb180c0b39ffbb.sha256",
+        "sha256": "a2b41f58a36d0d8f4377a6e8d7b023d4c5f813a699f551f814446162510d2d48"
+      },
+      {
+        "path": "assets/objects/b4/b440b9f628359ce877d995353066a94316450384",
+        "sha256": "6c97b74b447038838bd3763460b0837c7d018af5bf2dfe6c596da25d8d6cded9"
+      },
+      {
+        "path": "assets/objects/b4/b440b9f628359ce877d995353066a94316450384.sha256",
+        "sha256": "f99c15a9e3e13bbd0a31713301b42394ef4bb8b26bd63a4c338ac3638f5da8d1"
+      },
+      {
+        "path": "assets/objects/b6/b62ca8ec10d07e6bf5ac8dae0c8c1d2e6a1e3356",
+        "sha256": "be785e1c671c5f8a8ef39aa8b8bcdd116804626ba03f5b1bc3700d399fb45bc3"
+      },
+      {
+        "path": "assets/objects/b6/b62ca8ec10d07e6bf5ac8dae0c8c1d2e6a1e3356.sha256",
+        "sha256": "4e286e516ffa76c1ad5477c24cec424475e89c205e1894429ef56653684dfec0"
+      },
+      {
+        "path": "assets/objects/b6/b6e2e0b1f88bbaeac473656d888c9768f8ecbac1",
+        "sha256": "d8826b5a7df547036904ea5b1f7b7fa17577db9e0de1433e967083a03d1f0fa1"
+      },
+      {
+        "path": "assets/objects/b6/b6e2e0b1f88bbaeac473656d888c9768f8ecbac1.sha256",
+        "sha256": "1597b88a2023e8fe51fc892261004f83b99025b643a134fc3efa4fe97aecf1ae"
+      },
+      {
+        "path": "assets/objects/b8/b80b6e9ff01c78c624df5429e1d3dcd3d5130834",
+        "sha256": "c474d91a8591df001a4817327a43ce58a9964765b8507751fb855b04077bd413"
+      },
+      {
+        "path": "assets/objects/b8/b80b6e9ff01c78c624df5429e1d3dcd3d5130834.sha256",
+        "sha256": "5b2f83593f5aa8c90ead7b2b948614aa716e9ce91b7cdb7c11434247356d15d3"
+      },
+      {
+        "path": "assets/objects/b8/b8927bf7538f93a510951b28daf5d73c170abf1a",
+        "sha256": "0998fb453e156da8902f4ab80f5a4e04e0f0c66bcd6e805b7d97359793e8c6e1"
+      },
+      {
+        "path": "assets/objects/b8/b8927bf7538f93a510951b28daf5d73c170abf1a.sha256",
+        "sha256": "0611a8da85c4d47fef0f1fc2bb65a28ff57da405d349984bb5bb05487f82199b"
+      },
+      {
+        "path": "assets/objects/bd/bde50ccdd1e00729f4d187c8ff25ebed357a761a",
+        "sha256": "0591aa408e24281f7d012ee41aaa87ab6e322f801013701a83b760a7907330ed"
+      },
+      {
+        "path": "assets/objects/bd/bde50ccdd1e00729f4d187c8ff25ebed357a761a.sha256",
+        "sha256": "10abd1f9da6e5742a7112bbad6b2620382046ebe717bce1ec3d2070bacebcc71"
+      },
+      {
+        "path": "assets/objects/be/be00c9b222059997b5490a20b6d24200a6500baa",
+        "sha256": "662c8d52ce661fba2bff81a8bbd2b242a2700182607547d12d42e4b7d14a36b1"
+      },
+      {
+        "path": "assets/objects/be/be00c9b222059997b5490a20b6d24200a6500baa.sha256",
+        "sha256": "bee206190049efdd3c472133976a9bf91b7a6bf4b8a34b4aadcb5565cb5bd54e"
+      },
+      {
+        "path": "assets/objects/c0/c05cbd8c88b5878703898150e157af88a29d8091",
+        "sha256": "8c0f0e9939db729ba11794aa5c4eaa905075868258749e38d9470bcf56707a66"
+      },
+      {
+        "path": "assets/objects/c0/c05cbd8c88b5878703898150e157af88a29d8091.sha256",
+        "sha256": "d04c6b99b0c9cc249b2d8c976a0e36ebc9045a11e8c88ac9b84db2d799f9a35a"
+      },
+      {
+        "path": "assets/objects/c1/c106e5ef000809049ce7d56e858898255cff9223",
+        "sha256": "2713851774063c269d55d1a654aabf15e9d39a573a857ca102c88c9f6356e448"
+      },
+      {
+        "path": "assets/objects/c1/c106e5ef000809049ce7d56e858898255cff9223.sha256",
+        "sha256": "cb3db323c38bd538657a2954335db8d82ffe34a145dc570374de7337b6c52d21"
+      },
+      {
+        "path": "assets/objects/c5/c54fc554b61415e12ab43280fac3c5fa9f53161f",
+        "sha256": "33c4dec3753df93f19d1ecde964af163a8716fb118045de73eb6766a9b5341ca"
+      },
+      {
+        "path": "assets/objects/c5/c54fc554b61415e12ab43280fac3c5fa9f53161f.sha256",
+        "sha256": "dcf99c928a616b0548e22bc498754a364bd4554abd700fcb30163f36842bc418"
+      },
+      {
+        "path": "assets/objects/c7/c7ba666a772e41380eb1e430972b29020c7615d8",
+        "sha256": "4359b2f5166a86fec961c39e1046c286b0ef0cc31275a5a25b33f87d8642a5e1"
+      },
+      {
+        "path": "assets/objects/c7/c7ba666a772e41380eb1e430972b29020c7615d8.sha256",
+        "sha256": "397a85528a26db16d0e9cf51f01c15c6b0bd07b1331cbce36a76755f34972249"
+      },
+      {
+        "path": "assets/objects/c9/c96d824290932fd60ea3cf2992a46ebf14211370",
+        "sha256": "88d3128bbc11ef29f5928cf98113b923b49dd89acf83522e362d6e23112f2dd4"
+      },
+      {
+        "path": "assets/objects/c9/c96d824290932fd60ea3cf2992a46ebf14211370.sha256",
+        "sha256": "d20944d3909a933d0b77c5d300fc18effeefc690b5ea9c247b0a91cbf2ce0167"
+      },
+      {
+        "path": "assets/objects/cb/cbd0a93333d906f446e8ec29b321460bb4e3b3cc",
+        "sha256": "9e57f769f44c70dff6f3ec10912723e29d82b542596da73cfbcc47b17e361810"
+      },
+      {
+        "path": "assets/objects/cb/cbd0a93333d906f446e8ec29b321460bb4e3b3cc.sha256",
+        "sha256": "6962cb2f6786c11764e7f69800339c594af8c820c06399f538a95725cb971213"
+      },
+      {
+        "path": "assets/objects/cc/cc6832a02808837dd5bc309020054592ef4b58de",
+        "sha256": "b06811a9720dce6ef8ce09c99c57eb5867b01374497537cccadcf5e332ffb78e"
+      },
+      {
+        "path": "assets/objects/cc/cc6832a02808837dd5bc309020054592ef4b58de.sha256",
+        "sha256": "d9a9f6bd8f2812a3adf0582de0dfd638ec1435d478f40d3b42e43d683734e2c8"
+      },
+      {
+        "path": "assets/objects/cc/ccb648af6a82436e0f97fc0eeb1fedff1987b916",
+        "sha256": "8cba1bf9f18abdec93c63c63172b2ade55559ae9a6966578aa8f35e2db68491d"
+      },
+      {
+        "path": "assets/objects/cc/ccb648af6a82436e0f97fc0eeb1fedff1987b916.sha256",
+        "sha256": "0001ba72554930cd83fe75bf4eedbb8d19348d8d13cc7b642a1c454519855c87"
+      },
+      {
+        "path": "assets/objects/cc/ccd5ac4767ce0a9c71d1dd62f2dc25449789b5dd",
+        "sha256": "aea3e9918b0d31de6f94623080f04c31c8c16a5b1a2e8d99ab39f1acdddd30f7"
+      },
+      {
+        "path": "assets/objects/cc/ccd5ac4767ce0a9c71d1dd62f2dc25449789b5dd.sha256",
+        "sha256": "d7a7c0bfbbd68e79270eeb5966e31fcb24abe02ed303591d6cd9d10d742e4e86"
+      },
+      {
+        "path": "assets/objects/cc/ccd7fba623088d3a53b8a762010c2d163f725918",
+        "sha256": "c67efc9efba460b88839e73d03b0ada70c2197b237e48f57c69f70c184b2403f"
+      },
+      {
+        "path": "assets/objects/cc/ccd7fba623088d3a53b8a762010c2d163f725918.sha256",
+        "sha256": "15cb32ecc6e36d3f77c054b0afec50ecd97c55b43e7ee0ac6aa364024e88f3c7"
+      },
+      {
+        "path": "assets/objects/d4/d406b411298512c67d7731fefa3f5d3476d979d8",
+        "sha256": "77be47e9e3387ab118199cd6e3d01c28b7c214dff0397c7f03923aee27cd8bf3"
+      },
+      {
+        "path": "assets/objects/d4/d406b411298512c67d7731fefa3f5d3476d979d8.sha256",
+        "sha256": "44b44c4be6040405fadfed100e1c4be793238f657a5554a18e0e5fa705786071"
+      },
+      {
+        "path": "assets/objects/d4/d4bdfba22b31906e9aded146b5e71ac4e16740b1",
+        "sha256": "d27357984ac6704ace0509c4bbad034d2fab91ee762d55fe5f3db7851dc0d607"
+      },
+      {
+        "path": "assets/objects/d4/d4bdfba22b31906e9aded146b5e71ac4e16740b1.sha256",
+        "sha256": "a359b30ae75739008296a493e5b2e6ff38e4c9e3298f0459ca8647e9d4408292"
+      },
+      {
+        "path": "assets/objects/d5/d558b63e479f0146b34f826b4b3aefde61cbeaad",
+        "sha256": "d2b17d166361e2046f844c448da4f52ec66f26a8d574197d66c56ea7db84de41"
+      },
+      {
+        "path": "assets/objects/d5/d558b63e479f0146b34f826b4b3aefde61cbeaad.sha256",
+        "sha256": "aa956c27ae4959222b12f0bd4d0d904a3c9897f8eb3c5f29ad9522d1003e9cd5"
+      },
+      {
+        "path": "assets/objects/d5/d57bf5739d53501e511593220aa730488f1be990",
+        "sha256": "5c955bc5fa8b5c1a263602438f411c80506493a554cf3d45f7fe17be176c09e4"
+      },
+      {
+        "path": "assets/objects/d5/d57bf5739d53501e511593220aa730488f1be990.sha256",
+        "sha256": "01dd90c639f5651cba4539a48552aa61cdb651b4bc91a9ce4e1f26442200f61d"
+      },
+      {
+        "path": "assets/objects/d7/d70617249e1c2262a812e6aa320ceb43f0e30749",
+        "sha256": "c1a671d6f97bc9f58b8b17b584262d713dce407db8ca8786f28345970d9ce6b4"
+      },
+      {
+        "path": "assets/objects/d7/d70617249e1c2262a812e6aa320ceb43f0e30749.sha256",
+        "sha256": "22a1887a867bcb9f27f2c6f407c2892510427df946642638fa3af4adcf457b2b"
+      },
+      {
+        "path": "assets/objects/d7/d7caa0e3aa5eb656c51817ae4bfbf3c4d72cdaad",
+        "sha256": "65388145333f6ceffe2be67790183a77d45b97236248ac1eab3befe6a17979d7"
+      },
+      {
+        "path": "assets/objects/d7/d7caa0e3aa5eb656c51817ae4bfbf3c4d72cdaad.sha256",
+        "sha256": "d95d4121bfd9572ada3f9fc220c52a2727ce6b0a1409f3b1fc6e64f80d2d6115"
+      },
+      {
+        "path": "assets/objects/d8/d84e504a065cb830287f41fb3263f7db8b4a1593",
+        "sha256": "8be92cb99ce56d28484a56b11788621e26ed3cbfde160218b7fb93b10a7efbba"
+      },
+      {
+        "path": "assets/objects/d8/d84e504a065cb830287f41fb3263f7db8b4a1593.sha256",
+        "sha256": "4aefd9d8008947ca312155ed81fb74428f0367392fc25018afa1a047c5ddecd3"
+      },
+      {
+        "path": "assets/objects/d8/d8a92597015f7a6c179180e11f2b10bdac1e3832",
+        "sha256": "818696e12ec64aa257a17be367add1d0b7d33f7973b7fd61af7b63a73f6d91f5"
+      },
+      {
+        "path": "assets/objects/d8/d8a92597015f7a6c179180e11f2b10bdac1e3832.sha256",
+        "sha256": "c6f0f1c27ecc91d7f47567aa0ced22868cccea2f34828bcd698cffc60ca79b19"
+      },
+      {
+        "path": "assets/objects/d9/d945ca3d1b21991888650a4841c50e1c9caf30d8",
+        "sha256": "3e5d20dc3d5ffec9075e9671c79bf7251788464c261c1624c24ef521bd9a4594"
+      },
+      {
+        "path": "assets/objects/d9/d945ca3d1b21991888650a4841c50e1c9caf30d8.sha256",
+        "sha256": "76a7953d6739502017dacbedd847ede10b7c65d84074c1291c8495f49799513e"
+      },
+      {
+        "path": "assets/objects/db/db06028e8e9242442c5aed84c06f16e9ddfb4af8",
+        "sha256": "17c56d11860dd1b1e2adfbfeb80694a61c0f72a4884290ae157f3436395847fd"
+      },
+      {
+        "path": "assets/objects/db/db06028e8e9242442c5aed84c06f16e9ddfb4af8.sha256",
+        "sha256": "da8279173c8555bf0feca2bd7df35323062f4dd175b0ffae372b11827eafb39d"
+      },
+      {
+        "path": "assets/objects/db/db5582c177aca966ba1a9b062cead233a262a939",
+        "sha256": "f930b6cc37353ee5c149a18eadf7a6d492a8bfd02ad63b8782ed4afc528800d5"
+      },
+      {
+        "path": "assets/objects/db/db5582c177aca966ba1a9b062cead233a262a939.sha256",
+        "sha256": "705166b69a0faec3b3246e9dfffa08d7b4f7e30524502561c7cf8a04dbb7e88c"
+      },
+      {
+        "path": "assets/objects/dd/dd3c8f33a2e589db0453c8302253985cc4091e30",
+        "sha256": "992f7ef36b9ba8ed3acfd925de784e91cd0940af7e70871eeb63c7f6f3f33fe2"
+      },
+      {
+        "path": "assets/objects/dd/dd3c8f33a2e589db0453c8302253985cc4091e30.sha256",
+        "sha256": "ff1eec7d4ac076d1f94afc1a6efd6613164b3c402f47f1e5aa09d71c49cab75b"
+      },
+      {
+        "path": "assets/objects/de/de8ef1bb0f48b39c951c24a36bb8808f1cf3c732",
+        "sha256": "544d1b1dbc25357e5b6031208c39ef19620e997b6ddc4c86d2ef4f2a3bd9d282"
+      },
+      {
+        "path": "assets/objects/de/de8ef1bb0f48b39c951c24a36bb8808f1cf3c732.sha256",
+        "sha256": "565f8014c7f9c0ec2363b9014f2f2cb097cee42776b9218808b9d83087e42d1a"
+      },
+      {
+        "path": "assets/objects/de/deba0627f49ca561aaec8b61057dac00deb83fe2",
+        "sha256": "48457e42275deb27e95e9bf685ec21b0ccc376e87afc03303c2f1b34dc73ce71"
+      },
+      {
+        "path": "assets/objects/de/deba0627f49ca561aaec8b61057dac00deb83fe2.sha256",
+        "sha256": "813ee9a44e60ffb6453368889e58b545d7df4c04187f24a3b5b5dbf667b8175c"
+      },
+      {
+        "path": "assets/objects/df/df274fe57c49ef1af6d218703d805db76a5c8af9",
+        "sha256": "2f8780bf08e78188c2523cf79063bf59b8c3441a09de805800686638b230a4e0"
+      },
+      {
+        "path": "assets/objects/df/df274fe57c49ef1af6d218703d805db76a5c8af9.sha256",
+        "sha256": "b16962d8bc1f6cb98d1f7dad6ef7f6fb69e9aeb5a19b46acf6494cb1ba0d3966"
+      },
+      {
+        "path": "assets/objects/e1/e145e56c18a6fae2774580e7925fc6eaae675ab7",
+        "sha256": "988929ca9f798d9436f3124a4b1aa730202ad7c0e25f5a339f6e7f02d47af523"
+      },
+      {
+        "path": "assets/objects/e1/e145e56c18a6fae2774580e7925fc6eaae675ab7.sha256",
+        "sha256": "ba121cff39de75c955599c1afe64df3a5eb85632d9b72d62038d722810a06ead"
+      },
+      {
+        "path": "assets/objects/e1/e1972e7b7485e8afde9e621912ffcb42c455398b",
+        "sha256": "36ee443027164f0ce9a201a40219f50bb60c0ac18536bb7ae424ac5d9e48e67f"
+      },
+      {
+        "path": "assets/objects/e1/e1972e7b7485e8afde9e621912ffcb42c455398b.sha256",
+        "sha256": "da1434037a7b2b3c5d72d912431fa8b94947eab6886d88d8f1fd7157861ce359"
+      },
+      {
+        "path": "assets/objects/e1/e1996451848924cca92ec4bf2667363f08d6d52c",
+        "sha256": "77911b78310bfbc76e9b2dfd6398b31caef70e93f1aa7b7f3aaf753745b06b07"
+      },
+      {
+        "path": "assets/objects/e1/e1996451848924cca92ec4bf2667363f08d6d52c.sha256",
+        "sha256": "2e654661e18d5578372814bd76c946f7d5782311d393fff76c0b3afe6e42efc4"
+      },
+      {
+        "path": "assets/objects/e4/e448b43724a15a06b9e2fe44114d2c203947d607",
+        "sha256": "9e4911fb640ff3d7bd55eff42f473b722c636b5e25fe8951ad78d1f4c5540ed8"
+      },
+      {
+        "path": "assets/objects/e4/e448b43724a15a06b9e2fe44114d2c203947d607.sha256",
+        "sha256": "25a021dcaa41589d6fb3dc4df5b46661af443bba1f95173539429abbd65c0628"
+      },
+      {
+        "path": "assets/objects/e5/e512c64b367f6e13d863aac7acb01d3f08301775",
+        "sha256": "97d2fa4d7a0ab220ace9e046a30fee5b0ef363454d5c8c33a3f903af57089955"
+      },
+      {
+        "path": "assets/objects/e5/e512c64b367f6e13d863aac7acb01d3f08301775.sha256",
+        "sha256": "8066328ef6d9aef053a44d94d6f81efffbf7de05ea04f2de550c3046db3eee1a"
+      },
+      {
+        "path": "assets/objects/e5/e5572ca1507224dc231272b15dbf45851d36d9af",
+        "sha256": "f703d3fbb62197b5d8157aa0dfea40a0f126ebd8d5a8239a84c3ca2b8251c6a8"
+      },
+      {
+        "path": "assets/objects/e5/e5572ca1507224dc231272b15dbf45851d36d9af.sha256",
+        "sha256": "8804a02c3df790cf407fee053a989a0369e225cbf6b34ed23667948e9330ea9e"
+      },
+      {
+        "path": "assets/objects/ea/ea1e408edd4f0ae3f7f3efa1b3f032339ee265d5",
+        "sha256": "c2b285f0ffd2668a9e1f65807934ba457ea5a9c09c492c2c2a224959039dee0a"
+      },
+      {
+        "path": "assets/objects/ea/ea1e408edd4f0ae3f7f3efa1b3f032339ee265d5.sha256",
+        "sha256": "ff96040a70ff5329c906c382118952d4a528e4ea88c8d5aa701c44683e0a4589"
+      },
+      {
+        "path": "assets/objects/eb/ebfcf644121c9d918a76cd4c3f66befbcae613e5",
+        "sha256": "fd69295d1ed55d73bd86766b28cbd1d293fb89b7a0492d1c6ba4de1cfc767bd7"
+      },
+      {
+        "path": "assets/objects/eb/ebfcf644121c9d918a76cd4c3f66befbcae613e5.sha256",
+        "sha256": "5a50fe40087b30163da1358db5971b8d6b47bd4ae2475cbd32f35ec74a26125d"
+      },
+      {
+        "path": "assets/objects/ee/ee17f63ddbe9d792681a258a3ed4f50ec2b38c9b",
+        "sha256": "614bba09c64912278258764b98c6f45746a664de95da52fe8e8a08a27d0c0033"
+      },
+      {
+        "path": "assets/objects/ee/ee17f63ddbe9d792681a258a3ed4f50ec2b38c9b.sha256",
+        "sha256": "d3938528bf3a30c9ff6917ef01609a0db4aa106972fc3f8e5984c6ed8255ee69"
+      },
+      {
+        "path": "assets/objects/ee/eed3b961158ebeae781e6c737ee55a1f5e8f6c9d",
+        "sha256": "e0c3b298da6877620d1a9ea90236ae08645e3cc382e0c48b91fcbacc460fa5ec"
+      },
+      {
+        "path": "assets/objects/ee/eed3b961158ebeae781e6c737ee55a1f5e8f6c9d.sha256",
+        "sha256": "17f6893f7bf2200ee5729d36cf9b6afcc177d748eba3bead0826054329ef2b4b"
+      },
+      {
+        "path": "assets/objects/ef/ef9207e37f012f6b7ad5e7bf6c9446ffb27e51d5",
+        "sha256": "df93f2d2ed42314e2645e0406dd2513fe7911c2d2c2db6187969cb901fa068b9"
+      },
+      {
+        "path": "assets/objects/ef/ef9207e37f012f6b7ad5e7bf6c9446ffb27e51d5.sha256",
+        "sha256": "4f67b219b4a73fa7007bc07ff8e03a3382ec1d6999cb2cde02cdf140d3bd6ee8"
+      },
+      {
+        "path": "assets/objects/f0/f00657542252858a721e715a2e888a9226404e35",
+        "sha256": "cd8fbbf47ef6b69dc65176c94426e9711a115baa1b505a545c954e167b8a30c5"
+      },
+      {
+        "path": "assets/objects/f0/f00657542252858a721e715a2e888a9226404e35.sha256",
+        "sha256": "f43ea5bddc779a31ae01101ebc97ac7573f18a1b02dfc2191fcbbe8c2d9b7322"
+      },
+      {
+        "path": "assets/objects/f4/f40a458a878dc9725af117aa6a665bde615b0641",
+        "sha256": "f8499be381c1bc9df857c2221f37e9e446be1e8e3ce06bf9b50a9a4aebea4552"
+      },
+      {
+        "path": "assets/objects/f4/f40a458a878dc9725af117aa6a665bde615b0641.sha256",
+        "sha256": "20c8851dd230eed195bdafa82cd4149dda53bb50d6ee82a5750b32361ef4739b"
+      },
+      {
+        "path": "assets/objects/f5/f5e0a5cfbc2e7b1e89094d7882dde106b030ec26",
+        "sha256": "43755b6c73db4b901e24b472f9876c63bc77d7af279a00b677ccfed9e140e1ed"
+      },
+      {
+        "path": "assets/objects/f5/f5e0a5cfbc2e7b1e89094d7882dde106b030ec26.sha256",
+        "sha256": "b10626e201f0ff352269beb9b11a5f791efcd5a2d530e53931bbba46aba4ef3d"
+      },
+      {
+        "path": "assets/objects/f9/f943b4cc49672424193fa37d69a245f1093d117f",
+        "sha256": "25227605d0f067712e94de528c4ad0b36c6361aebee4bf27f2b5a5f281b1f4d6"
+      },
+      {
+        "path": "assets/objects/f9/f943b4cc49672424193fa37d69a245f1093d117f.sha256",
+        "sha256": "bd50de1928fd2f5e1fa72f47d57671029107b1785c5c850218f9cadfb821cdfe"
+      },
+      {
+        "path": "assets/objects/fb/fb5668247ffd51905e3a13eff34b74c9b709e2f4",
+        "sha256": "296df4dccfb686c126a24aafda11d3043033ddbc4905b09992454aa7cbad4e59"
+      },
+      {
+        "path": "assets/objects/fb/fb5668247ffd51905e3a13eff34b74c9b709e2f4.sha256",
+        "sha256": "670904457c8c38310f9740fee95a27a2fe6df895399be6b8310ea204afb3a454"
+      },
+      {
+        "path": "assets/objects/fc/fcf06ec5b0141ae5b3baddb08db172929b5c1e94",
+        "sha256": "762ef574076a705b868e42a256afd096316ea6abc6f8c476ecd6b856cb067061"
+      },
+      {
+        "path": "assets/objects/fc/fcf06ec5b0141ae5b3baddb08db172929b5c1e94.sha256",
+        "sha256": "e6dcdc92acf7b8bebf6d71a5e2e0edd4d54bf2621470a3487f54a4b175d10dfd"
+      },
+      {
+        "path": "assets/objects/fd/fdeec5366edc45dcaf46326ddad511e8d6bcd4a9",
+        "sha256": "f3f0bede0e4061f7c709ac9a876349628b60a10b807c3ccdfc40915f0bb865fd"
+      },
+      {
+        "path": "assets/objects/fd/fdeec5366edc45dcaf46326ddad511e8d6bcd4a9.sha256",
+        "sha256": "81b667095f1cb3ecc72a08908937b35774ceeb7f494274fb09ce16f1c634bbaa"
+      },
+      {
+        "path": "assets/objects/fd/fdf18a3512fd1d2ce62b19865d4312fcc343cd36",
+        "sha256": "2a3d835f1f5a53306803fbddd60d31c1e3794b89a1c6a95310f40052175c8a29"
+      },
+      {
+        "path": "assets/objects/fd/fdf18a3512fd1d2ce62b19865d4312fcc343cd36.sha256",
+        "sha256": "48d55549ccae4ffa3716e8879f864f4a92280720da74ad20693bea6389b1fa34"
+      },
+      {
+        "path": "assets/objects/fe/fe9223b778aae30ca1d28df09b02ba8d0626d236",
+        "sha256": "953ec90a8e32f03a6f84e6e691efd7ddfde77afc05669cb9e828ed92da331a88"
+      },
+      {
+        "path": "assets/objects/fe/fe9223b778aae30ca1d28df09b02ba8d0626d236.sha256",
+        "sha256": "a232b7c9269b42e16fb19ec90699af109381b9674c4c98b97e97f650bf4c0914"
+      },
+      {
+        "path": "assets/objects/ff/ffa98ef282d59d5f837b4c05003233142bed1a95",
+        "sha256": "5ed5a825e73f952d6b8a6c93d6c9f1304f02d19c20335be921bd6bc95695fa6e"
+      },
+      {
+        "path": "assets/objects/ff/ffa98ef282d59d5f837b4c05003233142bed1a95.sha256",
+        "sha256": "7d4f7d7750332441eed5d7f020750230356946a467bc5286fd15d980ef541366"
+      },
+      {
+        "path": "libraries/at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar",
+        "sha256": "a58a84c4271e50df4c96ed916ccb7e48a869f8ed9cdcda1ad5d3d4c33b0214a3"
+      },
+      {
+        "path": "libraries/at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar.sha256",
+        "sha256": "5131b4f0897f4ae40295b43da71680cbb95d91d31634bbf8a59fb1fe9f88384f"
+      },
+      {
+        "path": "libraries/com/azure/azure-json/1.4.0/azure-json-1.4.0.jar",
+        "sha256": "c50bc998cd1a6c689f8644b51c206217bf2da09d5b949e777490a60290cc3a0d"
+      },
+      {
+        "path": "libraries/com/azure/azure-json/1.4.0/azure-json-1.4.0.jar.sha256",
+        "sha256": "0bad7edf1f6490d8ce8404d5ad286ec47cc438cb6607d2a9da2400744f5f9f69"
+      },
+      {
+        "path": "libraries/com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar",
+        "sha256": "b29ba9bce041e6ea822203d5b5a692660c87551241510ebc76eedffe684844c7"
+      },
+      {
+        "path": "libraries/com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar.sha256",
+        "sha256": "4846d43e8cbc8de3487dd36ca47c952a60684ab633557197449ab258061cd674"
+      },
+      {
+        "path": "libraries/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar",
+        "sha256": "dd0ce1b55a3ed2080cb70f9c655850cda86c206862310009dcb5e5c95265a5e0"
+      },
+      {
+        "path": "libraries/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar.sha256",
+        "sha256": "0d10b26261222f786dc0248517709f52a7fd50a13696adec5ad89f538abffa72"
+      },
+      {
+        "path": "libraries/com/google/code/gson/gson/2.14.0/gson-2.14.0.jar",
+        "sha256": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f"
+      },
+      {
+        "path": "libraries/com/google/code/gson/gson/2.14.0/gson-2.14.0.jar.sha256",
+        "sha256": "7b1be62ec0bf395854f82f5c356edb7a123a25e6f391f9b3b7e7c37333bdf1c7"
+      },
+      {
+        "path": "libraries/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar",
+        "sha256": "cbfc3906b19b8f55dd7cfd6dfe0aa4532e834250d7f080bd8d211a3e246b59cb"
+      },
+      {
+        "path": "libraries/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar.sha256",
+        "sha256": "1f5c860e070ea603c9b3d233787c3f6cb2cbc668324e7f4b1b937ab83274ba37"
+      },
+      {
+        "path": "libraries/com/google/guava/guava/33.5.0-jre/guava-33.5.0-jre.jar",
+        "sha256": "1e301f0c52ac248b0b14fdc3d12283c77252d4d6f48521d572e7d8c4c2cc4ac7"
+      },
+      {
+        "path": "libraries/com/google/guava/guava/33.5.0-jre/guava-33.5.0-jre.jar.sha256",
+        "sha256": "7c5722cce9256704030705438c07d4624db33d92746de1c2ab6f70f94fa4e8e2"
+      },
+      {
+        "path": "libraries/com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar",
+        "sha256": "dc573e1fca4fd5454f4a5fd3d7da2df03002876a4175bafc14a95980dd7713b3"
+      },
+      {
+        "path": "libraries/com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar.sha256",
+        "sha256": "a334798d7b2e6ae62b19bb5f6efa55fdb223a7396e8880b348a149047c34e67f"
+      },
+      {
+        "path": "libraries/com/ibm/icu/icu4j/77.1/icu4j-77.1.jar",
+        "sha256": "b3640b9f416a4411fd33c59abbeea8fd57d024c23e1819bf9673220a97499fe3"
+      },
+      {
+        "path": "libraries/com/ibm/icu/icu4j/77.1/icu4j-77.1.jar.sha256",
+        "sha256": "b9e18e41f9ba734d57e04ac3b4466c41a246ec84f8828d73be97d541850a83ad"
+      },
+      {
+        "path": "libraries/com/ibm/icu/icu4j/78.3/icu4j-78.3.jar",
+        "sha256": "e962c1758d9659ea1e1fbab99c58683f654d304e1126ace19aaabfe39e0edb25"
+      },
+      {
+        "path": "libraries/com/ibm/icu/icu4j/78.3/icu4j-78.3.jar.sha256",
+        "sha256": "8249af165f276ae4f276c69872275582dd4831c46c067b55234c73aaf7824c5d"
+      },
+      {
+        "path": "libraries/com/microsoft/azure/msal4j/1.23.1/msal4j-1.23.1.jar",
+        "sha256": "414d4fe3c66c7bb1a741014f352e5f0a8329172703e7fbb0020d232a8c8385b1"
+      },
+      {
+        "path": "libraries/com/microsoft/azure/msal4j/1.23.1/msal4j-1.23.1.jar.sha256",
+        "sha256": "f364eb5b9daa6a6f4c86ddf0b4cc946c227206387593ef78ac235107d6774122"
+      },
+      {
+        "path": "libraries/com/microsoft/azure/msal4j/1.24.1/msal4j-1.24.1.jar",
+        "sha256": "12e62f79d1a71d176a41c168c0587f8167f0add99b78f006f39595bd7242aebe"
+      },
+      {
+        "path": "libraries/com/microsoft/azure/msal4j/1.24.1/msal4j-1.24.1.jar.sha256",
+        "sha256": "958b7cf442d3850e17d1af573cd1000341fac69e65722e7d6f686cee62c75a56"
+      },
+      {
+        "path": "libraries/com/mojang/authlib/7.0.63/authlib-7.0.63.jar",
+        "sha256": "44de93d9df077fa1d4829ada260efe9d126476b9b7abdfba30cfbb5db145cb2f"
+      },
+      {
+        "path": "libraries/com/mojang/authlib/7.0.63/authlib-7.0.63.jar.sha256",
+        "sha256": "1a7d9cfa64ae193ab9af814c1e91b2d526c169bae428f3b9d817e2c7ea1cd58c"
+      },
+      {
+        "path": "libraries/com/mojang/authlib/9.0.75/authlib-9.0.75.jar",
+        "sha256": "1f77e70240548b9cd233da0e12938bbbe5597ac9e94f6c6b07577faf1461a951"
+      },
+      {
+        "path": "libraries/com/mojang/authlib/9.0.75/authlib-9.0.75.jar.sha256",
+        "sha256": "6ce917cdfc0e815dc2805cd1b68bd27daefb3288ea5ffae964419b202043e9f2"
+      },
+      {
+        "path": "libraries/com/mojang/blocklist/1.0.10/blocklist-1.0.10.jar",
+        "sha256": "830bfd639c8db49236bbd8e45d3a2b8c96c56ff654a10118654958a6235d4c44"
+      },
+      {
+        "path": "libraries/com/mojang/blocklist/1.0.10/blocklist-1.0.10.jar.sha256",
+        "sha256": "615076d01113549f2181b59f331222bd04ea71c65b8751342b82aaf971885e24"
+      },
+      {
+        "path": "libraries/com/mojang/brigadier/1.3.10/brigadier-1.3.10.jar",
+        "sha256": "c8ee4136e474ac7723ca2b432ec8d1a2bc88ef7d1ec57c314ba9e33cdc83dd75"
+      },
+      {
+        "path": "libraries/com/mojang/brigadier/1.3.10/brigadier-1.3.10.jar.sha256",
+        "sha256": "5df035a6bfd82bfe2a924c5746a9b477b16ed32dae34ad666ec530e6846a074f"
+      },
+      {
+        "path": "libraries/com/mojang/datafixerupper/10.0.21/datafixerupper-10.0.21.jar",
+        "sha256": "3547cb1da8993fb7ebd42494d0e78997d2cfbe90c421f5efd022863e6909941e"
+      },
+      {
+        "path": "libraries/com/mojang/datafixerupper/10.0.21/datafixerupper-10.0.21.jar.sha256",
+        "sha256": "0dafe91f788ea02f4413d33e8bbfa182558fce3b85c8e28bf444845984754a43"
+      },
+      {
+        "path": "libraries/com/mojang/datafixerupper/9.0.19/datafixerupper-9.0.19.jar",
+        "sha256": "9653a39cf5c4853cc98628d902dcb23ffeb2755122ecc563bde38c8f60c0b61e"
+      },
+      {
+        "path": "libraries/com/mojang/datafixerupper/9.0.19/datafixerupper-9.0.19.jar.sha256",
+        "sha256": "3b0933b74090d3ee5e26013ea69bf247b75326efa5d2857eca4f64022e8fd242"
+      },
+      {
+        "path": "libraries/com/mojang/jtracy/1.0.37/jtracy-1.0.37-natives-linux.jar",
+        "sha256": "4b22779ea24eecd3e3cf6eb06030ca85b833dd8b7a169bf3b88afd6c1676cc68"
+      },
+      {
+        "path": "libraries/com/mojang/jtracy/1.0.37/jtracy-1.0.37-natives-linux.jar.sha256",
+        "sha256": "eed393a751225717c202b163203fda8bd7cbaf0feb7b4ac6da161212b863e889"
+      },
+      {
+        "path": "libraries/com/mojang/jtracy/1.0.37/jtracy-1.0.37.jar",
+        "sha256": "8bb68d0b65e8eceb92de2bd1d9e1443a8c9a9dd1b5818a5e54870b0f8253672a"
+      },
+      {
+        "path": "libraries/com/mojang/jtracy/1.0.37/jtracy-1.0.37.jar.sha256",
+        "sha256": "7dcc4e50f73860ec2d35bf82f0929ed32961e07dc9e30fb694193bdea1d3da9d"
+      },
+      {
+        "path": "libraries/com/mojang/logging/1.6.11/logging-1.6.11.jar",
+        "sha256": "5d803eb7348a27468c6172daef2f0d77260dd63cde377ebfa73e36789ae8fcee"
+      },
+      {
+        "path": "libraries/com/mojang/logging/1.6.11/logging-1.6.11.jar.sha256",
+        "sha256": "2199b4e20d9c61b0f99c8689a071ab024c27e08b7ca800b92a865d0f3178ff93"
+      },
+      {
+        "path": "libraries/com/mojang/logging/1.7.12/logging-1.7.12.jar",
+        "sha256": "3c7ac9742fa98c773275379eb1046c048b5d2ee989152a8c69e7ba696c3f8538"
+      },
+      {
+        "path": "libraries/com/mojang/logging/1.7.12/logging-1.7.12.jar.sha256",
+        "sha256": "d92e28f0981cb4ad05e572e3e00398cf9331d303abeba1b9c34cdfbb7fa32a1e"
+      },
+      {
+        "path": "libraries/com/mojang/patchy/2.2.10/patchy-2.2.10.jar",
+        "sha256": "16d70e7968b45caffc81576268eb000f473fb60bf257182d3447dea8ec919d5a"
+      },
+      {
+        "path": "libraries/com/mojang/patchy/2.2.10/patchy-2.2.10.jar.sha256",
+        "sha256": "3df30f809ed985c12639b2d89dfc2b2d7bb520061060d4efb99c2129fd046986"
+      },
+      {
+        "path": "libraries/com/mojang/text2speech/1.18.11/text2speech-1.18.11.jar",
+        "sha256": "587f08aa316ee4d6a9f39f77d3ba7d8a83425da53aa74938a1f034a4e3fc255f"
+      },
+      {
+        "path": "libraries/com/mojang/text2speech/1.18.11/text2speech-1.18.11.jar.sha256",
+        "sha256": "5fe7ca72d89082deb97a4036ae76d7fb3b7da25b239b706fb54f71568bc01897"
+      },
+      {
+        "path": "libraries/com/mojang/text2speech/1.19.12/text2speech-1.19.12.jar",
+        "sha256": "63769a6f662ad8943adf6be14a45e375d76a567d7ba50c2a7f1f95082c93b816"
+      },
+      {
+        "path": "libraries/com/mojang/text2speech/1.19.12/text2speech-1.19.12.jar.sha256",
+        "sha256": "54656f7d86be8ea29b622d901a358e4c70d17a37565d2b699f717547dfff5705"
+      },
+      {
+        "path": "libraries/commons-codec/commons-codec/1.19.0/commons-codec-1.19.0.jar",
+        "sha256": "5c3881e4f556855e9c532927ee0c9dfde94cc66760d5805c031a59887070af5f"
+      },
+      {
+        "path": "libraries/commons-codec/commons-codec/1.19.0/commons-codec-1.19.0.jar.sha256",
+        "sha256": "cc2fe1a2affeaa5740295deb1189bb9b19001d23c7ad381b79543d67ba174e3d"
+      },
+      {
+        "path": "libraries/commons-codec/commons-codec/1.22.0/commons-codec-1.22.0.jar",
+        "sha256": "d164fe79f262c32d9b18a0b5b2d317d1c27653d5e98fd2b998c24bf901c72ce4"
+      },
+      {
+        "path": "libraries/commons-codec/commons-codec/1.22.0/commons-codec-1.22.0.jar.sha256",
+        "sha256": "47fd6daec2fbe6c23984d46a76980492afe8f4619377f68a613c45d368224817"
+      },
+      {
+        "path": "libraries/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar",
+        "sha256": "df90bba0fe3cb586b7f164e78fe8f8f4da3f2dd5c27fa645f888100ccc25dd72"
+      },
+      {
+        "path": "libraries/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar.sha256",
+        "sha256": "36877b8dd4a99e39222259c1e6a8e6a5f7d0f4d47d92acb5e722eaeda764be72"
+      },
+      {
+        "path": "libraries/io/netty/netty-buffer/4.2.15.Final/netty-buffer-4.2.15.Final.jar",
+        "sha256": "1361fd9c9ba85b9831cf54a1b2e45ddc3ce34a768931726c099d3f5ef0efe4a3"
+      },
+      {
+        "path": "libraries/io/netty/netty-buffer/4.2.15.Final/netty-buffer-4.2.15.Final.jar.sha256",
+        "sha256": "3548c4485a97cddb4a30790db26b89a53031039c70d52491e477d91bfbc64377"
+      },
+      {
+        "path": "libraries/io/netty/netty-buffer/4.2.7.Final/netty-buffer-4.2.7.Final.jar",
+        "sha256": "b81613c8ed22b1cc39eccf2a28bd0c1d4561fb2e5e542061617ef4ce1d228bf5"
+      },
+      {
+        "path": "libraries/io/netty/netty-buffer/4.2.7.Final/netty-buffer-4.2.7.Final.jar.sha256",
+        "sha256": "8246083231da13cf6f580103e0bacfcb3778313d3a58a92fa6fe3284d3f94e9c"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-base/4.2.15.Final/netty-codec-base-4.2.15.Final.jar",
+        "sha256": "2c6d39d7270628b8cfc3166fbd7a93d595958e59c461bc32ddb383c8c91bf811"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-base/4.2.15.Final/netty-codec-base-4.2.15.Final.jar.sha256",
+        "sha256": "6cff74e97f3ed3e9528ebc6f8ff5c3f35dd51a2820ef1d8b90cc15c1d411790e"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-base/4.2.7.Final/netty-codec-base-4.2.7.Final.jar",
+        "sha256": "6360415b7c87160afcde5e7d4946c35539b9f043e8166c91a7fff95cc6067d9f"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-base/4.2.7.Final/netty-codec-base-4.2.7.Final.jar.sha256",
+        "sha256": "bf541e7fa2534fd4567ea63d68ded65f65ae83cc6cccc6be77f82fb27ebb0a9b"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-compression/4.2.15.Final/netty-codec-compression-4.2.15.Final.jar",
+        "sha256": "4adaa5cdd4d2e9b50b23e4c3eff42e73de6eb40848718b3aa84cd5b454da6ce8"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-compression/4.2.15.Final/netty-codec-compression-4.2.15.Final.jar.sha256",
+        "sha256": "82f2e44900204612de27f0fe0c609017d2e3c3e6294bcaa10a24303e3279a892"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-compression/4.2.7.Final/netty-codec-compression-4.2.7.Final.jar",
+        "sha256": "edd53ad34991804301a46571113d8ffb4d6f67e6d874674dafbb915724275cb3"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-compression/4.2.7.Final/netty-codec-compression-4.2.7.Final.jar.sha256",
+        "sha256": "8071954128a15ed1e1d1dde61269e4ab426ef650af704153d30597eedd38da0e"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-http/4.2.15.Final/netty-codec-http-4.2.15.Final.jar",
+        "sha256": "76ae57e87af37b3c4107140f50b9244b1456163a6a225510838f7c5a4458ec22"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-http/4.2.15.Final/netty-codec-http-4.2.15.Final.jar.sha256",
+        "sha256": "ff246c37d9901dde1ead26fb0cd9de264dab96fc477bb79dae77972fe18f323a"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-http/4.2.7.Final/netty-codec-http-4.2.7.Final.jar",
+        "sha256": "2984dd38420a61c4dd68fcacc51ffc528eb46f73f7795cdafdb3a4d6fcb76862"
+      },
+      {
+        "path": "libraries/io/netty/netty-codec-http/4.2.7.Final/netty-codec-http-4.2.7.Final.jar.sha256",
+        "sha256": "529c989c5373a6f5cb18443625912f437c748dfb26a70e73fb6ebdd7653220f6"
+      },
+      {
+        "path": "libraries/io/netty/netty-common/4.2.15.Final/netty-common-4.2.15.Final.jar",
+        "sha256": "78206aa7f6d197caa926291408c01889b6b910ca0f74017d3fcbdaccf9562959"
+      },
+      {
+        "path": "libraries/io/netty/netty-common/4.2.15.Final/netty-common-4.2.15.Final.jar.sha256",
+        "sha256": "0e0d68471b0aae97816ca5b27d513a92e9a4799d44f68859ee91daa2d658af4d"
+      },
+      {
+        "path": "libraries/io/netty/netty-common/4.2.7.Final/netty-common-4.2.7.Final.jar",
+        "sha256": "2345bc0ed5843fa57aa49eba67529485c3a1d420fcf0429324c8220c7a80e9a6"
+      },
+      {
+        "path": "libraries/io/netty/netty-common/4.2.7.Final/netty-common-4.2.7.Final.jar.sha256",
+        "sha256": "8447dcea0e0ac2689278446bd747faeba9a181ae5bb0e88e6068b06c5810ef31"
+      },
+      {
+        "path": "libraries/io/netty/netty-handler/4.2.15.Final/netty-handler-4.2.15.Final.jar",
+        "sha256": "99b59e4bea72220d2aed52df8baf37d97431b06ade0b135226cdf73168975eab"
+      },
+      {
+        "path": "libraries/io/netty/netty-handler/4.2.15.Final/netty-handler-4.2.15.Final.jar.sha256",
+        "sha256": "a84f543edd36c79ef0cfe8a44438c85ad600a9d43086d5d7f91e61c5973f6082"
+      },
+      {
+        "path": "libraries/io/netty/netty-handler/4.2.7.Final/netty-handler-4.2.7.Final.jar",
+        "sha256": "21d063409c12dbcec46d380c8856a0f7b6a5b68bb5f1d005eb065b4d64146cb3"
+      },
+      {
+        "path": "libraries/io/netty/netty-handler/4.2.7.Final/netty-handler-4.2.7.Final.jar.sha256",
+        "sha256": "f6f0411c878ad7263cc4879cfe0d0b236f29c8181e723c85637c22ce65cdb757"
+      },
+      {
+        "path": "libraries/io/netty/netty-resolver/4.2.15.Final/netty-resolver-4.2.15.Final.jar",
+        "sha256": "24318497f2a3a645964fed418f48879ba11365cab8e1f8d66c47fa7da15ef19a"
+      },
+      {
+        "path": "libraries/io/netty/netty-resolver/4.2.15.Final/netty-resolver-4.2.15.Final.jar.sha256",
+        "sha256": "136e57e7ce903d8c407603ac4a08a857ed351fa92856c9a1a4cb0c3d02709f45"
+      },
+      {
+        "path": "libraries/io/netty/netty-resolver/4.2.7.Final/netty-resolver-4.2.7.Final.jar",
+        "sha256": "7e4d569867e6c08437fb21a220ea01c294b0e38f01149b683c895a1bcd928438"
+      },
+      {
+        "path": "libraries/io/netty/netty-resolver/4.2.7.Final/netty-resolver-4.2.7.Final.jar.sha256",
+        "sha256": "0044b965116e16c65151e8e0ff003f78734107fc8a92942aab08d40c3a63e772"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-classes-epoll/4.2.15.Final/netty-transport-classes-epoll-4.2.15.Final.jar",
+        "sha256": "be509407fd71a4b83378567c613420db544d659bb522df7b253a1dbe8ca297fe"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-classes-epoll/4.2.15.Final/netty-transport-classes-epoll-4.2.15.Final.jar.sha256",
+        "sha256": "16e8b6c1336007158b57449e77d80eb0572afd7436003d36fd55f7e440a28897"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-classes-epoll/4.2.7.Final/netty-transport-classes-epoll-4.2.7.Final.jar",
+        "sha256": "4492948e6a7694398e5197cf15ed2e21d6662a739d010ae666fa276e7222853c"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-classes-epoll/4.2.7.Final/netty-transport-classes-epoll-4.2.7.Final.jar.sha256",
+        "sha256": "28c7cdf97d02dec61d5232334f36192a0ee1e1ea0a64b9326c949e4c465f9eec"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-classes-kqueue/4.2.15.Final/netty-transport-classes-kqueue-4.2.15.Final.jar",
+        "sha256": "2a15e2213a1fe49e73b4bb39bc746e7196dba8c1b182bc0d21a719a4d1be2c00"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-classes-kqueue/4.2.15.Final/netty-transport-classes-kqueue-4.2.15.Final.jar.sha256",
+        "sha256": "75237f7bc6c2a3f24d8ac2f44e7363f82c4f77c336a17d865c771e3680af723a"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-classes-kqueue/4.2.7.Final/netty-transport-classes-kqueue-4.2.7.Final.jar",
+        "sha256": "a3eb1c94ae1a6be9e1d1ec52c3f5c510a75b04b8ef1ea86b7e77b3f1287ae3cc"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-classes-kqueue/4.2.7.Final/netty-transport-classes-kqueue-4.2.7.Final.jar.sha256",
+        "sha256": "8421434d8bc0c37ee6ca6d10ac8bcb854caf478f5025d23bf9e25dbb8c95a7eb"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-epoll/4.2.15.Final/netty-transport-native-epoll-4.2.15.Final-linux-aarch_64.jar",
+        "sha256": "5a401e9dfb4f937e37a2221f6b91da25a008eac1f08ddd4bb0d9ed20e0e32668"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-epoll/4.2.15.Final/netty-transport-native-epoll-4.2.15.Final-linux-aarch_64.jar.sha256",
+        "sha256": "c81e6c2024cb40291415f3143d9b8fd4a91176942b339ec0425d0ba1045d4eb3"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-epoll/4.2.15.Final/netty-transport-native-epoll-4.2.15.Final-linux-x86_64.jar",
+        "sha256": "5440e38f5ca2858fee8d7898e65291e05b665736c9e8a14c832e707511f5dba6"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-epoll/4.2.15.Final/netty-transport-native-epoll-4.2.15.Final-linux-x86_64.jar.sha256",
+        "sha256": "787c42804914ef495880e89973ccc242d59a883693a5423b8b1b92cf4b004cdf"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-epoll/4.2.7.Final/netty-transport-native-epoll-4.2.7.Final-linux-aarch_64.jar",
+        "sha256": "2f0c7309d7df48a88fb374c02cfb446e1a1e5fb597fb02d773c70ac07da2c268"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-epoll/4.2.7.Final/netty-transport-native-epoll-4.2.7.Final-linux-aarch_64.jar.sha256",
+        "sha256": "82d1ff3c77dd52d5bc56168f0ddca7987ff420adbd8078945d9d1f692ff91cbd"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-epoll/4.2.7.Final/netty-transport-native-epoll-4.2.7.Final-linux-x86_64.jar",
+        "sha256": "7f395c8fdbe6990f7664408b57d919042401b893178fcba48bebf1a61bf78618"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-epoll/4.2.7.Final/netty-transport-native-epoll-4.2.7.Final-linux-x86_64.jar.sha256",
+        "sha256": "04f8bb9341341a56b701d9bb632d6b968c83b3c3ba5465b7145728882ca59af4"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-unix-common/4.2.15.Final/netty-transport-native-unix-common-4.2.15.Final.jar",
+        "sha256": "b9ea9fc5ad5eba04e99afdff75b2eb97b5ddfb2ad772e2f2ef5d8f277f3cbd76"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-unix-common/4.2.15.Final/netty-transport-native-unix-common-4.2.15.Final.jar.sha256",
+        "sha256": "eacd60f7aec25fac349c8bd5f85aa2f8212a0589117d2bf20c3cda2154a69fe9"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-unix-common/4.2.7.Final/netty-transport-native-unix-common-4.2.7.Final.jar",
+        "sha256": "736703b3f6d127e182f5be888b6e15732b0c08d6634e00725352a6a9d19974b2"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport-native-unix-common/4.2.7.Final/netty-transport-native-unix-common-4.2.7.Final.jar.sha256",
+        "sha256": "60b284bf5f360dc5456fff6dd1eb50ec7c1428de414c03b8808cb63cfca79754"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport/4.2.15.Final/netty-transport-4.2.15.Final.jar",
+        "sha256": "9fb671e96651066cf1a28dad3f1382c7c99df5b8326d4a214d9a375b311f8dc1"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport/4.2.15.Final/netty-transport-4.2.15.Final.jar.sha256",
+        "sha256": "7373f7bb6374b60d2f39bdb600c8cec3f46d676ec3ccccabdabe29d010b4b249"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport/4.2.7.Final/netty-transport-4.2.7.Final.jar",
+        "sha256": "aadc6fb05c14fb789368ca3f854721549c72f6c0d81798bbccf9de1bb716892b"
+      },
+      {
+        "path": "libraries/io/netty/netty-transport/4.2.7.Final/netty-transport-4.2.7.Final.jar.sha256",
+        "sha256": "3acd96d791d025ca9b00785eca2de20af47c2c372d740b016062b065896bedc1"
+      },
+      {
+        "path": "libraries/it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar",
+        "sha256": "9094ae67d01d0ad246f886f11ad557fc2e79c72cbf3feed83e1512a8ae90a74a"
+      },
+      {
+        "path": "libraries/it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar.sha256",
+        "sha256": "541bf73651894eddca3aa5f87e6d8dafa403c3a2b1b6280847029cfe1e40e095"
+      },
+      {
+        "path": "libraries/net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar",
+        "sha256": "b7e3d46c87bad2eb409b0e704916bcd81206168e357312dfddd0e253679cd9e0"
+      },
+      {
+        "path": "libraries/net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar.sha256",
+        "sha256": "edb4a7ad4f04a6910acb4d5035d43f1d6a28f674d9d28c26210b9874d90b7aa8"
+      },
+      {
+        "path": "libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar",
+        "sha256": "b3a9408e7c51e08ef0e3bfcc08f443f6ec0f6191ba8cd7c18d53d2b22e5bdbc0"
+      },
+      {
+        "path": "libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar.sha256",
+        "sha256": "5de64662412da01d3ca9e8ace1969cd94ae632b80a8beb63ab4e8d63144cc364"
+      },
+      {
+        "path": "libraries/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar",
+        "sha256": "df26cc58f235f477db07f753ba5a3ab243ebe5789d9f89ecf68dd62ea9a66c28"
+      },
+      {
+        "path": "libraries/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar.sha256",
+        "sha256": "ea13cc0e6beda56c1b9247d267499c198579ce77644100ef08c15c8f411ceb32"
+      },
+      {
+        "path": "libraries/org/apache/commons/commons-compress/1.28.0/commons-compress-1.28.0.jar",
+        "sha256": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca"
+      },
+      {
+        "path": "libraries/org/apache/commons/commons-compress/1.28.0/commons-compress-1.28.0.jar.sha256",
+        "sha256": "b801600eb29f1736942c5d1cc53a53509155f725ca9576c7ff2bdc00e32b9c0e"
+      },
+      {
+        "path": "libraries/org/apache/commons/commons-lang3/3.19.0/commons-lang3-3.19.0.jar",
+        "sha256": "32733ab4bc90b45b63eb72677d886961003fd4ed113e07b1028f9877cb2ac735"
+      },
+      {
+        "path": "libraries/org/apache/commons/commons-lang3/3.19.0/commons-lang3-3.19.0.jar.sha256",
+        "sha256": "66fdd3bf8e80908430237e56a72f6b539d846937ca5d33ed389f9882a1e4982d"
+      },
+      {
+        "path": "libraries/org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar",
+        "sha256": "69e5c9fa35da7a51a5fd2099dfe56a2d8d32cf233e2f6d770e796146440263f4"
+      },
+      {
+        "path": "libraries/org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar.sha256",
+        "sha256": "7704d5dbe47cfb11d23bc134157ea450a6ec11cc565b3dc0ec397c6b313e83b9"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-api/2.25.2/log4j-api-2.25.2.jar",
+        "sha256": "9fd66c9fe0bea06fa9666c147989a46cafaa92b4a88753697d3945cc43338cbb"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-api/2.25.2/log4j-api-2.25.2.jar.sha256",
+        "sha256": "769c2b5f4a936ed22e7d3e52768b3becc0308108484d731cd060ba185692ca57"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-api/2.26.0/log4j-api-2.26.0.jar",
+        "sha256": "820de7bbaf430eaf2e3e5ccb92f23e2085797c5ac4d4f7fc6c8b660fbefa1dbc"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-api/2.26.0/log4j-api-2.26.0.jar.sha256",
+        "sha256": "4b4a2adad46e012d2de37a881a005ada38e0c19d3fe6e7183f7ec8f4a1380479"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-core/2.25.2/log4j-core-2.25.2.jar",
+        "sha256": "e50db7701430ff907981850ef527a41d51a53dd0017f53a0860afcbab8570277"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-core/2.25.2/log4j-core-2.25.2.jar.sha256",
+        "sha256": "03eb35f77f065cdb479cb955ae0eaf228d1769ee2ab6a390a6966755e4f1fb14"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-core/2.26.0/log4j-core-2.26.0.jar",
+        "sha256": "406bb3132c47a5d322e5c571feb0787ca84496469f346eb51f1ef2ee45499902"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-core/2.26.0/log4j-core-2.26.0.jar.sha256",
+        "sha256": "6f6f723c2cf4949c0be5fb43bba1abe3ac27ea3d71a7d5d0a69f1aee36dae103"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.25.2/log4j-slf4j2-impl-2.25.2.jar",
+        "sha256": "faffe8c867d59f813fb4bd1edf5354bfe86125811a7c9b305e5d225da8e7ea54"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.25.2/log4j-slf4j2-impl-2.25.2.jar.sha256",
+        "sha256": "4ba12ceebe5b293fcd451c5f1da6298ed1cf25bda6f5e2a41266c53dafedb3c4"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.26.0/log4j-slf4j2-impl-2.26.0.jar",
+        "sha256": "cfc1bddbd39e684b698ae968291d8a3b3a55ee0ec2ef3d3ea5c2336a9e151598"
+      },
+      {
+        "path": "libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.26.0/log4j-slf4j2-impl-2.26.0.jar.sha256",
+        "sha256": "b58a2919d165190b59226b7a1e6574f00bf09443e970dbde12db5cd87b0646c1"
+      },
+      {
+        "path": "libraries/org/jcraft/jorbis/0.0.17/jorbis-0.0.17.jar",
+        "sha256": "e067f29a3701426b67ed973036949c6e58ca5bb53eef7240b2e71e286d252a9e"
+      },
+      {
+        "path": "libraries/org/jcraft/jorbis/0.0.17/jorbis-0.0.17.jar.sha256",
+        "sha256": "cbf6bfdbada351dd417f66c3ff62a4ef6a87dd408a4721d8f1b2d383312ea42c"
+      },
+      {
+        "path": "libraries/org/joml/joml/1.10.8/joml-1.10.8.jar",
+        "sha256": "bf19510145178df82cd3bd37edd514c13f411531ec5545299fd3abcbc98fe7c2"
+      },
+      {
+        "path": "libraries/org/joml/joml/1.10.8/joml-1.10.8.jar.sha256",
+        "sha256": "8e5f407c1ae284c8f51318478d8f8bb1e59a5c6b14f2daf21a3c115e75aabcd5"
+      },
+      {
+        "path": "libraries/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar",
+        "sha256": "1fad6e6be7557781e4d33729d49ae1cdc8fdda6fe477bb0cc68ce351eafdfbab"
+      },
+      {
+        "path": "libraries/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar.sha256",
+        "sha256": "dc3cc461a7b6a88906e3bacda84a4cdb24d9be8ab4e74ba6a917a0f726760cf1"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-freetype/3.4.1/lwjgl-freetype-3.4.1-natives-linux.jar",
+        "sha256": "b839414c52a97548e5358727494145e5b61a6fc2e76741646b3117da02751c5a"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-freetype/3.4.1/lwjgl-freetype-3.4.1-natives-linux.jar.sha256",
+        "sha256": "5485feba40b5d86238e0fa8b052c26772b51d09b7ca0dc6b7cff4b40a6fd06ad"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-freetype/3.4.1/lwjgl-freetype-3.4.1.jar",
+        "sha256": "c57a40cedf39c4f3dfe25df596c0933cecb91d323c3fc4c2ed08661d1b79d8c7"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-freetype/3.4.1/lwjgl-freetype-3.4.1.jar.sha256",
+        "sha256": "3d7d279e2c8beb3a5e7173b3f924d75304dbf9c55013bcb702cf253fdf53d9f1"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-glfw/3.4.1/lwjgl-glfw-3.4.1-natives-linux.jar",
+        "sha256": "d73bb4d13d636ac7e5af1a9ba1067320ba7b529d46a08da86e5f6e96d7f5b4cb"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-glfw/3.4.1/lwjgl-glfw-3.4.1-natives-linux.jar.sha256",
+        "sha256": "fd8748f90f1a3cd04648b6e39278e8da80d3f9247c5072240a7b3169dfd0b71e"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-glfw/3.4.1/lwjgl-glfw-3.4.1.jar",
+        "sha256": "c2d93964f0a8b2a846708c7fb1b0a095e7d79dce8ea4c543969ffef508027190"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-glfw/3.4.1/lwjgl-glfw-3.4.1.jar.sha256",
+        "sha256": "7c20f26bc3ccbb7006fd69e89eaf663fb37a11c3c7af35066573651a277a0df7"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-jemalloc/3.4.1/lwjgl-jemalloc-3.4.1-natives-linux.jar",
+        "sha256": "47beb71c1d1c2dfc90c2c044671a6f63069eb274f77ea6cbe7967f53acf827bc"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-jemalloc/3.4.1/lwjgl-jemalloc-3.4.1-natives-linux.jar.sha256",
+        "sha256": "6b8901841790ebd27692edbefe75832c6c80fc7118d2e9f9fc1bfa3bf41b90e4"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-jemalloc/3.4.1/lwjgl-jemalloc-3.4.1.jar",
+        "sha256": "184866f4dcb444666e9062f690c389d69e4a62dd7fd9e2bb13ab7bdf3d03bd1e"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-jemalloc/3.4.1/lwjgl-jemalloc-3.4.1.jar.sha256",
+        "sha256": "c37b5b7373700f8787318b559ad3d6f69f3f0d5f5c3a5d232c273f26c173361c"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-openal/3.4.1/lwjgl-openal-3.4.1-natives-linux.jar",
+        "sha256": "c3be36ffda26c46b77bfa359586424a95d7620be11427897c7a454abb16c0994"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-openal/3.4.1/lwjgl-openal-3.4.1-natives-linux.jar.sha256",
+        "sha256": "e676629bec3e08c6ad81dbc194f9689ee5a331d7b85ecf4fd65cafff53ef6dfc"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-openal/3.4.1/lwjgl-openal-3.4.1.jar",
+        "sha256": "824a68b6f22220feb45cdaf06ebd5496b96e38c50e2588fc3ea0e819f910cf28"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-openal/3.4.1/lwjgl-openal-3.4.1.jar.sha256",
+        "sha256": "6bba3bc11eb6ebdc875a402657ff2553cd2f71fbb82be5989d307bbb7e71f572"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-opengl/3.4.1/lwjgl-opengl-3.4.1-natives-linux.jar",
+        "sha256": "2eaca4892129653ca265625f640544ba10389d4d310cad036c41ef168be5c2b8"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-opengl/3.4.1/lwjgl-opengl-3.4.1-natives-linux.jar.sha256",
+        "sha256": "e26da6e9672816be4b2ceadd5687361b71f430344ef0ddbeaaa34b33c44cf9fc"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-opengl/3.4.1/lwjgl-opengl-3.4.1.jar",
+        "sha256": "a76b8fd9ff7428ae5e0f01b8f91a4e44debba87285048e965757742093418702"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-opengl/3.4.1/lwjgl-opengl-3.4.1.jar.sha256",
+        "sha256": "99cd486c14c3420ef4a9a1d6c05a5ee03d0184f09ce35c2511cb9dc85c1bc1ad"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-shaderc/3.4.1/lwjgl-shaderc-3.4.1-natives-linux.jar",
+        "sha256": "207a09044daa8bb6fed7ff8057411b22d8cc86f3e86939b03428b573e621e21c"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-shaderc/3.4.1/lwjgl-shaderc-3.4.1-natives-linux.jar.sha256",
+        "sha256": "9a31ce3f5845e00eab04557f1277fa706b26598454e7a78a8903e79fd1f111d2"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-shaderc/3.4.1/lwjgl-shaderc-3.4.1.jar",
+        "sha256": "72293c0d58aa07205f67233efed3769111e8312c73bd8e1f4c13a44ab255f27f"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-shaderc/3.4.1/lwjgl-shaderc-3.4.1.jar.sha256",
+        "sha256": "e5a4b39bda14412aeeccc0233a7bbcb0fb01a147b6f37b8193268c7fa1225ded"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-spvc/3.4.1/lwjgl-spvc-3.4.1-natives-linux.jar",
+        "sha256": "2d7a220d7ca6f12a9df2c7f86d5136d017e4268621a9c4471e32f86b5d9f2f3c"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-spvc/3.4.1/lwjgl-spvc-3.4.1-natives-linux.jar.sha256",
+        "sha256": "3a1627b8a334f48ab82cd6873df87c8f1b6e2a12b55ffdbad4e7125cddee5558"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-spvc/3.4.1/lwjgl-spvc-3.4.1.jar",
+        "sha256": "3c453700ea383d6f9ad736ed1d268d45b716d5acf27e9cc4f8c15c8fca1c421c"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-spvc/3.4.1/lwjgl-spvc-3.4.1.jar.sha256",
+        "sha256": "8eb7f884ddcdd8ad37a431138617549437b027bd9f6c7b3f858b32172748cd54"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-stb/3.4.1/lwjgl-stb-3.4.1-natives-linux.jar",
+        "sha256": "3da990015c5f504cec78f269a5aacf365a64f7d510a2908f3fd9cb749535b10a"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-stb/3.4.1/lwjgl-stb-3.4.1-natives-linux.jar.sha256",
+        "sha256": "86393ff365c6cf33bfdca175d6a5cc471cda8021726f33526bcf34548513e740"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-stb/3.4.1/lwjgl-stb-3.4.1.jar",
+        "sha256": "3d77b0a242b8a52788934356560191db910ed242ab23c521d55f030b4e867970"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-stb/3.4.1/lwjgl-stb-3.4.1.jar.sha256",
+        "sha256": "f0334d7163d7ce14d87df27f4eba886c158f8c7433418f90677700ae77b60897"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-tinyfd/3.4.1/lwjgl-tinyfd-3.4.1-natives-linux.jar",
+        "sha256": "2b92312a7f340ac6bb4f432e4f79be9ea046b3cbd93cdb3e4f12a0a4537f0d0f"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-tinyfd/3.4.1/lwjgl-tinyfd-3.4.1-natives-linux.jar.sha256",
+        "sha256": "5ccf6fc37914fb36dd96850ce678a7e763d8385d01b5b2cc9b69547809bf7cc3"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-tinyfd/3.4.1/lwjgl-tinyfd-3.4.1.jar",
+        "sha256": "3ffad01103b6cbc8c12c7156691fd87a96f063600a5ff5c9087d321c6736963a"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-tinyfd/3.4.1/lwjgl-tinyfd-3.4.1.jar.sha256",
+        "sha256": "74f9b2974f33cb0692ffddc8d0dafdb1b491ec3fd48721a09a9d69e8ac395c97"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-vma/3.4.1/lwjgl-vma-3.4.1-natives-linux.jar",
+        "sha256": "4f83a80bc03ad749aa4c9ad7d39d136753e7e862624e7e0ee4ab7b914848815f"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-vma/3.4.1/lwjgl-vma-3.4.1-natives-linux.jar.sha256",
+        "sha256": "9d67c85bee76cb15007d25845c29641830e4b997f0bfb4d7e48fcb8ca685641b"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-vma/3.4.1/lwjgl-vma-3.4.1.jar",
+        "sha256": "d6a9677b5d487c97b874c18cb9c726197e9a8773f6a1c031ea9f5950b8c0b3c2"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-vma/3.4.1/lwjgl-vma-3.4.1.jar.sha256",
+        "sha256": "596c6ead28343ba7785b1ff66fccd6abb47b030d81e168f3aba406fbc8cb3cb2"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-vulkan/3.4.1/lwjgl-vulkan-3.4.1.jar",
+        "sha256": "7f39be7c1e7b14b47d18ec5e23dd25240d2e41c090393524615d760203bf14a6"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl-vulkan/3.4.1/lwjgl-vulkan-3.4.1.jar.sha256",
+        "sha256": "01c25a5187877155b72880aa38be87801cd2611a188723dcd5f1db545632029d"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl/3.4.1/lwjgl-3.4.1-natives-linux.jar",
+        "sha256": "5dfee41aba83762229b27f969e0b567d68bc9cedda1edcaf82b91dc99fe34677"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl/3.4.1/lwjgl-3.4.1-natives-linux.jar.sha256",
+        "sha256": "9f85dde2b12f70ebbb377fd2623254de41c6282748911253cf2a8c570cd97cd5"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl/3.4.1/lwjgl-3.4.1-unsafe.jar",
+        "sha256": "28b8dd3421e11e90d4d93dd3b7c9261aeda2d67645324bee0194e175f6963de2"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl/3.4.1/lwjgl-3.4.1-unsafe.jar.sha256",
+        "sha256": "8eb12b8060080798567596371cd69c2c4406dd21a694796a7492386c68ecea09"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl/3.4.1/lwjgl-3.4.1.jar",
+        "sha256": "9b1c3a3a078c2377219ecb8a2662730b3dece07c10592cf1d12f957286037b69"
+      },
+      {
+        "path": "libraries/org/lwjgl/lwjgl/3.4.1/lwjgl-3.4.1.jar.sha256",
+        "sha256": "04d6b761787c8f43684b4380243522e81e9309757b0a135af2ff9372e1fb28d9"
+      },
+      {
+        "path": "libraries/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar",
+        "sha256": "7b751d952061954d5abfed7181c1f645d336091b679891591d63329c622eb832"
+      },
+      {
+        "path": "libraries/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar.sha256",
+        "sha256": "976732a1f15428f7edb943b73b6fa047e52c353d2788cb45c7c18b52a3b826c8"
+      },
+      {
+        "path": "metadata/version_manifest_v2.json",
+        "sha256": "845dfb7f8b28ce06bf0752b597ef2d4d65df973e4b59d8d6ff429ad2d3adde04"
+      },
+      {
+        "path": "metadata/version_manifest_v2.json.sha256",
+        "sha256": "85c3213b97706e5b1bb1ea4a60de3616ba921bf62139a16da86cd33121a0aa29"
+      },
+      {
+        "path": "versions/26.1.2/client.jar",
+        "sha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0"
+      },
+      {
+        "path": "versions/26.1.2/client.jar.sha256",
+        "sha256": "bd50b77408f59f67ad2f44245463e8152f0e3dc6993330aad7f5348b518cc94b"
+      },
+      {
+        "path": "versions/26.1.2/version.json",
+        "sha256": "739c0e0520086c1a6d3dcd3ceec4f9c209848146e8a6012503241a3ba8117775"
+      },
+      {
+        "path": "versions/26.1.2/version.json.sha256",
+        "sha256": "885f6d4c7d662a8285639993ac4d09e8ef4a5865178e6979720e606eca7e4bde"
+      },
+      {
+        "path": "versions/26.2/client.jar",
+        "sha256": "40896ee9f1e2bec3c934daac7e93d41e9e3d9c2f8ae0ca366d52ffbfd1afa290"
+      },
+      {
+        "path": "versions/26.2/client.jar.sha256",
+        "sha256": "454561570f6cc2deaf101fb88271a5fa2a36921f990bdf54e664027f2688fc67"
+      },
+      {
+        "path": "versions/26.2/version.json",
+        "sha256": "4d6b3a5a27fed3c0faab2cb4b6dee7318be310bc3c627a78951519ffefaf1d0c"
+      },
+      {
+        "path": "versions/26.2/version.json.sha256",
+        "sha256": "1e9da473129a9566cce325cab15d4220c65eff066f2dfb2672dde521d34381f1"
+      }
+    ]
+  },
+  "buildSandboxFailure": {
+    "reason": "Gradle初回起動のローカルsocketがsandboxで拒否。権限を付けた同じoffline buildで成功。",
+    "logSha256": "fc7186eeefdbfc2b3111533cf69738765f4958533abba4bcb95b10b23be06fed",
+    "successfulLogSha256": "2549f9093eaff1b533a48136a44c69bd46e7202eabacfb505e5087e1a0c1b275"
+  },
+  "regeneration": "production・context・worker・settingsDigestは不変。このQA拡張による既存出力の再生成は不要。",
+  "support": "experimental / deterministic=false / verified0を維持",
+  "passed": true
+}

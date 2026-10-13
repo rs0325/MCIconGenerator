@@ -122,3 +122,6 @@ Issue #28ではgui-deferredのexact 9版（1.21.6・1.21.7・1.21.8・1.21.9・1
 WindowsでJSON Linesの内部改行が残って描画がtimeoutになる不具合と、metadata/settings hashがCRLFに依存する不具合を修正しました。Mesaの128bit指定だけでは残るCPU最適化の量子化差を、SSE4.1指定と合わせて抑えます。以前のWindows出力と旧Docker imageのiconsは新しい出力先で再生成してください。
 
 1.20.6のlightmapも実測RGB252へ合わせました。全1,329枚を監査し、変更前から1,327枚のRGBAが変わります。可視alpha mask・パスは不変、alpha量子化差は最大1/255です。保存した通常ワールド画像とのstone/diamond/grass_block/oak_leaves/chest比較は誤差0ですが、player_headの85画素・最大76/255の差は、GUI位置に伴うテクスチャ参照の変化として再現しました。ユーザー指定のGUI 320×240・インベントリ位置(80,121)へ投影とモデル位置を合わせ、再撮影した通常ワールドとの24種類比較が成功しました。headを含む20種類は誤差0、glint付き4種類は最大1/255（基準2/255以内）です。初回FAILは修正前の記録として保持します。最終binaryの4代表版で全件・反復と3ホスト比較が成功しました。以前に許容されたGUI(32,32)の33画素差とは別の記録です。全版experimental/deterministic=false・verified版0を維持します。
+
+
+Issue #29ではgui-26.2のexact release 26.2を通常flat Worldの静的7種類・64pxで照合し、実インベントリ位置(80,121)との7比較は誤差0でした。GUI専用UiLightmapのCPU/GPU白255と実使用Sampler2 textureを確認し、production描画・照明・原点基準・contextは変更しません。全1,536 PNGと独立全件反復1,536 PNG、各ID別7 PNG、16/512pxの14 PNGを監査し、全件反復・代表一括・個別のRGBA/hashと設定が厳密一致しました。サイズ境界はPNG・終了検証で、World画質の受入ではありません。26.1.2の回帰7 PNGと独立World7比較も成功しました。26.2の画面・描画先API移動に伴う初回QA2失敗と再撮影を分けて[数値記録](../qa/validation-2026-10-13-latest-world.json)へ保存します。worker/settingsDigestは不変で再生成は不要です。全モデル・動的状態・全サイズ・他GPUへ一般化せず、全版experimental/deterministic=false・verified版0を維持します。
