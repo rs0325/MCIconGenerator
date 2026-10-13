@@ -22,7 +22,7 @@ public final class WorldInventoryAgent {
     private static Object minecraft;
     private static Path output;
     private static int stage,frames,index=-1;
-    private static boolean legacy,fixed,classic,modern,gpuImmediate,deferred,extracted;
+    private static boolean legacy,fixed,classic,modern,gpuImmediate,deferred,extracted,latest;
     private static boolean screenshotPending;
     private static Object screenshot;
     private static Object guiLightTexture;
@@ -45,6 +45,7 @@ public final class WorldInventoryAgent {
         modern=config.get("version").getAsString().matches("1\\.(?:20(?:\\.[1-5])?|21(?:\\.[1-3])?)");
         gpuImmediate=config.get("version").getAsString().equals("1.21.5");
         extracted=config.get("version").getAsString().startsWith("26.");
+        latest=config.get("version").getAsString().equals("26.2");
         deferred=extracted||config.get("version").getAsString().matches("1\\.21\\.(?:[6-9]|10|11)");
         if(legacy||fixed||classic||modern||gpuImmediate||deferred){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",true);}
         final String owner=s.actualClass(MC).replace('.','/'),method=s.methodName(MC,legacy?"m_0520165":"runTick",1);
@@ -182,9 +183,10 @@ public final class WorldInventoryAgent {
         try {
             if(legacy){frameLegacy();return;}
             if(minecraft==null)minecraft=s.call(MC,"getInstance",null);
-            Object screen=s.field(MC,"screen",minecraft);
+            Object gui=latest?s.field(MC,"gui",minecraft):null;
+            Object screen=latest?s.call("net.minecraft.client.gui.Gui","screen",gui):s.field(MC,"screen",minecraft);
             if(stage==0) {
-                if((!fixed&&!classic&&s.hasMethod(MC,"isGameLoadFinished",0)&&!Boolean.TRUE.equals(s.call(MC,"isGameLoadFinished",minecraft)))||s.call(MC,"getOverlay",minecraft)!=null||!s.type("net.minecraft.client.gui.screens.TitleScreen").isInstance(screen))return;
+                if((!fixed&&!classic&&s.hasMethod(MC,"isGameLoadFinished",0)&&!Boolean.TRUE.equals(s.call(MC,"isGameLoadFinished",minecraft)))||(latest?s.call("net.minecraft.client.gui.Gui","overlay",gui):s.call(MC,"getOverlay",minecraft))!=null||!s.type("net.minecraft.client.gui.screens.TitleScreen").isInstance(screen))return;
                 if(++frames<60)return;
                 if(fixed||(classic&&s.hasMethod(MC,"createLevel",4))){createDirectWorld();return;}
                 if(config.has("frameZeroResources")) {
@@ -198,7 +200,7 @@ public final class WorldInventoryAgent {
                 }
                 if(extracted||s.hasMethod(CREATE,"openFresh","net.minecraft.client.Minecraft","java.lang.Runnable")) {
                     final Object parent=screen;
-                    s.call(CREATE,"openFresh",null,minecraft,new Runnable(){public void run(){try{s.call(MC,"setScreen",minecraft,parent);}catch(Exception e){throw new IllegalStateException(e);}}});
+                    s.call(CREATE,"openFresh",null,minecraft,new Runnable(){public void run(){try{setScreen(parent);}catch(Exception e){throw new IllegalStateException(e);}}});
                 } else s.call(CREATE,"openFresh",null,minecraft,screen);
                 stage=1;frames=0;return;
             }
@@ -221,12 +223,12 @@ public final class WorldInventoryAgent {
             }
             Object player=s.field(MC,"player",minecraft),level=s.field(MC,"level",minecraft);
             if(stage==2) {
-                if(player==null||level==null||screen!=null||s.call(MC,"getOverlay",minecraft)!=null)return;
+                if(player==null||level==null||screen!=null||(latest?s.call("net.minecraft.client.gui.Gui","overlay",gui):s.call(MC,"getOverlay",minecraft))!=null)return;
                 if(++frames<60)return;
                 Object mouse=s.field(MC,"mouseHandler",minecraft);
                 s.setField("net.minecraft.client.MouseHandler","xpos",mouse,0.0);
                 s.setField("net.minecraft.client.MouseHandler","ypos",mouse,0.0);
-                s.call(MC,"setScreen",minecraft,s.construct("net.minecraft.client.gui.screens.inventory.InventoryScreen",player));
+                setScreen(s.construct("net.minecraft.client.gui.screens.inventory.InventoryScreen",player));
                 stage=3;frames=0;return;
             }
             if(stage!=3)return;
@@ -235,7 +237,7 @@ public final class WorldInventoryAgent {
             if(gpuImmediate||deferred) {
                 if(!screenshotPending) {
                     screenshotPending=true;
-                    s.call("net.minecraft.client.Screenshot","takeScreenshot",null,s.call(MC,"getMainRenderTarget",minecraft),new java.util.function.Consumer<Object>() {public void accept(Object image){screenshot=image;}});
+                    s.call("net.minecraft.client.Screenshot","takeScreenshot",null,mainRenderTarget(),new java.util.function.Consumer<Object>() {public void accept(Object image){screenshot=image;}});
                     return;
                 }
                 if(screenshot==null)return;
@@ -271,7 +273,7 @@ public final class WorldInventoryAgent {
                 finally{s.call("com.mojang.blaze3d.platform.NativeImage","close",lightImage);}
                 report.addProperty("lightmapProbe","gpu-target");
             }
-            Object target=s.call(MC,"getMainRenderTarget",minecraft);
+            Object target=mainRenderTarget();
             Object image=gpuImmediate||deferred?screenshot:s.hasMethod("net.minecraft.client.Screenshot","takeScreenshot",3)?s.call("net.minecraft.client.Screenshot","takeScreenshot",null,1280,960,target):s.call("net.minecraft.client.Screenshot","takeScreenshot",null,target);
             Path path=output.resolve(id.replace(':','_')+"-screen.png");
             try{s.call("com.mojang.blaze3d.platform.NativeImage","writeToFile",image,path);}finally{s.call("com.mojang.blaze3d.platform.NativeImage","close",image);}
@@ -414,6 +416,13 @@ public final class WorldInventoryAgent {
         else ((java.util.concurrent.Executor)server).execute(new Runnable() {public void run() {
             try{update.call();}catch(Exception e){throw new IllegalStateException("server側のスロットを更新できません",e);}
         }});
+    }
+    private static Object mainRenderTarget() throws Exception {
+        return latest?s.call("net.minecraft.client.renderer.GameRenderer","mainRenderTarget",s.field(MC,"gameRenderer",minecraft)):s.call(MC,"getMainRenderTarget",minecraft);
+    }
+    private static void setScreen(Object screen) throws Exception {
+        if(latest)s.call("net.minecraft.client.gui.Gui","setScreen",s.field(MC,"gui",minecraft),screen);
+        else s.call(MC,"setScreen",minecraft,screen);
     }
     public static void observeGui(Object stack) {
         if(stage!=3||index<0)return;

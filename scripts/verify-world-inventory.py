@@ -6,7 +6,7 @@ from pathlib import Path
 repo=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser()
 p.add_argument('--out',type=Path,required=True)
-p.add_argument('--version',choices=['1.13','1.13.1','1.13.2','1.14','1.14.1','1.14.2','1.14.3','1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','1.16.3','1.16.4','1.16.5','1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4','1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.20.6','1.21','1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2'],default='1.21.4')
+p.add_argument('--version',choices=['1.13','1.13.1','1.13.2','1.14','1.14.1','1.14.2','1.14.3','1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','1.16.3','1.16.4','1.16.5','1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4','1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.20.6','1.21','1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2','26.2'],default='1.21.4')
 p.add_argument('--cache',type=Path,default=repo/'.local/cache')
 p.add_argument('--compare',type=Path,required=True,help='指定版の64px出力を含むディレクトリ')
 p.add_argument('--ids',nargs='+',default=['stone','diamond','chest','ender_chest','white_bed','white_banner','shield','player_head','dragon_head','white_shulker_box','glass','white_stained_glass','ice','grass_block','oak_leaves','potion','creeper_spawn_egg','leather_chestplate'])
@@ -20,8 +20,8 @@ fixed=a.version in ['1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','
 classic=a.version in ['1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4']
 modern=a.version in ['1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.21','1.21.1','1.21.2','1.21.3']
 gpu_immediate=a.version=='1.21.5'
-deferred=a.version in ['1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2']
-if (legacy or fixed or classic or modern or gpu_immediate or deferred) and (a.frame_zero or a.fixed_glint):p.error('legacy/gui-fixed/gui-classic/gui-1.21.4/gui-1.21.5系の撮影は通常の静的アイテムに限定します')
+deferred=a.version in ['1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2','26.2']
+if (legacy or fixed or classic or modern or gpu_immediate or deferred) and (a.frame_zero or a.fixed_glint):p.error('この版の撮影は通常の静的アイテムに限定します')
 out=a.out.resolve();out.mkdir(parents=True,exist_ok=False)
 cache=a.cache.resolve();version=cache/'versions'/a.version;meta=json.loads((version/'version.json').read_text())
 ids=['minecraft:'+i if ':' not in i else i for i in a.ids]

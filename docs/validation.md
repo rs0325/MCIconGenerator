@@ -668,3 +668,27 @@ python3 scripts/verify-world-inventory.py --version 26.1.2 --ids stone diamond g
 python3 scripts/verify-matrix.py --versions 1.21.6 1.21.7 1.21.8 1.21.9 1.21.10 1.21.11 26.1 26.1.1 26.1.2 --offline --out .local/deferred-repeat --compare .local/deferred-all --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-worker-lifecycle.py --versions 1.21.6 1.21.7 1.21.8 1.21.9 1.21.10 1.21.11 26.1 26.1.1 26.1.2 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/deferred-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
+
+
+## #29: gui-26.2の通常World照明
+
+起点は#28のmerge commit 82d529f023c1e44ad8eb2cbbe57fbdf3af483cbe、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。exact release 26.2のstone・diamond・grass_block・oak_leaves・chest・player_head・glassを、Linux amd64・固定Mesa llvmpipe Dockerで検証しました。通常flat World、保存seed0・minecraft:flat・SURVIVAL、window1280×960、GUI scale4、slot9の実座標(80,121)、count1・既定stack・overlayなし・64pxです。最終7比較は最大channel誤差0、許容2/255超過0、輪郭例外0でした。level.datとdata/minecraft/world_gen_settings.datを読んで保存条件を確認し、両hashを保持します。
+
+実使用GUIはUiLightmapの1×1白255を使用し、CPU画像とGPU texelが一致しました。通常Level照明は別に観測し、GUIのatlas描画中にSampler2へ指定されたtextureと、宣言されたUiLightmapのtexture IDが一致することを確認します。productionの既存原点PNGが実インベントリ位置(80,121)へ一致したため、描画・照明・固定context・PNG復元・比較許容値を変更しません。公開API、manifest/context、worker/settingsDigestも不変で、このQA拡張による既存出力の再生成は不要です。
+
+独立QAはproduction renderer・canonical hook・PngOutputを含まず、通常フレーム末尾の画面操作とバニラの非同期Screenshotを使います。ItemModelResolverの対象stackとslot9のstackを同一性で照合し、そのstateのGuiItemAtlas描画中にSampler2を観測します。resolver/atlasの名前とdescriptorを厳密に限定し、撮影callbackまでスロットを維持してGL pack状態を復帰します。ASMによる観測があるため完全な無計装clientではなく、全draw内部状態の保証ではありません。
+
+初回QAはMinecraft.screenのNoSuchFieldExceptionで終了しました。26.2の画面・overlay・setScreenはGuiへ移動しているため、その版だけ取得・操作経路を変更しました。次のQAはMinecraft.getMainRenderTargetのNoSuchMethodExceptionで終了し、GameRenderer.mainRenderTargetへ対応しました。private field取得での中間7比較は誤差0でしたが、公式public accessorへ変更して最終Worldを再撮影し、現在sourceの成功と区別します。初回2失敗のlog・report・source/agent hashを保持し、描画PNGの失敗や成功へ書き換えません。Gradleの初回起動はsandboxのローカルsocket制約で失敗し、権限を付けた同じoffline buildで成功しました。
+
+全1,536 PNGと独立全件反復1,536 PNGを監査し、登録母集団・除外理由・ID/パス重複・CRC/hash・RGBA8・透過・空画像を確認しました。全件反復、代表一括7枚、各IDを別CLI・ゲームプロセスで生成した7枚は、decoded RGBA・PNG hash・パス・source・settings/digest・context・renderer・catalogへ厳密一致しました。全IDの個別生成ではありません。16/512pxの14枚はPNG監査とworker終了0・強制終了なしの確認で、World画質受入ではありません。26.1.2の回帰7枚は#28のworker出力へ厳密一致し、変更後QAの独立World7比較も誤差0でした。JUnit64件・build/installDistが成功しています。
+
+[数値・入力/worker/helper hash・初回失敗](../qa/validation-2026-10-13-latest-world.json)を公開し、JAR・assets・World・画像・個人パスはprivateに保持します。全モデル・動的状態・全サイズ・他GPUへ一般化せず、experimental/deterministic=false・verified版0を維持します。
+
+再実行例です。各ID別比較はIDを1つずつ指定した別CLI起動で行い、サイズ検証のcacheを他ジョブから分離してください。
+
+```sh
+python3 scripts/verify-matrix.py --versions 26.2 --offline --out .local/latest-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-world-inventory.py --version 26.2 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/latest-all --out .local/latest-world/26.2 --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-matrix.py --versions 26.2 --offline --out .local/latest-repeat --compare .local/latest-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-worker-lifecycle.py --versions 26.2 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/latest-sizes --docker-image mcicon-render:0.1.0-preview.1
+```
