@@ -14,6 +14,14 @@ public final class DeferredRenderer extends GpuImmediateRenderer {
     public DeferredRenderer(Symbols symbols,Object minecraft) throws Exception {
         super(symbols,minecraft);
         extracted=RenderAgent.config.get("version").getAsString().startsWith("26.");
+        if(!extracted) {
+            Object renderer=s.field("net.minecraft.client.Minecraft","gameRenderer",minecraft);
+            Object light=s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",renderer);
+            Object texture=s.call("com.mojang.blaze3d.textures.GpuTextureView","texture",s.call("net.minecraft.client.renderer.LightTexture","getTextureView",light));
+            Object gpu=s.call("com.mojang.blaze3d.systems.RenderSystem","getDevice",null);
+            Object encoder=s.call("com.mojang.blaze3d.systems.GpuDevice","createCommandEncoder",gpu);
+            s.call("com.mojang.blaze3d.systems.CommandEncoder","clearColorTexture",encoder,texture,0xfffcfcfc);
+        }
         if(extracted) {
             Object lookup=s.call("net.minecraft.data.registries.VanillaRegistries","createLookup",null);
             Object initializers=s.field("net.minecraft.core.registries.BuiltInRegistries","DATA_COMPONENT_INITIALIZERS",null);

@@ -6,7 +6,7 @@ from pathlib import Path
 repo=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser()
 p.add_argument('--out',type=Path,required=True)
-p.add_argument('--version',choices=['1.13','1.13.1','1.13.2','1.14','1.14.1','1.14.2','1.14.3','1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','1.16.3','1.16.4','1.16.5','1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4','1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.20.6','1.21','1.21.1','1.21.2','1.21.3','1.21.4','1.21.5'],default='1.21.4')
+p.add_argument('--version',choices=['1.13','1.13.1','1.13.2','1.14','1.14.1','1.14.2','1.14.3','1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','1.16.3','1.16.4','1.16.5','1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4','1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.20.6','1.21','1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2'],default='1.21.4')
 p.add_argument('--cache',type=Path,default=repo/'.local/cache')
 p.add_argument('--compare',type=Path,required=True,help='指定版の64px出力を含むディレクトリ')
 p.add_argument('--ids',nargs='+',default=['stone','diamond','chest','ender_chest','white_bed','white_banner','shield','player_head','dragon_head','white_shulker_box','glass','white_stained_glass','ice','grass_block','oak_leaves','potion','creeper_spawn_egg','leather_chestplate'])
@@ -20,7 +20,8 @@ fixed=a.version in ['1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','
 classic=a.version in ['1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4']
 modern=a.version in ['1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.21','1.21.1','1.21.2','1.21.3']
 gpu_immediate=a.version=='1.21.5'
-if (legacy or fixed or classic or modern or gpu_immediate) and (a.frame_zero or a.fixed_glint):p.error('legacy/gui-fixed/gui-classic/gui-1.21.4/gui-1.21.5系の撮影は通常の静的アイテムに限定します')
+deferred=a.version in ['1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2']
+if (legacy or fixed or classic or modern or gpu_immediate or deferred) and (a.frame_zero or a.fixed_glint):p.error('legacy/gui-fixed/gui-classic/gui-1.21.4/gui-1.21.5系の撮影は通常の静的アイテムに限定します')
 out=a.out.resolve();out.mkdir(parents=True,exist_ok=False)
 cache=a.cache.resolve();version=cache/'versions'/a.version;meta=json.loads((version/'version.json').read_text())
 ids=['minecraft:'+i if ':' not in i else i for i in a.ids]
@@ -43,11 +44,12 @@ with zipfile.ZipFile(worker) as source,zipfile.ZipFile(agent,'w',compression=zip
  for f in classes.rglob('*.class'):target.write(f,f.relative_to(classes).as_posix())
  target.writestr('META-INF/MANIFEST.MF','Manifest-Version: 1.0\r\nPremain-Class: io.github.rs0325.mcicon.qa.WorldInventoryAgent\r\n\r\n')
 with zipfile.ZipFile(agent) as archive:
- excluded=['RenderAgent','CanonicalTransformer','CanonicalContext','ResourceTransformer','ModernRenderer','ClassicRenderer','FixedRenderer','LegacyRenderer','PngOutput','Bridge']
+ excluded=['RenderAgent','CanonicalTransformer','CanonicalContext','ResourceTransformer','ModernRenderer','ClassicRenderer','FixedRenderer','LegacyRenderer','DeferredRenderer','GpuImmediateRenderer','LatestRenderer','PngOutput','Bridge']
  assert not any('io/github/rs0325/mcicon/worker/'+name+'.class' in archive.namelist() for name in excluded)
 game=out/'game';game.mkdir()
 (game/'options.txt').write_text('soundCategory_master:0.0\nguiScale:4\nmaxFps:30\nfullscreen:false\nonboardAccessibility:false\nrenderDistance:2\nsimulationDistance:5\nclouds:false\n')
-config={'version':a.version,'mappings':'/mcicon/cache/versions/'+a.version+'/mappings.txt','output':'/mcicon/qa','ids':ids}
+config={'version':a.version,'output':'/mcicon/qa','ids':ids}
+if 'client_mappings' in meta['downloads']:config['mappings']='/mcicon/cache/versions/'+a.version+'/mappings.txt'
 if a.fixed_glint:config['fixedGlintMillis']=1000
 animation_inputs=[]
 if a.frame_zero:
@@ -83,14 +85,16 @@ image=subprocess.run(['docker','--context',a.docker_context,'image','inspect',a.
 active=subprocess.run(['docker','--context',a.docker_context,'ps','--format','{{.Names}}'],capture_output=True,text=True,check=True).stdout.splitlines()
 if sum(n.startswith(('mcicon-worker-','mcicon-world-qa-')) for n in active)>=2:raise RuntimeError('native clientの同時実行は2つまでです')
 container='mcicon-world-qa-'+str(uuid.uuid4())
-java='/opt/java/java8/bin/java' if legacy or fixed else '/opt/java/java17/bin/java' if classic or meta['javaVersion']['majorVersion']==17 else '/opt/java/java21/bin/java'
-command=['docker','--context',a.docker_context,'run','--rm','--name',container,'--platform','linux/amd64','--network','none','--memory','3g','--cpus','4','-v',str(cache)+':/mcicon/cache:ro','-v',str(out)+':/mcicon/qa',image,java,'-Xmx1G' if classic or modern or gpu_immediate else '-Xmx2G','-Djava.awt.headless=true','-Duser.timezone=UTC','-Djava.library.path=/mcicon/cache/versions/'+a.version+'/natives-linux','-javaagent:/mcicon/qa/world-reference.jar=/mcicon/qa/agent.json','-cp',':'.join(['/mcicon/cache/versions/'+a.version+'/client.jar']+libraries),meta['mainClass'],'--username','MCIconGenerator','--version',a.version,'--gameDir','/mcicon/qa/game','--assetsDir','/mcicon/cache/assets','--assetIndex',meta['assetIndex']['id'],'--accessToken','0','--uuid','00000000000000000000000000000000','--userType','legacy','--width','1280','--height','960','--disableMultiplayer']
+java='/opt/java/java8/bin/java' if legacy or fixed else '/opt/java/java17/bin/java' if classic or meta['javaVersion']['majorVersion']==17 else '/opt/java/openjdk/bin/java' if meta['javaVersion']['majorVersion']==25 else '/opt/java/java21/bin/java'
+command=['docker','--context',a.docker_context,'run','--rm','--name',container,'--platform','linux/amd64','--network','none','--memory','3g','--cpus','4','-v',str(cache)+':/mcicon/cache:ro','-v',str(out)+':/mcicon/qa',image,java,'-Xmx1G' if classic or modern or gpu_immediate or deferred else '-Xmx2G','-Djava.awt.headless=true','-Duser.timezone=UTC','-Djava.library.path=/mcicon/cache/versions/'+a.version+'/natives-linux','-javaagent:/mcicon/qa/world-reference.jar=/mcicon/qa/agent.json','-cp',':'.join(['/mcicon/cache/versions/'+a.version+'/client.jar']+libraries),meta['mainClass'],'--username','MCIconGenerator','--version',a.version,'--gameDir','/mcicon/qa/game','--assetsDir','/mcicon/cache/assets','--assetIndex',meta['assetIndex']['id'],'--accessToken','0','--uuid','00000000000000000000000000000000','--userType','legacy','--width','1280','--height','960','--disableMultiplayer']
 report={'scope':'通常のローカルflatワールドのInventoryScreen。QA callbackはMinecraft.runTick末尾のみで、ゲーム状態・画面操作とnative Screenshotを使用する。描画メソッド、production初期化、canonical hook、透過復元を共有しない。完全な無計装clientではない。','version':a.version,'sourceSha256':source_hash,'baselineAgentSha256':baseline['settings']['agentSha256'],'qaAgentSha256':sha(agent),'imageId':image,'harnessSourcesSha256':{str(f.relative_to(repo)):sha(f) for f in [Path(__file__).resolve(),repo/'scripts/qa/WorldInventoryAgent.java']},'windowPixels':[1280,960],'guiScale':4,'worldPreset':'flat','seed':'0','slot':9,'excludedProductionClasses':excluded,'maxAllowedChannelError':2,'baselineFullBrightRgb':baseline['context'].get('lightmapFullBrightRgb',[255,255,255]),'baselineLightmapSource':'manifest' if 'lightmapFullBrightRgb' in baseline['context'] else 'client-constructor-default-white','entries':[],'passed':False}
-report['resourceLimits']={'heapMiB':1024 if classic or modern or gpu_immediate else 2048,'containerMiB':3072}
+report['resourceLimits']={'heapMiB':1024 if classic or modern or gpu_immediate or deferred else 2048,'containerMiB':3072}
 if legacy or fixed or classic or modern:
  report['scope']='通常のローカルflatワールドのインベントリ。通常フレーム末尾で画面操作・native Screenshot・CPU/GPU照明値を読み取る。対象スロットのGUIモデル描画直前にlightmap texture unitの有効状態だけを観測し、元のactive textureを復帰する。production描画・固定化・透過復元を共有しない。完全な無計装clientではない。'
- report['baselineFullBrightRgb']=baseline['context'].get('lightmapFullBrightRgb',[255,255,255] if classic or modern or gpu_immediate else None);report['baselineLightmapSource']='manifest' if 'lightmapFullBrightRgb' in baseline['context'] else 'client-constructor-default-white' if classic or modern or gpu_immediate else '対象スロットのモデル描画入口でlightmap texture unit無効を実測する。GUI内部の全描画状態を保証する値ではない。'
+ report['baselineFullBrightRgb']=baseline['context'].get('lightmapFullBrightRgb',[255,255,255] if classic or modern or gpu_immediate or deferred else None);report['baselineLightmapSource']='manifest' if 'lightmapFullBrightRgb' in baseline['context'] else 'client-constructor-default-white' if classic or modern or gpu_immediate or deferred else '対象スロットのモデル描画入口でlightmap texture unit無効を実測する。GUI内部の全描画状態を保証する値ではない。'
  if classic or modern:report['scope']='通常のローカルflatワールドのインベントリ。通常フレーム末尾で画面操作・native Screenshotを行う。CPU画像がある版はCPU/GPU texel、GPU target版はScreenshot/GPU texelを読み取る。対象スロットのモデル描画入口ではRenderSystemのshader texture番号2を読み、固定機能のGL_TEXTURE_2D有効状態は使用しない。production描画・固定化・透過復元を共有しない。完全な無計装clientではない。'
+if deferred:
+ report['scope']='通常flat Worldを非同期Screenshotで撮影する。Inventory slot 9のstackとItemModelResolverのstateを同一性で照合し、そのstateのatlas描画中にSampler2のGpuTextureViewを観測する。Levelと実使用GUIのGPU texelを分け、UiLightmap版ではGUI CPU画像も読む。production描画・照明初期化・固定化・透過復元は共有しない。完全な無計装clientではない。'
 if gpu_immediate:
  report['scope']='通常flat Worldのインベントリをバニラの非同期Screenshotで撮影する。対象スロットのItemStackRenderState.render入口と後続GlRenderPass.bindSamplerのSampler2を読み、LightTextureのGPU textureをGLで読み戻す。CPU画像は存在しない。production描画・照明初期化・固定化・透過復元を共有しない。完全な無計装clientではない。'
 save=lambda:(out/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
@@ -151,9 +155,17 @@ for c in capture['captures'][1:]:
   entry['guiLightmapShaderTexture']=c['guiLightmapShaderTexture'];entry['lightmapTextureId']=c['lightmapTextureId'];entry['guiLightmapTextureUnit']=c['guiLightmapTextureUnit']
   entry['guiLightmapAtEntry']=c['guiLightmapAtEntry']
   entry['lightingCompatible']=light==report['baselineFullBrightRgb'] and c['guiLightmapShaderTexture']==c['lightmapTextureId']
- lighting=entry['lightingCompatible'] if legacy or fixed or classic or modern or gpu_immediate else entry['lightmapMatches']
+ if deferred:
+  entry['levelFullBrightGpuRgba']=c['levelFullBrightGpuRgba'];entry['fullBrightGpuRgba']=c['fullBrightGpuRgba']
+  entry['guiLightmapSource']=c['guiLightmapSource'];entry['guiLightmapTextureId']=c['guiLightmapTextureId'];entry['declaredGuiLightmapTextureId']=c['declaredGuiLightmapTextureId']
+  entry['guiLightmapSize']=[c['guiLightmapWidth'],c['guiLightmapHeight']];entry['lightmapCpuAvailable']=c['lightmapCpuAvailable']
+  entry['guiStateMatchedInventoryStack']=c['guiStateMatchedInventoryStack']
+  if 'fullBrightCpuRgba' in c:entry['fullBrightCpuRgba']=c['fullBrightCpuRgba']
+  entry['lightingCompatible']=c['fullBrightGpuRgba'][:3]==report['baselineFullBrightRgb'] and c['guiStateMatchedInventoryStack'] and c['guiLightmapTextureId']==c['declaredGuiLightmapTextureId'] and (not c['lightmapCpuAvailable'] or c['fullBrightCpuRgba']==c['fullBrightGpuRgba'])
+  entry['lightmapMatches']=None
+ lighting=entry['lightingCompatible'] if legacy or fixed or classic or modern or gpu_immediate or deferred else entry['lightmapMatches']
  report['entries'].append(entry);print(c['id'],'PASS' if entry['comparisonPassed'] and entry['count']==1 and lighting and opaque else 'FAIL',metrics['maxChannelError'],flush=True)
 report['officialInputsModified']=sha(client)!=source_hash
 complete=run.returncode==0 and capture.get('completed',False) and len(report['entries'])==len(ids) and not report['officialInputsModified']
-report['passed']=complete and all(e['comparisonPassed'] and e['count']==1 and e['opaqueReference'] and (e['lightingCompatible'] if legacy or fixed or classic or modern or gpu_immediate else e['lightmapMatches']) for e in report['entries']) and (not a.frame_zero or report['frameZeroPack']['sourcesConfirmed']) and (not a.fixed_glint or capture.get('glintClockCallSites')==1 and capture.get('fixedGlintMillis')==1000)
+report['passed']=complete and all(e['comparisonPassed'] and e['count']==1 and e['opaqueReference'] and (e['lightingCompatible'] if legacy or fixed or classic or modern or gpu_immediate or deferred else e['lightmapMatches']) for e in report['entries']) and (not a.frame_zero or report['frameZeroPack']['sourcesConfirmed']) and (not a.fixed_glint or capture.get('glintClockCallSites')==1 and capture.get('fixedGlintMillis')==1000)
 save();raise SystemExit(not report['passed'])
