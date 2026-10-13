@@ -591,3 +591,29 @@ python3 scripts/verify-matrix.py --versions 1.17 1.17.1 1.18 1.18.1 1.18.2 1.19 
 python3 scripts/verify-world-inventory.py --version 1.19.4 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/classic-all --out .local/classic-world/1.19.4 --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-worker-lifecycle.py --versions 1.17 1.17.1 1.18 1.18.1 1.18.2 1.19 1.19.1 1.19.2 1.19.3 1.19.4 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/classic-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
+
+## #26: gui-1.21.4の通常World照明・インベントリ基準
+
+起点は#25のmerge commit d31ee558f1140d98865c24bfe18e7c10ddc5be68、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。対象exact releaseは1.20・1.20.1・1.20.2・1.20.3・1.20.4・1.20.5・1.21・1.21.1・1.21.2・1.21.3です。Linux amd64・固定Mesa llvmpipe Dockerで、通常flat Worldのstone・diamond・grass_block・oak_leaves・chest・player_head・glassを64pxで照合しました。window 1280×960、GUI scale4、slot9の実座標(80,121)、count1・既定stack・overlayなし、保存Worldのseed0・minecraft:flat・SURVIVALを確認しました。70比較は最大channel誤差0、許容2/255超過0、輪郭例外0です。
+
+初回の代表1.20・1.20.5・1.21.3では、worldなしproductionのlightmap白255とWorldのfull-bright252が異なり、diamond864画素・glass145画素で最大3/255のFAILでした。1.20・1.20.5のplayer_headは85画素で最大76/255です。照明だけの修正で他6種類は誤差0になり、ヘッド差だけが残りました。通常インベントリの投影・スロット位置へ合わせた試作は代表3版21比較が誤差0となり、ユーザーが#26の10版もGUI 320×240・(80,121)基準とすることを承認しました。許容値を広げず、projection/viewportによる切出しで修正し、PNG保存後のRGB補正は行いません。
+
+gui-1.21.4の12版へ描画前RGB252初期化を適用します。今回対象のCPU lightPixels 8版はNativeImageを初期化・uploadし、1.21.2・1.21.3のGPU targetは既存1.21.4と同じ0.99のclearを用います。WorldのCPU画像がある8版ではCPU/GPU texel、GPU targetの2版ではScreenshot/GPU texelのRGBA(252,252,252,255)を照合しました。GPU targetに存在しないCPU値は作成しません。描画入口のshader texture番号2を読み、内部buffer描画全体の状態は保証しません。QA agentはproduction renderer・canonical hook・PngOutputを含まず、照明や参照画像をproduction値で上書きしません。観測のためのASMを使用するので完全な無計装clientではありません。
+
+1.20・1.20.1のQAにはisGameLoadFinishedが存在せず、初回1.20は撮影前にnative exit1となりました。capture・log・実行時sourceを保全し、APIが存在する版だけ呼び、TitleScreen/overlayで初期化完了を待つよう修正しました。1.20〜1.20.4はJava17、1.20.5以降はJava21を使用します。setAllowCheats/setAllowCommandsとGuiGraphicsのrenderItem7引数内のItemRenderer8/11引数をmappings/bytecodeに照合しました。QAのheap1GiB・container3GiBでWorld試験を単独実行し、production workerのheapは変更しません。初回API失敗・修正前画像FAIL・照明のみ試作・座標試作・最終native受入を区別します。
+
+64px全件13,125 PNG（1.20は1,254、1.20.1は1,254、1.20.2は1,254、1.20.3は1,311、1.20.4は1,311、1.20.5は1,329、1.21は1,332、1.21.1は1,332、1.21.2は1,374、1.21.3は1,374）の登録集合・hash/CRC・RGBA8/sRGB・透過・空画像監査が成功しました。独立した選択一括70枚と各ID別CLI・ゲームプロセス70枚は、全件基準とdecoded RGBA・PNG hash・パス・source・settings/digest・context・renderer・catalogが厳密一致しました。全IDの単品生成、全件の独立反復ではありません。16/512px・20ジョブ140枚は専用cacheでPNG監査とworker exit0・強制終了なしを確認し、World画像比較とは区別します。
+
+1.19.4・既存基準1.20.6・原点基準1.21.4の回帰21 PNGは旧workerとRGBA・PNG hash・パス、agent以外のsettings、context・renderer・catalogが一致し、World21比較は誤差0でした。回帰後にPythonのscope説明1行だけをCPU/GPUとScreenshot/GPUに区別しました。比較・native実行・Java helperは不変で、実行時sourceを各試験フォルダへ保存しhashを照合しています。
+
+修正前後の代表3版21 PNGは色が変わり、alphaと透明領域は不変でした。全モデルのalpha不変の保証ではありません。入力/sidecar 776ファイル×3cache、回帰用732ファイルのhashは不変です。新しい10版のlightmapとGUI context、worker hash/settings digestが変わるので、照明変更のない版も以前のiconsは新しい出力先へ再生成してください。
+
+JUnit64件、CLI installDist、Java8対象QA compile、Python構文と差分確認が成功しました。[全版の数値・入力/worker/helper hash・初回失敗](../qa/validation-2026-10-13-modern-world.json)を保存します。JAR・assets・World・画像・個人パスは公開記録に含めません。全モデル・動的状態・全サイズ・他GPUのWorld受入へ一般化せず、experimental/deterministic=false・verified版0を維持します。
+
+既存cacheで対象版を準備した後、再現例は次のとおりです。Worldは単独client、終了検証は専用cacheで実行します。各IDの個別比較には別CLI呼び出しを使い、audit-export.pyへ全件manifestを指定します。
+
+```sh
+python3 scripts/verify-matrix.py --versions 1.20 1.20.1 1.20.2 1.20.3 1.20.4 1.20.5 1.21 1.21.1 1.21.2 1.21.3 --offline --out .local/modern-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-world-inventory.py --version 1.21.3 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/modern-all --out .local/modern-world/1.21.3 --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-worker-lifecycle.py --versions 1.20 1.20.1 1.20.2 1.20.3 1.20.4 1.20.5 1.21 1.21.1 1.21.2 1.21.3 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/modern-sizes --docker-image mcicon-render:0.1.0-preview.1
+```

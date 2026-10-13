@@ -16,12 +16,12 @@ public class ModernRenderer implements WorkerRenderer {
         items=s.field(registries,"ITEM",null);
         blocks=s.field(registries,"BLOCK",null);
         String version=RenderAgent.config.get("version").getAsString();
-        inventoryView=version.equals("1.20.6");
-        if(version.equals("1.20.6")||version.equals("1.21.4")) {
+        inventoryView=RenderAgent.config.get("profile").getAsString().equals("gui-1.21.4")&&!version.equals("1.21.4");
+        if(RenderAgent.config.get("profile").getAsString().equals("gui-1.21.4")) {
             Object gameRenderer=s.field("net.minecraft.client.Minecraft","gameRenderer",minecraft);
             Object light=s.call("net.minecraft.client.renderer.GameRenderer","lightTexture",gameRenderer);
             // 実ワールドのfull-bright lightmapと同じ252/255へ初期化する。
-            if(version.equals("1.20.6")) {
+            if(s.hasField("net.minecraft.client.renderer.LightTexture","lightPixels")) {
                 initializeLightPixels(light);
             } else {
                 Object target=s.field("net.minecraft.client.renderer.LightTexture","target",light);

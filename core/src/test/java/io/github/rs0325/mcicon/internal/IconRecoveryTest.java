@@ -13,7 +13,7 @@ class IconRecoveryTest {
     @TempDir Path directory;
     RuntimePreparer.Prepared runtime() throws Exception {
         Path client=directory.resolve("client.jar");Files.write(client,new byte[]{1,2,3});
-        return new RuntimePreparer.Prepared(new VersionInfo("1.21.4","2024-12-03","experimental","https://example.invalid/metadata",""),Json.MAPPER.createObjectNode(),client,null,List.of(),directory,directory,21,"synthetic");
+        return new RuntimePreparer.Prepared(new VersionInfo("1.21.4","2024-12-03","experimental","https://example.invalid/metadata",""),Json.MAPPER.createObjectNode(),client,null,List.of(),directory,directory,21,"gui-1.21.4");
     }
     List<CatalogEntry> catalog(int count) {
         List<CatalogEntry> result=new ArrayList<>();
