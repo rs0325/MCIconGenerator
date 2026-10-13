@@ -6,7 +6,7 @@ from pathlib import Path
 repo=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser()
 p.add_argument('--out',type=Path,required=True)
-p.add_argument('--version',choices=['1.13','1.13.1','1.13.2','1.14','1.14.1','1.14.2','1.14.3','1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','1.16.3','1.16.4','1.16.5','1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4','1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.20.6','1.21','1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2','26.2'],default='1.21.4')
+p.add_argument('--version',choices=['1.13','1.13.1','1.13.2','1.14','1.14.1','1.14.2','1.14.3','1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','1.16.3','1.16.4','1.16.5','1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4','1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.20.6','1.21','1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2','26.2','26.3'],default='1.21.4')
 p.add_argument('--cache',type=Path,default=repo/'.local/cache')
 p.add_argument('--compare',type=Path,required=True,help='指定版の64px出力を含むディレクトリ')
 p.add_argument('--ids',nargs='+',default=['stone','diamond','chest','ender_chest','white_bed','white_banner','shield','player_head','dragon_head','white_shulker_box','glass','white_stained_glass','ice','grass_block','oak_leaves','potion','creeper_spawn_egg','leather_chestplate'])
@@ -20,7 +20,7 @@ fixed=a.version in ['1.14.4','1.15','1.15.1','1.15.2','1.16','1.16.1','1.16.2','
 classic=a.version in ['1.17','1.17.1','1.18','1.18.1','1.18.2','1.19','1.19.1','1.19.2','1.19.3','1.19.4']
 modern=a.version in ['1.20','1.20.1','1.20.2','1.20.3','1.20.4','1.20.5','1.21','1.21.1','1.21.2','1.21.3']
 gpu_immediate=a.version=='1.21.5'
-deferred=a.version in ['1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2','26.2']
+deferred=a.version in ['1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11','26.1','26.1.1','26.1.2','26.2','26.3']
 if (legacy or fixed or classic or modern or gpu_immediate or deferred) and (a.frame_zero or a.fixed_glint):p.error('この版の撮影は通常の静的アイテムに限定します')
 out=a.out.resolve();out.mkdir(parents=True,exist_ok=False)
 cache=a.cache.resolve();version=cache/'versions'/a.version;meta=json.loads((version/'version.json').read_text())
@@ -87,6 +87,7 @@ if sum(n.startswith(('mcicon-worker-','mcicon-world-qa-')) for n in active)>=2:r
 container='mcicon-world-qa-'+str(uuid.uuid4())
 java='/opt/java/java8/bin/java' if legacy or fixed else '/opt/java/java17/bin/java' if classic or meta['javaVersion']['majorVersion']==17 else '/opt/java/openjdk/bin/java' if meta['javaVersion']['majorVersion']==25 else '/opt/java/java21/bin/java'
 command=['docker','--context',a.docker_context,'run','--rm','--name',container,'--platform','linux/amd64','--network','none','--memory','3g','--cpus','4','-v',str(cache)+':/mcicon/cache:ro','-v',str(out)+':/mcicon/qa',image,java,'-Xmx1G' if classic or modern or gpu_immediate or deferred else '-Xmx2G','-Djava.awt.headless=true','-Duser.timezone=UTC','-Djava.library.path=/mcicon/cache/versions/'+a.version+'/natives-linux','-javaagent:/mcicon/qa/world-reference.jar=/mcicon/qa/agent.json','-cp',':'.join(['/mcicon/cache/versions/'+a.version+'/client.jar']+libraries),meta['mainClass'],'--username','MCIconGenerator','--version',a.version,'--gameDir','/mcicon/qa/game','--assetsDir','/mcicon/cache/assets','--assetIndex',meta['assetIndex']['id'],'--accessToken','0','--uuid','00000000000000000000000000000000','--userType','legacy','--width','1280','--height','960','--disableMultiplayer']
+if a.version=='26.3':command[command.index(image):command.index(image)]=['-e','SDL_VIDEO_FORCE_EGL=1']
 report={'scope':'通常のローカルflatワールドのInventoryScreen。QA callbackはMinecraft.runTick末尾のみで、ゲーム状態・画面操作とnative Screenshotを使用する。描画メソッド、production初期化、canonical hook、透過復元を共有しない。完全な無計装clientではない。','version':a.version,'sourceSha256':source_hash,'baselineAgentSha256':baseline['settings']['agentSha256'],'qaAgentSha256':sha(agent),'imageId':image,'harnessSourcesSha256':{str(f.relative_to(repo)):sha(f) for f in [Path(__file__).resolve(),repo/'scripts/qa/WorldInventoryAgent.java']},'windowPixels':[1280,960],'guiScale':4,'worldPreset':'flat','seed':'0','slot':9,'excludedProductionClasses':excluded,'maxAllowedChannelError':2,'baselineFullBrightRgb':baseline['context'].get('lightmapFullBrightRgb',[255,255,255]),'baselineLightmapSource':'manifest' if 'lightmapFullBrightRgb' in baseline['context'] else 'client-constructor-default-white','entries':[],'passed':False}
 report['resourceLimits']={'heapMiB':1024 if classic or modern or gpu_immediate or deferred else 2048,'containerMiB':3072}
 if legacy or fixed or classic or modern:
@@ -94,7 +95,7 @@ if legacy or fixed or classic or modern:
  report['baselineFullBrightRgb']=baseline['context'].get('lightmapFullBrightRgb',[255,255,255] if classic or modern or gpu_immediate or deferred else None);report['baselineLightmapSource']='manifest' if 'lightmapFullBrightRgb' in baseline['context'] else 'client-constructor-default-white' if classic or modern or gpu_immediate or deferred else '対象スロットのモデル描画入口でlightmap texture unit無効を実測する。GUI内部の全描画状態を保証する値ではない。'
  if classic or modern:report['scope']='通常のローカルflatワールドのインベントリ。通常フレーム末尾で画面操作・native Screenshotを行う。CPU画像がある版はCPU/GPU texel、GPU target版はScreenshot/GPU texelを読み取る。対象スロットのモデル描画入口ではRenderSystemのshader texture番号2を読み、固定機能のGL_TEXTURE_2D有効状態は使用しない。production描画・固定化・透過復元を共有しない。完全な無計装clientではない。'
 if deferred:
- report['scope']='通常flat Worldを非同期Screenshotで撮影する。Inventory slot 9のstackとItemModelResolverのstateを同一性で照合し、そのstateのatlas描画中にSampler2のGpuTextureViewを観測する。Levelと実使用GUIのGPU texelを分け、UiLightmap版ではGUI CPU画像も読む。production描画・照明初期化・固定化・透過復元は共有しない。完全な無計装clientではない。'
+ report['scope']='通常flat Worldを非同期Screenshotで撮影する。Inventory slot 9のstackとItemModelResolverのstateを同一性で照合し、そのstateのatlas描画中にSampler2のGpuTextureViewを観測する（26.3はFrontendRenderPass.setUniform）。Levelと実使用GUIのGPU texelを分け、UiLightmap版ではGUI CPU画像も読む。production描画・照明初期化・固定化・透過復元は共有しない。完全な無計装clientではない。'
 if gpu_immediate:
  report['scope']='通常flat Worldのインベントリをバニラの非同期Screenshotで撮影する。対象スロットのItemStackRenderState.render入口と後続GlRenderPass.bindSamplerのSampler2を読み、LightTextureのGPU textureをGLで読み戻す。CPU画像は存在しない。production描画・照明初期化・固定化・透過復元を共有しない。完全な無計装clientではない。'
 save=lambda:(out/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')

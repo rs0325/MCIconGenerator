@@ -692,3 +692,24 @@ python3 scripts/verify-world-inventory.py --version 26.2 --ids stone diamond gra
 python3 scripts/verify-matrix.py --versions 26.2 --offline --out .local/latest-repeat --compare .local/latest-all --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-worker-lifecycle.py --versions 26.2 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/latest-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
+
+## #30: gui-26.3の通常World照明
+
+起点は#29のmerge commit 6f38fb902a7cea1b6b977876244a7c4415c6408d、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。exact release 26.3のstone・diamond・grass_block・oak_leaves・chest・player_head・glassをLinux amd64・固定Mesa llvmpipe Dockerで検証しました。通常flat World、保存seed0・SURVIVAL、window1280×960、GUI scale4、slot9の実座標(80,121)、count1・既定stack・overlayなし・64pxです。
+
+RenderPearlへ移動したGpuTexture/GpuTextureView/GlTextureとFrontendRenderPass.setUniformに独立QAを対応させました。26.2と同じGuiのscreen/overlay/setScreen、GameRenderer.mainRenderTargetを使い、26.3の起動にSDL_VIDEO_FORCE_EGL=1を指定します。ItemModelResolverの対象stackとslot9を同一性で照合し、そのstateのGuiItemAtlas.drawToSlot中にSampler2へ指定されるtextureを読みます。バニラの非同期Screenshotを使用し、描画・照明初期化・canonical hook・PNG復元をproductionと共有しません。ASM観測を行うため完全な無計装clientではなく、全draw内部状態の保証ではありません。
+
+独立Worldの7比較はすべて最大channel誤差0、許容2/255超過0、輪郭例外0でした。実使用GUIはUiLightmapの1×1白255で、CPU画像とGPU texelが一致し、Sampler2と宣言されたUiLightmapのtexture IDも一致します。通常Level照明は別に読み取ります。GL pack buffer/row length等を読み取り後に復帰します。初回の独立撮影から成功しており、照明・位置による差や欠落IDはありません。productionの既存原点PNGが実インベントリ位置へ一致したため、描画・照明・固定context・画像許容を変更しません。公開API、manifest/context、worker/settingsDigestは不変で、このQA拡張による既存出力の再生成は不要です。
+
+全1,657 PNGと独立全件反復1,657 PNGを監査し、登録母集団・除外理由・ID/パス重複・CRC/hash・RGBA8・透過・空画像を確認しました。全件反復と各IDを別CLI・ゲームプロセスで生成した7枚は、decoded RGBA・PNG hash・パス・source・settings/digest・context・environment・renderer・catalogへ厳密一致しました。全IDの個別生成ではありません。16/512pxの14枚はPNG監査とworker終了0・強制終了なしの確認で、World画質受入ではありません。26.2の回帰7枚は#29の全件結果へ厳密一致し、変更後QAの独立World7比較も誤差0でした。JUnit64件・Python検査33件・offline build/installDistが成功しています。テスト検出0件と配布候補試験の引数不足は検証セットアップとして記録し、個別実行した検査成功や対象外の配布試験と区別します。差分と対象stack/state同一性、観測範囲、sampler overload、GL pack復帰、production除外、hashと比較条件を反証し、追加の問題はありませんでした。
+
+[数値・入力/worker/helper/image hash・初回撮影と回帰](../qa/validation-2026-10-13-pearl-world.json)を公開し、JAR・assets・World・スクリーンショット・個人パスはprivateに保持します。通常Worldの保存seed0・minecraft:flat・SURVIVALはlevel.datとdata/minecraft/world_gen_settings.datを読んで確認し、両hashを保持しました。全モデル・動的状態・全サイズ・他GPUへ一般化せず、experimental/deterministic=false・verified版0を維持します。
+
+再実行例です。各ID別比較はIDを1つずつ指定した別CLI起動で行い、サイズ検証のcacheを他ジョブから分離してください。
+
+```sh
+python3 scripts/verify-matrix.py --versions 26.3 --offline --out .local/pearl-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-world-inventory.py --version 26.3 --ids stone diamond grass_block oak_leaves chest player_head glass --compare .local/pearl-all --out .local/pearl-world/26.3 --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-matrix.py --versions 26.3 --offline --out .local/pearl-repeat --compare .local/pearl-all --docker-image mcicon-render:0.1.0-preview.1
+python3 scripts/verify-worker-lifecycle.py --versions 26.3 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/pearl-sizes --docker-image mcicon-render:0.1.0-preview.1
+```

@@ -22,7 +22,8 @@ public final class WorldInventoryAgent {
     private static Object minecraft;
     private static Path output;
     private static int stage,frames,index=-1;
-    private static boolean legacy,fixed,classic,modern,gpuImmediate,deferred,extracted,latest;
+    private static boolean legacy,fixed,classic,modern,gpuImmediate,deferred,extracted,latest,pearl;
+    private static String textureType,viewType,glTextureType;
     private static boolean screenshotPending;
     private static Object screenshot;
     private static Object guiLightTexture;
@@ -45,7 +46,11 @@ public final class WorldInventoryAgent {
         modern=config.get("version").getAsString().matches("1\\.(?:20(?:\\.[1-5])?|21(?:\\.[1-3])?)");
         gpuImmediate=config.get("version").getAsString().equals("1.21.5");
         extracted=config.get("version").getAsString().startsWith("26.");
-        latest=config.get("version").getAsString().equals("26.2");
+        pearl=config.get("version").getAsString().equals("26.3");
+        latest=pearl||config.get("version").getAsString().equals("26.2");
+        textureType=pearl?"com.mojang.renderpearl.api.textures.GpuTexture":"com.mojang.blaze3d.textures.GpuTexture";
+        viewType=pearl?"com.mojang.renderpearl.api.textures.GpuTextureView":"com.mojang.blaze3d.textures.GpuTextureView";
+        glTextureType=pearl?"com.mojang.renderpearl.backend.opengl.GlTexture":"com.mojang.blaze3d.opengl.GlTexture";
         deferred=extracted||config.get("version").getAsString().matches("1\\.21\\.(?:[6-9]|10|11)");
         if(legacy||fixed||classic||modern||gpuImmediate||deferred){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",true);}
         final String owner=s.actualClass(MC).replace('.','/'),method=s.methodName(MC,legacy?"m_0520165":"runTick",1);
@@ -103,13 +108,13 @@ public final class WorldInventoryAgent {
                         }
                     },0);return writer.toByteArray();
                 }
-                if((gpuImmediate||deferred)&&name.equals(s.actualClass("com.mojang.blaze3d.opengl.GlRenderPass").replace('.','/'))) {
+                if((gpuImmediate||deferred)&&name.equals(s.actualClass(pearl?"com.mojang.renderpearl.frontend.FrontendRenderPass":"com.mojang.blaze3d.opengl.GlRenderPass").replace('.','/'))) {
                     ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                     reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
                         public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
                             MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
-                            String sampler=s.methodName("com.mojang.blaze3d.opengl.GlRenderPass",extracted||s.hasMethod("com.mojang.blaze3d.opengl.GlRenderPass","bindTexture",3)?"bindTexture":"bindSampler",extracted||s.hasMethod("com.mojang.blaze3d.opengl.GlRenderPass","bindTexture",3)?3:2);
-                            if(!name.equals(sampler)||!desc.startsWith("(Ljava/lang/String;"+descriptor(gpuImmediate?"com.mojang.blaze3d.textures.GpuTexture":"com.mojang.blaze3d.textures.GpuTextureView")))return target;
+                            String sampler=pearl?"setUniform":s.methodName("com.mojang.blaze3d.opengl.GlRenderPass",extracted||s.hasMethod("com.mojang.blaze3d.opengl.GlRenderPass","bindTexture",3)?"bindTexture":"bindSampler",extracted||s.hasMethod("com.mojang.blaze3d.opengl.GlRenderPass","bindTexture",3)?3:2);
+                            if(!name.equals(sampler)||!desc.startsWith("(Ljava/lang/String;"+descriptor(gpuImmediate?textureType:viewType)))return target;
                             return new MethodVisitor(Opcodes.ASM9,target) {
                                 public void visitCode() {
                                     super.visitCode();super.visitVarInsn(Opcodes.ALOAD,1);super.visitVarInsn(Opcodes.ALOAD,2);
@@ -254,12 +259,12 @@ public final class WorldInventoryAgent {
             int fullBright;
             if(deferred) {
                 Object view=extracted?light:s.call("net.minecraft.client.renderer.LightTexture","getTextureView",light);
-                Object texture=s.call("com.mojang.blaze3d.textures.GpuTextureView","texture",view);
-                ByteBuffer pixels=readLightTexture(texture,"com.mojang.blaze3d.opengl.GlTexture","glId");
+                Object texture=s.call(viewType,"texture",view);
+                ByteBuffer pixels=readLightTexture(texture,glTextureType,"glId");
                 fullBright=0;for(int channel=0;channel<4;channel++)fullBright|=(pixels.get((15*16+15)*4+channel)&255)<<(channel*8);
                 report.addProperty("lightmapProbe","gpu-texture-view-gl-readback");
             } else if(gpuImmediate) {
-                ByteBuffer pixels=readLightTexture(s.call("net.minecraft.client.renderer.LightTexture","getTarget",light),"com.mojang.blaze3d.opengl.GlTexture","glId");
+                ByteBuffer pixels=readLightTexture(s.call("net.minecraft.client.renderer.LightTexture","getTarget",light),glTextureType,"glId");
                 fullBright=0;
                 for(int channel=0;channel<4;channel++)fullBright|=(pixels.get((15*16+15)*4+channel)&255)<<(channel*8);
                 report.addProperty("lightmapProbe","gpu-texture-gl-readback");
@@ -289,14 +294,14 @@ public final class WorldInventoryAgent {
                 capture.add("levelFullBrightGpuRgba",rgba);capture.addProperty("levelLightmapCpuAvailable",false);
                 if(index>=0) {
                     if(guiLightmapSampler==null||guiLightTexture==null)throw new IllegalStateException("対象GUI atlasのlightmap samplerを観測できませんでした");
-                    ByteBuffer pixels=readLightTexture(guiLightTexture,"com.mojang.blaze3d.opengl.GlTexture","glId");
-                    int width=((Number)s.call("com.mojang.blaze3d.textures.GpuTexture","getWidth",guiLightTexture,0)).intValue();
-                    int height=((Number)s.call("com.mojang.blaze3d.textures.GpuTexture","getHeight",guiLightTexture,0)).intValue();
+                    ByteBuffer pixels=readLightTexture(guiLightTexture,glTextureType,"glId");
+                    int width=((Number)s.call(textureType,"getWidth",guiLightTexture,0)).intValue();
+                    int height=((Number)s.call(textureType,"getHeight",guiLightTexture,0)).intValue();
                     JsonArray guiRgba=new JsonArray();for(int channel=0;channel<4;channel++)guiRgba.add(pixels.get(((height-1)*width+width-1)*4+channel)&255);
                     capture.add("fullBrightGpuRgba",guiRgba);capture.addProperty("guiLightmapTextureId",guiLightmapSampler);
                     capture.addProperty("guiLightmapWidth",width);capture.addProperty("guiLightmapHeight",height);
                     Object declared=extracted?s.call("net.minecraft.client.renderer.UiLightmap","getTextureView",s.field("net.minecraft.client.renderer.GameRenderer","uiLightmap",renderer)):s.call("net.minecraft.client.renderer.LightTexture","getTextureView",light);
-                    int declaredId=((Number)s.call("com.mojang.blaze3d.opengl.GlTexture","glId",s.call("com.mojang.blaze3d.textures.GpuTextureView","texture",declared))).intValue();
+                    int declaredId=((Number)s.call(glTextureType,"glId",s.call(viewType,"texture",declared))).intValue();
                     capture.addProperty("declaredGuiLightmapTextureId",declaredId);
                     capture.addProperty("guiStateMatchedInventoryStack",true);
                     if(extracted) {
@@ -312,7 +317,7 @@ public final class WorldInventoryAgent {
             } else if(gpuImmediate) {
                 JsonArray rgba=new JsonArray();for(int channel=0;channel<4;channel++)rgba.add((fullBright>>(channel*8))&255);
                 capture.add("fullBrightGpuRgba",rgba);capture.addProperty("lightmapCpuAvailable",false);
-                int texture=((Number)s.call("com.mojang.blaze3d.opengl.GlTexture","glId",s.call("net.minecraft.client.renderer.LightTexture","getTarget",light))).intValue();
+                int texture=((Number)s.call(glTextureType,"glId",s.call("net.minecraft.client.renderer.LightTexture","getTarget",light))).intValue();
                 if(index>=0) {
                     if(guiLightmapSampler==null)throw new IllegalStateException("GUIのGPU lightmap samplerを観測できませんでした");
                     capture.addProperty("guiLightmapShaderTexture",guiLightmapSampler);capture.addProperty("guiLightmapAtEntry",guiLightmapAtEntry);capture.addProperty("guiLightmapTextureUnit",guiLightmapUnit);
@@ -433,7 +438,7 @@ public final class WorldInventoryAgent {
             if(gpuImmediate) {
                 Object texture=s.call("com.mojang.blaze3d.systems.RenderSystem","getShaderTexture",null,guiLightmapUnit);
                 observingItem=true;guiLightmapSampler=null;
-                guiLightmapAtEntry=texture==null?0:((Number)s.call("com.mojang.blaze3d.opengl.GlTexture","glId",texture)).intValue();return;
+                guiLightmapAtEntry=texture==null?0:((Number)s.call(glTextureType,"glId",texture)).intValue();return;
             }
             if(classic||modern){guiLightmapShaderTexture=((Number)s.call("com.mojang.blaze3d.systems.RenderSystem","getShaderTexture",null,guiLightmapUnit)).intValue();return;}
             int active=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,34016)).intValue();
@@ -453,9 +458,9 @@ public final class WorldInventoryAgent {
     public static void observeSampler(String name,Object texture) {
         if(!observingItem||!name.equals("Sampler2"))return;
         try {
-            if(deferred)texture=s.call("com.mojang.blaze3d.textures.GpuTextureView","texture",texture);
+            if(deferred)texture=s.call(viewType,"texture",texture);
             guiLightTexture=texture;
-            guiLightmapSampler=texture==null?0:((Number)s.call("com.mojang.blaze3d.opengl.GlTexture","glId",texture)).intValue();}
+            guiLightmapSampler=texture==null?0:((Number)s.call(glTextureType,"glId",texture)).intValue();}
         catch(Exception e){throw new IllegalStateException("GUIのlightmap samplerを取得できません",e);}
     }
     private static Object stack(String id) throws Exception {
@@ -523,8 +528,8 @@ public final class WorldInventoryAgent {
     }
     private static ByteBuffer readLightTexture(Object texture,String type,String method) throws Exception {
         int id=((Number)s.call(type,method,texture)).intValue();
-        int width=deferred?((Number)s.call("com.mojang.blaze3d.textures.GpuTexture","getWidth",texture,0)).intValue():16;
-        int height=deferred?((Number)s.call("com.mojang.blaze3d.textures.GpuTexture","getHeight",texture,0)).intValue():16;
+        int width=deferred?((Number)s.call(textureType,"getWidth",texture,0)).intValue():16;
+        int height=deferred?((Number)s.call(textureType,"getHeight",texture,0)).intValue():16;
         ByteBuffer gpu=ByteBuffer.allocateDirect(width*height*4);
         int previous=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,32873)).intValue();
         int pack=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,35053)).intValue();
