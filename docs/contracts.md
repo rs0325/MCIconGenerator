@@ -56,9 +56,11 @@ fixed-v1はcount=1、既定ItemStack、overlayなし、world/playerなし、part
 
 Dockerfileはsoftware描画に加え、Mesa llvmpipeの`LP_NATIVE_VECTOR_WIDTH=128`と`GALLIUM_OVERRIDE_CPU_CAPS=sse4.1`を指定します。CPUによる最適化の差を抑えるための条件で、[Mesaの環境変数](https://docs.mesa3d.org/envvars.html)と[llvmpipeの指定](https://docs.mesa3d.org/drivers/llvmpipe.html)に従います。実行CPUまたはエミュレーションにSSE4.1が必要です。Docker image更新でsettings digestが変わるため、以前のiconsは新しい出力先へ再生成してください。任意のMesa/LLVM版・CPU・GPUでのRGBA一致を保証するものではありません。
 
-gui-fixedの1.15〜1.16.5の9版、gui-classicの1.17〜1.19.4の10版と、gui-1.21.4の1.20〜1.21.4の12版のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。照明反映前のこれら31版はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
+gui-fixedの1.15〜1.16.5の9版、gui-classicの1.17〜1.19.4の10版、gui-1.21.4の1.20〜1.21.4の12版、gui-1.21.5の1.21.5のlightmapは、通常ワールドのInventoryScreenで実測したfull-bright RGB 252/252/252へ描画前に初期化します。world/playerなしの起動を維持し、時刻・天候・状態異常による照明変動を持ち込みません。PNG保存後のRGB補正は行いません。manifestのcontext.lightmapFullBrightRgbに固定値を記録します。他版の照明は変更せず、各版の実表示との照合を継続します。照明反映前のこれら32版はworldなしの初期白255を使っていたため、色が変わります。agent hashとsettings digestが変わるので、以前のiconsは新しい出力先へ再生成してください。
 
 legacy-1.13の3版（1.13・1.13.1・1.13.2）とlegacy-1.14の4版（1.14・1.14.1・1.14.2・1.14.3）は、通常flatワールドのインベントリ位置(80,121)、GUI scale4、64pxで静的7種類を照合し、最大channel誤差0でした。対象スロットのモデル描画入口ではlightmap texture unitが無効で、観測したCPU/GPUのfull-bright texelはともにRGBA(252,252,252,255)です。このtexelをexportへ適用する変更は行いません。lightmap値がmanifestにないことからGUIの使用値を白255と推定せず、描画入口の状態と画像差分を分けて記録します。全モデルの内部描画状態・全サイズ・他GPUのWorld一致へ一般化しません。
+
+1.21.5ではLightTextureのGpuTextureを描画前にRGBA(252,252,252,255)へ初期化します。通常flatワールドのインベントリ位置(80,121)と、既存の描画原点基準で生成した静的7種類・64pxのPNGは誤差0でした。この版のGUI投影・原点位置は維持し、guiReferenceは追加しません。CPU lightmap画像は存在せず、QAはGPU texelとSampler2の指定textureを観測します。全draw内部状態・全モデル・動的状態・全サイズ・他GPUの一致へ一般化しません。
 
 1.20〜1.21.3の11版（1.20.6を含む）はGUI 320×240のインベントリ位置(80,121)を固定基準にします。出力sizeに対して16 GUI単位のアイコンを拡大し、同じ投影・モデル位置のままviewportを移動してsize四方へ切り出します。512pxではviewport 10240×7680が必要です。1.20.6では、検証したMesa環境の上限16384×16384と、viewport設定・元viewportへの復帰を観測済みです。今回の10版は16/512pxのPNG監査・終了検証で、GL状態の観測とは区別します。バニラのGUI原点と他位置では浮動小数点演算・テクスチャ参照が変わるため、すべてのGUI位置との一致は保証しません。以前の原点基準とは画像・context・agent hashが変わるため、新しい出力先へ再生成してください。PNGへの色補正や差分許容の追加は行いません。1.21.4は既存の原点基準を維持します。
 
