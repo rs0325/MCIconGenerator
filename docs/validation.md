@@ -946,6 +946,44 @@ python3 scripts/verify-uninstrumented-inventory.py --version 1.21.4 \
   --qa-reference .local/qa-1.21.4 --out .local/uninstrumented-1.21.4 --samples 2
 ```
 
+## Issue #65のworld/playerなし既定針の独立検査（2026-10-15）
+
+固定51版のclock/compass102件と、元Itemsおよび実catalogに登録されるrecovery_compass29件、計131件のモデル・元texture・RGBA期待値を検査しました。元の生成前期待値と、provenance再監査後のmodel/selection/resource/expectedRGBAは全件同一です。PNG生成後の再監査時刻を、最初の生成前計算へ再ラベルしません。
+
+確定#66 worker `6938a46a…`の48版122件と、確定#68 worker `27a0c956…`の26.1/26.1.1/26.1.2の9件、全51版131件はRGB・alphaとも誤差0です。旧26.1系のproduction復帰不具合によるFAILと元ログを保持します。#68の非affected API44版87descriptor整合証拠と、通常worker境界8版21針・#68原通常9針の計30件で採取workerとのRGBA完全一致を確認しました。#68原測定を#65採取世代へ再ラベルせず、同一最終candidateによる全131実測と扱いません。正式profile昇格後の同候補一括受入は後続の統合検証です。
+
+元metadata/client/mappingのhashと、調査済み元class・shader・メソッドfingerprintを確認します。null world/entityから0返却までの元命令を限定解釈し、既定stackのentity getterのempty両分岐も確認します。乱数や未知命令へ到達すればFAILです。旧overrideの最後の一致、新component欠如・null dimension fallback・range最大閾値<=0から、PNGを開く前にclock_00/compass_16/登録recovery_compass_16を選びます。期待値計算のclasspathはGsonとQAだけで、ゲームクラス・GPU・production renderer・CanonicalContextをロードしません。
+
+照明は比較PNG/成功manifestから逆算しません。同じ元clientの保存World QAをrecord SHA・JSON pointer・GPU値・source/version/image・exit0・入力不変へ照合します。1.13/1.14はgenerated GUI3D=falseと固定照明/lightmap無効の元経路を結び付けて255、1.15〜1.21.11は元full-brightとfront/generated正面係数1へ適用されるGPU252、26系はGUI UiLightmapのGPU255を使います。1.15/1.15.1はgenerated.jsonにfront指定がないため元generated/GUIの正面経路を確認します。1.20.6の新GPU記録ではpost-apply Sampler2と実texture identityも一致し、物理unit番号2とは同一視しません。CPU lightPixelsをGPU読取として受理しません。
+
+元generatedのGUI変形なし・単一layer・無tint・無glint原因の既定stack・16px/非animation/alpha0または255に限定します。側面境界は16px中心へ入らず、元UVとnearest samplingを確認します。1.13の各辺0.01texel insetを含めます。後続の中心縮小 `u'=u+(8-u)s` は、同atlasの64枚の16px clockから最大辺>=128、s<=1/32、7.5s<0.5を裏付けます。1.21.11/26系は元の直接UV経路です。16pxの成功を64px以上へ一般化しません。
+
+1.21.6以降の16px jobはscale1・atlas slot16・GUI16です。採取用NeedleSamplingAgentは元GUI atlas描画入口でこれを描画前に検査し、元引数・戻り値・UV・色を変更しません。採取workerは通常workerと別hashです。原点と、1.20〜1.21.3の承認GUI(80,121)、独立Worldの採取座標を区別します。
+
+native監督はCLI全体240秒、Docker操作各10秒以下、CLI/eventsのTERM→KILL→有限waitを使います。専用cacheの新規worker、cache RW・snapshot RO/hash・exact javaagent path・imageから所有を照合し、自然終了後の残存もfinallyで回収して元FAILを保持します。通常完了を待つ固定sleepはありません。任意45秒超過診断はprivate外側scriptで、実行時hashと診断成否を本jobと分離します。初回診断はhostだけを採取した旧source、後の診断sourceは所有cache RWの判定を修正したものとして区別します。
+
+model/null/PNG等の合成26条件、監督/所有回収15条件、World provenance17条件、元World record51版の実照合が成功しました。旧scanがregression摘要を先に選んだ3参照は正式WorldAcceptanceへ修正し、元FAILを保持しました。GPU値・モデル・期待RGBAは不変です。既存flat回帰は1.13/26.3で成功。1.21.4の旧light255保存画像は現252 checkerにRGB3差のFAILを保持し、現候補通常workerではdiamond・creeper_spawn_egg・3針の5件すべて誤差0でした。最終checkerで原測定51版の保存成果も再監査しました。担当WT起点ad887a6のJUnit90件fail/error/skip0、test/buildが成功しました。#66本体の92件とは別測定です。
+
+再実行には、検証済み51版cache、build済みCLI、確定worker artifactと固定image、private Worldの元recordをhash一致のsnapshotとして用意します。1.20.6/1.21.4は明示`--world-record`で渡します。各outは未使用のprivate directoryです。
+
+```sh
+python3 scripts/verify-needle-inputs.py --cache private-cache --out private-proofs \
+  --world-record 1.20.6=/absolute/immutable-1206.json \
+  --world-record 1.21.4=/absolute/immutable-1214.json
+python3 scripts/verify-flat-textures.py --cache private-cache --out private-prepared \
+  --needle-proofs private-proofs --prepare-only --versions <固定51版>
+python3 scripts/verify-needle-rendering.py --cache private-cache --out private-native \
+  --proofs private-proofs --prepared private-prepared --production-worker /absolute/worker-agent.jar \
+  --dependency-commit <確定commit> --docker-image sha256:<測定済みimageID>
+python3 scripts/verify-flat-textures.py --cache private-cache --out private-comparison \
+  --needle-proofs private-proofs --prepared private-prepared --compare private-native --versions <固定51版>
+python3 scripts/test-needle-textures.py --out private-synthetic
+python3 scripts/test-needle-process.py
+python3 scripts/test-needle-world.py
+```
+
+[数値・元入力/モデル/worker/image/QA hash・初回FAIL](../qa/validation-2026-10-14-needle-textures.json)を保持します。JAR/assets/World/PNG/個人pathは公開しません。任意GPU・動的World針・全サイズの保証やcanonical昇格へ広げず、experimental/deterministic=falseを維持します。
+
 ## Issue #61の無agent中間alpha照合（2026-10-14）
 
 1.20.6と1.21.4のwhite_stained_glass・slime_blockを、64px出力PNGと、元client JAR・公式librariesだけで起動した通常InventoryScreenのslot 9で照合します。既定ItemStackをvanilla commandで置き、追加component/NBTなし・count 1で各素材を2回撮影します。empty slotも2回撮影し、各sampleに対応する背景として使います。別JVMのAWT Robotがメニュー・command・F2を操作します。client command・`/proc/1`のprocess proofにagent引数・attach libraryがなく、resource packを使わないことを確認します。元のsaveは新規outへコピーし、cacheはread-only mountです。
