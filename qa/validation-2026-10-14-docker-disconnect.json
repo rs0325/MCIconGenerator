@@ -1,0 +1,130 @@
+{
+  "issue": 37,
+  "baseCommit": "7fdb40e9a594cdeb35c59e88bb9a958d521be36e",
+  "dependencyCommit": "f6f0b82e22aca3ee3b374aec167e432b96caf55a",
+  "scope": "専用Unix代理のattach両方向切断。新規cleanup接続は利用可能。daemon本体停止/再起動と接続先全体断絶は未検証。",
+  "experimental": true,
+  "deterministic": false,
+  "verifiedVersions": 0,
+  "native": {
+    "daemonStopped": false,
+    "otherContainersStopped": false,
+    "version": "1.13",
+    "size": 64,
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "coreSha256": "604720a44933be15bc34b717e1a73fcb04476205ca0c1dffde92fa18243a6dea",
+    "agentSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+    "harnessSourcesSha256": {
+      "scripts/verify-docker-disconnect.py": "0a40c703fd5a23ff318811c27ccca11e5369541a2451bc1bfb511b90ca818751",
+      "scripts/qa/DockerDisconnectProbe.java": "ebe177c5f574a0f857bd1fece3e01948e17879b1e43e25ca95223f0f68a96d1f"
+    },
+    "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+    "baselineCounts": {
+      "failed": 0,
+      "noItemForm": 46,
+      "succeeded": 4
+    },
+    "outputLockHeldBeforeCut": true,
+    "exitCode": 3,
+    "jobFinishedSeconds": 1.913,
+    "attachBothDirectionsClosed": true,
+    "futureCompletedObserved": true,
+    "interruptedCounts": {
+      "failed": 3,
+      "noItemForm": 46,
+      "succeeded": 1
+    },
+    "interruptedCodes": [
+      "WORKER_EXITED",
+      "NOT_RENDERED",
+      "NOT_RENDERED"
+    ],
+    "successKept": true,
+    "reservedPathsKept": true,
+    "daemonRespondingAfterCut": true,
+    "ownedContainerRemoved": true,
+    "ownedSnapshotsRemoved": true,
+    "workerLogsKept": true,
+    "outputLockReleasedAfterCut": true,
+    "resumeExitCode": 0,
+    "recovery": {
+      "version": "1.13",
+      "mode": "icons",
+      "audited": 4,
+      "registryPopulationVerified": false,
+      "transparentImages": 4,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 4,
+      "comparisonVerified": true,
+      "canonicalVerified": false
+    },
+    "temporaryFilesAfterResume": 0,
+    "passed": true,
+    "outputs": [
+      {
+        "id": "minecraft:chest",
+        "path": "assets/minecraft/textures/block/chest.png",
+        "width": 64,
+        "height": 64,
+        "pngSha256": "4fca72be4999498f78a2f9a90bf0785a3648980a44d9ea77165d44312839aa24",
+        "rgbaSha256": "1fcc45ad2625b0000760eff79ef008299a80aaa880c84acfea08bb43e5301d67",
+        "rgbaAndPathMatched": true
+      },
+      {
+        "id": "minecraft:diamond",
+        "path": "assets/minecraft/textures/item/diamond.png",
+        "width": 64,
+        "height": 64,
+        "pngSha256": "58109a8f4f2d2096803c5097ad446842aa744e9b9f196f028221975b91d2ee14",
+        "rgbaSha256": "01a99293013752b490cf22b2c98f8571c6b84e78653e5b07e3962f0518f58515",
+        "rgbaAndPathMatched": true
+      },
+      {
+        "id": "minecraft:glass",
+        "path": "assets/minecraft/textures/block/glass.png",
+        "width": 64,
+        "height": 64,
+        "pngSha256": "6fd8e09a55eecd0265ad22e0c7b78da3a4e2ca669eacb95892ec93458af2255f",
+        "rgbaSha256": "e4dc4d1c6e3d233ffa9d0423c36ae966d730b949e44e12267db060e1ed212dd4",
+        "rgbaAndPathMatched": true
+      },
+      {
+        "id": "minecraft:stone",
+        "path": "assets/minecraft/textures/block/stone.png",
+        "width": 64,
+        "height": 64,
+        "pngSha256": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+        "rgbaSha256": "805dbbf4bcefaba1e58c95d25c9431f053bdd7286f9c80b615472f19bef13b4b",
+        "rgbaAndPathMatched": true
+      }
+    ]
+  },
+  "synthetic": {
+    "firstFailure": {
+      "observed": "終了済みDocker CLIのcloseでcontainer削除要求が行われない",
+      "exitCode": 1,
+      "preserved": true
+    },
+    "baselineClassControl": {
+      "baseCommit": "7fdb40e9a594cdeb35c59e88bb9a958d521be36e",
+      "workerClientSourceSha256": "8dcfa236602f808490b33a4ac9960d35a624a9117cf7a58e54464db1ce476eca",
+      "exitCode": 1,
+      "removedMarkerExists": false,
+      "failure": "終了済みCLIの専用container削除を要求していません"
+    },
+    "fixedTests": 2,
+    "fixedPassed": true,
+    "harnessSourcesSha256": {
+      "scripts/test-docker-disconnect.py": "150455c1c21dfb2f331910269ff7e886d80999494a6767723c0c17ffe3abb590",
+      "scripts/qa/WorkerDisconnectProbe.java": "0c29c2ee1ebbca468d6e9fe905dbc94fe60d7037d9dcecb954f06525c8478f2c"
+    }
+  },
+  "requiredChecks": {
+    "junitTests": 67,
+    "junitPassed": true,
+    "cliBuildPassed": true,
+    "gitDiffCheckPassed": true,
+    "nativeFirstFailure": false
+  }
+}

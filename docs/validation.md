@@ -69,6 +69,21 @@ local-qa.shは全51版を順番に生成します。verify-matrix.pyはCLI配布
 - 既知のRGB/alphaをRGBA8 FBOにGPU描画した合成試験では、alpha誤差0、alpha≥64のstraight RGB最大誤差2/255、灰色背景への再合成最大誤差1/255でした。sRGB framebuffer conversionは無効です。ゲーム自身の色空間・特殊blend/glintの受入とは区別します。
 - JUnit47件成功。rawの未所有ファイル/付随metadataの保護、overwrite直後のクラッシュ、fail-fastの未処理予約、API close時の実行中/待機中Futureの完了、close後のtyped failure、全サブコマンドのhelpを追加検証しました。
 
+### Issue #37の専用Docker代理接続切断（2026-10-14）
+
+#13のmerge結果を含むmain `7fdb40e9`を起点に、専用Unix代理と専用DOCKER_CONFIG/contextを使いました。global context・実daemon・他containerは変更しません。1.13・64pxのchest/diamond/glass/stoneを同じ固定Mesa Linux amd64 imageで生成し、1件成功後の次render要求でattachの両方向を切断しました。
+
+Futureは未完了のExportResultを返し、プロセスは切断後1.913秒でexit 3でした。manifestは成功1件・WORKER_EXITED 1件・NOT_RENDERED予約2件を保持し、成功PNG hashは正常基準と一致しました。専用containerの消失、agent snapshot・一時icon回収、worker.log保持、切断直前のFileLock占有と終了後の解放を確認しました。新instanceの再開はexit 0で、4PNGのdecoded RGBA・パスが正常基準と厳密一致し、partは0件でした。
+
+修正前の初回合成試験では、Docker CLIが先に終了するとcloseが専用containerの削除を要求しない問題を確認しました。起点のWorkerClient 1クラスを使う独立制御試験でも同じFAILを保存しています。closeの既終了分岐だけを修正し、代理streamの両方向切断と新規cleanup接続、専用UUIDの削除要求を確認する合成2件・JUnit67件・CLI buildが成功しました。native初回は全3ジョブ成功で、自動retryはありません。[入力・binary・QA hashと数値記録](../qa/validation-2026-10-14-docker-disconnect.json)を参照してください。
+
+新規cleanup接続を利用できるattach切断の受入です。daemon本体停止/再起動、接続先全体の断絶、全版/全サイズ/他OSの障害へ保証を広げません。API・protocol・保存形式・workerは変更しておらず、既存正常PNGの再生成は不要です。全版experimental/deterministic=false・verified 0版を維持します。
+
+```sh
+python3 scripts/test-docker-disconnect.py
+python3 scripts/verify-docker-disconnect.py --cache .local/cache --out .local/docker-disconnect-repeat --docker-context colima-mcicon --docker-image sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf
+```
+
 1.21.4 / 64px / 全1,384件の単一worker計測を実施しました。coldは空のMCIcon cacheへ公式HTTPS取得を含めて38.68秒、warmは同じ入力をofflineで使い、新しい出力先へ再描画して27.96秒・28.60秒でした。warm全件がcoldのRGBAと一致しました。workerのVmHWMはそれぞれ1,216,925,696 / 1,152,536,576 / 1,167,818,752 bytes、準備済みcacheは211,762,689 bytes / 777 filesです。
 
 coldでもDocker image/VMは既に準備済みで、OS page cacheは消去していません。時間はAPI開始からworker終了までで、最終icon後のDocker memory samplingを含み、PNG監査を含みません。VmHWMとcontainer memory.peakは最終icon後・shutdown前に読みます。cache容量はworker作業ディレクトリを除き、hash/lock/native展開を含みます。1版・cold 1回/warm 2回の実測で、全版や別環境の速度保証ではありません。
