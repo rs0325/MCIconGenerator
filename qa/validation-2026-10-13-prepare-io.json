@@ -3,7 +3,7 @@
   "baseCommit": "6f38fb902a7cea1b6b977876244a7c4415c6408d",
   "dependencyMergeCommit": "f6f0b82",
   "date": "2026-10-13",
-  "status": "未再現・根本原因未確定",
+  "status": "2026-10-14に並行asset取得のEDEADLKを再現・原因機構特定・修正検証済み",
   "previousFailureRootCauseEstablished": false,
   "initialFailure": {
     "record": "qa/validation-2026-10-10-followup.json",
@@ -697,5 +697,7 @@
       1.176
     ],
     "originalFailureIdentityEstablished": false
-  }
+  },
+  "investigationStatusOn20261013": "未再現・根本原因未確定",
+  "followupEvidence": "validation-2026-10-14-asset-lock.json"
 }
