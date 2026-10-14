@@ -139,3 +139,9 @@ Issue #31では1.20.6の静的5種類（stone・player_head・chest・glass・gr
 1.21.4のclock・compass・recovery_compass・glint付きenchanted_book・animation付きsea_lanternは、通常Worldとfixed-v1の状態が異なるため、raw差を保存して画質受入から除外します。元saveは既存QAで作ったものをコピーし、今回のclient描画にはagent・時刻固定・描画置換を入れていません。glassはbinary alphaであり、全モデル・全状態・半透明・glint・他GPUの保証には広げません。[操作条件・初回FAIL・状態分類](validation.md#issue-31の無計装client基準2026-10-14)を参照してください。
 
 全版experimental、deterministic=false、verified 0版を維持します。productionの描画・worker・PNG形式は変更しておらず、既存PNGの再生成は不要です。
+
+## RGBA8と合成色空間
+
+Issue #32では1.20.6/1.21.4のknown-RGBA packを固定Mesaで検証し、64px・指定GUI位置・1層/2層・6背景のbyte RGB再合成は最大2/255でした。元straight RGBの無誤差復元は低alphaで保証できず、linear-light合成では通常GUIと最大73/255の条件差があります。PNGのsRGB宣言は合成式を指定するものではありません。[色精度の条件と限界](color-precision.md)を参照してください。
+
+production・公開API・PNG形式は変更していません。既存PNGの再生成は不要で、全版experimental・deterministic=false・verified 0版を維持します。

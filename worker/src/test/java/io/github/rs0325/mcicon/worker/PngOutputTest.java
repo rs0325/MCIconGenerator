@@ -31,6 +31,20 @@ class PngOutputTest {
         BufferedImage recovered=ImageIO.read(output.toFile());
         assertEquals(0x7f4081c1,recovered.getRGB(0,0));assertEquals(0,recovered.getRGB(1,0));
     }
+    @Test void keepsLowAlphaAndExposesUnrecoverableColorQuantization() throws Exception {
+        BufferedImage dark=new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB),light=new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+        // RGB(20,180,80), alpha=1のsource-overをRGBA8へ量子化した観測値。
+        dark.setRGB(0,0,0xff000100);light.setRGB(0,0,0xfffefffe);
+        Path output=directory.resolve("low-alpha.png");PngOutput.compose(dark,light,output);
+        int recovered=ImageIO.read(output.toFile()).getRGB(0,0);
+        assertEquals(0x0100ff00,recovered);
+        for(int background:new int[]{0,32,127,255})for(int channel=0;channel<3;channel++) {
+            int source=new int[]{20,180,80}[channel];
+            int expected=(source+background*254+127)/255;
+            int actual=(((recovered>>>(16-8*channel))&255)+background*254+127)/255;
+            assertTrue(Math.abs(actual-expected)<=1);
+        }
+    }
     @Test void declaresSrgbWithoutChangingRgbaForReadbackAndComposite() throws Exception {
         Path direct=directory.resolve("direct.png"),composite=directory.resolve("composite.png");
         PngOutput.write(ByteBuffer.wrap(new byte[]{32,64,96,(byte)255}),1,direct);
