@@ -56,13 +56,20 @@ public final class MCIconGenerator implements AutoCloseable {
         });
     }
     /**
-     * 既定ItemStackの透過PNGとmanifestを出力する。experimentalへの明示opt-inが必要。
+     * 既定ItemStackの透過PNGとmanifestを出力する。verifiedはopt-in不要、experimentalは明示opt-inが必要。
+     * discovered・unsupportedはopt-inにかかわらず入力準備前に拒否する。
      * 個別失敗や途中取消は未完了のExportResultへ記録し、準備・起動失敗はFutureを失敗させる。
      */
     public CompletableFuture<ExportResult> render(RenderRequest request,WorkerOptions options) {
         return submit(()-> {
             VersionInfo version=versions.resolve(request.version());
-            if(!request.allowExperimental())throw new McIconException("UNVERIFIED_VERSION","Rendering adapters are experimental; opt in with --allow-experimental",2);
+            switch(version.support()) {
+                case "verified" -> {}
+                case "experimental" -> {
+                    if(!request.allowExperimental())throw new McIconException("UNVERIFIED_VERSION","Rendering adapters are experimental; opt in with --allow-experimental",2);
+                }
+                default -> throw new McIconException("ADAPTER_UNAVAILABLE","No rendering adapter is available for "+version.id(),2);
+            }
             progress.onProgress(new ProgressListener.ProgressEvent("prepare",version.id(),0,1));
             var runtime=new RuntimePreparer(assets,versions,cancellation).prepare(version);
             try(var worker=new WorkerClient(runtime,assets.root(),options,cancellation)) {

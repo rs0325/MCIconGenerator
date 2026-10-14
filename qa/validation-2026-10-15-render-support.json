@@ -1,0 +1,78 @@
+{
+  "issue": 73,
+  "date": "2026-10-15",
+  "baseCommit": "07182c236152cef47dd1392bfb6e327d96a429e3",
+  "scope": "描画の版support判定。対応版の正式昇格ではない",
+  "sourcesSha256": {
+    "README.md": "750aec069580d8a73063690ba2b11eb214d560ca1f5365cfaad3f279810202f9",
+    "cli/src/main/java/io/github/rs0325/mcicon/cli/Main.java": "c6932b5faaaf2ab0dc18ecaac959be15322631a0768ec259abc7d07045f525ab",
+    "core/src/main/java/io/github/rs0325/mcicon/MCIconGenerator.java": "93af89a1846699d84e7e68d7968b3ef9ff24aa46753350d1b26221abb5af2ad5",
+    "core/src/main/java/io/github/rs0325/mcicon/RenderRequest.java": "6d9ba1605ffd87f059835da0c886a71dedde1b4cef591731071af64e0cba6d8d",
+    "core/src/main/java/io/github/rs0325/mcicon/VersionInfo.java": "cc39cf0722a8682f8835170f3cc37e3ce0758d66201e75f3a8aea3645fb20c76",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/Diagnostics.java": "269e6feeccf8def9c653a472e2f6f7873bb8b79bcf1c943f2cdaa8a8c6cddc68",
+    "docs/contracts.md": "720021c614b4d659addb06f62018419189bf07070fd1ad3747f0f17a700800a4",
+    "core/src/test/java/io/github/rs0325/mcicon/RenderSupportTest.java": "7923fcd33d32c629261a7116e561c0ff30b3eacb2c1760c9e8715f57ff9df00a"
+  },
+  "coreSha256": "44898a6a714d9c92e67283052397adf6ebd9e4d90c7d31c4152493e1bc60366d",
+  "workerSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+  "workerUnchangedFromIssue68": true,
+  "releasesSha256": "89e52cd741c38d0cb80a7beb5e2dbdfcbee7f3d2dcef1e93758c9277548384a1",
+  "supportCounts": {
+    "experimental": 51,
+    "verified": 0
+  },
+  "context": "fixed-v1",
+  "deterministic": false,
+  "junit": {
+    "core": {
+      "tests": 61,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "cli": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "worker": {
+      "tests": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "renderSupportAssertions": [
+    "実対応表1.13 experimentalはopt-inなしで準備前UNVERIFIED_VERSION/exit2",
+    "opt-in有りは実resolve→render→prepare通知へ到達",
+    "fixture verifiedはflag両方でprepare通知へ到達",
+    "discovered/unsupportedはflag両方で準備前ADAPTER_UNAVAILABLE/exit2",
+    "latestの未登録26.4はflag両方で拒否し、既存verified1.13へfallbackしない"
+  ],
+  "fixtureBoundary": "verified等はVersionServiceの内部supportだけをsubmit前に置換。公式対応表は変更しない。prepare通知の同一例外で到達を確認し、入力取得・Docker前に止める",
+  "build": {
+    "testBuildInstallDist": "PASS",
+    "finalJavadocBuildInstallDist": "PASS; VersionInfoのJavadoc追記後はtestを再実行せずbuild -x test"
+  },
+  "api": {
+    "previousCoreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+    "publicClassCount": 16,
+    "publicSignaturesUnchanged": true,
+    "publicSignaturesSha256": "f38d7f6cc3a1080adbd32402438176644e6cd4c6eec0020cd8623e0fdf758374"
+  },
+  "cliHelp": {
+    "exit": 0,
+    "experimentalOptInAndVerifiedDescription": true,
+    "initialAssertionFailure": "FAIL: picocliの説明折返しを考慮しない比較。元出力保全、空白正規化後に同じ説明を確認"
+  },
+  "review": {
+    "completed": true,
+    "confirmedFindings": 0
+  },
+  "limits": [
+    "doctorのverified表示はコードの静的確認。実行した受入試験ではない",
+    "ゲーム・Docker描画の再実行なし。workerとPNG処理は不変",
+    "verified fixtureの許可経路の確認であり、実51版の品質受入ではない"
+  ]
+}

@@ -15,7 +15,7 @@ public final class Diagnostics {
         checks.add(new DiagnosticReport.Check("core_java", Runtime.version().feature() >= 21, "Java " + Runtime.version().feature()));
         boolean adapter;
         try {RuntimePreparer.profileFor(exact.id());adapter=true;}catch(McIconException unavailable){adapter=false;}
-        checks.add(new DiagnosticReport.Check("adapter", adapter, adapter ? "experimental; canonical context is pending" : "ADAPTER_UNAVAILABLE"));
+        checks.add(new DiagnosticReport.Check("adapter", adapter, adapter ? exact.support() : "ADAPTER_UNAVAILABLE"));
         checks.add(new DiagnosticReport.Check("agent", Files.isRegularFile(worker.agentJar()), "Rendering agent must exist"));
         List<String> docker = List.of("docker", "--context", worker.dockerContext());
         checks.add(command("docker_image", docker, List.of("image", "inspect", worker.dockerImage(), "--format", "{{.Os}}/{{.Architecture}} {{.Id}}"), 15,token));

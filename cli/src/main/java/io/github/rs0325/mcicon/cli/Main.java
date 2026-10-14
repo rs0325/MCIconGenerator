@@ -111,7 +111,7 @@ public final class Main implements Runnable {
             }
         }
     }
-    @Command(name="render",description="Render inventory PNGs using an experimental vanilla adapter.")
+    @Command(name="render",description="版のsupport状態に従いインベントリPNGを生成します。")
     static final class Render implements Callable<Integer> {
         @Mixin Common common;
         @Mixin ReleaseHelp help;
@@ -123,7 +123,7 @@ public final class Main implements Runnable {
         @Option(names="--out",required=true) Path output;
         @Option(names="--overwrite") boolean overwrite;
         @Option(names="--fail-fast") boolean failFast;
-        @Option(names="--allow-experimental") boolean allow;
+        @Option(names="--allow-experimental",description="experimental版の描画を許可します。verified版では不要です。") boolean allow;
         static final class Selection {
             @Option(names="--id") List<String> ids;
             @Option(names="--all") boolean all;
