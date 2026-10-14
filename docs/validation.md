@@ -900,6 +900,32 @@ python3 scripts/verify-matrix.py --versions 26.3 --offline --out .local/pearl-re
 python3 scripts/verify-worker-lifecycle.py --versions 26.3 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/pearl-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
 
+## 12代表版のanimation・glint World参照（Issue #64）
+
+通常flat WorldのInventoryScreen slot9（GUI座標80,121）・灰色背景・既定stack/count1・64pxを、production renderer・canonical fixer・透過復元を含まない独立QA agentで撮影します。元PNG bytesを保持する先頭frame QA resource packと、glintの時刻取得だけを1000msへ指定する計装を使用します。完全な無計装・無資源変更clientの受入ではありません。
+
+対象は1.13、1.14.3、1.14.4、1.16.5、1.19.4、1.20.6、1.21.4、1.21.5、1.21.11、26.1.2、26.2、26.3。各版stone・diamond・sea_lantern・prismarine・magma_block・enchanted_book・enchanted_golden_appleの7ID、計84比較です。許容2/255を維持し、この組合せへ画像別例外は加えません。時計・compassのnull World/player条件、全ID・全GPU・全サイズ・半透明復元の受入とは分けます。
+
+旧frame pack形式は元pack.mcmeta/整数pack_version、新しい形式はresource値またはmajor/minorを読みます。animation metadataは最初のframe1種類・interpolate=falseにし、PNG bytesを変えません。26.2/26.3のみ同じ先頭indexを2件登録します。元clientは登録1件を非animation扱いにし、strip全heightをframeサイズtargetへuploadするためです。登録は2件でもunique indexは1種類で、異なるindex・他版の2件登録・無効なframe timeを拒否します。実Resourceの提供元が当該QA packであることを検査します。glintは旧ItemRenderer内の2箇所、RenderStateShard内の1箇所、TextureTransform内の1箇所を元bytecodeで厳密照合し、対象2IDのhasFoil=trueと撮影までの固定時計実使用を記録します。
+
+受入記録は `qa/validation-2026-10-15-controlled-dynamic-world.json` に版ごとの source・core・worker・QA hashを保存します。1.13〜1.19.4の5版35比較は #66 worker、1.20.6以降の7版49比較は #68 workerで測定し、同一workerの全84比較とは扱いません。各版の比較元はその測定と同じworkerで生成した7IDです。元公式入力のhash、元PNG bytes、実pack提供元、固定時計の実使用、所有container/snapshot/一時PNG回収を監査します。
+
+1.20.6はGPU lightmap texel(15,15)とCPU texelを別々に採取し、対象GUIの実Shader.apply後にSampler2の結合texture identityを照合します。blockと2D itemで物理texture unitが異なるため、sampler名から実unitを取得します。観測scopeは対象GUI・render thread内に限定し、apply異常経路の古いshaderを次のcaptureへ持ち越しません。 既存独立Worldと生GPU採取で確認したRGB252を比較元の照明条件とし、CPU/GPU双方とcaptureのsigned ARGBをbyteへ復号したRGBAも一致させます。CPU/GPUが同じ誤値であるだけでは受入れません。判定時source hashと測定時source hashを別に記録し、保存結果を最終判定で再監査します。 自然終了後のcontainer残存もFAILとし、自分のUUID名・image・QA agent指定・cache/output mountが一致するものだけを期限付きで回収し、回収結果を保存します。終了code0/1の残存と所有条件不一致をDockerなしの子process合成で検証します。
+
+初回の旧worker1.14.4は基準生成7IDがproduction復帰API版差で失敗し、別Issue #66へ分離しました。1.20.6ではbuffered描画前のidentity観測不足と、元StackMapのchopped localsを使うQA注入のVerifyErrorを別outに保全し、実apply後の観測とentry保持・無引数RETURN callbackへ修正しました。26.1.2の既知復帰不具合は #68 確定workerを前提とし、旧candidateのblind retryは行っていません。26.2では先頭1件packのuploadエラーでclientが全packを解除し、animation3IDが比較失敗した初回も保全しました。metadata補正実装の版変数上書きは合成とWorld起動前検査で拒否され、実World測定とは扱いません。成功結果でこれらの初回失敗を置き換えません。
+
+再試験は新しいoutと同一candidateの基準を使います。QAには比較元と同じworkerを指定し、参照JARへはSymbols・ASM・JSONだけを同梱します。
+
+```sh
+python3 -m unittest discover -s scripts/qa -p 'test_*reference.py' -v
+python3 scripts/test-world-glint.py --cache .local/cache --worker-jar worker-agent.jar
+python3 scripts/test-world-cleanup.py --cache .local/cache --compare .local/baseline-1.20.6 --worker-jar worker-agent.jar
+python3 scripts/verify-world-inventory.py --version 1.21.4 --cache .local/cache \
+  --compare .local/baseline --worker-jar worker-agent.jar --frame-zero --fixed-glint \
+  --ids stone diamond sea_lantern prismarine magma_block enchanted_book enchanted_golden_apple \
+  --out .local/world-repeat --docker-image sha256:<IMAGE_SHA256>
+```
+
 ## Issue #31の無計装client基準（2026-10-14）
 
 Linux amd64・固定Mesa imageで、1.20.6のstone・player_head・chest・glass・grass_blockをagent無しclientのF2画像と独立照合しました。1280×960、GUI scale 4、通常InventoryScreenのslot 9、GUI座標(80,121)、count 1、components追加なしの既定stack、64pxです。各IDを2回撮影した10比較は、受入済みの通常World QAのslot RGBAと完全一致し、現workerのPNGを空slot背景に再合成した比較も最大channel誤差0でした。empty画像2回も既存QAと完全一致しました。

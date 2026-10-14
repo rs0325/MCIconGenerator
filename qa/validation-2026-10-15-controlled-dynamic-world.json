@@ -1,0 +1,1591 @@
+{
+  "issue": 64,
+  "date": "2026-10-15",
+  "status": "controlled dynamic World acceptance",
+  "scope": {
+    "versions": [
+      "1.13",
+      "1.14.3",
+      "1.14.4",
+      "1.16.5",
+      "1.19.4",
+      "1.20.6",
+      "1.21.4",
+      "1.21.5",
+      "1.21.11",
+      "26.1.2",
+      "26.2",
+      "26.3"
+    ],
+    "ids": [
+      "minecraft:stone",
+      "minecraft:diamond",
+      "minecraft:sea_lantern",
+      "minecraft:prismarine",
+      "minecraft:magma_block",
+      "minecraft:enchanted_book",
+      "minecraft:enchanted_golden_apple"
+    ],
+    "comparisons": 84,
+    "screenPixels": [
+      1280,
+      960
+    ],
+    "guiScale": 4,
+    "slot": 9,
+    "guiCoordinates": [
+      80,
+      121
+    ],
+    "iconPixels": [
+      64,
+      64
+    ],
+    "stackCount": 1,
+    "background": "InventoryScreen default gray",
+    "maximumChannelError": 2,
+    "exceptions": [],
+    "claimLimit": "限定clock計装・先頭frame QA packを用いる独立World参照。全ID/GPU/サイズ/半透明復元・無計装client・単一workerによる全84比較は主張しない。"
+  },
+  "identity": {
+    "branchBaseCommit": "ad887a67841992a9e33a4c3c85ce2ab7c8f83fd1",
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "finalSourcesSha256": {
+      "scripts/verify-world-inventory.py": "6a5c914c1c2563b43e1c2a25a3452b4d35cc419a529ba0e5a9b9da05cbfaa883",
+      "scripts/qa/WorldInventoryAgent.java": "57c9dae87482b1f3a750e99fb8d9160674213a3986bc7d2060caf265207d7faa",
+      "scripts/qa/world_dynamic_reference.py": "201862e2d98f5c319d7eded7c58edadba2f8cb47993241a3e515370c7e69980f"
+    },
+    "officialInputProofSha256": "54a5a00a7da34202dc6017b47794947bbd9897fbc958afa376162f7b5d989ffd"
+  },
+  "checks": {
+    "officialInputsChecked": 1400,
+    "officialInputsUnchanged": true,
+    "workerSnapshotsAbsent": true,
+    "temporaryPngAbsent": true,
+    "sourceGenerationsPreserved": true,
+    "savedResultsReaudited": true,
+    "unitReferenceTests": 6,
+    "comparisonTests": 10,
+    "junitTests": 90,
+    "clientBytecodePreflightVersions": 12,
+    "shaderStackMapAndScopeFixturePassed": true,
+    "ownedCleanupProofSha256": "8845014d5a8ffc73df967d0448beb0e4c266e8d770aa567789f819043de62941",
+    "naturalExitCleanupFixtures": 3,
+    "naturalExitCleanupFixturePassed": true,
+    "lightingBaselineAndArgbChecked": true,
+    "lightingRegressionSha256": "81e7a77985cff908d6040ed4cca687fe643e271054eddb1b4c864ab324930d8f",
+    "cleanupRegressionSha256": "6f01917141b39e47eaeb4791a03d59c68785d27af14409cfcc25deb9554dde95"
+  },
+  "records": [
+    {
+      "version": "1.13",
+      "comparisons": 7,
+      "workerImplementationCommit": "0f598af17ff02bdb973ae95b7ddd8d76378cb6d2",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "6938a46a007caa273673ee8317b97b87b7a89e951ebb5e0ca13c2e9ab510644e",
+      "clientSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+      "qaAgentSha256": "bf6db0192820ec8e9441adb0961df6a5e1895c918b4206dcd7eb9c75274995d3",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "7e9f5b2efa3d93f1a9955fff7a24e9e230092585c15f7c0590a1dc431aac0837",
+        "scripts/qa/WorldInventoryAgent.java": "6b3bc9767aa70dffe8b2923fa46b8f74f3780cfadb2ffaa577b49c26a689d5fd",
+        "scripts/qa/world_dynamic_reference.py": "64e79b28b5f832577e31a2f60a2d9c5ffc412ef5b66dc40e51f8d2345b3ac915"
+      },
+      "worldReportSha256": "41ef807f63b6eb6d0c63753093fa4eebc2b07bcf96c3eb0d150bd87650c63641",
+      "baselineManifestSha256": "45af75b41bab43cccfd5a7abad361a762d9dc4f812a26c46789b75f4e153f59e",
+      "framePackSha256": "ba11c161891faf1804a5ae808b3049add415adfd1693fb97a902926c88a6a11f",
+      "animationTextures": 27,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 2,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+          "screenSha256": "b0ce98f60d4afc770d992dbac32637edb10ce51cbb9a83feae8f52b366df5011",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "58109a8f4f2d2096803c5097ad446842aa744e9b9f196f028221975b91d2ee14",
+          "screenSha256": "27888c424137d79e2685f14d943bde8523f3193387a17d276c3dcf22fe7598ea",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "9a47684b641ec02425eda239ac6fa205113c6fc3106f058e001f1d461f1e5a35",
+          "screenSha256": "e31dc29c78cab36533e7bf4752f97cb7c61d722038f9f150d1c3e5e94c0d5ff5",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "5952cc9abeb7bbef2c8b11aa3f09f1e763935582081a1393253168f457374927",
+          "screenSha256": "94764e7b2f75d84364b6e501dabae4b643840249e5daccc54d9459417b1a4b1e",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "c447f2bde98cfc3a298780a840a359eca397d7069ea9c8be071b032f40d6cc29",
+          "screenSha256": "bc74998da3aaba04bf44e73d9a221b08d039a4d0564466c0e37650a38cd08b9f",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "34472dcf1811dcab43fa21b81d4d94e377afc654bc1a96d8c21bbe48279244af",
+          "screenSha256": "70daa5278f206b53348fa15d972dd1422f159b4c7338505c083dd35b3f415258",
+          "hasFoil": true,
+          "glintClockCalls": 60,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "1ca4222b3bc84ef8371950902b1182c952c000cf0f4b65dbc1cc30800b986e1b",
+          "screenSha256": "c842443650bf501230c8f138a9a38e2c3022b9552e96b6cc26407abfa3f7f8d6",
+          "hasFoil": true,
+          "glintClockCalls": 60,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "1.14.3",
+      "comparisons": 7,
+      "workerImplementationCommit": "0f598af17ff02bdb973ae95b7ddd8d76378cb6d2",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "6938a46a007caa273673ee8317b97b87b7a89e951ebb5e0ca13c2e9ab510644e",
+      "clientSha256": "4063062677433988e012fba53e42e4c21adb6919ac7f061f19f3c6e75b334e07",
+      "qaAgentSha256": "397a4eda537de5ccecc755c79f0598b610460692f846911ec8517a649673b6fc",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "7e9f5b2efa3d93f1a9955fff7a24e9e230092585c15f7c0590a1dc431aac0837",
+        "scripts/qa/WorldInventoryAgent.java": "6b3bc9767aa70dffe8b2923fa46b8f74f3780cfadb2ffaa577b49c26a689d5fd",
+        "scripts/qa/world_dynamic_reference.py": "64e79b28b5f832577e31a2f60a2d9c5ffc412ef5b66dc40e51f8d2345b3ac915"
+      },
+      "worldReportSha256": "3fd1f2e69a0ca9d893689ed53bb6948c67283a0953922b6d99b399475696faa0",
+      "baselineManifestSha256": "2f8f55dc1d459478072af3157d96b24eb6ad6e02e459be47f7e489dec8092c2c",
+      "framePackSha256": "4b6e02ba2848446d0c024a32913b28aaf0cdef873615613b0644f62152da5c8f",
+      "animationTextures": 33,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 2,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "65e554abf13a39887115af84f8a890c67e7114f1b0703bc9eb2d9012903eb372",
+          "screenSha256": "2b06d3fa402123c75fbdc52f8455b406e82f437be784d21c7afee17ed64a5760",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "298d873a46d43c485ac396d01d767c1e07c1a3b9fb83be5d80b40419c897d422",
+          "screenSha256": "142f37f6f9adee56eda6bc46097b760e6100437901c47cab84b5477cdbb463d9",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "e83bce2edaef79b0481ca93a7c116bef0e0810db3305b818d0832650db8ca8d9",
+          "screenSha256": "3564df95a3c32fa706b1d4b9cbd980af10fd873f492ce0b8700759a9b49e97b8",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "d585dd818bee247d0abdfb02c0929c2d5f4401ebaeaa1646170bfe17ac59930f",
+          "screenSha256": "743bd71e8d39b49672f5416453c3dd0e63c8247914dbd33e5a6db4615d3adac0",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "278cf911fad98dc18d3bbe742dce807f9ed395a66600ebf683e33f1b22b6c566",
+          "screenSha256": "c530a7a770d14e870ff0b9eb7cef83764e8ec4cfb3304ba4f89953a2deab6f59",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "4547dd78e66c11526500fbdb175320067a4c654633972207261786752de00eac",
+          "screenSha256": "e09c6be781bab792a638e3f1803d471f04c10921da935e04ff05d0cc1d344804",
+          "hasFoil": true,
+          "glintClockCalls": 60,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "d1fe5283b8a57453f814b4e58925341dc49ad06326642876b1c67b98f3ed6d64",
+          "screenSha256": "93d7eb97ef22b0948318c42049500c2faf95ebb3bd566c233811644ff19ce7d4",
+          "hasFoil": true,
+          "glintClockCalls": 60,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "1.14.4",
+      "comparisons": 7,
+      "workerImplementationCommit": "0f598af17ff02bdb973ae95b7ddd8d76378cb6d2",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "6938a46a007caa273673ee8317b97b87b7a89e951ebb5e0ca13c2e9ab510644e",
+      "clientSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+      "qaAgentSha256": "c44d68fe0ce8034c009fc60049e8b0a35e7c152066d0daa1949c867c108c859e",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "7e9f5b2efa3d93f1a9955fff7a24e9e230092585c15f7c0590a1dc431aac0837",
+        "scripts/qa/WorldInventoryAgent.java": "6b3bc9767aa70dffe8b2923fa46b8f74f3780cfadb2ffaa577b49c26a689d5fd",
+        "scripts/qa/world_dynamic_reference.py": "64e79b28b5f832577e31a2f60a2d9c5ffc412ef5b66dc40e51f8d2345b3ac915"
+      },
+      "worldReportSha256": "03654ff03b509d4a95abc492c6cf4d5296b2ac8546345d23c08ef3d03d72195f",
+      "baselineManifestSha256": "c21a5252bced7998d81e4b7c10a40b1dc28420d4cedaa54b014baa8ea5f07804",
+      "framePackSha256": "23433e9d98e5c4b83f1238d2aeba1edfb59ecb5409b9f591dd67b774ffec24ea",
+      "animationTextures": 33,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 2,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "65e554abf13a39887115af84f8a890c67e7114f1b0703bc9eb2d9012903eb372",
+          "screenSha256": "d4b51eb208846ecc24b233d05ac4d6cddec29ac833e0ebc77d88db38dd2e9c97",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "298d873a46d43c485ac396d01d767c1e07c1a3b9fb83be5d80b40419c897d422",
+          "screenSha256": "5c48e9ac2bf626343c84421b1ee3e72297a522173f4806e8d89fa5efa146d308",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "e83bce2edaef79b0481ca93a7c116bef0e0810db3305b818d0832650db8ca8d9",
+          "screenSha256": "88990d912c359a4b93a6835892b751f321f0e85885799bbb537916fe5f49999c",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "d585dd818bee247d0abdfb02c0929c2d5f4401ebaeaa1646170bfe17ac59930f",
+          "screenSha256": "9ec634986c6ef677a6f6d17036ac32fa58e2e477b57be3c06811915a8cac226e",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "278cf911fad98dc18d3bbe742dce807f9ed395a66600ebf683e33f1b22b6c566",
+          "screenSha256": "56f54a6da6eb1f2d61a5fb887c773def38f65eae91e40aead20810d19242026d",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "4547dd78e66c11526500fbdb175320067a4c654633972207261786752de00eac",
+          "screenSha256": "c4e4a396302d065f9714caf617d16424b9ffc7fb2c0ee818939d05ed6ddaad24",
+          "hasFoil": true,
+          "glintClockCalls": 60,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "d1fe5283b8a57453f814b4e58925341dc49ad06326642876b1c67b98f3ed6d64",
+          "screenSha256": "346f86e86211aa55c1cf375558815ebe618441720fc5a3c72c340109fbfceea1",
+          "hasFoil": true,
+          "glintClockCalls": 60,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "1.16.5",
+      "comparisons": 7,
+      "workerImplementationCommit": "0f598af17ff02bdb973ae95b7ddd8d76378cb6d2",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "6938a46a007caa273673ee8317b97b87b7a89e951ebb5e0ca13c2e9ab510644e",
+      "clientSha256": "00b5ebbc33e95ea88c1ab80601599c9827e9aa861d93ccc2cfcbbfd996e86263",
+      "qaAgentSha256": "3da380a9529961fcbc59c1acd0640ac4a608454f979074269be59678cc31ca68",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "7e9f5b2efa3d93f1a9955fff7a24e9e230092585c15f7c0590a1dc431aac0837",
+        "scripts/qa/WorldInventoryAgent.java": "6b3bc9767aa70dffe8b2923fa46b8f74f3780cfadb2ffaa577b49c26a689d5fd",
+        "scripts/qa/world_dynamic_reference.py": "64e79b28b5f832577e31a2f60a2d9c5ffc412ef5b66dc40e51f8d2345b3ac915"
+      },
+      "worldReportSha256": "6106029bde42ba7af2f857608e56bbaf8afcfe9795451aa10e528ecf81d5f607",
+      "baselineManifestSha256": "2b3912e45ddeb788b2e8c20ed7e8f2a234b84060831d9f706b5728a35bc51321",
+      "framePackSha256": "faf540100b22bfa64abff4ad10f914cab0945b3f96626029c9f25e607e304b4b",
+      "animationTextures": 41,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "5abbd36b1fbea760e701882365412edd4281fc01d801c951e67b390154fe4061",
+          "screenSha256": "01dccde8195ffe6222d06d8e4f7595a95c826aa0003fed4d1335818cfa86ae51",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "a3ca21a524108466358284c6715db9ebf842d2059a5bdb7a80a6eae27b507e50",
+          "screenSha256": "f5e2598d136d8cc80b66bfb0354f4c86b2da829418d5eddc3c83580f42de6a69",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "b0001cb45b3446e081ba9f2b3b9b251900c5c7d31ca6d7931e3b6c6340fe8dce",
+          "screenSha256": "37929ac78c6afb0fe549b5d944e92fd465006ef8569854c9df20864f0784ad11",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "7a0e034eb3f834a6051b023b40d01a77845eceb72305cb8eaebf6be6be763d64",
+          "screenSha256": "3db0c9b995f7f33da18fb67d27d8355954d4d82b9a81360645d3378d7ff41907",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "6f648aa909d30a774bb2657264d5a1d203d5ae93fd198462c325d955c7132c55",
+          "screenSha256": "671f9c9b42fff79a8eeaae75e4b87b73f714c46e70960c94c0cf76d037f9a16f",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "45b9efea32458487f66862c0bed658ae99fffec26783a9a8267d2d89d505b96c",
+          "screenSha256": "c3b0cd60dee7d50a5ac42139a8a9b87b9d2f7697ee5fcb14bb2fc232bd2e460d",
+          "hasFoil": true,
+          "glintClockCalls": 30,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "26c7c53edd0c5a8322687c6e0434133551ac5d9eb2a5b39e3171ccdc720e4422",
+          "screenSha256": "e8e6196233282277904f5a0427030fd387babf9fa0093559ef1c61111608c2cc",
+          "hasFoil": true,
+          "glintClockCalls": 30,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "1.19.4",
+      "comparisons": 7,
+      "workerImplementationCommit": "0f598af17ff02bdb973ae95b7ddd8d76378cb6d2",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "6938a46a007caa273673ee8317b97b87b7a89e951ebb5e0ca13c2e9ab510644e",
+      "clientSha256": "0e79cf7f07c107e9a1fe22ed703e472372b44149e64114944f0811abbd25f3ec",
+      "qaAgentSha256": "b72362a1f3e5309c7bb4d17b690acd92a9fbb6a1a652ad8078483339aa981fbc",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "7e9f5b2efa3d93f1a9955fff7a24e9e230092585c15f7c0590a1dc431aac0837",
+        "scripts/qa/WorldInventoryAgent.java": "6b3bc9767aa70dffe8b2923fa46b8f74f3780cfadb2ffaa577b49c26a689d5fd",
+        "scripts/qa/world_dynamic_reference.py": "64e79b28b5f832577e31a2f60a2d9c5ffc412ef5b66dc40e51f8d2345b3ac915"
+      },
+      "worldReportSha256": "1abc9b94176b3ee99a68230b3569bb02875e370987c922cc768f9e89238cb690",
+      "baselineManifestSha256": "ccbe2b500a330f69b952be4daaa6952dd31bdc9fb2a58d8b3dd8d2748a88f82d",
+      "framePackSha256": "3ff0bcc31069d5d5b3abfc2c77eab0e27371b4b07c15249c09400d05f1ed175e",
+      "animationTextures": 49,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "screenSha256": "b12d19921fdf812239a9de503f8a789ba73237bb7b101026d5c91295169bb9eb",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+          "screenSha256": "20668a08a643a6a72eeba2bed0f7dffe6af5b1406e4959bffeedc51a1c9619eb",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "0595319d8973acc4ecb5f654f82144a96d5ce17bbba2db94b49f8c844a344232",
+          "screenSha256": "8a0af02a8ff253c485ba66468e75d5992f90608b5d2b35f96d9e577e919eaf8e",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "4053719b53cea9c4fa0ecbf37057b9af9b7082481bf885df8f510421791eec64",
+          "screenSha256": "fb6c7f6b82aee910d6a47bbbf2412432785dc3a3734acf0f160294b5d57c3739",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "4a5ba25936a4c4567dc40e90299d0dfa08597029ebbfea06a8a5e891efd11985",
+          "screenSha256": "a32d0992e15aedda9a484762169cf5a76e0606fd88b42ce351120db35055b3d6",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "031d60f9e9108ca270b1de39463934f3804fa37164d53328a26c4bd3af1c3d9f",
+          "screenSha256": "a74d2bb7c16a54a5f13a3bbc068e3e9d4d9541e6ce52116c7ecb0c50fb2d9302",
+          "hasFoil": true,
+          "glintClockCalls": 30,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "320bce2128ac4e23bb23d1bbd697ce36d119f7568afb5a882e047d251bde4ca9",
+          "screenSha256": "43a2558b7be965bbcad4033a13d1add4f35e7571716eeb01139cf4ad4317abfa",
+          "hasFoil": true,
+          "glintClockCalls": 30,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "1.20.6",
+      "comparisons": 7,
+      "workerImplementationCommit": "904db1be5c62afb1bfa81053bed5d306a5437311",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+      "clientSha256": "02dfd345ac1ad55692d5dbc8486ac7e4fea72cd54ac494a79cd48963048e56b2",
+      "qaAgentSha256": "130986726922868c8229b322c5d1157db0c6497f70a8c451fdbbb8b840870d17",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "272fa7c3ec005377c86e10ca20a514a92e9e9d37dbf8ce819fe2512fa422cb71",
+        "scripts/qa/WorldInventoryAgent.java": "57c9dae87482b1f3a750e99fb8d9160674213a3986bc7d2060caf265207d7faa",
+        "scripts/qa/world_dynamic_reference.py": "55b51c00d02655f94be5cbefa48ff3201098c9f57f70df9952a39f34ac00f73d"
+      },
+      "worldReportSha256": "ace01e0d3a70be8336d25ff68a8a1eac63b655e0f68d5578650a56ee5e059f14",
+      "baselineManifestSha256": "f00dec8fe8833d768392a476ccdeab9229b4d28a764a383cf69a154c131d76f1",
+      "framePackSha256": "e41130bdf545963c4ee5472eaf1cb1bcf0c670eaf3989f623a95ffcb424c7ba5",
+      "animationTextures": 49,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "screenSha256": "56fb3ec0e172f802fa333a40e11f063cc085e46abc0d8411aadc48c37b0be6cc",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+          "screenSha256": "8633ba86c73ccaf68b90c1543c090237c896601fbe653e763df0f7a28ddab709",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "0595319d8973acc4ecb5f654f82144a96d5ce17bbba2db94b49f8c844a344232",
+          "screenSha256": "536ecf84952da08f897def69797f13000ec802674f222bdeef5de95dbe917bbe",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "4053719b53cea9c4fa0ecbf37057b9af9b7082481bf885df8f510421791eec64",
+          "screenSha256": "ff7c48ef1b18f7ce345bd21903877339e62edd2dc67bb30344482692400662a5",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "4a5ba25936a4c4567dc40e90299d0dfa08597029ebbfea06a8a5e891efd11985",
+          "screenSha256": "dace66f472c21d14f5202e35f66b326f9b84b273c4d106f8282f18e50b9d21f4",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "373a05ad4c320b1c310d5ef5c024ab95bf9c18076a3f9c03155bf2f1db548944",
+          "screenSha256": "eef9f3b378e32f8ffc7175efd77f5dc72dedccbd37a669e41c24a11e9423646f",
+          "hasFoil": true,
+          "glintClockCalls": 30,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "7e37782fc8b08cf75b0b4f2f1fcde34b0ca0aaa222fc2dc08d34463e190159ff",
+          "screenSha256": "e232d62126c1476ba3ee5ab8c6c410b5b9979276a96b5a3e431693f0405599d7",
+          "hasFoil": true,
+          "glintClockCalls": 30,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "gpuLightmap": [
+        {
+          "id": "minecraft:stone",
+          "fullBrightGpuTexel": [
+            15,
+            15
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapTextureId": 5,
+          "guiLightmapShaderTexture": 5,
+          "appliedSampler2TextureId": 5,
+          "appliedSampler2Unit": 2,
+          "appliedSampler2Observations": 30,
+          "guiLightmapTextureIdentityMatches": true,
+          "captureFullBrightArgb": -197380
+        },
+        {
+          "id": "minecraft:diamond",
+          "fullBrightGpuTexel": [
+            15,
+            15
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapTextureId": 5,
+          "guiLightmapShaderTexture": 5,
+          "appliedSampler2TextureId": 5,
+          "appliedSampler2Unit": 1,
+          "appliedSampler2Observations": 30,
+          "guiLightmapTextureIdentityMatches": true,
+          "captureFullBrightArgb": -197380
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "fullBrightGpuTexel": [
+            15,
+            15
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapTextureId": 5,
+          "guiLightmapShaderTexture": 5,
+          "appliedSampler2TextureId": 5,
+          "appliedSampler2Unit": 2,
+          "appliedSampler2Observations": 30,
+          "guiLightmapTextureIdentityMatches": true,
+          "captureFullBrightArgb": -197380
+        },
+        {
+          "id": "minecraft:prismarine",
+          "fullBrightGpuTexel": [
+            15,
+            15
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapTextureId": 5,
+          "guiLightmapShaderTexture": 5,
+          "appliedSampler2TextureId": 5,
+          "appliedSampler2Unit": 2,
+          "appliedSampler2Observations": 30,
+          "guiLightmapTextureIdentityMatches": true,
+          "captureFullBrightArgb": -197380
+        },
+        {
+          "id": "minecraft:magma_block",
+          "fullBrightGpuTexel": [
+            15,
+            15
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapTextureId": 5,
+          "guiLightmapShaderTexture": 5,
+          "appliedSampler2TextureId": 5,
+          "appliedSampler2Unit": 2,
+          "appliedSampler2Observations": 30,
+          "guiLightmapTextureIdentityMatches": true,
+          "captureFullBrightArgb": -197380
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "fullBrightGpuTexel": [
+            15,
+            15
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapTextureId": 5,
+          "guiLightmapShaderTexture": 5,
+          "appliedSampler2TextureId": 5,
+          "appliedSampler2Unit": 1,
+          "appliedSampler2Observations": 30,
+          "guiLightmapTextureIdentityMatches": true,
+          "captureFullBrightArgb": -197380
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "fullBrightGpuTexel": [
+            15,
+            15
+          ],
+          "fullBrightGpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "fullBrightCpuRgba": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "lightmapTextureId": 5,
+          "guiLightmapShaderTexture": 5,
+          "appliedSampler2TextureId": 5,
+          "appliedSampler2Unit": 1,
+          "appliedSampler2Observations": 30,
+          "guiLightmapTextureIdentityMatches": true,
+          "captureFullBrightArgb": -197380
+        }
+      ],
+      "baselineReused": false,
+      "independentExpectedFullBrightRgb": [
+        252,
+        252,
+        252
+      ]
+    },
+    {
+      "version": "1.21.4",
+      "comparisons": 7,
+      "workerImplementationCommit": "904db1be5c62afb1bfa81053bed5d306a5437311",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+      "clientSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+      "qaAgentSha256": "5fea5a7aee9fb7332d0286a5f2c6b4ad71a8126c15482125fad647c6aca8b01a",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "272fa7c3ec005377c86e10ca20a514a92e9e9d37dbf8ce819fe2512fa422cb71",
+        "scripts/qa/WorldInventoryAgent.java": "57c9dae87482b1f3a750e99fb8d9160674213a3986bc7d2060caf265207d7faa",
+        "scripts/qa/world_dynamic_reference.py": "55b51c00d02655f94be5cbefa48ff3201098c9f57f70df9952a39f34ac00f73d"
+      },
+      "worldReportSha256": "39df7a466198e96b255581db0084a3110e3be98acabbc5d22b0fe2aff3b18176",
+      "baselineManifestSha256": "92cfb92193df96279ec751edda8633ba8c7e34f67f819545edd0476f4c2f4f5d",
+      "framePackSha256": "56af746a4827f33cf9fecf29731a0f6a5914611dbfa66c49c27d389f94cdfde6",
+      "animationTextures": 49,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "screenSha256": "68953749e9e17ae117f63e87df24a5473754fda57746c74e79c491d7fcb06c5b",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+          "screenSha256": "9e2db16a56ccf25df06936e1c0ed966e783a73614cebfdec3f3e9afc3a2fdfe0",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "0595319d8973acc4ecb5f654f82144a96d5ce17bbba2db94b49f8c844a344232",
+          "screenSha256": "3753a60798deea324727d5a53e96fdaddb55738aa5339b39f2e568cc9ab46d42",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "4053719b53cea9c4fa0ecbf37057b9af9b7082481bf885df8f510421791eec64",
+          "screenSha256": "8bb2e817e573ebf6c062534fe30a7e0b882f1446ea29636ba0f977f9532d30f9",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "4a5ba25936a4c4567dc40e90299d0dfa08597029ebbfea06a8a5e891efd11985",
+          "screenSha256": "34753ae32572bb44094c712c4fdf84d1705aae2fc4ff8d101e93c4546eeca3b1",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "d3f5616a91ed985481ea885f58c8ea1a03adfcbeeb9a7a8c90dd25351d505ddd",
+          "screenSha256": "f61d3067bbb596f17a01383cea60efb33193e26d8372b23b2be094dff407e513",
+          "hasFoil": true,
+          "glintClockCalls": 30,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "d3bfe45f8400240e7b7648b02a4973c87de4c22d2005869435360073a0bb2128",
+          "screenSha256": "7c50d03b1329a400045f07dd9b4eaecb846e620c9f0d15640dad1ef73907659f",
+          "hasFoil": true,
+          "glintClockCalls": 30,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "1.21.5",
+      "comparisons": 7,
+      "workerImplementationCommit": "904db1be5c62afb1bfa81053bed5d306a5437311",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+      "clientSha256": "522672ad20b460c02c2e39b6c5035ef6a849af28eb11ab2ac7eb293d395a8c11",
+      "qaAgentSha256": "12fd86afb2e6075cc9e7ff667d0bdc83996ccb825b6a0844012288ff4b2afcdc",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "272fa7c3ec005377c86e10ca20a514a92e9e9d37dbf8ce819fe2512fa422cb71",
+        "scripts/qa/WorldInventoryAgent.java": "57c9dae87482b1f3a750e99fb8d9160674213a3986bc7d2060caf265207d7faa",
+        "scripts/qa/world_dynamic_reference.py": "55b51c00d02655f94be5cbefa48ff3201098c9f57f70df9952a39f34ac00f73d"
+      },
+      "worldReportSha256": "7d8a4a77dda9f31de7c4a48febc310b9a97c22166ff35fe454bda4d32be1f368",
+      "baselineManifestSha256": "7f644e104901d864227126c758c55e5a29d08279fa0a8250ecd1277ff223e62b",
+      "framePackSha256": "976c73b7a6f449eeafcafffaf2e419dc8b80ea49a040748344f262cb1a8d8f94",
+      "animationTextures": 50,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "screenSha256": "1b79a85f55945672ca645f3afd529b58d6720008a7db3451768b7c35e71ef58e",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+          "screenSha256": "018408968678a589801c7d8ba4a17de586e0db60c9bc2cb69710ac6dfc11886a",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "0595319d8973acc4ecb5f654f82144a96d5ce17bbba2db94b49f8c844a344232",
+          "screenSha256": "2e45c41ec2a6a05b360993d33058c192fdadda0ec5e64e29bd7a30922bb7980e",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "4053719b53cea9c4fa0ecbf37057b9af9b7082481bf885df8f510421791eec64",
+          "screenSha256": "06c8058edeb9bfb46583592f2752a1ba2bac3be99da34ea0db5185e01d767a23",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "4a5ba25936a4c4567dc40e90299d0dfa08597029ebbfea06a8a5e891efd11985",
+          "screenSha256": "27aaee955e1181f8037f8e7ce8cd1dc5928874274c08f46c7c4f3d0246ee74c4",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "6900c1614dc084d4b9eaf84f71c7dde089ac142b8576ea15ab3bdd72fb3511f3",
+          "screenSha256": "37dd0790cdc327511a2332a96b19a4dc439301ab51effb27ba0983a188eb18de",
+          "hasFoil": true,
+          "glintClockCalls": 31,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "8305230421f662850e8087c07af0c2c5e810760c9d0f20bff34229bd74c993a4",
+          "screenSha256": "51f5eda75b4c807e45778249f3c1a42a3e8260c9af8cdc9e039327fc39348cc9",
+          "hasFoil": true,
+          "glintClockCalls": 31,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "1.21.11",
+      "comparisons": 7,
+      "workerImplementationCommit": "904db1be5c62afb1bfa81053bed5d306a5437311",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+      "clientSha256": "1473c9489ac50fda3c435049a76a70d61a10b8610db27f5ba9d8756b686cd3bd",
+      "qaAgentSha256": "035c2ecf166ee7893203d1a50a54893149c15c7eaaaa2c72af30337a9dc69ac8",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "272fa7c3ec005377c86e10ca20a514a92e9e9d37dbf8ce819fe2512fa422cb71",
+        "scripts/qa/WorldInventoryAgent.java": "57c9dae87482b1f3a750e99fb8d9160674213a3986bc7d2060caf265207d7faa",
+        "scripts/qa/world_dynamic_reference.py": "55b51c00d02655f94be5cbefa48ff3201098c9f57f70df9952a39f34ac00f73d"
+      },
+      "worldReportSha256": "4c51e9b3b703f9dc5d95fac13598259f08e6c51faf46882a5a94d1bb68721c1f",
+      "baselineManifestSha256": "38ba41cad367245719070e99c08a60114a76affed085c389d633697470e82210",
+      "framePackSha256": "779432608075c3180716e746b5e621188b6bd65c3847ccb56a4868443d4603da",
+      "animationTextures": 54,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "426af0a119f0f3c10a02c6ff1c4ae3ef1b3d215794fbc21aa3ba27d59eb2501d",
+          "screenSha256": "61cfcfb7e6e20847951acefa51a20dc2139efe66a092e1a842ef258749e62e34",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "82aa5ad371ab2dfd29a1a53196bb8d65f9cf279b00dc881f0cf9ea996869328e",
+          "screenSha256": "7c2a4a479d6e06f71f251e4332b5da8f0c133744dda8fc453bd871d5986702b6",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "3d784e6f3be718766dce848ff158635b00b94ca8314b60eaa25f14af4a4dfe66",
+          "screenSha256": "8d8d6c4fc32de5f1ee78e505a53aedea26e9468c453ee717879321989444812f",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "1b575e63157f06119f6a3f50e8d247478a17ba8310d1c70854d1bb4a2309ce53",
+          "screenSha256": "b124f3eee5da75a8a9541e103eb5c70a904e40ef6557e2f0d16a8d652c542fb0",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "fa114ab468983395aa32cda424d5c9b55ac7f6830f1b5dbcf87714179affb77d",
+          "screenSha256": "17a24cbb13d189d968bed642035858a9f4736633f0f71a7f93cb3dd090006922",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "be3a10769a76bc5fb76176b6786ca765837e046c41d75be054de406af0e80a0c",
+          "screenSha256": "91bb38a16fa2b31c3036d44058728c53d9b7fdc1c2f334a36bdb90b9928b1495",
+          "hasFoil": true,
+          "glintClockCalls": 31,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "df513237c1738969d7d2d7fccf421d1665efa4b90ba97eba8ef18db212dc2f15",
+          "screenSha256": "968f97f043c7d9d24c1d1c5c7897198c81e5593e5aa4978f697ac0e23dc55f50",
+          "hasFoil": true,
+          "glintClockCalls": 31,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "26.1.2",
+      "comparisons": 7,
+      "workerImplementationCommit": "904db1be5c62afb1bfa81053bed5d306a5437311",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+      "clientSha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0",
+      "qaAgentSha256": "8bcf71543eede2764ce28b22e10dd3ccc391f5d5f615b91e096e417f1918f874",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "272fa7c3ec005377c86e10ca20a514a92e9e9d37dbf8ce819fe2512fa422cb71",
+        "scripts/qa/WorldInventoryAgent.java": "57c9dae87482b1f3a750e99fb8d9160674213a3986bc7d2060caf265207d7faa",
+        "scripts/qa/world_dynamic_reference.py": "55b51c00d02655f94be5cbefa48ff3201098c9f57f70df9952a39f34ac00f73d"
+      },
+      "worldReportSha256": "ac47aadfc730747c7496686e8a8180e7dc86b5cd61e242acad8b78a7eeb902c0",
+      "baselineManifestSha256": "27cde4e6e722849fca27a3c06ec4218c78ead3a05f7db6a2cd65aa810191f31e",
+      "framePackSha256": "69f53e66740574f5aad517fe409ee02dc7635394d5f552bf868d5d190ef0a36b",
+      "animationTextures": 54,
+      "frameIndexRegistrationCount": 1,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+          "screenSha256": "a34887c12de51d1d93b3ba13135ce62e3d04ca03f45e1212fb7c9e58beef82ee",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "47bc10a457edd60968476dab038eba3f3d9de127d7f94399ee2bdbf5b7135828",
+          "screenSha256": "fe52b7b4410faf6f960ee862546569c3556ec6f3846b88ab2c60480abc7be260",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "2693f136ac5404eb199128c8365c1ca173dfefa58bbb89f76df8f7b38aad5e73",
+          "screenSha256": "1bb26b869b6b9d5d3817a67b2ff7564dece870acc7c8a2032ba18d24538b1871",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "25193974336d90cd70c097abe473a9c751df8567efffde1dc6e5f7de31d5fa49",
+          "screenSha256": "2cb12227b734f084862b92390eaa46ec2844b4e141e5b8f57098e04f7353ed35",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "cc32bf97b528286b662e8f0269ef14909c106adaa26aadd5bd230d1acfd816ed",
+          "screenSha256": "a4b496461f060eddc382ed045446c8e73a72e32c86d41843fcaf5c22fb04bfbc",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "f3bbd98a4aeb233d5dc3093c28a992064187d2033eaf956bdbf6785dc4ca358a",
+          "screenSha256": "6f07a8dfdd1596ee204501528824625125b3394b4dfd67b094f5709404384e69",
+          "hasFoil": true,
+          "glintClockCalls": 31,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "056cc7de2d1f7f31f2cff2213625e04b3d05d5034e8c386c135032100bdec059",
+          "screenSha256": "ee146eec462049901f5fe2bfe8cf0200d2febc7bd15dc7a843c9a1298b6955d6",
+          "hasFoil": true,
+          "glintClockCalls": 31,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    },
+    {
+      "version": "26.2",
+      "comparisons": 7,
+      "workerImplementationCommit": "904db1be5c62afb1bfa81053bed5d306a5437311",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+      "clientSha256": "40896ee9f1e2bec3c934daac7e93d41e9e3d9c2f8ae0ca366d52ffbfd1afa290",
+      "qaAgentSha256": "22853e7f092460e4cc9ff8a4c8ef338d83ce683356ac021bf691de80c2b6e041",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "8abd548e320e98bf8d2dbcde82295d5e659f62bea11bd9c4c9a5e61825183055",
+        "scripts/qa/WorldInventoryAgent.java": "57c9dae87482b1f3a750e99fb8d9160674213a3986bc7d2060caf265207d7faa",
+        "scripts/qa/world_dynamic_reference.py": "d2ce3fd437c15e41844598a689987cb8ae157b1278cf7c937328689b85da7f8c"
+      },
+      "worldReportSha256": "1513ce2bf2525d8e4dd9076b87bd726ccb3a2ee26793c0a2079b96e50fb3f5ad",
+      "baselineManifestSha256": "3047f6b31d55251ee5738ca18d580c256fa93472481f69624d963b5e64b40490",
+      "framePackSha256": "338c691a7fc0ccccc83f30b428bba5fe52b7cbcebe78e523cd075bb1b78ef262",
+      "animationTextures": 54,
+      "frameIndexRegistrationCount": 2,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+          "screenSha256": "2b58b620d54b45401a963c94edb0159671d113172c791eba90d84e745724e697",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "47bc10a457edd60968476dab038eba3f3d9de127d7f94399ee2bdbf5b7135828",
+          "screenSha256": "a847eeb5519e2bcd50442e27a1dcf18772f93b0addc7a2161064d8b830e0fafa",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "2693f136ac5404eb199128c8365c1ca173dfefa58bbb89f76df8f7b38aad5e73",
+          "screenSha256": "b9336174193bcf71d5c4c30c9abfc452c42555f07349b312d62ce84c9ec447dc",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "25193974336d90cd70c097abe473a9c751df8567efffde1dc6e5f7de31d5fa49",
+          "screenSha256": "45ce42e2e809b5a7b4ecc477d62028183b72416f4876e358fd8fd5b6514caf26",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "cc32bf97b528286b662e8f0269ef14909c106adaa26aadd5bd230d1acfd816ed",
+          "screenSha256": "859445448f2a072c5e195875d14f8d61d34261a15afdf921a0d01eef3f25cc9b",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "f3bbd98a4aeb233d5dc3093c28a992064187d2033eaf956bdbf6785dc4ca358a",
+          "screenSha256": "35194b228789e92ac8fe72eacad4d9deed705d1dcf68a09cd28b81f77928ffcc",
+          "hasFoil": true,
+          "glintClockCalls": 32,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "056cc7de2d1f7f31f2cff2213625e04b3d05d5034e8c386c135032100bdec059",
+          "screenSha256": "2e7953fe87eea7ee1022aa3a4b76fa1d5fb43e398686184cbfea3a4e26f24d3a",
+          "hasFoil": true,
+          "glintClockCalls": 32,
+          "maxChannelError": 1,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": true,
+      "baselineGenerationRecordSha256": "66d30018eacade71e191dcb9bdd99c408a90db403247f0983323992e51ead987"
+    },
+    {
+      "version": "26.3",
+      "comparisons": 7,
+      "workerImplementationCommit": "904db1be5c62afb1bfa81053bed5d306a5437311",
+      "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+      "workerSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+      "clientSha256": "4508d006323f24fa02876310c192d739af56516eb259000ac50f0909a68c9a2d",
+      "qaAgentSha256": "05c4b3483b637981bcfa46acf86e0999f6bc82b60e6004d7a0163a27ac422fbb",
+      "measurementSourcesSha256": {
+        "scripts/verify-world-inventory.py": "8abd548e320e98bf8d2dbcde82295d5e659f62bea11bd9c4c9a5e61825183055",
+        "scripts/qa/WorldInventoryAgent.java": "57c9dae87482b1f3a750e99fb8d9160674213a3986bc7d2060caf265207d7faa",
+        "scripts/qa/world_dynamic_reference.py": "d2ce3fd437c15e41844598a689987cb8ae157b1278cf7c937328689b85da7f8c"
+      },
+      "worldReportSha256": "e73bc88d4bda5952cdb6464f9e98eac272f078a51350e5effddc962c3acfec5f",
+      "baselineManifestSha256": "030c86ccaa65311c54c48fd3e2bbb586f024aa34da7c468f1d4b1dd656917fe1",
+      "framePackSha256": "45413e46827d155fd4893108008bdd459460cc95a3451435d3519dd6aa0118d2",
+      "animationTextures": 54,
+      "frameIndexRegistrationCount": 2,
+      "uniqueFrameIndices": 1,
+      "originalPngBytesUnchanged": true,
+      "actualPackProvidersConfirmed": true,
+      "glintClockCallSites": 1,
+      "fixedGlintMillis": 1000,
+      "ownedContainerAbsent": true,
+      "officialInputsModified": false,
+      "worldExitCode": 0,
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "exportPngSha256": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+          "screenSha256": "af4bb3306730b256a36acb733247c509b064c30f26ffe078f3138122e2dbdfa8",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:diamond",
+          "exportPngSha256": "47bc10a457edd60968476dab038eba3f3d9de127d7f94399ee2bdbf5b7135828",
+          "screenSha256": "86480d1a8babe2e21b76620f4b0ca7ed82b1ad273aad19a533ed0fd28577a785",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:sea_lantern",
+          "exportPngSha256": "2693f136ac5404eb199128c8365c1ca173dfefa58bbb89f76df8f7b38aad5e73",
+          "screenSha256": "e41948ff03d54b86c64bf3dc579101791d5cab3fcced1ab7a13e2335061b360b",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:prismarine",
+          "exportPngSha256": "25193974336d90cd70c097abe473a9c751df8567efffde1dc6e5f7de31d5fa49",
+          "screenSha256": "cbf5ce0b0384e29d465d011cb3e51761a3c7381e0e6b93f90dfc29e13a457992",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:magma_block",
+          "exportPngSha256": "cc32bf97b528286b662e8f0269ef14909c106adaa26aadd5bd230d1acfd816ed",
+          "screenSha256": "2e11b29c200d8a81d35b26159b6c35640efa77081ec3a407e36e2fa74f694bbb",
+          "hasFoil": false,
+          "glintClockCalls": 0,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_book",
+          "exportPngSha256": "9e69638b01dab04fb930448976861aae6e6e88081a64f041b1f76a7f88ce9d4d",
+          "screenSha256": "71fcc97630a7ab2617c110324884dc1eb95abd38f3b03cd60c491f6a2f7b8cf9",
+          "hasFoil": true,
+          "glintClockCalls": 32,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        },
+        {
+          "id": "minecraft:enchanted_golden_apple",
+          "exportPngSha256": "43222c90dc38ec4d4e8a895908d0f4bb6f75d514a4903fe627df9ea963a7724a",
+          "screenSha256": "8b437189c309cd05f04c724a19cc5f877a07b792e5bcdc786543143b54feebb3",
+          "hasFoil": true,
+          "glintClockCalls": 32,
+          "maxChannelError": 0,
+          "pixelsOverTolerance": 0,
+          "edgeAcceptedPixels": 0,
+          "comparisonPassed": true
+        }
+      ],
+      "baselineReused": false
+    }
+  ],
+  "priorFailures": [
+    {
+      "stage": "1.14.4 baseline generation",
+      "cause": "production restore API mismatch",
+      "resolutionIssue": 66
+    },
+    {
+      "stage": "1.20.6 GPU identity observation",
+      "cause": "buffered draw entry precedes actual sampler bind",
+      "qaObservationCorrected": true
+    },
+    {
+      "stage": "26.2 frame pack load",
+      "cause": "single metadata entry disables animation and uploads full original strip into frame-sized target",
+      "qaMetadataCorrected": true
+    },
+    {
+      "stage": "26.2 corrected QA preflight",
+      "cause": "version parameter overwritten by pack_version local; World never launched",
+      "qaImplementationCorrected": true
+    },
+    {
+      "stage": "1.20.6 shader observer load",
+      "cause": "original chopped StackMap locals",
+      "qaInstrumentationCorrected": true
+    }
+  ],
+  "preservedFailureEvidenceSha256": {
+    "original1144Generation": "c532ce7140ebe8cf084da3bd7799d45cec96bc61080ec049862240fe7f98d41e",
+    "bufferEntry206Observation": "0b33216cf751d24e740b2af6497c1569b4e04d8b9f3b0928a9dd98ed5aa1d714",
+    "shader206VerifyError": "89f9840f7783c6654f2424c0b8f6cdc9de6dec9281de1ab4cd93724557af4398",
+    "original262PackLoad": "991be1bf1854bdcc24c127d763f47bdb7e494443fbe3d89d4d4b177d8cbef22b",
+    "duplicateMetadataImplementationPreflight": "66d30018eacade71e191dcb9bdd99c408a90db403247f0983323992e51ead987",
+    "duplicateMetadataSynthetic": "61ff21e05b77184d062411ed57fa2d796017fdac0ea41186a1b262daf861cca0",
+    "gpuRgbaMissingSynthetic": "9d3a615755cd1805f198e0a3d98024d1252e72253bf5c1c26799217d5e3b41b6"
+  }
+}
