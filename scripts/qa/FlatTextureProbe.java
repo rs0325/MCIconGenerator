@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 /** ゲーム・GPUを使わず、generated textureと定数tint・既定の針モデルを照合する。 */
 public final class FlatTextureProbe {
     public static void main(String[] args) throws Exception {
+        if(args.length>0&&args[0].equals("--needles")){NeedleTextureProbe.main(Arrays.copyOfRange(args,1,args.length));return;}
         String version=args[0];Path client=Paths.get(args[1]),folder=Paths.get(args[2]);
         JsonObject manifest=json(Files.readAllBytes(folder.resolve("manifest.json")));
         String sourceHash=hash(Files.readAllBytes(client));
