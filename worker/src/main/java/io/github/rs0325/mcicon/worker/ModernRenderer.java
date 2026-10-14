@@ -77,6 +77,7 @@ public class ModernRenderer implements WorkerRenderer {
         if(item==null||key(items,item).equals("minecraft:air"))throw new IllegalArgumentException("Unknown item: "+id);
         Object stack=s.call("net.minecraft.world.item.Item","getDefaultInstance",item);
         boolean oldTarget=s.hasMethod("com.mojang.blaze3d.pipeline.RenderTarget","clear",1);
+        IntBuffer targetState=captureTargetState();
         Object target=createTarget(size,oldTarget);
         Object original=s.field("net.minecraft.client.Minecraft","mainRenderTarget",minecraft);
         Object view=null;
@@ -99,12 +100,15 @@ public class ModernRenderer implements WorkerRenderer {
         } finally {
             if(view!=null)restoreView(view);
             s.setField("net.minecraft.client.Minecraft","mainRenderTarget",minecraft,original);
-            bindTarget(original);
             s.call("com.mojang.blaze3d.pipeline.RenderTarget","destroyBuffers",target);
+            restoreTargetState(targetState);
         }
     }
     protected void setupLighting() throws Exception {s.call("com.mojang.blaze3d.platform.Lighting","setupFor3DItems",null);}
     protected Object setupView(boolean oldTarget) throws Exception {
+        String matrixClass=s.hasClass("com.mojang.math.Matrix4f")?"com.mojang.math.Matrix4f":"org.joml.Matrix4f";
+        Object originalProjection=s.construct(matrixClass,s.call("com.mojang.blaze3d.systems.RenderSystem","getProjectionMatrix",null));
+        Object originalType=s.hasMethod("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",1)?null:s.call("com.mojang.blaze3d.systems.RenderSystem",oldTarget?"getVertexSorting":"getProjectionType",null);
         Object projection;
         if(s.hasClass("com.mojang.math.Matrix4f"))projection=s.call("com.mojang.math.Matrix4f","orthographic",null,16f,-16f,1000f,21000f);
         else {
@@ -127,9 +131,10 @@ public class ModernRenderer implements WorkerRenderer {
             s.call("org.joml.Matrix4f","translation",view,0f,0f,-11000f);
             if(s.hasMethod("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",0))s.call("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",null);
         }
-        return view;
+        return new Object[]{view,originalProjection,originalType};
     }
-    protected void restoreView(Object view) throws Exception {
+    protected void restoreView(Object state) throws Exception {
+        Object[] saved=(Object[])state;Object view=saved[0];
         if(view.getClass().getName().equals(s.actualClass("com.mojang.blaze3d.vertex.PoseStack"))) {
             s.call("com.mojang.blaze3d.vertex.PoseStack","popPose",view);
             s.call("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",null);
@@ -137,6 +142,8 @@ public class ModernRenderer implements WorkerRenderer {
             s.call("org.joml.Matrix4fStack","popMatrix",view);
             if(s.hasMethod("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",0))s.call("com.mojang.blaze3d.systems.RenderSystem","applyModelViewMatrix",null);
         }
+        if(saved[2]==null)s.call("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",null,saved[1]);
+        else s.call("com.mojang.blaze3d.systems.RenderSystem","setProjectionMatrix",null,saved[1],saved[2]);
     }
     protected void drawItem(Object stack) throws Exception {
         Object buffers=s.call("net.minecraft.client.Minecraft","renderBuffers",minecraft);
@@ -152,6 +159,21 @@ public class ModernRenderer implements WorkerRenderer {
         s.call("com.mojang.blaze3d.pipeline.RenderTarget","setClearColor",target,CanonicalContext.backgroundColor(),CanonicalContext.backgroundColor(),CanonicalContext.backgroundColor(),CanonicalContext.backgroundAlpha());
         if(oldTarget)s.call("com.mojang.blaze3d.pipeline.RenderTarget","clear",target,false);
         else s.call("com.mojang.blaze3d.pipeline.RenderTarget","clear",target);
+    }
+    protected IntBuffer captureTargetState() throws Exception {
+        IntBuffer state=ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder()).asIntBuffer();
+        s.call("org.lwjgl.opengl.GL11","glGetIntegerv",null,2978,state);
+        state.put(4,(Integer)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,36006));
+        state.put(5,(Integer)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,36010));
+        return state;
+    }
+    protected void restoreTargetState(IntBuffer state) throws Exception {
+        s.call("org.lwjgl.opengl.GL30","glBindFramebuffer",null,36009,state.get(4));
+        s.call("org.lwjgl.opengl.GL30","glBindFramebuffer",null,36008,state.get(5));
+        String glState=RenderAgent.config.get("profile").getAsString().equals("gui-26.3")?"com.mojang.renderpearl.backend.opengl.GlStateManager":(RenderAgent.config.get("profile").getAsString().equals("gui-26.2")||s.hasClass("com.mojang.blaze3d.opengl.GlStateManager"))?"com.mojang.blaze3d.opengl.GlStateManager":"com.mojang.blaze3d.platform.GlStateManager";
+        s.call(glState,"_glBindFramebuffer",null,36009,state.get(4));
+        s.call(glState,"_glBindFramebuffer",null,36008,state.get(5));
+        s.call(glState,"_viewport",null,state.get(0),state.get(1),state.get(2),state.get(3));
     }
     protected void bindTarget(Object target) throws Exception {s.call("com.mojang.blaze3d.pipeline.RenderTarget","bindWrite",target,true);}
     protected ByteBuffer readPixels(Object target,int size) throws Exception {

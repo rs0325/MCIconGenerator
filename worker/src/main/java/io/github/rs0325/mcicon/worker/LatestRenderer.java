@@ -35,6 +35,7 @@ public final class LatestRenderer extends ModernRenderer {
         String windowClass="net.minecraft.client.renderer.state.WindowRenderState";
         Object width=s.field(windowClass,"width",window),height=s.field(windowClass,"height",window),scale=s.field(windowClass,"guiScale",window);
         Object colorFormat=s.field(gpuPackage+"GpuFormat","RGBA8_UNORM",null);
+        IntBuffer targetState=captureTargetState();
         Object target;
         if(pearl) {
             Object depthFormat=s.field(gpuPackage+"GpuFormat","D32_FLOAT",null);
@@ -76,6 +77,7 @@ public final class LatestRenderer extends ModernRenderer {
             s.setField("net.minecraft.client.renderer.GameRenderer","mainRenderTarget",gameRenderer,original);
             s.setField(windowClass,"width",window,width);s.setField(windowClass,"height",window,height);s.setField(windowClass,"guiScale",window,scale);
             s.call("com.mojang.blaze3d.pipeline.RenderTarget","destroyBuffers",target);
+            restoreTargetState(targetState);
         }
     }
 }
