@@ -1,0 +1,327 @@
+{
+  "issue": 61,
+  "date": "2026-10-14",
+  "status": "limited uninstrumented intermediate-alpha inventory acceptance",
+  "scope": {
+    "versions": [
+      "1.20.6",
+      "1.21.4"
+    ],
+    "ids": [
+      "minecraft:white_stained_glass",
+      "minecraft:slime_block"
+    ],
+    "comparisons": 8,
+    "samplesPerIdAndVersion": 2,
+    "stack": "default ItemStack; count 1; no additional components/NBT",
+    "screen": {
+      "pixels": [
+        1280,
+        960
+      ],
+      "guiScale": 4,
+      "slot": 9,
+      "guiCoordinates": [
+        80,
+        121
+      ],
+      "iconPixels": [
+        64,
+        64
+      ]
+    },
+    "composition": "byte RGB: (src * alpha + emptyBackground * (255 - alpha) + 127) // 255",
+    "maximumChannelError": 2,
+    "exceptions": [],
+    "claimLimit": "one static InventoryScreen background; does not prove unique recovery of straight RGB or generalize to other states, versions, sizes, or GPUs"
+  },
+  "identity": {
+    "sourceCommit": "cbc8a82f820419ab8cfb50593219ff973b9e411a",
+    "coreCommit": "06cf810e43dffdac5b47d01ce39d50a6496220ce",
+    "coreSha256": "e9ec3f7388c1d804da0a21fee15b3caf117af029f7d33e627de5f147b6889f72",
+    "workerCommit": "2a9574e977ffbc6b68970a068914e0ad4dd8787f",
+    "workerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "versions": {
+      "1.20.6": {
+        "clientSha256": "02dfd345ac1ad55692d5dbc8486ac7e4fea72cd54ac494a79cd48963048e56b2",
+        "worldQaReportSha256": "1b71ff7de4db4ec02ec41ab2e8a04713771c840207a5a6d95592c175308df0e5"
+      },
+      "1.21.4": {
+        "clientSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+        "worldQaReportSha256": "7e8b89e09e6d79966e20e919cc7b9dd59b48232a82ce03d0da1fd037b16e6dbf"
+      }
+    }
+  },
+  "conditions": {
+    "agentAttached": false,
+    "agentLibrariesOrHooks": false,
+    "qaResourcePackFiles": 0,
+    "resourcePackSettingPresent": false,
+    "externalController": "AWT Robot in separate JVM",
+    "vanillaF2": true,
+    "officialInputsModified": false,
+    "sourceWorldModified": false,
+    "normalClientExit": true,
+    "ownedContainerRemoved": true,
+    "workerConcurrency": 1,
+    "reference": "same-version static World QA; production render classes excluded from QA reference agent"
+  },
+  "runs": [
+    {
+      "clientJarSha256": "02dfd345ac1ad55692d5dbc8486ac7e4fea72cd54ac494a79cd48963048e56b2",
+      "officialInputHashesSha256": "80515919824661f4e13aa0cfcf9070603299e244c806c8468490153be9e96077",
+      "worldQaReportSha256": "1b71ff7de4db4ec02ec41ab2e8a04713771c840207a5a6d95592c175308df0e5",
+      "worldQaHarnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "972ecd957da22b0cab78847e57799d3f5c62836bc6b9df92c6d55f204be91645",
+        "scripts/qa/WorldInventoryAgent.java": "2a6c913d9daced438042cf0868db2e8880c409b75511d500b765cb63407883a1"
+      },
+      "worldQaAgentSha256": "7505e0a0260364668fb98667ab9aabddd4e94ea2f5d7df47446b5e3d433c43d8",
+      "clientCaptureHarnessSourcesSha256": {
+        "scripts/verify-uninstrumented-inventory.py": "2ee2bca48b241e6607f222547df0452a77b1e467add32c12658d123b501690db",
+        "scripts/qa/DesktopInput.java": "0ce7fbf849032b6f9acf223fd322cce52c59f97c6bdc3d80000b08b524af85fa",
+        "scripts/audit-export.py": "d1e81cc8843b1bc2b05684c8f45b7553a2dc1754a06699beaae16f2bb9a87c84"
+      },
+      "alphaAuditHarnessSha256": "3084af5573feb5312ea9e031e37b8d84f5c1fa5773695f89187063bbb4c66228",
+      "alphaAuditModuleSha256": "5888c0277b3f4bb6094dc582b5fca8409f7145a306f1d37fa2f2bc19fda1ff96",
+      "clientProcessProofSha256": "cf85b31d3df88a812599d338f0a55df585498146fa25875eb43547c27f8a7fb0",
+      "referenceImageHashes": {
+        "empty": "e1179d85d53ba01a89e40a4540964c012bd24fdddd85d8ddefe189784a2c96d4",
+        "white_stained_glass": "417c01bed4c350adea8e7b2a8a7c88865f0577194579ae4bbe106de7af8d00bd",
+        "slime_block": "f24a552895bc2df9bedb65f0532249b284978663c9e47b67fb915b8976f675b8"
+      },
+      "exportManifestSha256": "8cfb06c8f1c67e42f48f375e312aa9982105f69e097f8375743a598aa747ccc7",
+      "exportPngHashes": {
+        "minecraft:slime_block": "117277d5258dfbc530e8004c2bd4d6cc4570e392b096c28c2d7556810cafbc5e",
+        "minecraft:white_stained_glass": "d67a6f489a2311b32a7cb59769689edb816b4e8050b7b6fe4a2cb21121b28bdc"
+      },
+      "registryAuditPassed": true,
+      "worldQaPassed": true,
+      "captureExitCode": 0,
+      "instrumentationAbsent": true,
+      "officialInputsModified": false,
+      "sourceWorldModified": false,
+      "ownedContainerCleanup": {
+        "attempted": true,
+        "removed": true,
+        "returnCode": 0,
+        "stderr": ""
+      },
+      "excludedProductionClasses": [
+        "Bridge",
+        "CanonicalContext",
+        "CanonicalTransformer",
+        "ClassicRenderer",
+        "DeferredRenderer",
+        "FixedRenderer",
+        "GpuImmediateRenderer",
+        "LatestRenderer",
+        "LegacyRenderer",
+        "ModernRenderer",
+        "PngOutput",
+        "RenderAgent",
+        "ResourceTransformer"
+      ],
+      "comparisons": [
+        {
+          "id": "minecraft:slime_block",
+          "sample": 0,
+          "exportPngSha256": "117277d5258dfbc530e8004c2bd4d6cc4570e392b096c28c2d7556810cafbc5e",
+          "nativeScreenSha256": "ea68d692478f5d26f7e36b2fdab6d8e07ae0f304eb6261b6cf0876c0646bdc85",
+          "emptySlotRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "nonzeroAlphaPixels": 2744,
+          "fractionalAlphaPixels": 2744,
+          "maxChannelError": 1,
+          "meanChannelError": 0.005615234375,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        },
+        {
+          "id": "minecraft:slime_block",
+          "sample": 1,
+          "exportPngSha256": "117277d5258dfbc530e8004c2bd4d6cc4570e392b096c28c2d7556810cafbc5e",
+          "nativeScreenSha256": "a36bedeb3bf9934ffd9c9c72191e8c5cf0cea117e6d0c1c7e3748b7679c73383",
+          "emptySlotRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "nonzeroAlphaPixels": 2744,
+          "fractionalAlphaPixels": 2744,
+          "maxChannelError": 1,
+          "meanChannelError": 0.005615234375,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "sample": 0,
+          "exportPngSha256": "d67a6f489a2311b32a7cb59769689edb816b4e8050b7b6fe4a2cb21121b28bdc",
+          "nativeScreenSha256": "c5df2de6d46df9a364f28788b2827f868ea2d152a9a94e6adee25e3cc3a56fb5",
+          "emptySlotRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "nonzeroAlphaPixels": 2744,
+          "fractionalAlphaPixels": 2744,
+          "maxChannelError": 1,
+          "meanChannelError": 0.147705078125,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "sample": 1,
+          "exportPngSha256": "d67a6f489a2311b32a7cb59769689edb816b4e8050b7b6fe4a2cb21121b28bdc",
+          "nativeScreenSha256": "c6bbe3b6f383d0e43ac1bd3da63252c23f3b8e5c5fa46ff37962c276ee81b5ea",
+          "emptySlotRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "nonzeroAlphaPixels": 2744,
+          "fractionalAlphaPixels": 2744,
+          "maxChannelError": 1,
+          "meanChannelError": 0.147705078125,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      ],
+      "version": "1.20.6",
+      "sourceWorldInputsSha256": "d3ecd203b34e070c012676b9fdfbc1e06b158980e788d30a97e99abee4e64e00",
+      "officialInputFileCount": 58,
+      "captureControllerClassSha256": "ffacd682fcbf0318b3de3a3061e58ddd5edc9c1ab694eb948e4c1f306e1ae2d8",
+      "captureHarnessSha256": "2ee2bca48b241e6607f222547df0452a77b1e467add32c12658d123b501690db",
+      "qaResourcePackFiles": 0,
+      "resourcePackSettingPresent": false,
+      "postCaptureHarnessSourcesSha256": {
+        "scripts/verify-uninstrumented-inventory.py": "ccb4be0d9d12c9aebf8c40a3c64a115928e901cb49efed2498458551253dd530",
+        "scripts/qa/owned_container.py": "703610ccb9d7f1940fcdb37bfa0343983de4c3de27c76ddd347ba509bd63ba5c",
+        "scripts/qa/static_world_reference.py": "49c00152652a35127b1dad8d932760e745102f77b9cc83a79396138ea368e2c8"
+      }
+    },
+    {
+      "clientJarSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+      "officialInputHashesSha256": "cd6febd2fed45a9cb492f25e204a1d6a66bc34e535c9d5e1b4e7eb9301b7d829",
+      "worldQaReportSha256": "7e8b89e09e6d79966e20e919cc7b9dd59b48232a82ce03d0da1fd037b16e6dbf",
+      "worldQaHarnessSourcesSha256": {
+        "scripts/verify-world-inventory.py": "972ecd957da22b0cab78847e57799d3f5c62836bc6b9df92c6d55f204be91645",
+        "scripts/qa/WorldInventoryAgent.java": "2a6c913d9daced438042cf0868db2e8880c409b75511d500b765cb63407883a1"
+      },
+      "worldQaAgentSha256": "690e38118748cd5e768f99cfca39de0f63f82002d65116cf6bda37f7bd487106",
+      "clientCaptureHarnessSourcesSha256": {
+        "scripts/verify-uninstrumented-inventory.py": "2ee2bca48b241e6607f222547df0452a77b1e467add32c12658d123b501690db",
+        "scripts/qa/DesktopInput.java": "0ce7fbf849032b6f9acf223fd322cce52c59f97c6bdc3d80000b08b524af85fa",
+        "scripts/audit-export.py": "d1e81cc8843b1bc2b05684c8f45b7553a2dc1754a06699beaae16f2bb9a87c84"
+      },
+      "alphaAuditHarnessSha256": "3084af5573feb5312ea9e031e37b8d84f5c1fa5773695f89187063bbb4c66228",
+      "alphaAuditModuleSha256": "5888c0277b3f4bb6094dc582b5fca8409f7145a306f1d37fa2f2bc19fda1ff96",
+      "clientProcessProofSha256": "1e0117964cc6f01d82a7df4c11e5ed37a2b99875aaacc0877a7ca237223c8466",
+      "referenceImageHashes": {
+        "empty": "4271e4100ae53380198f17a94369221722ddf0c14587669585faa2879a191a5c",
+        "white_stained_glass": "a215c41c3fd232679e78a9c1459acce656168487759d2a57f163bbee897b8d64",
+        "slime_block": "31928549536c40f01f124f9da7b2f994a9bbff3be7f68d14119811baee01ecf2"
+      },
+      "exportManifestSha256": "011c6f24ae4d19956d057b937a9f60c0f651719947e51b2fcb23dbd708085364",
+      "exportPngHashes": {
+        "minecraft:slime_block": "117277d5258dfbc530e8004c2bd4d6cc4570e392b096c28c2d7556810cafbc5e",
+        "minecraft:white_stained_glass": "d67a6f489a2311b32a7cb59769689edb816b4e8050b7b6fe4a2cb21121b28bdc"
+      },
+      "registryAuditPassed": true,
+      "worldQaPassed": true,
+      "captureExitCode": 0,
+      "instrumentationAbsent": true,
+      "officialInputsModified": false,
+      "sourceWorldModified": false,
+      "ownedContainerCleanup": {
+        "attempted": true,
+        "removed": true,
+        "returnCode": 0,
+        "stderr": ""
+      },
+      "excludedProductionClasses": [
+        "Bridge",
+        "CanonicalContext",
+        "CanonicalTransformer",
+        "ClassicRenderer",
+        "DeferredRenderer",
+        "FixedRenderer",
+        "GpuImmediateRenderer",
+        "LatestRenderer",
+        "LegacyRenderer",
+        "ModernRenderer",
+        "PngOutput",
+        "RenderAgent",
+        "ResourceTransformer"
+      ],
+      "comparisons": [
+        {
+          "id": "minecraft:slime_block",
+          "sample": 0,
+          "exportPngSha256": "117277d5258dfbc530e8004c2bd4d6cc4570e392b096c28c2d7556810cafbc5e",
+          "nativeScreenSha256": "2f7291d2bf323b50b652a780f012f95f0b31bbef8ef5268bc7fe9bb9fb0a70fb",
+          "emptySlotRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "nonzeroAlphaPixels": 2744,
+          "fractionalAlphaPixels": 2744,
+          "maxChannelError": 1,
+          "meanChannelError": 0.005615234375,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        },
+        {
+          "id": "minecraft:slime_block",
+          "sample": 1,
+          "exportPngSha256": "117277d5258dfbc530e8004c2bd4d6cc4570e392b096c28c2d7556810cafbc5e",
+          "nativeScreenSha256": "00465437ed7138ad5806da7a1bfa9b308a6d4b043753b72b5bcfedbe0c37ed31",
+          "emptySlotRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "nonzeroAlphaPixels": 2744,
+          "fractionalAlphaPixels": 2744,
+          "maxChannelError": 1,
+          "meanChannelError": 0.005615234375,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "sample": 0,
+          "exportPngSha256": "d67a6f489a2311b32a7cb59769689edb816b4e8050b7b6fe4a2cb21121b28bdc",
+          "nativeScreenSha256": "f05380958e7dc89220f8ec4e104f864b7ceb86f5e1f3e70168c9daf9950391a9",
+          "emptySlotRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "nonzeroAlphaPixels": 2744,
+          "fractionalAlphaPixels": 2744,
+          "maxChannelError": 1,
+          "meanChannelError": 0.147705078125,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        },
+        {
+          "id": "minecraft:white_stained_glass",
+          "sample": 1,
+          "exportPngSha256": "d67a6f489a2311b32a7cb59769689edb816b4e8050b7b6fe4a2cb21121b28bdc",
+          "nativeScreenSha256": "77b539c44017291f575c1c219814aec74790510051127eb1951aed95d249d204",
+          "emptySlotRgbaSha256": "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90",
+          "nonzeroAlphaPixels": 2744,
+          "fractionalAlphaPixels": 2744,
+          "maxChannelError": 1,
+          "meanChannelError": 0.147705078125,
+          "pixelsOverTolerance": 0,
+          "passed": true
+        }
+      ],
+      "version": "1.21.4",
+      "sourceWorldInputsSha256": "177a2b1c957fece9131df38bf446e4506292057b3b256d7f2f42a04001befdab",
+      "officialInputFileCount": 72,
+      "captureControllerClassSha256": "ffacd682fcbf0318b3de3a3061e58ddd5edc9c1ab694eb948e4c1f306e1ae2d8",
+      "captureHarnessSha256": "2ee2bca48b241e6607f222547df0452a77b1e467add32c12658d123b501690db",
+      "qaResourcePackFiles": 0,
+      "resourcePackSettingPresent": false,
+      "postCaptureHarnessSourcesSha256": {
+        "scripts/verify-uninstrumented-inventory.py": "ccb4be0d9d12c9aebf8c40a3c64a115928e901cb49efed2498458551253dd530",
+        "scripts/qa/owned_container.py": "703610ccb9d7f1940fcdb37bfa0343983de4c3de27c76ddd347ba509bd63ba5c",
+        "scripts/qa/static_world_reference.py": "49c00152652a35127b1dad8d932760e745102f77b9cc83a79396138ea368e2c8"
+      }
+    }
+  ],
+  "allEightComparisonsPassed": true,
+  "performanceGuarantee": false,
+  "auditEvidence": {
+    "auditRunPassed": true,
+    "auditHarnessSha256": "3084af5573feb5312ea9e031e37b8d84f5c1fa5773695f89187063bbb4c66228",
+    "auditModuleSha256": "5888c0277b3f4bb6094dc582b5fca8409f7145a306f1d37fa2f2bc19fda1ff96",
+    "captureHarnessSha256": "2ee2bca48b241e6607f222547df0452a77b1e467add32c12658d123b501690db",
+    "screenshotHashVerification": "両版のempty/item全12枚で実F2 PNG SHA-256とslot crop RGBA SHA-256をcapture reportに照合",
+    "emptySlotRgbaSha256": [
+      "5a09912d69e6b5eda398c8aa1d57942cbff6bc1a332cc89e615bf52f5d6f1f90"
+    ],
+    "meaning": "captureHarnessSha256は実測capture時の旧harness。auditHarnessSha256とpostCaptureHarnessSourcesSha256はcapture後の静的監査用ソースで、後者はnative captureを生成していない。"
+  }
+}

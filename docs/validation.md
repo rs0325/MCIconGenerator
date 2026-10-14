@@ -919,6 +919,18 @@ python3 scripts/verify-uninstrumented-inventory.py --version 1.21.4 \
   --qa-reference .local/qa-1.21.4 --out .local/uninstrumented-1.21.4 --samples 2
 ```
 
+## Issue #61の無agent中間alpha照合（2026-10-14）
+
+1.20.6と1.21.4のwhite_stained_glass・slime_blockを、64px出力PNGと、元client JAR・公式librariesだけで起動した通常InventoryScreenのslot 9で照合します。既定ItemStackをvanilla commandで置き、追加component/NBTなし・count 1で各素材を2回撮影します。empty slotも2回撮影し、各sampleに対応する背景として使います。別JVMのAWT Robotがメニュー・command・F2を操作します。client command・`/proc/1`のprocess proofにagent引数・attach libraryがなく、resource packを使わないことを確認します。元のsaveは新規outへコピーし、cacheはread-only mountです。
+
+通常World QAは補助referenceとして両版で新規取得し、empty・対象2種類のstatic slot画像が成功することを確認します。reference用agentのJARからRenderAgent、CanonicalTransformer、Renderer、PngOutput、Bridgeを除外します。これらは通常Worldの表示を確認する補助検査であり、無agent capture側との合成判定は行いません。
+
+出力PNGは64×64 RGBA8とmanifest hashを検証し、alphaが0より大きく255未満の画素があることを必須にします。各pixel・各RGB channelについて`(src * alpha + empty * (255 - alpha) + 127) // 255`でbyte合成し、実F2画像との最大差2/255、超過pixel 0を合格条件とします。例外pixelはありません。単一の実背景との一致は、alphaやstraight RGBの一意復元、別背景・別状態・他版・他GPUでの保証を意味しません。
+
+両版で合計8比較が成功し、各PNGのvisible/fractional alphaは2,744画素、全sampleの最大channel差は1/255、許容超過pixelは0でした。World QAも両版の対象2 IDで成功しました。captureは両版ともexit 0、agentなし、公式入力と元saveのhash不変、owned container削除済みです。保存captureの後段監査では12枚すべてのF2 PNG file SHAとslot crop RGBA SHAをcapture記録と照合しました。実測capture時のharness hashと、この後段監査・cleanup修正のsource hashは分けて[限定QA記録](../qa/validation-2026-10-14-uninstrumented-alpha.json)に保存し、F2画像・JAR・save・raw logはprivateに保持します。
+
+QAではproduction API・renderer・imageやGLを変更せず、他IDや全版の保証へ広げません。失敗時は新しいoutで自動再試験せず、最初のcapture・reportを保持して原因を記録します。
+
 ## Issue #32のRGBA8・色精度検証（2026-10-14）
 
 1.20.6/1.21.4のknown-RGBA診断パックを、generated-modelの1層/2層、alpha 0/1/127/128/254/255・cutout境界25/26を含む16段階、暗/明色を含む16色で検証しました。64px・GUI位置(80,121)・6背景、変更しないwheat対照を含む通常GUIの36比較はbyte RGB再合成で最大2/255でした。production readback入口のblack/white計12回とGUI各背景のFBOはRGBA8・GL_LINEAR・sRGB無効・各channel 8bit、texture binding復帰・GL error 0を確認しました。

@@ -21,10 +21,14 @@ version=cache/'versions'/a.version;meta=json.loads((version/'version.json').read
 client=version/'client.jar'
 if hashlib.sha1(client.read_bytes()).hexdigest()!=meta['downloads']['client']['sha1']:raise ValueError('client hashが不一致です')
 ids=a.ids or (['stone','player_head','chest','glass','grass_block'] if a.version=='1.20.6' else ['diamond','clock','compass','recovery_compass','enchanted_book','sea_lantern'])
-allowed=['stone','player_head','chest','glass','grass_block'] if a.version=='1.20.6' else ['diamond','clock','compass','recovery_compass','enchanted_book','sea_lantern']
+allowed=['stone','player_head','chest','glass','grass_block','white_stained_glass','slime_block'] if a.version=='1.20.6' else ['diamond','clock','compass','recovery_compass','enchanted_book','sea_lantern','white_stained_glass','slime_block']
 if any(id not in allowed for id in ids):p.error('この版の受入対象IDを指定してください')
 reference=a.qa_reference.resolve();qa=json.loads((reference/'report.json').read_text())
 if qa['version']!=a.version or qa['sourceSha256']!=sha(client) or not qa['passed']:p.error('同じ元clientの受入済みWorld QAが必要です')
+reference_entries={entry['id']:entry for entry in qa['entries']}
+reference_spec=importlib.util.spec_from_file_location('static_world_reference',repo/'scripts/qa/static_world_reference.py');static_reference=importlib.util.module_from_spec(reference_spec);reference_spec.loader.exec_module(static_reference)
+if not static_reference.has_static_references(ids,reference_entries):
+ p.error('静的対象IDすべてにWorld QAの成功画像が必要です')
 spec=importlib.util.spec_from_file_location('audit_export',repo/'scripts/audit-export.py');audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit)
 def crop(path):
  w,h,rgba=audit.rgba_png(path.read_bytes())
@@ -32,7 +36,7 @@ def crop(path):
  return b''.join(rgba[(y*w+320)*4:(y*w+384)*4]for y in range(484,548))
 qa_images={'empty':reference/'empty-screen.png'}
 for id in ids:
- if id not in ['clock','compass','recovery_compass','enchanted_book','sea_lantern']:qa_images[id]=reference/('minecraft_'+id+'-screen.png')
+ if id not in static_reference.DYNAMIC_IDS:qa_images[id]=reference/('minecraft_'+id+'-screen.png')
 qa_pixels={id:crop(path)for id,path in qa_images.items()}
 if len(ids)!=len(set(ids)) or any(not re.fullmatch('[a-z0-9_]+',id) for id in ids):p.error('IDは重複なしのvanilla名を指定してください')
 world=a.world_save.resolve();world_inputs=[{'path':str(f.relative_to(world)),'sha256':sha(f)} for f in sorted(world.rglob('*')) if f.is_file()]
@@ -56,12 +60,19 @@ image=subprocess.run(docker+['image','inspect',a.docker_image,'--format','{{.Id}
 active=subprocess.run(docker+['ps','--format','{{.Names}}'],capture_output=True,text=True,check=True).stdout.splitlines()
 if sum(n.startswith(('mcicon-worker-','mcicon-world-qa-'))for n in active)>=2:raise RuntimeError('native clientの同時実行は2つまでです')
 container='mcicon-world-qa-uninstrumented-'+str(uuid.uuid4())
+container_run_attempted=False
+container_label=container
+cleanup_spec=importlib.util.spec_from_file_location('owned_container',repo/'scripts/qa/owned_container.py');owned_container=importlib.util.module_from_spec(cleanup_spec);cleanup_spec.loader.exec_module(owned_container)
 command=['/opt/java/java21/bin/java','-Xmx2G','-Duser.timezone=UTC','-Djava.library.path=/mcicon/cache/versions/'+a.version+'/natives-linux','-cp',':'.join(['/mcicon/cache/versions/'+a.version+'/client.jar']+libraries),meta['mainClass'],'--username','MCIconGenerator','--version',a.version,'--gameDir','/mcicon/qa/game','--assetsDir','/mcicon/cache/assets','--assetIndex',meta['assetIndex']['id'],'--accessToken','0','--uuid','00000000000000000000000000000000','--userType','legacy','--width','1280','--height','960','--disableMultiplayer']
 (out/'start.sh').write_text('#!/bin/sh\nexport DISPLAY=:99\nXvfb :99 -screen 0 1280x960x24 -ac -nolisten tcp > /mcicon/qa/xvfb.log 2>&1 &\nsleep 2\nexec '+shlex.join(command)+' > /mcicon/qa/client.log 2>&1\n')
-report={'scope':'clientは元JARと公式libraryだけで起動する。別JVMのAWT Robotで通常UI・vanilla command・F2を操作する。saveは入力としてコピーし、時刻・描画・animationを変更しない。','version':a.version,'imageId':image,'sourceSha256':sha(client),'inputs':inputs,'worldInputs':world_inputs,'worldSource':'指定された保存済みワールド。生成時の無計装性は保証せず、今回の描画clientだけを無計装とする。','windowPixels':[1280,960],'guiScale':4,'slot':9,'slotGui':[80,121],'count':1,'componentOverrides':{},'qaReferenceReportSha256':sha(reference/'report.json'),'qaReferenceImages':{id:sha(path)for id,path in qa_images.items()},'clientCommand':command,'controllerClassSha256':sha(classes/'DesktopInput.class'),'harnessSourcesSha256':{str(f.relative_to(repo)):sha(f) for f in [Path(__file__).resolve(),repo/'scripts/qa/DesktopInput.java',repo/'scripts/audit-export.py']},'operations':[],'captures':[],'completed':False}
+report={'scope':'clientは元JARと公式libraryだけで起動する。別JVMのAWT Robotで通常UI・vanilla command・F2を操作する。saveは入力としてコピーし、時刻・描画・animationを変更しない。','version':a.version,'imageId':image,'sourceSha256':sha(client),'inputs':inputs,'worldInputs':world_inputs,'worldSource':'指定された保存済みワールド。生成時の無計装性は保証せず、今回の描画clientだけを無計装とする。','windowPixels':[1280,960],'guiScale':4,'slot':9,'slotGui':[80,121],'count':1,'componentOverrides':{},'qaReferenceReportSha256':sha(reference/'report.json'),'qaReferenceImages':{id:sha(path)for id,path in qa_images.items()},'clientCommand':command,'controllerClassSha256':sha(classes/'DesktopInput.class'),'harnessSourcesSha256':{str(f.relative_to(repo)):sha(f) for f in [Path(__file__).resolve(),repo/'scripts/qa/DesktopInput.java',repo/'scripts/audit-export.py',repo/'scripts/qa/owned_container.py',repo/'scripts/qa/static_world_reference.py']},'operations':[],'captures':[],'completed':False}
 save=lambda:(out/'capture.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 save()
 def run(*args):return subprocess.run(docker+list(args),capture_output=True,text=True,check=True,timeout=120)
+def remove_owned_container():
+ if not container_run_attempted:return {'attempted':False,'removed':False}
+ return owned_container.cleanup(docker,container,container_label,{
+  '/mcicon/cache':(str(cache),False),'/mcicon/qa':(str(out),True),'/mcicon/control':(str(classes),False)})
 def act(*args):
  run('exec','-e','DISPLAY=:99',container,'/opt/java/java21/bin/java','-cp','/mcicon/control','DesktopInput',*map(str,args));report['operations'].append({'action':list(args),'elapsedSeconds':round(time.monotonic()-start,3)});save()
 def wait(check,seconds,message):
@@ -77,7 +88,8 @@ def chat(s):
  report.setdefault('commandConfirmations',[]).append({'command':s,'logCharacterOffset':offset,'expected':expected,'observed':log.read_text()[offset:]});save();time.sleep(1)
 start=time.monotonic()
 try:
- run('run','-d','--name',container,'--platform','linux/amd64','--network','none','--memory','3g','--cpus','4','--entrypoint','/bin/sh','-e','JAVA_TOOL_OPTIONS=','-e','JDK_JAVA_OPTIONS=','-e','_JAVA_OPTIONS=','-v',str(cache)+':/mcicon/cache:ro','-v',str(out)+':/mcicon/qa','-v',str(classes)+':/mcicon/control:ro',image,'/mcicon/qa/start.sh')
+ container_run_attempted=True
+ run('run','-d','--name',container,'--label','mcicon.qa.owner='+container,'--platform','linux/amd64','--network','none','--memory','3g','--cpus','4','--entrypoint','/bin/sh','-e','JAVA_TOOL_OPTIONS=','-e','JDK_JAVA_OPTIONS=','-e','_JAVA_OPTIONS=','-v',str(cache)+':/mcicon/cache:ro','-v',str(out)+':/mcicon/qa','-v',str(classes)+':/mcicon/control:ro',image,'/mcicon/qa/start.sh')
  wait(lambda:(out/'client.log').exists() and 'minecraft:textures/atlas/gui.png-atlas' in (out/'client.log').read_text(),90,'titleのロードが完了しません');time.sleep(2)
  act('screen','/mcicon/qa/title.png');act('click',640,470);time.sleep(2);act('screen','/mcicon/qa/world-menu.png');act('click',480,260);act('click',320,790)
  wait(lambda:'joined the game' in (out/'client.log').read_text(),90,'worldのロードが完了しません');time.sleep(8)
@@ -106,9 +118,13 @@ try:
  status=run('wait',container).stdout.strip();report['exitCode']=int(status)
  report['worldOutputLevelDatSha256']=sha(game/'saves'/'MCIcon QA'/'level.dat')
  report['officialInputsModified']=any(sha(cache/e['path'])!=e['sha256']for e in inputs)
- report['completed']=report['exitCode']==0 and not report['officialInputsModified'];save()
+ report['sourceWorldModified']=world_inputs!=[{'path':str(f.relative_to(world)),'sha256':sha(f)} for f in sorted(world.rglob('*')) if f.is_file()]
+ report['ownedContainerCleanup']=remove_owned_container()
+ report['completed']=report['exitCode']==0 and not report['officialInputsModified'] and not report['sourceWorldModified'] and report['ownedContainerCleanup']['removed'];save()
  if not report['completed']:raise SystemExit(1)
 except BaseException as error:
- report['failure']={'type':type(error).__name__,'message':str(error)};save()
- subprocess.run(docker+['stop','--time','5',container],capture_output=True)
+ report['failure']={'type':type(error).__name__,'message':str(error)}
+ try:report['ownedContainerCleanup']=remove_owned_container()
+ except BaseException as cleanup_error:report['ownedContainerCleanup']={'attempted':True,'removed':False,'error':f'{type(cleanup_error).__name__}: {cleanup_error}'}
+ save()
  raise
