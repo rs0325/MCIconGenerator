@@ -12,7 +12,7 @@ import java.util.Set;
  * @param output version/mode別ディレクトリを作る出力の起点
  * @param overwrite 今回選択した出力だけを置換する
  * @param failFast 最初の個別失敗で処理を止める
- * @param allowExperimental 未受入adapterの使用へ明示的に同意する
+ * @param allowExperimental experimental版の描画へ明示的に同意する。verifiedでは不要で、未実装版は許可しない
  */
 public record RenderRequest(String version,List<ResourceId> ids,boolean all,String kind,int size,Path output,
                             boolean overwrite,boolean failFast,boolean allowExperimental) {

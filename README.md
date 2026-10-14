@@ -30,6 +30,6 @@ mcicon extract --version 1.21.4 --all --out out
 
 描画passで追跡したfallbackモデルとmissing spriteは `MISSING_MODEL` / `MISSING_TEXTURE` として失敗を記録します。特殊rendererの全リソースの監査は継続中です。準備・I/Oの例外原因は任意の `--debug` でstderrへ表示できます。
 
-公開API・worker・manifestの契約は[contracts.md](docs/contracts.md)、対応版の固定集合は[releases.json](adapters/releases.json)です。未実装adapterの版を指定すると `ADAPTER_UNAVAILABLE`、experimental描画へのopt-inがない場合は `UNVERIFIED_VERSION` を返します。
+公開API・worker・manifestの契約は[contracts.md](docs/contracts.md)、対応版の固定集合は[releases.json](adapters/releases.json)です。未実装adapterの版を指定すると `ADAPTER_UNAVAILABLE`、experimental描画へのopt-inがない場合は `UNVERIFIED_VERSION` を返します。verified版はopt-in不要ですが、現在の固定51版はすべてexperimentalです。未登録・unsupported版は `--allow-experimental` でも描画できません。
 
 MinecraftのゲームJAR・アセット・生成画像はこのリポジトリに含めません。本プロジェクトは非公式で、Mojang/Microsoftとは関係ありません。プロジェクトコードはMIT License、Minecraft資産は各権利者のものです。利用時は[Minecraft EULA](https://www.minecraft.net/en-us/eula)をご確認ください。

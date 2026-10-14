@@ -534,6 +534,14 @@ python3 scripts/verify-native-failure.py --cache .local/cache \
   --docker-image mcicon-render:0.1.0-preview.1
 ```
 
+## Issue #73の版supportによる描画受入（2026-10-15）
+
+renderはexact版のsupportを入力準備前に判定し、verifiedは通常利用、experimentalは明示opt-in時だけ許可します。discovered・unsupportedはopt-inでも拒否し、latestが未登録の場合も旧版へ切り替えません。doctorのadapter説明を実際のsupportに合わせました。対応表の51版はすべてexperimentalで、verified昇格は行っていません。
+
+[数値記録](../qa/validation-2026-10-15-render-support.json)に、JUnit97件（core61／CLI5／worker31）、build/installDist、公開16クラスの署名不変、CLI helpを保存しています。verified等の試験は内部supportだけをsubmit前にfixtureへ置換し、実resolve→renderからprepare通知への到達を確認しました。ゲーム資産・network・Dockerは使わず、doctorのverified表示は静的確認です。CLI説明の折返しを考慮しなかった初回検査FAILは保持し、説明の空白正規化で確認しています。
+
+共有APIの重点反証に確定した問題はありません。workerは#68の27a0、対応表・fixed-v1・deterministic=false・保存形式・PNG処理は不変です。この判定の実装を正式品質の受入やリリース完了とは扱いません。
+
 ## Issue #68の26.1 framebuffer復帰API選択（2026-10-14）
 
 `Symbols.hasClass`はmappingへの登録を調べます。26.1/26.1.1/26.1.2は名前付きclassのためmapping登録がなく、元JARにある`com.mojang.blaze3d.opengl.GlStateManager`を検出できず、存在しない`com.mojang.blaze3d.platform.GlStateManager`へfallbackして描画が失敗していました。対象3版は実在するopengl classを明示選択します。framebuffer bindingとviewportの復帰は公式APIを使い、回帰fixtureでは実GL相当のviewport値と、後続の公式framebuffer bindによるcache同期を検査します。
