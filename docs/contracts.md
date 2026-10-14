@@ -95,7 +95,7 @@ deferred GUIでは各passのアトラス割当を初期化し、単品・全件�
 
 iconsのPNGは8bit RGBA・straight alphaで、sRGB chunk（Perceptual）を付けてRGBの解釈を明示します。[PNG仕様](https://www.w3.org/TR/png-3/#11sRGB)の色空間指定に従い、RGB値のgamma変換は行いません。rawは元JARのPNG bytesを保持します。
 
-透過PNGは黒・白の不透明背景で同じアイテムを2回描画し、背景差からalphaとstraight RGBを復元します。GPU readbackの上下を反転し、alpha=0のRGBを0にします。byte RGB上の再合成はバニラのGUIブレンドとの一致を確認するもので、linear-lightの背景合成とは区別します。通常GUI fixtureでの再合成比較は[検証記録](validation.md)を参照してください。sRGB・半透明・glintを含む無改変のワールド内inventory基準画像との受入は未完了です。
+透過PNGは黒・白の不透明背景で同じアイテムを2回描画し、背景差からalphaとstraight RGBを復元します。GPU readbackの上下を反転し、alpha=0のRGBを0にします。byte RGB上の再合成はバニラのGUIブレンドとの一致を確認するもので、sRGB EOTFで線形化して合成するlinear-lightとは区別します。Issue #32の2版known-RGBA fixtureでは通常GUIとの差は最大2/255、linear-lightとの差は最大73/255でした。低alphaではRGBA8量子化後の元straight RGBを一意に復元できず、透明source RGBの保存や全色・全renderer・他GPUの無誤差復元を保証しません。色の条件・誤差分解・PNG chunkは[色精度の記録](color-precision.md)を参照してください。通常GUI fixtureでの再合成比較は[検証記録](validation.md)を参照してください。sRGB・半透明・glintを含む無改変のワールド内inventory基準画像との受入は未完了です。
 
 Issue #31では1.20.6のstone・player_head・chest・glass・grass_blockを64pxで照合し、agent無しclientのF2画像が通常World QAと生成PNGに誤差0で一致しました。glassはbinary alphaの素材です。この静的5種類の結果を、半透明・glint・他版・他状態の受入へ広げません。条件は[検証記録](validation.md#issue-31の無計装client基準2026-10-14)を参照してください。
 

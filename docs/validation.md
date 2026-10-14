@@ -856,3 +856,13 @@ python3 scripts/verify-uninstrumented-inventory.py --version 1.21.4 \
   --cache .local/cache --world-save '.local/qa-1.21.4/game/saves/MCIcon QA' \
   --qa-reference .local/qa-1.21.4 --out .local/uninstrumented-1.21.4 --samples 2
 ```
+
+## Issue #32のRGBA8・色精度検証（2026-10-14）
+
+1.20.6/1.21.4のknown-RGBA診断パックを、generated-modelの1層/2層、alpha 0/1/127/128/254/255・cutout境界25/26を含む16段階、暗/明色を含む16色で検証しました。64px・GUI位置(80,121)・6背景、変更しないwheat対照を含む通常GUIの36比較はbyte RGB再合成で最大2/255でした。production readback入口のblack/white計12回とGUI各背景のFBOはRGBA8・GL_LINEAR・sRGB無効・各channel 8bit、texture binding復帰・GL error 0を確認しました。
+
+独立syntheticでは同じgridをRGBA8、SRGB8_ALPHA8、RGBA32Fで描画します。float対照の誤差はRGB 0〜255単位で最大0.00001909、RGBA8の同じoracleとの差は最大0.997でした。RGBA8の復元alphaは誤差0、byte再合成は最大1、alpha>=127のstraight RGBは最大1でした。alpha=1ではstraight RGBの最大127の情報損失があり、元色の一意復元は保証できません。通常shaderのalpha<0.1 discardと区別し、alphaを余分に0へ丸める変更は行っていません。
+
+ゲームの2版fixtureではlinear-lightの再合成と通常GUIに最大73/255の差がありました。SRGB8_ALPHA8・sRGB有効のsynthetic対照はlinear oracleに最大0.849で一致しますが、その対照へbyte RGB復元式を誤適用するとalphaに60、再合成に44の差が出ます。非適用条件の診断として保持し、productionの色空間・復元式・既存PNGを変更せず、許容値も拡大していません。全版experimental・deterministic=false・verified 0版を維持します。
+
+出力PNGのCRC・RGBA8・sRGB Perceptual chunkを確認し、alpha0のhidden RGBは0でした。JUnit 68件、alpha1の情報損失と再合成の回帰、ビルドが成功。最終入力726ファイルのhash保持、公式client不変、QA packの実選択元も確認しました。初期系列は最終件数へ加算せず、今回の追加native/JUnitに失敗はありません。[条件・契約・再実行方法](color-precision.md)と[数値・hash記録](../qa/validation-2026-10-14-color-precision.json)を参照してください。

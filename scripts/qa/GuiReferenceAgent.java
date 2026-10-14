@@ -154,6 +154,11 @@ public final class GuiReferenceAgent {
     private static void recordFramebuffer() throws Exception {
         Path path=Paths.get(fixture.get("captureFolder").getAsString()).resolve("framebuffer.json");
         if(Files.exists(path))return;
+        JsonObject state=framebufferState(symbols);
+        Files.createDirectories(path.getParent());Files.write(path,new Gson().toJson(state).getBytes("UTF-8"));
+    }
+    /** 色形式を読み取り、触れたtexture bindingを復帰するQA観測。 */
+    public static JsonObject framebufferState(Symbols symbols) throws Exception {
         String gl="org.lwjgl.opengl.GL11",gl30="org.lwjgl.opengl.GL30";
         JsonObject state=new JsonObject();
         state.addProperty("framebuffer",((Number)symbols.call(gl,"glGetInteger",null,36006)).intValue());
@@ -163,8 +168,19 @@ public final class GuiReferenceAgent {
             state.addProperty(channels[i]+"Bits",((Number)symbols.call(gl30,"glGetFramebufferAttachmentParameteri",null,36160,36064,0x8212+i)).intValue());
         }
         state.addProperty("colorEncoding",((Number)symbols.call(gl30,"glGetFramebufferAttachmentParameteri",null,36160,36064,33296)).intValue());
+        int objectType=((Number)symbols.call(gl30,"glGetFramebufferAttachmentParameteri",null,36160,36064,36048)).intValue();
+        state.addProperty("attachmentObjectType",objectType);
+        if(objectType==5890) {
+            int texture=((Number)symbols.call(gl30,"glGetFramebufferAttachmentParameteri",null,36160,36064,36049)).intValue();
+            int binding=((Number)symbols.call(gl,"glGetInteger",null,32873)).intValue();
+            try {
+                symbols.call(gl,"glBindTexture",null,3553,texture);
+                state.addProperty("internalFormat",((Number)symbols.call(gl,"glGetTexLevelParameteri",null,3553,0,4099)).intValue());
+            } finally {symbols.call(gl,"glBindTexture",null,3553,binding);}
+            state.addProperty("textureBindingRestored",((Number)symbols.call(gl,"glGetInteger",null,32873)).intValue()==binding);
+        }
         state.addProperty("glError",((Number)symbols.call(gl,"glGetError",null)).intValue());
-        Files.createDirectories(path.getParent());Files.write(path,new Gson().toJson(state).getBytes("UTF-8"));
+        return state;
     }
     private static Object stack(String id) throws Exception {
         if(legacy) {
