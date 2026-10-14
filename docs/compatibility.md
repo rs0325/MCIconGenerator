@@ -154,3 +154,7 @@ production・公開API・PNG形式は変更していません。既存PNGの再�
 ## 1.14.4の復帰API修正
 
 #64の受入で、#36以降の1.14.4が存在しないGlStateManager._glBindFramebuffer/_viewportを呼んで全描画に失敗することを確認しました。#66ではその版だけ実GLのbinding復帰と旧viewport/cache更新へ合わせ、他版のcache同期を維持します。修正候補の全876枚と隣接・新方式4版28枚は既存正常出力へRGBA/パス一致し、独立World7比較も許容内でした。[検証範囲と数値](validation.md#issue-66の1144復帰api修正2026-10-14)を参照してください。worker hash/settingsDigestが変わるため旧iconsへの再開をせず、新しい出力先へ再生成してください。API/raw/contextは不変で、全版experimental/deterministic=falseを維持します。
+
+## 26.1系列の復帰API選択
+
+26.1/26.1.1/26.1.2の描画復帰では、実JARに存在する`blaze3d.opengl.GlStateManager`を選択します。worker hash/settingsDigestが変わるため、既存iconsへの再開は避け、新しい出力先で生成してください。検証条件と範囲は[Issue #68の記録](validation.md#issue-68の261-framebuffer復帰api選択2026-10-14)を参照してください。

@@ -9,20 +9,31 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.file.*;
 import java.nio.charset.StandardCharsets;
 
-class RendererCleanupTest {
+public class RendererCleanupTest {
     @TempDir Path directory;
     @Test void restoresActualBindingsAfterTargetDestructionAndKeepsDrawFailure() throws Exception {verify(false,false);}
     @Test void restoresActualBindingsAfterTargetDestructionAndKeepsReadbackFailure() throws Exception {verify(true,false);}
     @Test void restores1144BindingsAndViewportAfterDrawFailure() throws Exception {verify(false,true);}
     @Test void restores1144BindingsAndViewportAfterReadbackFailure() throws Exception {verify(true,true);}
+    @Test void restoresNamed261BindingsAndViewportAfterDrawFailure() throws Exception {for(String version:new String[]{"26.1","26.1.1","26.1.2"})verify(false,false,version);}
+    @Test void restoresNamed261BindingsAndViewportAfterReadbackFailure() throws Exception {for(String version:new String[]{"26.1","26.1.1","26.1.2"})verify(true,false,version);}
     private void verify(boolean readback,boolean oldApi) throws Exception {
-        JsonObject previous=RenderAgent.config;JsonObject config=new JsonObject();config.addProperty("version",oldApi?"1.14.4":"1.21.4");config.addProperty("profile","test");RenderAgent.config=config;
+        verify(readback,oldApi,(String)null);
+    }
+    private void verify(boolean readback,boolean oldApi,String namedVersion) throws Exception {
+        boolean named26=namedVersion!=null;
+        JsonObject previous=RenderAgent.config;JsonObject config=new JsonObject();config.addProperty("version",named26?namedVersion:oldApi?"1.14.4":"1.21.4");config.addProperty("profile",named26?"gui-deferred":"test");RenderAgent.config=config;
         try {
             State state=new State();state.oldApi=oldApi;if(readback){state.draw=state.read=0;state.cachedDraw=state.cachedRead=0;}Gl.state=state;
+            if(named26)com.mojang.blaze3d.opengl.GlStateManager.reset();
             Path mapping=directory.resolve("mappings.txt");
             String prefix="io.github.rs0325.mcicon.worker.RendererCleanupTest$";
-            Files.write(mapping,("net.minecraft.core.Registry -> "+prefix+"Registry:\n    java.lang.Object ITEM -> ITEM\n    java.lang.Object BLOCK -> BLOCK\n    java.lang.Object getValue(java.lang.Object) -> getValue\n    java.lang.String getKey(java.lang.Object) -> getKey\nnet.minecraft.resources.ResourceLocation -> "+prefix+"Identifier:\n    java.lang.Object parse(java.lang.String) -> parse\nnet.minecraft.world.item.Item -> "+prefix+"Item:\nnet.minecraft.client.Minecraft -> "+prefix+"Minecraft:\n    java.lang.Object mainRenderTarget -> mainRenderTarget\ncom.mojang.blaze3d.pipeline.RenderTarget -> "+prefix+"Target:\ncom.mojang.blaze3d.platform.GlStateManager -> "+prefix+(oldApi?"OldStateManager":"StateManager")+":\norg.lwjgl.opengl.GL11 -> "+prefix+"Gl:\norg.lwjgl.opengl.GL30 -> "+prefix+"Gl:\n").getBytes(StandardCharsets.UTF_8));
+            String stateMapping=named26?"":"com.mojang.blaze3d.platform.GlStateManager -> "+prefix+(oldApi?"OldStateManager":"StateManager")+":\n";
+            String namedRegistries=named26?"net.minecraft.core.registries.BuiltInRegistries -> "+prefix+"Registry:\n    java.lang.Object ITEM -> ITEM\n    java.lang.Object BLOCK -> BLOCK\n":"";
+            String namedIdentifier=named26?"net.minecraft.resources.Identifier -> "+prefix+"Identifier:\n    java.lang.Object parse(java.lang.String) -> parse\n":"";
+            Files.write(mapping,("net.minecraft.core.Registry -> "+prefix+"Registry:\n    java.lang.Object ITEM -> ITEM\n    java.lang.Object BLOCK -> BLOCK\n    java.lang.Object getValue(java.lang.Object) -> getValue\n    java.lang.String getKey(java.lang.Object) -> getKey\n"+namedRegistries+"net.minecraft.resources.ResourceLocation -> "+prefix+"Identifier:\n    java.lang.Object parse(java.lang.String) -> parse\n"+namedIdentifier+"net.minecraft.world.item.Item -> "+prefix+"Item:\nnet.minecraft.client.Minecraft -> "+prefix+"Minecraft:\n    java.lang.Object mainRenderTarget -> mainRenderTarget\ncom.mojang.blaze3d.pipeline.RenderTarget -> "+prefix+"Target:\n"+stateMapping+"org.lwjgl.opengl.GL11 -> "+prefix+"Gl:\norg.lwjgl.opengl.GL30 -> "+prefix+"Gl:\n").getBytes(StandardCharsets.UTF_8));
             Symbols symbols=new Symbols(mapping);Minecraft minecraft=new Minecraft(state);
+            if(named26)assertFalse(symbols.hasClass("com.mojang.blaze3d.opengl.GlStateManager"));
             IllegalStateException failure=new IllegalStateException("draw/readback fault");
             ModernRenderer renderer=new ModernRenderer(symbols,minecraft) {
                 protected Object createTarget(int size,boolean old) {state.draw=state.read=0;return state.target;}
@@ -37,13 +48,16 @@ class RendererCleanupTest {
             JsonObject request=new JsonObject();request.addProperty("id","minecraft:stone");request.addProperty("size",64);
             assertSame(failure,assertThrows(IllegalStateException.class,()->renderer.render(request)));
             assertTrue(state.destroyed);assertTrue(state.viewRestored);assertSame(state.original,minecraft.mainRenderTarget);
-            assertEquals(readback?0:23,state.draw);assertEquals(readback?0:24,state.read);assertArrayEquals(new int[]{2,4,100,120},state.viewport);
+            assertEquals(readback?0:23,state.draw);assertEquals(readback?0:24,state.read);
+            assertArrayEquals(new int[]{2,4,100,120},state.viewport);
             assertTrue(state.destroyedBeforeRestore);
-            if(!oldApi){assertEquals(state.draw,state.cachedDraw);assertEquals(state.read,state.cachedRead);}
-            assertArrayEquals(state.viewport,state.cachedViewport);
-            if(oldApi)Gl.glBindFramebuffer(36160,0);else StateManager._glBindFramebuffer(36160,0);
+            if(!oldApi&&!named26){assertEquals(state.draw,state.cachedDraw);assertEquals(state.read,state.cachedRead);}
+            if(!named26)assertArrayEquals(state.viewport,state.cachedViewport);
+            if(named26){assertEquals(readback?0:23,com.mojang.blaze3d.opengl.GlStateManager.draw);assertEquals(readback?0:24,com.mojang.blaze3d.opengl.GlStateManager.read);}
+            if(oldApi)Gl.glBindFramebuffer(36160,0);else if(named26)com.mojang.blaze3d.opengl.GlStateManager._glBindFramebuffer(36160,0);else StateManager._glBindFramebuffer(36160,0);
             assertEquals(0,state.draw);assertEquals(0,state.read);
-        } finally {RenderAgent.config=previous;Gl.state=null;}
+            if(named26){assertEquals(0,com.mojang.blaze3d.opengl.GlStateManager.draw);assertEquals(0,com.mojang.blaze3d.opengl.GlStateManager.read);}
+        } finally {RenderAgent.config=previous;Gl.state=null;if(named26)com.mojang.blaze3d.opengl.GlStateManager.reset();}
     }
     private static final class State {
         final Object original=new Object();final Target target=new Target();
