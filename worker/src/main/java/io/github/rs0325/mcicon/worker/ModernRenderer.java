@@ -171,9 +171,12 @@ public class ModernRenderer implements WorkerRenderer {
         s.call("org.lwjgl.opengl.GL30","glBindFramebuffer",null,36009,state.get(4));
         s.call("org.lwjgl.opengl.GL30","glBindFramebuffer",null,36008,state.get(5));
         String glState=RenderAgent.config.get("profile").getAsString().equals("gui-26.3")?"com.mojang.renderpearl.backend.opengl.GlStateManager":(RenderAgent.config.get("profile").getAsString().equals("gui-26.2")||s.hasClass("com.mojang.blaze3d.opengl.GlStateManager"))?"com.mojang.blaze3d.opengl.GlStateManager":"com.mojang.blaze3d.platform.GlStateManager";
-        s.call(glState,"_glBindFramebuffer",null,36009,state.get(4));
-        s.call(glState,"_glBindFramebuffer",null,36008,state.get(5));
-        s.call(glState,"_viewport",null,state.get(0),state.get(1),state.get(2),state.get(3));
+        boolean oldApi=RenderAgent.config.get("version").getAsString().equals("1.14.4");
+        if(!oldApi) {
+            s.call(glState,"_glBindFramebuffer",null,36009,state.get(4));
+            s.call(glState,"_glBindFramebuffer",null,36008,state.get(5));
+        }
+        s.call(glState,oldApi?"viewport":"_viewport",null,state.get(0),state.get(1),state.get(2),state.get(3));
     }
     protected void bindTarget(Object target) throws Exception {s.call("com.mojang.blaze3d.pipeline.RenderTarget","bindWrite",target,true);}
     protected ByteBuffer readPixels(Object target,int size) throws Exception {

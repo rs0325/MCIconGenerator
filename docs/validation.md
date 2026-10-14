@@ -997,3 +997,16 @@ python3 scripts/test-runtime-inputs.py
 ```
 
 `prepare` に必要な版の入力が複数cacheへ分かれている場合は `--source-cache` を反復できます。各 `--out` は未使用の場所を指定します。Windowsでは同じPython harnessが `mcicon.bat` を使用します。cold/warm時間は#38で別に測定し、ここでの経過秒を正式benchmarkや性能保証として扱いません。全版experimental/deterministic=falseを維持します。
+## Issue #66の1.14.4復帰API修正（2026-10-14）
+
+#64の動的受入で、現worker `8b85e11a…`の1.14.4・7IDがすべて`RENDER_FAILED / NoSuchMethodException: GlStateManager._glBindFramebuffer/2`になりました。初回FAILは保全しています。#36で追加したModernRendererの復帰を継承するFixedRendererが、その版にないAPIを呼んでいたことを元clientのbytecodeで確認しました。1.14.4のGLXはFBO bindingをCORE/ARB/EXTへ直接渡してcacheを持たず、GlStateManagerは旧`viewport(IIII)V`でviewport/cacheを更新します。
+
+1.14.4だけ、実GLのdraw/read binding復帰を維持して存在しないFBO cache同期を外し、viewportを旧API経由で復帰します。他版の公式cache同期は維持します。元入力・照明・GUI位置・時間・公開API・PNG/manifest形式は変更していません。workerは`6938a46a…`へ変わり、旧workerとのJAR entry差はModernRenderer.classだけです。settingsDigestが変わるため、旧iconsへ再開せず新しい出力先へ生成してください。rawの再生成は不要です。
+
+旧APIしか持たないfixtureのdraw/readback故障2件は修正前に失敗し、修正後は原例外を保持してtarget破棄後の実bindingとviewport/cacheを復帰します。既存modern回帰を含むJUnit92件が成功しました。固定Mesa image `c498eda7…`で、1.14.4の代表7枚・全件876枚がPNG監査に成功し、代表7枚は同候補の全件へRGBA/パス一致しました。全876枚は#36以前の#24正常出力へRGBA/パス一致しました。異なるworker世代の画素比較であり、旧settingsの再開互換を示しません。
+
+1.14.4の独立World7比較は最大差1/255・許容2/255超過0でした。通常InventoryScreen slot9、GUI(80,121)、64px、既定stack/count1です。#64作業中のQA sourceを私有snapshotへ固定して使い、元PNG保持の先頭frameパックとglint1000ms指定を記録しています。productionの描画・固定化・透過復元classは含まず、完全無計装clientとは扱いません。測定sourceのSHAは現行・後続QAと区別します。
+
+隣接1.14.3/1.15と1.21.4/26.3の7IDずつ、計28枚も生成・PNG監査に成功し、各版の既存正常基準へRGBA/パス一致しました。公式入力902ファイルのhashは前後不変です。6所有workerは保存ログのDocker既定hostname短IDとDocker eventのActor.IDを対応し、die exit0・destroyとsnapshot/一時PNG回収を確認しました。World clientもexit0・所有container消失を確認しています。CLI終了0だけからworker終了0を推定していません。
+
+[初回FAIL・元API根拠・候補hash・比較と回収の数値記録](../qa/validation-2026-10-14-framebuffer-1144.json)を保存します。全版品質の正式受入やcanonical昇格は完了しておらず、experimental/deterministic=falseを維持します。

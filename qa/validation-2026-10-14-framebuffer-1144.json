@@ -1,0 +1,625 @@
+{
+  "issue": 66,
+  "date": "2026-10-14",
+  "baseCommit": "ad887a67841992a9e33a4c3c85ce2ab7c8f83fd1",
+  "scope": "1.14.4のframebuffer/viewport復帰API版差のみ修正。全版品質・canonical昇格ではない。",
+  "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+  "workerSha256": "6938a46a007caa273673ee8317b97b87b7a89e951ebb5e0ca13c2e9ab510644e",
+  "workerSourceSha256": "b3bf731217a3d566dfefeffeef71f297abdddd581025f55631348ce7e992913b",
+  "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+  "beforeFailure": {
+    "workerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+    "manifestSha256": "756c947de41d4d19f0e5254028213c6596cc864d0c6ddc04f7b1f08673c5c0c4",
+    "counts": {
+      "failed": 7,
+      "noItemForm": 43,
+      "succeeded": 0
+    },
+    "code": "RENDER_FAILED",
+    "message": "NoSuchMethodException: GlStateManager._glBindFramebuffer/2",
+    "savedUnchanged": true
+  },
+  "officialApiEvidence": {
+    "sourceSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+    "classSha256": {
+      "com/mojang/blaze3d/platform/GlStateManager.class": "e4a55d9ceff53563904c2986374c725658489f139cd44d326c36171862c6c5f8",
+      "com/mojang/blaze3d/platform/GLX.class": "3f17871e8c6d08b4ddbdf0b233819b1900a6ffc744d18f8cbdab744c7da46833"
+    },
+    "glStateManagerFramebufferCache": false,
+    "viewportMethod": "viewport(IIII)V",
+    "framebufferDispatch": "GLX.glBindFramebuffer(II)V → CORE/ARB/EXT。binding cacheなし。実GL30復帰を維持",
+    "bytecodeDisassemblySha256": {
+      "GlStateManager": "49eba6f5dee4f88ccacda2131904b55b48b014586b93b25d33e7de6966a249ce",
+      "GLX": "e91fe8a9d217d3ffa90f4a4f054c0b3a09310d7c899d29a9a7e6b4f4f98f1969"
+    }
+  },
+  "binaryDiff": {
+    "beforeWorkerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+    "afterWorkerSha256": "6938a46a007caa273673ee8317b97b87b7a89e951ebb5e0ca13c2e9ab510644e",
+    "changedJarEntries": [
+      "io/github/rs0325/mcicon/worker/ModernRenderer.class"
+    ]
+  },
+  "junit": {
+    "core": {
+      "tests": 58,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "cli": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "worker": {
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "beforeRegression": {
+    "tests": 4,
+    "failed": 2,
+    "scope": "旧APIのdraw/readback fault fixtureがNoSuchMethodExceptionで原例外を隠す。修正前結果を別保存。"
+  },
+  "selected": {
+    "version": "1.14.4",
+    "mode": "icons",
+    "audited": 7,
+    "registryPopulationVerified": false,
+    "transparentImages": 7,
+    "fractionalAlphaPixels": 0,
+    "failures": [],
+    "compared": 0,
+    "comparisonVerified": false,
+    "canonicalVerified": false,
+    "exitCode": 0,
+    "elapsedSeconds": 25.98,
+    "cliCoreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0"
+  },
+  "singleAll": {
+    "version": "1.14.4",
+    "mode": "icons",
+    "audited": 7,
+    "registryPopulationVerified": false,
+    "transparentImages": 7,
+    "fractionalAlphaPixels": 0,
+    "failures": [],
+    "compared": 7,
+    "comparisonVerified": true,
+    "canonicalVerified": false
+  },
+  "all": {
+    "version": "1.14.4",
+    "mode": "icons",
+    "audited": 876,
+    "registryPopulationVerified": true,
+    "transparentImages": 860,
+    "fractionalAlphaPixels": 114928,
+    "failures": [],
+    "compared": 876,
+    "comparisonVerified": true,
+    "canonicalVerified": false,
+    "exitCode": 0,
+    "elapsedSeconds": 41.05,
+    "cliCoreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0"
+  },
+  "regression": {
+    "1.14.3": {
+      "version": "1.14.3",
+      "mode": "icons",
+      "audited": 7,
+      "registryPopulationVerified": false,
+      "transparentImages": 7,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 7,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "nativeAudit": {
+        "version": "1.14.3",
+        "mode": "icons",
+        "audited": 7,
+        "registryPopulationVerified": false,
+        "transparentImages": 7,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 32.99,
+        "cliCoreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0"
+      }
+    },
+    "1.15": {
+      "version": "1.15",
+      "mode": "icons",
+      "audited": 7,
+      "registryPopulationVerified": false,
+      "transparentImages": 7,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 7,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "nativeAudit": {
+        "version": "1.15",
+        "mode": "icons",
+        "audited": 7,
+        "registryPopulationVerified": false,
+        "transparentImages": 7,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 39.15,
+        "cliCoreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0"
+      }
+    },
+    "1.21.4": {
+      "version": "1.21.4",
+      "mode": "icons",
+      "audited": 7,
+      "registryPopulationVerified": false,
+      "transparentImages": 7,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 7,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "nativeAudit": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "audited": 7,
+        "registryPopulationVerified": false,
+        "transparentImages": 7,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 19.83,
+        "cliCoreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0"
+      }
+    },
+    "26.3": {
+      "version": "26.3",
+      "mode": "icons",
+      "audited": 7,
+      "registryPopulationVerified": false,
+      "transparentImages": 7,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 7,
+      "comparisonVerified": true,
+      "canonicalVerified": false,
+      "nativeAudit": {
+        "version": "26.3",
+        "mode": "icons",
+        "audited": 7,
+        "registryPopulationVerified": false,
+        "transparentImages": 7,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false,
+        "exitCode": 0,
+        "elapsedSeconds": 25.55,
+        "cliCoreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0"
+      }
+    }
+  },
+  "world": {
+    "version": "1.14.4",
+    "reportSha256": "d0408603433d73ad6da9ae724b95ca055201006375a933a5b51c755797f5cad1",
+    "scope": "通常ワールドのInventoryScreenで版別に指定したglint時刻取得だけを1000msへ指定するQA。productionの固定化・bootstrap・PNG復元は共有しない。glint時刻を変更した管理下の参照画像である。 animationの元PNGを保持し、metadataのframesを最初のframe1件、interpolateをfalseにするQAパックを使用する。",
+    "qaSourceState": "#64作業中のsourceを私有snapshotへ固定。main未公開の独立QA。現行/後続sourceと測定SHAを混同しない。",
+    "qaAgentSha256": "de945c917c2397cbae5116b5ec3cbb7ae3ca8cf9ab31f0be001730e6c89d63c3",
+    "harnessSourcesSha256": {
+      "scripts/verify-world-inventory.py": "7bc41a42823402df5f6602f3ca9c58461d1ba732451678494b9a208a846ef452",
+      "scripts/qa/WorldInventoryAgent.java": "c7ef19d8cc783eec43fe8efe7f84d7650251ea298367d2b7b64ee6fcc178f0ab",
+      "scripts/qa/world_dynamic_reference.py": "774dee2e9c8825bd62b8427c6c3a4c419b90fa8f4a523512266f4ed4d0341968"
+    },
+    "excludedProductionClasses": [
+      "RenderAgent",
+      "CanonicalTransformer",
+      "CanonicalContext",
+      "ResourceTransformer",
+      "ModernRenderer",
+      "ClassicRenderer",
+      "FixedRenderer",
+      "LegacyRenderer",
+      "DeferredRenderer",
+      "GpuImmediateRenderer",
+      "LatestRenderer",
+      "PngOutput",
+      "Bridge"
+    ],
+    "windowPixels": [
+      1280,
+      960
+    ],
+    "guiScale": 4,
+    "slot": 9,
+    "captures": 8,
+    "glintClockCallSites": 2,
+    "fixedGlintMillis": 1000,
+    "maxAllowedChannelError": 2,
+    "entries": [
+      {
+        "hasFoil": false,
+        "glintClockCalls": 0,
+        "fixedGlintMillis": 1000,
+        "id": "minecraft:stone",
+        "exportPngSha256": "65e554abf13a39887115af84f8a890c67e7114f1b0703bc9eb2d9012903eb372",
+        "screenSha256": "241f7d28a183b6c95362c2ec4e3e0458e964faad008644ff90c28f1a0ace5357",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "fullBrightGpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "fullBrightCpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "lightmapGpuMatchesCpu": true,
+        "guiLightmapTextureEnabled": false,
+        "guiLightmapTextureUnit": 1,
+        "lightingCompatible": true
+      },
+      {
+        "hasFoil": false,
+        "glintClockCalls": 0,
+        "fixedGlintMillis": 1000,
+        "id": "minecraft:diamond",
+        "exportPngSha256": "298d873a46d43c485ac396d01d767c1e07c1a3b9fb83be5d80b40419c897d422",
+        "screenSha256": "2783370cbf985ba822e66be662a894d44e89a3375633039a89d8bb4075cdf227",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "fullBrightGpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "fullBrightCpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "lightmapGpuMatchesCpu": true,
+        "guiLightmapTextureEnabled": false,
+        "guiLightmapTextureUnit": 1,
+        "lightingCompatible": true
+      },
+      {
+        "hasFoil": false,
+        "glintClockCalls": 0,
+        "fixedGlintMillis": 1000,
+        "id": "minecraft:sea_lantern",
+        "exportPngSha256": "e83bce2edaef79b0481ca93a7c116bef0e0810db3305b818d0832650db8ca8d9",
+        "screenSha256": "3050fd59ea61ef658cf63e12d42c75ff8f3eabc375ba347a635e45458236b804",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "fullBrightGpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "fullBrightCpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "lightmapGpuMatchesCpu": true,
+        "guiLightmapTextureEnabled": false,
+        "guiLightmapTextureUnit": 1,
+        "lightingCompatible": true
+      },
+      {
+        "hasFoil": false,
+        "glintClockCalls": 0,
+        "fixedGlintMillis": 1000,
+        "id": "minecraft:prismarine",
+        "exportPngSha256": "d585dd818bee247d0abdfb02c0929c2d5f4401ebaeaa1646170bfe17ac59930f",
+        "screenSha256": "5cbae7890e1b539a28fd45fd1fc0084762dd84713ff6f1c59c7bac967938cb2e",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "fullBrightGpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "fullBrightCpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "lightmapGpuMatchesCpu": true,
+        "guiLightmapTextureEnabled": false,
+        "guiLightmapTextureUnit": 1,
+        "lightingCompatible": true
+      },
+      {
+        "hasFoil": false,
+        "glintClockCalls": 0,
+        "fixedGlintMillis": 1000,
+        "id": "minecraft:magma_block",
+        "exportPngSha256": "278cf911fad98dc18d3bbe742dce807f9ed395a66600ebf683e33f1b22b6c566",
+        "screenSha256": "22136472ceaabe30a5f5d37a9cc9f1e13d41b08b79006359a441c4d04fcd520f",
+        "maxChannelError": 0,
+        "meanChannelError": 0.0,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "fullBrightGpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "fullBrightCpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "lightmapGpuMatchesCpu": true,
+        "guiLightmapTextureEnabled": false,
+        "guiLightmapTextureUnit": 1,
+        "lightingCompatible": true
+      },
+      {
+        "hasFoil": true,
+        "glintClockCalls": 60,
+        "fixedGlintMillis": 1000,
+        "id": "minecraft:enchanted_book",
+        "exportPngSha256": "4547dd78e66c11526500fbdb175320067a4c654633972207261786752de00eac",
+        "screenSha256": "b3d2a55bf353d13b7d1c0fda223a8bc3b134426966680da877beae93e0efb470",
+        "maxChannelError": 1,
+        "meanChannelError": 0.0004069010416666667,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "fullBrightGpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "fullBrightCpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "lightmapGpuMatchesCpu": true,
+        "guiLightmapTextureEnabled": false,
+        "guiLightmapTextureUnit": 1,
+        "lightingCompatible": true
+      },
+      {
+        "hasFoil": true,
+        "glintClockCalls": 60,
+        "fixedGlintMillis": 1000,
+        "id": "minecraft:enchanted_golden_apple",
+        "exportPngSha256": "d1fe5283b8a57453f814b4e58925341dc49ad06326642876b1c67b98f3ed6d64",
+        "screenSha256": "9b8690767467d949cd9dd0b323b5bf1cf5f62f66f4e82ebcda6ae27adde8f663",
+        "maxChannelError": 1,
+        "meanChannelError": 8.138020833333333e-05,
+        "pixelsOverTolerance": 0,
+        "edgePixels": [],
+        "edgeAcceptedPixels": 0,
+        "comparisonPassed": true,
+        "count": 1,
+        "fullBrightRgb": [
+          252,
+          252,
+          252
+        ],
+        "opaqueReference": true,
+        "rawPassed": true,
+        "lightmapMatches": null,
+        "fullBrightGpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "fullBrightCpuRgba": [
+          252,
+          252,
+          252,
+          255
+        ],
+        "lightmapGpuMatchesCpu": true,
+        "guiLightmapTextureEnabled": false,
+        "guiLightmapTextureUnit": 1,
+        "lightingCompatible": true
+      }
+    ],
+    "passed": true,
+    "ownedContainerAbsent": true
+  },
+  "officialInputs": {
+    "files": 902,
+    "beforeAfterSha256Unchanged": true,
+    "proofSha256": "68c808e31a2eb73d31b5dd2f27c29803374846ac6db23a8749f5b1fc2d6f2763"
+  },
+  "ownedCleanup": {
+    "rows": [
+      {
+        "runDirectory": "worker-11810851475290048512",
+        "version": "1.15",
+        "containerId": "cd796c6ad1ccf5be84e19145712197c68ae44c50d84ff444d1e15cbd42f10d2d",
+        "name": "mcicon-worker-7ba9e718-5159-4b7e-87d5-0a47bddc8326",
+        "exitCode": "0",
+        "destroyEvent": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true,
+        "workerLogSha256": "cedb3a7e774fcc23cdc140da42be60f05b516219190ee1308265fcadb2fcaa77",
+        "identityEvidence": "worker.logのDocker既定hostname短IDとDocker event Actor.IDを対応"
+      },
+      {
+        "runDirectory": "worker-17885860972970437162",
+        "version": "1.14.4",
+        "containerId": "49f1616712c6399d66974240c81c237531da6fd3ae360ad4accbe64e3a014891",
+        "name": "mcicon-worker-d34c711d-50ae-4395-906a-5dd62e21c2f6",
+        "exitCode": "0",
+        "destroyEvent": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true,
+        "workerLogSha256": "f76f9e44e72a6c5292516ce4f2b3ba639cb04e9ede67becd3ca438bf9b89d7fe",
+        "identityEvidence": "worker.logのDocker既定hostname短IDとDocker event Actor.IDを対応"
+      },
+      {
+        "runDirectory": "worker-1899417991266385782",
+        "version": "1.14.3",
+        "containerId": "e35f37f3e579445c1b4c599735fc5de5711fb6e12f4103fefe1f4e55afebd3be",
+        "name": "mcicon-worker-40199695-db2c-4e14-ae6f-8dbe1a689efa",
+        "exitCode": "0",
+        "destroyEvent": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true,
+        "workerLogSha256": "c05b1dd64eeb9770cccbde617de2be309b8d0b2079b989ba101b72ea64432414",
+        "identityEvidence": "worker.logのDocker既定hostname短IDとDocker event Actor.IDを対応"
+      },
+      {
+        "runDirectory": "worker-318078098330638584",
+        "version": "1.14.4",
+        "containerId": "ce60e32ce7148b56a76cbf16e81be1d319d3b6245fc1e710271dba821329da0f",
+        "name": "mcicon-worker-9e6b93f1-2b81-4451-a75b-26fd6456134a",
+        "exitCode": "0",
+        "destroyEvent": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true,
+        "workerLogSha256": "5d5e1318d6c6191b16cb1ecef8c450afa943587326ee4db8d645fa8e705d5534",
+        "identityEvidence": "worker.logのDocker既定hostname短IDとDocker event Actor.IDを対応"
+      },
+      {
+        "runDirectory": "worker-4612104688096847296",
+        "version": "1.21.4",
+        "containerId": "6c6e265df08dc46800d3034eae77f936b35d5f38d9ba9eb1b5e26cd572f5e1d7",
+        "name": "mcicon-worker-a727f2c2-3cb9-4efe-80df-3a2463473cf4",
+        "exitCode": "0",
+        "destroyEvent": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true,
+        "workerLogSha256": "9ef7f5f067b39f8be24afded602e78250772bc02c0b5d2006596c81bc5c983b6",
+        "identityEvidence": "worker.logのDocker既定hostname短IDとDocker event Actor.IDを対応"
+      },
+      {
+        "runDirectory": "worker-8507081197063453071",
+        "version": "26.3",
+        "containerId": "65e752bb07cbc0f350ca4afd257d97af19e5197e13242c39fef1715c43d90401",
+        "name": "mcicon-worker-fdce72a5-294f-4f44-9100-da1196248f15",
+        "exitCode": "0",
+        "destroyEvent": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true,
+        "workerLogSha256": "0bff36a97dbb3c719e1861a5104c42a8f61d810028e00bf2b981539c3fde48c5",
+        "identityEvidence": "worker.logのDocker既定hostname短IDとDocker event Actor.IDを対応"
+      }
+    ],
+    "eventLogSha256": "95cacd9b58f7d03f674e2945430cb931e537da22d0e15133b138ca389a4b864f",
+    "passed": true
+  },
+  "limits": [
+    "古い正常基準とのRGBA/path比較はagent/settingsDigestが異なる世代を明示する。旧出力再開の互換証明ではない。",
+    "World参照は時間/resource制御あり。完全無計装clientではない。",
+    "CLI0だけからworker0を推定せず、ログhostnameのcontainer短IDとDocker die/destroy Actor.IDを対応した。",
+    "任意GPU・全状態・全版color品質へ一般化しない。",
+    "worker hash/settingsDigestが変わるので新しいicons出力先へ生成する。raw保存形式・API・contextは不変。"
+  ],
+  "passed": true
+}
