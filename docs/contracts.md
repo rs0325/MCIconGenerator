@@ -63,7 +63,7 @@ countsはそのmanifestに蓄積した成功/失敗の数です。選択IDは書
 
 `.mcicon-<数字>.part` は書き込み途中のツール専用一時ファイル名です。通常の失敗ではfinallyで削除し、SIGKILL等で残った場合は次のエクスポートがFileLockを取得した後に回収します。対象は同じ版/modeの出力ツリー内にある、この名前に一致する通常ファイルだけです。シンボリックリンクとそのリンク先は削除対象にしません。
 
-再開は元JAR、settings digest、renderer、保存PNG/sidecar hashを照合し、一致した成功だけ再利用します。iconsのsettingsにはversion metadata・mappings・agentのSHA-256とDocker image IDを含めます。Dockerのtagは起動前にimage IDへ解決し、そのIDでworkerを起動します。旧版mappingsは固定SHA-1のTinyを毎回検証・合成します。
+再開は元JAR、settings digest、renderer、保存PNG/sidecar hashを照合し、一致した成功だけ再利用します。iconsのsettingsにはversion metadata・mappings・agentのSHA-256とDocker image IDを含めます。Dockerのtagは起動前にimage IDへ解決し、そのIDでworkerを起動します。起動前にimage内Javaを検査し、実major・version・実行パスのSHA-256をsettingsへ含めます。Javaの絶対パスはmanifestへ保存しません。Javaの選択またはversionが変わると旧iconsを再利用しないため、従来のsettingsで生成したiconsは別の出力先へ再生成してください。rawの条件は変わりません。旧版mappingsは固定SHA-1のTinyを毎回検証・合成します。
 
 metadataと設定のhashに使う整形JSONはUTF-8・LFでserializeし、同じ入力がホストの改行形式だけで別のhashにならないようにします。以前のWindows出力はhashが変わるため、新しい出力先へ再生成してください。以前のMac/LinuxのLF形式は維持します。
 

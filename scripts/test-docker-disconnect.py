@@ -46,6 +46,7 @@ class ProxyTest(unittest.TestCase):
 import json,os,sys
 from pathlib import Path
 if 'inspect' in sys.argv:print('sha256:'+'0'*64)
+elif 'run' in sys.argv and '--entrypoint' in sys.argv:print('openjdk version \"21.0.9\"')
 elif 'run' in sys.argv:
  Path(os.environ['MCICON_FAKE_CACHE'],'owned').write_text(sys.argv[sys.argv.index('--name')+1])
  print(json.dumps({'type':'ready','protocolVersion':1,'animationFrameZero':True,'contextProfile':'fixed-v1','renderer':'synthetic'}),flush=True)

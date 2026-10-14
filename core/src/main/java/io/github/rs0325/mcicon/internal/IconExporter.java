@@ -15,9 +15,10 @@ public final class IconExporter {
         SortedMap<String,CatalogEntry> selected=ExportPlanner.select(catalog,request);
         Path base=FilesSupport.safeResolve(request.output(),"java/"+runtime.version().id()+"/icons");Files.createDirectories(base);
         Path manifest=FilesSupport.safeResolve(base,"manifest.json");
-        Map<String,Object> settings=Map.of("size",request.size(),"profile",runtime.profile(),"context","fixed-v1","agentSha256",worker.agentSha256(),
+        Map<String,Object> settings=new TreeMap<>(Map.of("size",request.size(),"profile",runtime.profile(),"context","fixed-v1","agentSha256",worker.agentSha256(),
                 "mappingsSha256",runtime.mappings()==null?"named":FilesSupport.hash(runtime.mappings(),"SHA-256"),
-                "metadataSha256",FilesSupport.hash(Json.MAPPER.writeValueAsBytes(runtime.metadata())),"dockerImageId",worker.imageId());
+                "metadataSha256",FilesSupport.hash(Json.MAPPER.writeValueAsBytes(runtime.metadata())),"dockerImageId",worker.imageId()));
+        settings.putAll(worker.javaRuntime().settings());
         String digest=FilesSupport.hash(Json.MAPPER.writeValueAsBytes(settings));String source=FilesSupport.hash(runtime.client(),"SHA-256");
         TreeMap<String,ExportResult.Entry> entries=new TreeMap<>();
         try(FileChannel channel=FileChannel.open(FilesSupport.safeResolve(base,".export.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE)) {
@@ -76,7 +77,7 @@ public final class IconExporter {
         Map<String,Object> manifest=new TreeMap<>();
         manifest.put("schemaVersion",1);manifest.put("edition","java");manifest.put("version",runtime.version().id());manifest.put("mode","icons");
         manifest.put("toolVersion",ToolVersion.VERSION);manifest.put("adapterVersion",runtime.profile()+"/0.1");manifest.put("sourceSha256",source);
-        manifest.put("settings",settings);manifest.put("settingsDigest",digest);manifest.put("renderer",worker.renderer());manifest.put("javaMajor",runtime.javaMajor());
+        manifest.put("settings",settings);manifest.put("settingsDigest",digest);manifest.put("renderer",worker.renderer());manifest.put("javaMajor",worker.javaRuntime().major());
         manifest.put("environment",Map.of("os","linux","arch","amd64","backend","docker","imageId",worker.imageId()));
         Map<String,Object> context=new TreeMap<>();
         context.put("profile","fixed-v1");context.put("alphaMethod","black-white-native-composite-v1");context.put("deterministic",false);context.put("count",1);context.put("overlays",false);

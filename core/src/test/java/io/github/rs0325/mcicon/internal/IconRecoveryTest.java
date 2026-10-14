@@ -32,6 +32,7 @@ class IconRecoveryTest {
         public String renderer(){return "synthetic";}
         public String agentSha256(){return "a".repeat(64);}
         public String imageId(){return "sha256:"+"b".repeat(64);}
+        public Diagnostics.WorkerJava javaRuntime(){return new Diagnostics.WorkerJava("/opt/java/java21/bin/java",21,"21.0.9");}
     }
     @Test void recoversOwnedFilesWrittenSinceTheLastCheckpointAfterCrash() throws Exception {
         var runtime=runtime();var catalog=catalog(20);var exporter=new IconExporter(new CancellationToken(),ProgressListener.NONE);
@@ -43,6 +44,16 @@ class IconRecoveryTest {
         assertTrue(resumed.complete());assertEquals(20,resumed.succeeded());assertEquals(0,resumed.failed());
         assertEquals(Json.MAPPER.valueToTree(List.of(252,252,252)),Json.MAPPER.readTree(manifest.toFile()).path("context").path("lightmapFullBrightRgb"));
         FakeWorker cached=new FakeWorker(-1);assertTrue(exporter.export(runtime,cached,catalog,request()).complete());assertEquals(0,cached.calls);
+    }
+    @Test void changedJavaVersionOrSelectionCannotReusePreviousIcons() throws Exception {
+        var runtime=runtime();var exporter=new IconExporter(new CancellationToken(),ProgressListener.NONE);
+        assertTrue(exporter.export(runtime,new FakeWorker(-1),catalog(1),request()).complete());
+        for(var java:List.of(new Diagnostics.WorkerJava("/opt/java/java21/bin/java",21,"21.0.10"),
+                new Diagnostics.WorkerJava("/alternative/java21/bin/java",21,"21.0.9"))) {
+            var worker=new FakeWorker(-1){public Diagnostics.WorkerJava javaRuntime(){return java;}};
+            assertEquals("OUTPUT_MISMATCH",assertThrows(McIconException.class,()->exporter.export(runtime,worker,catalog(1),request())).code());
+            assertEquals(0,worker.calls);
+        }
     }
     @Test void repeatedResumeNeverClaimsUnownedOutput() throws Exception {
         Path file=directory.resolve("out/java/1.21.4/icons/assets/minecraft/textures/item/sample_00.png");

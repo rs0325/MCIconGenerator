@@ -36,31 +36,50 @@ public final class RuntimePreparer {
             }
         }
         Path natives=FilesSupport.safeResolve(assets.root(),"versions/"+version.id()+"/natives-linux");Files.createDirectories(natives);
-        for(Path jar:nativeJars)try(ZipFile zip=new ZipFile(jar.toFile())) {
-            Enumeration<? extends ZipEntry> entries=zip.entries();
-            while(entries.hasMoreElements()) {
-                ZipEntry entry=entries.nextElement();if(entry.isDirectory()||entry.getName().startsWith("META-INF/"))continue;
-                if(entry.getSize()<0||entry.getSize()>64L*1024*1024)throw new IOException("Unsafe native archive entry");
-                Path target=FilesSupport.safeResolve(natives,entry.getName());
-                try(InputStream input=zip.getInputStream(entry)){byte[] data=input.readNBytes(64*1024*1024+1);if(data.length>64*1024*1024)throw new IOException("Native exceeds size limit");FilesSupport.atomicWrite(target,data);}
-            }
-        }
+        for(Path jar:nativeJars)extractNatives(jar,natives);
         JsonNode indexRef=meta.path("assetIndex");
         Path index=download(indexRef,"assets/indexes/"+indexRef.path("id").asText()+".json");
         JsonNode objects=Json.MAPPER.readTree(index.toFile()).path("objects");
+        prepareAssets(objects);
+        int javaMajor=runtimeJavaMajor(meta.path("javaVersion").path("majorVersion").asInt(profile.startsWith("legacy-")?8:21));
+        return new Prepared(version,meta,client,mappings,List.copyOf(classpath),natives,assets.root().resolve("assets"),javaMajor,profile);
+    }
+    void prepareAssets(JsonNode objects) throws Exception {
         List<Map.Entry<String,JsonNode>> inputs=new ArrayList<>();objects.fields().forEachRemaining(inputs::add);
         try(ExecutorService pool=Executors.newFixedThreadPool(8)) {
+            var completed=new ExecutorCompletionService<Void>(pool);
             List<Future<?>> futures=new ArrayList<>();
-            for(var entry:inputs)if(!entry.getKey().endsWith(".ogg"))futures.add(pool.submit(()-> {
+            for(var entry:inputs)if(!entry.getKey().endsWith(".ogg"))futures.add(completed.submit(()-> {
                 token.check();JsonNode object=entry.getValue();String hash=object.path("hash").asText();
                 if(!hash.matches("[0-9a-f]{40}"))throw new McIconException("INVALID_ASSET_HASH","Invalid official asset hash",1);
                 try {assets.obtain("assets/objects/"+hash.substring(0,2)+"/"+hash,URI.create("https://resources.download.minecraft.net/"+hash.substring(0,2)+"/"+hash),hash,object.path("size").asLong(),false);}
                 catch(IOException e){throw new UncheckedIOException(e);}
+                return null;
             }));
-            for(Future<?> future:futures)future.get();
+            try {for(int i=0;i<futures.size();i++)completed.take().get();}
+            finally {for(Future<?> future:futures)future.cancel(true);}
         }
-        int javaMajor=runtimeJavaMajor(meta.path("javaVersion").path("majorVersion").asInt(profile.startsWith("legacy-")?8:21));
-        return new Prepared(version,meta,client,mappings,List.copyOf(classpath),natives,assets.root().resolve("assets"),javaMajor,profile);
+    }
+    void extractNatives(Path jar,Path natives) throws IOException {
+        try(ZipFile zip=new ZipFile(jar.toFile())) {
+            Enumeration<? extends ZipEntry> entries=zip.entries();long total=0,expanded=0;int count=0;
+            while(entries.hasMoreElements()) {
+                token.check();if(++count>4096)throw new IOException("Native archive has too many entries");
+                ZipEntry entry=entries.nextElement();if(entry.isDirectory()||entry.getName().startsWith("META-INF/"))continue;
+                if(entry.getSize()<0||entry.getSize()>64L*1024*1024)throw new IOException("Unsafe native archive entry");
+                total+=entry.getSize();if(total>256L*1024*1024)throw new IOException("Native archive exceeds total size limit");
+                Path target=FilesSupport.safeResolve(natives,entry.getName());
+                try(InputStream input=zip.getInputStream(entry);ByteArrayOutputStream output=new ByteArrayOutputStream()) {
+                    byte[] buffer=new byte[65536];int size;
+                    while((size=input.read(buffer))>=0) {
+                        token.check();if(output.size()+size>64*1024*1024)throw new IOException("Native exceeds size limit");
+                        expanded+=size;if(expanded>256L*1024*1024)throw new IOException("Native archive exceeds total size limit");
+                        output.write(buffer,0,size);
+                    }
+                    token.check();FilesSupport.atomicWrite(target,output.toByteArray());
+                }
+            }
+        }
     }
     static int runtimeJavaMajor(int minimum) {
         // Java 16 is no longer an image runtime; 1.17 runs on the Java 17 LTS.

@@ -27,12 +27,25 @@ public final class MCIconGenerator implements AutoCloseable {
      * @param cancellation このinstanceの全ジョブに適用する取消状態
      */
     public MCIconGenerator(Path cache,boolean offline,ProgressListener progress,CancellationToken cancellation) {
-        this.assets=new AssetStore(cache,offline,cancellation);this.versions=new VersionService(assets);this.cancellation=cancellation;this.progress=progress;
+        this(cache,offline,progress,cancellation,null);
+    }
+    /**
+     * 既存インストールの公式入力をhash検証してcacheへコピーする。元のファイルは変更しない。
+     * @param cache 入力・準備結果と診断ログの保存先
+     * @param offline cacheと既存インストールだけを使用し、不足時は失敗する
+     * @param progress ジョブのスレッドで呼ぶ通知先
+     * @param cancellation このinstanceの全ジョブに適用する取消状態
+     * @param minecraftDirectory 既存インストールのディレクトリ。nullでは取り込まない。
+     *                           versions・libraries・assetsの必要な公式入力だけを読み取る。cacheと同一・入れ子の場所は使用できない
+     * @throws IllegalArgumentException 入力ディレクトリが存在しない、cacheと重なる、または解決できない場合
+     */
+    public MCIconGenerator(Path cache,boolean offline,ProgressListener progress,CancellationToken cancellation,Path minecraftDirectory) {
+        this.assets=new AssetStore(cache,offline,cancellation,minecraftDirectory);this.versions=new VersionService(assets);this.cancellation=cancellation;this.progress=progress;
     }
     /** 公式metadataから1.13以降の正式版を新しい順に返す。未登録adapterの版も含む。 */
     public CompletableFuture<List<VersionInfo>> listVersions() {return submit(versions::list);}
     /** 指定版のadapterとローカルDocker image・Java・Mesaを確認する。ゲームの全件描画は行わない。 */
-    public CompletableFuture<DiagnosticReport> doctor(String version,WorkerOptions options) {return submit(()->Diagnostics.doctor(versions,version,options));}
+    public CompletableFuture<DiagnosticReport> doctor(String version,WorkerOptions options) {return submit(()->Diagnostics.doctor(versions,version,options,cancellation));}
     /** cacheの使用量を返す。verify=trueでは記録済みSHA-256がある入力を検査する。 */
     public CompletableFuture<CacheReport> cache(boolean verify) {return submit(()->Diagnostics.cache(assets.root(),verify,cancellation));}
     /** 入力を準備してゲームworkerを起動し、登録アイテム・ブロックの対応と除外理由を返す。 */

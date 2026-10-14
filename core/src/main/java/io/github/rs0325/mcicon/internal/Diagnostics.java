@@ -5,9 +5,10 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public final class Diagnostics {
-    public static DiagnosticReport doctor(VersionService service, String version, WorkerOptions worker) throws IOException {
+    public static DiagnosticReport doctor(VersionService service, String version, WorkerOptions worker,CancellationToken token) throws IOException {
         VersionInfo exact = service.resolve(version);
         int javaMajor = RuntimePreparer.runtimeJavaMajor(service.metadata(exact).path("javaVersion").path("majorVersion").asInt(exact.id().startsWith("1.13") || exact.id().startsWith("1.14") ? 8 : 21));
         List<DiagnosticReport.Check> checks = new ArrayList<>();
@@ -17,13 +18,38 @@ public final class Diagnostics {
         checks.add(new DiagnosticReport.Check("adapter", adapter, adapter ? "experimental; canonical context is pending" : "ADAPTER_UNAVAILABLE"));
         checks.add(new DiagnosticReport.Check("agent", Files.isRegularFile(worker.agentJar()), "Rendering agent must exist"));
         List<String> docker = List.of("docker", "--context", worker.dockerContext());
-        checks.add(command("docker_image", docker, List.of("image", "inspect", worker.dockerImage(), "--format", "{{.Os}}/{{.Architecture}} {{.Id}}"), 15));
-        String java = javaMajor == 25 ? "/opt/java/openjdk/bin/java" : "/opt/java/java" + javaMajor + "/bin/java";
-        checks.add(command("worker_java_" + javaMajor, docker, List.of("run", "--rm", "--platform", "linux/amd64", "--network", "none", worker.dockerImage(), java, "-version"), 45));
-        checks.add(command("mesa", docker, List.of("run", "--rm", "--platform", "linux/amd64", "--network", "none", worker.dockerImage(), "glxinfo", "-B"), 45));
+        checks.add(command("docker_image", docker, List.of("image", "inspect", worker.dockerImage(), "--format", "{{.Os}}/{{.Architecture}} {{.Id}}"), 15,token));
+        try {
+            WorkerJava java=workerJava(worker,worker.dockerImage(),javaMajor,token);
+            checks.add(new DiagnosticReport.Check("worker_java",true,"Java "+java.version()));
+        }catch(McIconException failure){checks.add(new DiagnosticReport.Check("worker_java",false,failure.code()));}
+        token.check();checks.add(command("mesa", docker, List.of("run", "--rm", "--platform", "linux/amd64", "--network", "none", worker.dockerImage(), "glxinfo", "-B"), 45,token));
+        token.check();
         return new DiagnosticReport(exact.id(), checks.stream().allMatch(DiagnosticReport.Check::passed), checks);
     }
-    private static DiagnosticReport.Check command(String name, List<String> prefix, List<String> args, int seconds) {
+    record WorkerJava(String executable,int major,String version) {
+        Map<String,Object> settings() {return Map.of("javaMajor",major,"javaVersion",version,"javaSelectionSha256",FilesSupport.hash(executable.getBytes(java.nio.charset.StandardCharsets.UTF_8)));}
+    }
+    static WorkerJava parseJava(String executable,String detail,int minimum) {
+        var match=Pattern.compile("(?:java|openjdk) version \"([0-9][0-9A-Za-z.+_-]{0,79})\"").matcher(detail);
+        if(!match.find())throw new McIconException("WORKER_JAVA_UNAVAILABLE","The selected image Java did not report its version",1);
+        String version=match.group(1);var number=Pattern.compile("^(?:1[.])?([0-9]+)").matcher(version);number.find();
+        int major;
+        try {major=Integer.parseInt(number.group(1));}
+        catch(NumberFormatException invalid){throw new McIconException("WORKER_JAVA_UNAVAILABLE","The selected image Java reported an invalid major",1);}
+        if(major<minimum)throw new McIconException("WORKER_JAVA_INCOMPATIBLE","The selected image Java is older than the required major "+minimum,2);
+        return new WorkerJava(executable,major,version);
+    }
+    static WorkerJava workerJava(WorkerOptions worker,String image,int minimum,CancellationToken token) {
+        String executable=worker.javaHome()==null?(minimum==25?"/opt/java/openjdk/bin/java":"/opt/java/java"+minimum+"/bin/java")
+                :worker.javaHome().replaceAll("/+$","")+"/bin/java";
+        var check=command("worker_java",List.of("docker","--context",worker.dockerContext()),
+                List.of("run","--rm","--platform","linux/amd64","--network","none","--entrypoint",executable,image,"-version"),45,token);
+        token.check();
+        if(!check.passed())throw new McIconException("WORKER_JAVA_UNAVAILABLE","The selected Java is unavailable inside the Docker image",1);
+        return parseJava(executable,check.detail(),minimum);
+    }
+    private static DiagnosticReport.Check command(String name, List<String> prefix, List<String> args, int seconds,CancellationToken token) {
         List<String> command = new ArrayList<>(prefix); command.addAll(args);
         String container=null;
         if(args.getFirst().equals("run")) {
@@ -35,8 +61,10 @@ public final class Diagnostics {
         try {
             log = Files.createTempFile("mcicon-diagnostic-", ".log");
             process = new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
-            if (!process.waitFor(seconds, TimeUnit.SECONDS)) {
-                process.destroyForcibly(); return new DiagnosticReport.Check(name, false, "Diagnostic timed out");
+            long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(seconds);
+            while(!process.waitFor(100,TimeUnit.MILLISECONDS)) {
+                token.check();
+                if(System.nanoTime()>=deadline){process.destroyForcibly();return new DiagnosticReport.Check(name,false,"Diagnostic timed out");}
             }
             String detail;
             try (InputStream input = Files.newInputStream(log)) { detail = new String(input.readNBytes(65536), java.nio.charset.StandardCharsets.UTF_8).trim(); }
