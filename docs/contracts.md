@@ -18,7 +18,7 @@ exit 0=成功、1=起動/IO等の致命エラー、2=不正な引数/版/ID、3=
 
 ## Worker JSON Lines
 
-UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1、contextProfile=fixed-v1、animationFrameZero=trueであることを要求します。profile/hookの不一致はWORKER_CONTEXT_MISMATCHです。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致は致命エラーにします。requestは1MiB、responseは16MiBを上限とします。待受ポートは使いません。
+UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1、contextProfile=fixed-v1、animationFrameZero=trueであることを要求します。profile/hookの不一致はWORKER_CONTEXT_MISMATCHです。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致はその要求を失敗にします。要求と応答を混同して成功PNGへ採用しません。1行の上限はrequestが1,048,576、responseが16,777,216 Java文字（UTF-16 code unit）です。bytesの上限ではなく、readLine後に検査します。待受ポートは使いません。
 
 requestは整形なしでserializeし、文字列内の改行はJSON escapeで保持します。WindowsのCRLFもJSONの途中へ混入させず、行末だけに使います。
 
@@ -32,11 +32,28 @@ requestは整形なしでserializeし、文字列内の改行はJSON escapeで�
 {"requestId":"3","type":"result"}
 ```
 
+[worker-v1.schema.json](../schemas/worker-v1.schema.json)は正規peerのメッセージ形式を定義します。[形式・51版contextの検証記録](../qa/validation-2026-10-14-worker-contract.json)は正常10例・不正25例と、現行coreの合成peer試験12条件を保持します。`python3 scripts/test-worker-contract.py -v`で再試験できます（先にCLI installDist、JDK21以上、jsonschema 4.25.1が必要）。core/workerがこのSchemaをruntimeで全面検証するという意味ではありません。追加フィールドは許可し、必須フィールド・command・応答payloadの形を固定します。catalogのavailable項目はkindとblocksを持ち、no_item_formはアイテム形態を持たないblockです。block aliasはblocksの関係からcoreで解決します。renderのvisiblePixelsは復元PNGのalpha>0の画素数です。shutdownのresultにはpayloadを付けません。
+
+coreは1要求を送ってその応答を待つ直列peerです。readyは最初の1回だけ、catalogの返答はentries、renderの返答はresult、shutdownの返答はtype=resultです。requestIdは文字列で、同じジョブの要求ごとにUUIDを生成します。idの意味はcommand依存なので、JSON Schemaだけで要求と応答の対応は検証できません。
+
+| 条件 | 現在の処理と外部結果 |
+|---|---|
+| 最初のtypeがready以外／protocolVersionが1以外 | 接続を破棄し、起動FutureはIO_FAILED（exit 1）。別protocolへのfallbackなし |
+| fixed-v1／animationFrameZeroの不一致 | 接続を破棄し、WORKER_CONTEXT_MISMATCH（exit 1） |
+| 応答requestId不一致／result・error以外のtype | その要求がIOExceptionで失敗。catalog段階はIO_FAILED、render段階はfailed entryのRENDER_FAILED（exit 3） |
+| workerのtype=error | code/messageを保持。catalog段階は例外、render段階はfailed entry。fail-fast指定がなければ次IDへ進む |
+| ready／応答期限超過 | WORKER_TIMEOUT、専用containerの終了を要求。render途中は部分失敗としてmanifestへ保存 |
+| 応答前にDocker CLIが終了 | WORKER_EXITED。render途中は成功済みPNGを保持して部分失敗へ |
+| 不正JSON／上限超過／reader例外 | readerが処理を終了。core側はCLI終了またはtimeoutを検出。JSON Schema専用の診断codeは存在しない |
+| stdin EOF | worker readerが内部shutdown要求を投入し、render threadで終了 |
+
+不正commandはworkerのRENDER_FAILEDです。第三者の不正peerとの再同期や、欠落・過剰なpayloadの完全診断は公開APIの保証範囲に含めません。workerのschemaVersionという別フィールドは使わず、handshakeのprotocolVersionを用います。
+
 エラーはtype=error、code、messageを返します。PNGは専用cache内の一時ファイルで渡し、coreでサイズ・alphaを検証してから出力へ原子的に移します。PNGバイナリをstdoutへ流しません。workerは一つのrender threadで要求を処理し、全件ジョブで再利用します。16リクエストごとにバニラのフレーム処理へ戻り、描画・present・GPUの遅延解放を進めます。
 
 requested inventory passでバニラのfallback BakedModelまたはMissingItemModelが選択された場合はMISSING_MODEL、消費されたquad/materialまたはatlas取得のsprite名がminecraft:missingnoの場合はMISSING_TEXTUREを返します。直接取得・bindするTextureが保持済みmissing textureと同じ場合もMISSING_TEXTUREです。modernではバニラのTextureContents.createMissingで生成された内容を適用したtextureを追跡し、requested passでTextureManagerまたはGPU getterから取得した場合に同じ診断を返します。適用したtextureの状態はpass間で保持し、通常のrender executorによる正常な内容の適用で解除します。独自のreload APIは提供せず、非render threadからGPU適用だけを後送する外部呼び出しとの並行性は保証しません。観測のためにmissing textureを生成するgetterは呼びません。成功PNGを出力せず、entryをfailedとして記録します。 workerが返す診断codeと具体的なmessageをmanifestとAPI結果に保持します。空画像と描画例外はRENDER_FAILEDとなり、同じworkerで次のアイテムへ継続します。起動時や別の描画passでの利用だけでは失敗としません。追跡済みの欠損textureをrequested passで取得した場合は、ロードした時点にかかわらず失敗とします。破損モデルがmissing spriteを持つ代替形状へ解決された場合はMISSING_TEXTUREになり、元ファイルの破損種別とは一致しない場合があります。特殊rendererの全テクスチャやGPU cacheの完全監査は未完了です。画像の色だけでmissing判定は行いません。
 
-cancelは現在coreのCancellationTokenと専用Dockerコンテナ終了で行います。応答中の描画を同じrender threadでキャンセルするJSON commandは未実装です。timeout、startup失敗、cancel後は所有するコンテナだけを停止します。shutdownで正常終了を待ち、失敗時は強制終了します。worker.logは診断用にcacheへ残し、一時icon PNGを削除します。起動するagentはジョブごとにsnapshotを取り、記録したSHA-256と実際に起動したbytesを一致させます。coreの通常終了・SIGTERMでは専用containerの終了を要求します。SIGKILL時の即時cleanupは保証しません。
+cancelはcoreのCancellationTokenと専用Dockerコンテナ終了で行う正式仕様です。JSON cancel commandは提供せず、実行中の描画threadが要求を受信できることを取消の前提にしません。timeout、startup失敗、cancel後は所有するコンテナだけを停止します。shutdownで正常終了を待ち、失敗時は強制終了します。worker.logは診断用にcacheへ残し、一時icon PNGを削除します。起動するagentはジョブごとにsnapshotを取り、記録したSHA-256と実際に起動したbytesを一致させます。coreの通常終了・SIGTERMでは専用containerの終了を要求します。SIGKILL時の即時cleanupは保証しません。
 
 ## Manifest
 
@@ -81,5 +98,32 @@ iconsのPNGは8bit RGBA・straight alphaで、sRGB chunk（Perceptual）を付�
 透過PNGは黒・白の不透明背景で同じアイテムを2回描画し、背景差からalphaとstraight RGBを復元します。GPU readbackの上下を反転し、alpha=0のRGBを0にします。byte RGB上の再合成はバニラのGUIブレンドとの一致を確認するもので、linear-lightの背景合成とは区別します。通常GUI fixtureでの再合成比較は[検証記録](validation.md)を参照してください。sRGB・半透明・glintを含む無改変のワールド内inventory基準画像との受入は未完了です。
 
 Issue #31では1.20.6のstone・player_head・chest・glass・grass_blockを64pxで照合し、agent無しclientのF2画像が通常World QAと生成PNGに誤差0で一致しました。glassはbinary alphaの素材です。この静的5種類の結果を、半透明・glint・他版・他状態の受入へ広げません。条件は[検証記録](validation.md#issue-31の無計装client基準2026-10-14)を参照してください。
+
+### canonical-v1の固定値と版別境界
+
+canonical-v1は受入完了後に使うプロファイル名で、以下の固定値を契約とします。現在の生成物のprofile名はfixed-v1のままです。名前の定義だけでverified／deterministicへ昇格させず、実画像・反復・色の検証記録と対象環境を合わせて判断します。
+
+| 項目 | 全51版の固定値／境界 |
+|---|---|
+| ItemStack | 当該版バニラの既定stack、count=1、未損傷、利用者追加NBT/componentsなし。バニラ既定componentは削除しない |
+| world／player／overlay | absent／absent／false。外部スキン取得なし |
+| animation／partialTick | atlasの初期frame 0／0.0。atlas以外の動的propertyは下記の時刻・乱数・entityなしのバニラ判定に従う |
+| 時刻／暦日 | 描画pass内1000ms・1,000,000,000ns、epoch 946684800000ms（2000-01-01 UTC）。timeoutは実時計 |
+| 乱数 | 各黒・白passでseed=0。モデル自身のquad seedはバニラのまま |
+| PNG | 8bit RGBA、straight alpha、sRGB Perceptual。色値のgamma変換なし、透明画素RGB=0。byte RGB合成とlinear-light合成の保証は分離 |
+
+| adapterと対象版 | 照明／GUI投影の固定条件 |
+|---|---|
+| legacy-1.13：1.13〜1.13.2 | バニラ起動時の照明・原点投影を維持。GUI描画入口のlightmap無効を観測 |
+| legacy-1.14：1.14〜1.14.3 | 同上 |
+| gui-fixed：1.14.4、1.15〜1.16.5 | 1.14.4は起動時照明を維持、残り9版はRGB252。原点投影 |
+| gui-classic：1.17〜1.19.4 | RGB252、原点投影 |
+| gui-1.21.4：1.20〜1.21.4 | RGB252。1.20〜1.21.3はGUI320×240・位置(80,121)、1.21.4は原点投影 |
+| gui-1.21.5：1.21.5 | RGB252、原点投影 |
+| gui-deferred：1.21.6〜1.21.11、26.1〜26.1.2 | 1.21系はRGB252。26.1系は白255のUiLightmapを維持。原点投影、atlas割当reset-per-pass |
+| gui-26.2：26.2 | 白255のUiLightmapを維持、原点投影、atlas割当reset-per-pass |
+| gui-26.3：26.3 | 同上 |
+
+色付けは当該版の既定stackとworld/playerなしのGUI規則を使用し、特定biome・効果・方角・実ワールド時刻を捏造しません。時計・コンパスの選択frameが全版で同一という契約はなく、前述の1.21.4の観測値を他版へ流用しません。版のexact集合は[adapters/releases.json](../adapters/releases.json)、選択はRuntimePreparer.profileForを正本とします。
 
 canonical-v1への昇格には、固定環境の反復RGBAとsingle/all一致、意味的な画像検査、色空間の確認が必要です。現在はdeterministic=falseです。agent/contextの変更はsettings digestを変え、古いPNGを再利用しません。任意NBT/componentsや状態の直積は対象外です。
