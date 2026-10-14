@@ -70,8 +70,9 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
         });
         try {
             JsonNode hello=await(options.startupTimeout());
-            if(!hello.path("type").asText().equals("ready")||hello.path("protocolVersion").asInt()!=1)throw new IOException("Worker protocol version mismatch");
-            if(!hello.path("animationFrameZero").asBoolean()||!hello.path("contextProfile").asText().equals("fixed-v1"))
+            JsonNode protocolVersion=hello.path("protocolVersion");
+            if(!hello.path("type").asText().equals("ready")||!protocolVersion.isNumber()||protocolVersion.doubleValue()!=1.0)throw new IOException("Worker protocol version mismatch");
+            if(!hello.path("animationFrameZero").isBoolean()||!hello.path("animationFrameZero").asBoolean()||!hello.path("contextProfile").asText().equals("fixed-v1"))
                 throw new McIconException("WORKER_CONTEXT_MISMATCH","Worker did not install the required fixed-v1 context",1);
             renderer=hello.path("renderer").asText();
         }catch(Exception e){terminate();removeShutdownHook();cleanupTemporaryFiles();try{output.close();}catch(IOException ignored){}throw e;}

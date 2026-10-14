@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "MCIconGenerator worker protocol v1 message",
+  "title": "MCIconGenerator worker v1の要求・応答",
   "oneOf": [
     {
       "type": "object",
@@ -37,8 +37,7 @@
       ],
       "properties": {
         "requestId": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/requestId"
         },
         "command": {
           "enum": [
@@ -48,7 +47,7 @@
           ]
         },
         "id": {
-          "type": "string"
+          "$ref": "#/$defs/resourceId"
         },
         "size": {
           "enum": [
@@ -61,7 +60,8 @@
           ]
         },
         "path": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       },
       "allOf": [
@@ -91,18 +91,73 @@
       ],
       "properties": {
         "requestId": {
-          "type": "string"
+          "$ref": "#/$defs/requestId"
         },
         "type": {
           "const": "result"
         },
         "entries": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/catalogEntry"
+          }
         },
         "result": {
-          "type": "object"
+          "type": "object",
+          "required": [
+            "path",
+            "visiblePixels"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "visiblePixels": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
         }
-      }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "entries"
+          ],
+          "not": {
+            "required": [
+              "result"
+            ]
+          }
+        },
+        {
+          "required": [
+            "result"
+          ],
+          "not": {
+            "required": [
+              "entries"
+            ]
+          }
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "entries"
+                ]
+              },
+              {
+                "required": [
+                  "result"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "type": "object",
@@ -114,18 +169,93 @@
       ],
       "properties": {
         "requestId": {
-          "type": "string"
+          "$ref": "#/$defs/requestId"
         },
         "type": {
           "const": "error"
         },
         "code": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "message": {
           "type": "string"
         }
       }
     }
-  ]
+  ],
+  "description": "正規のpeerが交換するメッセージ。runtimeでJSON Schema全体を検証するものではない。取消はwire commandではなくcore tokenとcontainer終了で行う。",
+  "$defs": {
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resourceId": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+:[a-z0-9/._-]+$"
+    },
+    "catalogEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/resourceId"
+        },
+        "kind": {
+          "enum": [
+            "item",
+            "block"
+          ]
+        },
+        "status": {
+          "enum": [
+            "available",
+            "no_item_form"
+          ]
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resourceId"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "available"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "blocks"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "no_item_form"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "const": "block"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
 }

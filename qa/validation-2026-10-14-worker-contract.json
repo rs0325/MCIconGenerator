@@ -1,0 +1,928 @@
+{
+  "issue": 3,
+  "baseCommit": "7fdb40e9a594cdeb35c59e88bb9a958d521be36e",
+  "scope": "Schemaの正規メッセージ・欠落・不一致検査。runtimeで全面Schema検証をする保証ではない。描画やcanonical昇格の再検証ではない。",
+  "validator": {
+    "name": "jsonschema",
+    "version": "4.25.1",
+    "draft": "2020-12"
+  },
+  "schemaSha256": "830b962ed2ec6060dcba27c0cfc846e99b10962cf3e6268b1ce53b42d503efc9",
+  "accepted": [
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": true
+    },
+    {
+      "requestId": "1",
+      "command": "catalog"
+    },
+    {
+      "requestId": "1",
+      "type": "result",
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "kind": "block",
+          "status": "available",
+          "blocks": [
+            "minecraft:stone"
+          ]
+        },
+        {
+          "id": "minecraft:water",
+          "kind": "block",
+          "status": "no_item_form"
+        },
+        {
+          "id": "minecraft:diamond",
+          "kind": "item",
+          "status": "available",
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "minecraft:stone",
+      "size": 64,
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "/mcicon/cache/worker-test/icon-test.png",
+        "visiblePixels": 2744
+      }
+    },
+    {
+      "requestId": "4",
+      "type": "error",
+      "code": "MISSING_TEXTURE",
+      "message": "対象のtextureが欠損"
+    },
+    {
+      "requestId": "3",
+      "command": "shutdown"
+    },
+    {
+      "requestId": "3",
+      "type": "result"
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": true,
+      "futureField": "追加フィールド"
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1.0,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": true
+    }
+  ],
+  "rejected": [
+    {
+      "type": "ready",
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1"
+    },
+    {
+      "command": "catalog"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "size": 64,
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "minecraft:stone",
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "minecraft:stone",
+      "size": 64
+    },
+    {
+      "requestId": "4",
+      "type": "error",
+      "message": "対象のtextureが欠損"
+    },
+    {
+      "requestId": "4",
+      "type": "error",
+      "code": "MISSING_TEXTURE"
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 2,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": false
+    },
+    {
+      "requestId": "",
+      "command": "catalog"
+    },
+    {
+      "requestId": "1",
+      "command": "cancel"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "minecraft:stone",
+      "size": 65,
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "stone",
+      "size": 64,
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "a"
+      }
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "a",
+        "visiblePixels": -1
+      }
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "/mcicon/cache/worker-test/icon-test.png",
+        "visiblePixels": 2744
+      },
+      "entries": []
+    },
+    {
+      "requestId": "1",
+      "type": "result",
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "kind": "block",
+          "status": "available"
+        }
+      ]
+    },
+    {
+      "requestId": "1",
+      "type": "result",
+      "entries": [
+        {
+          "id": "minecraft:water",
+          "kind": "item",
+          "status": "no_item_form"
+        }
+      ]
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "a",
+        "visiblePixels": 0
+      }
+    },
+    {
+      "type": "ready",
+      "protocolVersion": "1",
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1.5,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": "true"
+    }
+  ],
+  "acceptedCount": 10,
+  "rejectedCount": 25,
+  "passed": true,
+  "exactVersionCount": 51,
+  "contexts": [
+    {
+      "version": "26.3",
+      "adapter": "gui-26.3",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "26.2",
+      "adapter": "gui-26.2",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "26.1.2",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "26.1.1",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "26.1",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "1.21.11",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.21.10",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.21.9",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.21.8",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.21.7",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.21.6",
+      "adapter": "gui-deferred",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.21.5",
+      "adapter": "gui-1.21.5",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.21.4",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.21.3",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.21.2",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.21.1",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.21",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.20.6",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.20.5",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.20.4",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.20.3",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.20.2",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.20.1",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.20",
+      "adapter": "gui-1.21.4",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": {
+        "width": 320,
+        "height": 240,
+        "x": 80,
+        "y": 121
+      }
+    },
+    {
+      "version": "1.19.4",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.19.3",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.19.2",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.19.1",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.19",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.18.2",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.18.1",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.18",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.17.1",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.17",
+      "adapter": "gui-classic",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.16.5",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.16.4",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.16.3",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.16.2",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.16.1",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.16",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.15.2",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.15.1",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.15",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": [
+        252,
+        252,
+        252
+      ],
+      "guiReference": null
+    },
+    {
+      "version": "1.14.4",
+      "adapter": "gui-fixed",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "1.14.3",
+      "adapter": "legacy-1.14",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "1.14.2",
+      "adapter": "legacy-1.14",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "1.14.1",
+      "adapter": "legacy-1.14",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "1.14",
+      "adapter": "legacy-1.14",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "1.13.2",
+      "adapter": "legacy-1.13",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "1.13.1",
+      "adapter": "legacy-1.13",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    },
+    {
+      "version": "1.13",
+      "adapter": "legacy-1.13",
+      "contextProfile": "fixed-v1",
+      "lightmapFullBrightRgb": null,
+      "guiReference": null
+    }
+  ],
+  "contextCheck": "RuntimePreparer.profileForのexact集合とadapters/releases.jsonが一致。IconExporter.saveのlightmap/GUI条件およびCanonicalContextを読み取り照合。色や全版の動的frameを新規実測した記録ではない。",
+  "runtimeCases": [
+    {
+      "case": "valid",
+      "expected": "success",
+      "passed": true
+    },
+    {
+      "case": "worker-error",
+      "expected": "MISSING_TEXTURE:3",
+      "passed": true
+    },
+    {
+      "case": "request-id",
+      "expected": "IOException",
+      "passed": true
+    },
+    {
+      "case": "response-type",
+      "expected": "IOException",
+      "passed": true
+    },
+    {
+      "case": "protocol-version",
+      "expected": "IOException",
+      "passed": true
+    },
+    {
+      "case": "ready-type",
+      "expected": "IOException",
+      "passed": true
+    },
+    {
+      "case": "context",
+      "expected": "WORKER_CONTEXT_MISMATCH:1",
+      "passed": true
+    },
+    {
+      "case": "animation",
+      "expected": "WORKER_CONTEXT_MISMATCH:1",
+      "passed": true
+    },
+    {
+      "case": "protocol-string",
+      "expected": "IOException",
+      "passed": true
+    },
+    {
+      "case": "protocol-fraction",
+      "expected": "IOException",
+      "passed": true
+    },
+    {
+      "case": "animation-string",
+      "expected": "WORKER_CONTEXT_MISMATCH:1",
+      "passed": true
+    },
+    {
+      "case": "protocol-decimal",
+      "expected": "success",
+      "passed": true
+    }
+  ],
+  "runtimeScope": "PATH上の専用合成Docker peerで現行coreを起動。handshake/要求・応答/終了snapshot回収を確認。実Dockerやゲーム描画の検証ではない。",
+  "runtimeCoreSha256": "51612079eeb03e74212225cb20796c5ba56d8590b6c00c6997d9fd241ca28c07",
+  "workerSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+  "qaHashes": {
+    "scripts/qa/WorkerContractProbe.java": "71b9fcc25bc75d53d09c1978f6738687541c2519384ad18cd8383bf391aaf546",
+    "scripts/test-worker-contract.py": "d6155cacbcd39394b119cfa15bba5783ae61c2e5c763bc4f38e3f43a353df3a6"
+  },
+  "commands": [
+    "gradle --offline :core:test :cli:installDist",
+    "python3 scripts/test-worker-contract.py -v",
+    "git diff --check"
+  ],
+  "reviewCorrection": "visiblePixels=0はworkerが空画像例外を返すため、正規render resultのminimumを1にした。0拒否fixtureを追加。",
+  "cancelDecision": "ユーザー合意: core token＋専用container終了を正式仕様とする。wire cancel commandは契約に含めない。",
+  "initialFailure": {
+    "scope": "当時core・専用合成peer。追加の3条件を誤受理。",
+    "cases": [
+      "protocol-string",
+      "protocol-fraction",
+      "animation-string"
+    ],
+    "logSha256": "c7f78b65cdb9461177cfad4ce16b672687eb4e7adf6ba22ab5db34846770abd8",
+    "expected": "reject",
+    "actual": "success",
+    "passed": false
+  },
+  "coreTests": {
+    "tests": 39,
+    "failures": 0,
+    "errors": 0
+  },
+  "runtimeAfterLogSha256": "b1b08f969b6e15963facf148e196dbe83306391850ed6e0e7c1434d15516d3b1",
+  "handshakeCorrection": "protocolVersionは数値1（1.0を含む）、animationFrameZeroはboolean trueを要求。文字列・1.5の型変換による誤受理を修正。"
+}
