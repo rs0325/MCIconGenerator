@@ -440,6 +440,40 @@ python3 scripts/verify-special-resources.py --cache .local/cache \
   --docker-image mcicon-render:0.1.0-preview.1
 ```
 
+## Issue #36のnative途中失敗・描画状態復帰（2026-10-14）
+
+起点はmainの7fdb40e9a594cdeb35c59e88bb9a958d521be36e、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。1.21.4の即時描画と26.3のRenderPearl描画で、実native readback後にstoneだけ例外を注入し、後続wheatと独立正常workerのRGBAを比較します。SIGKILL・描画前の欠損置換とは別の試験です。結果は[数値・hash記録](../qa/validation-2026-10-14-native-failure.json)へ保存します。
+
+1.21.4は実FBOをbindして描画した後、direct ByteBufferへのglReadPixels完了直後を注入点にします。26.3はowned target colorからreadback bufferへのcopy、submit・fence完了・map後のdata取得完了直後を使います。黒pass失敗と白pass失敗を別workerで実行し、白pass失敗は黒のprobe完了後に発生します。各失敗はRENDER_FAILEDと具体的なreadback failure messageを保持し、対象PNGを出力せず、同workerのwheatへ継続します。
+
+修正前は4注入とも対象未出力・wheat RGBA一致・所有資源解放が成功しましたが、1.21.4の最初のpassでprojectionが320×240から16×16のまま残り、target破棄がdraw/read framebufferを1から0へ変えていました。26.3ではviewportが320×240から64×64で残りました。修正前FAILを受入結果へ書き換えません。
+
+ModernRendererの標準viewは元projection/typeも保存・復帰し、継承先の独自view処理は維持します。ModernRenderer/LatestRendererはtarget作成前のviewport・draw/read framebuffer bindingを保存し、所有target破棄後に実際のbindingとviewportへ戻します。mainTargetの論理参照・model-view、26.3のwindow寸法/scaleも復帰します。戻す先はmainTargetのFBOと常に同じとは限りません。通常のfinally終了時にQAが投げた元の具体例外を保持することを、nativeと合成回帰で確認します。cleanup自体が失敗するすべてのケースへの保証ではありません。
+
+重点反証で、実GLだけの復帰では公式GlStateManagerのFBO cacheと1.21.4のViewport保持値が破棄時の値に残り、後続の公式bind(0)が同値として省略される不備を確認しました。実GLを先に確定復帰してから版別の公式_glBindFramebufferでread/write cacheを同期し、viewportは公式_viewportへ復帰します。これにより復帰前のcacheが実GLと不一致でも、同値省略に依存しません。1.21.4はplatform namespace、1.21.5以降のBlaze3Dはopengl、26.3はrenderpearl.backend.openglです。26.3にはViewport shadowがなく、その保持値の保証を捏造しません。旧系列のRGBA一致・所有資源解放の成功は保持し、cache同期の追加確認と区別します。
+
+追加QAは復帰後の実GLと公式cacheの一致を読み、公式bind(0)後にdraw/readがともに0になることを確認してから元の実値とcacheへ戻します。描画前にcacheが不一致だった場合はその不一致自体を復元せず、描画前の実値へ同期します。合成回帰は実値/cacheの初期不一致、同値省略、後続公式bind(0)も確認します。
+
+修正後の黒/白4注入は状態・所有資源の検証に成功しました。1.21.4はreadback時のFBO identity・実binding・glIsFramebuffer/Textureで使用と削除を確認します。26.3はcopy元/dest identity、submit/fence完了、mapped view/fence/bufferのclose完了、buffer/target textureのisClosedを確認します。GUI atlasのendFrameとdynamic uniform resetは共有cacheのframe終了であり、atlas textureやpool全体を閉じる保証ではありません。通常cacheを毎回破棄しません。NIO direct ByteBufferのGC回収時刻や内部driver allocationの完全解放も測定対象外です。
+
+通常回帰は2対象版の64px全件3,041 PNG（1.21.4は1,384、26.3は1,657）を監査します。故障/後続対象、特殊renderer、透過、glintを含む選択10IDの各ID別生成をallへ比較し、全IDごとに別workerを起動する試験とは区別します。比較IDはstone/wheat/chest/dragon_head/player_head/shield/glass/diamond/enchanted_golden_apple/nether_starです。継承profileは1.16.5/1.17/1.19.4/1.20.6/1.21.5/1.21.11/26.2の旧/新各7 PNGで境界回帰します。
+
+最終workerの各ID別系列では1.21.4 shieldの起動が180秒でWORKER_TIMEOUTとなりました。getLocalHostのUnknownHostException警告は観測しましたが、他の成功ログにも同種の警告があるため原因と断定しません。自然timeout後のcontainer削除を確認し、CLI/workerログと初回FAILを保全します。失敗前のThread.print・raw game stdoutは採取できず、起動原因は#34の切り分け対象として未解決です。無観測の単独再試験はRGBA一致しましたが別履歴として保ちます。最終単品20件は初回19成功と#34の診断付きsolo1成功で構成します。同core/worker/版/64px/公式入力・固定Dockerで、debug・wrapper/JFR/自動thread dumpを伴うsoloはready 15.899秒、CLI exit 0、cleanup正常となり、旧all・修正workerのall双方へRGBA/パスが一致しました。観測負荷を伴うため初回起動条件の再現・原因修正とは扱いません。明示再試験の成功を原因解消と扱いません。
+
+担当反証で、failed entryがpathを省略する場合に旧QAの対象PNG不在判定がそのpathへ依存していたことを確認しました。最終checkerは独立normalのstone pathを使い、PNGがwheatの1枚だけであることも検査します。保存済み4 native成果を再監査し、対象不在・PNG数1・黒/白pass順序が成功しました。この旧系列はnativeを実行したdriver hashと修正checker hashを分けて記録し、checker修正後のnative再実行とは扱いません。公式state cache修正後の最終系列は現行checkerと追加agentを実行する別記録です。注入agent・production処理はこの修正で変わりません。
+
+合成2件はmainTargetと異なるdraw/read binding・crop viewportを設定して描画/読出しで失敗させ、target破棄後の正確な復帰と元の例外identityを確認します。JUnit69件・offline build/installDistが成功しました。最初の合成fixtureはfinal Symbolsを継承しようとしてcompileに失敗し、既存mapping resolverで公開fixtureを解決する形へ修正しました。このsetup失敗はnative不具合と区別して保持します。QA agent・fixtureはproduction worker JARへ含めません。
+
+公開API・manifest/cache形式・canonical条件・画像の色復元を変更しません。worker hash/settingsDigestが変わるため、旧iconsへのresumeはせず新しい出力先へ再生成してください。全版experimental/deterministic=false・verified版0を維持し、Vulkan/他GPU、setup途中のすべての例外、cleanup自体の多重失敗・SIGKILL・同時外部更新へ保証を広げません。
+
+再現例です。CLIをbuildし対象版の検証済み入力を専用cacheへ用意してください。QAは通常基準と各fault workerを順番に起動します。このcacheはworkerログ識別のため専有し、同じcacheで別系列を同時実行しないでください。追加系列の初回は同cacheで通常回帰を並列起動したため、workerを複数検出してharnessが停止しました。production起動障害と区別してログ・出力を保存し、公式入力を別cacheへコピーして明示再試験しています。
+
+```sh
+python3 scripts/verify-native-failure.py --cache .local/cache \
+  --out .local/native-failure --versions 1.21.4 26.3 \
+  --docker-image mcicon-render:0.1.0-preview.1
+```
+
 ## Issue #13のホスト移植性と1.20.6インベントリ基準（2026-10-12）
 
 [数値記録](../qa/validation-2026-10-12-host-lighting.json)に、失敗から修正までのbinary・image・入力hash、ホスト、比較条件、件数を保存します。画像・公式入力・QAパック・接続先・個人の絶対パスは含めません。GitHub Actionsは使用していません。

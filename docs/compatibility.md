@@ -111,6 +111,10 @@ Issue #28ではgui-deferredのexact 9版（1.21.6・1.21.7・1.21.8・1.21.9・1
 
 1.13・1.21.4・26.3の既定chest/dragon_head/player_head/shieldについて、直接texture、atlas sprite、cache hitと既存MissingResources guardの対応を確認しました。26.3は実GPU Sampler0のview identityも対応し、通常workerとQA観測workerの独立12 PNGはRGBA一致でした。確認された漏れはなく、production・API/context・既存PNGは不変です。[範囲・対応表・数値記録](validation.md#issue-35の特殊renderer-resourcecache監査2026-10-14)を参照してください。#12の150成功fault結果は関連4ファイルのbyte一致を確認して再利用し、今回の正常監査とは分けます。任意skin/profile・shield模様・季節性・他版/他GPU・独自raw GPU cache・非render-thread外部更新の全組み合わせは保証しません。全版experimental/deterministic=false・verified版0を維持します。
 
+## Issue #36のnative失敗後の復帰（2026-10-14）
+
+1.21.4/26.3でnative readback完了後の黒/白pass例外を検証し、対象PNG未出力・具体診断・同worker正常継続と独立RGBA基準の一致を確認します。projection/type、viewport、実draw/read framebuffer bindingと公式GlStateManager cacheの復帰漏れを修正し、所有target/readback資源の解放とGUI atlas/uniformのframe終了を[限定条件と数値記録](validation.md#issue-36のnative途中失敗描画状態復帰2026-10-14)へ残します。共有atlas/pool全体やGC/driver内の全allocation解放を保証しません。公開API/context・色復元は不変ですがworker hash/settingsDigestが変わるため、旧iconsは新しい出力先へ再生成してください。全版experimental/deterministic=false・verified版0を維持します。
+
 ## Issue #13のホスト・照明検証（2026-10-12）
 
 描画backendはLinux amd64・Mesa llvmpipeのDockerに限定します。ホストJavaは21以上、CPUまたはエミュレーションにはSSE4.1が必要です。ホストnative/GPU描画、Linux ARM64 imageは未対応です。
