@@ -16,6 +16,12 @@ iconsはcanonical item IDのパスを使い、block aliasを別ファイルと�
 
 exit 0=成功、1=起動/IO等の致命エラー、2=不正な引数/版/ID、3=部分失敗。全件は可能なIDを続行し、fail-fast/cancel時はcomplete=falseです。単品の出力競合等、エントリ処理中に発生したエラーはmanifestに残して3を返します。入力選択前の版/ID不備は2です。
 
+## ゲームworkerのメモリ上限
+
+`WorkerOptions.containerMemoryMiB` と `heapMemoryMiB` は正のMiB整数で、heapはcontainer未満を要求します。不正なAPI指定は `IllegalArgumentException`、CLIの `--memory-mib` / `--heap-mib` は引数エラー（exit 2）です。既定3072/2048 MiBを従来の5/6引数constructorでも保持します。containerはDocker `--memory`、heapはゲームJVM `-Xmx` へそのまま渡し、ホストJVM・Docker VM・起動前のJava診断containerは変更しません。起動を保証する最小予算ではなく、低予算の失敗を理由に補正・retryしません。CPU・期限・protocol・agentの描画処理も変更しません。
+
+メモリ予算は描画設定digestに含めず、manifest schema・raw出力・既存保存形式を変更しません。予算だけを変えた再開は従来の画像hash照合に従います。
+
 ## Worker JSON Lines
 
 UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1、contextProfile=fixed-v1、animationFrameZero=trueであることを要求します。profile/hookの不一致はWORKER_CONTEXT_MISMATCHです。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致はその要求を失敗にします。要求と応答を混同して成功PNGへ採用しません。1行の上限はrequestが1,048,576、responseが16,777,216 Java文字（UTF-16 code unit）です。bytesの上限ではなく、readLine後に検査します。待受ポートは使いません。

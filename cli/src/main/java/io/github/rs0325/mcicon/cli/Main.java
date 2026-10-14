@@ -83,13 +83,15 @@ public final class Main implements Runnable {
         @Option(names="--startup-timeout",defaultValue="180",description="Startup timeout in seconds.") int startup;
         @Option(names="--item-timeout",defaultValue="30",description="Per-item timeout in seconds.") int timeout;
         @Option(names="--java-home",description="Docker image内のJavaディレクトリ。ホストのJavaは使用しない。") String javaHome;
+        @Option(names="--memory-mib",defaultValue="3072",description="ゲームworkerのcontainerメモリ上限（正のMiB整数）。") int memory;
+        @Option(names="--heap-mib",defaultValue="2048",description="ゲームworkerのJava heap上限（正のMiB整数、container未満）。") int heap;
         WorkerOptions options() throws Exception {
             Path path=agent;
             if(path==null) {
                 Path location=Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
                 path=location.getParent().getParent().resolve("worker/worker-agent.jar");
             }
-            return new WorkerOptions(path,context,image,Duration.ofSeconds(startup),Duration.ofSeconds(timeout),javaHome);
+            return new WorkerOptions(path,context,image,Duration.ofSeconds(startup),Duration.ofSeconds(timeout),javaHome,memory,heap);
         }
     }
     @Command(name="list",description="Read item/block registries from the exact vanilla client.")

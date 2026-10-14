@@ -132,6 +132,23 @@ python3 scripts/verify-native-alpha.py --out .local/alpha-repeat
 
 startup timeout=1秒と不正agentの実CLI試験では、専用agent snapshotと一時PNGが回収されました。対応コミットは64ff362です。core SIGKILLの即時cache snapshot回収は保証しません。
 
+## workerのメモリ指定（Issue #60、2026-10-14）
+
+ゲームworkerの既定3072/2048 MiBと指定4096/2560 MiBを、同一image・agentで1.21.4 stone / 64pxとして順次実行しました。いずれもexit 0で、decoded RGBA・相対path・PNG bytes・描画settingsが一致し、#4の旧core基準にもRGBA・pathが一致しました。所要時間は20.73秒と16.43秒で、性能比較ではありません。memoryは描画settingsに加えていません。
+
+有効だが小さい128/16 MiBでは、agent premainのmappings読込み中に `OutOfMemoryError: Java heap space` が発生しました。3.75秒で `WORKER_EXITED` / CLI exit 1、Docker die exit 127となり、WORKER_TIMEOUT・自動retryはありません。3条件すべてで所有container・agent snapshot・一時PNG・partが残らないことを確認しました。低予算で起動が成功するという受入ではありません。
+
+JUnit 90件、合成起動引数の既定/指定/小予算3条件と既存protocol回帰2件、旧coreだけでcompileした5/6引数consumerの新core実行が成功しました。受入QAは空manifest・誤IDを拒否し、低予算の原因ログを所有containerに対応するworkerだけへ限定します。この拒否と他jobのOOM誤帰属を防ぐ合成2件、保存済み3試験の厳密再監査も成功しました。`build :cli:installDist` も成功しています。Javadoc追記後の最終coreでも旧consumerと既定予算1起動を追加確認し、#4基準とRGBA・pathが一致しました。保存済みcustom/lowは実行時core hashを維持し、実行時source SHAと一致する再構成WorkerOptionsの命令列が最終classと一致することを別途記録します。旧native core JAR本体はsnapshotしていないため、この比較は旧sourceを独立compileした命令列との照合です。数値・入力/source/core/worker/image hashは[数値記録](../qa/validation-2026-10-14-worker-memory.json)に保存しました。このnative受入はmacOS Colima / Linux amd64・上記1版1IDのメモリ変更による一致と回収に限定し、全版の予算下限・画質・他ホストの性能を保証しません。
+
+再試験は新しい出力先と検証済みcacheを使います。旧core JARのbinary試験は、そのSHA-256を指定して独立compileします。
+
+```sh
+python3 scripts/test-worker-memory.py
+python3 scripts/test-worker-memory-audit.py
+python3 scripts/test-worker-memory-binary.py --old-core old-core.jar --old-sha256 <SHA256> --report .local/memory-binary.json
+python3 scripts/verify-worker-memory.py --source-cache .local/cache --out .local/memory-repeat --image sha256:<IMAGE_SHA256>
+```
+
 ## fallback診断・新workerの全件比較（同日）
 
 CLIの診断は8ccdadb、描画中のresource観測は63ce8d9 / 5c6719a / 521302c、26.x検証fixtureのatlas指定修正は1d49f77です。[数値記録](../qa/validation-2026-10-10-resource-guard.json)に、各ジョブのcore/agent/source/image hashと以前の記録への参照を保存します。
