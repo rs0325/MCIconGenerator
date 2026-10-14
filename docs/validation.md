@@ -534,6 +534,16 @@ python3 scripts/verify-native-failure.py --cache .local/cache \
   --docker-image mcicon-render:0.1.0-preview.1
 ```
 
+## Issue #68の26.1 framebuffer復帰API選択（2026-10-14）
+
+`Symbols.hasClass`はmappingへの登録を調べます。26.1/26.1.1/26.1.2は名前付きclassのためmapping登録がなく、元JARにある`com.mojang.blaze3d.opengl.GlStateManager`を検出できず、存在しない`com.mojang.blaze3d.platform.GlStateManager`へfallbackして描画が失敗していました。対象3版は実在するopengl classを明示選択します。framebuffer bindingとviewportの復帰は公式APIを使い、回帰fixtureでは実GL相当のviewport値と、後続の公式framebuffer bindによるcache同期を検査します。
+
+26.1系列の64px全件生成は各1,505件、計4,515件が成功し、#36以前の正常全件基準と全entryのpath・PNG SHA-256が一致しました。5代表版（1.14.4/1.21.5/1.21.11/26.2/26.3）の静的7種類も計35枚が既存PNG・pathと一致しました。16px needleは各版3件が成功しましたが、旧16px基準は対象PNGなしの失敗記録なのでRGBA比較には使っていません。初期の64px needle比較はサイズ不一致のため撤回しました。
+
+公式Mojang client JARとmappingsを使った静的監査では、適用対象44版すべてで選択classを確認しました。1.14.4は旧APIのため`viewport(IIII)V`だけを使用し、framebuffer bindingはGLX経路です。残る43版は`_glBindFramebuffer(II)V`と`_viewport(IIII)V`を使用し、実際に呼ぶdescriptor計87件がmapping・JARと一致しました。公式metadata/library/asset indexのexpected SHA-1と、使用8版（26.1系列および5代表版）のcache上748 unique filesの実after SHA-1はすべて一致し、欠落・不一致はありません。assetは`RuntimePreparer`の実装どおり`.ogg`を除外し、libraryは`linux/amd64`のrulesで選択しました。native所有container 13件はworker logとDocker event IDを突合し、全件die exit 0・destroy、残存snapshot・一時PNG・worker JARなしを確認しました。
+
+named fixture強化前の候補JUnitはcore 58件・CLI 5件・worker 31件、計94件が成功しました。named fixture修正後はworker 31件が成功し、失敗・error・skipはいずれも0件（`RendererCleanupTest`は6件成功）です。詳細なclass/JAR hash、入力参照件数・重複排除件数、manifest比較、cleanup証跡は[数値・hash記録](../qa/validation-2026-10-14-named-framebuffer.json)にあります。旧worker hash/settingsDigestと異なるため、既存iconsへの再開はせず新しい出力先で生成してください。全版品質の正式受入・canonical昇格は行わず、experimental/deterministic=falseを維持します。
+
 ## Issue #13のホスト移植性と1.20.6インベントリ基準（2026-10-12）
 
 [数値記録](../qa/validation-2026-10-12-host-lighting.json)に、失敗から修正までのbinary・image・入力hash、ホスト、比較条件、件数を保存します。画像・公式入力・QAパック・接続先・個人の絶対パスは含めません。GitHub Actionsは使用していません。

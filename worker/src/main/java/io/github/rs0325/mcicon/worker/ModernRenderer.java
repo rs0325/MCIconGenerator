@@ -170,8 +170,11 @@ public class ModernRenderer implements WorkerRenderer {
     protected void restoreTargetState(IntBuffer state) throws Exception {
         s.call("org.lwjgl.opengl.GL30","glBindFramebuffer",null,36009,state.get(4));
         s.call("org.lwjgl.opengl.GL30","glBindFramebuffer",null,36008,state.get(5));
-        String glState=RenderAgent.config.get("profile").getAsString().equals("gui-26.3")?"com.mojang.renderpearl.backend.opengl.GlStateManager":(RenderAgent.config.get("profile").getAsString().equals("gui-26.2")||s.hasClass("com.mojang.blaze3d.opengl.GlStateManager"))?"com.mojang.blaze3d.opengl.GlStateManager":"com.mojang.blaze3d.platform.GlStateManager";
-        boolean oldApi=RenderAgent.config.get("version").getAsString().equals("1.14.4");
+        String profile=RenderAgent.config.get("profile").getAsString();
+        String version=RenderAgent.config.get("version").getAsString();
+        boolean named261=version.equals("26.1")||version.equals("26.1.1")||version.equals("26.1.2");
+        String glState=profile.equals("gui-26.3")?"com.mojang.renderpearl.backend.opengl.GlStateManager":(profile.equals("gui-26.2")||named261||s.hasClass("com.mojang.blaze3d.opengl.GlStateManager"))?"com.mojang.blaze3d.opengl.GlStateManager":"com.mojang.blaze3d.platform.GlStateManager";
+        boolean oldApi=version.equals("1.14.4");
         if(!oldApi) {
             s.call(glState,"_glBindFramebuffer",null,36009,state.get(4));
             s.call(glState,"_glBindFramebuffer",null,36008,state.get(5));

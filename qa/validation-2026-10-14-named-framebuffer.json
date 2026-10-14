@@ -1,0 +1,1647 @@
+{
+  "issue": 68,
+  "date": "2026-10-14",
+  "baseCommit": "3da2738e889645858739eaa321431f802fd370fc",
+  "scope": "26.1/26.1.1/26.1.2は名前付きclassでmapping登録がないため、Symbols.hasClassが元JARに存在するopengl GlStateManagerを検出できず、存在しないplatform GlStateManagerへfallback選択していた問題を修正。experimental/deterministic=falseを維持。",
+  "productionSourceSha256": "797fb1756d325819a98b4d100f6ffd0707aea79ac3912651bbd7243bab165452",
+  "productionCandidateJarSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+  "coreJarSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+  "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+  "files": {
+    "production": "worker/src/main/java/io/github/rs0325/mcicon/worker/ModernRenderer.java",
+    "test": "worker/src/test/java/io/github/rs0325/mcicon/worker/RendererCleanupTest.java",
+    "fixture": "worker/src/test/java/com/mojang/blaze3d/opengl/GlStateManager.java",
+    "sha256": {
+      "worker/src/main/java/io/github/rs0325/mcicon/worker/ModernRenderer.java": "797fb1756d325819a98b4d100f6ffd0707aea79ac3912651bbd7243bab165452",
+      "worker/src/test/java/io/github/rs0325/mcicon/worker/RendererCleanupTest.java": "43004064b8468f78190da82d7f3c8fc93fae08cc787929874b49b92a03d639ae",
+      "worker/src/test/java/com/mojang/blaze3d/opengl/GlStateManager.java": "d5a2acdb2f752240da101c71a2d5830073e25a717c1513b720431b42a387f9f8"
+    }
+  },
+  "fullRender": {
+    "versions": {
+      "26.1": {
+        "size": 64,
+        "context": "fixed-v1",
+        "profile": "gui-deferred",
+        "sourceSha256": "bc6194c61566b587f196090d730698f2191170f7580adb143e4ff839939d3840",
+        "agentSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+        "total": 1505,
+        "success": 1505,
+        "failed": 0,
+        "noItemForm": 0,
+        "allPng64": true,
+        "metadataSha256": "05d0766b4f0b97abbc0e6127060d62b3add9ed88c40488cf3fa831033cfb1561",
+        "oldManifestSha256": "08feeadb4974d14bd7cb5edd086b2f7a2045e0d8d4becf0a56cad1516280482f",
+        "newManifestSha256": "1a24550359344610cd9aeb4febcc46b8cff062f5e04acd5e225d981a4676c537"
+      },
+      "26.1.1": {
+        "size": 64,
+        "context": "fixed-v1",
+        "profile": "gui-deferred",
+        "sourceSha256": "8c109be6177f40d10d0afd820b06542f9609597874242b96e16c5b0dc9e1fef3",
+        "agentSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+        "total": 1505,
+        "success": 1505,
+        "failed": 0,
+        "noItemForm": 0,
+        "allPng64": true,
+        "metadataSha256": "8907e36fb50d354acd8f9d6bc885e4fca82c095e714668e4e287a8bbfc1f60dc",
+        "oldManifestSha256": "6ffd31d794bf0aa7b02040cf113f468d5a9545d69bcf9ef5a3158cbd5efbfbb7",
+        "newManifestSha256": "fbcc2f0b3533fc8e36e5169cc4a016548bd6d57ce371b343caccb15821d1b208"
+      },
+      "26.1.2": {
+        "size": 64,
+        "context": "fixed-v1",
+        "profile": "gui-deferred",
+        "sourceSha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0",
+        "agentSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+        "total": 1505,
+        "success": 1505,
+        "failed": 0,
+        "noItemForm": 0,
+        "allPng64": true,
+        "metadataSha256": "11c40418b3368bcc26d6c7238984a6f7af6993748d334855a0d5beeded13b556",
+        "oldManifestSha256": "fa7433197fda696d7c3f0ef17bbaf2e84c2cdf9c7092186b7ae575008204de0e",
+        "newManifestSha256": "deb98617806f78dc8450eb61318a0d0f59f48f5b4e820afe796f2fb122586e22"
+      }
+    },
+    "comparison": {
+      "reference": "Issue #36以前の正常な全件基準",
+      "size": 64,
+      "context": "fixed-v1",
+      "profile": "gui-deferred",
+      "total": 4515,
+      "success": 4515,
+      "pathMismatches": 0,
+      "pngSha256Mismatches": 0,
+      "rgba": "PNG SHA-256完全一致による一致",
+      "failed16PixelBaselineUsedAsRgbaReference": false
+    }
+  },
+  "representativeStatic": {
+    "1.14.4": {
+      "size": 64,
+      "profile": "gui-fixed",
+      "sourceMatches": true,
+      "total": 7,
+      "success": 7,
+      "allPathsAndPngsMatch": true
+    },
+    "1.21.5": {
+      "size": 64,
+      "profile": "gui-1.21.5",
+      "sourceMatches": true,
+      "total": 7,
+      "success": 7,
+      "allPathsAndPngsMatch": true
+    },
+    "1.21.11": {
+      "size": 64,
+      "profile": "gui-deferred",
+      "sourceMatches": true,
+      "total": 7,
+      "success": 7,
+      "allPathsAndPngsMatch": true
+    },
+    "26.2": {
+      "size": 64,
+      "profile": "gui-26.2",
+      "sourceMatches": true,
+      "total": 7,
+      "success": 7,
+      "allPathsAndPngsMatch": true
+    },
+    "26.3": {
+      "size": 64,
+      "profile": "gui-26.3",
+      "sourceMatches": true,
+      "total": 7,
+      "success": 7,
+      "allPathsAndPngsMatch": true
+    }
+  },
+  "needle16px": {
+    "versions": {
+      "26.1": {
+        "size": 16,
+        "profile": "gui-deferred",
+        "sourceSha256": "bc6194c61566b587f196090d730698f2191170f7580adb143e4ff839939d3840",
+        "agentSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+        "success": 3,
+        "failed": 0
+      },
+      "26.1.1": {
+        "size": 16,
+        "profile": "gui-deferred",
+        "sourceSha256": "8c109be6177f40d10d0afd820b06542f9609597874242b96e16c5b0dc9e1fef3",
+        "agentSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+        "success": 3,
+        "failed": 0
+      },
+      "26.1.2": {
+        "size": 16,
+        "profile": "gui-deferred",
+        "sourceSha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0",
+        "agentSha256": "27a0c9566f4c799678e9c10a670f3892a8dc7c1a4ed02b027ef6f1619c82ddf3",
+        "success": 3,
+        "failed": 0
+      }
+    },
+    "comparisonNote": "旧16px基準3 IDはすべてfailedでPNGがなく、新PNGとのRGBA比較対象ではない。初期64px比較はサイズ不一致のため撤回。"
+  },
+  "officialApiAudit": {
+    "versionCount": 44,
+    "mappingDescriptorMatches": 87,
+    "badVersionCount": 0,
+    "evidenceSha256": "71ccbf5cd4cc02e81247eb78429b292f398c21f828d2646763c267b2347d8b0b",
+    "versions": [
+      {
+        "version": "26.3",
+        "profile": "gui-26.3",
+        "selectedClass": "com.mojang.renderpearl.backend.opengl.GlStateManager",
+        "actualClass": "com.mojang.renderpearl.backend.opengl.GlStateManager",
+        "jarSha1": "e877b6a07acd633fb3bb475002175cec036e7b87",
+        "officialJarSha1": "e877b6a07acd633fb3bb475002175cec036e7b87",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "4508d006323f24fa02876310c192d739af56516eb259000ac50f0909a68c9a2d",
+        "mappingsSha1": null,
+        "officialMappingsSha1": null,
+        "mappingsSha1MatchesOfficialMetadata": null,
+        "mappingsSha256": null,
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "26.2",
+        "profile": "gui-26.2",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "2dc72797acbc1b63fc16a11c4ac393605f453754",
+        "officialJarSha1": "2dc72797acbc1b63fc16a11c4ac393605f453754",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "40896ee9f1e2bec3c934daac7e93d41e9e3d9c2f8ae0ca366d52ffbfd1afa290",
+        "mappingsSha1": null,
+        "officialMappingsSha1": null,
+        "mappingsSha1MatchesOfficialMetadata": null,
+        "mappingsSha256": null,
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "26.1.2",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "4e618f09a0c649dde3fdf829df443ce0b8831e65",
+        "officialJarSha1": "4e618f09a0c649dde3fdf829df443ce0b8831e65",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0",
+        "mappingsSha1": null,
+        "officialMappingsSha1": null,
+        "mappingsSha1MatchesOfficialMetadata": null,
+        "mappingsSha256": null,
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "26.1.1",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "377031a9e733ba8ab4d355959a8f6fb8eb707556",
+        "officialJarSha1": "377031a9e733ba8ab4d355959a8f6fb8eb707556",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "8c109be6177f40d10d0afd820b06542f9609597874242b96e16c5b0dc9e1fef3",
+        "mappingsSha1": null,
+        "officialMappingsSha1": null,
+        "mappingsSha1MatchesOfficialMetadata": null,
+        "mappingsSha256": null,
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "26.1",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "191771837687b766537a8c4607cb6fad79c533a1",
+        "officialJarSha1": "191771837687b766537a8c4607cb6fad79c533a1",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "bc6194c61566b587f196090d730698f2191170f7580adb143e4ff839939d3840",
+        "mappingsSha1": null,
+        "officialMappingsSha1": null,
+        "mappingsSha1MatchesOfficialMetadata": null,
+        "mappingsSha256": null,
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.11",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd",
+        "officialJarSha1": "ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "1473c9489ac50fda3c435049a76a70d61a10b8610db27f5ba9d8756b686cd3bd",
+        "mappingsSha1": "031a68bebf55d824f66d6573d8c752f0e1bf232a",
+        "officialMappingsSha1": "031a68bebf55d824f66d6573d8c752f0e1bf232a",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "517799a8485e107e932dc1bd27c002b2d0b9207eb2396b685bcfe6c3321a9fbd",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.10",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "d3bdf582a7fa723ce199f3665588dcfe6bf9aca8",
+        "officialJarSha1": "d3bdf582a7fa723ce199f3665588dcfe6bf9aca8",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "e65ca028bc58da12bf8413066c90ecd4d48c94fb351d9bbd22ecdff5c87f9482",
+        "mappingsSha1": "7e62354a697f95cf5e7d5981face0583676a9ef7",
+        "officialMappingsSha1": "7e62354a697f95cf5e7d5981face0583676a9ef7",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "2a6f53f4c1fd048e8fa956e3a3fbbb0afc02d5bbc23e52a16b328aed61b9bf39",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.9",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "ce92fd8d1b2460c41ceda07ae7b3fe863a80d045",
+        "officialJarSha1": "ce92fd8d1b2460c41ceda07ae7b3fe863a80d045",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "40c0a32c46601f71f6a61dae9f126202ded5cc453cfb8da6e42ae73f2a3f5c1b",
+        "mappingsSha1": "3641ccb54eac2153c7e8274823c5a8e046beaba0",
+        "officialMappingsSha1": "3641ccb54eac2153c7e8274823c5a8e046beaba0",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "f223e9775abb66b6712c505cb1a73b48d615efebaf43a9f81dd58df9a9b1c7b3",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.8",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "a19d9badbea944a4369fd0059e53bf7286597576",
+        "officialJarSha1": "a19d9badbea944a4369fd0059e53bf7286597576",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "ea74e9c5e92d01f95f3d39196ddb734e19a077a58b4c433c34109487d600276f",
+        "mappingsSha1": "bdeb624c3aefba11d9d40f34bc96176350b549b6",
+        "officialMappingsSha1": "bdeb624c3aefba11d9d40f34bc96176350b549b6",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "dce035fedcc047ce0306c69892176b5eb9036bcc2845c87198163f12bb1d67ca",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.7",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "a2db1ea98c37b2d00c83f6867fb8bb581a593e07",
+        "officialJarSha1": "a2db1ea98c37b2d00c83f6867fb8bb581a593e07",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "6d0aa64c6a0aee3270253317f51e9e816f94cd3b16b44f5d605615c39fc62fb9",
+        "mappingsSha1": "8d83af626cae1865deaf55fbf96934be4886fd45",
+        "officialMappingsSha1": "8d83af626cae1865deaf55fbf96934be4886fd45",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "328f2c5849c7c5fc4f2b1eae4f74a7cfe6bb337c7938242ac5c4f9eac89b1e50",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.6",
+        "profile": "gui-deferred",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "740a125b83dd3447feaa3c5e891ead7fbb21ae28",
+        "officialJarSha1": "740a125b83dd3447feaa3c5e891ead7fbb21ae28",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "9592df8587d6d3ec0334c873ad432dc76006d6129afdce9a7eac52638339a24a",
+        "mappingsSha1": "848855615bc81e3db1c85e69b6afb150807a1261",
+        "officialMappingsSha1": "848855615bc81e3db1c85e69b6afb150807a1261",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "2ff82b34ce5f849aaafdff51e23b9448c4263881238b780a441fe1061a6fc261",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.5",
+        "profile": "gui-1.21.5",
+        "selectedClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.opengl.GlStateManager",
+        "jarSha1": "b88808bbb3da8d9f453694b5d8f74a3396f1a533",
+        "officialJarSha1": "b88808bbb3da8d9f453694b5d8f74a3396f1a533",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "522672ad20b460c02c2e39b6c5035ef6a849af28eb11ab2ac7eb293d395a8c11",
+        "mappingsSha1": "57669731d542f98646772e91a0d68628f9827a5c",
+        "officialMappingsSha1": "57669731d542f98646772e91a0d68628f9827a5c",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "3907657ade3e61bc8cffb4ca0a1bcba15f57986be4e613900947119364a206e5",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.4",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "a7e5a6024bfd3cd614625aa05629adf760020304",
+        "officialJarSha1": "a7e5a6024bfd3cd614625aa05629adf760020304",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+        "mappingsSha1": "0cf2a0b7f056da1a5a5dd99fc6dc752f33987150",
+        "officialMappingsSha1": "0cf2a0b7f056da1a5a5dd99fc6dc752f33987150",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.3",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "6f67d19b4467240639cb2c368ffd4b94ba889705",
+        "officialJarSha1": "6f67d19b4467240639cb2c368ffd4b94ba889705",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "25190c556bc56d11070638ccab3b3c6efd76bb9684c92a2680a4de01c3c7138b",
+        "mappingsSha1": "42c2292dfc21de314dee5205760332c807cad411",
+        "officialMappingsSha1": "42c2292dfc21de314dee5205760332c807cad411",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "e92a9cb01c233075b51a6233d0c22f56dcda3fcab46438d3f7a1781d104dcd41",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.2",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "c7ac2d0d86f4ca416cab9064ff8a281852ad0c7b",
+        "officialJarSha1": "c7ac2d0d86f4ca416cab9064ff8a281852ad0c7b",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "613091da0f62426ae8dcf9afb30eb639485f493b81cda3a2b96b1fb8a6b9976c",
+        "mappingsSha1": "ce0ed2eb99175df9ec5166324e3fdd1f87cee827",
+        "officialMappingsSha1": "ce0ed2eb99175df9ec5166324e3fdd1f87cee827",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "e37560e4889168916a73dbc4922c563002eff70fbecfe1cf5c50a7b222f451b2",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21.1",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "30c73b1c5da787909b2f73340419fdf13b9def88",
+        "officialJarSha1": "30c73b1c5da787909b2f73340419fdf13b9def88",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+        "mappingsSha1": "2244b6f072256667bcd9a73df124d6c58de77992",
+        "officialMappingsSha1": "2244b6f072256667bcd9a73df124d6c58de77992",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.21",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "0e9a07b9bb3390602f977073aa12884a4ce12431",
+        "officialJarSha1": "0e9a07b9bb3390602f977073aa12884a4ce12431",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "4b56bc9b44de7e88f9fbb52e716c18240da34469fcbafa5ed2e75b04d60617e8",
+        "mappingsSha1": "0530a206839eb1e9b35ec86acbbe394b07a2d9fb",
+        "officialMappingsSha1": "0530a206839eb1e9b35ec86acbbe394b07a2d9fb",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "127485d79248d4ae2955a7d061c3626d38853ecb054c4d008707732264b0aac1",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.20.6",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "05b6f1c6b46a29d6ea82b4e0d42190e42402030f",
+        "officialJarSha1": "05b6f1c6b46a29d6ea82b4e0d42190e42402030f",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "02dfd345ac1ad55692d5dbc8486ac7e4fea72cd54ac494a79cd48963048e56b2",
+        "mappingsSha1": "de46c8f33d7826eb83e8ef0e9f80dc1f08cb9498",
+        "officialMappingsSha1": "de46c8f33d7826eb83e8ef0e9f80dc1f08cb9498",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "27f4ef3a9362e9874e2c33edac981b6f485ad97f92c4e35b497525b646aae745",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.20.5",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "c6b92b2374a629f20802bb284f98a4ee790e950a",
+        "officialJarSha1": "c6b92b2374a629f20802bb284f98a4ee790e950a",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "49d5949adbb1021a7eb00c1b949f9e39934b10249cbf86d25004774d1b3ff510",
+        "mappingsSha1": "65b1468c44fbf34382716416b5c1a16d2949217a",
+        "officialMappingsSha1": "65b1468c44fbf34382716416b5c1a16d2949217a",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "9afdb3b7fcc4c6acbec3bc6ccb46192bfc6460e12bf9e268e29bfee46bc7fbac",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.20.4",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "fd19469fed4a4b4c15b2d5133985f0e3e7816a8a",
+        "officialJarSha1": "fd19469fed4a4b4c15b2d5133985f0e3e7816a8a",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "9221ab461a491bf9661cd8e773a5e662aaa43d600fa7970b8c12bbfb0431b838",
+        "mappingsSha1": "be76ecc174ea25580bdc9bf335481a5192d9f3b7",
+        "officialMappingsSha1": "be76ecc174ea25580bdc9bf335481a5192d9f3b7",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "ad03c803d866062909dd378ed5f1611687dc0ed0a76cc7fd57e968a99d641e5f",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.20.3",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "b178a327a96f2cf1c9f98a45e5588d654a3e4369",
+        "officialJarSha1": "b178a327a96f2cf1c9f98a45e5588d654a3e4369",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "bef21938224902dd925e2d89dcfe1d2540656d4cf7a5abd2b93e0402d135c655",
+        "mappingsSha1": "be76ecc174ea25580bdc9bf335481a5192d9f3b7",
+        "officialMappingsSha1": "be76ecc174ea25580bdc9bf335481a5192d9f3b7",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "ad03c803d866062909dd378ed5f1611687dc0ed0a76cc7fd57e968a99d641e5f",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.20.2",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "82d1974e75fc984c5ed4b038e764e50958ac61a0",
+        "officialJarSha1": "82d1974e75fc984c5ed4b038e764e50958ac61a0",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "fa1a19be56a506426308abbc1cad85f299a7fc6dae4335559351ba0246713fda",
+        "mappingsSha1": "5c292ff7d3161977041116698e295083fd5ec8f5",
+        "officialMappingsSha1": "5c292ff7d3161977041116698e295083fd5ec8f5",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "d4e2eb2b32ae7bd2e95ea3a8391813a7b6795e20884cf01d989dce68f906e2fd",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.20.1",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "0c3ec587af28e5a785c0b4a7b8a30f9a8f78f838",
+        "officialJarSha1": "0c3ec587af28e5a785c0b4a7b8a30f9a8f78f838",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "56b71336d2b4fdffd197f56595b0da93e32a946f78f382a299b8f4b92758bb0f",
+        "mappingsSha1": "6c48521eed01fe2e8ecdadbd5ae348415f3c47da",
+        "officialMappingsSha1": "6c48521eed01fe2e8ecdadbd5ae348415f3c47da",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "67bfc33ef0c7103f002d6ac134f8eddd3d67e2ce45d266e83816d1a2e2c9b01d",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.20",
+        "profile": "gui-1.21.4",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "e575a48efda46cf88111ba05b624ef90c520eef1",
+        "officialJarSha1": "e575a48efda46cf88111ba05b624ef90c520eef1",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "5ac9ead135746f5f27048f2e01d8d5bdc2dabc4d91422f73ef2435f4c3d24aff",
+        "mappingsSha1": "a4cd9a97400f7ecfe4dba23e427549ebc5815d66",
+        "officialMappingsSha1": "a4cd9a97400f7ecfe4dba23e427549ebc5815d66",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "fdd921d6bcc7657850f78514d36bb57af0b8a340786d12c46ec18d9c46c039de",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.19.4",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "958928a560c9167687bea0cefeb7375da1e552a8",
+        "officialJarSha1": "958928a560c9167687bea0cefeb7375da1e552a8",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "0e79cf7f07c107e9a1fe22ed703e472372b44149e64114944f0811abbd25f3ec",
+        "mappingsSha1": "f14771b764f943c154d3a6fcb47694477e328148",
+        "officialMappingsSha1": "f14771b764f943c154d3a6fcb47694477e328148",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "5ef270b938f89cfc77371e0deee9f9044c41d9a373fa11dcb1fd1923272c4606",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.19.3",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "977727ec9ab8b4631e5c12839f064092f17663f8",
+        "officialJarSha1": "977727ec9ab8b4631e5c12839f064092f17663f8",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "b7228c23dbc8988129561af3918dd469577de842d2eb3c7dabe00316bf9a44d6",
+        "mappingsSha1": "42366909cc612e76208d34bf1356f05a88e08a1d",
+        "officialMappingsSha1": "42366909cc612e76208d34bf1356f05a88e08a1d",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "f72a4675ae77fa16966a0338567e30ee3a64bb7476932e264e8b25937f664a1b",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.19.2",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "055b30d860ead928cba3849ba920c88b6950b654",
+        "officialJarSha1": "055b30d860ead928cba3849ba920c88b6950b654",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "e1ac65de9b471b6916cc457fdcff00c1bafac17027aa79100c4df893b3d956db",
+        "mappingsSha1": "8e8c9be5dc27802caba47053d4fdea328f7f89bd",
+        "officialMappingsSha1": "8e8c9be5dc27802caba47053d4fdea328f7f89bd",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "c5db94c44c1ce6c5d3bfce64152831090310c202f4abe4375adbb3454afcec76",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.19.1",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "90d438c3e432add8848a9f9f368ce5a52f6bc4a7",
+        "officialJarSha1": "90d438c3e432add8848a9f9f368ce5a52f6bc4a7",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "146d4018cfed50c5e77483940653091f186d2eea9ad42fc40939f5c72d6b7f52",
+        "mappingsSha1": "fc8e22d42c0e4eb1899e2acf7e97eae917e1cb94",
+        "officialMappingsSha1": "fc8e22d42c0e4eb1899e2acf7e97eae917e1cb94",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "9b2dfe745719f4de1ce3fb23baeb24e31623c1fcc249e39bbdb068ad7f600236",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.19",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "c0898ec7c6a5a2eaa317770203a1554260699994",
+        "officialJarSha1": "c0898ec7c6a5a2eaa317770203a1554260699994",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "ffd4fb3037d4110085b4d3d2dc47b760695528eb14292c3e5f7c758983c6d764",
+        "mappingsSha1": "150346d1c0b4acec0b4eb7f58b86e3ea1aa730f3",
+        "officialMappingsSha1": "150346d1c0b4acec0b4eb7f58b86e3ea1aa730f3",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "9e31de7fc15b1bac0e58abc441a5e56c320266112feaea981bcffd41dd6201e1",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.18.2",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "2e9a3e3107cca00d6bc9c97bf7d149cae163ef21",
+        "officialJarSha1": "2e9a3e3107cca00d6bc9c97bf7d149cae163ef21",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "1d09e3639644b6b2254499469d0765cc005a286d19f3fa595b0ed8fb07971ec7",
+        "mappingsSha1": "a661c6a55a0600bd391bdbbd6827654c05b2109c",
+        "officialMappingsSha1": "a661c6a55a0600bd391bdbbd6827654c05b2109c",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "a2aa6ee1030bfef79e9b2e08e79de1637fdd7ecb5bf8891cf2e9a4b186042543",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.18.1",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "7e46fb47609401970e2818989fa584fd467cd036",
+        "officialJarSha1": "7e46fb47609401970e2818989fa584fd467cd036",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "737c28a56c8980fcd8574465c61538ebde8f511bdd035c69d0cbe27953f892aa",
+        "mappingsSha1": "99ade839eacf69b8bed88c91bd70ca660aee47bb",
+        "officialMappingsSha1": "99ade839eacf69b8bed88c91bd70ca660aee47bb",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "a7a4109255dfb74b9552b339482f0714bb0e7e7143d1059b0bf62a526d2c2a84",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.18",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "d49eb6caed53d23927648c97451503442f9e26fd",
+        "officialJarSha1": "d49eb6caed53d23927648c97451503442f9e26fd",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "381e090ef22584526113bcccf26ae38a310a22094d14c2d0dec72b71fdf65aaa",
+        "mappingsSha1": "e824c89c612c0b9cb438ef739c44726c59bbf679",
+        "officialMappingsSha1": "e824c89c612c0b9cb438ef739c44726c59bbf679",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "b4c7d514328050fa09ac04818d21e4be0b58e75c6b0847e56ce09f6637b8877b",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.17.1",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "8d9b65467c7913fcf6f5b2e729d44a1e00fde150",
+        "officialJarSha1": "8d9b65467c7913fcf6f5b2e729d44a1e00fde150",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "a49b4a56c5bbe15c9ed9fe53efa9a591f265a1f5ba7d6aa9739a58ea7a92b79d",
+        "mappingsSha1": "e4d540e0cba05a6097e885dffdf363e621f87d3f",
+        "officialMappingsSha1": "e4d540e0cba05a6097e885dffdf363e621f87d3f",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "2b28ded68f8602aaf2f35ef92dd10ee41ba2cf9723e29570155d60e1723848e9",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.17",
+        "profile": "gui-classic",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "1cf89c77ed5e72401b869f66410934804f3d6f52",
+        "officialJarSha1": "1cf89c77ed5e72401b869f66410934804f3d6f52",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "14122287d4e4256c2d65ec8c0ccfa3b56448495fa3ccabc87d0f0eeb4fa1c30f",
+        "mappingsSha1": "227d16f520848747a59bef6f490ae19dc290a804",
+        "officialMappingsSha1": "227d16f520848747a59bef6f490ae19dc290a804",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "191b957aaa40b294402feef29651ae7a9f1263ec22c5382f3b8fa0a4918b0471",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "_glBindFramebuffer",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "_viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.16.5",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "dem",
+        "jarSha1": "37fd3c903861eeff3bc24b71eed48f828b5269c8",
+        "officialJarSha1": "37fd3c903861eeff3bc24b71eed48f828b5269c8",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "00b5ebbc33e95ea88c1ab80601599c9827e9aa861d93ccc2cfcbbfd996e86263",
+        "mappingsSha1": "374c6b789574afbdc901371207155661e0509e17",
+        "officialMappingsSha1": "374c6b789574afbdc901371207155661e0509e17",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "7931ed6d723eceb1d621d05a76e10ddf643bf468c6ecf1c4ecf377bd72cf8b8c",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "d",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.16.4",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "dem",
+        "jarSha1": "1952d94a0784e7abda230aae6a1e8fc0522dba99",
+        "officialJarSha1": "1952d94a0784e7abda230aae6a1e8fc0522dba99",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "d6740464ee2bdf37d285c5d368d2e16497492427fb5783e2db3482bbf0079ed0",
+        "mappingsSha1": "0837de813d1a6b67e23da3c520a84e872c8d2f0e",
+        "officialMappingsSha1": "0837de813d1a6b67e23da3c520a84e872c8d2f0e",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "93f188a0038fec8c2402d78e7acca983680978d6a9237c1fab80f22caddb00fe",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "d",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.16.3",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "dej",
+        "jarSha1": "1321521b2caf934f7fc9665aab7e059a7b2bfcdf",
+        "officialJarSha1": "1321521b2caf934f7fc9665aab7e059a7b2bfcdf",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "da85197babd989a7de318774cf5d97bcef95e89a70c9fa9a4c8180463e9589fa",
+        "mappingsSha1": "faac5028fbca3859db970cc4ca041aeec55f6d9d",
+        "officialMappingsSha1": "faac5028fbca3859db970cc4ca041aeec55f6d9d",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "c41c58faaf3a3b651d8883b9b1df355cb6ad59c4d6296b2e1ffc3dfe2bf9be3e",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "c",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.16.2",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "dej",
+        "jarSha1": "653e97a2d1d76f87653f02242d243cdee48a5144",
+        "officialJarSha1": "653e97a2d1d76f87653f02242d243cdee48a5144",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "19960f4e3c60f2723f361844d2b4020b8bf2160bd91a1e1efde8ce5aea4ff73d",
+        "mappingsSha1": "16d12d67cd5341bfc848340f61f3ff6b957537fe",
+        "officialMappingsSha1": "16d12d67cd5341bfc848340f61f3ff6b957537fe",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "c95a7046ab43371cc476b8b51978c6f2155c62f4cc5756b05c8ef81e0f11691f",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "c",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.16.1",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "dgl",
+        "jarSha1": "c9abbe8ee4fa490751ca70635340b7cf00db83ff",
+        "officialJarSha1": "c9abbe8ee4fa490751ca70635340b7cf00db83ff",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "b4831e7b63b10588ff06ea86322108d916c536446f3aea3ae988b7fe3e1f66ef",
+        "mappingsSha1": "ddf517a4f6750f4c15189de4e03246ae1f916cf5",
+        "officialMappingsSha1": "ddf517a4f6750f4c15189de4e03246ae1f916cf5",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "6cc374f819bca44d940f8912044b07bdac3e240a02e37117ae1d4ad63c21409b",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "c",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.16",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "dgl",
+        "jarSha1": "228fdf45541c4c2fe8aec4f20e880cb8fcd46621",
+        "officialJarSha1": "228fdf45541c4c2fe8aec4f20e880cb8fcd46621",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "00740ef4475d4cd0a1d7064f89602f759c45ff9afe29da9b0ee0b9037ebb2a71",
+        "mappingsSha1": "9539840a7dbea682b305858fe138bd03ee7823cf",
+        "officialMappingsSha1": "9539840a7dbea682b305858fe138bd03ee7823cf",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "53d46abe149aadd367be8789207c53a7cee46ba8382e5bfd60247eb22984119d",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "c",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.15.2",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "cxk",
+        "jarSha1": "e3f78cd16f9eb9a52307ed96ebec64241cc5b32d",
+        "officialJarSha1": "e3f78cd16f9eb9a52307ed96ebec64241cc5b32d",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "4a73008a73f3824b7c711750a5a37556df8614f193c0a531e292dad159a73a7c",
+        "mappingsSha1": "1fbf9f0bc9c326af859b3ccf71c2a8f5edc47ef8",
+        "officialMappingsSha1": "1fbf9f0bc9c326af859b3ccf71c2a8f5edc47ef8",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "65ad295b6cf63821f5d8f961c128128475e6d39386358d22eb238a3ce6e31777",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "e",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.15.1",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "cxh",
+        "jarSha1": "8b11614bea9293592a947ea8f4fd72981ea66677",
+        "officialJarSha1": "8b11614bea9293592a947ea8f4fd72981ea66677",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "6e28ecd008d0ca5e1dcd346dbc2882430f02a77a78864d57acc49fc8bc1b5358",
+        "mappingsSha1": "054ee5085ec49b6d037d10d43c04fd4c9c3b9f4b",
+        "officialMappingsSha1": "054ee5085ec49b6d037d10d43c04fd4c9c3b9f4b",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "f46186d0ed9d17e073e16ae2c98675dbbc70b4a29495700837aa5de9c1b42c34",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "e",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.15",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "cxh",
+        "jarSha1": "7b07fd09d1e3aae1bc7a1304fedc73bfe5d81800",
+        "officialJarSha1": "7b07fd09d1e3aae1bc7a1304fedc73bfe5d81800",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "41eee66b4c8e76c018745a63a46a15097cc1c6482c94b38801054938a010b21b",
+        "mappingsSha1": "580c412cfa5869318a3a02d6b018a83781bf3ae7",
+        "officialMappingsSha1": "580c412cfa5869318a3a02d6b018a83781bf3ae7",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "11415bc25024658f0ef1c1a0028df282135299e526a689de2f29c4662edf931a",
+        "methods": [
+          {
+            "name": "_glBindFramebuffer",
+            "actualName": "h",
+            "descriptor": "(II)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          },
+          {
+            "name": "_viewport",
+            "actualName": "e",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      },
+      {
+        "version": "1.14.4",
+        "profile": "gui-fixed",
+        "selectedClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "actualClass": "com.mojang.blaze3d.platform.GlStateManager",
+        "jarSha1": "8c325a0c5bd674dd747d6ebaa4c791fd363ad8a9",
+        "officialJarSha1": "8c325a0c5bd674dd747d6ebaa4c791fd363ad8a9",
+        "jarSha1MatchesOfficialMetadata": true,
+        "jarSha256": "b3b2a798e2d67b566008fe4a03767ae2c7ff3f8c7ba6751e7b71fc7299672d0a",
+        "mappingsSha1": "6073e4ba6949217eb708c4512be2ccc1850a603f",
+        "officialMappingsSha1": "6073e4ba6949217eb708c4512be2ccc1850a603f",
+        "mappingsSha1MatchesOfficialMetadata": true,
+        "mappingsSha256": "2dd53a5e70ba493cf6e33c0fc52bbdf4c57f9429c7a13842565aa825fd44d910",
+        "methods": [
+          {
+            "name": "viewport",
+            "actualName": "viewport",
+            "descriptor": "(IIII)V",
+            "mappingMatch": true,
+            "jarMethodFound": true
+          }
+        ]
+      }
+    ],
+    "methodSelectionRule": "1.14.4は旧APIのためGlStateManager.viewport(IIII)Vのみ（framebuffer bindingはGLX経路）。残る43版は選択された公式GlStateManagerの_glBindFramebuffer(II)Vと_viewport(IIII)Vを照合。各version.methodsに実際のclass・method・descriptorを記録。"
+  },
+  "officialInputAudit": {
+    "versions": [
+      "26.1",
+      "26.1.1",
+      "26.1.2",
+      "1.14.4",
+      "1.21.5",
+      "1.21.11",
+      "26.2",
+      "26.3"
+    ],
+    "versionReferenceCounts": {
+      "26.1": {
+        "versionMetadata": 1,
+        "clientJar": 1,
+        "assetIndex": 1,
+        "assetObject": 186,
+        "libraryArtifact": 61
+      },
+      "26.1.1": {
+        "versionMetadata": 1,
+        "clientJar": 1,
+        "assetIndex": 1,
+        "assetObject": 186,
+        "libraryArtifact": 61
+      },
+      "26.1.2": {
+        "versionMetadata": 1,
+        "clientJar": 1,
+        "assetIndex": 1,
+        "assetObject": 186,
+        "libraryArtifact": 61
+      },
+      "1.14.4": {
+        "versionMetadata": 1,
+        "clientJar": 1,
+        "mappings": 1,
+        "assetIndex": 1,
+        "assetObject": 265,
+        "libraryArtifact": 39,
+        "nativeLibrary": 7
+      },
+      "1.21.5": {
+        "versionMetadata": 1,
+        "clientJar": 1,
+        "mappings": 1,
+        "assetIndex": 1,
+        "assetObject": 185,
+        "libraryArtifact": 70
+      },
+      "1.21.11": {
+        "versionMetadata": 1,
+        "clientJar": 1,
+        "mappings": 1,
+        "assetIndex": 1,
+        "assetObject": 186,
+        "libraryArtifact": 61
+      },
+      "26.2": {
+        "versionMetadata": 1,
+        "clientJar": 1,
+        "assetIndex": 1,
+        "assetObject": 186,
+        "libraryArtifact": 68
+      },
+      "26.3": {
+        "versionMetadata": 1,
+        "clientJar": 1,
+        "assetIndex": 1,
+        "assetObject": 186,
+        "libraryArtifact": 66
+      }
+    },
+    "uniqueFileCounts": {
+      "assetIndex": 6,
+      "assetObject": 485,
+      "clientJar": 8,
+      "libraryArtifact": 231,
+      "mappings": 3,
+      "nativeLibrary": 7,
+      "versionMetadata": 8
+    },
+    "uniqueFiles": 748,
+    "missingOrHashMismatches": 0,
+    "inventorySha256": "993213b6c974883396d59d42bf7a474b353fae608ffa35f449d99f08cf93b1f6",
+    "rawEvidenceSha256": "0425ac1b426a7a6c6ee4fddb661863a7c235672a5a0de6cb2deb8a7954a362a9",
+    "audit": "公式metadata/asset index/library記載のexpected SHA-1と対象cache実ファイルafter SHA-1を照合。欠落・不一致0。version別参照件数と重複排除後実ファイル数を別記。RuntimePreparer.prepareAssetsが.oggを除外し、libraryはrulesに対しlinux/amd64 selectorで抽出。"
+  },
+  "testResults": {
+    "command": ":worker:test --offline --no-daemon --rerun-tasks",
+    "total": 31,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": [
+      {
+        "suite": "io.github.rs0325.mcicon.worker.AgentPackagingTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "io.github.rs0325.mcicon.worker.CanonicalContextTest",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "io.github.rs0325.mcicon.worker.PngOutputTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "io.github.rs0325.mcicon.worker.RendererCleanupTest",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "io.github.rs0325.mcicon.worker.ResourceGuardTest",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "io.github.rs0325.mcicon.worker.SymbolsCapabilitiesTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "rendererCleanup": {
+      "suite": "io.github.rs0325.mcicon.worker.RendererCleanupTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "initialJUnitBeforeNamedFixture": {
+      "core": 58,
+      "cli": 5,
+      "worker": 31,
+      "total": 94,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "note": "named fixture修正前の元テスト実行結果。fixtureを含む最終再実行はtestResults.totalのworker 31件。"
+    }
+  },
+  "cleanup": {
+    "workerCount": 13,
+    "containerDieExit0AndDestroy": 13,
+    "remainingSnapshots": 0,
+    "remainingPngTemps": 0,
+    "remainingWorkerJars": 0,
+    "dockerPs": "empty",
+    "proofSha256": "7fb862a77b217a6b32d0e71ebf08d67905f3222110352ac48b92c84ac28dff7e",
+    "dockerEventsSha256": "0763cb99c4fe3173e661d0661deeb698d8469512d5aa28774ae2753832337d19",
+    "scopeNote": "worker.log/agent.json/gameは診断保全のため残置。各worker log hostname short IDとDocker Actor.IDを対応し、die exit0・destroyを確認。CLI exit code単独の推定ではない。"
+  },
+  "limitations": [
+    "旧16px失敗baselineはRGBA比較していない。",
+    "初期64px needle比較は撤回済み。",
+    "正式な全版品質受入・canonical昇格ではなくexperimental/deterministic=falseを維持する。",
+    "native raw log/PNG・全ファイルinput inventoryはprivateに保全し、公開記録にはsummary/hashのみ記載。"
+  ]
+}
