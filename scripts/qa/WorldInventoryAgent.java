@@ -24,12 +24,15 @@ public final class WorldInventoryAgent {
     private static int stage,frames,index=-1;
     private static boolean legacy,fixed,classic,modern,gpuImmediate,deferred,extracted,latest,pearl;
     private static String textureType,viewType,glTextureType;
+    private static long glintCalls,glintCallsAtSelection;
     private static boolean screenshotPending;
     private static Object screenshot;
-    private static Object guiLightTexture;
+    private static Object guiLightTexture,applyingShader;
+    private static Thread observingThread;
     private static final Set<Object> guiStates=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());
     private static boolean observingItem;
     private static Integer guiLightmapAtEntry,guiLightmapSampler;
+    private static int appliedLightmapObservations,appliedLightmapUnit;
     private static int guiLightmapUnit=1;
     private static Boolean guiLightmapEnabled;
     private static Integer guiLightmapShaderTexture;
@@ -43,7 +46,7 @@ public final class WorldInventoryAgent {
         legacy=config.get("version").getAsString().matches("1\\.(?:13(?:\\.[12])?|14(?:\\.[123])?)");
         fixed=config.get("version").getAsString().matches("1\\.(?:14\\.4|15(?:\\.[12])?|16(?:\\.[1-5])?)");
         classic=config.get("version").getAsString().matches("1\\.(?:17(?:\\.1)?|18(?:\\.[12])?|19(?:\\.[1-4])?)");
-        modern=config.get("version").getAsString().matches("1\\.(?:20(?:\\.[1-5])?|21(?:\\.[1-3])?)");
+        modern=config.get("version").getAsString().matches("1\\.(?:20(?:\\.[1-5])?|21(?:\\.[1-3])?)")||config.get("version").getAsString().equals("1.20.6");
         gpuImmediate=config.get("version").getAsString().equals("1.21.5");
         extracted=config.get("version").getAsString().startsWith("26.");
         pearl=config.get("version").getAsString().equals("26.3");
@@ -52,7 +55,7 @@ public final class WorldInventoryAgent {
         viewType=pearl?"com.mojang.renderpearl.api.textures.GpuTextureView":"com.mojang.blaze3d.textures.GpuTextureView";
         glTextureType=pearl?"com.mojang.renderpearl.backend.opengl.GlTexture":"com.mojang.blaze3d.opengl.GlTexture";
         deferred=extracted||config.get("version").getAsString().matches("1\\.21\\.(?:[6-9]|10|11)");
-        if(legacy||fixed||classic||modern||gpuImmediate||deferred){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",true);}
+        if(legacy||fixed||classic||modern||gpuImmediate||deferred){report.remove("fullBrightPackedLight");report.addProperty("renderMethodsTransformed",true);report.addProperty("renderStateObservedOnly",!config.has("fixedGlintMillis"));}
         final String owner=s.actualClass(MC).replace('.','/'),method=s.methodName(MC,legacy?"m_0520165":"runTick",1);
         final String itemClass=legacy?"net.minecraft.client.render.entity.ItemRenderer":"net.minecraft.client.renderer.entity.ItemRenderer";
         final String itemOwner=s.actualClass(itemClass).replace('.','/');
@@ -72,9 +75,22 @@ public final class WorldInventoryAgent {
         final String stateOwner=s.actualClass("net.minecraft.client.renderer.item.ItemStackRenderState").replace('.','/');
         final String stateMethod=s.methodName("net.minecraft.client.renderer.item.ItemStackRenderState","render",4);
         final String stateDescriptor="("+descriptor("com.mojang.blaze3d.vertex.PoseStack")+descriptor("net.minecraft.client.renderer.MultiBufferSource")+"II)V";
-        final String glintOwner=s.actualClass("net.minecraft.client.renderer.RenderStateShard").replace('.','/');
-        final String glintMethod=s.methodName("net.minecraft.client.renderer.RenderStateShard","setupGlintTexturing",1);
-        final String timeOwner=s.actualClass("net.minecraft.Util").replace('.','/'),timeMethod=s.methodName("net.minecraft.Util","getMillis",0);
+        final boolean oldGlint=legacy||config.get("version").getAsString().equals("1.14.4");
+        final String glintClass=oldGlint?itemClass:deferred?"net.minecraft.client.renderer.rendertype.TextureTransform":"net.minecraft.client.renderer.RenderStateShard";
+        final String glintOwner=s.actualClass(glintClass).replace('.','/');
+        final String glintMethod=s.methodName(glintClass,legacy?"renderEnchantmentGlint":oldGlint?"renderFoilLayer":"setupGlintTexturing",oldGlint?3:1);
+        final String glintDescriptor=oldGlint?"("+descriptor(legacy?"net.minecraft.client.render.texture.TextureManager":"net.minecraft.client.renderer.texture.TextureManager")+"Ljava/lang/Runnable;I)V":deferred?"(F)Lorg/joml/Matrix4f;":"(F)V";
+        final String util=legacy?"net.minecraft.util.Utils":deferred?"net.minecraft.util.Util":"net.minecraft.Util";
+        final String timeOwner=s.actualClass(util).replace('.','/'),timeMethod=s.methodName(util,legacy?"getTimeMillis":"getMillis",0);
+        if(config.has("fixedGlintMillis")) {
+            try(java.util.zip.ZipFile client=new java.util.zip.ZipFile(config.get("client").getAsString())) {
+                java.util.zip.ZipEntry entry=client.getEntry(glintOwner+".class");
+                if(entry==null)throw new IllegalStateException("元clientにglint classがありません: "+glintOwner);
+                ByteArrayOutputStream original=new ByteArrayOutputStream();InputStream input=client.getInputStream(entry);byte[] buffer=new byte[8192];int read;
+                while((read=input.read(buffer))!=-1)original.write(buffer,0,read);
+                input.close();fixGlint(original.toByteArray(),glintMethod,glintDescriptor,timeOwner,timeMethod,oldGlint?2:1);
+            }
+        }
         final String resolver="net.minecraft.client.renderer.item.ItemModelResolver";
         final String resolverOwner=s.actualClass(resolver).replace('.','/'),resolverMethod=s.methodName(resolver,"updateForTopItem",6);
         final String atlas=extracted?"net.minecraft.client.gui.render.GuiItemAtlas":"net.minecraft.client.gui.render.GuiRenderer";
@@ -85,6 +101,13 @@ public final class WorldInventoryAgent {
         final String atlasDescriptor=extracted?"(IIZ"+descriptor("net.minecraft.client.renderer.item.ItemStackRenderState")+")V":"("+descriptor(atlasState)+descriptor("com.mojang.blaze3d.vertex.PoseStack")+"III)V";
         instrumentation.addTransformer(new ClassFileTransformer() {
             public byte[] transform(ClassLoader loader,String name,Class<?> redef,ProtectionDomain domain,byte[] bytes) {
+                if(config.has("fixedGlintMillis")&&name.equals(glintOwner)) {
+                    bytes=fixGlint(bytes,glintMethod,glintDescriptor,timeOwner,timeMethod,oldGlint?2:1);
+                    report.addProperty("glintClockCallSites",oldGlint?2:1);report.addProperty("fixedGlintMillis",1000);
+                }
+                if(config.get("version").getAsString().equals("1.20.6")&&name.equals(s.actualClass("net.minecraft.client.renderer.ShaderInstance").replace('.','/'))) {
+                    return observeShader(bytes,s.methodName("net.minecraft.client.renderer.ShaderInstance","apply",0));
+                }
                 if(deferred&&(name.equals(resolverOwner)||name.equals(atlasOwner))) {
                     final boolean resolve=name.equals(resolverOwner);
                     ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
@@ -132,7 +155,7 @@ public final class WorldInventoryAgent {
                             if(!name.equals(modern||gpuImmediate?modernGuiMethod:guiMethod)||!desc.equals(modern||gpuImmediate?modernGuiDescriptor:guiDescriptor))return target;
                             return new MethodVisitor(Opcodes.ASM9,target) {
                                 public void visitInsn(int opcode) {
-                                    if(gpuImmediate&&opcode==Opcodes.RETURN)super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/WorldInventoryAgent","endGui","()V",false);
+                                    if((gpuImmediate||config.get("version").getAsString().equals("1.20.6"))&&opcode==Opcodes.RETURN)super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/WorldInventoryAgent","endGui","()V",false);
                                     super.visitInsn(opcode);
                                 }
                                 public void visitMethodInsn(int opcode,String owner,String name,String desc,boolean itf) {
@@ -146,26 +169,7 @@ public final class WorldInventoryAgent {
                         }
                     },0);return writer.toByteArray();
                 }
-                if(config.has("fixedGlintMillis")&&name.equals(glintOwner)) {
-                    final int[] calls={0};ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
-                    reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
-                        public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
-                            MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
-                            if(!name.equals(glintMethod)||!desc.equals("(F)V"))return target;
-                            return new MethodVisitor(Opcodes.ASM9,target) {
-                                public void visitMethodInsn(int opcode,String owner,String name,String desc,boolean itf) {
-                                    if(opcode==Opcodes.INVOKESTATIC&&owner.equals(timeOwner)&&name.equals(timeMethod)&&desc.equals("()J")) {
-                                        super.visitLdcInsn(config.get("fixedGlintMillis").getAsLong());calls[0]++;return;
-                                    }
-                                    super.visitMethodInsn(opcode,owner,name,desc,itf);
-                                }
-                            };
-                        }
-                    },0);
-                    report.addProperty("glintClockCallSites",calls[0]);report.addProperty("fixedGlintMillis",config.get("fixedGlintMillis").getAsLong());
-                    return writer.toByteArray();
-                }
-                if(!name.equals(owner))return null;
+                if(!name.equals(owner))return config.has("fixedGlintMillis")&&name.equals(glintOwner)?bytes:null;
                 ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                 reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
                     public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
@@ -184,6 +188,65 @@ public final class WorldInventoryAgent {
             }
         });
     }
+    static byte[] fixGlint(byte[] bytes,final String method,final String descriptor,final String timeOwner,final String timeMethod,int expected) {
+        final int[] sites={0},methods={0};ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
+        reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
+            public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
+                MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
+                if(!name.equals(method)||!desc.equals(descriptor))return target;
+                methods[0]++;
+                return new MethodVisitor(Opcodes.ASM9,target) {
+                    public void visitMethodInsn(int opcode,String owner,String name,String desc,boolean itf) {
+                        if(opcode==Opcodes.INVOKESTATIC&&owner.equals(timeOwner)&&name.equals(timeMethod)&&desc.equals("()J")) {
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/WorldInventoryAgent","glintMillis","()J",false);sites[0]++;return;
+                        }
+                        super.visitMethodInsn(opcode,owner,name,desc,itf);
+                    }
+                };
+            }
+        },0);
+        if(methods[0]!=1||sites[0]!=expected)throw new IllegalStateException("glint時刻のmethod/置換数不一致: "+methods[0]+"/"+sites[0]+", expected="+expected);
+        return writer.toByteArray();
+    }
+    static byte[] observeShader(byte[] bytes,final String method) {
+        final int[] methods={0};ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
+        reader.accept(new ClassVisitor(Opcodes.ASM9,writer) {
+            public MethodVisitor visitMethod(int access,String name,String desc,String signature,String[] exceptions) {
+                MethodVisitor target=super.visitMethod(access,name,desc,signature,exceptions);
+                if(!name.equals(method)||!desc.equals("()V"))return target;
+                methods[0]++;
+                return new MethodVisitor(Opcodes.ASM9,target) {
+                    public void visitCode() {
+                        super.visitCode();super.visitVarInsn(Opcodes.ALOAD,0);super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/WorldInventoryAgent","beginShader","(Ljava/lang/Object;)V",false);
+                    }
+                    public void visitInsn(int opcode) {
+                        if(opcode==Opcodes.RETURN)super.visitMethodInsn(Opcodes.INVOKESTATIC,"io/github/rs0325/mcicon/qa/WorldInventoryAgent","observeAppliedShader","()V",false);
+                        super.visitInsn(opcode);
+                    }
+                };
+            }
+        },0);
+        if(methods[0]!=1)throw new IllegalStateException("Shader.applyのmethod数不一致: "+methods[0]);
+        return writer.toByteArray();
+    }
+    public static void beginShader(Object shader) {
+        if(Thread.currentThread()==observingThread)applyingShader=observingItem&&stage==3?shader:null;
+    }
+    public static long glintMillis() {glintCalls++;return 1000L;}
+    private static void verifyFrameResources() throws Exception {
+        if(!config.has("frameZeroResources"))return;
+        JsonObject sources=new JsonObject();Object manager=s.call(MC,"getResourceManager",minecraft);
+        String managerType=legacy?"net.minecraft.resource.manager.ResourceManager":"net.minecraft.server.packs.resources.ResourceManager";
+        String resourceType=legacy?"net.minecraft.resource.Resource":"net.minecraft.server.packs.resources.Resource";
+        for(JsonElement e:config.getAsJsonArray("frameZeroResources")) {
+            String id=e.getAsString();Object location=legacy?s.construct("net.minecraft.resource.Identifier",id):location(id);
+            Object resource=s.call(managerType,"getResource",manager,location);
+            if(resource instanceof Optional)resource=((Optional<?>)resource).get();
+            sources.addProperty(id,String.valueOf(s.call(resourceType,legacy||fixed?"getSourceName":"sourcePackId",resource)));
+            if(resource instanceof Closeable)((Closeable)resource).close();
+        }
+        report.add("frameZeroResourceSources",sources);writeReport();
+    }
     public static void frame() {
         try {
             if(legacy){frameLegacy();return;}
@@ -193,16 +256,8 @@ public final class WorldInventoryAgent {
             if(stage==0) {
                 if((!fixed&&!classic&&s.hasMethod(MC,"isGameLoadFinished",0)&&!Boolean.TRUE.equals(s.call(MC,"isGameLoadFinished",minecraft)))||(latest?s.call("net.minecraft.client.gui.Gui","overlay",gui):s.call(MC,"getOverlay",minecraft))!=null||!s.type("net.minecraft.client.gui.screens.TitleScreen").isInstance(screen))return;
                 if(++frames<60)return;
+                verifyFrameResources();
                 if(fixed||(classic&&s.hasMethod(MC,"createLevel",4))){createDirectWorld();return;}
-                if(config.has("frameZeroResources")) {
-                    JsonObject sources=new JsonObject();Object manager=s.call(MC,"getResourceManager",minecraft);
-                    for(JsonElement e:config.getAsJsonArray("frameZeroResources")) {
-                        String id=e.getAsString();Object location=location(id);
-                        Object resource=((Optional<?>)s.call("net.minecraft.server.packs.resources.ResourceManager","getResource",manager,location)).get();
-                        sources.addProperty(id,String.valueOf(s.call("net.minecraft.server.packs.resources.Resource","sourcePackId",resource)));
-                    }
-                    report.add("frameZeroResourceSources",sources);writeReport();
-                }
                 if(extracted||s.hasMethod(CREATE,"openFresh","net.minecraft.client.Minecraft","java.lang.Runnable")) {
                     final Object parent=screen;
                     s.call(CREATE,"openFresh",null,minecraft,new Runnable(){public void run(){try{setScreen(parent);}catch(Exception e){throw new IllegalStateException(e);}}});
@@ -325,8 +380,9 @@ public final class WorldInventoryAgent {
                 }
             } else if(fixed||classic||modern){observeLightTexture(light,fullBright,capture);}
             capture.addProperty("gameTime",((Number)s.call(s.hasMethod("net.minecraft.world.level.LevelAccessor","getGameTime",0)?"net.minecraft.world.level.LevelAccessor":"net.minecraft.world.level.Level","getGameTime",level)).longValue());
+            capture.addProperty("glintClockCalls",glintCalls-glintCallsAtSelection);capture.addProperty("fixedGlintMillis",config.has("fixedGlintMillis")?1000:0);
             captures.add(capture);writeReport();System.err.println("[mcicon QA world] captured "+id);
-            index++;frames=0;screenshot=null;screenshotPending=false;guiLightmapEnabled=null;guiLightmapShaderTexture=null;guiLightmapAtEntry=null;guiLightmapSampler=null;guiLightTexture=null;guiStates.clear();observingItem=false;
+            index++;frames=0;glintCallsAtSelection=glintCalls;appliedLightmapObservations=0;screenshot=null;screenshotPending=false;guiLightmapEnabled=null;guiLightmapShaderTexture=null;guiLightmapAtEntry=null;guiLightmapSampler=null;guiLightTexture=null;guiStates.clear();observingItem=false;
             if(index==config.getAsJsonArray("ids").size()) {report.addProperty("completed",true);writeReport();stage=4;s.call(MC,"stop",minecraft);return;}
             final Object next=stack(config.getAsJsonArray("ids").get(index).getAsString());
             s.call(INVENTORY,"setItem",inventory,9,next);
@@ -351,6 +407,7 @@ public final class WorldInventoryAgent {
         Object screen=s.field(MC,"screen",minecraft);
         if(stage==0) {
             if(!s.type("net.minecraft.client.gui.screen.TitleScreen").isInstance(screen)||++frames<60)return;
+            verifyFrameResources();
             Object settings=s.construct("net.minecraft.world.WorldSettings",0L,s.field("net.minecraft.world.GameMode","SURVIVAL",null),false,false,s.field("net.minecraft.world.gen.WorldGeneratorType","FLAT",null));
             s.call("net.minecraft.world.WorldSettings","enableCommands",settings);
             stage=2;frames=0;
@@ -401,8 +458,9 @@ public final class WorldInventoryAgent {
         capture.add("fullBrightCpuRgba",cpuRgba);capture.add("fullBrightGpuRgba",gpuRgba);
         capture.addProperty("gameTime",((Number)s.call("net.minecraft.world.World","getTime",world)).longValue());
         report.addProperty("lightmapProbe","cpu-pixels-and-gpu-texture");
+        capture.addProperty("glintClockCalls",glintCalls-glintCallsAtSelection);capture.addProperty("fixedGlintMillis",config.has("fixedGlintMillis")?1000:0);
         captures.add(capture);writeReport();System.err.println("[mcicon QA world] captured "+id);
-        index++;frames=0;guiLightmapEnabled=null;
+        index++;frames=0;glintCallsAtSelection=glintCalls;guiLightmapEnabled=null;
         if(index==config.getAsJsonArray("ids").size()){report.addProperty("completed",true);writeReport();stage=4;s.call(MC,"stop",minecraft);return;}
         String nextId=config.getAsJsonArray("ids").get(index).getAsString();Object item=null;
         for(Object value:(Iterable<?>)items)if(String.valueOf(s.call(registryType,"getKey",items,value)).equals(nextId)){item=value;break;}
@@ -440,7 +498,11 @@ public final class WorldInventoryAgent {
                 observingItem=true;guiLightmapSampler=null;
                 guiLightmapAtEntry=texture==null?0:((Number)s.call(glTextureType,"glId",texture)).intValue();return;
             }
-            if(classic||modern){guiLightmapShaderTexture=((Number)s.call("com.mojang.blaze3d.systems.RenderSystem","getShaderTexture",null,guiLightmapUnit)).intValue();return;}
+            if(classic||modern){
+                int texture=((Number)s.call("com.mojang.blaze3d.systems.RenderSystem","getShaderTexture",null,guiLightmapUnit)).intValue();
+                if(config.get("version").getAsString().equals("1.20.6")){guiLightmapAtEntry=texture;applyingShader=null;observingThread=Thread.currentThread();observingItem=true;}else guiLightmapShaderTexture=texture;
+                return;
+            }
             int active=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,34016)).intValue();
             try {
                 s.call("org.lwjgl.opengl.GL13","glActiveTexture",null,33984+guiLightmapUnit);
@@ -448,13 +510,29 @@ public final class WorldInventoryAgent {
             } finally {s.call("org.lwjgl.opengl.GL13","glActiveTexture",null,active);}
         }catch(Exception e){throw new IllegalStateException("GUIのlightmap状態を取得できません",e);}
     }
+    public static void observeAppliedShader() {
+        if(Thread.currentThread()!=observingThread)return;
+        Object shader=applyingShader;applyingShader=null;
+        if(!observingItem||stage!=3||shader==null)return;
+        try {
+            List<?> names=(List<?>)s.field("net.minecraft.client.renderer.ShaderInstance","samplerNames",shader);
+            int unit=names.indexOf("Sampler2");if(unit<0)return;
+            int previous=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,34016)).intValue();
+            try {
+                s.call("org.lwjgl.opengl.GL13","glActiveTexture",null,33984+unit);
+                guiLightmapSampler=((Number)s.call("org.lwjgl.opengl.GL11","glGetInteger",null,32873)).intValue();
+            } finally {s.call("org.lwjgl.opengl.GL13","glActiveTexture",null,previous);}
+            appliedLightmapUnit=unit;appliedLightmapObservations++;
+            guiLightmapShaderTexture=((Number)s.call("com.mojang.blaze3d.systems.RenderSystem","getShaderTexture",null,2)).intValue();
+        }catch(Exception e){throw new IllegalStateException("対象GUI shaderの適用済みSampler2を取得できません",e);}
+    }
     public static void observeState(Object state,Object stack) {
         if(stage!=3||index<0)return;
         try {if(stack==s.call(INVENTORY,"getItem",inventory(s.field(MC,"player",minecraft)),9))guiStates.add(state);}
         catch(Exception e){throw new IllegalStateException("GUI stateとスロットを照合できません",e);}
     }
     public static void beginAtlas(Object state) {observingItem=guiStates.contains(state);}
-    public static void endGui() {observingItem=false;}
+    public static void endGui() {observingItem=false;applyingShader=null;observingThread=null;}
     public static void observeSampler(String name,Object texture) {
         if(!observingItem||!name.equals("Sampler2"))return;
         try {
@@ -508,6 +586,8 @@ public final class WorldInventoryAgent {
         boolean cpu=s.hasField("net.minecraft.client.renderer.LightTexture","lightPixels");
         Object texture=s.field("net.minecraft.client.renderer.LightTexture",cpu?"lightTexture":"target",light);
         ByteBuffer gpu=readLightTexture(texture,cpu?"net.minecraft.client.renderer.texture.AbstractTexture":"com.mojang.blaze3d.pipeline.RenderTarget",cpu?"getId":"getColorTextureId");
+        capture.addProperty("lightmapTextureId",((Number)s.call(cpu?"net.minecraft.client.renderer.texture.AbstractTexture":"com.mojang.blaze3d.pipeline.RenderTarget",cpu?"getId":"getColorTextureId",texture)).intValue());
+        JsonArray texel=new JsonArray();texel.add(15);texel.add(15);capture.add("fullBrightGpuTexel",texel);
         JsonArray cpuRgba=new JsonArray(),gpuRgba=new JsonArray();
         for(int channel=0;channel<4;channel++){cpuRgba.add((fullBright>>(channel*8))&255);gpuRgba.add(gpu.get((15*16+15)*4+channel)&255);}
         capture.addProperty("lightmapCpuAvailable",cpu);
@@ -518,6 +598,11 @@ public final class WorldInventoryAgent {
             if(classic||modern) {
                 if(guiLightmapShaderTexture==null)throw new IllegalStateException("GUIのshader textureを観測できませんでした");
                 capture.addProperty("guiLightmapShaderTexture",guiLightmapShaderTexture);
+                if(config.get("version").getAsString().equals("1.20.6")) {
+                    if(guiLightmapSampler==null||appliedLightmapObservations==0)throw new IllegalStateException("対象GUIの適用済みSampler2を観測できませんでした");
+                    capture.addProperty("guiLightmapShaderTextureAtEntry",guiLightmapAtEntry);capture.addProperty("appliedSampler2TextureId",guiLightmapSampler);
+                    capture.addProperty("appliedSampler2Unit",appliedLightmapUnit);capture.addProperty("appliedSampler2Observations",appliedLightmapObservations);
+                }
             } else {
                 if(guiLightmapEnabled==null)throw new IllegalStateException("GUIのlightmap状態を観測できませんでした");
                 capture.addProperty("guiLightmapTextureEnabled",guiLightmapEnabled);
