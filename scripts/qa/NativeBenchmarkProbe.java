@@ -7,10 +7,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
-/** One native all-items run; samples the owned worker's kernel high-water marks. */
+/** 一版のnative全件描画を実行し、所有workerのkernel高水位メモリを採取する。 */
 public final class NativeBenchmarkProbe {
     public static void main(String[] args) throws Exception {
-        String context=args[4];long started=System.nanoTime();
+        String version=args[0],context=args[5];long started=System.nanoTime();
         AtomicReference<Map<String,Long>> memory=new AtomicReference<>();
         long[] firstIconNanos={0};
         ProgressListener progress=event->{
@@ -35,14 +35,14 @@ public final class NativeBenchmarkProbe {
             }
             throw new AssertionError("Owned worker not found for memory sampling");
         };
-        var options=new WorkerOptions(Path.of(args[3]),context,args[5],Duration.ofSeconds(180),Duration.ofSeconds(30));
+        var options=new WorkerOptions(Path.of(args[4]),context,args[6],Duration.ofSeconds(180),Duration.ofSeconds(30));
         ExportResult result;
-        try(var generator=new MCIconGenerator(Path.of(args[0]),Boolean.parseBoolean(args[2]),progress,new CancellationToken())) {
-            result=generator.render(new RenderRequest("1.21.4",List.of(),true,"all",64,Path.of(args[1]),false,false,true),options).join();
+        try(var generator=new MCIconGenerator(Path.of(args[1]),Boolean.parseBoolean(args[3]),progress,new CancellationToken())) {
+            result=generator.render(new RenderRequest(version,List.of(),true,"all",64,Path.of(args[2]),false,false,true),options).join();
         }
         if(!result.complete()||memory.get()==null)throw new AssertionError("Benchmark export incomplete");
         Map<String,Object> report=new TreeMap<>(memory.get());
-        report.put("version","1.21.4");report.put("size",64);report.put("succeeded",result.succeeded());
+        report.put("version",version);report.put("size",64);report.put("succeeded",result.succeeded());
         report.put("elapsedSeconds",(System.nanoTime()-started)/1e9);
         report.put("startToFirstIconSeconds",(firstIconNanos[0]-started)/1e9);
         System.out.println(Json.MAPPER.writeValueAsString(report));
