@@ -8,4 +8,5 @@ public interface IconWorker {
     String renderer();
     String agentSha256();
     String imageId();
+    Diagnostics.WorkerJava javaRuntime();
 }

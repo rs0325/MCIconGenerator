@@ -65,9 +65,10 @@ public final class Main implements Runnable {
     static class Common {
         @Option(names="--cache",description="Input cache directory.") Path cache=Path.of(".mcicon-cache");
         @Option(names="--offline",description="Use verified cached inputs only.") boolean offline;
+        @Option(names="--minecraft-dir",description="既存インストールの公式入力を検証してcacheへコピーする。") Path minecraft;
         @Option(names="--json",description="Write structured JSON to stdout.") boolean json;
         MCIconGenerator generator(CancellationToken token) {
-            return new MCIconGenerator(cache,offline,event->System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total()),token);
+            return new MCIconGenerator(cache,offline,event->System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total()),token,minecraft);
         }
     }
     // The standard help mixin also defines --version, which conflicts with the
@@ -81,13 +82,14 @@ public final class Main implements Runnable {
         @Option(names="--docker-image",defaultValue="mcicon-render:dev") String image;
         @Option(names="--startup-timeout",defaultValue="180",description="Startup timeout in seconds.") int startup;
         @Option(names="--item-timeout",defaultValue="30",description="Per-item timeout in seconds.") int timeout;
+        @Option(names="--java-home",description="Docker image内のJavaディレクトリ。ホストのJavaは使用しない。") String javaHome;
         WorkerOptions options() throws Exception {
             Path path=agent;
             if(path==null) {
                 Path location=Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
                 path=location.getParent().getParent().resolve("worker/worker-agent.jar");
             }
-            return new WorkerOptions(path,context,image,Duration.ofSeconds(startup),Duration.ofSeconds(timeout));
+            return new WorkerOptions(path,context,image,Duration.ofSeconds(startup),Duration.ofSeconds(timeout),javaHome);
         }
     }
     @Command(name="list",description="Read item/block registries from the exact vanilla client.")

@@ -44,7 +44,11 @@ mcicon cache verify --json
 
 準備やI/Oの失敗を調べる場合は `mcicon --debug ...` または各サブコマンドの `--debug` を指定できます。通常のエラーコード・終了コードを保持し、原因例外とstack traceをstderrへ追加します。stdoutのJSONには診断を混ぜません。traceにはローカルのパスや例外メッセージが含まれます。
 
-描画のオプションは `--worker-jar`、`--docker-context`（既定colima-mcicon）、`--docker-image`（既定mcicon-render:dev）、`--startup-timeout`（180秒）、`--item-timeout`（30秒）です。他のDocker contextでは明示してください。ゲームJVMはimage内の版別Javaを使います。hostの `--java-home` / `--minecraft-dir` による準備経路は未実装です。
+描画のオプションは `--worker-jar`、`--docker-context`（既定colima-mcicon）、`--docker-image`（既定mcicon-render:dev）、`--startup-timeout`（180秒）、`--item-timeout`（30秒）です。他のDocker contextでは明示してください。ゲームJVMはimage内の版別Javaを使います。`--java-home /opt/java/java21` のようにimage内のLinux絶対ディレクトリを指定すると、そのJavaを起動前に検査し、必要major未満なら失敗します。ホストのJavaはマウントしません。1.17系は既存runtime契約に合わせてJava17 LTSを下限にします。明示した新しいmajorでの描画互換性は保証せず、失敗時に別Javaへ切り替えません。
+
+`--minecraft-dir` は既存インストールの公式入力をSHA-1・sizeで検証し、専用cacheへコピーします。`versions/<版>/<版>.jar`・同名JSON、libraries、assets/indexes・objectsの必要なファイルだけを読み、元のファイルは変更せず、Launcher設定・資格情報・ワールドは読み取りません。symlinkを含む入力パスは拒否します。元インストールを変更しないため、cacheとインストールが同一・入れ子になる配置も開始前に拒否します。破損・不足はオンラインでは公式配信から取得し、offlineでは `OFFLINE_CACHE_MISS` になります。公式全版manifestと旧版mappingsは既存インストールから取り込まないため、offlineで使うには先に専用cacheへ準備してください。
+
+HTTPS取得は1試行あたりredirect・本文を含めて2分、最大3試行です。取消しは応答header・本文の待機中も接続を閉じます。asset並列取得の1件が失敗した場合は残りを取消します。native JARは1entry 64MiB、1JAR合計256MiB、4,096 entries以内で展開し、パス逸脱・symlinkを拒否します。
 
 初回はオンラインで完了させ、同じcacheに `--offline` を付けて再実行できます。offline時も公式SHA-1・sizeまたは記録済みSHA-256を照合します。cache verifyは記録済みSHA-256のある入力を検証する機能で、cache内のすべてのファイルが検証対象という意味ではありません。破損した入力はオンライン準備時に修復します。
 
@@ -74,6 +78,8 @@ try (var generator = new MCIconGenerator(Path.of("cache"), false, ProgressListen
     ExportResult result = generator.render(request, worker).join();
 }
 ```
+
+既存インストールを利用するAPIは `new MCIconGenerator(cache, offline, progress, cancel, minecraftDirectory)`、image内Javaを選ぶAPIは `new WorkerOptions(agent, context, image, startupTimeout, itemTimeout, "/opt/java/java21")` です。従来の引数数のconstructorは引き続き利用できます。
 
 `listVersions`, `listEntries`, `render`, `extract`, `doctor`, `cache` はCompletableFutureを返します。一つのgeneratorではジョブを順番に処理します。進捗callbackはジョブのスレッドで実行するため、同じgeneratorの別ジョブの完了をcallback内で待たないでください。別generatorは別cache/outputの利用を推奨します。CancellationToken.cancel()は途中のエクスポートを中断し、未完了のExportResult/manifestを返します。close()は実行中・待機中のFutureをCancellationExceptionで終了させ、executorとworkerの終了を要求します。完了済みの結果は保持します。close後の新規呼び出しはGENERATOR_CLOSEDのfailed Futureを返します。キャンセルしたgeneratorは新ジョブに再利用せず、新しいinstance/tokenを作ってください。
 

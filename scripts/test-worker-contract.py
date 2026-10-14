@@ -35,6 +35,7 @@ class WorkerContractTest(unittest.TestCase):
 import json,os,sys
 from pathlib import Path
 if 'inspect' in sys.argv:print('sha256:'+'0'*64)
+elif 'run' in sys.argv and '--entrypoint' in sys.argv:print('openjdk version \"21.0.9\"')
 elif 'run' in sys.argv:
  case=os.environ['MCICON_PROTOCOL_CASE']
  hello={'type':'ready','protocolVersion':1,'animationFrameZero':True,'contextProfile':'fixed-v1','renderer':'synthetic'}

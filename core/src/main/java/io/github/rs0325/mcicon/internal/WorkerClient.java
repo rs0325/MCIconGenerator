@@ -22,6 +22,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
     private final String containerName="mcicon-worker-"+UUID.randomUUID();
     private final String agentSha256;
     private final String imageId;
+    private final Diagnostics.WorkerJava javaRuntime;
     private final Thread shutdownHook;
     public WorkerClient(RuntimePreparer.Prepared runtime,Path cache,WorkerOptions options,CancellationToken token) throws Exception {
         this.token=token;this.options=options;
@@ -29,6 +30,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
         byte[] agentBytes=readAgent(options.agentJar());
         agentSha256=FilesSupport.hash(agentBytes);
         imageId=resolveImage(options,token);
+        javaRuntime=Diagnostics.workerJava(options,imageId,runtime.javaMajor(),token);
         cache=cache.toAbsolutePath().normalize();
         runDirectory=Files.createTempDirectory(cache,"worker-");
         Path agentSnapshot=runDirectory.resolve("worker-agent.jar");
@@ -47,7 +49,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
                     "--network","none","--memory","3g","--cpus","4","-v",cache+":/mcicon/cache","-v",agentSnapshot+":/mcicon/worker.jar:ro",imageId));
             if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"-e");
             if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"SDL_VIDEO_FORCE_EGL=1");
-            String java=runtime.javaMajor()==25?"/opt/java/openjdk/bin/java":"/opt/java/java"+runtime.javaMajor()+"/bin/java";
+            String java=javaRuntime.executable();
             String run=inContainer(cache,runDirectory);
             command.addAll(List.of(java,"-Xmx2G","-Djava.awt.headless=true","-Duser.timezone=UTC","-Djava.library.path="+inContainer(cache,runtime.natives()),
                     "-javaagent:/mcicon/worker.jar="+run+"/agent.json","-cp",String.join(":",cp),runtime.metadata().path("mainClass").asText(),
@@ -124,6 +126,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
     public String renderer(){return renderer;}
     public String agentSha256(){return agentSha256;}
     public String imageId(){return imageId;}
+    public Diagnostics.WorkerJava javaRuntime(){return javaRuntime;}
     private static String resolveImage(WorkerOptions options,CancellationToken token) throws Exception {
         token.check();
         Process inspect=new ProcessBuilder("docker","--context",options.dockerContext(),"image","inspect",options.dockerImage(),"--format","{{.Id}}")

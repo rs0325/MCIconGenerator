@@ -900,3 +900,43 @@ python3 scripts/verify-uninstrumented-inventory.py --version 1.21.4 \
 ゲームの2版fixtureではlinear-lightの再合成と通常GUIに最大73/255の差がありました。SRGB8_ALPHA8・sRGB有効のsynthetic対照はlinear oracleに最大0.849で一致しますが、その対照へbyte RGB復元式を誤適用するとalphaに60、再合成に44の差が出ます。非適用条件の診断として保持し、productionの色空間・復元式・既存PNGを変更せず、許容値も拡大していません。全版experimental・deterministic=false・verified 0版を維持します。
 
 出力PNGのCRC・RGBA8・sRGB Perceptual chunkを確認し、alpha0のhidden RGBは0でした。JUnit 68件、alpha1の情報損失と再合成の回帰、ビルドが成功。最終入力726ファイルのhash保持、公式client不変、QA packの実選択元も確認しました。初期系列は最終件数へ加算せず、今回の追加native/JUnitに失敗はありません。[条件・契約・再実行方法](color-precision.md)と[数値・hash記録](../qa/validation-2026-10-14-color-precision.json)を参照してください。
+
+
+## Issue #4のruntime入力・Java指定の途中検証（2026-10-14）
+
+既存インストールの公式入力を検証して専用cacheへコピーする `--minecraft-dir` と、Docker image内のJavaを選ぶ `--java-home` を実装しました。旧constructorは保持しています。入力を配布物へ同梱せず、Launcher設定・資格情報・ワールドの取り込みはありません。
+
+Java 21の `BodyHandlers.ofInputStream` では本文のreadが要求timeoutだけでは終了しないため、redirect・header・本文を含む1試行2分の期限とtoken/interruptによる接続closeを追加しました。ローカルHTTPS fixtureで本文停止・本文進行中の総期限・header待機取消・本文待機取消・3試行後のpartial不在を検証しました。並行assetsは完了順に失敗を受け取り、待機中の他Futureを取り消します。native JARはdeclared/実展開byteの双方に上限を設けています。
+
+反証で見つかった失敗検知順序、公式subtreeからの `..` 逸脱、ZIPの実展開総量を修正し、逆順転送・Launcher/worldパス逸脱・central directoryの過少size申告を含む回帰を追加しました。最終JUnitはcore55・CLI4・worker25の84件で失敗・error・skip0です。worker JSONL契約（schema10/25例・runtime12条件）とDocker切断cleanupの合成2件も成功しました。初回compile・例外期待・ローカルfixtureの準備失敗は別ログへ保全しています。
+
+macOS Apple SiliconのCLIからLinux amd64 Mesa Dockerを使用し、検証済みインストールfixtureで1.13/Java8、1.21.4/Java21、26.3/Java25のstoneを各64pxで出力しました。1.21.4の既定Javaと明示Java21は設定・PNG hashが一致し、1.21.4/26.3は#36の全件基準ともPNG hashが一致しました。必要major未満のJava17と存在しないJavaは起動前に具体コードで拒否しました。元入力612ファイルとコピーしたインストールfixture607ファイルのhash不変、partial/snapshot/専用containerの不在を確認しました。空cacheへの公式HTTPS取得から1.13のraw抽出も成功し、metadata/clientの公式SHA-1・sizeと内部SHA-256を再照合しました。
+
+旧coreでcompileした4/5引数constructorのconsumerを新coreで実行できました。新5/6引数constructorの独立consumerも1.21.4 stoneの描画に成功し、#36基準のPNG hashと一致しました。Java versionまたは実行パスが変わると、旧iconsの再利用をOUTPUT_MISMATCHで拒否する回帰も成功しています。新settingsのため旧iconsは新しい出力先へ再生成してください。rawの再開条件は変わりません。
+
+[数値記録](../qa/validation-2026-10-14-runtime-inputs.json)は途中成果です。起点は4684fc8、coreとCLIは#4の未commit差分、描画workerは#36の2a9574e（main merge9dcac94）の不変artifactを `--worker-jar` で指定しました。worktreeの同梱workerは起点版であり、配布物の最終統合を済ませたという意味ではありません。文書・数値記録の限定反証も完了し、追加の確定指摘はありませんでした。Windowsホストの確認、公開native harnessの整理、最新worker同梱配布の統合確認、Git公開は未完了です。ユーザーの30分以内の区切り指示に従い、この状態で保全します。cold/warmの正式測定・canonicalへの昇格・全版品質の再受入は行わず、全版experimental/deterministic=falseを維持しています。
+
+
+### Issue #4の最終入力・配布候補検証（2026-10-14）
+
+最新main 9dcac94とIssue #4の差分を、Git履歴を変更しない検証用snapshotへ統合しました。coreのディレクトリ重複拒否を含む候補v2はJUnit87件（core56・CLI4・worker27）で失敗・error・skip0、worker同梱hashは#36の8b85へ一致しました。core hashはe9ec3f73です。旧coreでcompileしたconstructorのbinary consumer、新constructorの独立描画consumerも、このcoreで成功しています。前節の起点workerを指定した途中結果とは別系列です。
+
+公開harness `scripts/verify-runtime-inputs.py` は `prepare` で検証済みcacheからprivate fixtureを作り、`verify` で3代表版のJava8/21/25、明示Java21、Java17/不在Java拒否、cache同一/両向き入れ子拒否、rawを確認します。case毎のcache・出力を分離し、期待stoneのentry集合、正規path、PNG1枚、元JAR/worker/PNG hash、可視RGBA、raw元bytesを監査します。harness出力も入力・検証元cacheと重ねられません。入力fixtureと生成画像をpublic repository・配布物へ追加しません。
+
+Mac Apple SiliconからのLinux amd64 Mesa Dockerと、Windowsからの既存Docker Desktopで、各10条件が成功しました。インストールfixture607ファイルは不変、partial・worker snapshot・専用containerの残存はありません。Mac imageはc498、Windows imageは64c2で別条件として保持します。4アイコンのdecoded RGBAとraw1枚の元bytes、および5枚のPNG hashは跨ホストで一致しました。任意GPU・全モデル・全サイズでの一致へ広げません。
+
+harnessの反証で、空成功manifestの受入、supervisor期限時のFAIL記録・終了、同名runDirectoryだけによるcontainer所有判定、fresh拒否後の既存summary書換を修正しました。合成8件で空出力/hash・不可視PNG・入力重複を拒否し、TERMを無視する所有CLIを有限終了、同名/別mountのunowned containerを保持、既存PASS sentinelを不変にすることを確認しました。所有containerはcase cache mountとjavaagent引数の双方を照合します。Windows daemonの実mount表記も私的作業先で確認しました。Windowsの強制supervisor期限回収は実機で故意に発生させておらず、合成のprocess回収はPOSIXとして記録します。
+
+正常native実行時harnessは8d306206、最後の失敗時所有判定・既存成果保護を含むcheckerは数値記録のfinalCheckerSha256です。両ホストの正常5条件ずつは最終checkerで保存成果を独立再監査しました。nativeを再実行した意味ではありません。初回Windowsのinline Python引用符失敗、Docker API接続失敗（描画未開始）、rawへのRGBA8専用decoder誤用も別履歴に保全します。Dockerを同じSSH sessionで開始した候補v2は成功しましたが、元の起動WORKER_TIMEOUTの原因解消を主張しません。
+
+再実行例（既存の検証済みcacheとbuild済みCLI、必要なローカルDocker imageを用意）:
+
+```sh
+python3 scripts/verify-runtime-inputs.py prepare --source-cache /absolute/verified-cache --out private-fixture
+python3 scripts/verify-runtime-inputs.py verify --fixture private-fixture \
+  --distribution cli/build/install/mcicon --context colima-mcicon \
+  --image sha256:<検証するimageID> --jobs 1 --out private-results
+python3 scripts/test-runtime-inputs.py
+```
+
+`prepare` に必要な版の入力が複数cacheへ分かれている場合は `--source-cache` を反復できます。各 `--out` は未使用の場所を指定します。Windowsでは同じPython harnessが `mcicon.bat` を使用します。cold/warm時間は#38で別に測定し、ここでの経過秒を正式benchmarkや性能保証として扱いません。全版experimental/deterministic=falseを維持します。
