@@ -125,6 +125,8 @@ Issue #28ではgui-deferredのexact 9版（1.21.6・1.21.7・1.21.8・1.21.9・1
 
 WindowsでJSON Linesの内部改行が残って描画がtimeoutになる不具合と、metadata/settings hashがCRLFに依存する不具合を修正しました。Mesaの128bit指定だけでは残るCPU最適化の量子化差を、SSE4.1指定と合わせて抑えます。以前のWindows出力と旧Docker imageのiconsは新しい出力先で再生成してください。
 
+Issue #37では1.13・64pxの専用Docker代理attach接続を両方向切断し、1.913秒でのFuture待機解除・exit 3、成功1件と未処理予約2件の保持、所有container/snapshot回収、出力FileLockの占有/解放を確認しました。新instanceで再開した4件は正常基準のdecoded RGBA・パスと厳密一致しました。Docker CLIが既に終了したcloseでも専用container削除を要求する最小修正を含みます。[条件と数値記録](validation.md#issue-37の専用docker代理接続切断2026-10-14)を参照してください。新規cleanup接続は利用可能な条件であり、daemon本体停止/再起動・接続先全体断絶の即時cleanup保証へ広げません。正常PNG・worker・保存形式は不変です。
+
 1.20.6のlightmapも実測RGB252へ合わせました。全1,329枚を監査し、変更前から1,327枚のRGBAが変わります。可視alpha mask・パスは不変、alpha量子化差は最大1/255です。保存した通常ワールド画像とのstone/diamond/grass_block/oak_leaves/chest比較は誤差0ですが、player_headの85画素・最大76/255の差は、GUI位置に伴うテクスチャ参照の変化として再現しました。ユーザー指定のGUI 320×240・インベントリ位置(80,121)へ投影とモデル位置を合わせ、再撮影した通常ワールドとの24種類比較が成功しました。headを含む20種類は誤差0、glint付き4種類は最大1/255（基準2/255以内）です。初回FAILは修正前の記録として保持します。最終binaryの4代表版で全件・反復と3ホスト比較が成功しました。以前に許容されたGUI(32,32)の33画素差とは別の記録です。全版experimental/deterministic=false・verified版0を維持します。
 
 

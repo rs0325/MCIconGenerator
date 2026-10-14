@@ -148,7 +148,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
         try {Runtime.getRuntime().removeShutdownHook(shutdownHook);}catch(IllegalStateException ignored){}
     }
     @Override public void close() {
-        try {if(process.isAlive()) {request(Map.of("command","shutdown"));if(!process.waitFor(10,TimeUnit.SECONDS))terminate();}}
+        try {if(process.isAlive()) {request(Map.of("command","shutdown"));if(!process.waitFor(10,TimeUnit.SECONDS))terminate();}else terminate();}
         catch(Exception e){terminate();}
         removeShutdownHook();
         try {output.close();}catch(IOException ignored){}

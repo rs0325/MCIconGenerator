@@ -83,3 +83,9 @@ iconsのPNGは8bit RGBA・straight alphaで、sRGB chunk（Perceptual）を付�
 Issue #31では1.20.6のstone・player_head・chest・glass・grass_blockを64pxで照合し、agent無しclientのF2画像が通常World QAと生成PNGに誤差0で一致しました。glassはbinary alphaの素材です。この静的5種類の結果を、半透明・glint・他版・他状態の受入へ広げません。条件は[検証記録](validation.md#issue-31の無計装client基準2026-10-14)を参照してください。
 
 canonical-v1への昇格には、固定環境の反復RGBAとsingle/all一致、意味的な画像検査、色空間の確認が必要です。現在はdeterministic=falseです。agent/contextの変更はsettings digestを変え、古いPNGを再利用しません。任意NBT/componentsや状態の直積は対象外です。
+
+## Docker通信切断時の終了
+
+Dockerのattach接続が失われ、`docker run`のCLIが終了した場合は、応答待ちを`WORKER_EXITED`で解除します。closeはCLIが既に終了していても、ジョブが所有する名前のcontainerだけに削除を要求し、agent snapshotと一時iconを回収します。描画中の個別失敗は未完了のExportResultとmanifestに残り、fail-fastでは成功済み出力と未処理のパス予約を保持します。同じ入力・worker・image・renderer・設定を使う新しいinstanceで再開できます。
+
+削除要求には選択したDocker接続先への新規接続が必要です。daemon停止や接続先全体の断絶ではcontainerの即時解放を保証しません。診断用worker.logは保持します。専用Unix代理でattachの両方向だけを切断する受入は、daemon本体の停止・再起動やネットワーク全体の断絶とは区別します。
