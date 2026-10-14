@@ -107,6 +107,10 @@ Issue #28ではgui-deferredのexact 9版（1.21.6・1.21.7・1.21.8・1.21.9・1
 
 正常PNG bytes・RGBA・パスは不変ですが、worker hashとsettingsDigestは変わります。旧manifestへ再開せず、新しい出力先で再生成してください。全版experimental/deterministic=false・verified版0を維持し、全状態・サイズ・world・OS/GPUなどの受入は#13等で継続します。
 
+## Issue #35の特殊renderer監査（2026-10-14）
+
+1.13・1.21.4・26.3の既定chest/dragon_head/player_head/shieldについて、直接texture、atlas sprite、cache hitと既存MissingResources guardの対応を確認しました。26.3は実GPU Sampler0のview identityも対応し、通常workerとQA観測workerの独立12 PNGはRGBA一致でした。確認された漏れはなく、production・API/context・既存PNGは不変です。[範囲・対応表・数値記録](validation.md#issue-35の特殊renderer-resourcecache監査2026-10-14)を参照してください。#12の150成功fault結果は関連4ファイルのbyte一致を確認して再利用し、今回の正常監査とは分けます。任意skin/profile・shield模様・季節性・他版/他GPU・独自raw GPU cache・非render-thread外部更新の全組み合わせは保証しません。全版experimental/deterministic=false・verified版0を維持します。
+
 ## Issue #13のホスト・照明検証（2026-10-12）
 
 描画backendはLinux amd64・Mesa llvmpipeのDockerに限定します。ホストJavaは21以上、CPUまたはエミュレーションにはSSE4.1が必要です。ホストnative/GPU描画、Linux ARM64 imageは未対応です。

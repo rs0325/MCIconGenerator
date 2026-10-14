@@ -406,6 +406,40 @@ python3 scripts/verify-resource-faults.py --injection resource-pack --preload-di
 
 上のnativeコマンドは部分集合の再実行例です。全51版と12境界版のexact IDは数値記録に保存します。欠損対象のCLI終了値3を期待するテストであり、通常生成の成功とは区別します。画像・公式入力・破損パック・QA agent・workerログは公開配布物に含めません。実測環境はmacOS Apple Silicon＋Colima/Rosetta・Linux amd64・Mesa llvmpipeです。
 
+## Issue #35の特殊renderer resource・cache監査（2026-10-14）
+
+起点はmainのc7c878f3e8686880305c6cdca09ba900c6beb920、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。1.13・1.21.4・26.3のchest/dragon_head/player_head/shieldを、既定stack・64px・固定Linux amd64 Mesa Dockerで監査しました。[数値・hash記録](../qa/validation-2026-10-14-special-resource.json)に、通常workerと観測workerの別実行、実resourceの入口、cache hitと既存guardの対応を残します。
+
+| 版 | chest | dragon_head | player_head | shield |
+|---|---|---|---|---|
+| 1.13 | entity/chest/normal.pngを直接bind | entity/enderdragon/dragon.pngを直接bind | entity/steve.pngを直接bind | entity/shield_base_nopattern.pngを直接bind |
+| 1.21.4 | entity/chest/normal sprite、chest atlas | entity/enderdragon/dragon.pngを直接取得 | entity/player/slim/steve.pngを直接取得 | entity/shield_base_nopattern sprite、shield_patterns atlas |
+| 26.3 | entity/chest/normal sprite、chest atlas | entity/enderdragon/dragon.pngを直接取得 | entity/player/slim/steve.pngを直接取得 | entity/shield/shield_base_nopattern sprite、shield_patterns atlas |
+
+PNGの直接パスはassets/minecraft/textures/以下、sprite名はminecraft:以下です。atlas化されたPNGはSpriteResourceLoaderのロード入口と公式JAR内のresource hashを照合し、描画pass中のatlas取得・guard:spriteへ対応させます。1.13のdirect bind、後続版のTextureManager取得は黒/白の2背景passで初回取得とcache hitを観測し、cacheに保存済みの同一texture objectにもguard:textureが呼ばれました。26.3では実際のFrontendRenderPass.setUniformのSampler0へ渡るGpuTextureViewをAbstractTextureの既存textureView fieldへidentityで紐付け、取得・guard・GPU消費の対応を確認しました。新規のgetTexture/getId/bind/loadやmissing生成は観測のために呼びません。
+
+通常workerの独立基準12 PNGとQA観測12 PNGはdecoded RGBAが一致しました。観測対象の12経路で確認された欠損検出漏れはなく、production worker・公開API・診断契約・contextは変更していません。以前のPNGの再生成は不要です。JUnit67件とoffline build/installDist、QA Java8対象compile・Python構文検査が成功しました。
+
+#12の150成功faultケースは今回再実行していません。当時のworker/hash・条件・10初回失敗を含む公開記録を参照し、ResourceGuard/ResourceTransformerとfault harnessの4ファイルが今回起点とbyte一致することを確認して再利用します。当時は破損対象PNG未出力、同workerでwheat継続・基準RGBA一致を150ケースで受け入れています。今回の12正常監査を、12種の新しい破損pack試験と数えません。
+
+専用cacheの初回実行はlegacy mapping入力不足でOFFLINE_CACHE_MISSとなり、ゲームは起動しませんでした。初回stderrとQA JARを保全し、不足mappingを検証・複製した再試験と区別します。観測入口の継承名・obfuscated lambda補正前、GPU観測追加前の中間成功も別worker/source hashで記録し、最終harnessの証拠へ混在させません。
+
+重点反証で、1.13のQA bind観測が難読化名aの別overloadであるTextureManager.reload(ResourceManager)まで選択していたことを確認しました。Identifier引数・void戻りの厳密descriptorへ限定し、get/atlas/resource/GPU getter・sprite loaderも正規の引数/戻り型へ限定しました。修正前hook・source/QA hash・採点は別記録として保全し、修正後はreload hookがないことを実ログで確認しました。1.13の4passのeventはobject identity番号を除いて修正前後で一致し、今回の12対象の採点は変わりません。修正後の同一QA sourceで3版を再照合しています。
+
+descriptor修正前harnessの26.3観測workerでは、描画開始前にWORKER_EXITEDが1件発生しました。所有ログ末尾はwrite /dev/stdout: broken pipe、Dockerにはkill15/kill9・exit127が記録され、OOMイベントは観測されませんでした。終了原因は未確定で、cleanup後のexitだけでは根本原因を説明できません。初回FAILを保持し、同じsource/production worker/input/imageで26.3だけ明示再試験した結果は成功しています。再試験成功を起動原因の解消と扱わず、#34の切り分け対象として記録します。
+
+仕上げとしてQA sourceの未使用Type[] args計算だけを削除し、Java8対象compile・Python構文を確認しました。native試験は削除前c0fd10f5 source、起動FAILはdescriptor修正前ab999a88 sourceです。削除後の公開source hashとcompile証拠は別フィールドに記録し、削除後sourceでnative再試験したとは扱いません。挿入するhook・観測・採点ロジックは変更していません。
+
+保証は、この3版・既定4 stackの固定描画条件と#12の既存fault条件に限ります。任意のcustom skin/profile、染色・模様付きshield、季節性texture、他版・他GPU、全resourceを受け入れたものではありません。GPU uniformへ渡す前に外部が独自cacheへ保持したraw viewを、requested pass内の取得・sprite/guardを経由せず使う経路は今回の保証外です。生成GUI atlas・lightmap等の全補助GPU資源、非render-thread更新・外部agentの競合・reloadの全組み合わせは完全監査していません。実際の漏れが確定した場合には、対象破損packの未出力・具体診断・同worker継続と独立RGBA基準を追加検証します。全版experimental/deterministic=false・verified版0を維持します。
+
+再実行には対象3版の公式入力・checksumとlegacy mappingを専用cacheへ用意し、CLIをbuildします。通常workerとQA workerは別ゲームプロセスで順番に起動します。
+
+```sh
+python3 scripts/verify-special-resources.py --cache .local/cache \
+  --out .local/special-resource-audit --versions 1.13 1.21.4 26.3 \
+  --docker-image mcicon-render:0.1.0-preview.1
+```
+
 ## Issue #13のホスト移植性と1.20.6インベントリ基準（2026-10-12）
 
 [数値記録](../qa/validation-2026-10-12-host-lighting.json)に、失敗から修正までのbinary・image・入力hash、ホスト、比較条件、件数を保存します。画像・公式入力・QAパック・接続先・個人の絶対パスは含めません。GitHub Actionsは使用していません。
