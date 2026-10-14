@@ -771,3 +771,39 @@ python3 scripts/verify-world-inventory.py --version 26.3 --ids stone diamond gra
 python3 scripts/verify-matrix.py --versions 26.3 --offline --out .local/pearl-repeat --compare .local/pearl-all --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-worker-lifecycle.py --versions 26.3 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/pearl-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
+
+## Issue #31の無計装client基準（2026-10-14）
+
+Linux amd64・固定Mesa imageで、1.20.6のstone・player_head・chest・glass・grass_blockをagent無しclientのF2画像と独立照合しました。1280×960、GUI scale 4、通常InventoryScreenのslot 9、GUI座標(80,121)、count 1、components追加なしの既定stack、64pxです。各IDを2回撮影した10比較は、受入済みの通常World QAのslot RGBAと完全一致し、現workerのPNGを空slot背景に再合成した比較も最大channel誤差0でした。empty画像2回も既存QAと完全一致しました。
+
+clientは元client JARと公式libraryだけで起動します。`-javaagent`・agent用classpath・時刻固定・描画置換・frame-zero resource packは使用しません。別JVMのAWT Robotが通常メニュー、vanilla command、E、F2を操作します。実clientの`/proc/1/cmdline`・環境・mapsをprivateに採取し、agent引数とlibinstrument/libattachがないことを確認します。controllerのclasspathはDesktopInputだけで、ゲームクラス・production rendererへアクセスしません。元saveは既存QAが生成したseed 0のflatワールドをコピーしたもので、ワールド生成自体を無計装と主張するものではありません。今回の保存結果でもseed 0・survivalを確認し、Time/DayTimeは進行していました。
+
+`/clear`の後、`/item replace entity @s inventory.0 with minecraft:<id>`で対象を置きます。各送信直前のlog文字offset以降でclearと該当IDの置換成功を確認し、F2の静的slotが既存QAと一致しなければ停止します。公式bytecodeでは数量省略のItemCommands分岐が`createItemStack(1,false)`を呼び、components未指定のItemInputとItemのgetDefaultInstanceが既定componentsのItemStackを作ります。PlayerHeadItem/BlockItemはgetDefaultInstanceをoverrideしません。最後の保存InventoryにもSlot 9・count 1・components追加なしを確認しました。この根拠を、potion等のgetDefaultInstance overrideを持つアイテムへ一般化しません。
+
+初期の外部ハーネスでは、join log直後のclear入力が取りこぼされ、emptyラベルの画像に元のglassが残りました。capture自体は終了0でしたが、画質受入はFAILです。元画像・log・当時のハーネスhashを保全し、command成功確認とempty/静的slot比較を加え、別出力先で再試験しました。最初のprototypeのallowCommands前提assert失敗、start.sh未生成の起動試行、Gradleのsandbox socket失敗も撮影・テスト成功へ数えていません。
+
+1.21.4ではdiamond・clock・compass・recovery_compass・enchanted_book・sea_lanternを各2回、同じ外部方式で撮影しました。emptyとdiamondは通常World QAと一致し、diamondの生成PNGとの2比較も誤差0でした。残る5種類のraw差は診断として保存し、固定条件と異なるため画質受入には使いません。
+
+| 代表状態 | fixed-v1との比較条件 |
+|---|---|
+| diamond | 静的generated model、既定stack、同じGUI条件で比較できる。今回の2比較は誤差0。 |
+| clock | 通常Worldの時刻・entity・針のwobbleと、entity無しの向き0（clock_00）は異なる。対象外。 |
+| compass | spawn位置、entityの向き、針のwobbleと、entity無しの向き0（compass_16）は異なる。対象外。 |
+| recovery_compass | 死亡位置・entityと、対象がないときの乱数/wobbleを使う。entity無しのrecovery_compass_16と同条件を保証しない。対象外。 |
+| enchanted_book | 既定のenchantment_glint_override=true。通常GUIのglint経過時刻はfixed-v1の1000msと一致を保証しない。対象外。 |
+| sea_lantern | 公式metadataはframetime 5。通常atlasの更新frameとfixed-v1の初期frameは一致を保証しない。対象外。 |
+
+対象外の一部が偶然同じ画素になっても、比較可能へ変更しません。全モデル・全状態・他GPU・他版・他サイズへ自動一般化せず、公開の状態指定APIも追加しません。glassはbinary alphaなので、sRGB・半透明・glintの全般的な受入は継続します。experimental・deterministic=false・verified 0版を維持します。productionコード・worker・PNG形式は変更しておらず、既存PNGの再生成は不要です。
+
+JUnit 67件とビルドが成功しました。入力・binary・外部ハーネス・無計装/通常QA画像のhash、command確認、raw比較、分類、初回失敗は[数値記録](../qa/validation-2026-10-14-uninstrumented-client.json)に保存します。元JAR・save・game画像・process情報・生logはprivateに保持します。
+
+再実行には同じ版の受入済みWorld QA出力と、flat・survival・Commands有効の保存済みワールドを専用ディレクトリへ用意します。元saveは変更せず、新規出力先へコピーします。現在の英語UIと1280×960に限定した操作です。通常撮影の終了だけではPNGの画質合格とはせず、静的slot照合と別途の生成PNG再合成比較も確認してください。
+
+```sh
+python3 scripts/verify-uninstrumented-inventory.py --version 1.20.6 \
+  --cache .local/cache --world-save '.local/qa-1.20.6/game/saves/MCIcon QA' \
+  --qa-reference .local/qa-1.20.6 --out .local/uninstrumented-1.20.6 --samples 2
+python3 scripts/verify-uninstrumented-inventory.py --version 1.21.4 \
+  --cache .local/cache --world-save '.local/qa-1.21.4/game/saves/MCIcon QA' \
+  --qa-reference .local/qa-1.21.4 --out .local/uninstrumented-1.21.4 --samples 2
+```
