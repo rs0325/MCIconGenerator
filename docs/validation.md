@@ -712,6 +712,22 @@ python3 scripts/test-concurrent-prepare.py
 
 再発時は初回からCLIの`--debug`を有効にし、再試験を別出力先へ保存してください。根本例外のcause、操作・同時数・開始終了時刻、OS/Java、入力/core/worker/QA/image hashを保存し、cacheの他利用JVMが終了した後に確定hashとpart状態を採取します。取得・checksum・mapping/native確定のどこで失敗したかを例外から特定し、その発生条件に対応した回帰を追加する必要があります。初回証拠を失った今回の再試験成功だけでは原因確定としません。
 
+## Issue #33の並行asset取得lock障害の再現・修正（2026-10-14）
+
+当時CLI/core/worker/imageで、初回の9版連続・16px/512pxの2系列を専用cacheへ復元しました。取得した6,161入力/派生ファイルは元cacheとbytes一致を確認し、JFRの例外記録を有効にしています。最初の1.13/16pxは1.29秒で初回と同じ「prepare 1.13 0/1 → IO_FAILED」、並行512pxは成功しました。失敗で後続を止め、根本IOException `Resource deadlock avoided`を15件採取しました。stackは`FileChannel.lock → AssetStore.obtain → RuntimePreparer`のasset取得スレッドを示し、Dockerプロセス起動前の失敗です。[数値・hash記録](../qa/validation-2026-10-14-asset-lock.json)に保存します。
+
+macOSのPOSIX record lockはプロセス単位です。P1のスレッド1がAを保持しスレッド2がBを待ち、P2のスレッド1がBを保持しスレッド2がAを要求すると、保持スレッドが独立して進行できる場合でもXNUの循環検出がEDEADLKを返します。[Apple XNU](https://raw.githubusercontent.com/apple-oss-distributions/xnu/main/bsd/kern/kern_lockf.c)と[OpenJDK 21.0.9のfcntl呼び出し](https://raw.githubusercontent.com/openjdk/jdk21u/jdk-21.0.9%2B10/src/java.base/unix/native/libnio/ch/UnixFileDispatcherImpl.c)を確認しました。IOExceptionはasset taskのUncheckedIOException、Future.getのExecutionExceptionを経てIO_FAILEDになります。
+
+AssetStoreの取得は同一キーのJVM内monitor・単一channel・ファイル単位の排他を維持し、tryLockが競合を返した場合だけ10ms待機する方式へ変更しました。OSのblocking待機queueに入らず、並列取得と検証・atomic確定を保持します。I/O例外は伝播し、取得待ちの各試行前に取消を確認します。sleep中断ではinterruptを復帰して失敗させ、channelを閉じます。公開API・cache形式は変更していません。
+
+制御した2 JVM・各2スレッドでも、当時coreは4取得中3件成功・EDEADLK1件、修正版は4件成功・0件でした。input/checksum一致・part0を確認しています。待機開始通知はfixtureでJVM stack上のlock待機またはsleepを観測した後に出し、試行前通知の懸念を解消しました。交差待機、外部lock中の取消、interrupt保持と次回取得の3回帰を含むJUnit67件・Python QA4件・ビルドが成功し、重点反証で公開を妨げる問題はありませんでした。
+
+当時core JARのAssetStore.classだけを置換し、他の全JAR entryとCLI/worker/imageを保持した比較でも、9版×16/512pxの18ジョブ・108PNGすべてが監査と旧成功基準とのRGBA/パス比較に成功しました。6,161確定ファイルhashは試験前後で不変、part0、JFRの該当例外は0件でした。
+
+修正した正式CLI配布物と#13の固定Mesa imageでも、1.13/16px・512pxの2並列で計6PNGが監査と既存成功基準へのRGBA/パス比較に成功しました。描画workerはLinux amd64、hostのlock検証はmacOSです。
+
+原初回のcause chain自体は未保存です。同じ当時binary・ジョブ構成で再現した障害の原因機構を特定し、制御再現と1クラス置換比較で修正を検証していますが、失われた初回例外の歴史的同一性を直接証明したとは扱いません。JFRの観測負荷はタイミングを変え、hostのWindows/Linux file lock実機検証は未実施です。
+
 ## #29: gui-26.2の通常World照明
 
 起点は#28のmerge commit 82d529f023c1e44ad8eb2cbbe57fbdf3af483cbe、前提#13はf6f0b82e22aca3ee3b374aec167e432b96caf55aです。exact release 26.2のstone・diamond・grass_block・oak_leaves・chest・player_head・glassを、Linux amd64・固定Mesa llvmpipe Dockerで検証しました。通常flat World、保存seed0・minecraft:flat・SURVIVAL、window1280×960、GUI scale4、slot9の実座標(80,121)、count1・既定stack・overlayなし・64pxです。最終7比較は最大channel誤差0、許容2/255超過0、輪郭例外0でした。level.datとdata/minecraft/world_gen_settings.datを読んで保存条件を確認し、両hashを保持します。
@@ -734,20 +750,3 @@ python3 scripts/verify-world-inventory.py --version 26.2 --ids stone diamond gra
 python3 scripts/verify-matrix.py --versions 26.2 --offline --out .local/latest-repeat --compare .local/latest-all --docker-image mcicon-render:0.1.0-preview.1
 python3 scripts/verify-worker-lifecycle.py --versions 26.2 --sizes 16 512 --ids stone diamond grass_block oak_leaves chest player_head glass --cache .local/size-cache --out .local/latest-sizes --docker-image mcicon-render:0.1.0-preview.1
 ```
-
-
-## Issue #33の並行asset取得lock障害の再現・修正（2026-10-14）
-
-当時CLI/core/worker/imageで、初回の9版連続・16px/512pxの2系列を専用cacheへ復元しました。取得した6,161入力/派生ファイルは元cacheとbytes一致を確認し、JFRの例外記録を有効にしています。最初の1.13/16pxは1.29秒で初回と同じ「prepare 1.13 0/1 → IO_FAILED」、並行512pxは成功しました。失敗で後続を止め、根本IOException `Resource deadlock avoided`を15件採取しました。stackは`FileChannel.lock → AssetStore.obtain → RuntimePreparer`のasset取得スレッドを示し、Dockerプロセス起動前の失敗です。[数値・hash記録](../qa/validation-2026-10-14-asset-lock.json)に保存します。
-
-macOSのPOSIX record lockはプロセス単位です。P1のスレッド1がAを保持しスレッド2がBを待ち、P2のスレッド1がBを保持しスレッド2がAを要求すると、保持スレッドが独立して進行できる場合でもXNUの循環検出がEDEADLKを返します。[Apple XNU](https://raw.githubusercontent.com/apple-oss-distributions/xnu/main/bsd/kern/kern_lockf.c)と[OpenJDK 21.0.9のfcntl呼び出し](https://raw.githubusercontent.com/openjdk/jdk21u/jdk-21.0.9%2B10/src/java.base/unix/native/libnio/ch/UnixFileDispatcherImpl.c)を確認しました。IOExceptionはasset taskのUncheckedIOException、Future.getのExecutionExceptionを経てIO_FAILEDになります。
-
-AssetStoreの取得は同一キーのJVM内monitor・単一channel・ファイル単位の排他を維持し、tryLockが競合を返した場合だけ10ms待機する方式へ変更しました。OSのblocking待機queueに入らず、並列取得と検証・atomic確定を保持します。I/O例外は伝播し、取得待ちの各試行前に取消を確認します。sleep中断ではinterruptを復帰して失敗させ、channelを閉じます。公開API・cache形式は変更していません。
-
-制御した2 JVM・各2スレッドでも、当時coreは4取得中3件成功・EDEADLK1件、修正版は4件成功・0件でした。input/checksum一致・part0を確認しています。待機開始通知はfixtureでJVM stack上のlock待機またはsleepを観測した後に出し、試行前通知の懸念を解消しました。交差待機、外部lock中の取消、interrupt保持と次回取得の3回帰を含むJUnit67件・Python QA4件・ビルドが成功し、重点反証で公開を妨げる問題はありませんでした。
-
-当時core JARのAssetStore.classだけを置換し、他の全JAR entryとCLI/worker/imageを保持した比較でも、9版×16/512pxの18ジョブ・108PNGすべてが監査と旧成功基準とのRGBA/パス比較に成功しました。6,161確定ファイルhashは試験前後で不変、part0、JFRの該当例外は0件でした。
-
-修正した正式CLI配布物と#13の固定Mesa imageでも、1.13/16px・512pxの2並列で計6PNGが監査と既存成功基準へのRGBA/パス比較に成功しました。描画workerはLinux amd64、hostのlock検証はmacOSです。
-
-原初回のcause chain自体は未保存です。同じ当時binary・ジョブ構成で再現した障害の原因機構を特定し、制御再現と1クラス置換比較で修正を検証していますが、失われた初回例外の歴史的同一性を直接証明したとは扱いません。JFRの観測負荷はタイミングを変え、hostのWindows/Linux file lock実機検証は未実施です。
