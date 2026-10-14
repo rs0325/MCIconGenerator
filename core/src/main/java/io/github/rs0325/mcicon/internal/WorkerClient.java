@@ -46,12 +46,12 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
             Files.writeString(game.resolve("options.txt"),"soundCategory_master:0.0\nguiScale:1\nmaxFps:60\nfullscreen:false\nonboardAccessibility:false\n");
             List<String> cp=new ArrayList<>();cp.add(inContainer(cache,runtime.client()));for(Path lib:runtime.libraries())cp.add(inContainer(cache,lib));
             List<String> command=new ArrayList<>(List.of("docker","--context",options.dockerContext(),"run","--rm","--name",containerName,"-i","--platform","linux/amd64",
-                    "--network","none","--memory","3g","--cpus","4","-v",cache+":/mcicon/cache","-v",agentSnapshot+":/mcicon/worker.jar:ro",imageId));
+                    "--network","none","--memory",options.containerMemoryMiB()+"m","--cpus","4","-v",cache+":/mcicon/cache","-v",agentSnapshot+":/mcicon/worker.jar:ro",imageId));
             if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"-e");
             if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"SDL_VIDEO_FORCE_EGL=1");
             String java=javaRuntime.executable();
             String run=inContainer(cache,runDirectory);
-            command.addAll(List.of(java,"-Xmx2G","-Djava.awt.headless=true","-Duser.timezone=UTC","-Djava.library.path="+inContainer(cache,runtime.natives()),
+            command.addAll(List.of(java,"-Xmx"+options.heapMemoryMiB()+"m","-Djava.awt.headless=true","-Duser.timezone=UTC","-Djava.library.path="+inContainer(cache,runtime.natives()),
                     "-javaagent:/mcicon/worker.jar="+run+"/agent.json","-cp",String.join(":",cp),runtime.metadata().path("mainClass").asText(),
                     "--username","MCIconGenerator","--version",runtime.version().id(),"--gameDir",run+"/game",
                     "--assetsDir",inContainer(cache,runtime.assets()),"--assetIndex",runtime.metadata().path("assetIndex").path("id").asText(),

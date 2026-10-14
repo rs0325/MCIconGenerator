@@ -5,6 +5,7 @@ import io.github.rs0325.mcicon.McIconException;
 import picocli.CommandLine;
 import java.io.*;
 import java.util.concurrent.*;
+import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CliArgumentsTest {
@@ -43,4 +44,18 @@ class CliArgumentsTest {
         assertEquals(2,Main.execute("render","--version","1.21.4","--id","stone","--size","63","--out","out"));
         assertEquals(2,Main.execute("render","--version","1.21.4","--id","stone","--item-timeout","0","--out","out"));
     }
+    @Test void memoryArgumentsReachWorkerOptionsAndInvalidPairsReturnUsageErrors() throws Exception {
+        var common=List.of("render","--version","1.21.4","--id","stone","--out","out","--worker-jar","agent.jar");
+        for(String[] flags:new String[][]{{},{"--memory-mib","4096","--heap-mib","2560"}}) {
+            CommandLine line=Main.commandLine();
+            var args=new ArrayList<>(common);args.addAll(Arrays.asList(flags));
+            line.parseArgs(args.toArray(String[]::new));Main.Render render=line.getSubcommands().get("render").getCommand();var options=render.worker.options();
+            assertEquals(flags.length==0?3072:4096,options.containerMemoryMiB());assertEquals(flags.length==0?2048:2560,options.heapMemoryMiB());
+        }
+        for(String[] flags:new String[][]{{"--memory-mib","0"},{"--heap-mib","0"},{"--memory-mib","2048"},{"--heap-mib","3072"},{"--memory-mib","not-an-int"}}) {
+            var args=new ArrayList<>(common);args.addAll(Arrays.asList(flags));
+            assertEquals(2,Main.execute(args.toArray(String[]::new)));
+        }
+    }
+
 }

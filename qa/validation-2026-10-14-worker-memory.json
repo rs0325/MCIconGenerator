@@ -1,0 +1,271 @@
+{
+  "status": "PASS",
+  "version": "1.21.4",
+  "size": 64,
+  "id": "minecraft:stone",
+  "parallelWorkers": 1,
+  "imageSha256": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+  "coreSha256": "80d46ecd8355ed5044a9424a65649ad548c72569f3e40d8b6a7ee707f797db20",
+  "workerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+  "driverSha256": "f78159d2c62ec50fe348473de4adea8cb423d15486d5f19ae4893183f38bcb0a",
+  "sourceSha256": {
+    "core/src/main/java/io/github/rs0325/mcicon/WorkerOptions.java": "01720e09f5b49a0f4c33ed1e4d1514c1d9e50bfdf171bd7192642bd4fe461517",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/WorkerClient.java": "cfbc54d9ad55e744f0fe32f39152f1ab8b3c7df701f50882cc3001cbf46b0652",
+    "cli/src/main/java/io/github/rs0325/mcicon/cli/Main.java": "4c224a7f6fab20470fb69c4f2dc60a841104ab4f7c3b146cf946964cd9770c10"
+  },
+  "inputFiles": 259,
+  "inputProofSha256": "8dd5b507aaea5f3d100a63c9c026edf4c9a5100b1a895f836e0900ee76ead1c6",
+  "records": [
+    {
+      "label": "default",
+      "containerMemoryMiB": 3072,
+      "heapMemoryMiB": 2048,
+      "exitCode": 0,
+      "startedUtc": "2026-10-14T11:08:34.651858+00:00",
+      "endedUtc": "2026-10-14T11:08:55.380749+00:00",
+      "elapsedSeconds": 20.728511082939804,
+      "observedContainers": 1,
+      "ownedContainersAbsent": true,
+      "snapshotsAbsent": true,
+      "temporaryPngAbsent": true,
+      "partFilesAbsent": true,
+      "supervisorCleanup": null,
+      "audit": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "audited": 1,
+        "registryPopulationVerified": false,
+        "transparentImages": 1,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      },
+      "manifestSha256": "b77db651aaf8cc0244c00851b68023936972b0f280f5483b1feb647fe30c887c",
+      "settings": {
+        "agentSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "javaMajor": 21,
+        "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+        "javaVersion": "21.0.12.1",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "74098a01467bea4aa019c714a7e199d64b9af89e104535bf62af1691cac9a91e",
+        "profile": "gui-1.21.4",
+        "size": 64
+      },
+      "pngSha256": {
+        "java/1.21.4/icons/assets/minecraft/textures/block/stone.png": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+      }
+    },
+    {
+      "label": "custom",
+      "containerMemoryMiB": 4096,
+      "heapMemoryMiB": 2560,
+      "exitCode": 0,
+      "startedUtc": "2026-10-14T11:08:55.396189+00:00",
+      "endedUtc": "2026-10-14T11:09:11.829792+00:00",
+      "elapsedSeconds": 16.433582541067153,
+      "observedContainers": 1,
+      "ownedContainersAbsent": true,
+      "snapshotsAbsent": true,
+      "temporaryPngAbsent": true,
+      "partFilesAbsent": true,
+      "supervisorCleanup": null,
+      "audit": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "audited": 1,
+        "registryPopulationVerified": false,
+        "transparentImages": 1,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 1,
+        "comparisonVerified": true,
+        "canonicalVerified": false
+      },
+      "manifestSha256": "b77db651aaf8cc0244c00851b68023936972b0f280f5483b1feb647fe30c887c",
+      "settings": {
+        "agentSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+        "context": "fixed-v1",
+        "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+        "javaMajor": 21,
+        "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+        "javaVersion": "21.0.12.1",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "74098a01467bea4aa019c714a7e199d64b9af89e104535bf62af1691cac9a91e",
+        "profile": "gui-1.21.4",
+        "size": 64
+      },
+      "pngSha256": {
+        "java/1.21.4/icons/assets/minecraft/textures/block/stone.png": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+      }
+    },
+    {
+      "label": "low",
+      "containerMemoryMiB": 128,
+      "heapMemoryMiB": 16,
+      "exitCode": 1,
+      "startedUtc": "2026-10-14T11:09:11.850291+00:00",
+      "endedUtc": "2026-10-14T11:09:15.599341+00:00",
+      "elapsedSeconds": 3.749084208975546,
+      "observedContainers": 1,
+      "ownedContainersAbsent": true,
+      "snapshotsAbsent": true,
+      "temporaryPngAbsent": true,
+      "partFilesAbsent": true,
+      "supervisorCleanup": null,
+      "workerTimeout": false,
+      "errorCode": "WORKER_EXITED",
+      "heapOutOfMemoryEvidence": true,
+      "dockerExitCodes": [
+        127
+      ],
+      "failureEvidence": {
+        "workerLogSha256": "6baab8cb81062843d2b7b1c15d402e5fbf26960db1c9bdb575255919824f5cad",
+        "cause": "java.lang.OutOfMemoryError: Java heap space",
+        "phase": "agent premainのSymbolsによるmappings読込み、game Main以前",
+        "dockerDieExitCode": 127
+      }
+    }
+  ],
+  "previousCoreComparison": {
+    "referenceManifestSha256": "b77db651aaf8cc0244c00851b68023936972b0f280f5483b1feb647fe30c887c",
+    "compared": 1,
+    "defaultRgbaAndPathEqual": true,
+    "customRgbaAndPathEqual": true
+  },
+  "binaryCompatibility": {
+    "status": "PASS",
+    "oldCoreSha256": "e9ec3f7388c1d804da0a21fee15b3caf117af029f7d33e627de5f147b6889f72",
+    "newCoreSha256": "80d46ecd8355ed5044a9424a65649ad548c72569f3e40d8b6a7ee707f797db20",
+    "consumerSha256": "288c6ea88cbc6cdd548f4321fa582d4e5b516b6f625eeb87e098207556875c86",
+    "constructorArguments": [
+      5,
+      6
+    ]
+  },
+  "syntheticMemoryTests": 1,
+  "syntheticProtocolRegressionTests": 2,
+  "junit": {
+    "tests": 90,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "scope": "1.21.4 / stone / 64px / Linux amd64 / macOS Colima、順次実行。メモリ変更による画像一致と所有回収に限定し、全版の画質・予算下限・性能保証とは区別する。",
+  "finalDefaultVerification": {
+    "status": "PASS",
+    "version": "1.21.4",
+    "size": 64,
+    "id": "minecraft:stone",
+    "parallelWorkers": 1,
+    "imageSha256": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+    "workerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+    "driverSha256": "9a245e90eec8b2924c795387addf85a725d56edd181cb2ee19b778c9fb9507b0",
+    "sourceSha256": {
+      "core/src/main/java/io/github/rs0325/mcicon/WorkerOptions.java": "55bac650adcb5004fff87d714cbdd8afd65841cbdf67a22b209364897ab9b79b",
+      "core/src/main/java/io/github/rs0325/mcicon/internal/WorkerClient.java": "cfbc54d9ad55e744f0fe32f39152f1ab8b3c7df701f50882cc3001cbf46b0652",
+      "cli/src/main/java/io/github/rs0325/mcicon/cli/Main.java": "4c224a7f6fab20470fb69c4f2dc60a841104ab4f7c3b146cf946964cd9770c10"
+    },
+    "inputFiles": 259,
+    "inputProofSha256": "8dd5b507aaea5f3d100a63c9c026edf4c9a5100b1a895f836e0900ee76ead1c6",
+    "records": [
+      {
+        "label": "default",
+        "containerMemoryMiB": 3072,
+        "heapMemoryMiB": 2048,
+        "exitCode": 0,
+        "startedUtc": "2026-10-14T11:15:49.906504+00:00",
+        "endedUtc": "2026-10-14T11:16:07.923326+00:00",
+        "elapsedSeconds": 18.016363042057492,
+        "observedContainers": 1,
+        "ownedContainersAbsent": true,
+        "snapshotsAbsent": true,
+        "temporaryPngAbsent": true,
+        "partFilesAbsent": true,
+        "supervisorCleanup": null,
+        "audit": {
+          "version": "1.21.4",
+          "mode": "icons",
+          "audited": 1,
+          "registryPopulationVerified": false,
+          "transparentImages": 1,
+          "fractionalAlphaPixels": 0,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "manifestSha256": "b77db651aaf8cc0244c00851b68023936972b0f280f5483b1feb647fe30c887c",
+        "settings": {
+          "agentSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+          "context": "fixed-v1",
+          "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+          "javaMajor": 21,
+          "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+          "javaVersion": "21.0.12.1",
+          "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+          "metadataSha256": "74098a01467bea4aa019c714a7e199d64b9af89e104535bf62af1691cac9a91e",
+          "profile": "gui-1.21.4",
+          "size": 64
+        },
+        "pngSha256": {
+          "java/1.21.4/icons/assets/minecraft/textures/block/stone.png": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+        }
+      }
+    ],
+    "referenceAudit": {
+      "version": "1.21.4",
+      "mode": "icons",
+      "audited": 1,
+      "registryPopulationVerified": false,
+      "transparentImages": 1,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 1,
+      "comparisonVerified": true,
+      "canonicalVerified": false
+    },
+    "firstDefaultAudit": {
+      "version": "1.21.4",
+      "mode": "icons",
+      "audited": 1,
+      "registryPopulationVerified": false,
+      "transparentImages": 1,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 1,
+      "comparisonVerified": true,
+      "canonicalVerified": false
+    }
+  },
+  "binaryCompatibilityFinal": {
+    "status": "PASS",
+    "oldCoreSha256": "e9ec3f7388c1d804da0a21fee15b3caf117af029f7d33e627de5f147b6889f72",
+    "newCoreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+    "consumerSha256": "288c6ea88cbc6cdd548f4321fa582d4e5b516b6f625eeb87e098207556875c86",
+    "constructorArguments": [
+      5,
+      6
+    ]
+  },
+  "strictReaudit": {
+    "savedNormalCases": 2,
+    "savedLowFailureCases": 1,
+    "emptyAndWrongIdRejectionPassed": true,
+    "foreignWorkerOutOfMemoryRejected": true,
+    "syntheticAuditTests": 2,
+    "auditDriverSha256": "9a245e90eec8b2924c795387addf85a725d56edd181cb2ee19b778c9fb9507b0"
+  },
+  "sourceBoundary": {
+    "note": "3条件のnativeはJavadoc追記前coreで実行。最終coreは旧5/6引数consumerと既定予算1起動を追加確認。custom/lowの実測SHAは保持する。",
+    "reconstructedNativeWorkerOptionsSha256": "01720e09f5b49a0f4c33ed1e4d1514c1d9e50bfdf171bd7192642bd4fe461517",
+    "finalWorkerOptionsSha256": "55bac650adcb5004fff87d714cbdd8afd65841cbdf67a22b209364897ab9b79b",
+    "javapInstructionsEqual": true,
+    "javapSha256": "e0361c4bee67f6779f56e00c0082e191ba02cd44a0ded8068cf1ee800a99133e",
+    "comparisonLimit": "旧native core JARはsnapshot未保存。実行時sourceSHAと一致するWorkerOptionsを再構成・独立compileし、最終classのjavap -c -p命令列と比較。他のproduction変更ファイルは実行時sourceSHAと同一。"
+  }
+}
