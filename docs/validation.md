@@ -88,14 +88,42 @@ python3 scripts/verify-docker-disconnect.py --cache .local/cache --out .local/do
 
 coldでもDocker image/VMは既に準備済みで、OS page cacheは消去していません。時間はAPI開始からworker終了までで、最終icon後のDocker memory samplingを含み、PNG監査を含みません。VmHWMとcontainer memory.peakは最終icon後・shutdown前に読みます。cache容量はworker作業ディレクトリを除き、hash/lock/native展開を含みます。1版・cold 1回/warm 2回の実測で、全版や別環境の速度保証ではありません。
 
-再実行は、描画matrixを終了してからbenchmarkを開始してください。
+## 境界版native性能測定（Issue #38）
+
+既存の1.21.4測定に加え、最古の1.13と最新の26.3を64px・各版の登録全件・単一workerで計測します。coldは版ごとに新設した空のMCIcon cacheへ公式HTTPSから入力を取得し、warmはその版のcacheをofflineで使って毎回新しい出力先へ再描画します。各warm出力はcoldの全件manifestとPNGを照合し、登録ID、RGBA、相対pathの一致を確認します。入力JAR・mappings・worker agent・settings・Docker imageのhash/IDも記録します。確定cacheのbytes/filesはworker作業領域を除いて数えます。
+
+各runの時間にはAPI開始からworker終了までを含み、PNG監査は含めません。最後のicon完了後、worker shutdown前にLinux kernelのJava PID 1 `VmHWM`とcontainer `memory.peak`を採取します。cold計測前にimageとVMは準備済みにし、OS page cacheは消去しません。coldとwarmの間に他のMCIcon workerを動かさず、同じDocker image/VM条件を維持します。この測定は準備・描画・終了時間とworker/containerの高水位メモリを報告する限定比較であり、全版・別CPU・別OSの性能保証ではありません。
+
+スクリプトはCLI配布物を計測開始時に専用outへsnapshotし、core・worker agentのSHA-256を指定値と照合します。source/core/worker commit、runtime、VM条件、image ID、probeと監査スクリプトのSHA-256を`report.json`へ保存します。各runのprobe stdoutとprobe stderr、失敗状態・監査結果は同じprivate outへ残します。Docker worker状態照会は15秒、probe終了待ちは600秒、TERM後の終了待ちは30秒、KILL後の終了・pipe回収待ちは15秒を上限とします。pipeが残って期限切れになった場合も取得できた部分stdout/stderrとcleanup状態を失敗reportへ保存します。失敗したoutは変更せず、再実行には別outを使います。生ログや個人環境のpathは公開QAへ含めません。
+
+```sh
+python3 scripts/benchmark-native.py --out .local/benchmark-boundaries \
+  --distribution .local/benchmark-input/cli \
+  --source-commit b34d7248645adcc8fc11fae30867ad199b392cfd \
+  --core-commit 06cf810e43dffdac5b47d01ce39d50a6496220ce \
+  --core-sha256 e9ec3f7388c1d804da0a21fee15b3caf117af029f7d33e627de5f147b6889f72 \
+  --worker-commit 2a9574e977ffbc6b68970a068914e0ad4dd8787f \
+  --worker-sha256 8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42 \
+  --image-id sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf \
+  --runtime-description 'macOS / Temurin 21.0.9 / Linux amd64 container' \
+  --vm-description 'Colima mcicon: 4 vCPU / 6 GiB'
+```
+
+native計測はsolo実行枠と確定worker/core artifactの割当後に行います。未実施の測定値は既存の1.21.4結果へ混ぜません。
+
+2026-10-14に確定した#4 core/#36 workerと専用solo期間で測定しました。1.13は全784件でcold 46.94秒、warm 19.67秒・20.80秒、準備済みcache 94,313,699 bytes / 852 filesでした。worker `VmHWM`は1,444,454,400 / 1,435,746,304 / 1,407,287,296 bytes、container `memory.peak`は1,415,446,528 / 1,406,476,288 / 1,378,099,200 bytesでした。
+
+26.3は全1,657件でcold 55.33秒、warm 37.19秒・36.31秒、準備済みcache 233,939,207 bytes / 768 filesでした。worker `VmHWM`は1,637,306,368 / 1,682,477,056 / 1,625,804,800 bytes、container `memory.peak`は1,659,678,720 / 1,704,394,752 / 1,648,103,424 bytesでした。6 runすべてexit 0、registry population監査成功、worker残存なしです。warmは各版coldと全件のdecoded RGBA・相対pathが一致し、Java probe stderrは全run 0 bytesでした。
+
+入力・mappings・agent・settings・image hash、cold/warmごとのprobe stdout/stderr hashと測定値は[数値記録](../qa/validation-2026-10-14-boundary-benchmark.json)に保存しています。sourceはb34d724、#4 coreは06cf810 / `e9ec3f73…b6889f72`、#36 workerは2a9574e / `8b85e11a…7805acb42`、Docker imageは`sha256:c498eda7…2b9601cf`です。imageと4 vCPU / 6 GiB VMはcold前に準備済み、OS page cacheは消去していません。初回失敗・retryはありません。測定後、Docker照会とprocess/pipe cleanupの待機を有限化し、timeout時の部分出力・失敗report保持を合成テストしました。この修正後のscript SHA-256は数値記録に測定harness SHAと分けて記録し、成功6runの測定値は変更していません。native再測定はしていません。この限定測定から別版・OS・CPU・VMでの性能を保証しません。
+
+ほかのnative QAを再実行する場合は描画matrixを終了してから開始してください。性能計測の再実行では、上記の全provenance引数を維持し、前回と異なる新規`--out`を指定します。
 
 ```sh
 python3 scripts/verify-matrix.py --mode raw --out .local/raw-repeat --offline
 python3 scripts/verify-export-faults.py --out .local/fault-repeat
 python3 scripts/verify-icon-sigkill.py --out .local/icon-sigkill-repeat --compare .local/qa-output
 python3 scripts/verify-native-alpha.py --out .local/alpha-repeat
-python3 scripts/benchmark-native.py --out .local/benchmark-repeat
 ```
 
 16/512pxの端点は9 adapter・各6代表ID、18ジョブ/108 PNGが監査に成功しました。1.13/16pxの初回は準備段階でIO_FAILED、単独再実行で成功し、並行準備8回では再現しませんでした。最初の失敗も追加記録に保存します。
