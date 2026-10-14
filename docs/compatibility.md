@@ -151,3 +151,6 @@ Issue #31では1.20.6の静的5種類（stone・player_head・chest・glass・gr
 Issue #32では1.20.6/1.21.4のknown-RGBA packを固定Mesaで検証し、64px・指定GUI位置・1層/2層・6背景のbyte RGB再合成は最大2/255でした。元straight RGBの無誤差復元は低alphaで保証できず、linear-light合成では通常GUIと最大73/255の条件差があります。PNGのsRGB宣言は合成式を指定するものではありません。[色精度の条件と限界](color-precision.md)を参照してください。
 
 production・公開API・PNG形式は変更していません。既存PNGの再生成は不要で、全版experimental・deterministic=false・verified 0版を維持します。
+## 1.14.4の復帰API修正
+
+#64の受入で、#36以降の1.14.4が存在しないGlStateManager._glBindFramebuffer/_viewportを呼んで全描画に失敗することを確認しました。#66ではその版だけ実GLのbinding復帰と旧viewport/cache更新へ合わせ、他版のcache同期を維持します。修正候補の全876枚と隣接・新方式4版28枚は既存正常出力へRGBA/パス一致し、独立World7比較も許容内でした。[検証範囲と数値](validation.md#issue-66の1144復帰api修正2026-10-14)を参照してください。worker hash/settingsDigestが変わるため旧iconsへの再開をせず、新しい出力先へ再生成してください。API/raw/contextは不変で、全版experimental/deterministic=falseを維持します。
