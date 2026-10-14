@@ -1,0 +1,703 @@
+{
+  "issue": 33,
+  "baseCommit": "6f38fb902a7cea1b6b977876244a7c4415c6408d",
+  "dependencyMergeCommit": "f6f0b82",
+  "date": "2026-10-13",
+  "status": "2026-10-14に並行asset取得のEDEADLKを再現・原因機構特定・修正検証済み",
+  "previousFailureRootCauseEstablished": false,
+  "initialFailure": {
+    "record": "qa/validation-2026-10-10-followup.json",
+    "version": "1.13",
+    "size": 16,
+    "code": "IO_FAILED",
+    "rootExceptionAvailable": false,
+    "individualLogReplacedByRetry": true,
+    "concurrentJobSize": 512,
+    "inputSnapshotAvailable": false,
+    "offline": true,
+    "elapsedSeconds": 1.57,
+    "cliCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+    "originalCommandAndStderrRecoveredFromPreviousChat": true,
+    "specificFailedStageEstablished": false,
+    "stderrBeforeRetry": [
+      "prepare 1.13 0/1",
+      "IO_FAILED: Input/output operation failed"
+    ],
+    "additionalPrivateEvidenceAvailable": false
+  },
+  "reproducedQaFailure": {
+    "phase": "準備後のQA native列挙",
+    "round": 3,
+    "concurrency": 2,
+    "successfulProcessesBeforeFailure": 5,
+    "rootException": "NoSuchFileException",
+    "affectedFile": "ツール専用.mcicon-*.part",
+    "cause": "Files.walkの属性取得前に他JVMが一時ファイルを確定して消失した",
+    "originalFailureIdentityEstablished": false,
+    "cacheChanged": false,
+    "residualParts": 0
+  },
+  "preparationRuns": [
+    {
+      "version": "1.13",
+      "concurrency": 2,
+      "rounds": 10,
+      "independentJvmProcesses": 20,
+      "baselineJvmProcesses": 1,
+      "offline": true,
+      "os": "macOS-15.7.7-arm64-arm-64bit",
+      "java": "openjdk version \"21.0.9\" 2025-10-21 LTS",
+      "binarySha256": {
+        "cli-0.1.0-SNAPSHOT.jar": "008a6f0094502089161c07266ef16388670473694a18df5bffe399df0f2b24bc",
+        "core-0.1.0-SNAPSHOT.jar": "7499f8eda717719e950f936b0b7a9e69d584ea803cd81efd8149f78e90c9ecbb",
+        "jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+        "jackson-core-2.22.3.jar": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+        "jackson-databind-2.22.3.jar": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9",
+        "picocli-4.7.7.jar": "f86e30fffd10d2b13b8caa8d4b237a7ee61f2ffccf5b1941de718b765d235bf8"
+      },
+      "probeSha256": "d578e534616e9ffaf383358b28a1ab179c059ad4d8f75f41df4758bb14c4a96f",
+      "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+      "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+      "cacheFileCount": 575,
+      "cacheStateSha256": "7b76e158a174384011f9cf3cdffe211c0eea1016a7a5a9c5a7cc1ae9ced7e566",
+      "allInputAndDerivedBytesMatch": true,
+      "residualParts": 0,
+      "elapsedSeconds": [
+        1.299,
+        1.304,
+        1.233,
+        1.141,
+        1.276,
+        1.307,
+        1.267,
+        1.33,
+        1.209,
+        1.229,
+        1.219,
+        1.215,
+        1.454,
+        1.358,
+        1.252,
+        1.241,
+        1.244,
+        1.207,
+        1.26,
+        1.319
+      ]
+    },
+    {
+      "version": "1.13",
+      "concurrency": 4,
+      "rounds": 10,
+      "independentJvmProcesses": 40,
+      "baselineJvmProcesses": 1,
+      "offline": true,
+      "os": "macOS-15.7.7-arm64-arm-64bit",
+      "java": "openjdk version \"21.0.9\" 2025-10-21 LTS",
+      "binarySha256": {
+        "cli-0.1.0-SNAPSHOT.jar": "008a6f0094502089161c07266ef16388670473694a18df5bffe399df0f2b24bc",
+        "core-0.1.0-SNAPSHOT.jar": "7499f8eda717719e950f936b0b7a9e69d584ea803cd81efd8149f78e90c9ecbb",
+        "jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+        "jackson-core-2.22.3.jar": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+        "jackson-databind-2.22.3.jar": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9",
+        "picocli-4.7.7.jar": "f86e30fffd10d2b13b8caa8d4b237a7ee61f2ffccf5b1941de718b765d235bf8"
+      },
+      "probeSha256": "d578e534616e9ffaf383358b28a1ab179c059ad4d8f75f41df4758bb14c4a96f",
+      "sourceSha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+      "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+      "cacheFileCount": 575,
+      "cacheStateSha256": "7b76e158a174384011f9cf3cdffe211c0eea1016a7a5a9c5a7cc1ae9ced7e566",
+      "allInputAndDerivedBytesMatch": true,
+      "residualParts": 0,
+      "elapsedSeconds": [
+        1.594,
+        1.747,
+        1.704,
+        1.706,
+        1.629,
+        1.467,
+        1.481,
+        1.575,
+        1.671,
+        1.619,
+        1.643,
+        1.633,
+        1.561,
+        1.677,
+        1.723,
+        1.666,
+        1.757,
+        1.651,
+        1.711,
+        1.61,
+        1.633,
+        1.518,
+        1.625,
+        1.552,
+        1.587,
+        1.648,
+        1.515,
+        1.701,
+        1.64,
+        1.62,
+        1.627,
+        1.631,
+        1.696,
+        1.634,
+        1.749,
+        1.66,
+        1.719,
+        1.719,
+        1.69,
+        1.699
+      ]
+    }
+  ],
+  "nativeRuns": [
+    {
+      "version": "1.13",
+      "size": 16,
+      "concurrency": 2,
+      "exitCode": 0,
+      "elapsedSeconds": 53.656,
+      "imageId": "sha256:64c2a99ca5ee94105277fbeaace3ed7ba1eb80b710a02111ec2476e8c2e7f09c",
+      "workerSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+      "audit": {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 3,
+        "registryPopulationVerified": false,
+        "transparentImages": 3,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      }
+    },
+    {
+      "version": "1.13",
+      "size": 512,
+      "concurrency": 2,
+      "exitCode": 0,
+      "elapsedSeconds": 55.807,
+      "imageId": "sha256:64c2a99ca5ee94105277fbeaace3ed7ba1eb80b710a02111ec2476e8c2e7f09c",
+      "workerSha256": "66610ab5c52a600c25fcefc200891281eef3b63e28c47448a0308eb713298110",
+      "audit": {
+        "version": "1.13",
+        "mode": "icons",
+        "audited": 3,
+        "registryPopulationVerified": false,
+        "transparentImages": 3,
+        "fractionalAlphaPixels": 0,
+        "failures": [],
+        "compared": 0,
+        "comparisonVerified": false,
+        "canonicalVerified": false
+      }
+    }
+  ],
+  "regression": {
+    "junitTests": 64,
+    "pythonQaTests": 4,
+    "build": "成功",
+    "failureCapture": {
+      "exitCode": 1,
+      "rootException": "FileSystemException: Not a directory",
+      "reportRetained": true
+    }
+  },
+  "limitations": [
+    "実入力の専用cache・offline準備に限定。公式HTTPS取得中・disk full・他OSの検証ではない。",
+    "初回例外・失敗時cache・入力snapshotがないため、過去障害の原因を断定しない。",
+    "準備後のQA競合を元のIO_FAILEDとして扱わない。",
+    "ゲーム資産・画像・実行コマンド・絶対パス・個別ログはprivateに保持する。",
+    "初回はofflineだったと過去chatで確認。online試験は追加探索であり、初回の再現試験とは区別する。",
+    "元のprepare表示はworker起動/catalog取得も含み、runtime準備で失敗したとは確定できない。",
+    "当日の初期host JavaはTemurin 21.0.9+10/arm64と確認。失敗したCLIプロセスの実効環境・失敗時cache状態は未保存。historical native replayの一致を根本原因の証拠にはしない。",
+    "asset objectsの並列Future.getはExecutionExceptionを経由するため、IO_FAILEDはIOExceptionに限定されない。制御したasset欠落とdocker不在で同じ初回表示になり、表示だけでは実根本原因を一意に選べない。"
+  ],
+  "nextEvidence": [
+    "初回からCLI --debugを有効にし、再試験を別出力先へ保存する。",
+    "失敗直後に対象cacheを使う全JVMを停止・終了させてから、確定ファイルhashとpartを採取する。",
+    "操作・同時数・開始終了時刻・OS/Java・入力/core/worker/QA/image hashと例外のcauseを保持する。",
+    "取得段階とderived確定段階を分け、捕捉した根本例外の発生条件で合成回帰を設計する。"
+  ],
+  "nativeHarnessInitialFailure": {
+    "code": "WORKER_NOT_FOUND",
+    "runs": 2,
+    "cause": "検証コマンドのworker JARパス指定誤り",
+    "originalFailureIdentityEstablished": false,
+    "logsRetained": true,
+    "correctedRetryPassed": true
+  },
+  "exploratoryRunsExcludedFromAcceptance": {
+    "independentJvmProcesses": 40,
+    "configuredConcurrency": 4,
+    "reason": "初回native調査の2CLIと時間帯が重なる可能性があり、cache全利用者の最大同時数を固定した系列から除外。別の専用cacheで4並列40回を再検証した。",
+    "logsRetained": true
+  },
+  "preparationBytecodeComparison": {
+    "historicalCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+    "sameBytecode": [
+      "AssetStore",
+      "RuntimePreparer",
+      "FilesSupport",
+      "LegacyMappings",
+      "VersionService"
+    ]
+  },
+  "onlineExploration": [
+    {
+      "offline": false,
+      "concurrency": 2,
+      "rounds": 4,
+      "independentJvmProcesses": 8,
+      "baselineJvmProcesses": 1,
+      "binarySha256": {
+        "cli-0.1.0-SNAPSHOT.jar": "008a6f0094502089161c07266ef16388670473694a18df5bffe399df0f2b24bc",
+        "core-0.1.0-SNAPSHOT.jar": "7499f8eda717719e950f936b0b7a9e69d584ea803cd81efd8149f78e90c9ecbb",
+        "jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+        "jackson-core-2.22.3.jar": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+        "jackson-databind-2.22.3.jar": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9",
+        "picocli-4.7.7.jar": "f86e30fffd10d2b13b8caa8d4b237a7ee61f2ffccf5b1941de718b765d235bf8"
+      },
+      "probeSha256": "606012613ac565486fcc48ebf3b48fbb4000c29426bef4995ac1c53cfc7f23ee",
+      "allInputAndDerivedBytesMatch": true,
+      "elapsedSeconds": [
+        1.357,
+        1.728,
+        1.076,
+        1.523,
+        1.264,
+        1.59,
+        2.28,
+        1.096
+      ]
+    },
+    {
+      "offline": false,
+      "concurrency": 2,
+      "rounds": 4,
+      "independentJvmProcesses": 8,
+      "baselineJvmProcesses": 1,
+      "binarySha256": {
+        "cli-0.1.0-SNAPSHOT.jar": "f393de812c546df38465baac237c8c4ada6e050874fbc79a1543ab49679ba878",
+        "core-0.1.0-SNAPSHOT.jar": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+        "jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+        "jackson-core-2.22.3.jar": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+        "jackson-databind-2.22.3.jar": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9",
+        "picocli-4.7.7.jar": "f86e30fffd10d2b13b8caa8d4b237a7ee61f2ffccf5b1941de718b765d235bf8"
+      },
+      "probeSha256": "606012613ac565486fcc48ebf3b48fbb4000c29426bef4995ac1c53cfc7f23ee",
+      "allInputAndDerivedBytesMatch": true,
+      "elapsedSeconds": [
+        1.639,
+        1.806,
+        1.312,
+        1.088,
+        1.102,
+        1.311,
+        1.426,
+        1.051
+      ]
+    }
+  ],
+  "historicalNativeReplay": {
+    "offline": true,
+    "concurrency": 2,
+    "rounds": 3,
+    "coreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+    "workerSha256": "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c",
+    "imageId": "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977",
+    "probeSha256": "ba58d2df61cbca0ec13fa4fc23682b9e4e8e146c5a0361050e9cfedb837c560a",
+    "historicalWorkerAndImageMatchParallelSuccessful512pxJob": true,
+    "historicalHostJavaVersionRecorded": false,
+    "results": [
+      {
+        "name": "round-1-16",
+        "size": 16,
+        "exitCode": 0,
+        "elapsedSeconds": 29.25435709953308,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "comparison": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4,
+          "failures": [],
+          "compared": 6,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "name": "round-1-512",
+        "size": 512,
+        "exitCode": 0,
+        "elapsedSeconds": 30.198254108428955,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4368,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "comparison": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4368,
+          "failures": [],
+          "compared": 6,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "name": "round-2-16",
+        "size": 16,
+        "exitCode": 0,
+        "elapsedSeconds": 30.654446125030518,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "comparison": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4,
+          "failures": [],
+          "compared": 6,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "name": "round-2-512",
+        "size": 512,
+        "exitCode": 0,
+        "elapsedSeconds": 31.474897146224976,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4368,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "comparison": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4368,
+          "failures": [],
+          "compared": 6,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "name": "round-3-16",
+        "size": 16,
+        "exitCode": 0,
+        "elapsedSeconds": 31.69424796104431,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "comparison": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4,
+          "failures": [],
+          "compared": 6,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      },
+      {
+        "name": "round-3-512",
+        "size": 512,
+        "exitCode": 0,
+        "elapsedSeconds": 32.30300807952881,
+        "audit": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4368,
+          "failures": [],
+          "compared": 0,
+          "comparisonVerified": false,
+          "canonicalVerified": false
+        },
+        "comparison": {
+          "version": "1.13",
+          "mode": "icons",
+          "audited": 6,
+          "registryPopulationVerified": false,
+          "transparentImages": 6,
+          "fractionalAlphaPixels": 4368,
+          "failures": [],
+          "compared": 6,
+          "comparisonVerified": true,
+          "canonicalVerified": false
+        }
+      }
+    ],
+    "runtimeWorkerCatalogExportStagesReached": true,
+    "rootCauseEstablished": false
+  },
+  "evidenceRetentionChecks": {
+    "matrixFailureRuns": 2,
+    "rootException": "FileSystemException: Not a directory",
+    "initialTraceRetainedOnRetry": true,
+    "normalNativeMatrix": {
+      "version": "1.13",
+      "mode": "icons",
+      "audited": 3,
+      "registryPopulationVerified": false,
+      "transparentImages": 3,
+      "fractionalAlphaPixels": 0,
+      "failures": [],
+      "compared": 0,
+      "comparisonVerified": false,
+      "canonicalVerified": false,
+      "exitCode": 0,
+      "elapsedSeconds": 16.1,
+      "cliCoreSha256": "7499f8eda717719e950f936b0b7a9e69d584ea803cd81efd8149f78e90c9ecbb"
+    },
+    "offlineOptionSmoke": {
+      "independentJvmProcesses": 2,
+      "baselineJvmProcesses": 1,
+      "allInputAndDerivedBytesMatch": true
+    },
+    "finalSmoke": {
+      "independentJvmProcesses": 2,
+      "baselineJvmProcesses": 1,
+      "offline": true,
+      "allInputAndDerivedBytesMatch": true
+    }
+  },
+  "finalSourceSha256": {
+    "scripts/qa/RuntimePrepareProbe.java": "0d269b456e46d331ed42937c7b0f5835acdffd9523e0ad4c4ef6430025c8260b",
+    "scripts/verify-concurrent-prepare.py": "22ed014896cbc58ff5b5946c852142d38b73d2e73b2804dd927e6b4d02f19463",
+    "scripts/verify-matrix.py": "3cfb4b3be4f36ee530463e65535e5ba3571fdf357f3d8f8d1b490bccb4b0b86b",
+    "scripts/test-concurrent-prepare.py": "c06be016ec423d19b049d70332c09ff87ef983538c5b2681fb3d889939df33be"
+  },
+  "coldPreparationRuns": {
+    "coreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+    "probeSha256": "0d269b456e46d331ed42937c7b0f5835acdffd9523e0ad4c4ef6430025c8260b",
+    "offline": true,
+    "baselinePreparationBeforeParallel": false,
+    "concurrency": 4,
+    "roundsPerMode": 2,
+    "independentJvmProcesses": 16,
+    "timeoutSeconds": 120,
+    "java": "openjdk version \"21.0.9\" 2025-10-21 LTS\nOpenJDK Runtime Environment Temurin-21.0.9+10 (build 21.0.9+10-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.9+10 (build 21.0.9+10-LTS, mixed mode, sharing)\n",
+    "sourceInputFileCount": 277,
+    "modes": [
+      {
+        "mode": "derived-absent",
+        "beforeFileCount": 554,
+        "afterFileCount": 575,
+        "rounds": 2,
+        "processes": 8,
+        "allPreparedResultsMatchHistoricalAcceptedBaseline": true,
+        "allInputAndDerivedBytesMatch": true,
+        "residualParts": 0,
+        "afterCacheStateSha256": "7b76e158a174384011f9cf3cdffe211c0eea1016a7a5a9c5a7cc1ae9ced7e566",
+        "elapsedSeconds": [
+          1.373,
+          1.323,
+          1.427,
+          1.428,
+          1.502,
+          1.413,
+          1.502,
+          1.502
+        ]
+      },
+      {
+        "mode": "checksums-and-derived-absent",
+        "beforeFileCount": 278,
+        "afterFileCount": 575,
+        "rounds": 2,
+        "processes": 8,
+        "allPreparedResultsMatchHistoricalAcceptedBaseline": true,
+        "allInputAndDerivedBytesMatch": true,
+        "residualParts": 0,
+        "afterCacheStateSha256": "7b76e158a174384011f9cf3cdffe211c0eea1016a7a5a9c5a7cc1ae9ced7e566",
+        "elapsedSeconds": [
+          1.411,
+          1.421,
+          1.309,
+          1.4,
+          1.308,
+          1.457,
+          1.384,
+          1.377
+        ]
+      }
+    ],
+    "checksumAbsenceException": "SHA-1を持たないversion manifestのoffline検証用checksumは残す。"
+  },
+  "retainedEvidenceReview": {
+    "cacheWorkerDirectoriesInspected": 526,
+    "retainedInitialWindow113WorkerDirectories": 1,
+    "initialWindowWorkerCreatedJst": "2026-10-10T17:44:15.929377",
+    "initialWindowWorkerLogSha256": "1c1cd790ec54b6cc296e96817385c788bba081d8755aaa479c299aaa041a7006",
+    "retryWorkerCreatedJst": "2026-10-10T17:52:52.617840",
+    "retryWorkerLogSha256": "7a8925e20c761d46747a8f77018d72946f200322cf5cde905d54d2db7a70537a",
+    "productDoesNotDeleteWorkerDirectory": true,
+    "inputFilesInspected": 9005,
+    "retainedInputFilesWithBirthOrModificationInInitialWindow": 0,
+    "inputWindowJst": "2026-10-10 17:43..17:45 JST",
+    "inference": "1.13の初回時間帯に残るworkerは並行成功512pxと時系列上整合し、16pxはworker directory作成前の失敗を支持する。外部削除・過去の別cache状態を否定する記録はなく、確定段階とはしない。",
+    "workerDirectoryPrecededBy": [
+      "RuntimePreparer.prepare",
+      "WorkerClient.readAgent",
+      "WorkerClient.resolveImage"
+    ],
+    "currentCacheTimestampsDoNotEstablishPastInputIntegrity": true,
+    "reviewWindowJst": "2026-10-10 17:43..17:54",
+    "initialFailureWindowJstApproximate": "2026-10-10 17:44:14.64..17:44:16.22"
+  },
+  "ambiguousDisplayChecks": {
+    "synthetic": true,
+    "originalFailureIdentityEstablished": false,
+    "historicalCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+    "exactHistoricalCliUsedForVisibleError": true,
+    "debugTraceUsesCurrentCliWithHistoricalCore": true,
+    "currentCliSha256": "008a6f0094502089161c07266ef16388670473694a18df5bffe399df0f2b24bc",
+    "initialHarnessUnknownDebugOptionExcluded": true,
+    "checks": [
+      {
+        "condition": "missing-asset-object",
+        "exitCode": 1,
+        "visibleStderr": [
+          "prepare 1.13 0/1",
+          "IO_FAILED: Input/output operation failed"
+        ],
+        "causeChain": [
+          "ExecutionException → McIconException（OFFLINE_CACHE_MISS）"
+        ],
+        "workerDirectoriesCreated": 0
+      },
+      {
+        "condition": "docker-executable-unavailable",
+        "exitCode": 1,
+        "visibleStderr": [
+          "prepare 1.13 0/1",
+          "IO_FAILED: Input/output operation failed"
+        ],
+        "causeChain": [
+          "IOException（dockerプロセス起動、実行ファイルなし）"
+        ],
+        "workerDirectoriesCreated": 0
+      }
+    ]
+  },
+  "historicalOperationEvidence": {
+    "initialHostJava": "Temurin 21.0.9+10-LTS / arm64",
+    "hostJavaObservationUtc": "2026-10-10T00:57:59Z",
+    "failureProcessEffectiveJavaEnvironmentNotRecorded": true,
+    "initialCliStdoutEmpty": true,
+    "initialCliStderr": [
+      "prepare 1.13 0/1",
+      "IO_FAILED: Input/output operation failed"
+    ],
+    "initialToolResultNotTruncated": true,
+    "jdkHelperWarningFound": false,
+    "subsequentDistributionBuildStartedJst": "2026-10-10T17:48:57",
+    "concurrentCacheDeletionFoundInRetainedOperationHistory": false,
+    "unifiedLogQueryWindowJst": "2026-10-10 17:44:00..17:44:30",
+    "unifiedLogRelevantRecords": 0,
+    "crashReportAtFailureTimeFound": false,
+    "crashReportInventoryIncludesRetired": true,
+    "localSnapshots": [
+      "OS更新用3件"
+    ],
+    "limitation": "保存ログの不在は当時の障害の不在を証明しない。初期host環境は失敗プロセスの実効環境の代用にしない。"
+  },
+  "workerPreflightRuns": {
+    "historicalCoreSha256": "ecae91e61ff679d08f45176cb7671c894d8171d00eceb222db7d2f9ddd5fd137",
+    "probeSha256": "ba415957edcf99d54ebbbdc621bfb8582dcbb04f42a326095ef954c3b87266ef",
+    "stages": [
+      "WorkerClient.readAgent",
+      "WorkerClient.resolveImage"
+    ],
+    "concurrency": 2,
+    "iterationsPerJvm": 32,
+    "successfulIterations": 64,
+    "timeoutSeconds": 120,
+    "exitCodes": [
+      0,
+      0
+    ],
+    "agentSha256": [
+      "60d44cdd91cb20db52262dbcff2da3eae426ca9a1402d075df9c08cff389912c"
+    ],
+    "imageId": [
+      "sha256:d48946bb12109a4008c48ee103c03a15c5c0f96980f754bcc05e436a95307977"
+    ],
+    "java": "openjdk version \"21.0.9\" 2025-10-21 LTS\nOpenJDK Runtime Environment Temurin-21.0.9+10 (build 21.0.9+10-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.9+10 (build 21.0.9+10-LTS, mixed mode, sharing)\n",
+    "elapsedSeconds": [
+      1.147,
+      1.176
+    ],
+    "originalFailureIdentityEstablished": false
+  },
+  "investigationStatusOn20261013": "未再現・根本原因未確定",
+  "followupEvidence": "validation-2026-10-14-asset-lock.json"
+}

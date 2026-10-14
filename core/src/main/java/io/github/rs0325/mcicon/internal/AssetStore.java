@@ -47,7 +47,7 @@ public final class AssetStore {
         Path lockPath=FilesSupport.safeResolve(root,relative+".lock");
         synchronized((root+"/"+relative).intern()) {
             try(FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE);
-                FileLock ignored=channel.lock()) {
+                FileLock ignored=lock(channel)) {
                 Path checksum=FilesSupport.safeResolve(root,relative+".sha256");
                 if(Files.exists(target)&&valid(target,sha1,expectedSize)&&(!refresh||offline)) {
                     String actual=FilesSupport.hash(target,"SHA-256");
@@ -82,6 +82,16 @@ public final class AssetStore {
                 }
                 throw failure;
             }
+        }
+    }
+    private FileLock lock(FileChannel channel) throws IOException {
+        // OSのプロセス単位の待機循環検出を避け、取得スレッド同士の並列性を保つ。
+        while(true) {
+            cancellation.check();
+            FileLock lock=channel.tryLock();
+            if(lock!=null)return lock;
+            try {Thread.sleep(10);}
+            catch(InterruptedException e) {Thread.currentThread().interrupt();throw new FileLockInterruptionException();}
         }
     }
     private boolean valid(Path file,String hash,long size) throws IOException {

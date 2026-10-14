@@ -44,7 +44,12 @@ with tempfile.TemporaryDirectory(prefix='.cli-snapshot-',dir=args.out) as tempor
     if len(core_jars)!=1:raise ValueError('CLI distribution must contain one core JAR')
     core_hash=hashlib.sha256(core_jars[0].read_bytes()).hexdigest()
     for version in versions:
-        command=[str(cli),'render' if args.mode=='icons' else 'extract','--version',version,'--cache',str(args.cache.resolve()),'--out',str(args.out),'--json']
+        previous=[reports/(version+suffix) for suffix in ('-result.json','-cli.log','-audit.json')
+                  if (reports/(version+suffix)).exists()]
+        if previous:
+            history=Path(tempfile.mkdtemp(prefix=version+'-previous-',dir=reports))
+            for path in previous:shutil.copy2(path,history/path.name)
+        command=[str(cli),'--debug','render' if args.mode=='icons' else 'extract','--version',version,'--cache',str(args.cache.resolve()),'--out',str(args.out),'--json']
         if args.mode=='icons':command+=['--allow-experimental','--size',str(args.size),'--docker-context',args.docker_context,'--docker-image',args.docker_image]
         if args.ids:
             for item in args.ids:command+=['--id' if args.mode=='icons' else '--texture',item]
