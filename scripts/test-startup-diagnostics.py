@@ -125,6 +125,34 @@ sys.stdout.buffer.write(b'dy","protocolVersion":1,"renderer":"fixture"}\\n');sys
         self.assertLessEqual(record['startedMonotonicNs'],record['firstStdoutMonotonicNs'])
         self.assertLessEqual(record['firstStdoutMonotonicNs'],record['readyMonotonicNs'])
         self.assertLessEqual(record['readyMonotonicNs'],record['finishedMonotonicNs'])
+
+    def test_stage_agent_preserves_original_arguments_and_protocol(self):
+        payload=b'{"type":"ready","protocolVersion":1,"renderer":"fixture"}\n'
+        root,env,command=self.fixture('import sys\nsys.stdout.buffer.write('+repr(payload)+');sys.stdout.buffer.flush()\n')
+        (root/'worker').mkdir()
+        agent=root/'stage.jar';agent.write_bytes(b'QA agent')
+        env['MCICON_STARTUP_STAGE_AGENT']=str(agent)
+        command+=['fixture-image','java','-javaagent:/mcicon/worker.jar=/mcicon/cache/worker/agent.json','-cp','original','Main']
+        original=command[2:]
+        result=subprocess.run(command,env=env,capture_output=True,timeout=10)
+        self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(result.stdout,payload)
+        record=json.loads((root/'docker-run.json').read_text())
+        self.assertEqual(original,record['originalArguments'])
+        extra='-javaagent:/mcicon/cache/worker/startup-stage.jar=/mcicon/cache/worker/startup-stages.tsv'
+        changed=list(original);changed.insert(original.index('-cp'),extra)
+        self.assertEqual(changed,record['arguments'])
+        self.assertEqual(b'QA agent',(root/'worker/startup-stage.jar').read_bytes())
+        self.assertEqual(payload,(root/'protocol.stdout').read_bytes())
+
+    def test_stage_agent_refuses_ambiguous_original_agent(self):
+        root,env,command=self.fixture("raise AssertionError('Dockerを起動してはいけない')\n")
+        (root/'worker').mkdir()
+        agent=root/'stage.jar';agent.write_bytes(b'QA agent')
+        env['MCICON_STARTUP_STAGE_AGENT']=str(agent)
+        result=subprocess.run(command,env=env,capture_output=True,timeout=10)
+        self.assertNotEqual(0,result.returncode)
+        self.assertIn('旧worker agentの引数が一意ではありません',result.stderr.decode())
+        self.assertFalse((root/'docker-run.json').exists())
     def test_invalid_protocol_and_exit_are_preserved(self):
         root,env,command=self.fixture("import sys\nsys.stdout.buffer.write(b'invalid protocol\\n');sys.stdout.buffer.flush();sys.exit(7)\n")
         result=subprocess.run(command,input=b'',env=env,capture_output=True,timeout=10)

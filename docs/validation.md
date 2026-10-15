@@ -1229,3 +1229,17 @@ Windowsの検証用Docker wrapperは小量stdinをbufferに残す問題があり
 Docker wrapper開始からstdoutのreadyを観測するまでは中央値29.016秒・最大34.774秒、45秒以上は0だった。hostの180秒timerの厳密な開始点や、純粋なゲーム初期化時間とは区別する。JFR/早期attachなしで45/120/165秒の遅延dumpを予定したが、今回は対象がなくthread dumpは未採取。正常な全1,553 worker logにもhostname警告があり、それだけではDNSを原因と断定できない。原失敗時の待ち先は依然不明で、#78は未解決・OPENを維持する。
 
 `scripts/verify-startup-soak.py`は既存診断を2系列で監督し、親を未reapで保持してから自身のgroupを回収する。7時間は新規起動の開始窓で、進行jobは420秒の外側期限と有限回収まで継続する。停止・片系列FAILでは新規開始を止め、照合済みの対象だけ回収し、再試行しない。ゲームなしの回収境界4試験、照会失敗2条件と非ゲームの所有container回収を開始前に確認した。元FAILは別世代として保持する。数値・hash・範囲は `qa/validation-2026-10-16-startup-soak.json` に記録する。
+
+## 起動境界の観測追加（#78、2026-10-16）
+
+元ログの`hkl.<clinit>`は公式mappingでは`GameLoadTimesEvent`で、INSTANCEの生成後にloggerを初期化する。hostname警告のstackはその時点の呼出しを示すが、180秒の停止位置とは断定できない。Log4j単体対照より広い起動経路を追跡するため、旧1.21.4のMainとhklだけへ少数の境界記録を追加するQA agentを用意した。製品コード、原本JAR、元agent順序、timeout・retryは変更しない。
+
+`scripts/qa/startup-stage/build.py`は既存JDK21とcacheのASM9.6を使う。旧client・mapping・worker・ASMのSHAを固定し、旧JARのSymbols→Canonical→Resourceをゲーム起動なしで呼び、第二agentへ届く変換後bytesを検査する。Main入口、hkl初期化前後、INSTANCE取得後、bootstrap・join・Minecraft constructor前後を、専用fileへ単調時刻とthread ID付きで記録する。recorderはpremainで準備し、frameを再計算してゲームclassを先行loadしない。変換不一致は終了97、記録失敗は98とし、無計装の成功へ置き換えない。
+
+`scripts/verify-startup-stages.py`は旧失敗世代snapshotの専用cache2個を使い、記録なし→あり→あり→なしの順で各2並列、計8起動を比較する。既存診断の45/120/165秒dumpと420秒の外側期限・所有回収を引き継ぐ。PNG bytesと14項目metadataを固定参照へ照合し、記録ありでは全11境界の順序・thread・追加agent以外の起動引数不変も必須とする。
+
+初回はMainの公式raw hashを要求したため、旧workerの変換後Mainを受け入れず、対照2件成功・記録2件拒否で停止した。FAILと実行sourceを保全し、変換後hashへ限定して別出力で明示再検証した。修正後の全8件はwarm起動で成功し、4件の記録に全44境界を取得した。PNG8枚と14項目metadataが旧基準に一致し、入力518件×2・参照2件・配布snapshot62件は不変、全groupは正常終了、所有containerと製品worker snapshot・一時iconは回収済み。QA agentと境界fileは測定証拠として保持する。
+
+wrapper開始からready観測までの中央値は記録なし21.065秒、あり21.689秒だった。各4件の記述値であり、観測の無影響や性能差を一般化しない。記録したhkl区間は656〜736ms、bootstrapは5.57〜6.26秒、joinは1ms未満、Minecraft constructorは2.24〜2.85秒だった。境界の記録呼出し自体やclass初期化を含み、純粋な関数のCPU時間ではない。constructor後からreadyまでの処理も別に存在する。
+
+45秒以上の遅延はなくdumpは未採取、元timeoutは再現しなかった。次の再発時に最後の到達境界とdumpを対応させる手段を整えた成果であり、#78の原因特定・解消ではない。元FAIL・旧7時間試験を保持し、IssueはOPENを維持する。変換検査、QAテスト、初回FAIL、実測・独立監査の数値とSHAは `qa/validation-2026-10-16-startup-stages.json` に記録する。
