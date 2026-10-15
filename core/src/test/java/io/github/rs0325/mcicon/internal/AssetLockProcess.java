@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /** ファイルlockを保持した取得と、別入力の取得待ちを独立スレッドで制御する。 */
 public final class AssetLockProcess {
@@ -28,15 +29,22 @@ public final class AssetLockProcess {
         holder.join();if(waiter!=null)waiter.join();
     }
     private static void waitForLock(Thread waiter) throws InterruptedException {
+        awaitLockWait(waiter);
+        System.out.println("WAITING");
+    }
+    static String awaitLockWait(Thread waiter) throws InterruptedException {
+        long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
         while(waiter.isAlive()) {
             for(var frame:waiter.getStackTrace()) {
                 if((frame.getClassName().startsWith("sun.nio.ch.")&&frame.getMethodName().equals("lock0"))
                         ||(frame.getClassName().equals("java.lang.Thread")&&frame.getMethodName().startsWith("sleep"))) {
-                    System.out.println("WAITING");return;
+                    return frame.getClassName()+"."+frame.getMethodName();
                 }
             }
+            if(System.nanoTime()>=deadline)throw new IllegalStateException("lock待機を観測できなかった");
             Thread.sleep(1);
         }
+        throw new IllegalStateException("lock待機の前に取得が終了した");
     }
     private static void obtain(AssetStore store,String path) {
         try {store.obtain(path,URI.create("https://example.test/"+path),null,1,false);System.out.println("DONE "+path);}

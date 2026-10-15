@@ -1,0 +1,15 @@
+allprojects {
+    afterEvaluate {
+        if (path == ':core') {
+            tasks.register('hostFileLockClasspath') {
+                dependsOn testClasses, jar
+                doLast {
+                    def output = rootProject.file(project.property('qaHostClasspath'))
+                    output.parentFile.mkdirs()
+                    def dependencies = (configurations.testRuntimeClasspath.files + configurations.testCompileClasspath.files).collect { it.absolutePath }.unique().sort()
+                    output.setText(groovy.json.JsonOutput.toJson(dependencies), 'UTF-8')
+                }
+            }
+        }
+    }
+}
