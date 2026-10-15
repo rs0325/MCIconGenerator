@@ -1,0 +1,197 @@
+{
+  "issue": 70,
+  "date": "2026-10-15",
+  "baseCommit": "98705d5de36d8005cde218cf9333e54923d44f8b",
+  "completed": true,
+  "coreSha256": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+  "bundleSha256": "a07534e39660c8efa2d7667361b8de3e6e070c36daae0ca9d12ed8ac81dda0fb",
+  "bundleHashes": {
+    "classes/HostFileLockProbe.class": "c736cd9c34e0dac6dc4b37e1b1c8a64bf0b92ce8cde336606cb883a3386074ce",
+    "classes/io/github/rs0325/mcicon/internal/AssetLockProcess.class": "be57f5e20f84fa097c8f9b918af2045475c189a1ef20a9cb76c6bc9c999681a1",
+    "classes/io/github/rs0325/mcicon/internal/AssetStoreLockTest$Actor.class": "abdfb96ecb0d169981961adc5b1362ef69dceadcbb96ec316afb4c0348b9594f",
+    "classes/io/github/rs0325/mcicon/internal/AssetStoreLockTest.class": "608ff18286982d8d83397ebe0b77959a39ccc0c8cfc7d5f085618b85c644f2ac",
+    "lib/apiguardian-api-1.1.2.jar": "b509448ac506d607319f182537f0b35d71007582ec741832a1f111e5b5b70b38",
+    "lib/core-0.1.0-SNAPSHOT.jar": "8b945e5fc61a64e86a63be0e9099dab693e74bea863ac2115d2620650adb59e0",
+    "lib/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+    "lib/jackson-core-2.22.3.jar": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+    "lib/jackson-databind-2.22.3.jar": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9",
+    "lib/junit-jupiter-5.13.4.jar": "b960f79217dd01c863031b678f07df4730bbf1eac650c74ad6b0c61faad78379",
+    "lib/junit-jupiter-api-5.13.4.jar": "d1bb81abfd9e03418306b4e6a3390c8db52c58372e749c2980ac29f0c08278f1",
+    "lib/junit-jupiter-engine-5.13.4.jar": "027404a92fe618b72465792a257951495c503a7d5751e2791e0f51c87f67f5bc",
+    "lib/junit-jupiter-params-5.13.4.jar": "3a8c6365716dbb698c0d49a05456c1e1ad05c406613c550f9dd50037872efc41",
+    "lib/junit-platform-commons-1.13.4.jar": "1c25ca641ebaae44ff3ad21ca1b2ef68d0dd84bfeb07c4805ba7840899b77408",
+    "lib/junit-platform-engine-1.13.4.jar": "390c5f77b84283a64b644f88251b397e0b0debb80bdcc50f899881aecff43a5a",
+    "lib/junit-platform-launcher-1.13.4.jar": "0b0beaeb6880a31149641d2d848b863712885469670c12099586d7f798522564",
+    "lib/opentest4j-1.3.0.jar": "48e2df636cab6563ced64dcdff8abb2355627cb236ef0bf37598682ddf742f1b"
+  },
+  "sourcesSha256": {
+    "core/src/test/java/io/github/rs0325/mcicon/internal/AssetLockProcess.java": "b4a4bc2b14bc77dd177278b918d7e8980339a089acca1b5300eaeafdf145603e",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/AssetStoreLockTest.java": "84c2fd2ad0b19e99ce4c48804bf8642fdcd053b254d95ad18af32cdc6ce66e4a",
+    "scripts/bundle-host-filelocks.py": "388e997d270fd4bd34f0b2f067d6a3fd5e4a5802fb53c2be11289da1ea63b020",
+    "scripts/qa/HostFileLockProbe.java": "69e8ca942917238f114ec797547fc5bbbc85cc6cd61db1761d9a9b171e79c70f",
+    "scripts/qa/host-filelock-classpath.gradle": "3c4aa99ef306c294c78fd96aff94fc773503b1e2b5a87208972bd6d5d5bde834",
+    "scripts/test-host-filelock-bundle.py": "2bb957e6024ebd49b2bde2cc7bf71618b2c91f6e9c80df562f4fa3a39b4f5259"
+  },
+  "hosts": {
+    "mac": {
+      "javaVersion": "21.0.9",
+      "os": "Mac OS X",
+      "arch": "aarch64",
+      "filesystem": "apfs",
+      "normalTests": 3,
+      "failed": 0,
+      "skipped": 0,
+      "containerFailures": 0,
+      "ownedChildrenRemaining": 0,
+      "deadlineExit": 124,
+      "deadlineKilledOwnedChildren": 1,
+      "deadlineOwnedChildrenRemaining": 0,
+      "normalReportSha256": "3b0e5e0a79e832ad2aa5308563a13f15848a2d6a7f1bdeb8cef986c54244a5bc",
+      "deadlineReportSha256": "37fb68d0e173509c97b815cb74f88b993702c8dabac88c287b1ae488825f94d3",
+      "waitObservations": [
+        "java.lang.Thread.sleep0",
+        "java.lang.Thread.sleep0"
+      ]
+    },
+    "linux": {
+      "javaVersion": "21.0.12.1",
+      "os": "Linux",
+      "arch": "amd64",
+      "filesystem": "tmpfs",
+      "normalTests": 3,
+      "failed": 0,
+      "skipped": 0,
+      "containerFailures": 0,
+      "ownedChildrenRemaining": 0,
+      "deadlineExit": 124,
+      "deadlineKilledOwnedChildren": 1,
+      "deadlineOwnedChildrenRemaining": 0,
+      "normalReportSha256": "4ab73df61856fcc90c4a7967e941f25c812d8702918e448f08ae31d3f7609fd5",
+      "deadlineReportSha256": "17d8bc85b24d247f5c9ef34627d1ccbf66e54447cbbc59db10efb54513ff128a",
+      "waitObservations": [
+        "java.lang.Thread.sleep0",
+        "java.lang.Thread.sleep0"
+      ]
+    },
+    "windows": {
+      "javaVersion": "21.0.9",
+      "os": "Windows 11",
+      "arch": "amd64",
+      "filesystem": "NTFS",
+      "normalTests": 3,
+      "failed": 0,
+      "skipped": 0,
+      "containerFailures": 0,
+      "ownedChildrenRemaining": 0,
+      "deadlineExit": 124,
+      "deadlineKilledOwnedChildren": 1,
+      "deadlineOwnedChildrenRemaining": 0,
+      "normalReportSha256": "a86661d44c5cc8237ee5797a86f52c013b69bcd2882768c0377963dbc2cac72e",
+      "deadlineReportSha256": "f32b6b4b554096c20309c4632b321737755371688388332f5abc0f28db3cc5f5",
+      "waitObservations": [
+        "java.lang.Thread.sleep0",
+        "java.lang.Thread.sleep0"
+      ],
+      "supervisorExit": 0,
+      "exitCodesValidatedBySupervisor": true,
+      "resultsZipSha256": "fca89dbb74f89a40ef4dd29c3fa8c8ac13d1ab29527772b8330ba31a8bc58dc1"
+    }
+  },
+  "guardTests": {
+    "count": 7,
+    "bundleHashChangeRejected": true,
+    "testEngineMissingRejected": true,
+    "deadlineReapsChild": true,
+    "reapExceptionFailureRecordSaved": true,
+    "emptyAndNonobjectInventoryRejected": true,
+    "unlistedClasspathRejected": true,
+    "existingZipPreserved": true
+  },
+  "coreJUnit": {
+    "tests": 58,
+    "failed": 0,
+    "skipped": 0
+  },
+  "linux": {
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "context": "Colima／Linux amd64 image／Apple Silicon Rosetta",
+    "lockFilesystem": "Linux tmpfs",
+    "memoryBytes": 268435456,
+    "javaHeapMiB": 64,
+    "ownContainersDestroyed": 2,
+    "dieExitCodes": [
+      0,
+      124
+    ],
+    "eventEvidenceSha256": "a14846cfca5c51364ad4416fe71ad9fc19969fa2c2287247a587a04d6d8b7d2e"
+  },
+  "limits": [
+    "Mac/APFS・Windows/NTFS・Linux/tmpfsの3限定条件。LinuxはColima/Rosettaのamd64 image",
+    "production/API/cache形式は不変。core binaryも不変",
+    "FileLockの3限定条件であり、任意CPU/OS/ネットワークfilesystem/エクスポートatomic/crashを保証しない",
+    "入力はJUnit/core/fixtureのみ。ゲーム資産・描画・Git操作なし"
+  ],
+  "previousEvidenceBeforeFixes": {
+    "recordSha256": "1b7f5264b469c37ee78967754e18ad1a8de45c8720b7b6e47572d427f01d2701",
+    "bundleSha256": "6df04c34e2287348b2c660c1a89b8e8642069af7d41c0175b09f35ab05e99682",
+    "measuredSourceHashes": {
+      "core/src/test/java/io/github/rs0325/mcicon/internal/AssetLockProcess.java": "b4a4bc2b14bc77dd177278b918d7e8980339a089acca1b5300eaeafdf145603e",
+      "core/src/test/java/io/github/rs0325/mcicon/internal/AssetStoreLockTest.java": "84c2fd2ad0b19e99ce4c48804bf8642fdcd053b254d95ad18af32cdc6ce66e4a",
+      "scripts/bundle-host-filelocks.py": "f293c8a9e8cdf39b5dc6e599e1e3a4d292f1dfb6de00a91d126f993efcb0d56d",
+      "scripts/qa/HostFileLockProbe.java": "90d825f5b9c3180301def5513df3bb3099ccae3743df33fe2c02e5703b64ab24",
+      "scripts/qa/host-filelock-classpath.gradle": "3c4aa99ef306c294c78fd96aff94fc773503b1e2b5a87208972bd6d5d5bde834",
+      "scripts/test-host-filelock-bundle.py": "1fb1088d5137797f08c25dee6abe050c72b60db300491d90a766e389153552e0"
+    },
+    "note": "元v3のMac/Linux実測は同一ZIP17内容へ一致。新checker/sourceへ再ラベルせず保全。修正後は新v5で再実行。"
+  },
+  "inventorySha256": "ac7a4b93ca5f9d18688edec6c2653534cbce21f3abc1e5cd444e0a6d9517fc06",
+  "setupFailures": [
+    "Windows SSH未起動時の接続timeout3回（検証開始前）",
+    "長いEncodedCommandの起動失敗。同一SHAのps1を許可済み作業先に転送し短いhash検証付きwrapperで実行。検証bundleは不変"
+  ],
+  "measuredCoreBoundary": "3ホストとも8b945のcoreを使用。後続main #73のrender gate変更へ再ラベルせず、直接依存するAssetStore/FilesSupport/CancellationTokenのclass bytesが同一であることを別途確認した。",
+  "review": {
+    "completed": true,
+    "previousMacLinuxReviewPassed": true,
+    "windowsAndIntegrationPassed": true,
+    "confirmedFindings": 0
+  },
+  "integration": {
+    "main": "89a11bb9d17d273e848f0f8fbbcae3891371c160",
+    "taskBase": "98705d5de36d8005cde218cf9333e54923d44f8b",
+    "historyUpdated": false,
+    "documentThreeWayConflicts": 0,
+    "junit": {
+      "core": {
+        "tests": 61,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cli": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "worker": {
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "buildInstallDist": "PASS",
+    "productionLockClassBytesEqual": {
+      "io/github/rs0325/mcicon/CancellationToken.class": "155ae31dd44c5c401fe9331631d95fdaa4979ca52baa2c34dab113ab018d3254",
+      "io/github/rs0325/mcicon/McIconException.class": "2f8800ebd803024aaa6dc4c1cfc543bb93e1ece8398ae9ff838c40214716a13a",
+      "io/github/rs0325/mcicon/internal/AssetStore$DeadlineInputStream.class": "c4265b4f27862813a0fca67af234df656a37620c4d1abe3791ebc56702a8e8f9",
+      "io/github/rs0325/mcicon/internal/AssetStore$Transport.class": "1301e049c648ca52f37e58cfe9b1b20c02ea2b5d9107bcf199a843a95a2e4feb",
+      "io/github/rs0325/mcicon/internal/AssetStore.class": "6aaae29fa7d17ee4c2114af5a0beb7d0f013b9fa1fa3ab81c80b54540ae86bde",
+      "io/github/rs0325/mcicon/internal/FilesSupport$1.class": "5996929d7d935ef61213a3cd88d29131b7130dbc54298f189005fd3fa87cb40f",
+      "io/github/rs0325/mcicon/internal/FilesSupport.class": "299ebfd6a4cd770ccd5646b8095c880195f6450edc1c2c62c45a31e43126f541"
+    },
+    "latestMainCoreSha256": "44898a6a714d9c92e67283052397adf6ebd9e4d90c7d31c4152493e1bc60366d",
+    "coreJarSha256": "44898a6a714d9c92e67283052397adf6ebd9e4d90c7d31c4152493e1bc60366d"
+  }
+}

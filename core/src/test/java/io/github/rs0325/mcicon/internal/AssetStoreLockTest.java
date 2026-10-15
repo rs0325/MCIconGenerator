@@ -54,6 +54,7 @@ class AssetStoreLockTest {
                 });
                 assertTrue(started.await(5,TimeUnit.SECONDS));
                 assertThrows(TimeoutException.class,()->result.get(100,TimeUnit.MILLISECONDS));
+                System.out.println("LOCK_WAIT "+AssetLockProcess.awaitLockWait(thread.get()));
                 if(interrupt)thread.get().interrupt();else token.cancel();
                 Throwable cause=assertThrows(ExecutionException.class,()->result.get(5,TimeUnit.SECONDS)).getCause();
                 if(cause instanceof McIconException error)assertEquals("CANCELLED",error.code());
@@ -83,6 +84,7 @@ class AssetStoreLockTest {
         @Override public void close() throws Exception {
             send("release");
             if(!process.waitFor(5,TimeUnit.SECONDS)){process.destroyForcibly();process.waitFor(5,TimeUnit.SECONDS);}
+            assertFalse(process.isAlive(),"所有lock actorが終了しなかった");
             input.close();output.close();reader.shutdownNow();
         }
     }

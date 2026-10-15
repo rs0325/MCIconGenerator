@@ -1092,3 +1092,22 @@ python3 scripts/test-runtime-inputs.py
 隣接1.14.3/1.15と1.21.4/26.3の7IDずつ、計28枚も生成・PNG監査に成功し、各版の既存正常基準へRGBA/パス一致しました。公式入力902ファイルのhashは前後不変です。6所有workerは保存ログのDocker既定hostname短IDとDocker eventのActor.IDを対応し、die exit0・destroyとsnapshot/一時PNG回収を確認しました。World clientもexit0・所有container消失を確認しています。CLI終了0だけからworker終了0を推定していません。
 
 [初回FAIL・元API根拠・候補hash・比較と回収の数値記録](../qa/validation-2026-10-14-framebuffer-1144.json)を保存します。全版品質の正式受入やcanonical昇格は完了しておらず、experimental/deterministic=falseを維持します。
+
+## Issue #70の実FileLockホスト検証（2026-10-15）
+
+修正済みcoreの既存`AssetStoreLockTest`を、同一core・fixture・JUnit依存bundleで実ホスト検証します。対象は2 JVMの交差待機、外部lock待ちのtoken取消、interruptのflag保持と後続取得の3条件です。取消の前に実取得threadのlock待機を観測し、所有actorの終了もassertします。production/API/cache形式とcore binaryは変更していません。
+
+Mac（Java21.0.9/aarch64/APFS）、Windows 11（Java21.0.9/amd64/NTFS）、Linux（Java21.0.12.1/amd64、固定Docker image・Colima/Rosetta、Linux tmpfs）の3条件すべてが成功しました。各ホストで期限故障を注入し、自身のJava childだけが回収され、期待exit124と残存0を確認しました。bundle hash改変・空inventory・未登録classpath・JUnit engine欠落・reap失敗記録・既存ZIP保護を含む合成7件、関連core JUnit58件が成功しています。3ホストの17ファイルのhashは一致し、Windowsの結果ZIPもSHA-256照合して取得しました。[数値記録](../qa/validation-2026-10-15-host-filelocks.json)には、SSH起動前のtimeoutと長いコマンドの拒否も検証開始前の失敗として残します。最新main 89a11bbとの統合snapshotでもJUnit97件・build/installDistが成功し、文書の3way競合は0でした。実測core 8b945は保持し、後続#73のcore 44898へ測定を付け替えません。lock依存7classのbytesは両coreで同一でした。Windows結果と統合差分の重点反証に確定した問題はありません。ネットワークfilesystem、任意OS、exportのatomic/crash復旧へ保証を広げません。
+
+bundleは既存Gradle環境で次のように準備します。出力先は新規directoryを指定してください。
+
+```sh
+gradle --offline --no-daemon -I scripts/qa/host-filelock-classpath.gradle \
+  -PqaHostClasspath=.local/host-classpath.json :core:hostFileLockClasspath :core:test
+python3 scripts/bundle-host-filelocks.py --classpath .local/host-classpath.json \
+  --core-jar core/build/libs/core-0.1.0-SNAPSHOT.jar \
+  --test-classes core/build/classes/java/test --out .local/host-filelock-bundle \
+  --javac "$JAVA_HOME/bin/javac"
+```
+
+Java21でbundleをcurrent directoryとし、`classes:lib/*`（Windowsは`classes;lib/*`）をclasspathへ指定します。`HostFileLockProbe`の引数は結果JSONの絶対パス、期限秒、`normal`または`deadline`、生成時に出力されたinventorySHA256の4つです。SHAは実行時bundleから再取得せず、準備時の信頼済み記録から渡します。`java.io.tmpdir`はbundle外の専用directoryへ指定し、結果の親directoryとtmpを事前作成してください。通常成功はexit0・3 tests成功・残存0、期限故障はexit124・DEADLINE・自身のchildを1件以上回収・残存0を要求します。bundleのclass/JAR hashも検査し、未完了や失敗を成功として記録しません。ゲーム資産と接続先をbundleや公開記録に含めません。
