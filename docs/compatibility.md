@@ -83,7 +83,7 @@ iconsのPNGへsRGB Perceptualの指定を追加しました。最終workerで1.2
 
 512pxの平面5種類の差は、比較計算がバニラのUV縮小を含めていなかったためでした。1.21.4の観測atlas寸法を入力にして公式UV式を計算すると、6サイズ×5種類の30ケースでRGB・alpha誤差0です。PNGや描画worker、許容誤差は変更していません。[UV比較の数値記録](../qa/validation-2026-10-11-inventory-uv.json)を参照してください。立体モデル全般・他版・別GPUの画質受入とは区別します。
 
-Issue #6の1.21.4描画backendはPR #17でmainへmergeされ、Issueはcloseされました。Issue #8では1.21.4・64pxの全1,384IDを別々のCLI・ゲームプロセスで個別生成し、全件出力とdecoded RGBA・パスの厳密一致を確認しました。初回の起動WORKER_TIMEOUT 1件を保存し、同条件の単独再実行を初回基準へ照合しています。[全ID比較の数値記録](../qa/validation-2026-10-11-single-all.json)は他版・他サイズの受入とは区別します。全版/全model・他OS/GPU等の品質と起動障害の受入はIssue #13で継続し、experimental/deterministic=falseを維持します。
+Issue #6の1.21.4描画backendはPR #17でmainへmergeされ、Issueはcloseされました。Issue #8では1.21.4・64pxの全1,384IDを別々のCLI・ゲームプロセスで個別生成し、全件出力とdecoded RGBA・パスの厳密一致を確認しました。初回の起動WORKER_TIMEOUT 1件を保存し、同条件の単独再実行を初回基準へ照合しています。後続#34では当時/現行のsolo cold・warmと当時2並列を計6起動し、専用診断QAを準備しましたが、元timeoutは未再現・原因未確定です。[診断条件と限界](validation.md#issue-34の起動診断採取とcoldwarm対照2026-10-14)を記録し、成功を原因解消と扱いません。2026-10-15の利用者承認で#34を診断整備の確定へ変更し、原因調査は#78へ分離しました。遅延観測24起動を含むゲーム対照47起動とlogger初期化だけの20対照も、原因特定とは区別します。#36で新たに発生した1.21.4 shield timeoutも診断付きsolo/2並列計17起動では未再現で、元#8と同じ原因とは断定していません。[全ID比較の数値記録](../qa/validation-2026-10-11-single-all.json)は他版・他サイズの受入とは区別します。全版/全model・他OS/GPU等の品質と起動障害の受入はIssue #13で継続し、experimental/deterministic=falseを維持します。
 
 Issue #10では1.13〜1.21.3の正式38版・64pxの全41,056PNGを現workerで監査しました。代表26種類を版ごとに別のCLI・ゲームプロセスで再生成した988PNGは、全件基準とdecoded RGBA・PNG hash・パス、入力/設定/context/環境/catalogが一致しました。GUI原点(0,0)の2背景1,976比較は最大誤差2/255以内、元JARから計算した無着色diamondの38比較はRGB・alpha誤差0です。これは各IDごとの独立起動や全状態の受入とは区別します。
 

@@ -297,7 +297,8 @@ PR #17をmergeしたmainの1c31978を起点とします。`verify-single-all.py`
 
 1.21.4・64pxの全1,384PNG監査と、1,384IDの独立個別CLIジョブを実行しました。初回は1,383IDが厳密一致し、netherite_ingotだけが描画前の起動応答180秒でWORKER_TIMEOUTとなりました。初回のexit 1・failed=1・allIdsVerified=falseを保存し、失敗を成功へ置き換えません。単独再実行では成功し、そのPNG・入力・設定・環境・catalogを初回の全件基準へ再照合しました。再実行側の全1,384PNGも初回基準と一致しました。両実行の成功IDの和集合が登録全1,384IDと一致することを確認し、数値記録の`acceptance.allIdsComparedSuccessfullyAcrossRuns=true`に保存します。画素差の許容は0で、柵の輪郭許容も使いません。
 
-初回の全件検証は2並列で25,665.659秒（約7時間8分）、再実行は1並列で49.397秒でした。起動タイムアウトの根本原因は未特定で、障害受入はIssue #13に残します。[全IDと再実行の数値記録](../qa/validation-2026-10-11-single-all.json)に各IDのhash・パス・初回の失敗・再照合結果を保存し、[代表8IDの開始時記録](../qa/validation-2026-10-11-single-all-pilot.json)も維持します。誤色、同一RGBAでのパス違い、入力/設定/環境/catalogの違い、複数entry、指定ID違い、PNGの差し替えを拒否する7件のQAテストとJUnit61件が成功しました。
+初回の全件検証は2並列で25,665.659秒（約7時間8分）、再実行は1並列で49.397秒でした。起動タイムアウトの根本原因は未特定で、障害受入はIssue #13に残します。後続Issue #34の診断採取と短期対照も下記のとおり未再現で、原因未確定を維持します。[全IDと再実行の数値記録](../qa/validation-2026-10-11-single-all.json)に各IDのhash・パス・初回の失敗・再照合結果を保存し、[代表8IDの開始時記録](../qa/validation-2026-10-11-single-all-pilot.json)も維持します。誤色、同一RGBAでのパス違い、入力/設定/環境/catalogの違い、複数entry、指定ID違い、PNGの差し替えを拒否する7件のQAテストとJUnit61件が成功しました。
+
 
 ```sh
 python3 scripts/test-single-all.py
@@ -309,7 +310,58 @@ python3 scripts/verify-single-all.py --version 1.21.4 --size 64 \
   --ids minecraft:netherite_ingot
 ```
 
+
 事前にCLIをbuildし、同じworktreeのcacheへ公式入力を準備してください。検証はofflineで実行し、途中結果は指定出力先の`report.json`へ原子的に保存します。画像・ゲーム入力・workerログは公開リポジトリへ含めません。2並列はこの検証に使った上限で、他環境の速度・メモリ保証ではありません。今回の受入は1.21.4・64px・ローカルDocker/Linux amd64/Mesaに限定し、全版・全サイズ・他OS/GPUの品質受入と区別します。experimental/deterministic=falseを維持します。実装・検証の完了と、PR公開・merge・Issue closeは別の段階です。
+
+### Issue #34の起動診断採取とcold/warm対照（2026-10-14）
+
+2026-10-15の利用者承認により、#34は診断整備と検証記録の確定を完成範囲とし、原因調査は[Issue #78](https://github.com/rs0325/MCIconGenerator/issues/78)へ分離しました。下記の未達・未再現は旧設計と各測定時点の履歴です。初期6＋shield17＋遅延観測24の計47ゲーム起動と、ゲームMain/GLを起動しないlogger初期化20対照を区別して保持します。診断整備の完了を原因特定・解消と扱わず、production・timeout・retry・API・保存形式を変更しません。
+
+当時保存したCLI/core/workerのhashと旧imageを確認し、最新main `7fdb40e9`上のQAで1.21.4・netherite_ingot・64pxを計6起動しました。専用cacheの初回ゲームをcold、同じcacheの後続の新ゲームprocessをwarmと呼びます。公式入力は準備済みで、OS pagecacheは消去していません。当時2並列の対照は、起動済みの共有専用cacheを使う短期2起動です。元の約7時間の連続系列や失敗時点のVM状態を再現するものではありません。
+
+| binary/image | 条件 | Docker runからreadyまで | 実CLI/worker終了 |
+| --- | --- | --- | --- |
+| 当時snapshot | solo cold / warm | 15.799 / 15.227秒 | 各0 |
+| 現行snapshot | solo cold / warm | 15.173 / 15.265秒 | 各0 |
+| 当時snapshot | 共有cacheのwarm・2並列 | 22.948 / 23.590秒 | 各0 |
+
+専用wrapperはstdout bytesをそのまま転送し、CLI→Docker PID→container→worker directoryの対応、最初のstdout・ready/protocolとwall/monotonic時刻をprivateに記録します。host JFRの例外採取、所有containerのevents/stats、起動前後のhost/game thread dumpを保存しました。保存済み6起動ではCLIの`--debug`は未有効で、原例外の採取はhost JFRによります。反証後、以後のdriverにグローバル`--debug`を追加し、当時/現行CLIのflag受付とoffline cache欠損エラーのstack保存をDocker未起動で確認しました。修正後driverのnative再試験は行わず、実行済みdriverのSHAと修正後SHAを数値記録で分けています。Main初期化からRender threadのclassloading・shader compile等への進行を観測しましたが、原初回の停止位置を示す証拠ではありません。2並列のreadyはsoloより遅い結果でしたが、180秒timeoutの原因と結び付けません。監視・JFR・wrapperの観測負荷は原初回にはありません。
+
+全6起動のPNG監査、worker exit 0・OOM/kill9イベント0、agent snapshot/一時icon回収を確認しました。当時warm/2並列は当時coldのPNG、現行warmは現行coldのPNGとdecoded RGBA・パスが厳密一致しました。原当時imageと現行imageの画質を相互受入する試験ではありません。初回coldのQAは、`docker inspect`のlowercase診断を大文字だけで照合したためFAILでした。実CLI/PNGは成功し、die 0/destroyと別途のno-such照会でcontainer解放を確認しています。初回reportを保持し、QAを修正した別出力のwarmを明示試験しました。成功への書換えやnative自動retryはありません。分割ready bytesの厳密転送、不正protocol/終了コード保持、JFRの原IOException/stack保持を合成検証しました。独立反証で、旧観測wrapperがJSON非object4種類とunpaired surrogateを含むrendererで転送を壊すことを確認し、元SHAのsourceで5条件FAILを保存しました。object以外をinvalid観測へ分類して転送を続け、private観測JSONをASCII escapeで保存する最小修正を行いました。続く反証では、SIGTERMを無視する所有childによってBrokenPipe後の無期限waitとevents終了待ちのtimeoutを合成再現し、初回FAILを保存しました。各箇所を期限付きwait→所有PIDだけのkill→期限付きwaitへ変更し、CLI強制終了後のwaitにも期限を付けました。修正後の合成7テストが成功しました。protocol.stdout/CLI stdoutの元bytesとDocker終了コードは維持します。保存6nativeの実行時wrapper SHAは保持し、保存した6起動の再実行はしていません。CLI buildが成功しました。
+
+#4のJava診断containerとの互換性のため、観測対象をdocker run・`mcicon-worker-`名・`/mcicon/worker.jar:ro` mountの3条件を満たすworkerだけに限定しました。非worker名、worker名だがJAR無し、JAR有だが非worker名、name無しの4合成条件で、stdin・binary stdout・stderr・終了コードが透明転送され、worker観測ファイルが作られないことを確認しました。旧分類の3条件FAILを保存し、通常workerのready/ownership観測を含む合成8テストが成功しました。互換修正単独の確認はこの時点では合成で行い、既存6trialと新shield17trialの実行時source SHAを保持します。同じ修正済wrapperによる後続24起動は、遅延観測を加えた別世代driverとして下記に記録します。
+
+原初回に強く対応するworker log候補は2,511 bytesで、Main初期化中のLog4j DNS診断を11:38:17 UTCに出力しています。CLI/containerの直接対応は未保存で、時刻と唯一の異常logによる候補です。同cacheの1,658ログに同じDNS警告があり、1,657ログにはStoppingがあります。DNS警告を原因とする根拠はありません。原初回の失敗瞬間のthread/CPU/memory/protocolは回収できず、**WORKER_TIMEOUTは未再現・根本原因未確定**です。当時の完成条件だった原因特定は未達で、現在は#78へ分離した未解決事項です。再試験成功を解消と扱いません。production・timeout・retryは変更せず、今回の起動失敗注入は未実施です。[条件・初回QA FAIL・入力/binary/診断artifact hash・数値](../qa/validation-2026-10-14-startup-diagnostics.json)を保存します。
+
+その後#36の1.21.4・shield単品で新しいWORKER_TIMEOUTが発生しました。CLI開始02:34:29.731900 UTCから02:37:30.504943 UTCまで180.773秒で、core `eec62d03`・worker `8b85e11a`のimmutable配布物でした。自然timeout後のcleanupを確認しましたが、失敗前のthread/CPU/memoryとgame raw stdoutは未採取です。2,511 bytesのworker logは02:34:35 UTCのMain/Log4j DNS診断で終わり、同じ警告は正常起動にもあるため原因と判断しません。元#8との原因同一性も未確認です。
+
+同じcandidateの公式入力だけを別の診断cacheへSHA確認copyし、旧worker directoryや実行データは混ぜませんでした。反証修正後のdriverでdebug/JFR/所有PID対応/自動thread dump/events/statsを採取したsolo 1起動はready 15.899秒で成功し、#36の20件目の診断成果として返しました。続く同じ共有cacheの2並列×各8warm、計16起動も全件成功しました。warm readyは21.045〜35.937秒、全17 CLI/workerはexit 0・OOM/kill9は0、所有container/snapshotを回収しました。17 PNGはold all・latest allの両基準とdecoded RGBA・パスが厳密一致しました。
+
+readonlyの実JAR SHA/javap照合では、このcandidateがMainへ到達する前にpremain設定・mapping・transformer・reader開始を通過する構成と確認しました。失敗logには`render-thread hook installed`がなく、同candidateの正常logはDatafixer→hook installed→Environmentの順です。stderrが継続して保存される前提で、クラス変換から初回hook以前を優先採取する根拠になりますが、ログ欠落だけで未到達とは断定しません。hook設置と`Bridge.frame`実行は別段階で、ready後のshield処理をstartup原因とする根拠もありません。
+
+既存自動QAの親/ゲーム`Thread.print`とraw stdout/stderr保存が最小の再発採取に対応します。必要時の追加候補は初回hook、loadFinished通過、renderer初期化完了の時刻です。この追記では追加計測の実装・実行は行わず、6/17起動の成功を原因解消と扱いません。
+
+新timeoutも未再現・原因未確定です。観測負荷とホスト実装/buildの並行があり、OS空負荷・元longseriesや失敗時の他job/VM状態の完全再現とは扱いません。productionのtimeout延長・fallback・retryは追加せず、初回失敗と先行した無観測再試験の成功を診断付き結果へ置き換えません。[新FAILの証拠hash・immutable入力・17起動の段階/数値/診断artifact hash](../qa/validation-2026-10-14-shield-startup.json)を、以前の6trialと別の記録に保存します。原因特定は旧完成条件では未達のままで、現在は#78で継続します。
+
+続く対照では`--delayed-observation`を追加し、host JFRと45秒以前のthread dumpを外しました。起動が長時間停止した場合だけ45/120/165秒のhost/game dumpを採ります。元のcore `eec62d03…`・worker `8b85e11a…`・image `c498eda7…`を維持し、別専用cacheの初回game各1回・後続各3回の8起動と、同じwarm cacheを2 workerで共有する16起動を実施しました。24起動とも正常PNG・基準RGBA/path一致・終了0・所有container/snapshot/一時PNGの回収を確認し、runからreadyは19.71〜24.40秒でした。最初の45秒より前に全起動が完了したため、game thread dumpは採られていません。wrapper・stats監視は残り、OS pagecache未消去、共有系列には別Issueのホストbuild/testが重なり得る条件です。ゲーム未起動cacheをcoldと呼び、公式HTTPS取得時間は含めません。追加の合成テストを含む9件が成功しました。[24起動の条件・数値・artifact hash](../qa/validation-2026-10-14-startup-delayed.json)は先の6/17起動と分けて保存し、これらの成功を原因解消とは扱いません。
+
+実clientの`hkl`はGameLoadTimesEventで、保存失敗logはlogger初期化中です。protocol readerの最初のstdin待機経路はMinecraft・hkl・Log4jを呼ばず、transformerのmapping参照も`Symbols.type`によるゲームクラスロードを行いません。readerとhklの間にagentが作る具体的なロック循環は確認できませんでした。これはJVMや他のゲームスレッドのdeadlock全体を否定する結果ではありません。再発時は実際の待ち先と保持スレッドを失敗前dumpで対応付けます。
+
+公式clientとlibrariesを使い、Minecraft Main・GL・core・readyを起動せず、`hkl`のclass初期化だけを隔離した対照も行いました。元workerを付けた10回とagent無し10回を最大2並列で実行し、全20回が1.78〜3.37秒で正常終了しました。同じhostname警告は全20回で出ているため、警告だけを停止原因とは判断できません。これはゲーム起動停止の再現や停止箇所の特定ではありません。最初のfixtureは署名済みclientと同じdefault packageによる証明書衝突で失敗し、fixtureだけを専用packageへ移した対照を別に保存しました。agent無しの警告はstdoutに出るため、stderrだけを見るdriverの観測値を採用せず、保存済み両streamで確認しました。元raw結果は保全し、再判定のためのnative再実行はしていません。[20回の条件・数値・入力と診断fixtureのhash](../qa/validation-2026-10-14-logger-init.json)を保存しています。
+
+診断整備の確定時には、最新main `96d09cc`との非Git統合snapshotでdocsの3way競合0、JUnit97件・build/installDist成功を確認しました。最新の`Diagnostics`が作る`mcicon-doctor-*`・`--entrypoint`付きJava診断runも、最終合成12テストと統合CLI doctorのfake Docker試験でstdin/stdout/stderr/終了codeを透明に扱い、worker観測ファイルを作らないことを確認しました。最終化で本物のDockerやゲームは起動していません。この統合buildのcore/workerは過去47起動・logger20対照の測定binaryと分け、元FAIL・診断source・測定世代のhashを保持します。原因解消は#78で未解決のままです。
+
+最終反証では、初期のimage inspectとJava version取得に期限がなく、monitor終了確認も不足する故障境界を修正しました。外部呼出しを15秒・10秒以内とし、失敗時は初期化FAILを保存します。monitorは停止通知を各呼出しの間で確認し、20秒のjoin後も生存していれば結果を読まずFAILにします。初期化停止と所有PID回収、進行中監視の終了待ち、join後生存による結果消費拒否を合成で確認しました。最初の0.2秒fixtureはPID証拠の作成前に切れたため、その試験FAILを保存してfixtureだけ2秒へ変更しています。このQA修正を過去47起動で実測したとは扱わず、統合buildと追加合成のsource hashを分けています。最終限定反証と、メイン担当による9ファイルhash・統合JUnit97件・最終QA sourceの独立照合も成功し、追加指摘はありません。#34の診断整備と検証記録の確定は完了し、原因調査は#78で未解決のまま継続します。
+
+専用cacheでの診断再実行例です。2並列対照は他nativeを終了し、専用2枠を確保してから実行してください。
+
+```sh
+python3 scripts/test-startup-diagnostics.py
+python3 scripts/verify-startup-diagnostics.py --cache .local/startup-cache --out .local/startup-diagnostics
+# 初期attach/JFRの観測負荷を減らす対照。既存outを再利用しない。
+python3 scripts/verify-startup-diagnostics.py --cache .local/delayed-cache --out .local/delayed-diagnostics --delayed-observation
+```
+
 
 ## Issue #10の旧38版adapterの受入（2026-10-12）
 
