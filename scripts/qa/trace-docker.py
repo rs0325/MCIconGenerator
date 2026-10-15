@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """QA専用Docker wrapper。stdout bytesを転送し、起動段階だけprivateに記録する。"""
 import json
+import hashlib
 import os
 from pathlib import Path
 import signal
+import shutil
 import subprocess
 import sys
 import time
@@ -22,6 +24,16 @@ def main():
         record['containerName']=name
         record['mounts']=mounts
         record['runDirectory']=str(snapshot.parent)
+        if agent := os.environ.get('MCICON_STARTUP_STAGE_AGENT'):
+            source=Path(agent).resolve(strict=True)
+            target=snapshot.parent/'startup-stage.jar'
+            shutil.copyfile(source,target)
+            previous='-javaagent:/mcicon/worker.jar='
+            indices=[i for i,value in enumerate(arguments) if value.startswith(previous)]
+            if len(indices)!=1:raise ValueError('旧worker agentの引数が一意ではありません')
+            record['originalArguments']=list(arguments)
+            arguments.insert(indices[0]+1,'-javaagent:/mcicon/cache/'+snapshot.parent.name+'/startup-stage.jar=/mcicon/cache/'+snapshot.parent.name+'/startup-stages.tsv')
+            record['stageAgentSha256']=hashlib.sha256(target.read_bytes()).hexdigest()
     destination=root/('docker-run.json' if run else 'docker-call-'+str(os.getpid())+'.json')
     def save():destination.write_text(json.dumps(record,ensure_ascii=True,indent=2)+'\n')
     save()

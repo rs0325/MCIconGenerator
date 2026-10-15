@@ -1,0 +1,199 @@
+{
+  "issue": 78,
+  "refs": [
+    34,
+    36
+  ],
+  "baseCommit": "4d0a83bedf476f7751ed3d4b32bda1a9602a0993",
+  "conclusion": "旧worker全体の境界記録QAを検証した。元180秒timeoutは未再現、停止段階・原因は未確定でIssue OPENを維持する。",
+  "productionChanged": false,
+  "historicalCauseResolved": false,
+  "startupTimeoutSeconds": 180,
+  "timeoutRetryFallbackChanged": false,
+  "identity": {
+    "coreSha256": "eec62d03a0f004e4d3d4963eba31b399ace8b030135651c1480f4c40a92db825",
+    "cliSha256": "008a6f0094502089161c07266ef16388670473694a18df5bffe399df0f2b24bc",
+    "workerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+    "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+    "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "effectiveHostJava": "openjdk version \"21.0.9\" 2025-10-21 LTS\nOpenJDK Runtime Environment Temurin-21.0.9+10 (build 21.0.9+10-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.9+10 (build 21.0.9+10-LTS, mixed mode, sharing)\n",
+    "referenceManifestSha256": "e0cd1eb4e11d976cef11f7509c6448e82fc6ff720e99e89c621ee65051de3919",
+    "referenceShieldPngSha256": "db2cb91e0d256e65da07b6ef3c5612cebe2106604af79a18ad4f2aaf4e36f7ef"
+  },
+  "scope": {
+    "host": "macOS 15.7.7 arm64、Python3.12.4、Java21.0.9+10、Colimaの固定Linux amd64 Mesa Docker",
+    "version": "1.21.4",
+    "id": "minecraft:shield",
+    "size": 64,
+    "context": "旧fixed-v1世代。v1.0/canonical-v1受入とは別。",
+    "order": [
+      "control",
+      "stage",
+      "stage",
+      "control"
+    ],
+    "parallelLanes": 2,
+    "separateCaches": true,
+    "conditions": "初回対照2件の起動済み専用cacheで、明示再検証8件を全warmとして実行。OS pagecacheは消去しない。",
+    "observations": "従来wrapper/events/statsと遅延45/120/165秒dumpを維持。記録条件だけ旧worker agentの直後にQA agentを追加。原本JARと元agent順は変更しない。",
+    "noNewLongTrial": true,
+    "inflightOuterSeconds": 420
+  },
+  "agent": {
+    "sha256": "1096fe818761ad82faed7b9315aeeb8ad7704bf813cd4467868b00af5f0d2270",
+    "javaRelease": 21,
+    "onlyTargets": [
+      "net.minecraft.client.main.Main.main(String[])",
+      "hkl.<clinit>"
+    ],
+    "hklOfficialClass": "net.minecraft.client.telemetry.events.GameLoadTimesEvent",
+    "mainRawSha256": "27c3d56033d024cfcb6ee541b0c67a8cf01e8cefc3a95eadac437d00a7f33c3e",
+    "mainAfterHistoricalWorkerSha256": "0f6cac210e06f12a82dcee3e3397012814a0ef984b5153989bff09a7f0a69065",
+    "hklRawAndAfterWorkerSha256": "83291f476b4ff65345b76cfd9bad2b3d1308827c9c9639d4f5ff4a643aa0009b",
+    "buildInputs": "旧client・mapping・worker・ASMをSHA固定。旧JARのSymbols/Canonical/Resourceを順に呼び、Bridgeやgameは起動せず、変換後bytesで境界/hash拒否を検査する。",
+    "recording": "premainでrecorderを準備し、固定stage名・System.nanoTime・thread IDを専用fileへflush。Minecraft/Log4jをrecorderから初期化しない。frame再計算を避けCOMPUTE_MAXSのみ使用。",
+    "transformFailureExitCode": 97,
+    "recordFailureExitCode": 98,
+    "stages": [
+      "agent.ready",
+      "main.entry",
+      "hkl.enter",
+      "hkl.exit",
+      "main.telemetry.ready",
+      "bootstrap.before",
+      "bootstrap.after",
+      "join.before",
+      "join.after",
+      "client.before",
+      "client.after"
+    ],
+    "semantics": "client.before/afterはMainのNEW flk直前〜constructor直後。class初期化と観測負荷を含み、readyや描画完了とは異なる。hkl.exitはclinitのRETURN直前。MainのGETSTATIC後でINSTANCE取得完了を別に記録する。",
+    "bootstrapBoundary": "Mainのakx.a()（server.Bootstrap.bootStrap）呼出し直前/直後。後続ClientBootstrap等を含む全初期化の区間ではない。"
+  },
+  "trial": {
+    "passed": true,
+    "games": 8,
+    "conditions": {
+      "control": 4,
+      "stage": 4
+    },
+    "warmGames": 8,
+    "stageRecords": 44,
+    "metadataFieldsCompared": 14,
+    "pngBytesEqual": 8,
+    "readySeconds": {
+      "control": {
+        "min": 20.045643959,
+        "median": 21.0653875625,
+        "max": 21.514311333
+      },
+      "stage": {
+        "min": 21.225776792,
+        "median": 21.688661187500003,
+        "max": 22.069534916
+      }
+    },
+    "stageIntervalsMillis": {
+      "hklMillis": {
+        "min": 655.71785,
+        "median": 698.228428,
+        "max": 735.612075
+      },
+      "bootstrapMillis": {
+        "min": 5569.100475,
+        "median": 5763.4755205,
+        "max": 6260.133205
+      },
+      "joinMillis": {
+        "min": 0.215959,
+        "median": 0.3327095,
+        "max": 0.936044
+      },
+      "clientMillis": {
+        "min": 2241.50002,
+        "median": 2505.659504,
+        "max": 2849.854262
+      }
+    },
+    "events": {
+      "create": 8,
+      "attach": 8,
+      "start": 8,
+      "die": 8,
+      "destroy": 8
+    },
+    "protocolMessages": {
+      "ready": 8,
+      "result": 24
+    },
+    "maxSampledConcurrentWorkers": 2,
+    "threadDumps": 0,
+    "hostnameWarnings": 8,
+    "changedInputs": [],
+    "allOwnedContainersRemoved": true,
+    "allRootGroupsReapedNormally": true,
+    "allProductWorkerSnapshotsAndTemporaryIconsRemoved": true,
+    "sourceEvidencePinsUnchanged": true,
+    "historicalCauseResolved": false,
+    "readySecondsBasis": "Docker wrapper startedMonotonicNs→stdout ready観測。180秒timerの厳密な開始点や純粋なMain初期化時間ではない。stage区間は同一guest JVMのnanoTime差で、host/guestの絶対時刻を比較しない。",
+    "wallSeconds": 97.847132
+  },
+  "invariants": {
+    "originalFilesPerLane": 518,
+    "references": 2,
+    "distributionSnapshotFiles": 62,
+    "changedFiles": 0,
+    "sourceAndEvidencePinsMatchedAfterRun": true,
+    "finalLiveOwnedProcesses": 0,
+    "finalWorkerContainers": 0
+  },
+  "checks": {
+    "agentBuildAndExactBoundaryCheck": true,
+    "unsupportedClassJvmExit97": true,
+    "wrapperAndDiagnosticTests": 14,
+    "stageTests": {
+      "methods": 2,
+      "metadataChangedOrMissingRejections": 28,
+      "invalidStageSequences": 6
+    },
+    "soakCleanupHelperTests": 4,
+    "junitAndProductBuildRerun": false,
+    "reason": "製品コード変更なし。凍結旧JARを実測し、QA用Javaのみ既存JDK21でbuildした。以前のJUnit98/v1.0検証を今回の再測定とは扱わない。"
+  },
+  "priorFailures": [
+    {
+      "generation": "run-abba-1",
+      "jobs": 4,
+      "controlPassed": 2,
+      "stageRejected": 2,
+      "reason": "第二agentの入力を公式raw Mainのhashと誤認。旧CanonicalTransformer通過後Mainは別hashのため拒否97。元timeoutの再発ではない。",
+      "automaticRetry": false,
+      "preserved": true,
+      "metadataGate": "初回driverのPASSに14field比較がない点を反証で検出。修正して別世代run-abba-2の必須gateで全件実測。"
+    },
+    {
+      "scope": "独立監査のみ",
+      "reason": "container cleanupの非run traceにもabsentを要求したassertを修正。名前のある所有対象のabsentと全traceのfailure/unexpectedRemainingを照合。製品/描画試験のFAILではない。"
+    }
+  ],
+  "limits": [
+    "今回4件ずつのready時刻は記述値で、agentの無影響や性能差を統計的に保証しない。",
+    "元ログのhostname警告stackはlogger初期化時のstackで、180秒の待ち先を示さない。今回8正常logにも警告がある。",
+    "遅延45秒以上はなくthread dumpは未採取。原初回の停止段階、Rosetta/JVM/資産共有/OSスケジューラ等の原因は証明できない。",
+    "全ID長時間系列、共有cache長時間対照、Windows/native amd64の追加実測は行っていない。"
+  ],
+  "evidenceSha256": {
+    "run-abba-1/report.json": "b2c96aa47fde72bba5da720c64ffcbb56fae734ca435769d78e53ee33a3b53ca",
+    "run-abba-2/report.json": "673e4f9acf4aa4e5e4a0949fef03039e46c93cbe5bea473d1aef9d1fe8fb6ac4",
+    "pre-run-2.json": "a0115c8433ba9021b64db555c2687998c49503844bf58d9ded9e8e4cc42d991c",
+    "independent-audit-2.json": "7df0b5b08fd325a5557914bbc712e7c3d4d8038560787053ceaad3a56fc9dfbb"
+  },
+  "harnessSourcesSha256": {
+    "scripts/verify-startup-stages.py": "21e6d911f09921cabb549763166ad50fa221bd4df62768dfd923b8bc7837e7c4",
+    "scripts/verify-startup-diagnostics.py": "8cb8265346bf0781d54f4cc83ef0e9cf904dd2373a4bda4271460622b331e0ec",
+    "scripts/verify-startup-soak.py": "3acd53c1dc5e74aa4e33df05b2b890d034e425c12d241234d63967da6710d68b",
+    "scripts/qa/trace-docker.py": "0e5f4a45b9331638cda29e03a5af4e8e18e2751e5fa0fd47ba1990c4907a3a51"
+  },
+  "agentBuildReportSha256": "ab6e620737a96c2c5de8704c2e6612d91bc6a7e57a3e238cd5c4d4a52450cde4",
+  "review": "実装/修正差分・初回FAIL保全・全8件のraw TSV/protocol/events/PNG/metadata/回収/pinと文書を独立反証し、確定指摘0。最終runtime0はrootの読み取り確認を再利用。"
+}
