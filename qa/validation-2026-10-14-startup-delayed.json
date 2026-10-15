@@ -1,0 +1,867 @@
+{
+  "issue": 34,
+  "date": "2026-10-14",
+  "conclusion": "観測負荷を減らした24起動も未再現。原timeoutの原因は未確定のまま#78で継続し、#34の診断整備とは区別する。",
+  "scope": "失敗時core/worker/imageを保持した対照。初期thread attachとhost JFRを外し、長時間停止時に45/120/165秒dumpを採る。",
+  "identity": {
+    "coreSha256": "eec62d03a0f004e4d3d4963eba31b399ace8b030135651c1480f4c40a92db825",
+    "workerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+    "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "harnessSourcesSha256": {
+      "scripts/verify-startup-diagnostics.py": "8494b4ee89dfbba30c1d0bd9f38a37ce9a24284c1de17fd0f1e0eb8be333e81a",
+      "scripts/qa/trace-docker.py": "467c08fa872bd81298de7861c755fbb333d8e53d2907ea79d07aff9f4ee82bc5"
+    }
+  },
+  "conditions": {
+    "nativeWorkers": 2,
+    "containerMemoryBytes": 3221225472,
+    "vmCpu": 4,
+    "vmMemoryBytes": 6197370880,
+    "dockerHostArch": "aarch64",
+    "colimaVmType": "vz",
+    "colimaConfiguredRosetta": true,
+    "gamePlatform": "linux/amd64",
+    "osPageCacheCleared": false,
+    "officialInputsPrepared": true,
+    "hostJfrEnabled": false,
+    "hostEmptyLoadGuaranteed": false,
+    "earlyThreadAttach": false,
+    "cacheConditions": "別専用cacheでcold各1/warm各3の8回、同warm cache共有2系列各8回の16回。coldはgame未起動cacheであり公式HTTPS取得を含まない。",
+    "otherActivity": "共有cache系列の期間には別Issueのホストbuild/testを許可。Docker nativeはこの2系列だけ。"
+  },
+  "trials": [
+    {
+      "series": "a",
+      "index": 0,
+      "cacheCondition": "cold",
+      "sharedCache": false,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 22.546982541,
+      "jobSeconds": 25.479,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "e0049477cc8494f1217866028b188e90a4b524c46570b1d7738dba7c2c7952b7",
+        "protocol.stdout": "557f151a158da63267c7e08a6a85fe32c299895e0f19ea7b4a6bd65bee5d3efb",
+        "worker.log": "e14f75b74d7de98affa265bef6257fd899fa4a668af57bf13108ced51005b268",
+        "samples.jsonl": "44abeded55fa451ba38ca427d1c0e797a1610fea556e8efa2eca49af79a9505c",
+        "events.jsonl": "0df63ef0b509511fc5b496306015f79e1ab2c35b60790868bfdb0d6f35fcf5c9",
+        "stdout.json": "f9f5e5b74cc3d10f925c3c7b0918e8a0b930360b615dbfbb69f75947f431d163",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "a",
+      "index": 1,
+      "cacheCondition": "warm",
+      "sharedCache": false,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 22.31832175,
+      "jobSeconds": 24.645,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "5b30c189b9278d4de343c11c999c1021decbba5bdd41f251a4c8aff9c3ab8746",
+        "protocol.stdout": "6d2cd8fc05c4921df023360950fa24c06108be4d910c6aa2dc5f70ed88b75595",
+        "worker.log": "4adf40986700cbc328fbc35c8dbfb269f6a24479f2bbadce59afa975ca534048",
+        "samples.jsonl": "81abfe0beabd1c8790f56dde4b68a734a72a6c65c459529ec7fa1a1f63d801aa",
+        "events.jsonl": "f45be45c4085ebe1d9273139d01a4e4f28d39079034de60ec8b6944be979efd6",
+        "stdout.json": "3ff8256b896a1832389ce0db9844adedba2544f93d3bc182ccc01390448d318b",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "a",
+      "index": 2,
+      "cacheCondition": "warm",
+      "sharedCache": false,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 22.605436417,
+      "jobSeconds": 25.1,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "d68ad8a8119511caf00eeaf1a8ff72b302ac93afd2b1fc8400b475adc2d201fc",
+        "protocol.stdout": "1e0e4fa9bc2e970acbb9c72c52d6ab84a1a182aef590a987a78dfacaae65788b",
+        "worker.log": "092fa3080f54cabb54d5ec68b05b856bafd565bb4123793a4f6d7b1f2df146eb",
+        "samples.jsonl": "812862dae6e14714b591cb6281429cdb00e0b0468ea7d7952a6e2346cddcf050",
+        "events.jsonl": "4e4c592528ce0f892fcdb90a5599f50002fc05839826db515426c8298aa89176",
+        "stdout.json": "ebf71250d555534126b3e7a8916eb874de3b39f9bdc38eabc83ad82cc4682be1",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "a",
+      "index": 3,
+      "cacheCondition": "warm",
+      "sharedCache": false,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 22.352415916,
+      "jobSeconds": 25.358,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "cef24ede19dc485d9b7c3eeefc2420ee8de2c0aa17584a3c15ad92b5bd056a1e",
+        "protocol.stdout": "5616ebce68304ffada5be77704e908f28a4819443d93ab09c12e2a3cf688252e",
+        "worker.log": "1f57fb2c2fd7abdce937bda4e78e654d600cce79db4c75059fbab5569d4ca44d",
+        "samples.jsonl": "8156a34e0e33c13e1714606f375686e123de8af5f0b47d8ee948847a98da76e1",
+        "events.jsonl": "92b3690d5b87e47ce981f7d04ebd73997867ea8246ac0f2ea1fc3961678e5e9a",
+        "stdout.json": "f2203b06206ebb02043461f3520be69715e0343ed2c496f75dbd1421a5df931f",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "b",
+      "index": 0,
+      "cacheCondition": "cold",
+      "sharedCache": false,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.105905542,
+      "jobSeconds": 26.159,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "97c14d5b441d64dd12e1823a895c0ffff3485d2b3e59d59af004011fc9762a19",
+        "protocol.stdout": "4f401ede6a9e9eed2f85bd96f7a264a8098a7091dff29a04ece1fcc4bd87b352",
+        "worker.log": "c429e546d3a8de889f06b3b065b7ef239d021b14619d8e2aa433a8041eab5fd6",
+        "samples.jsonl": "68fea22329f4b61216b5457ef419e2b7b47c16143ea688cbefa63673cc2b9461",
+        "events.jsonl": "291511e337bf58f43b2dccb7155bb099c8392a7b033a05e573c04cb00e78ad53",
+        "stdout.json": "f931a2669a9e4f72af53367a9f56e275eca1fdb20ec1f5f93edb59a1ef9524e3",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "b",
+      "index": 1,
+      "cacheCondition": "warm",
+      "sharedCache": false,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 22.859024834,
+      "jobSeconds": 25.777,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "9d10d18247319cdcdc4c8a3a2703f76cf2351fddd6b21ada6e677c750c43d3fa",
+        "protocol.stdout": "f95fe6aebbf278847fb278421adbe194e0d9b0639464926a456818bb7a2217d2",
+        "worker.log": "852225355476f3722bf38ddcd9762c5bf70da2b26d4c18f670742e06898be5a0",
+        "samples.jsonl": "c8d6a5a093c03d3b7f5241a1e36a7f8eef3a081f16f305ea33676f952415fc32",
+        "events.jsonl": "5c6506acd78c2e759ddd05db9ab7664548a34d66d400a8c92731610f4b50bfd3",
+        "stdout.json": "01a8ba0ea4f355cc419495d593a893c496877e0d3b063734d5d1fc90984ca526",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "b",
+      "index": 2,
+      "cacheCondition": "warm",
+      "sharedCache": false,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.181833541,
+      "jobSeconds": 25.655,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "18cc7d542b696559099067567b807643beb9b09eb08f054cdb1e1b0e5ab37688",
+        "protocol.stdout": "0dbd261b504942991657dc2879cb4c84859d360b6d07ea0b91334abc1112efaa",
+        "worker.log": "8da47dd3533776d549a8b97a30e086df4a70bd79ad8d87ee8578ac913690f2bb",
+        "samples.jsonl": "183b712cc0764589e117abe3b67a3d53fbddf72d5225ff1d14de23c8c8d2b020",
+        "events.jsonl": "4e4c592528ce0f892fcdb90a5599f50002fc05839826db515426c8298aa89176",
+        "stdout.json": "2de2375ddf7afb165c73fe2a9f6ed24b5f4a0ac96411c8b1e655de118a837578",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "b",
+      "index": 3,
+      "cacheCondition": "warm",
+      "sharedCache": false,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 22.632247209,
+      "jobSeconds": 25.103,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "9add9deba9195353a80afd77dee445f92d94c1263ada1a47889f7aa997fa71ba",
+        "protocol.stdout": "4d306d3c0ef00ffb9c510598914167ad4c47e19a03855560418a5043dbdbac6b",
+        "worker.log": "1d6c49865d33cfcadb5bc5c0626d593fd3979dcf114c41b8901bc38de4b3b93d",
+        "samples.jsonl": "dcdbfaaf2835a3b3430d953e3b4ae882324780ff16e028d4d5cc21745a17adf8",
+        "events.jsonl": "dd6e784920d651666907cfca5c297f890c55ac5b2ea8b35ad45c8138e8108769",
+        "stdout.json": "3db29d7f0bcffe39d9e49748d312918b7017eec9fc6c77378b76118f2cc23120",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "c",
+      "index": 0,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 20.310747125,
+      "jobSeconds": 23.746,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "706cbe615caa98ab34d652f7b6aba0e2f3b38a941759cd9647b6104aa9aa3082",
+        "protocol.stdout": "0f2ffad55fabf649887882eb54a7fe3891d5cde095145a0a366b7ebd76f9cca8",
+        "worker.log": "fba188730a87bcf29a5191d985b53253eab0a6a045a2a41ce23ba31dde9ad345",
+        "samples.jsonl": "c803846216eee2b02a139eb9aba069948ac82fd1dab079f85eb75b88d17a3ea6",
+        "events.jsonl": "1866f6f23ecf520e22e367c8ae08a9aab661d59effbdaaf8d5df6148f11acfc6",
+        "stdout.json": "be6e97e5770d8b2f4208a8d08a76489505408bf92cd400e7db36fda22fad3f0f",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "c",
+      "index": 1,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 21.545657791,
+      "jobSeconds": 23.863,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "259d4b1d21eba26278ed867ea25c929978932eb344658c064aef7d42e5605891",
+        "protocol.stdout": "0999bd062b3a352fc6454d6e2f716731c75fb760474bc17d546f8fb134237d7a",
+        "worker.log": "69555ccfe8332274be1737d232853eb778eb9b740044f40eec057b4891ba390d",
+        "samples.jsonl": "bbc06db36cb04e1e8a9a215975a0d6ed2d3d95aac8aea7f34e69f1817d53ee43",
+        "events.jsonl": "845b0876694445f8a2cf718d48ff7fc215dbe4eef63f323446a42587069c44d2",
+        "stdout.json": "3e349a22101cc0b0aa0c30651436264787b1c08ff6e4960b8461ed37caad57ef",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "c",
+      "index": 2,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.783095375,
+      "jobSeconds": 26.324,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "2b62eeff01520b0f6709670bc45835cd3a42121b4f788647cb15fe29cf1d3366",
+        "protocol.stdout": "31cafb37fc221e3cf30626e29036ec99888c85a4f7e888f2804a81c974b9963f",
+        "worker.log": "326e6d4c6263dde4e962a8b177e83470bc7d0195fb749b8a2f8dff70d08b0a2a",
+        "samples.jsonl": "2cf4b62a2906b8b8484c387c83b4076b72ad2dfe9136de36f7c12c84d1432e4f",
+        "events.jsonl": "d222f9c060b09af50b270747570fcf244758409738064dff401fc92cbfd3895d",
+        "stdout.json": "04dc2de4c53f806140bd5e21cf0065743f39846e207b31d3f480a12b632479e9",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "c",
+      "index": 3,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.697147916,
+      "jobSeconds": 26.285,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "8d2c784098f47323448b04e8cb759283eedf06b6728c2dd5ddce5a5886df7ee8",
+        "protocol.stdout": "f916590a9cb659e0d171bc5162295a9a49f14beaa829521ed993ce279937575e",
+        "worker.log": "a8687c5116574d6c45d887bc021608e4a6d12b24c688a36b7c433a955bc03c41",
+        "samples.jsonl": "8056c5719df4cc84629c3930729e2065d3fd0637fb8dabffbe9831c6cbf9b379",
+        "events.jsonl": "1e29a8686bc6634d5b2c902828807b689acaec5447d6a459f348b92ef1dde632",
+        "stdout.json": "1cde2e78fe379f807728707c4468333748696514f9030a926078baf233e86020",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "c",
+      "index": 4,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 22.847098042,
+      "jobSeconds": 25.27,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "2f27cf766caab9b0cbd77231195de2e3635dd3f33e26bb0f8e1588e1e47b2a93",
+        "protocol.stdout": "3c65e9a6f9085bf32e3c58d591f6fa78cfca1cf82c552048b2e41ac8a7306917",
+        "worker.log": "b288b7e39389d38724a7e9e840975d14a29f194d60180b5d36b838e6d8b21416",
+        "samples.jsonl": "80a4a2152c00c74e3576f6b4fa86910fee8c8c0008e378e4c4807f49e1adc8db",
+        "events.jsonl": "1bb4f8ca0315079b17075a5b19cc6a7c822f1f5a422eb4665806f93b8ac696ba",
+        "stdout.json": "123aae8d0aed3c58772fb96903bfefe500432dffeff1646bcc6e69cd1e89825d",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "c",
+      "index": 5,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 21.712835416,
+      "jobSeconds": 24.062,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "5ca47f633e37a4082ceb13b72d230578a3b7535b7158a3eb89c190a2cabdc18d",
+        "protocol.stdout": "07f0e3dae23d81248a416465b77755d07104cf4af645a50b3f88845f54c48dd6",
+        "worker.log": "9405ad9987dffe8bd552165ca2e6b36bdfe86bfcfefe444c32613289a66874a1",
+        "samples.jsonl": "3c6dd63db8aa55d2ea44cfa40e1b65245bac1d9c6ae8b80dbc5bbb8e1441c584",
+        "events.jsonl": "1c03d8a3dadafaa6737a7875064f3a225e800b80417e680b39cb27b8073c6a26",
+        "stdout.json": "7d7ea4b698f14ef3ba944dab0baa119c83e04f3ed0df50f584e38c7156843be7",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "c",
+      "index": 6,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.613940917,
+      "jobSeconds": 26.488,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "4f55f9627856b170c4b3b0ec274e25ca08d3ef2a47a15d7d0b1e5a2f6f754f90",
+        "protocol.stdout": "827f09c712c99ef1badfcee9489cbb5d557f5ceee4a8f2db167f9d9c0d6fe07b",
+        "worker.log": "18a4ca74597191cdb913ab294051a8908afbe6986cbe3d19928e7d950a38a92a",
+        "samples.jsonl": "9eb17d53002f8b1586f8f49289d617263c05f43957aeaaa340bc84fa1c300d6a",
+        "events.jsonl": "020f3492f910e4380d785ef453d2643fc6155b3976c1efc80d256f71a3e989d4",
+        "stdout.json": "1001455153702204689f4450f173f312860a0969f2a1d8fb788bd101db0bbd73",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "c",
+      "index": 7,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.799427417,
+      "jobSeconds": 26.221,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "dbebaa8b62f647af0a8ee489a82681b6795192949c55bd6a25834a5dbc3353c5",
+        "protocol.stdout": "0715df17c2c8d25f6d609e7775a66277df11116a1d3a720de284c5da6d5b2206",
+        "worker.log": "af120b23c4cb45a36e60bd1bb847c643080c8bd90e51176badb20c6a0627919a",
+        "samples.jsonl": "d969ad7e2cb17d54ee8ebbd92ed8965d532b786a5dd3789fbe06630a2beeab0a",
+        "events.jsonl": "33abeed6aee79defd64a55677a04789cf9176ee3ca2c673657e74e4470082119",
+        "stdout.json": "c2fd375802e93692400d5d4080277a8af1ac4126523b9cc117da55c1913eb999",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "d",
+      "index": 0,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 19.705986333,
+      "jobSeconds": 22.139,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "dcefa8eda68a29285a73e6e7d6a396819ccb7bee3f3db782201e3510724574ba",
+        "protocol.stdout": "900dbc51f1ceba5e572529118a6dd55041e7c4ba38ed1a70f4b9c20413aebc50",
+        "worker.log": "94604f3ea320dc7fd7acf17237793ed746868151a6196a374025129919a3e554",
+        "samples.jsonl": "9c85459af84e0b3e552270673edb71c579f0d6d6b895d2db904277ffaf47a6fb",
+        "events.jsonl": "a79b7e5714ad1b654b61cc0178bc76745284342c4fab9beed550de7ae1b29615",
+        "stdout.json": "8a8dedac86c860da9e177c39d3dd5707bfc4c381d4307a6a69063e447ba26401",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "d",
+      "index": 1,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 20.951631667,
+      "jobSeconds": 23.701,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "0ec54404fe53b1b9fe3904b81d2209ec8d5f8057e3e1d299104ab4d0b00b6328",
+        "protocol.stdout": "edf30391d4c5618ea30de0782186b2395789e2f716495a153f70c38ff01cd584",
+        "worker.log": "8a20142757250b404b55774efb4a50bef23ff25592645588f2ec5cb4d28065c5",
+        "samples.jsonl": "411db8e3258b2c13580a7298c109ccb0976d0650d6ca5640d58db9316ff736fd",
+        "events.jsonl": "845b0876694445f8a2cf718d48ff7fc215dbe4eef63f323446a42587069c44d2",
+        "stdout.json": "9ef91ec1fe72c644c343b590d9e81987d3d6dc67c720e627f9accc20e7e77836",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "d",
+      "index": 2,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.680844792,
+      "jobSeconds": 26.023,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "88f73dc7654bac7747c934117141b33cd931aaa60e0249605d01a167875f5ad7",
+        "protocol.stdout": "a5bb6e341aaa568f497f8445a2c9cdb84c83d18dbb9761a7675f73d106aaf68e",
+        "worker.log": "b4f77ac89a6b0e41755dc0395427a929f12d22c6e1de7bbf9902d9853241cf94",
+        "samples.jsonl": "d6fdc4631e099ba5288f28022653cda5bf1ec585a0d753e831eb3ad856ea0d5a",
+        "events.jsonl": "d222f9c060b09af50b270747570fcf244758409738064dff401fc92cbfd3895d",
+        "stdout.json": "94bb7c8f6377de73f1e5c62833b7df7bb786180a7640ac013c0e239f2d54dcfe",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "d",
+      "index": 3,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.6735395,
+      "jobSeconds": 26.254,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "d9de46cf02cbeb717e0d81462071a7906c72dbce028eb4db8f7ca42d37ed15b8",
+        "protocol.stdout": "a0eb60738da8abefaf672f62a92aa5614cb31dd3f7897fefab21f2d11a2e0b18",
+        "worker.log": "6f0995a9d81b7733717060d0ce3fe87eea291a145aae37eb9fd39fe46485f9df",
+        "samples.jsonl": "c42d22265b28e7f119bec1a786fb51c4be70b7c0f1aeb4e31e8a3188496394ed",
+        "events.jsonl": "1e29a8686bc6634d5b2c902828807b689acaec5447d6a459f348b92ef1dde632",
+        "stdout.json": "884d3e50e079d7ffef31364458f6f90a6f55c18245dd0fc4f944739f8d9b2273",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "d",
+      "index": 4,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 22.182468875,
+      "jobSeconds": 24.584,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "1028e3f1f53c7119128b12a19ec592248026123e0424bab4aaa77a41dd014938",
+        "protocol.stdout": "e515bea82125461452bb37b84a2a6ea5cb529c175a1f18c96e496285acf43b83",
+        "worker.log": "d5801a8bdbaae9003f5723524533e629176174aed9f6f1460c4db7c74ca1c0e6",
+        "samples.jsonl": "e4eee02557123ac858cde98a5de29f5e29ff2bac2a2228229b8a30857eb90d28",
+        "events.jsonl": "18697e7cfa0e49f521cdd63ea684c6f3a2b482b8850a182d8037ac333a1e2468",
+        "stdout.json": "7be38a87001374ad48170d618dd0d1cd83fde6b4c0e6138032578247de281e57",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "d",
+      "index": 5,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 21.957656375,
+      "jobSeconds": 24.403,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "189e0412ce9d8a25bc126520668909144872aa342ab251bc15d8ab322849af5b",
+        "protocol.stdout": "b71fef83e6940e7c493ddea2a29049592dad841d8b69e415746c7bc305b82115",
+        "worker.log": "6e16bbdd2e8f5383ec32c57378e3fb31ace273110249a35a3250b4448d986b5c",
+        "samples.jsonl": "8b1bc3fa7f1c8cb5c0afb77c51f203633d696afe95a37ddefbbbfce564a12208",
+        "events.jsonl": "4693eae60ce4fe3adca8bd7507d23f42a453787af39c6236126705bde126975e",
+        "stdout.json": "d6c0968af26edf267f592ec1b0e60cf038d47193a8d4710786e816fbabae6555",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "d",
+      "index": 6,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 23.709947666,
+      "jobSeconds": 26.181,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "a2008c458d44a05f38262d74c777be4c095dd7c298ccdb7873ca272c786e4050",
+        "protocol.stdout": "c5ea55eb9685130012b789779f9262b7d5ffab6bebdd5b7905ffb35ecc53e5f2",
+        "worker.log": "0246aacbb246c6cc2fc75e4ddefd1f5139d0397d9113492b696639f2af7eddfa",
+        "samples.jsonl": "97be599500fba2d63dce2721a029b2a1298e9b393c55a3fcb97d2202a7f20d0a",
+        "events.jsonl": "020f3492f910e4380d785ef453d2643fc6155b3976c1efc80d256f71a3e989d4",
+        "stdout.json": "22c9e5ecd5c22a48c29fd1854d46157ad7fde745b687777b637eb5c30c97c231",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    },
+    {
+      "series": "d",
+      "index": 7,
+      "cacheCondition": "warm",
+      "sharedCache": true,
+      "hostJfrEnabled": false,
+      "threadDumpSeconds": [
+        45,
+        120,
+        165
+      ],
+      "readySeconds": 24.403556125,
+      "jobSeconds": 27.282,
+      "cliExitCode": 0,
+      "maximumObservedWorkers": 2,
+      "passed": true,
+      "monitorErrors": [],
+      "cleanup": {
+        "ownedContainerRemoved": true,
+        "snapshotRemoved": true,
+        "temporaryIconsRemoved": true
+      },
+      "harnessSignal": null,
+      "diagnosticSha256": {
+        "docker-run.json": "59476c1be471497c3a452e95a9bf09e87a7fe4e3120895d54d72620b79093f3b",
+        "protocol.stdout": "61ed780b335f2f160c94071cc9de5ab612cc18591ed87663a38adca6ca9a0df6",
+        "worker.log": "8a8c5c29398241f46c4c9350b66743cc465bb5737c02b3cf5f863b46951016fd",
+        "samples.jsonl": "fc5bead2a8d5d356134ca104409390136a19e9453d55491e58b3f6a1706e056c",
+        "events.jsonl": "33abeed6aee79defd64a55677a04789cf9176ee3ca2c673657e74e4470082119",
+        "stdout.json": "7821f149c44263e6326ea0a33c16434ce48022e2fbf6976757722143c3ff1a6f",
+        "stderr.log": "b1dfec74bbdc9e627bcaff06efa274fe3e8921d5e70ca8dc238600e304a5d037"
+      },
+      "threadDumpsCaptured": []
+    }
+  ],
+  "passed": 24,
+  "failed": 0,
+  "productionTimeoutRetryChanged": false,
+  "historicalCauseResolved": false,
+  "lockAnalysis": "readerの最初のstdin待機経路はゲーム/Log4j/Reflective Symbols.typeを呼ばず、hkl初期化とのagent由来ロック循環を支持する具体経路なし。JVMや他スレッドのdeadlock全体を否定しない。",
+  "nextEvidence": "自然再発時の失敗前host/game thread、raw protocol、CPU/memoryを照合する。成功だけでは原因を確定しない。",
+  "scopeDisposition": {
+    "approvedDate": "2026-10-15",
+    "diagnosticIssue": 34,
+    "rootCauseIssue": 78,
+    "rootCauseResolved": false,
+    "purpose": "診断整備と検証記録の確定。原因特定は旧scopeで未達のまま#78へ分離し、測定時のFAIL・source・binaryを保持する。",
+    "recordSha256BeforeScopeSplit": "7796aaa58e3f3445f82feab5a746ca98abe718cab1f3590b61c4e3ea36f572eb",
+    "diagnosticCompleted": true
+  },
+  "historicalConclusionBeforeScopeSplit": "観測負荷を減らした24起動も未再現。原timeoutの原因未確定、完成条件未達。"
+}
