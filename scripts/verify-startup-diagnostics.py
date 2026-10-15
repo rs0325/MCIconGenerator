@@ -77,7 +77,9 @@ def main():
     p.add_argument('--cli',type=Path,default=repo/'cli/build/install/mcicon/bin/mcicon')
     p.add_argument('--compare',type=Path,help='別出力の同binary/image正常基準manifest')
     p.add_argument('--stage-agent',type=Path,help='旧1.21.4専用のQA境界記録agent（追加の観測条件）')
+    p.add_argument('--datafixer-gate-agent',type=Path,help='最適化taskを明示解除まで保留する旧1.21.4専用QA agent')
     a=p.parse_args();out=a.out.resolve();cache=a.cache.resolve();out.mkdir(parents=True,exist_ok=False)
+    if a.datafixer_gate_agent and not a.stage_agent:p.error('gateの制御には--stage-agentが必要です')
     if a.runs<1:p.error('--runs は1以上です')
     used=bool(list(cache.glob('worker-*')))
     if used!=a.warm_cache:p.error('初回はゲーム未起動cache、--warm-cache では起動済み専用cacheを指定してください')
@@ -104,7 +106,9 @@ def main():
         folder=out/str(index);folder.mkdir();start=time.monotonic();start_wall=time.time_ns()
         env=dict(os.environ,PATH=str(private)+os.pathsep+os.environ['PATH'],MCICON_REAL_DOCKER=real_docker,MCICON_STARTUP_TRACE=str(folder))
         env.pop('MCICON_STARTUP_STAGE_AGENT',None)
+        env.pop('MCICON_STARTUP_DATAFIXER_GATE',None)
         if a.stage_agent:env['MCICON_STARTUP_STAGE_AGENT']=str(a.stage_agent.resolve(strict=True))
+        if a.datafixer_gate_agent:env['MCICON_STARTUP_DATAFIXER_GATE']=str(a.datafixer_gate_agent.resolve(strict=True))
         recording='-XX:StartFlightRecording=filename='+str(folder/'host.jfr')+',settings='+str(settings)+',dumponexit=true -Xlog:jfr+startup=off'
         if not a.delayed_observation:env['JAVA_OPTS']=os.environ.get('JAVA_OPTS','')+' '+recording
         command=[str(distribution/'bin/mcicon'),'--debug','render','--version',a.version,'--size','64','--allow-experimental','--offline','--cache',str(cache),'--out',str(folder/'output'),'--worker-jar',str(distribution/'worker/worker-agent.jar'),'--docker-context',a.docker_context,'--docker-image',a.docker_image,'--json','--id',a.id]

@@ -1,0 +1,238 @@
+{
+  "issue": 78,
+  "baseCommit": "a4b1f1d9571acf67b7d4149159ebea48b19be8a0",
+  "conclusion": "最適化先頭taskを保留してもMainはjoin直前まで進む。解除後の描画は旧基準と一致。元timeoutは未再現、原因未確定でOPEN維持。",
+  "productionChanged": false,
+  "historicalCauseResolved": false,
+  "startupTimeoutSeconds": 180,
+  "timeoutRetryFallbackChanged": false,
+  "identity": {
+    "coreSha256": "eec62d03a0f004e4d3d4963eba31b399ace8b030135651c1480f4c40a92db825",
+    "cliSha256": "008a6f0094502089161c07266ef16388670473694a18df5bffe399df0f2b24bc",
+    "workerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+    "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+    "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "effectiveHostJava": "openjdk version \"21.0.9\" 2025-10-21 LTS\nOpenJDK Runtime Environment Temurin-21.0.9+10 (build 21.0.9+10-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.9+10 (build 21.0.9+10-LTS, mixed mode, sharing)\n",
+    "referenceManifestSha256": "e0cd1eb4e11d976cef11f7509c6448e82fc6ff720e99e89c621ee65051de3919",
+    "referenceShieldPngSha256": "db2cb91e0d256e65da07b6ef3c5612cebe2106604af79a18ad4f2aaf4e36f7ef"
+  },
+  "scope": {
+    "host": "macOS 15.7.7 arm64、Python3.12.4、Java21.0.9+10、Colimaの固定Linux amd64 Mesa Docker",
+    "version": "1.21.4",
+    "id": "minecraft:shield",
+    "size": 64,
+    "context": "旧fixed-v1世代。v1.0 canonical-v1の再受入とは別。",
+    "order": [
+      "control",
+      "gated"
+    ],
+    "nativeGameConcurrency": 1,
+    "conditions": "専用cacheでcontrol cold→gated warm。OS pagecache消去なし。時刻を性能対照として比較しない。",
+    "outerSeconds": 420,
+    "noNewLongTrial": true
+  },
+  "gate": {
+    "class": "bao (DataFixers)",
+    "inputClassSha256": "909a5e42f9ae15a8adbd5a219ba67a6498227d41354df62449f7ccdea5290468",
+    "method": "a(Set):CompletableFuture内のResult.optimize(Set,Executor)直前",
+    "control": "元executorを維持し、先頭taskだけrelease fileまで保留。初期化/前処理は同じJVMで実行。",
+    "maximumSecondsSincePremain": 45,
+    "expiryOrInterruptExitCode": 99,
+    "transformFailureExitCode": 97,
+    "recordFailureExitCode": 98,
+    "agentOrder": [
+      "旧worker",
+      "stage",
+      "gate"
+    ],
+    "agentSha256": "79621b919ef54d9195e3fda34099c7ed615cdc4397fbb2a6ded89ee2fbd0d03b",
+    "stageAgentSha256": "77d8913a0efc8c79c033eab33907e6449d0718bbfeda275a7db54a6d38c16a4b",
+    "buildReportSha256": "4d2811e594b7dd48e2e7ba13c08d0aa02f519a7e26f8a656ff66f0d51689ca03",
+    "observation": "dump要求時とdump後snapshotを区別。最終到達順は同一guest JVMのjoin.beforeとgate.released nanoTime。host/guest絶対値は比較しない。"
+  },
+  "trial": {
+    "passed": true,
+    "scope": "driver判定とは別にraw TSV/protocol/events/manifest/PNG/入力/hash/dump/回収記録を照合",
+    "jobs": [
+      {
+        "condition": "control",
+        "cacheCondition": "cold",
+        "passed": true,
+        "metadataFieldsCompared": 14,
+        "pngBytesEqual": true,
+        "stages": 11,
+        "readySeconds": 16.33323025,
+        "hostnameWarning": true
+      },
+      {
+        "condition": "gated",
+        "cacheCondition": "warm",
+        "passed": true,
+        "metadataFieldsCompared": 14,
+        "pngBytesEqual": true,
+        "stages": 11,
+        "readySeconds": 16.640330667,
+        "hostnameWarning": true
+      }
+    ],
+    "eventCounts": {
+      "create": 2,
+      "attach": 2,
+      "start": 2,
+      "die": 2,
+      "destroy": 2,
+      "exec_create: /opt/java/java21/bin/jcmd 1 Thread.print": 1,
+      "exec_start: /opt/java/java21/bin/jcmd 1 Thread.print": 1,
+      "exec_die": 1
+    },
+    "protocolMessageCounts": {
+      "ready": 2,
+      "result": 6
+    },
+    "gateHoldMillis": 5060.328457,
+    "joinReachedAfterGateWaitMillis": 4316.189964,
+    "joinHeldBeforeReleaseMillis": 744.138493,
+    "postReleaseJoinMillis": 288.936327,
+    "fixedFiles": 582,
+    "changedInputs": [],
+    "changedPreRunSourcesAndArtifacts": [],
+    "hardwareComponentExitCode": 0,
+    "hardwareHarnessOriginalPassed": false,
+    "hardwareContainerAbsentBySeparateAudit": true,
+    "hardwareProcessCommands": [
+      "/sbin/ldconfig -p",
+      "uname -o"
+    ],
+    "historicalCauseResolved": false,
+    "auditCorrection": "初回のhostname警告検索literalが異なりfalseと記録。実logのCould not determine local host nameで両件trueを別監査へ訂正。元監査は保持。"
+  },
+  "checks": {
+    "agentBuildAndHistoricalTransform": true,
+    "normalRelease": true,
+    "expiryExitCode": 99,
+    "lateReleaseExitCode": 99,
+    "unsupportedClassJvmExitCode": 97,
+    "wrapperAndDiagnosticTestMethods": 15,
+    "controllerTestCases": 4,
+    "reviewBeforeNative": "観測race・失敗時保存・期限後解除を修正して限定反証PASS。",
+    "junitAndProductBuildRerun": false,
+    "reason": "製品変更なし。凍結旧JARを実測し、QA JavaだけJDK21でbuild。",
+    "controllerTestMethods": 2,
+    "controllerTestLogSha256": "5564f9d6618cd5878d49b5408c4c68d52f44b15d26aab92f5c40c6d8f4422a63",
+    "failureEvidenceFixture": "game FAILとcleanup例外を同時注入し、observer snapshot/期限TSVの保存と総合FAILを確認。"
+  },
+  "invariants": {
+    "cacheInputFiles": 518,
+    "referenceFiles": 2,
+    "distributionFiles": 62,
+    "changedFiles": 0,
+    "allGroupsReapedNormally": true,
+    "allOwnedGameContainersRemoved": true,
+    "allWorkerSnapshotsAndTemporaryIconsRemoved": true
+  },
+  "staticFindings": [
+    {
+      "status": "対象経路を除外",
+      "finding": "公式1.21.4 metadataにlib.natives指定0件。RuntimePreparerが共有hostディレクトリへnative JARを展開する経路は走らず、対象nativesディレクトリは空。JAR内部native展開一般は除外しない。"
+    },
+    {
+      "status": "未確定の候補",
+      "finding": "OSHI ExecutingCommandのrunNative/getProcessOutputにはreadLine/waitForの無期限待機がある。通常preload中のmain停止だけではDatafixer完了INFO欠落まで説明できない。Main例外からCrashReport/SystemReportへ入る二次停止の経路もあるが、原FAILでの発生は未証明。"
+    }
+  ],
+  "hardwareProbe": {
+    "scope": "OSHI component。Main/CrashReportの実起動とは区別し、JFRは開始に成功した子processだけを観測する。",
+    "logging": "SLF4J providerなし。元ゲームのLog4j・全SystemReport処理・Main実行の再現ではない。",
+    "componentExitCode": 0,
+    "phases": [
+      "hardware.before",
+      "processor.before",
+      "processor.after",
+      "graphics.after",
+      "memory.after"
+    ],
+    "successfulChildStarts": [
+      "/sbin/ldconfig -p",
+      "uname -o"
+    ],
+    "oshiCallerConfirmedFor": "uname -o",
+    "elapsedHardwareMillis": 371.547562,
+    "inputsSha256": {
+      "com/github/oshi/oshi-core/6.6.5/oshi-core-6.6.5.jar": "ec2afad57aca1d362c3b313c258aa9f66b517a28c60162a70d5fab3ae1659288",
+      "net/java/dev/jna/jna/5.15.0/jna-5.15.0.jar": "a564158d28ab5127fc6a958028ed54279fe0999662c46425b6a3b09a2a52094d",
+      "net/java/dev/jna/jna-platform/5.15.0/jna-platform-5.15.0.jar": "18b7f6e7d34ce89309a6d9052ae1a987e8e64057e2f683e01e50f2f2b59cd153",
+      "org/slf4j/slf4j-api/2.0.16/slf4j-api-2.0.16.jar": "a12578dde1ba00bd9b816d388a0b879928d00bab3c83c240f7013bf4196c579a"
+    },
+    "sourceSha256": "cdc0ea73bdb72d2c11d29c91bfbf55b295c2ac8caf50bd04a2d0c98d4fba029f",
+    "classSha256": "840659ee266ca3275412254f635ae13be26e6da5a51dc0a0c74cf7c8fb8f117a",
+    "harnessOriginalPassed": false,
+    "harnessFailure": "Docker error: no such objectを大文字No such objectで検査したprivate監督の不在判定がFAIL。原reportは保持。",
+    "separateAudit": "inspect exit1/no such objectと正確な名前filterのps -a exit0/空で、不在を別記録確認。元FAILをPASSへ書換えていない。",
+    "limits": "JFR ProcessStartは成功した開始だけ。exec自体の未復帰・開始失敗の全呼出し・待機原因を証明しない。"
+  },
+  "priorFailures": [
+    {
+      "generation": "gate-build-3",
+      "reason": "workerの引数を存在しないlib配下へ誤指定。gameなし・build起動拒否。correct pathのbuild4は別世代。",
+      "preserved": true
+    },
+    {
+      "generation": "run-control-gate-1.log",
+      "reason": "明示PATHにPythonの場所を含めずexit127。game/driverは起動しなかった。環境PATHを保持したrun-control-gate-2へ手動修正。",
+      "automaticRetry": false,
+      "preserved": true
+    },
+    {
+      "generation": "independent-audit.json",
+      "reason": "初回のhostname警告検索literalが異なりfalseと記録。実logのCould not determine local host nameで両件trueを別監査へ訂正。元監査は保持。",
+      "preserved": true
+    }
+  ],
+  "limits": [
+    "先頭taskを実行前に保留する試験で、途中実行中のType.rewrite pending cache競合や全てのDFU循環を除外しない。",
+    "正常2起動/制御dump1件から原失敗の原因や頻度を断定しない。",
+    "OSHI componentはコマンド開始を確認しただけで、原失敗の待ち先や二次停止を証明しない。",
+    "元FAIL、長時間系列、過去QAを保持。Windows・別GPU・共有cache追加長時間試験なし。"
+  ],
+  "harnessSourcesSha256": {
+    "scripts/verify-datafixer-dependency.py": "36f09793a774a34a8f2c9fb09270c15008bc3f324227d31c8733b0f14e25aab4",
+    "scripts/test-datafixer-dependency.py": "3f9e62bfc07fa52c8bb66a191ad10944f54ae7b3db8a80145de5cad63d87cfca",
+    "scripts/qa/HardwareProcessProbe.java": "cdc0ea73bdb72d2c11d29c91bfbf55b295c2ac8caf50bd04a2d0c98d4fba029f",
+    "scripts/qa/datafixer-gate/DatafixerGateAgent.java": "3cbc649d9ae0a030e6e07320da39ee00ed84e6164928453a1a295bb9f9177200",
+    "scripts/qa/datafixer-gate/DatafixerGateCheck.java": "27fceb13a46a90327c069ee83a13f8e0c5fc117e3d2950eaada8d8e37e5b9c40",
+    "scripts/qa/datafixer-gate/build.py": "a645e0bf4cbbf26bf2f67afc22775a13b89e42d67ebd26a0e9d264d6f121d973",
+    "scripts/qa/startup-stage/StartupStageCheck.java": "2ce458bd8a84c2278f8c393e3b3dd25f9f640dc0550a5e8332945d233b89f339",
+    "scripts/qa/trace-docker.py": "a72c99dc80941efc784ee77ba81241fe2226bd67734f0ee2544bddd12a6ed975",
+    "scripts/verify-startup-diagnostics.py": "f6c99c1ab49b66ba2229f758259862ce204e9304fd524d8d1455b698b0d7d7bd",
+    "scripts/test-startup-diagnostics.py": "a76fd58206088dfc0e5beb992cd6e0d2c7411676be593cace71cffdaa7a58c64"
+  },
+  "evidenceSha256": {
+    "run-control-gate-2/report.json": "80899d2b53beb50157f80ac48ea050884946c0dc4f0bdf0dadf11db52ca80d60",
+    "pre-run-freeze.json": "30205f0794dbd8e7df3fb2c98943b4eda32125302f7bf62d752de796cfce2e03",
+    "input-freeze.json": "fbd83336d2aa9e42d3e69c2613cd087877c0202f46f23b5b3eb39dc325ef7c94",
+    "independent-audit.json": "bab55788b658e1620a991e66222e991af18fdf08ae5fc99ce29c2480face1122",
+    "independent-audit-2.json": "662635a6c831f4e2a1f98c97f078a489ab7032c1077bef0b17b50512a20492bd",
+    "hardware-probe/pre-run.json": "6f42d5849a594fb80e30926526693b6db1ad5b2047aafdaedbc6b57fe1f3f038",
+    "hardware-probe/report.json": "393764f329d85e7548f0dfff29b49fe3c1e428fddde347dc127a61ffe0ec63cf",
+    "hardware-probe/post-run-container-audit.json": "c329da6e333cacb9501f5ed65dc723a754195f684f052b538573d6aef8344a32",
+    "hardware-probe/processes.jfr": "3dae17e1fc53e8d42660509e8d7ae20ef3c8aab9bd6a60dced71db65d249771e",
+    "hardware-probe/processes.json": "5a6c907b0a3e5ca837b827a1f77471b9be38a8f2b2885818608e60b307e630e7",
+    "hardware-probe/phases.tsv": "6db4c5b0d33f4aec8c58f747a711a7920aabb5f028066c62e8663e5f66635f2e",
+    "hardware-probe/run.py": "84152da964731be82cd1a154bcc48d037387374ac7d5185a8ddeeee22b522df6",
+    "run-control-gate-2/control/report.json": "5b3c0372a10e8dc58800c87f88ac665fab49ebe7f393967c683e9175e000964f",
+    "run-control-gate-2/control/0/docker-run.json": "2e674c6808246c518e4b3121d07dbd17e2151ef336e91ec9690c659d760eff49",
+    "run-control-gate-2/control/0/startup-stages.tsv": "203cbe138b7fb6d27afbe0a1546ae4052cfa8b6c7de35ea7e31e20869fe34605",
+    "run-control-gate-2/control/0/protocol.stdout": "b50433d491ff243487ebba7cc40a36743e7eb4ab3510a6f3a613bd8b5836d943",
+    "run-control-gate-2/control/0/events.jsonl": "0ac64a6bd0f8441c2a0ef5ed0705f6e846a2d5df7c0164ca758dce0660fd11c7",
+    "run-control-gate-2/control/0/worker.log": "89383341d719b09c075aef57e4681be85bf414380fd673ce3e6847d853f46649",
+    "run-control-gate-2/gated/report.json": "e519e5d54fc25b1a8afcacacc0e26b13f7eb04bcc85493afc269fd89e1a615c3",
+    "run-control-gate-2/gated/0/docker-run.json": "c4d6a9b6059a3e06ba310d46c32ebf5097e3d6ec5d37bb5504289d8a803763c6",
+    "run-control-gate-2/gated/0/startup-stages.tsv": "99d4723864d9d5bb7ee11b56d15522460ce2b927731febf8d49addb7b00f3022",
+    "run-control-gate-2/gated/0/protocol.stdout": "f24058ed4bfe86cbb1c2acc622aca6f0a882d29cdd267dfc0ad601e356f96080",
+    "run-control-gate-2/gated/0/events.jsonl": "1de53a2e636c27675ca3c38a88e38fb5a46476b1e28eec223c5caa5b97f00a6a",
+    "run-control-gate-2/gated/0/worker.log": "f5cfe41a475ad6f97f3ca2e0c71adabc6658eca4edf7758294e6486996bc99cc",
+    "run-control-gate-2/gated/datafixer-gate.tsv": "7e7de7e9f7412e80992c140be178e075e87b18bc40a1c3b821c1d756e972d7ea",
+    "run-control-gate-2/gated/gate-held-threads.log": "37725673972913a609e5d984d2cacb2d297b278b1b2b3ed551d9800f6cdb10cb"
+  },
+  "review": "最終限定反証PASS・確定指摘0。raw TSV/dump/protocol/events/PNG/14metadata/旧世代/回収/26evidence・10source pin/582固定file、故障保存fixtureと文書を独立照合。OSHI component exit0と監督FAIL・別監査を区別した。"
+}

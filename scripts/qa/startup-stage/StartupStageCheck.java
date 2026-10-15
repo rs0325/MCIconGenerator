@@ -14,23 +14,28 @@ import org.objectweb.asm.Opcodes;
 
 /** 変換が旧公式classの指定methodだけに境界を追加することを確認する。 */
 public final class StartupStageCheck {
+    static byte[] historicalInput(String name, byte[] original, Path mappings) throws Exception {
+        Class<?> symbolsType = Class.forName("io.github.rs0325.mcicon.worker.Symbols");
+        Object symbols = symbolsType.getConstructor(Path.class).newInstance(mappings);
+        for (String type : List.of("CanonicalTransformer", "ResourceTransformer")) {
+            Class<?> transformer = Class.forName("io.github.rs0325.mcicon.worker." + type);
+            var constructor = transformer.getDeclaredConstructor(symbolsType, boolean.class);
+            constructor.setAccessible(true);
+            var transform = transformer.getDeclaredMethod("transformGameClass", String.class, byte[].class);
+            transform.setAccessible(true);
+            byte[] result = (byte[]) transform.invoke(constructor.newInstance(symbols, false), name, original);
+            if (result != null) original = result;
+        }
+        return original;
+    }
+
     public static void main(String[] args) throws Exception {
         try (JarFile jar = new JarFile(args[0])) {
             for (String name : List.of("net/minecraft/client/main/Main", "hkl")) {
                 byte[] original = jar.getInputStream(jar.getJarEntry(name + ".class")).readAllBytes();
                 String rawHash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(original));
                 // 第二agentに届くのは、原本ではなく旧workerの変換を通過したbytes。
-                Class<?> symbolsType = Class.forName("io.github.rs0325.mcicon.worker.Symbols");
-                Object symbols = symbolsType.getConstructor(Path.class).newInstance(Path.of(args[2]));
-                for (String type : List.of("CanonicalTransformer", "ResourceTransformer")) {
-                    Class<?> transformer = Class.forName("io.github.rs0325.mcicon.worker." + type);
-                    var constructor = transformer.getDeclaredConstructor(symbolsType, boolean.class);
-                    constructor.setAccessible(true);
-                    var transform = transformer.getDeclaredMethod("transformGameClass", String.class, byte[].class);
-                    transform.setAccessible(true);
-                    byte[] result = (byte[]) transform.invoke(constructor.newInstance(symbols, false), name, original);
-                    if (result != null) original = result;
-                }
+                original = historicalInput(name, original, Path.of(args[2]));
                 byte[] transformed = StartupStageAgent.instrument(name, original);
                 System.out.println(name + " raw=" + rawHash + " worker=" + HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(original)));
                 List<String> stages = new ArrayList<>();
