@@ -21,7 +21,7 @@ public final class ExportExample {
                     Path.of(args[1]), false, false)).join();
             var icons = generator.render(new RenderRequest("1.20.6",
                     List.of(ResourceId.parse("stone"), ResourceId.parse("player_head")),
-                    false, "all", 64, Path.of(args[1]), false, false, true), worker).join();
+                    false, "all", 64, Path.of(args[1]), false, false, false), worker).join();
             if (!raw.complete() || !icons.complete()) {
                 throw new IllegalStateException("取得に失敗しました。manifestの診断を確認してください");
             }

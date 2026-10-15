@@ -15,7 +15,7 @@ class WorkerContractTest(unittest.TestCase):
         schema=json.loads((repo/'schemas/worker-v1.schema.json').read_text())
         Draft202012Validator.check_schema(schema)
         validator=Draft202012Validator(schema)
-        examples=json.loads((repo/'qa/validation-2026-10-14-worker-contract.json').read_text())
+        examples=json.loads((repo/'schemas/worker-v1.examples.json').read_text())
         for message in examples['accepted']:
             with self.subTest(message=message):self.assertTrue(validator.is_valid(message))
         for message in examples['rejected']:
@@ -38,13 +38,13 @@ if 'inspect' in sys.argv:print('sha256:'+'0'*64)
 elif 'run' in sys.argv and '--entrypoint' in sys.argv:print('openjdk version \"21.0.9\"')
 elif 'run' in sys.argv:
  case=os.environ['MCICON_PROTOCOL_CASE']
- hello={'type':'ready','protocolVersion':1,'animationFrameZero':True,'contextProfile':'fixed-v1','renderer':'synthetic'}
+ hello={'type':'ready','protocolVersion':1,'animationFrameZero':True,'contextProfile':'canonical-v1','renderer':'synthetic'}
  if case=='protocol-decimal':hello['protocolVersion']=1.0
  if case=='protocol-version':hello['protocolVersion']=2
  if case=='protocol-string':hello['protocolVersion']='1'
  if case=='protocol-fraction':hello['protocolVersion']=1.5
  if case=='ready-type':hello['type']='result'
- if case=='context':hello['contextProfile']='canonical-v1'
+ if case=='context':hello['contextProfile']='fixed-v1'
  if case=='animation':hello['animationFrameZero']=False
  if case=='animation-string':hello['animationFrameZero']='true'
  print(json.dumps(hello),flush=True)

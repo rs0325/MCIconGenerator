@@ -23,7 +23,7 @@ with Path(os.environ['MCICON_MEMORY_CACHE'],'docker.jsonl').open('a') as log:log
 if 'inspect' in sys.argv:print('sha256:'+'0'*64)
 elif 'run' in sys.argv and '--entrypoint' in sys.argv:print('openjdk version "21.0.9"')
 elif 'run' in sys.argv:
- print(json.dumps({'type':'ready','protocolVersion':1,'animationFrameZero':True,'contextProfile':'fixed-v1','renderer':'synthetic'}),flush=True)
+ print(json.dumps({'type':'ready','protocolVersion':1,'animationFrameZero':True,'contextProfile':'canonical-v1','renderer':'synthetic'}),flush=True)
  for line in sys.stdin:
   request=json.loads(line);response={'type':'result','requestId':request['requestId']}
   if request['command']=='catalog':response['entries']=[]

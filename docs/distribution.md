@@ -1,6 +1,6 @@
 # CLI・Javaライブラリの配布
 
-公開された版と添付ファイルは[GitHub Releases](https://github.com/rs0325/MCIconGenerator/releases)で確認してください。初回の配布形式は`0.1.0-preview.1`のGitHubプレリリースで、以下の4ファイルを提供します。すべての描画adapterはexperimentalで、opt-inが必要です。1.0以前はAPIやmanifestの設定が変わる場合があります。変更時の再生成条件は各版のリリースノートで説明します。
+公開された版と添付ファイルは[GitHub Releases](https://github.com/rs0325/MCIconGenerator/releases)で確認してください。初回の配布形式は`0.1.0-preview.1`のGitHubプレリリースで、以下の4ファイルを提供します。この公開済みpreviewの描画adapterはexperimentalで、opt-inが必要です。固定51版のcanonical-v1/verifiedを対象とする1.0候補の受入結果は[検証記録](validation.md)に分けて記録し、release/tagはまだ公開していません。1.0以前はAPIやmanifestの設定が変わる場合があります。変更時の再生成条件は各版のリリースノートで説明します。
 
 ## 配布物と必要環境
 
