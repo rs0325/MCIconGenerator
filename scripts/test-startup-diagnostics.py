@@ -153,6 +153,24 @@ sys.stdout.buffer.write(b'dy","protocolVersion":1,"renderer":"fixture"}\\n');sys
         self.assertNotEqual(0,result.returncode)
         self.assertIn('旧worker agentの引数が一意ではありません',result.stderr.decode())
         self.assertFalse((root/'docker-run.json').exists())
+
+    def test_datafixer_gate_follows_stage_agent(self):
+        root,env,command=self.fixture("import sys\nsys.stdout.buffer.write(b'fixture\\n');sys.stdout.buffer.flush()\n")
+        (root/'worker').mkdir()
+        stage=root/'stage.jar';stage.write_bytes(b'stage')
+        gate=root/'gate.jar';gate.write_bytes(b'gate')
+        env.update(MCICON_STARTUP_STAGE_AGENT=str(stage),MCICON_STARTUP_DATAFIXER_GATE=str(gate))
+        command+=['image','java','-javaagent:/mcicon/worker.jar=/mcicon/cache/worker/agent.json','-cp','original','Main']
+        result=subprocess.run(command,env=env,capture_output=True,timeout=10)
+        self.assertEqual(0,result.returncode,result.stderr)
+        record=json.loads((root/'docker-run.json').read_text())
+        before=record['argumentsBeforeGate']
+        after=list(before)
+        stage_arg='-javaagent:/mcicon/cache/worker/startup-stage.jar=/mcicon/cache/worker/startup-stages.tsv'
+        gate_arg='-javaagent:/mcicon/cache/worker/datafixer-gate.jar=/mcicon/cache/worker'
+        after.insert(before.index(stage_arg)+1,gate_arg)
+        self.assertEqual(after,record['arguments'])
+        self.assertEqual(b'gate',(root/'worker/datafixer-gate.jar').read_bytes())
     def test_invalid_protocol_and_exit_are_preserved(self):
         root,env,command=self.fixture("import sys\nsys.stdout.buffer.write(b'invalid protocol\\n');sys.stdout.buffer.flush();sys.exit(7)\n")
         result=subprocess.run(command,input=b'',env=env,capture_output=True,timeout=10)

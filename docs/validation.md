@@ -1243,3 +1243,31 @@ Docker wrapper開始からstdoutのreadyを観測するまでは中央値29.016�
 wrapper開始からready観測までの中央値は記録なし21.065秒、あり21.689秒だった。各4件の記述値であり、観測の無影響や性能差を一般化しない。記録したhkl区間は656〜736ms、bootstrapは5.57〜6.26秒、joinは1ms未満、Minecraft constructorは2.24〜2.85秒だった。境界の記録呼出し自体やclass初期化を含み、純粋な関数のCPU時間ではない。constructor後からreadyまでの処理も別に存在する。
 
 45秒以上の遅延はなくdumpは未採取、元timeoutは再現しなかった。次の再発時に最後の到達境界とdumpを対応させる手段を整えた成果であり、#78の原因特定・解消ではない。元FAIL・旧7時間試験を保持し、IssueはOPENを維持する。変換検査、QAテスト、初回FAIL、実測・独立監査の数値とSHAは `qa/validation-2026-10-16-startup-stages.json` に記録する。
+
+## 初期化の依存関係を制御した調査（#78、2026-10-16）
+
+旧1.21.4のDatafixer最適化とmain側bootstrapの依存を調べた。通常起動の回数を増やす試験とは分け、元worker・client・固定imageを維持したまま、QA agentで`bao.a(Set)`が渡すexecutorを包み、先頭taskだけを明示解除まで保留した。元のsingle daemon executorと後続taskは維持する。agentは旧worker→stage→gateの順で、追加対象の変換後classをhash固定する。解除期限はpremainから45秒、期限後の解除やinterruptはexit99、変換不適合は97、記録失敗は98とし、製品の180秒timeout・retryは変更しない。
+
+専用cacheでcontrol cold→gated warmを1件ずつ直列実行し、2件とも旧shield PNGのencoded bytes・14項目metadataが一致した。gatedでは保留開始の4,316.190ms後にmainが`join.before`へ到達した。所有containerをimage・name・network・2 mountで照合して取得したdumpでは、mainが`Main.main`の`CompletableFuture.join`、Datafixer BootstrapがQAの保留sleepで待っていた。保留は計5,060.328ms、`join.before`から解除まで744.138ms、解除から`join.after`まで288.936msだった。同じguest JVMのnanoTimeで順序を確認し、hostとの絶対時刻は比較しない。
+
+この条件では、最適化の先頭taskが実行されなくてもmainはbootstrapを終えて既存joinまで進めた。**先頭task実行前の保留であり、部分実行中の`Type.rewrite` pending cache競合や全ての循環待ちを除外する結果ではない。** cold/warmと観測条件が異なるためready時刻の性能比較もしない。22境界・2 ready・6 result、containerの正常終了/回収、入力518件・参照2件・配布snapshot62件の不変を独立照合した。2正常logにも元と同じhostname警告がある。
+
+再実行は、旧試験から作成した`cache/`・`distribution/`・`reference/`・`input-freeze.json`を持つ専用bundleとJDK21を使用する。元データや進行中試験のcacheは渡さない。
+
+```sh
+python3.12 scripts/qa/datafixer-gate/build.py \
+  --cache "$bundle/cache" --worker "$bundle/distribution/worker/worker-agent.jar" --out "$build"
+python3.12 scripts/verify-datafixer-dependency.py \
+  --bundle "$bundle" --stage-agent "$build/stage/startup-stage.jar" \
+  --gate-agent "$build/datafixer-gate.jar" --out "$result"
+```
+
+controllerはdump要求時とdump後のsnapshotを分け、最終到達順を`join.before`と`gate.released`で判定する。Datafixer保留のdumpを必須とし、描画や回収が失敗してもobserver記録を保存する。レビューで見つかった観測race・cleanup例外時の保存漏れ・期限後解除の迂回を修正し、描画FAILとcleanup例外の同時発生を含む合成4条件、agentの保留/解除・期限99・遅い解除99・非対応class97、既存診断15テストを確認した。誤ったworkerパスによるbuild拒否とPATH指定によるPython起動前exit127は保全し、ゲームtimeoutの再発とは扱わない。
+
+共有hostのnative展開競合も調べたが、公式1.21.4 metadataの`lib.natives`は0件で、この版のRuntimePreparerが当該ディレクトリへ展開する経路は実行されない。JAR内のnative抽出一般まで除外したとは扱わない。
+
+別候補として、SystemReportが使用するOSHIの外部コマンド出力読取・`Process.waitFor()`に期限のない経路を確認した。`HardwareProcessProbe.java`で旧OSHI 6.6.5/JNA 5.15.0・固定imageのCPU/graphics/memory取得だけを実行すると、371.548msで終了し、JFRに`/sbin/ldconfig -p`と`uname -o`の開始を記録した。後者はOSHI `ExecutingCommand.runNative`からの呼出しを確認した。probeはSLF4J providerなしで、元ゲームのLog4j・全SystemReport・Mainの再現ではない。JFRは開始に成功した子processだけを示し、exec自体の未復帰や開始失敗を網羅しない。
+
+probe本体はexit0だが、private監督はDockerの小文字`no such object`を大文字で照合し、不在判定をFAILにした。元reportは変更せず、別監査のinspect exit1と正確な名前による`ps -a` exit0/空で所有containerの不在を確認した。元FAILをPASSへ読み替えず、component終了と監督判定を分けて記録する。
+
+通常preload中にmainだけがOSHIで止まっても、別threadのDatafixer完了INFOが欠ける理由は未確定である。Mainの例外処理からCrashReport/SystemReportへ入る二次停止の経路はあるが、元FAILでその例外が起きた証拠はない。次の採取ではOSHIの呼出し入口・exec復帰・出力読取と、CrashReportを作る前の例外を区別する必要がある。**元timeoutの原因は未確定で、#78はOPENを維持する。** 製品変更はなく、JUnit・製品build・正式release受入の再実施とは扱わない。[数値・世代・証拠hash](../qa/validation-2026-10-16-startup-dependency.json)を保存する。

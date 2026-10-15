@@ -34,6 +34,15 @@ def main():
             record['originalArguments']=list(arguments)
             arguments.insert(indices[0]+1,'-javaagent:/mcicon/cache/'+snapshot.parent.name+'/startup-stage.jar=/mcicon/cache/'+snapshot.parent.name+'/startup-stages.tsv')
             record['stageAgentSha256']=hashlib.sha256(target.read_bytes()).hexdigest()
+        if gate := os.environ.get('MCICON_STARTUP_DATAFIXER_GATE'):
+            source=Path(gate).resolve(strict=True)
+            target=snapshot.parent/'datafixer-gate.jar'
+            shutil.copyfile(source,target)
+            indices=[i for i,value in enumerate(arguments) if value.startswith('-javaagent:')]
+            if not indices:raise ValueError('先行するagentがありません')
+            record['argumentsBeforeGate']=list(arguments)
+            arguments.insert(indices[-1]+1,'-javaagent:/mcicon/cache/'+snapshot.parent.name+'/datafixer-gate.jar=/mcicon/cache/'+snapshot.parent.name)
+            record['gateAgentSha256']=hashlib.sha256(target.read_bytes()).hexdigest()
     destination=root/('docker-run.json' if run else 'docker-call-'+str(os.getpid())+'.json')
     def save():destination.write_text(json.dumps(record,ensure_ascii=True,indent=2)+'\n')
     save()
