@@ -1207,3 +1207,15 @@ python3 scripts/bundle-host-filelocks.py --classpath .local/host-classpath.json 
 ```
 
 Java21でbundleをcurrent directoryとし、`classes:lib/*`（Windowsは`classes;lib/*`）をclasspathへ指定します。`HostFileLockProbe`の引数は結果JSONの絶対パス、期限秒、`normal`または`deadline`、生成時に出力されたinventorySHA256の4つです。SHAは実行時bundleから再取得せず、準備時の信頼済み記録から渡します。`java.io.tmpdir`はbundle外の専用directoryへ指定し、結果の親directoryとtmpを事前作成してください。通常成功はexit0・3 tests成功・残存0、期限故障はexit124・DEADLINE・自身のchildを1件以上回収・残存0を要求します。bundleのclass/JAR hashも検査し、未完了や失敗を成功として記録しません。ゲーム資産と接続先をbundleや公開記録に含めません。
+
+## 正式配布受入（#82）
+
+#79のmerge commit `4e2a98e`から1.0.0の配布候補v1を生成し、配布監査・監査10条件と候補3JARの一致を確認した。展開したMac CLIで5代表版の元diamond PNG・3ID描画（計15 PNG）、Maven ZIPの独立consumerによるraw取得、旧5/6引数binary consumerを確認した。
+
+LinuxはColima内の固定amd64 container/Java21でlauncher・5版rawに加え、LinuxのJava CLIから同VMのDocker daemonを使う描画経路も5版・15 PNGで確認した。Linux amd64のDocker client 29.5.2/API 1.54とarm64 daemon 29.5.2/API 1.54、固定c498…のamd64/Mesa workerを使用した。#79基準との14 metadata・RGBA・path不一致は0、各workerのexit0・destroy1、957入力と公式manifest/sidecarの不変を確認した。物理Linux・native GPU・任意のLinux環境を検証したとは扱わない。VM内のARM64 clientをamd64親で起動できなかった初回FAILは残し、公式amd64 clientを別世代で固定してから成功を確認した。
+
+Windowsはユーザー許可後、原CLI/library ZIPのchecksum・実展開と全file hashを確認した。Windows 11 Pro（10.0.26200、64bit）、既存Java21.0.9+10の明示指定でhelp/version・5版raw・Maven consumerのraw・旧5/6引数binary consumerの10 jobsがexit0、957入力と公式manifest/sidecar不変、所有actor0。期限fixtureは元FAILを保持して3 actorを回収した。正常終了ではJob会計が自然に0へ反映されるのを最大2秒だけ観測し、残存を強制回収した結果を成功へ付け替えない。原Java17/文字コード/backendの失敗記録は別世代で保持した。固定c498 imageの追加は別途許可を得て実施し、固定IDと既存image/tagの不変を確認した。そのimageを使う5版15 PNGは#79基準との14 metadata・RGBA・path不一致0、worker/doctor各exit0、所有container/actor0、一時snapshot/PNG削除、入力不変を確認した。
+
+Windowsの検証用Docker wrapperは小量stdinをbufferに残す問題があり、初回1.13のWORKER_TIMEOUTと模擬試験のFAILを保全した。独立したRead/Write/Flush転送に修正し、旧duplexの期限終了・旧exitと新4条件（binary双方向・大量stderr・EOF・非0終了透過）の成功、全Job回収後に描画を測定した。初回ゲームtimeoutの原因と模擬障害の歴史的同一性までは証明しておらず、#78の解決とも扱わない。製品JAR・描画コード・imageは変更していない。
+
+最終候補は同じ3JARとlauncherを保ち、この文書とQA記録を含めて生成する。最終ZIP自身のchecksumと配布監査は自己参照を避けて外部記録へ保存する。正式release/tagは未公開、#78の原因は未解決。数値と限定範囲は `qa/validation-2026-10-15-formal-distribution.json` に記録する。

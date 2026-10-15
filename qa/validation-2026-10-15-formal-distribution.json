@@ -1,0 +1,243 @@
+{
+  "issue": 82,
+  "baseCommit": "4e2a98e7a52f758abe502488513ee8474d7a931b",
+  "releasePublished": false,
+  "phase": "Mac・Windows・Linuxの限定環境で配布候補のホスト受入を完了。最終配布物は外部checksum/監査記録で確定し、Git公開・release/tagは別許可。",
+  "candidateVersion": "1.0.0",
+  "candidateBuiltFromBaseCommit": false,
+  "currentProgressDocumentIncludedInCandidate": true,
+  "candidateBinarySha256": {
+    "core": "588d99801ac6211ecb34c6714ca17441c4da0cb249c4ee51e3cfd83472528af7",
+    "cli": "c8ee4d7d41f13c263adb0d4c0ca514abf61057045c54be5e556663d8f074c4c3",
+    "worker": "edc897bca0a2accb85f540ab41c8ad4c9040d514ae0a44a2f273fcd3a607031c"
+  },
+  "checks": {
+    "prepareRelease": true,
+    "distributionAudit": true,
+    "distributionAuditTests": 10,
+    "sameBinariesAsIssue79": true,
+    "independentMavenConsumerCompileAndRaw": true,
+    "oldFiveAndSixArgumentBinaryConsumer": true
+  },
+  "mac": {
+    "scope": "Darwin arm64 Java21の展開launcher。描画は固定Linux amd64/Mesa Docker。Mac native描画ではない。",
+    "versions": [
+      "1.13",
+      "1.18.2",
+      "1.20.6",
+      "1.21.4",
+      "26.3"
+    ],
+    "helpVersionChecks": 2,
+    "rawDiamondOriginalBytesComparisons": 5,
+    "renderJobs": 5,
+    "renderPngs": 15,
+    "comparedToIssue79": true,
+    "workerExitCodes": [
+      "0"
+    ],
+    "destroyEventsPerWorker": 1,
+    "originalInputFiles": 957,
+    "officialManifestFiles": 1,
+    "changedInputs": 0,
+    "passed": true,
+    "reportSha256": "2a7d3259e254111471697ee44be57785fe9c921d30b133bd5a614b716be83dda",
+    "harnessSha256": "9256737300802a716402c874d3ac76c7e9a8a47a017c5ae50dab948884dc6f3e"
+  },
+  "linux": {
+    "scope": "Linux amd64 Java CLI親containerから同じVMのDocker daemonへ接続する検証。VM/daemonはarm64、描画はc498 amd64 Mesa。物理Linux・native GPU・任意環境を保証しない。",
+    "launcherRaw": {
+      "scope": "Mac Colimaの固定Linux amd64 container、Java21、bind filesystemにおけるlauncher/rawのみ。物理Linux/native GPU・描画host受入ではない。",
+      "helpVersionChecks": 2,
+      "rawDiamondOriginalBytesComparisons": 5,
+      "gameJobs": 0,
+      "containerRemoved": true,
+      "changedInputs": 0,
+      "javaVersion": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)",
+      "passedWithinScope": true,
+      "reportSha256": "2b5a50a9ce9de467d56afee805b6d835722e1dbefa2fd300c5e774eb087b240f",
+      "harnessSha256": "2c7321efae61ebcca6ea97512e218b382627ac69d3a53c543d0445fda144af91",
+      "renderingExecuted": false
+    },
+    "renderHostVerified": true,
+    "renderHost": {
+      "versions": [
+        "1.13",
+        "1.18.2",
+        "1.20.6",
+        "1.21.4",
+        "26.3"
+      ],
+      "renderJobs": 5,
+      "renderPngs": 15,
+      "comparedToIssue79": true,
+      "metadataFieldsCompared": 14,
+      "mismatches": 0,
+      "workerExitCodes": [
+        "0"
+      ],
+      "destroyEventsPerWorker": 1,
+      "candidateZipSha256": "698b8c829a76e92d318b8f1882dbc0e1c1d347a5746030e93d2f02b355722677",
+      "candidateBinarySameAsIssue79": true,
+      "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+      "dockerClient": {
+        "version": "29.5.2",
+        "arch": "amd64",
+        "apiVersion": "1.54",
+        "sha256": "ada0716bf566f41b6824f894a9af6a7ba71a19f855c0a4a5fc6e5fd3fd0fa00a"
+      },
+      "dockerDaemon": {
+        "version": "29.5.2",
+        "arch": "arm64",
+        "apiVersion": "1.54"
+      },
+      "parentJava": "21.0.12.1",
+      "changedInputs": 0,
+      "originalInputFiles": 957,
+      "officialManifestFiles": 1,
+      "manifestSidecarFiles": 1,
+      "passed": true,
+      "reportSha256": "89c269a8a0cd2e0590e4f6f2632a012a51fb78a6a66266c42a91eda9c03d6cc6",
+      "harnessSha256": "29a86dba7b9d926ac1d1734a5d0a95782e02f9c0cd76af812dea48db7eb62746",
+      "summarySha256": "ae81a927f946b773b8e208374a7f3fb29f3fc75b1e03866d3a9dbe210243a4a9",
+      "knownContainerNamesChecked": 18,
+      "remainingOwnedContainers": 0,
+      "remainingOwnedLiveActors": 0,
+      "allPngBytesEqual": true
+    },
+    "passedWithinScope": true
+  },
+  "windows": {
+    "connectionAuthorized": true,
+    "connectionExecuted": true,
+    "checksExecuted": 10,
+    "connectionRequested": true,
+    "preparationStaticReview": "初回レビュー後の実測でQA wrapperの通信buffering問題を確認。Read/Write/Flushの独立転送へ修正し、新旧対照後に描画を検証。旧FAILは保全。",
+    "bundleSha256": "3f56db5be71951b87084b655406ae811a60114cb4c5d693bccbe488139a42b8d",
+    "inputInventoryFiles": 991,
+    "cleanupMixedTraceFixtureCases": 6,
+    "cleanupMixedTraceFixturePassed": true,
+    "scope": "Windows 11 Pro/64bit・Java21.0.9+10の展開bat/raw/library経路と、固定Linux amd64 Mesa Dockerによる描画。Windows native GPU描画ではない。",
+    "os": {
+      "caption": "Microsoft Windows 11 Pro",
+      "architecture": "64 ビット",
+      "version": "10.0.26200"
+    },
+    "powerShell": "5.1.26100.9711",
+    "hostJava": "21.0.9+10",
+    "pythonUtf8Mode": 1,
+    "rawDiamondOriginalBytesComparisons": 5,
+    "independentMavenConsumerRaw": true,
+    "oldFiveAndSixArgumentBinaryConsumer": true,
+    "renderJobs": 5,
+    "renderHostVerified": true,
+    "originalInputFiles": 957,
+    "officialManifestFiles": 1,
+    "manifestSidecarFiles": 1,
+    "changedInputs": 0,
+    "candidateJarsSameAsIssue79": true,
+    "normalJobsExitCode": 0,
+    "remainingOwnedActors": 0,
+    "deadlineFixture": {
+      "expectedFail": true,
+      "ownedActorsBeforeCleanup": 3,
+      "remainingOwnedActors": 0,
+      "failurePreserved": true,
+      "naturalDrainNotApplied": true
+    },
+    "normalJobNaturalDrain": {
+      "maximumSeconds": 2,
+      "naturalExitOnly": true,
+      "remainingBeyondDeadlineFails": true
+    },
+    "passedWithinRawScope": true,
+    "reportSha256": "3b6ad075964c45eb25c4e71ab44465418f6eb66ed87e6e8e8716a61b3f55f0aa",
+    "resultsZipSha256": "2856def8ecb20c7538597e1960eaa49c2475aa92232cc80f4d63c880ccd7566d",
+    "harnessSha256": "a164c04076ff719e4ac16d500b48b343ec5f65b9b359944eeba9b708e4d66f71",
+    "guardSha256": "6d3591b1bf0b66b89e6641821dec93f41fd0c1164f20a55bc19c2d6fabf61afd",
+    "postproofSha256": "7a03ccdbc5edcaaca577c8e79b0c8171769a45a9c3b1e1f6bdcee22eb2a01468",
+    "limitedEvidenceReview": "PASS・確定指摘0、描画/全体完成の承認ではない",
+    "imageAdditionAuthorized": true,
+    "imageImported": true,
+    "fixedImageImport": {
+      "passed": true,
+      "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+      "archiveSha256": "1dcf9b4363583ed6c9cf5847aaf5648aaaf80a084f978b075d1b4fe483ed2e70",
+      "reportSha256": "98e86a2bc9fef8b82d68d5119340c713f8b25f8878cd49e1bafb33ebcf75fc62",
+      "previousImagesAndTagsUnchanged": true,
+      "remainingOwnedActors": 0
+    },
+    "renderHost": {
+      "versions": [
+        "1.13",
+        "1.18.2",
+        "1.20.6",
+        "1.21.4",
+        "26.3"
+      ],
+      "renderJobs": 5,
+      "renderPngs": 15,
+      "metadataFieldsCompared": 14,
+      "mismatches": 0,
+      "comparedToIssue79": true,
+      "workerExitCodes": [
+        0
+      ],
+      "doctorExitCodes": [
+        0
+      ],
+      "remainingOwnedActors": 0,
+      "remainingOwnedContainers": 0,
+      "snapshotAndTemporaryIconsRemoved": true,
+      "changedInputs": 0,
+      "passed": true,
+      "reportSha256": "fd28570d587f45062a525e8e8b54ba5d46bf99eb2cd2babfac728bc812bff071",
+      "resultsZipSha256": "34c09d406f73c1dcb7c38555fe52a8a20945a5da6c803b36f45211123c3f3608",
+      "harnessSha256": "5b0dd92afc5bd9e2bd9f0d92eec19db3799278353ac39e1878e7d2ca06bcab5f",
+      "shimSourceSha256": "6681e6d1eaefccf17d7bc66c30aba5c1fd5ed2feaa39bf4fc0a9d5b15f0e39f8",
+      "shimExecutableSha256": "a9254e86453effce36602588369cd36bbe3f26a95e73865045ec9c5de31808ac",
+      "postproofSha256": "66ac551c02718db40a75da0c4ae2723b08ac9081f5312202789a845c02c23810"
+    },
+    "streamFixture": {
+      "cases": 6,
+      "oldDuplexExpectedDeadline": true,
+      "oldExitAndNewFourCasesPassed": true,
+      "binaryBytesVerified": true,
+      "stderrBytes": 131072,
+      "remainingOwnedActors": 0,
+      "reportSha256": "de1380afba16eddaf23c44ef156f070f0394e9c5a6e04dadef8adc4eaab55108"
+    }
+  },
+  "pending": [
+    "最終QA/docsを含む配布物のchecksum監査と変更範囲の最終反証を外部記録へ保存",
+    "通常PR公開準備・個別許可後のGit公開",
+    "具体的な配布物と#78未解決を提示してrelease/tagを別途確認"
+  ],
+  "rootCauseIssue": 78,
+  "rootCauseResolved": false,
+  "candidateZipChecksums": "外部SHA256SUMSとprivate artifact freezeに記録する。自己参照を避け、この進捗QAへZIP自身のhashを埋め込まない。",
+  "linuxPreparationAttempts": {
+    "vmArm64DockerInAmd64Parent": "FAILを保持。ELF AArch64・要求loaderを別読取probeで確認し、公式amd64 clientの新規probe/実測へ切替。描画binaryは変更しない。",
+    "originalProbeReportSha256": "00d5a93dca258aaa1f1de7f472498e418418adf773ce6aa53fb77a8422244f8e",
+    "elfProbePassed": true,
+    "staticClientProbePassed": true,
+    "cachePreparation": "metadata directory不足の非native失敗を保持。既存957入力を再照合し、別continuationで不足manifest/sidecarのみ追加。",
+    "productionWorkaroundAdded": false
+  },
+  "windowsRetainedFailures": {
+    "gamesStarted": 1,
+    "attempts": [
+      "PowerShell既定CP932がUTF8 C#の先頭コメントとusing行を誤結合：明示UTF8で同sourceのコンパイル成功",
+      "Docker backend停止：既存Desktopの起動を確認。同接続外でnpipe消失を観測し、以後は同一接続内で確認",
+      "固定c498 image不在のFAILを保全。追加許可後、固定IDのimportと既存image/tag不変を確認",
+      "PATH Java17ではclass65を起動不可：既存Java21を明示した別世代でraw10jobs成功",
+      "固定image追加後の初回1.13はQA wrapper越しにWORKER_TIMEOUT。原FAILとworker記録を保持、製品JARは変更しない",
+      "独立転送だけを追加したQA wrapperはstdin Flush不足でduplex/pressure失敗。全actor回収、ゲーム開始0",
+      "Read/Write/Flush修正後は旧duplexの停止・新4条件成功を対照確認し、別世代の5版15PNG描画が成功。初回ゲームtimeoutの歴史的同一原因は未証明"
+    ],
+    "productionFallbackOrRetryAdded": false,
+    "allOriginalLogsAndResultZipsPreserved": true
+  },
+  "hostAcceptanceComplete": true,
+  "candidateSource": "production codeはbaseCommitのまま、配布文書と本QA記録だけを追加した候補。最終ZIPと監査のhashは外部記録へ保存する。"
+}
