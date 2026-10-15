@@ -1219,3 +1219,13 @@ Windowsはユーザー許可後、原CLI/library ZIPのchecksum・実展開と�
 Windowsの検証用Docker wrapperは小量stdinをbufferに残す問題があり、初回1.13のWORKER_TIMEOUTと模擬試験のFAILを保全した。独立したRead/Write/Flush転送に修正し、旧duplexの期限終了・旧exitと新4条件（binary双方向・大量stderr・EOF・非0終了透過）の成功、全Job回収後に描画を測定した。初回ゲームtimeoutの原因と模擬障害の歴史的同一性までは証明しておらず、#78の解決とも扱わない。製品JAR・描画コード・imageは変更していない。
 
 最終候補は同じ3JARとlauncherを保ち、この文書とQA記録を含めて生成する。最終ZIP自身のchecksumと配布監査は自己参照を避けて外部記録へ保存する。正式release/tagは未公開、#78の原因は未解決。数値と限定範囲は `qa/validation-2026-10-15-formal-distribution.json` に記録する。
+
+## 起動timeoutの長時間追加調査（#78、2026-10-16）
+
+旧shield失敗と同一のcore `eec62d03…`・CLI `008a6f00…`・worker `8b85e11a…`・1.21.4 client `c17c450c…`・固定image `c498eda7…`を、専用cache2個で約7時間・2並列実行した。2026-10-15 23:47〜10-16 06:47 JSTに1,553起動（lane a 777、b 776、cold 2・warm 1,551）が成功し、元の180秒起動timeoutは再現しなかった。元#8の全ID系列そのものではなく、同じshieldを繰り返す旧世代の診断である。v1.0のcanonical-v1受入とは区別する。
+
+1,553 PNGは旧世代の基準とファイルbytesが一致し、14 metadataの不一致0、全workerのexit0とdie/destroy各1を確認した。groupの強制終了・所有container残存は0、snapshot/一時PNGは削除済み。入力/sidecar 518件×2・配布snapshot62件・参照2件は前後で不変。旧世代の凍結JARを使うQA追加で、製品コード・timeout・retry・fallbackは変更していない。
+
+Docker wrapper開始からstdoutのreadyを観測するまでは中央値29.016秒・最大34.774秒、45秒以上は0だった。hostの180秒timerの厳密な開始点や、純粋なゲーム初期化時間とは区別する。JFR/早期attachなしで45/120/165秒の遅延dumpを予定したが、今回は対象がなくthread dumpは未採取。正常な全1,553 worker logにもhostname警告があり、それだけではDNSを原因と断定できない。原失敗時の待ち先は依然不明で、#78は未解決・OPENを維持する。
+
+`scripts/verify-startup-soak.py`は既存診断を2系列で監督し、親を未reapで保持してから自身のgroupを回収する。7時間は新規起動の開始窓で、進行jobは420秒の外側期限と有限回収まで継続する。停止・片系列FAILでは新規開始を止め、照合済みの対象だけ回収し、再試行しない。ゲームなしの回収境界4試験、照会失敗2条件と非ゲームの所有container回収を開始前に確認した。元FAILは別世代として保持する。数値・hash・範囲は `qa/validation-2026-10-16-startup-soak.json` に記録する。

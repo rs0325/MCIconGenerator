@@ -1,0 +1,144 @@
+{
+  "issue": 78,
+  "refs": [
+    34,
+    36
+  ],
+  "baseCommit": "3112ca8f404aebd7aeac01cafeddc287670ade9f",
+  "conclusion": "7時間・2並列の追加試験は未再現。元timeoutの停止段階と原因は未確定、IssueはOPENを維持する。",
+  "productionChanged": false,
+  "startupTimeoutSeconds": 180,
+  "timeoutRetryFallbackChanged": false,
+  "historicalCauseResolved": false,
+  "scope": {
+    "host": "macOS 15.7.7 arm64、Python3.12.4、Java21.0.9+10、Colimaの固定Linux amd64 Mesa Docker",
+    "version": "1.21.4",
+    "id": "minecraft:shield",
+    "size": 64,
+    "contextProfile": "fixed-v1（旧失敗世代の条件。v1.0のcanonical-v1受入を再実施した記録ではない）",
+    "parallelLanes": 2,
+    "separateCaches": true,
+    "newStartWindowHours": 7,
+    "inflightJobOuterSeconds": 420,
+    "finishPolicy": "7時間後は新規jobを開始せず進行中jobの有限終了・回収を待つ。停止要求・片lane失敗は新規開始を止め、未reapで保持した自身のgroupと照合済みcontainerだけを回収する。",
+    "differenceFromOriginal": "旧shield失敗のJAR/source/imageを使いshieldを繰返す。元#8の約7時間の全ID系列そのものではない。専用cacheへの初回gameをcoldと呼び、OS pagecacheは消去していない。",
+    "observation": "既存診断wrapper・Docker events/statsの観測負荷あり。JFR/早期attachなし。長い起動だけ45/120/165秒でhost/game thread dumpを予定。",
+    "memoryLimitBytesPerWorker": 3221225472,
+    "javaHeapPerWorker": "-Xmx2G",
+    "dockerCpusPerWorker": 4,
+    "dockerVmPreflightMemoryBytes": 6197370880,
+    "dockerVmPreflightCpus": 4,
+    "arbitraryEnvironmentGuarantee": false
+  },
+  "identity": {
+    "coreSha256": "eec62d03a0f004e4d3d4963eba31b399ace8b030135651c1480f4c40a92db825",
+    "cliSha256": "008a6f0094502089161c07266ef16388670473694a18df5bffe399df0f2b24bc",
+    "workerSha256": "8b85e11a940ef3497937e0af1d9f3571e2ba2842a6cd2b11dafba027805acb42",
+    "sourceSha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+    "dockerImageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "effectiveHostJava": "openjdk version \"21.0.9\" 2025-10-21 LTS\nOpenJDK Runtime Environment Temurin-21.0.9+10 (build 21.0.9+10-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.9+10 (build 21.0.9+10-LTS, mixed mode, sharing)\n",
+    "referenceManifestSha256": "e0cd1eb4e11d976cef11f7509c6448e82fc6ff720e99e89c621ee65051de3919",
+    "referenceShieldPngSha256": "db2cb91e0d256e65da07b6ef3c5612cebe2106604af79a18ad4f2aaf4e36f7ef"
+  },
+  "trial": {
+    "startedJst": "2026-10-15T23:47:03.914131+09:00",
+    "finishedJst": "2026-10-16T06:47:30.880318+09:00",
+    "monotonicElapsedSeconds": 25224.674,
+    "wallElapsedSeconds": 25226.966187,
+    "jobs": 1553,
+    "jobsByLane": {
+      "b": 776,
+      "a": 777
+    },
+    "conditions": {
+      "cold": 2,
+      "warm": 1551
+    },
+    "startupTimeouts": 0,
+    "failedJobs": 0,
+    "pngBytesEqualToHistoricalReference": 1553,
+    "metadataFieldsCompared": 14,
+    "metadataMismatches": 0,
+    "readySeconds": {
+      "min": 20.101508875,
+      "median": 29.015768875,
+      "max": 34.773744541,
+      "basis": "Docker wrapperのstartedMonotonicNsからstdoutのreadyを観測するまで。hostの180秒timerの開始点や純粋なゲーム初期化時間とは区別する。"
+    },
+    "jobSeconds": {
+      "min": 22.784,
+      "median": 32.139,
+      "max": 38.095
+    },
+    "readyAfter45Seconds": 0,
+    "threadDumps": {},
+    "protocolMessages": {
+      "ready": 1553,
+      "result": 4659
+    },
+    "containerEvents": {
+      "create": 1553,
+      "attach": 1553,
+      "start": 1553,
+      "die": 1553,
+      "destroy": 1553
+    },
+    "maxSampledConcurrentWorkers": 2,
+    "hostnameWarningInSuccessfulWorkerLogs": 1553,
+    "dnsCauseConfirmed": false,
+    "allRootGroupExitsZero": true,
+    "forcedGroupCleanupInGameTrials": 0,
+    "allOwnedContainersAbsentAtCleanup": true,
+    "allSnapshotsAndTemporaryIconsRemoved": true,
+    "finalLiveOwnedProcesses": 0,
+    "finalWorkerContainers": 0,
+    "passedWithinScope": true
+  },
+  "invariants": {
+    "originalInputAndSidecarFilesPerLane": 518,
+    "changedOriginalFiles": 0,
+    "referenceFiles": 2,
+    "changedReferences": 0,
+    "distributionSnapshotFiles": 62,
+    "changedDistributionFiles": 0,
+    "preRunSourceAndEvidencePinsMatchedAfterRun": true
+  },
+  "checks": {
+    "startupSoakBoundaryTests": 4,
+    "startupSoakBoundaryPassed": true,
+    "cleanupQueryFaultConditions": 2,
+    "cleanupQueryFaultsRecordedAsExpectedFail": true,
+    "cleanupContinuedAndOwnRootsReaped": true,
+    "nonGameOwnedContainerRecoveryProbePassed": true,
+    "newNativeGamesForPreflightFixtures": 0,
+    "pyCompilePassed": true,
+    "junitAndProductBuildRerun": false,
+    "reasonNotRerun": "productionコードを変更せず、旧失敗時の凍結JARを使用した診断QAの追加。既存98件やv1.0の成功を今回の再測定へ付け替えない。"
+  },
+  "evidenceSha256": {
+    "run-7h/report.json": "76cb8f1723570ff80b043b07a9be5462cceabf68f7c5c551ffde27290c4105ca",
+    "pre-run-freeze.json": "b3a53f23e4d749282814a2c6c616d40c111d14289fade5f36617ea73456223f3",
+    "input-freeze.json": "fbd83336d2aa9e42d3e69c2613cd087877c0202f46f23b5b3eb39dc325ef7c94",
+    "post-run-audit.json": "38f144408e2b25710d49e3ac0d92a35019aba81195c7b2c4cb6385222b9993d8",
+    "post-run-job-index.json": "d38f827b360c875a01178c7b5767b158b80099083869d5b083b9fc4d8bb6d839",
+    "final-runtime-proof.json": "5948b11a67a4e5ad7e7e1d306a5aa9bccd3052483c64aebd810855ec6fd2b651"
+  },
+  "harnessSourcesSha256": {
+    "scripts/verify-startup-soak.py": "3acd53c1dc5e74aa4e33df05b2b890d034e425c12d241234d63967da6710d68b",
+    "scripts/test-startup-soak.py": "62cb3d88c9d979757d9502af1bea826e13f336f796d46797642cb85d71830df7",
+    "scripts/verify-startup-diagnostics.py": "98282651952e9b3d055c5ec36d9c4dd693320a316fb39addf70859d61c22a7c1",
+    "scripts/qa/trace-docker.py": "467c08fa872bd81298de7861c755fbb333d8e53d2907ea79d07aff9f4ee82bc5",
+    "scripts/audit-export.py": "d1e81cc8843b1bc2b05684c8f45b7553a2dc1754a06699beaae16f2bb9a87c84"
+  },
+  "retainedPreflightFailures": [
+    {
+      "case": "所有mount比較fixtureの初回",
+      "resolution": "/varと/private/varの別名差でFAIL。実行側と同じresolve済みpathへfixtureを直した別ログで4件PASS。"
+    },
+    {
+      "case": "group照会失敗を注入した初回",
+      "resolution": "空zombie groupへのKILLがEPERMとなると親waitを省略したためFAIL。signal失敗時もfinallyで親をwaitする修正後、2故障条件を別結果先で検証。元FAILを保全。"
+    }
+  ],
+  "rootCauseBoundary": "全起動が45秒未満なので失敗前thread dumpは取得されていない。原失敗の待ち先は依然欠けており、正常7時間・hostname警告の正常例を原因解消の証明にしない。"
+}
