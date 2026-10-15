@@ -1093,6 +1093,36 @@ python3 scripts/test-runtime-inputs.py
 
 [初回FAIL・元API根拠・候補hash・比較と回収の数値記録](../qa/validation-2026-10-14-framebuffer-1144.json)を保存します。全版品質の正式受入やcanonical昇格は完了しておらず、experimental/deterministic=falseを維持します。
 
+## Issue #76のatomicWrite途中終了とraw再開（2026-10-15）
+
+既存の`AtomicCrashProbe`を変更せず、自作2×2 PNGのZIPと本番`FilesSupport.atomicWrite`で256MiBを書き込むactorを使います。監督JavaはREADY後に出力PNGの隣の正サイズの予約partを観測し、その所有actorだけを強制終了します。非0終了、PNG未確定、未完了予約manifest、観測partの残存を要求し、新しいJavaで`RawExporter`を再開します。fixture PNGの元bytes/hash、complete・失敗0、予約part回収、同じ出力lockの再取得、利用者ファイル2件の不変、所有actor残存0を照合します。利用者の`.mcicon-user.part`は回収対象に含めません。
+
+Mac（Java21.0.9/aarch64/APFS）、Windows 11（Java21.0.9/amd64/NTFS）、Linux（Java21.0.12.1/amd64、固定Docker image・Colima/Rosetta、tmpfs）の3条件すべてが同じv3 bundleで成功しました。11ファイルのbundle hashと73bytesのfixture PNG hashが3ホストで一致し、Windows結果ZIPもSHA-256を照合して取得しました。最終のWindows・公開資料の重点反証と、メイン担当の3ホストhash・PNG bytes独立照合も成功し、追加指摘はありません。[数値記録](../qa/validation-2026-10-15-host-atomic.json)にbundle・core・compiled QA・元sourceのhash、途中manifestと復旧結果のhashを記録します。v1/v2のMac/Linux測定と元sourceは先行世代として保持し、v3へ付け替えません。
+
+反証でPOSIXの親先行終了時の子回収漏れとJavaの成功・期限のreport競合を修正しました。成功と期限は同じlockで一度だけ確定し、後からの成功・期限が確定済みreportを覆しません。監督Javaの全体期限は75秒で、stdout/stderrはactorごとのファイルへ直接流します。POSIXは有限の`ps`で未reap親の終了状態を観測し、親PIDを保持したまま専用session/process groupの残actorを回収してから親をreapします。Windowsは保持したsupervisorと親PID・出生時刻・Java実体・class名の一致する直接actorだけを外側期限で回収します。Windowsのstdout/stderr取得も各5秒以内です。Linuxはnetworkなし・入力read-only・1GiB memory・512MiB tmpfsの専用containerで、固定image・name・owner・mountを照合して回収します。未観測・自然終了・期限超過・回収失敗はFAILで保存し、自動retryしません。
+
+合成11件はinventory/compiled actor改変、未登録resource、自然終了、実part未観測、Java期限、回収例外、既存output/ZIP保護と、成功先行・期限先行の終端整合を確認しました。Macの外側期限fixtureと親supervisorだけが先に終了するfixtureも、READY後の所有actorを実観測・回収し、FAIL保持と残存0を確認しています。初回のsandboxによる`ps`拒否はFAILとして保持し、プロセス読取権限を与えた新規結果先で実測しています。Windowsの外側期限fixtureもREADY後に自身のsupervisorと直接actor1件を回収し、期待FAIL・残存0を確認しました。既存export監査9件、JUnit97件、build/installDistが成功しました。production/API/cache/PNG形式の変更、ゲーム資産・描画の実行は含みません。任意OS・ネットワークfilesystemや#34の起動timeout原因の解消へ結果を広げません。
+
+bundleはJava21と指定Gradleで一度だけ準備し、同じZIPを全ホストへ渡します。出力先はすべて新規directoryです。
+
+```sh
+gradle --offline --no-daemon test build :cli:installDist
+python3 scripts/bundle-host-atomic.py --distribution cli/build/install/mcicon \
+  --out .local/host-atomic-bundle --javac "$JAVA_HOME/bin/javac"
+python3 scripts/test-host-atomic-bundle.py --bundle .local/host-atomic-bundle \
+  --java "$JAVA_HOME/bin/java" --evidence .local/atomic-refusal-evidence
+python3 scripts/verify-host-atomic-posix.py --bundle .local/host-atomic-bundle \
+  --java "$JAVA_HOME/bin/java" --inventory-sha256 <準備時のinventory SHA256> \
+  --out .local/atomic-mac
+python3 scripts/verify-host-atomic-linux.py --bundle .local/host-atomic-bundle \
+  --archive .local/host-atomic-bundle.zip --archive-sha256 <準備時のZIP SHA256> \
+  --inventory-sha256 <準備時のinventory SHA256> --out .local/atomic-linux
+```
+
+Windowsはタスクごとの接続許可を得てから転送し、ZIP・展開inventory・PS1を準備時の外部SHAと照合します。同一PS1を短いhash検証wrapperから起動し、既存Java21の絶対パスを`-Java`、展開先を`-Bundle`、新規結果先を`-OutputRoot`、準備時SHAを`-InventorySha256`へ指定します。`-Mode outer-deadline`は別の新規結果先で、子actorのREADY後に外側1秒で終了する故障fixtureです。正常はexit0とJava/外側reportのpassed、故障は非0と`OUTER_DEADLINE`、回収した所有actor1件以上、残存0・回収失敗なしを要求します。結果ZIPも転送前後でSHAを照合し、FAILを含む元reportと起動ログを保持します。
+
+POSIXの`--mode outer-deadline`と`--mode parent-only-exit`は、それぞれ外側期限と親だけの先行終了を故障注入します。期待値は非0・FAIL保持・所有actor1件以上の実観測と回収・group残存なしです。`ps`を拒否するsandboxでは成功扱いにせず、対象プロセスの読取権限を明示して確認します。
+
 ## Issue #70の実FileLockホスト検証（2026-10-15）
 
 修正済みcoreの既存`AssetStoreLockTest`を、同一core・fixture・JUnit依存bundleで実ホスト検証します。対象は2 JVMの交差待機、外部lock待ちのtoken取消、interruptのflag保持と後続取得の3条件です。取消の前に実取得threadのlock待機を観測し、所有actorの終了もassertします。production/API/cache形式とcore binaryは変更していません。

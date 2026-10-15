@@ -1,0 +1,341 @@
+{
+  "issue": 76,
+  "date": "2026-10-15",
+  "baseCommit": "0191acf7bcd23782f51cff2851f5a787596e9604",
+  "completed": true,
+  "pending": [],
+  "scope": "既存AtomicCrashProbeによる256MiB atomicWriteの実part観測・途中強制終了・同一coreのRawExporter再開。ゲーム資産・描画なし。",
+  "limits": [
+    "Mac/APFS、Windows/NTFS、固定imageのLinux/tmpfsだけを受入対象とする。",
+    "ネットワークfilesystem・任意OS・#34起動timeout原因の解消を保証しない。",
+    "part0は本番予約namespaceのpartを指す。利用者の.mcicon-user.partは保持する。"
+  ],
+  "bundleGeneration": "v3",
+  "archiveSha256": "f7280accf87bed261cdc1a05d00dc1452bd9b4e4ed12b8d59907c18a2cd7c0d8",
+  "inventorySha256": "7198c21c79ab19f4702797cd3a87d3ab19c4d62f39ca0b2c301d3f35cd38e42f",
+  "windowsScriptSha256": "21dff032afec230066cf12f16c1d490f542ba0a6f724b995a35ac5228785d38b",
+  "bundleHashes": {
+    "classes/AtomicCrashProbe.class": "0b2270ee2afe5a4e97ae2657df12adcafb4e85ef6c88efea091078e8e9a63af8",
+    "classes/HostAtomicRecoveryProbe.class": "ea1778b77b9418e83dd5a66ef9af51ce09520818165677171913bad7afdfcc17",
+    "lib/cli-0.1.0-SNAPSHOT.jar": "1770baaf7bcbd3ebd9c14fe7b63b0b32ed639e908a1fd36f91c489bc929a27fc",
+    "lib/core-0.1.0-SNAPSHOT.jar": "44898a6a714d9c92e67283052397adf6ebd9e4d90c7d31c4152493e1bc60366d",
+    "lib/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+    "lib/jackson-core-2.22.3.jar": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+    "lib/jackson-databind-2.22.3.jar": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9",
+    "lib/picocli-4.7.7.jar": "f86e30fffd10d2b13b8caa8d4b237a7ee61f2ffccf5b1941de718b765d235bf8",
+    "run-windows.ps1": "21dff032afec230066cf12f16c1d490f542ba0a6f724b995a35ac5228785d38b",
+    "source/AtomicCrashProbe.java": "25de3d50a45e87de7ad58e8d999182bb05cf2268f30fd1ebb5f32b83fb9902ec",
+    "source/HostAtomicRecoveryProbe.java": "60ca836cc59f320d7e4d8b154008a73283247f9475b2c76f110987b8f3dac6e2"
+  },
+  "sourcesSha256": {
+    "scripts/bundle-host-atomic.py": "bc5fb077bfab4bed504a3f71d72e8d2714dc5bbb6fba8b6a9000678c12d7adfd",
+    "scripts/qa/AtomicCrashProbe.java": "25de3d50a45e87de7ad58e8d999182bb05cf2268f30fd1ebb5f32b83fb9902ec",
+    "scripts/qa/HostAtomicRecoveryProbe.java": "60ca836cc59f320d7e4d8b154008a73283247f9475b2c76f110987b8f3dac6e2",
+    "scripts/qa/run-host-atomic-windows.ps1": "21dff032afec230066cf12f16c1d490f542ba0a6f724b995a35ac5228785d38b",
+    "scripts/test-host-atomic-bundle.py": "541d13475bc44859f25390746e162a5cf16007e5a0fcebd76dd72e363755d5cd",
+    "scripts/verify-host-atomic-linux.py": "7e9e566f59d2124d767e205465a3b04ac0f8d908888235dd49fcefd82daa0648",
+    "scripts/verify-host-atomic-posix.py": "750b666de8e4f70fa258edee4f7a8a718419444738e66255bc6e27eacf7464db",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/FilesSupport.java": "e97a022fd5cb588e989dcd7718d3b1f695cedb27b263ae014151e73e941f7ec0",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/RawExporter.java": "2e202e8eafe27c5d76dfd7dc00486046c4cf4b42be6b5c4eac8a32c00cd01fe3"
+  },
+  "hosts": {
+    "mac": {
+      "passed": true,
+      "javaVersion": "21.0.9",
+      "os": "Mac OS X",
+      "osVersion": "15.7.7",
+      "arch": "aarch64",
+      "filesystem": "apfs",
+      "readyObserved": true,
+      "observedPartBytes": 458752,
+      "orphanedPartCount": 1,
+      "orphanedPartBytes": 466944,
+      "writeExit": 137,
+      "interruptedCounts": {
+        "failed": 1,
+        "succeeded": 0
+      },
+      "resumeExit": 0,
+      "pngBytes": 73,
+      "pngSha256": "3a5a01f69f720e3e75bfec8aca1475b0f6a21671c9c1a2eb831dbb6f3d715120",
+      "fixtureSha256": "a83957397fb34a674c5cd28518cd950bb00f2ff20158435d603a17f134286df0",
+      "complete": true,
+      "recoveredCounts": {
+        "failed": 0,
+        "succeeded": 1
+      },
+      "reservedPartsAfterResume": 0,
+      "preservedUserFiles": 2,
+      "userFileSha256": "9ea896752a8f0c0f6816075b83ca76f3c0b261f1924fe376e1d69232229b8004",
+      "outputLockReacquired": true,
+      "remainingOwnedActors": [],
+      "inventorySha256": "7198c21c79ab19f4702797cd3a87d3ab19c4d62f39ca0b2c301d3f35cd38e42f",
+      "terminalWinner": "SUCCESS",
+      "reportSha256": "8dc42dde60400d96ac63271a62bfbefefe280884ef7d0ea8e03a1be1ab2a4b54",
+      "interruptedManifestSha256": "d7e442554f0db5221a7b2efdba0b23c0da3bf389c157d8ab54ef40f45df1dcb8",
+      "recoveredManifestSha256": "9699997bfe51ed71e6a1cff2483c58e2941866be41f983dc987e97f88dca8232"
+    },
+    "linux": {
+      "passed": true,
+      "javaVersion": "21.0.12.1",
+      "os": "Linux",
+      "osVersion": "6.8.0-117-generic",
+      "arch": "amd64",
+      "filesystem": "tmpfs",
+      "readyObserved": true,
+      "observedPartBytes": 352256,
+      "orphanedPartCount": 1,
+      "orphanedPartBytes": 507904,
+      "writeExit": 137,
+      "interruptedCounts": {
+        "failed": 1,
+        "succeeded": 0
+      },
+      "resumeExit": 0,
+      "pngBytes": 73,
+      "pngSha256": "3a5a01f69f720e3e75bfec8aca1475b0f6a21671c9c1a2eb831dbb6f3d715120",
+      "fixtureSha256": "8cea2e48ce05b89ae93fd0402b36bf44aabcf46a170204c6f97f9525a098e355",
+      "complete": true,
+      "recoveredCounts": {
+        "failed": 0,
+        "succeeded": 1
+      },
+      "reservedPartsAfterResume": 0,
+      "preservedUserFiles": 2,
+      "userFileSha256": "9ea896752a8f0c0f6816075b83ca76f3c0b261f1924fe376e1d69232229b8004",
+      "outputLockReacquired": true,
+      "remainingOwnedActors": [],
+      "inventorySha256": "7198c21c79ab19f4702797cd3a87d3ab19c4d62f39ca0b2c301d3f35cd38e42f",
+      "terminalWinner": "SUCCESS",
+      "reportSha256": "0066257752f44349842c2ad90ad19a2428ef926cc6bb27262b0f4e0dba616e16",
+      "interruptedManifestSha256": "4f4a14c25936d193123a3e662dc357d5f7336ee2bddfb4651deadd1de277d499",
+      "recoveredManifestSha256": "b2122b478382af2424d924b8387080953c38c93be281ba9e468988344d3f6445"
+    },
+    "windows": {
+      "passed": true,
+      "javaVersion": "21.0.9",
+      "os": "Windows 11",
+      "osVersion": "10.0",
+      "arch": "amd64",
+      "filesystem": "NTFS",
+      "readyObserved": true,
+      "observedPartBytes": 1335296,
+      "orphanedPartCount": 1,
+      "orphanedPartBytes": 1564672,
+      "writeExit": 1,
+      "interruptedCounts": {
+        "failed": 1,
+        "succeeded": 0
+      },
+      "resumeExit": 0,
+      "pngBytes": 73,
+      "pngSha256": "3a5a01f69f720e3e75bfec8aca1475b0f6a21671c9c1a2eb831dbb6f3d715120",
+      "fixtureSha256": "80aa46b5c15a564dc76fa874968a3f0c8f822637a0590e220319087f16f81eb6",
+      "complete": true,
+      "recoveredCounts": {
+        "failed": 0,
+        "succeeded": 1
+      },
+      "reservedPartsAfterResume": 0,
+      "preservedUserFiles": 2,
+      "userFileSha256": "9ea896752a8f0c0f6816075b83ca76f3c0b261f1924fe376e1d69232229b8004",
+      "outputLockReacquired": true,
+      "remainingOwnedActors": [],
+      "inventorySha256": "7198c21c79ab19f4702797cd3a87d3ab19c4d62f39ca0b2c301d3f35cd38e42f",
+      "terminalWinner": "SUCCESS",
+      "reportSha256": "6a60773320125f35f82aae6d31692d303375475aea00b2d626308d34bcc8f5d3",
+      "interruptedManifestSha256": "f987d76a4ebec4e636cd58ab3234d633d6d71d75c52e69b707d31b349f8e6182",
+      "recoveredManifestSha256": "91852676c143911b81cfe25987ad6cc89194f68d37a86747dfbb1545bc8e5099"
+    }
+  },
+  "verification": {
+    "junit": {
+      "tests": 97,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "build": "PASS",
+    "installDist": "PASS",
+    "bundleRefusalTests": 11,
+    "exportAuditRegressionTests": 9,
+    "expectedFailures": {
+      "test_deadline_reaps_owned_actor": {
+        "passed": false,
+        "failure": "DEADLINE",
+        "cleanupFailure": null,
+        "remainingOwnedActors": [],
+        "terminalWinner": "DEADLINE",
+        "reportSha256": "fb21a6dca3dcf98fffa4d891c4612ccb5e0c4a9bdff2bb9123a093feb2a0a43e"
+      },
+      "test_missing_real_part_is_failure": {
+        "passed": false,
+        "failure": "java.lang.IllegalStateException: 実part未観測",
+        "cleanupFailure": null,
+        "remainingOwnedActors": [],
+        "terminalWinner": "FAILURE",
+        "reportSha256": "37c017922caa6df44f68df35495ec8bd1c649a26ee3afa1e9cbd2d9e64b532e3"
+      },
+      "test_natural_exit_is_failure": {
+        "passed": false,
+        "failure": "java.lang.IllegalStateException: READY前にactorが終了: 0",
+        "cleanupFailure": null,
+        "remainingOwnedActors": [],
+        "terminalWinner": "FAILURE",
+        "reportSha256": "1a3fbf40d681f5b18e9d16cc566ab10ec62f5cc148e10924a69d5b1168dec0cd"
+      },
+      "test_reap_failure_is_preserved": {
+        "passed": false,
+        "failure": "DEADLINE",
+        "cleanupFailure": "java.lang.IllegalStateException: QA回収失敗注入",
+        "remainingOwnedActors": [],
+        "terminalWinner": "DEADLINE",
+        "reportSha256": "ef063daaa19b50f461e7f3ed65249d0a296951a2fd747a2cef6b25c82ccbba19"
+      },
+      "test_rejects_changed_compiled_actor": {
+        "passed": false,
+        "failure": "java.lang.IllegalStateException: bundle SHA256不一致: classes/AtomicCrashProbe.class",
+        "cleanupFailure": null,
+        "remainingOwnedActors": [],
+        "terminalWinner": "FAILURE",
+        "reportSha256": "19dc684cc97ccd2c915dcb39d90d5aa000c13cdcab237af39edf4df9246d0e6d"
+      },
+      "test_rejects_inventory_tampering": {
+        "passed": false,
+        "failure": "java.lang.IllegalStateException: inventory SHA256不一致",
+        "cleanupFailure": null,
+        "remainingOwnedActors": [],
+        "terminalWinner": "FAILURE",
+        "reportSha256": "e0da2845ff071e6826ee096d607b1160570aeb11e36255430a7ff79f3e74965b"
+      },
+      "test_rejects_unlisted_classpath_resource": {
+        "passed": false,
+        "failure": "java.lang.IllegalStateException: bundleのファイル集合不一致",
+        "cleanupFailure": null,
+        "remainingOwnedActors": [],
+        "terminalWinner": "FAILURE",
+        "reportSha256": "b8bdca2369e1177ba7cdbe480c8c54e10664681d618c858ef8a4b66a66d768fe"
+      },
+      "test_terminal_deadline_rejects_late_success": {
+        "passed": false,
+        "failure": "DEADLINE",
+        "cleanupFailure": null,
+        "remainingOwnedActors": [],
+        "terminalWinner": "DEADLINE",
+        "reportSha256": "02ebccac0031cbb1682310f528bc3128b18387d9fbb321b58b1a8d94c2ffae4e"
+      },
+      "test_terminal_success_rejects_queued_deadline": {
+        "passed": true,
+        "failure": null,
+        "cleanupFailure": null,
+        "remainingOwnedActors": [],
+        "terminalWinner": "SUCCESS",
+        "reportSha256": "6f8380d86f4c5b77b76bf5d6338affb2268e0b88b959ec1771a0b33269c279a7"
+      }
+    },
+    "macOuterDeadline": {
+      "passed": false,
+      "mode": "outer-deadline",
+      "inventorySha256": "7198c21c79ab19f4702797cd3a87d3ab19c4d62f39ca0b2c301d3f35cd38e42f",
+      "fixtureActorReady": true,
+      "failure": "OUTER_DEADLINE",
+      "killedOwnedGroup": true,
+      "supervisorExit": -9,
+      "ownedGroupRemaining": false
+    },
+    "linuxContainer": {
+      "containerExit": 0,
+      "oomKilled": false,
+      "cleanup": {
+        "attempted": true,
+        "removed": true,
+        "owned": true,
+        "returnCode": 0,
+        "stderr": ""
+      }
+    },
+    "macParentOnlyExit": {
+      "passed": false,
+      "mode": "parent-only-exit",
+      "inventorySha256": "7198c21c79ab19f4702797cd3a87d3ab19c4d62f39ca0b2c301d3f35cd38e42f",
+      "fixtureActorReady": true,
+      "fixtureKilledSupervisorOnly": true,
+      "supervisorExitObservedBeforeReap": true,
+      "killedOwnedGroup": true,
+      "supervisorExit": -9,
+      "ownedGroupRemaining": false,
+      "failure": "SUPERVISOR_REPORT_MISSING",
+      "ownedActorsBeforeCleanup": 1,
+      "reportSha256": "b6d4a6037a795675f896793042c35ab48f6e7d1c03ac31f1c961349b3965ae96"
+    },
+    "windowsOuterNormal": {
+      "mode": "normal",
+      "passed": true,
+      "supervisorRemaining": false,
+      "supervisorExit": 0,
+      "inventorySha256": "7198c21c79ab19f4702797cd3a87d3ab19c4d62f39ca0b2c301d3f35cd38e42f",
+      "remainingOwnedActors": [],
+      "cleanupKilledActorCount": 0,
+      "reportSha256": "d7d95e9fb75d09b112cd4537eec584ec03a66791691af51e3ea032c607ab2ec3"
+    },
+    "windowsOuterDeadline": {
+      "mode": "outer-deadline",
+      "supervisorExit": -1,
+      "failure": "OUTER_DEADLINE",
+      "passed": false,
+      "supervisorRemaining": false,
+      "killedSupervisor": true,
+      "inventorySha256": "7198c21c79ab19f4702797cd3a87d3ab19c4d62f39ca0b2c301d3f35cd38e42f",
+      "fixtureActorReady": true,
+      "remainingOwnedActors": [],
+      "cleanupKilledActorCount": 1,
+      "reportSha256": "97746553a04ea5c4d49d1f59c2587d12ceb99568e3253d2d477ce6ced555aa9d"
+    },
+    "threeHostBundleHashesEqual": true,
+    "windowsPlanResult": {
+      "normal": true,
+      "outerDeadlineExpectedFailure": true,
+      "remainingOwnedActors": 0
+    },
+    "focusedReview": {
+      "passed": true,
+      "confirmedFindingsFixed": 2,
+      "finalWindowsAndPublicRecordFindings": 0,
+      "independentThreeHostHashesAndPngBytes": "PASS"
+    }
+  },
+  "retainedGenerations": [
+    {
+      "generation": "v1",
+      "archiveSha256": "8d25307a5434766938a5b027bc4a55fff52a90e99d7fd97f7673e915d5874b5a",
+      "macPassed": true,
+      "linuxPassed": true,
+      "reason": "Windows外側監督を追加する前の測定を保持し、v2結果へ付け替えない。"
+    },
+    {
+      "generation": "v2",
+      "archiveSha256": "afd708b0867b45da7f9e22b49a76018873003bd98ee5e006780ba521caf996d0",
+      "macPassed": true,
+      "linuxPassed": true,
+      "reason": "反証でPOSIX親先行終了時の回収漏れとJava成功/期限の終端競合を検出。v2元source・hash・測定を保存し、v3へ付け替えない。"
+    }
+  ],
+  "retainedFailures": [
+    {
+      "generation": "v3",
+      "phase": "Mac initial POSIX supervisor",
+      "failure": "sandboxがps実行をOperation not permittedで拒否",
+      "passed": false,
+      "killedOwnedGroup": true,
+      "ownedGroupRemaining": false,
+      "reportSha256": "fefd5c936a9477e39641f7aef225dfb34e18cf61e96bbd149122a75c525ae9a9",
+      "resolution": "元FAILを保持。ps読取を許可した新しい結果先で正常・外側期限・親だけ先行終了を実測した。"
+    }
+  ],
+  "acceptanceCompleted": true,
+  "windowsResultsZipSha256": "eaf065fc80780f8762f3674de077712032f00eb06670195985e24f7dad8f7986",
+  "windowsResultsExtraction": {
+    "used": "元ZIPのbackslash区切りを正規化した展開結果",
+    "retainedInitialFailure": "初回の末尾backslash付きdirectory判定による部分展開は保全し、受入に使わない。元ZIPは変更しない。"
+  }
+}
