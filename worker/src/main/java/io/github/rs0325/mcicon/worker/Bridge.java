@@ -44,7 +44,7 @@ public final class Bridge {
                 boolean deferred=RenderAgent.config.has("profile")&&RenderAgent.config.get("profile").getAsString().equals("gui-deferred");
                 renderer=deferred?new DeferredRenderer(RenderAgent.symbols,minecraft):fixed?new FixedRenderer(RenderAgent.symbols,minecraft):classic?new ClassicRenderer(RenderAgent.symbols,minecraft):gpuImmediate?new GpuImmediateRenderer(RenderAgent.symbols,minecraft):legacy?new LegacyRenderer(RenderAgent.symbols,minecraft):latest?new LatestRenderer(RenderAgent.symbols,minecraft):new ModernRenderer(RenderAgent.symbols,minecraft);
                 JsonObject hello=new JsonObject(); hello.addProperty("type","ready"); hello.addProperty("protocolVersion",1);
-                hello.addProperty("renderer",renderer.environment()); hello.addProperty("animationFrameZero",RenderAgent.canonical.animationHook); hello.addProperty("contextProfile","fixed-v1"); emit(hello); ready=true;
+                hello.addProperty("renderer",renderer.environment()); hello.addProperty("animationFrameZero",RenderAgent.canonical.animationHook); hello.addProperty("contextProfile","canonical-v1"); emit(hello); ready=true;
             }
             int requestsInFrame=0;
             while(true) {

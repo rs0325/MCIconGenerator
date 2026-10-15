@@ -29,10 +29,10 @@ mcicon versions --json
 mcicon doctor --version 1.13.2 --json
 mcicon list --version 1.21.4 --kind block --json
 mcicon render --version 1.21.4 --kind block --id minecraft:stone \
-  --size 128 --allow-experimental --out out-128
+  --size 128 --out out-128
 mcicon render --version 1.21.4 --id diamond --id chest \
-  --allow-experimental --out out
-mcicon render --version 1.21.4 --all --allow-experimental --out out
+  --out out
+mcicon render --version 1.21.4 --all --out out
 mcicon extract --version 1.21.4 --texture minecraft:item/diamond --out out
 mcicon extract --version 1.21.4 --texture minecraft:entity/chest/normal --out out
 mcicon extract --version 1.21.4 --all --out out
@@ -66,7 +66,7 @@ block-itemの関連・aliasを実レジストリから取得します。水等�
 
 rawの全件はtextures/item/**とtextures/block/**のPNG・存在する付随mcmetaです。entity等は明示texture IDで抽出します。アイテムIDとtexture IDは別概念です。animated sheet・解像度・alpha・bytesを保持します。
 
-現行描画はfixed-v1です。暦日を2000-01-01 UTC、描画中の経過時刻を1000ms、partialTickを0、atlas animationを初期フレームに固定します。時計・コンパス等の動的propertyの乱数はseed=0に戻します。モデルのquad選択など、バニラ自身がseedを指定する乱数は保持します。黒・白背景の2回のネイティブ描画からstraight alphaを復元します。別ジョブ間のdecoded RGBA一致、GPU間一致、missing modelの完全検出、sRGBの厳密な検証をまだ保証しません。manifestのcontext.deterministic=falseを確認してください。
+1.0候補の描画はcanonical-v1です。固定51版のverified候補はopt-in不要ですが、同候補の全受入完了前に公開しません。暦日を2000-01-01 UTC、描画中の経過時刻を1000ms、partialTickを0、atlas animationを初期フレームに固定します。時計・コンパス等の動的propertyの乱数はseed=0に戻します。モデルのquad選択など、バニラ自身がseedを指定する乱数は保持します。黒・白背景の2回のネイティブ描画からstraight alphaを復元します。manifestのcontext.deterministic=trueは、同じ入力・adapter・settings・記録環境で固定状態を再現する契約です。受入対象は[契約](contracts.md#canonical-v1の受入)に記録したimage・Java・rendererと確認済みホスト条件に限ります。任意のGPU・独自image・別JDKへのRGBA一致や、missing modelの完全検出へ保証を広げません。同じDockerfileから再buildした別imageも同一受入とは扱いません。旧fixed-v1や別agentのiconsはsettingsDigestが変わるため再開を拒否し、新しい出力先または明示的な--overwriteを使います。rawの元bytesは維持します。
 
 ## Java APIと配布物
 
@@ -76,7 +76,7 @@ var worker = new WorkerOptions(Path.of("worker/worker-agent.jar"),
     "colima-mcicon", "mcicon-render:dev", Duration.ofSeconds(180), Duration.ofSeconds(30));
 try (var generator = new MCIconGenerator(Path.of("cache"), false, ProgressListener.NONE, cancel)) {
     var request = new RenderRequest("1.21.4", List.of(ResourceId.parse("stone")),
-        false, "block", 64, Path.of("out"), false, false, true);
+        false, "block", 64, Path.of("out"), false, false, false);
     ExportResult result = generator.render(request, worker).join();
 }
 ```

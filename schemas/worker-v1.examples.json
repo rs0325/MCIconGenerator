@@ -1,0 +1,258 @@
+{
+  "contextProfile": "canonical-v1",
+  "legacyRecord": {
+    "path": "qa/validation-2026-10-14-worker-contract.json",
+    "sha256": "25c9cb4d627dcd6ee28765ef815d6cff557746cffe733e42bc962f9ea9cbb8f1"
+  },
+  "accepted": [
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": true
+    },
+    {
+      "requestId": "1",
+      "command": "catalog"
+    },
+    {
+      "requestId": "1",
+      "type": "result",
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "kind": "block",
+          "status": "available",
+          "blocks": [
+            "minecraft:stone"
+          ]
+        },
+        {
+          "id": "minecraft:water",
+          "kind": "block",
+          "status": "no_item_form"
+        },
+        {
+          "id": "minecraft:diamond",
+          "kind": "item",
+          "status": "available",
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "minecraft:stone",
+      "size": 64,
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "/mcicon/cache/worker-test/icon-test.png",
+        "visiblePixels": 2744
+      }
+    },
+    {
+      "requestId": "4",
+      "type": "error",
+      "code": "MISSING_TEXTURE",
+      "message": "対象のtextureが欠損"
+    },
+    {
+      "requestId": "3",
+      "command": "shutdown"
+    },
+    {
+      "requestId": "3",
+      "type": "result"
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": true,
+      "futureField": "追加フィールド"
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1.0,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": true
+    }
+  ],
+  "rejected": [
+    {
+      "type": "ready",
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1"
+    },
+    {
+      "command": "catalog"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "size": 64,
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "minecraft:stone",
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "minecraft:stone",
+      "size": 64
+    },
+    {
+      "requestId": "4",
+      "type": "error",
+      "message": "対象のtextureが欠損"
+    },
+    {
+      "requestId": "4",
+      "type": "error",
+      "code": "MISSING_TEXTURE"
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 2,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "fixed-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": false
+    },
+    {
+      "requestId": "",
+      "command": "catalog"
+    },
+    {
+      "requestId": "1",
+      "command": "cancel"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "minecraft:stone",
+      "size": 65,
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "command": "render",
+      "id": "stone",
+      "size": 64,
+      "path": "/mcicon/cache/worker-test/icon-test.png"
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "a"
+      }
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "a",
+        "visiblePixels": -1
+      }
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "/mcicon/cache/worker-test/icon-test.png",
+        "visiblePixels": 2744
+      },
+      "entries": []
+    },
+    {
+      "requestId": "1",
+      "type": "result",
+      "entries": [
+        {
+          "id": "minecraft:stone",
+          "kind": "block",
+          "status": "available"
+        }
+      ]
+    },
+    {
+      "requestId": "1",
+      "type": "result",
+      "entries": [
+        {
+          "id": "minecraft:water",
+          "kind": "item",
+          "status": "no_item_form"
+        }
+      ]
+    },
+    {
+      "requestId": "2",
+      "type": "result",
+      "result": {
+        "path": "a",
+        "visiblePixels": 0
+      }
+    },
+    {
+      "type": "ready",
+      "protocolVersion": "1",
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1.5,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": true
+    },
+    {
+      "type": "ready",
+      "protocolVersion": 1,
+      "renderer": "llvmpipe / OpenGL",
+      "contextProfile": "canonical-v1",
+      "animationFrameZero": "true"
+    }
+  ]
+}

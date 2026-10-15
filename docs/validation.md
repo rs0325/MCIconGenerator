@@ -1,5 +1,19 @@
 # ローカル検証記録
 
+## Issue #79のcanonical-v1正式候補（2026-10-15）
+
+起点は#34診断整備を含むmain `200b859`です。固定51版の最終statusを含むcore・worker・CLIを`releaseVersion=1.0.0`で凍結し、core要求・worker ready・settings/contextをcanonical-v1へ揃えました。描画実値とrendererは維持し、旧workerとの305 class比較ではBridgeだけが変わっています。API16 class署名と旧5/6引数constructorは不変です。元timeoutの原因は#78で未解決のままです。
+
+JUnit98件、契約・メモリ・切断・PNG監査の関連合成、旧icons再開拒否・新規/明示overwriteが成功しました。固定image `c498eda7…`、Java8/17/21/25の実versionとpinを版別に記録しています。同一core・worker・CLIの全件1巡目と別プロセスの独立反復は、各51版・60,265 PNGで失敗0でした。settings/context/catalog/renderer/入力等のmetadataを厳密に照合し、全decoded RGBA・出力パスが一致しました。観測したPNG hashも全件一致しています。
+
+production候補の16px針は全51版・131件をsampling agentなしで生成し、公開pinに一致するproof・準備済み期待値を生成前に確認して独立oracleへ照合しました。許容値はRGB1/255・alpha0を維持し、実測最大差はRGB0・alpha0でした。9adapterと26.1分岐を含む10版70 PNGのsmoke、10版のenchanted_book single/all比較10 PNG、1.21.4原点分岐を加えた11版・16/512px・各7IDの154 PNGも成功しました。サイズ境界の監査は全ID・任意サイズの画質保証ではありません。
+
+既存の静的World51版357画像、限定clock計装・先頭frame条件の制御World12版84画像、無計装半透明8比較、特殊resource12画像、故障後healthy/normal8画像は、元入力と候補PNG bytesが一致する範囲を接続しました。新規World撮影・新しい故障注入とは区別し、旧image・GUI位置・計装・版別復帰分岐の根拠を残します。欠損resource旧150成功、atomic旧3host、raw旧51版72,638 PNGの受入も関連sourceと入力pinの不変を根拠に再利用します。rawのToolVersionは変わるため、core class全bytesの同一性は主張しません。
+
+新規ゲーム起動はsmokeから境界まで計195ジョブ、120,895 PNGです。各phaseで元入力2842件の前後hash不変、全worker終了0・destroy、所有container/actor残存0を確認しました。有限監督と個別traceの回収、停止要求、版別準備lock、外部pin差替え拒否、oracle空ログ時の証跡保持を合成で確認し、長期・選択driverの限定反証を通して実行しています。朝の部分完了checkpoint、参照pin不一致、過去のfixed-v1・experimental・FAILは保存し、測定世代を付け替えません。
+
+[候補pin・source境界・版別実測・参照接続](../qa/validation-2026-10-15-canonical-acceptance.json)を記録します。全体の受入判定とPNG構造監査の`canonicalVerified=false`は別責務です。最終資料反証は追加指摘0で通過しました。release/tagは未公開です。検証imageと同じDockerfileから作った別image、任意GPU/JDKへ保証を広げません。raw元bytes/保存形式は維持します。
+
 ## 描画workerの成立条件と正常終了（2026-10-13、#2）
 
 1.13.2の公開済みpreview workerはPNG生成・監査には成功しましたが、shutdown応答後の10秒待機を超え、DockerのSIGKILL・終了137で回収されました。親CLIのthread dumpはWorkerClient.closeのprocess.waitFor、workerは通常フレームの秒単位の追従処理を示しました。描画外のUtils時計をGLFW経過時刻からSystem.nanoTimeへ変更していたためです。元の時計の戻り値を維持し、描画中だけ固定値を選ぶよう修正しました。

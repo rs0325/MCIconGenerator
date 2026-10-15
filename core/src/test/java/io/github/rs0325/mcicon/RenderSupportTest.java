@@ -15,8 +15,8 @@ class RenderSupportTest {
     private final RuntimeException prepared=new RuntimeException("入力準備へ到達");
     private final WorkerOptions worker=new WorkerOptions(Path.of("missing-agent.jar"),"unused","unused",Duration.ofSeconds(1),Duration.ofSeconds(1));
 
-    @Test void currentExperimentalRequiresOptInBeforeAnyInputPreparation() throws Exception {
-        try(var generator=generator(null)) {
+    @Test void experimentalRequiresOptInBeforeAnyInputPreparation() throws Exception {
+        try(var generator=generator(Map.of("1.13","experimental"))) {
             var rejected=failure(generator,"1.13",false);
             assertEquals("UNVERIFIED_VERSION",((McIconException)rejected).code());
             assertEquals(2,((McIconException)rejected).exitCode());
@@ -25,7 +25,7 @@ class RenderSupportTest {
         }
     }
     @Test void verifiedAllowsBothFlagsAndNeverLetsLatestFallBackToIt() throws Exception {
-        try(var generator=generator(Map.of("1.13","verified"))) {
+        try(var generator=generator(null)) {
             for(boolean allow:new boolean[]{false,true}) {
                 assertSame(prepared,failure(generator,"1.13",allow));
                 var rejected=(McIconException)failure(generator,"latest",allow);
@@ -62,7 +62,7 @@ class RenderSupportTest {
                 .obtain("metadata/version_manifest_v2.json",VersionService.MANIFEST,null,-1,true);
         var generator=new MCIconGenerator(root,true,event->{throw prepared;},new CancellationToken());
         if(support!=null) {
-            // 対応表を昇格せず、解決済みsupportだけをfixtureへ置換する。
+            // 解決済みsupportだけをfixtureへ置換する。
             var versions=MCIconGenerator.class.getDeclaredField("versions");versions.setAccessible(true);
             var statuses=VersionService.class.getDeclaredField("support");statuses.setAccessible(true);
             statuses.set(versions.get(generator),support);

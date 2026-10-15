@@ -15,7 +15,7 @@ public final class IconExporter {
         SortedMap<String,CatalogEntry> selected=ExportPlanner.select(catalog,request);
         Path base=FilesSupport.safeResolve(request.output(),"java/"+runtime.version().id()+"/icons");Files.createDirectories(base);
         Path manifest=FilesSupport.safeResolve(base,"manifest.json");
-        Map<String,Object> settings=new TreeMap<>(Map.of("size",request.size(),"profile",runtime.profile(),"context","fixed-v1","agentSha256",worker.agentSha256(),
+        Map<String,Object> settings=new TreeMap<>(Map.of("size",request.size(),"profile",runtime.profile(),"context","canonical-v1","agentSha256",worker.agentSha256(),
                 "mappingsSha256",runtime.mappings()==null?"named":FilesSupport.hash(runtime.mappings(),"SHA-256"),
                 "metadataSha256",FilesSupport.hash(Json.MAPPER.writeValueAsBytes(runtime.metadata())),"dockerImageId",worker.imageId()));
         settings.putAll(worker.javaRuntime().settings());
@@ -76,11 +76,11 @@ public final class IconExporter {
     private void save(Path path,RuntimePreparer.Prepared runtime,IconWorker worker,Map<String,Object> settings,String digest,String source,TreeMap<String,ExportResult.Entry> entries,boolean complete,List<CatalogEntry> catalog) throws IOException {
         Map<String,Object> manifest=new TreeMap<>();
         manifest.put("schemaVersion",1);manifest.put("edition","java");manifest.put("version",runtime.version().id());manifest.put("mode","icons");
-        manifest.put("toolVersion",ToolVersion.VERSION);manifest.put("adapterVersion",runtime.profile()+"/0.1");manifest.put("sourceSha256",source);
+        manifest.put("toolVersion",ToolVersion.VERSION);manifest.put("adapterVersion",runtime.profile()+"/1.0");manifest.put("sourceSha256",source);
         manifest.put("settings",settings);manifest.put("settingsDigest",digest);manifest.put("renderer",worker.renderer());manifest.put("javaMajor",worker.javaRuntime().major());
         manifest.put("environment",Map.of("os","linux","arch","amd64","backend","docker","imageId",worker.imageId()));
         Map<String,Object> context=new TreeMap<>();
-        context.put("profile","fixed-v1");context.put("alphaMethod","black-white-native-composite-v1");context.put("deterministic",false);context.put("count",1);context.put("overlays",false);
+        context.put("profile","canonical-v1");context.put("alphaMethod","black-white-native-composite-v1");context.put("deterministic",true);context.put("count",1);context.put("overlays",false);
         context.put("guiItemAtlas","reset-per-pass");context.put("animationFrame",0);context.put("randomSeed",0);context.put("timeMillis",1000);context.put("epochMillis",946684800000L);
         context.put("partialTick",0.0);context.put("world","absent");context.put("player","absent");context.put("timeZone","UTC");
         if(runtime.profile().equals("gui-1.21.4")||runtime.profile().equals("gui-1.21.5")

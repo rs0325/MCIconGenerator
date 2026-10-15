@@ -22,7 +22,7 @@
           "type": "string"
         },
         "contextProfile": {
-          "const": "fixed-v1"
+          "const": "canonical-v1"
         },
         "animationFrameZero": {
           "const": true

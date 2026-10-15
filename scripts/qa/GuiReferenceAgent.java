@@ -105,7 +105,7 @@ public final class GuiReferenceAgent {
                 // Share only registry/bootstrap initialization, never export target/view/render methods.
                 catalog=legacy?new LegacyRenderer(symbols,minecraft):fixed?new FixedRenderer(symbols,minecraft):classic?new ClassicRenderer(symbols,minecraft):latest?new LatestRenderer(symbols,minecraft):deferred?new DeferredRenderer(symbols,minecraft):immediate?new GpuImmediateRenderer(symbols,minecraft):new ModernRenderer(symbols,minecraft);
                 if(fixture.has("resourcePack"))ResourcePackFaultAgent.reportPack();
-                JsonObject hello=new JsonObject();hello.addProperty("type","ready");hello.addProperty("protocolVersion",1);hello.addProperty("renderer","QA native screen / "+catalog.environment());hello.addProperty("animationFrameZero",animationHook());hello.addProperty("contextProfile","fixed-v1");emit(hello);ready=true;
+                JsonObject hello=new JsonObject();hello.addProperty("type","ready");hello.addProperty("protocolVersion",1);hello.addProperty("renderer","QA native screen / "+catalog.environment());hello.addProperty("animationFrameZero",animationHook());hello.addProperty("contextProfile","canonical-v1");emit(hello);ready=true;
             }
             if(pending!=null)return;
             JsonObject request=requests.poll(20,TimeUnit.MILLISECONDS);if(request==null)return;

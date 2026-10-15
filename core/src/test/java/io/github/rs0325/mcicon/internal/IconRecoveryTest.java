@@ -1,5 +1,6 @@
 package io.github.rs0325.mcicon.internal;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -13,7 +14,7 @@ class IconRecoveryTest {
     @TempDir Path directory;
     RuntimePreparer.Prepared runtime() throws Exception {
         Path client=directory.resolve("client.jar");Files.write(client,new byte[]{1,2,3});
-        return new RuntimePreparer.Prepared(new VersionInfo("1.21.4","2024-12-03","experimental","https://example.invalid/metadata",""),Json.MAPPER.createObjectNode(),client,null,List.of(),directory,directory,21,"gui-1.21.4");
+        return new RuntimePreparer.Prepared(new VersionInfo("1.21.4","2024-12-03","verified","https://example.invalid/metadata",""),Json.MAPPER.createObjectNode(),client,null,List.of(),directory,directory,21,"gui-1.21.4");
     }
     List<CatalogEntry> catalog(int count) {
         List<CatalogEntry> result=new ArrayList<>();
@@ -54,6 +55,31 @@ class IconRecoveryTest {
             assertEquals("OUTPUT_MISMATCH",assertThrows(McIconException.class,()->exporter.export(runtime,worker,catalog(1),request())).code());
             assertEquals(0,worker.calls);
         }
+    }
+    @Test void previousContextOrAgentRequiresNewOutputOrExplicitOverwrite() throws Exception {
+        var runtime=runtime();var exporter=new IconExporter(new CancellationToken(),ProgressListener.NONE);
+        for(String changed:List.of("context","agentSha256")) {
+            assertTrue(exporter.export(runtime,new FakeWorker(-1),catalog(1),request()).complete());
+            Path manifest=directory.resolve("out/java/1.21.4/icons/manifest.json");
+            var previous=(ObjectNode)Json.MAPPER.readTree(manifest.toFile());
+            var settings=(ObjectNode)previous.path("settings");
+            settings.put(changed,changed.equals("context")?"fixed-v1":"c".repeat(64));
+            previous.put("settingsDigest",FilesSupport.hash(Json.MAPPER.writeValueAsBytes(settings)));
+            Files.write(manifest,Json.MAPPER.writeValueAsBytes(previous));
+            var rejected=new FakeWorker(-1);
+            assertEquals("OUTPUT_MISMATCH",assertThrows(McIconException.class,()->exporter.export(runtime,rejected,catalog(1),request())).code());
+            assertEquals(0,rejected.calls);
+            var overwrite=new RenderRequest("1.21.4",List.of(),true,"all",16,directory.resolve("out"),true,false,false);
+            assertTrue(exporter.export(runtime,new FakeWorker(-1),catalog(1),overwrite).complete());
+            var current=Json.MAPPER.readTree(manifest.toFile());
+            assertEquals("canonical-v1",current.path("settings").path("context").asText());
+            assertEquals("canonical-v1",current.path("context").path("profile").asText());
+            assertTrue(current.path("context").path("deterministic").asBoolean());
+            assertEquals("gui-1.21.4/1.0",current.path("adapterVersion").asText());
+        }
+        var fresh=new RenderRequest("1.21.4",List.of(),true,"all",16,directory.resolve("new-out"),false,false,false);
+        var worker=new FakeWorker(-1);
+        assertTrue(exporter.export(runtime,worker,catalog(1),fresh).complete());assertEquals(1,worker.calls);
     }
     @Test void repeatedResumeNeverClaimsUnownedOutput() throws Exception {
         Path file=directory.resolve("out/java/1.21.4/icons/assets/minecraft/textures/item/sample_00.png");

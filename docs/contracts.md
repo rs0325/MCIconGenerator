@@ -20,7 +20,7 @@ exit 0=成功、1=起動/IO等の致命エラー、2=不正な引数/版/ID、3=
 
 `render`は公式metadataでexact版を解決してから、同梱対応表のsupportで入力準備前に判定します。verifiedはopt-in不要、experimentalは`allowExperimental=true`／`--allow-experimental`が必要です。opt-inなしのexperimentalは`UNVERIFIED_VERSION`（exit2）、discovered・unsupportedは指定にかかわらず`ADAPTER_UNAVAILABLE`（exit2）です。`latest`も公式最新の解決結果に同じ判定を適用し、旧版へ切り替えません。doctorのadapter説明には実際のsupportを表示します。
 
-現在の固定51版はすべてexperimentalで、verifiedは0です。この判定を実装したこと自体は品質受入や対応版の昇格を意味しません。extractとカタログ取得の契約、描画profile・settingsDigest・PNGは変更しません。
+1.0候補のverified対象は2026-10-10固定の51版だけです。同じ最終候補で全件・独立反復・独立oracle等を受け入れてから公開します。追加の正式版はdiscoveredのままで、古いverified版へfallbackしません。extractの元bytes・保存schemaは維持します。
 
 ## ゲームworkerのメモリ上限
 
@@ -30,12 +30,12 @@ exit 0=成功、1=起動/IO等の致命エラー、2=不正な引数/版/ID、3=
 
 ## Worker JSON Lines
 
-UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1、contextProfile=fixed-v1、animationFrameZero=trueであることを要求します。profile/hookの不一致はWORKER_CONTEXT_MISMATCHです。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致はその要求を失敗にします。要求と応答を混同して成功PNGへ採用しません。1行の上限はrequestが1,048,576、responseが16,777,216 Java文字（UTF-16 code unit）です。bytesの上限ではなく、readLine後に検査します。待受ポートは使いません。
+UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1、contextProfile=canonical-v1、animationFrameZero=trueであることを要求します。profile/hookの不一致はWORKER_CONTEXT_MISMATCHです。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致はその要求を失敗にします。要求と応答を混同して成功PNGへ採用しません。1行の上限はrequestが1,048,576、responseが16,777,216 Java文字（UTF-16 code unit）です。bytesの上限ではなく、readLine後に検査します。待受ポートは使いません。
 
 requestは整形なしでserializeし、文字列内の改行はJSON escapeで保持します。WindowsのCRLFもJSONの途中へ混入させず、行末だけに使います。
 
 ```json
-{"type":"ready","protocolVersion":1,"renderer":"llvmpipe / OpenGL","contextProfile":"fixed-v1","animationFrameZero":true}
+{"type":"ready","protocolVersion":1,"renderer":"llvmpipe / OpenGL","contextProfile":"canonical-v1","animationFrameZero":true}
 {"requestId":"1","command":"catalog"}
 {"requestId":"1","type":"result","entries":[{"id":"minecraft:stone","kind":"block","status":"available","blocks":["minecraft:stone"]}]}
 {"requestId":"2","command":"render","id":"minecraft:stone","size":64,"path":"/mcicon/cache/worker-.../icon-....png"}
@@ -51,7 +51,7 @@ coreは1要求を送ってその応答を待つ直列peerです。readyは最初
 | 条件 | 現在の処理と外部結果 |
 |---|---|
 | 最初のtypeがready以外／protocolVersionが1以外 | 接続を破棄し、起動FutureはIO_FAILED（exit 1）。別protocolへのfallbackなし |
-| fixed-v1／animationFrameZeroの不一致 | 接続を破棄し、WORKER_CONTEXT_MISMATCH（exit 1） |
+| canonical-v1／animationFrameZeroの不一致 | 接続を破棄し、WORKER_CONTEXT_MISMATCH（exit 1） |
 | 応答requestId不一致／result・error以外のtype | その要求がIOExceptionで失敗。catalog段階はIO_FAILED、render段階はfailed entryのRENDER_FAILED（exit 3） |
 | workerのtype=error | code/messageを保持。catalog段階は例外、render段階はfailed entry。fail-fast指定がなければ次IDへ進む |
 | ready／応答期限超過 | WORKER_TIMEOUT、専用containerの終了を要求。render途中は部分失敗としてmanifestへ保存 |
@@ -79,9 +79,9 @@ countsはそのmanifestに蓄積した成功/失敗の数です。選択IDは書
 
 metadataと設定のhashに使う整形JSONはUTF-8・LFでserializeし、同じ入力がホストの改行形式だけで別のhashにならないようにします。以前のWindows出力はhashが変わるため、新しい出力先へ再生成してください。以前のMac/LinuxのLF形式は維持します。
 
-## fixed-v1とcanonical-v1の受入
+## canonical-v1の受入
 
-fixed-v1はcount=1、既定ItemStack、overlayなし、world/playerなし、partialTick=0です。ゲーム内の暦日を2000-01-01 UTCにし、描画中の経過時刻を1000msに固定します。0msでは初期化を時刻で判定するバニラcacheに影響するため、正の定数を使います。描画外ではバニラの時計供給元の値を維持し、GLFW初期化からの経過時刻をホストの単調時計へ置き換えません。worker自身のtimeout時計は固定しません。
+canonical-v1はcount=1、既定ItemStack、overlayなし、world/playerなし、partialTick=0です。ゲーム内の暦日を2000-01-01 UTCにし、描画中の経過時刻を1000msに固定します。0msでは初期化を時刻で判定するバニラcacheに影響するため、正の定数を使います。描画外ではバニラの時計供給元の値を維持し、GLFW初期化からの経過時刻をホストの単調時計へ置き換えません。worker自身のtimeout時計は固定しません。
 
 Dockerfileはsoftware描画に加え、Mesa llvmpipeの`LP_NATIVE_VECTOR_WIDTH=128`と`GALLIUM_OVERRIDE_CPU_CAPS=sse4.1`を指定します。CPUによる最適化の差を抑えるための条件で、[Mesaの環境変数](https://docs.mesa3d.org/envvars.html)と[llvmpipeの指定](https://docs.mesa3d.org/drivers/llvmpipe.html)に従います。実行CPUまたはエミュレーションにSSE4.1が必要です。Docker image更新でsettings digestが変わるため、以前のiconsは新しい出力先へ再生成してください。任意のMesa/LLVM版・CPU・GPUでのRGBA一致を保証するものではありません。
 
@@ -107,13 +107,13 @@ deferred GUIでは各passのアトラス割当を初期化し、単品・全件�
 
 iconsのPNGは8bit RGBA・straight alphaで、sRGB chunk（Perceptual）を付けてRGBの解釈を明示します。[PNG仕様](https://www.w3.org/TR/png-3/#11sRGB)の色空間指定に従い、RGB値のgamma変換は行いません。rawは元JARのPNG bytesを保持します。
 
-透過PNGは黒・白の不透明背景で同じアイテムを2回描画し、背景差からalphaとstraight RGBを復元します。GPU readbackの上下を反転し、alpha=0のRGBを0にします。byte RGB上の再合成はバニラのGUIブレンドとの一致を確認するもので、sRGB EOTFで線形化して合成するlinear-lightとは区別します。Issue #32の2版known-RGBA fixtureでは通常GUIとの差は最大2/255、linear-lightとの差は最大73/255でした。低alphaではRGBA8量子化後の元straight RGBを一意に復元できず、透明source RGBの保存や全色・全renderer・他GPUの無誤差復元を保証しません。色の条件・誤差分解・PNG chunkは[色精度の記録](color-precision.md)を参照してください。通常GUI fixtureでの再合成比較は[検証記録](validation.md)を参照してください。sRGB・半透明・glintを含む無改変のワールド内inventory基準画像との受入は未完了です。
+透過PNGは黒・白の不透明背景で同じアイテムを2回描画し、背景差からalphaとstraight RGBを復元します。GPU readbackの上下を反転し、alpha=0のRGBを0にします。byte RGB上の再合成はバニラのGUIブレンドとの一致を確認するもので、sRGB EOTFで線形化して合成するlinear-lightとは区別します。Issue #32の2版known-RGBA fixtureでは通常GUIとの差は最大2/255、linear-lightとの差は最大73/255でした。低alphaではRGBA8量子化後の元straight RGBを一意に復元できず、透明source RGBの保存や全色・全renderer・他GPUの無誤差復元を保証しません。色の条件・誤差分解・PNG chunkは[色精度の記録](color-precision.md)を参照してください。通常GUI fixtureでの再合成比較は[検証記録](validation.md)を参照してください。独立World基準との受入は、記録した静的fixture、無計装半透明の8比較、先頭frame・1000ms時計固定などの計装・制御を含む動的参照の条件に限ります。glintを含む完全無改変Worldの全ID・全状態・任意環境の一致を保証するものではありません。
 
 Issue #31では1.20.6のstone・player_head・chest・glass・grass_blockを64pxで照合し、agent無しclientのF2画像が通常World QAと生成PNGに誤差0で一致しました。glassはbinary alphaの素材です。この静的5種類の結果を、半透明・glint・他版・他状態の受入へ広げません。条件は[検証記録](validation.md#issue-31の無計装client基準2026-10-14)を参照してください。
 
 ### canonical-v1の固定値と版別境界
 
-canonical-v1は受入完了後に使うプロファイル名で、以下の固定値を契約とします。現在の生成物のprofile名はfixed-v1のままです。名前の定義だけでverified／deterministicへ昇格させず、実画像・反復・色の検証記録と対象環境を合わせて判断します。
+canonical-v1は以下の固定描画状態の契約です。先行fixed-v1から描画の実値・renderer処理を変えず、core要求・worker ready・manifestのprofile名を整合します。adapterVersionはadapter名/1.0です。受入対象は固定51版の同じ1.0候補と、記録したDocker image・Java・renderer・確認済みホスト条件に限ります。
 
 | 項目 | 全51版の固定値／境界 |
 |---|---|
@@ -138,7 +138,7 @@ canonical-v1は受入完了後に使うプロファイル名で、以下の固�
 
 色付けは当該版の既定stackとworld/playerなしのGUI規則を使用し、特定biome・効果・方角・実ワールド時刻を捏造しません。時計・コンパスの選択frameが全版で同一という契約はなく、前述の1.21.4の観測値を他版へ流用しません。版のexact集合は[adapters/releases.json](../adapters/releases.json)、選択はRuntimePreparer.profileForを正本とします。
 
-canonical-v1への昇格には、固定環境の反復RGBAとsingle/all一致、意味的な画像検査、色空間の確認が必要です。現在はdeterministic=falseです。agent/contextの変更はsettings digestを変え、古いPNGを再利用しません。任意NBT/componentsや状態の直積は対象外です。
+deterministic=trueはcanonical固定状態を使い、同じ入力・adapter・settings・記録環境でdecoded RGBAを再現する契約を表します。任意のimage・agent・JDKを自動認証した表示ではありません。受入imageはsha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cfのLinux amd64/Mesa25.2.8・llvmpipe LLVM20.1.2（128bit/SSE4.1）です。同じDockerfileから再buildした別imageも同一受入とは扱いません。実際のagent・image・Java・rendererは既存manifestへ記録します。固定環境の反復RGBAとsingle/all一致、独立画像・色検査で受入を確認します。context/agent変更でsettingsDigestが変わるため旧fixed-v1 iconsの再開はOUTPUT_MISMATCHとなり、新出力先または明示overwriteが必要です。rawの元bytes・パス・schemaVersion=1は維持し、自動移行は行いません。任意NBT/componentsや状態の直積は対象外です。
 
 ## Docker通信切断時の終了
 

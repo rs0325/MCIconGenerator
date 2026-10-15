@@ -49,7 +49,7 @@ if 'inspect' in sys.argv:print('sha256:'+'0'*64)
 elif 'run' in sys.argv and '--entrypoint' in sys.argv:print('openjdk version \"21.0.9\"')
 elif 'run' in sys.argv:
  Path(os.environ['MCICON_FAKE_CACHE'],'owned').write_text(sys.argv[sys.argv.index('--name')+1])
- print(json.dumps({'type':'ready','protocolVersion':1,'animationFrameZero':True,'contextProfile':'fixed-v1','renderer':'synthetic'}),flush=True)
+ print(json.dumps({'type':'ready','protocolVersion':1,'animationFrameZero':True,'contextProfile':'canonical-v1','renderer':'synthetic'}),flush=True)
  sys.stdin.readline()
  sys.exit(1)
 elif 'rm' in sys.argv:Path(os.environ['MCICON_FAKE_CACHE'],'removed').write_text(sys.argv[-1])

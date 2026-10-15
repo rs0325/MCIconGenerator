@@ -2,7 +2,7 @@
 
 Minecraft Java Editionの元テクスチャと、インベントリ表示の透過PNGを取得する開発者向けCLI・Javaライブラリです。対象は1.13以降の正式版です。
 
-開発中です。元PNG抽出、CLI・Java API、ローカルDockerでのバニラGUI描画を実装しています。固定集合の全51版に描画adapterを実装しています。全件生成とPNG監査の結果は版ごとに記録し、未完了の検査を公開しています。描画contextはfixed-v1ですが、画質と再現性の受入検証が残るため、すべてexperimentalです。設計・進捗は[Issue #1](https://github.com/rs0325/MCIconGenerator/issues/1)、実測結果は[検証記録](docs/validation.md)で管理しています。
+元PNG抽出、CLI・Java API、ローカルDockerでのバニラGUI描画を実装しています。1.0候補は2026-10-10固定の51版をcanonical-v1・verifiedの対象とします。同じ候補の全51版生成・独立全件反復・独立oracleとの131針比較の結果は[Issue #79](https://github.com/rs0325/MCIconGenerator/issues/79)に記録します。release/tagはまだ公開していません。描画状態と再現性の保証は記録した固定環境に限り、任意のGPU・image・JDKへ広げません。設計・進捗は[Issue #1](https://github.com/rs0325/MCIconGenerator/issues/1)、実測結果は[検証記録](docs/validation.md)で管理しています。
 
 インストールとJavaライブラリの利用は[配布ガイド](docs/distribution.md)、操作例は[利用ガイド](docs/usage.md)を参照してください。公開された版は[GitHub Releases](https://github.com/rs0325/MCIconGenerator/releases)で確認できます。
 
@@ -18,8 +18,8 @@ Apple SiliconのColima設定、実行例、offline手順は[利用ガイド](doc
 ```sh
 mcicon versions --json
 mcicon doctor --version 1.21.4
-mcicon render --version 1.21.4 --id stone --id diamond --allow-experimental --out out
-mcicon render --version 1.21.4 --all --allow-experimental --out out
+mcicon render --version 1.21.4 --id stone --id diamond --out out
+mcicon render --version 1.21.4 --all --out out
 mcicon extract --version 1.21.4 --texture minecraft:item/diamond --out out
 mcicon extract --version 1.21.4 --all --out out
 ```
@@ -30,6 +30,6 @@ mcicon extract --version 1.21.4 --all --out out
 
 描画passで追跡したfallbackモデルとmissing spriteは `MISSING_MODEL` / `MISSING_TEXTURE` として失敗を記録します。特殊rendererの全リソースの監査は継続中です。準備・I/Oの例外原因は任意の `--debug` でstderrへ表示できます。
 
-公開API・worker・manifestの契約は[contracts.md](docs/contracts.md)、対応版の固定集合は[releases.json](adapters/releases.json)です。未実装adapterの版を指定すると `ADAPTER_UNAVAILABLE`、experimental描画へのopt-inがない場合は `UNVERIFIED_VERSION` を返します。verified版はopt-in不要ですが、現在の固定51版はすべてexperimentalです。未登録・unsupported版は `--allow-experimental` でも描画できません。
+公開API・worker・manifestの契約は[contracts.md](docs/contracts.md)、対応版の固定集合は[releases.json](adapters/releases.json)です。未実装adapterの版を指定すると `ADAPTER_UNAVAILABLE`、experimental描画へのopt-inがない場合は `UNVERIFIED_VERSION` を返します。固定51版のverified候補ではopt-in不要です。今後追加されるexperimental版にだけ明示opt-inが必要です。未登録・unsupported版は `--allow-experimental` でも描画できません。
 
 MinecraftのゲームJAR・アセット・生成画像はこのリポジトリに含めません。本プロジェクトは非公式で、Mojang/Microsoftとは関係ありません。プロジェクトコードはMIT License、Minecraft資産は各権利者のものです。利用時は[Minecraft EULA](https://www.minecraft.net/en-us/eula)をご確認ください。
