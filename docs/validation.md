@@ -1271,3 +1271,42 @@ controllerはdump要求時とdump後のsnapshotを分け、最終到達順を`jo
 probe本体はexit0だが、private監督はDockerの小文字`no such object`を大文字で照合し、不在判定をFAILにした。元reportは変更せず、別監査のinspect exit1と正確な名前による`ps -a` exit0/空で所有containerの不在を確認した。元FAILをPASSへ読み替えず、component終了と監督判定を分けて記録する。
 
 通常preload中にmainだけがOSHIで止まっても、別threadのDatafixer完了INFOが欠ける理由は未確定である。Mainの例外処理からCrashReport/SystemReportへ入る二次停止の経路はあるが、元FAILでその例外が起きた証拠はない。次の採取ではOSHIの呼出し入口・exec復帰・出力読取と、CrashReportを作る前の例外を区別する必要がある。**元timeoutの原因は未確定で、#78はOPENを維持する。** 製品変更はなく、JUnit・製品build・正式release受入の再実施とは扱わない。[数値・世代・証拠hash](../qa/validation-2026-10-16-startup-dependency.json)を保存する。
+
+## OSHI診断区間の停止再発と対策候補（#78、2026-10-16）
+
+旧失敗と同じcore・CLI・worker・client・固定imageを使い、単一warm cacheで1.21.4のIDを各1回、最大2並列で起動した。約9,517秒で479件を終了し、478件成功・1件WORKER_TIMEOUTとなった。失敗を検出して新規開始を止め、進行中の別workerを正常終了させたため、予定1,384件を完了した試験ではない。失敗jobの対象IDはfire_coral_fanだが、render要求前の起動段階であり、当該アイテムの描画失敗とは扱わない。
+
+OSHIの`lspci -vnnm`実行入口を最後に後続記録が途絶えた。45・120・165秒の採取では26 task中24が`rt_mutex_schedule`、残る2がfutex待ちだった。ゲームJVMへの3回のjcmdはすべて応答期限超過で失敗し、正常なJava stackは得られなかった。raw protocolは0 bytes、DockerはRunning、Paused/OOMKilledはfalseだった。同じ窓に別JVMの6起動が成功している。
+
+記録fileの最終mtimeは最初の診断開始より約31秒前だった。ただし、正常exec直後の記録hookと、例外処理を経た復帰の記録にも停止可能区間がある。`Runtime.exec`内部・返却直後hook・例外処理の区別、Java mainとLinux TIDの対応、Rosetta内部の停止機構は、この証拠だけでは確定できない。原初回のshield失敗ではraw protocolとstackが保存されておらず、今回との原因同一性も遡及して証明しない。
+
+対策候補では、描画に不要なOSHIの外部診断をworker内で抑制し、JNAに固定imageの標準library探索先を渡して`ldconfig`の起動も避ける。旧OSHI 1.1は既存の失敗契約であるnull、後続版は空リストとする。SystemReport/GLXの初期化全体は省略しない。core/CLIは正式v1.0のJARと同一で、workerの変更は診断初期化に限定する。製品の180秒起動期限とretry方針は維持する。
+
+`scripts/qa/hardware-diagnostics/build.py --worker "$worker" --out "$guard_build"`で、ゲームJVMの`ProcessBuilder.start`をfork前に拒否するQAを作れる。`JAVA_HOME`には既存JDK21を指定する。ホストの正controlに加え、使用するDocker内Javaでも`GuardCheck`が要求を拒否することを校正してから、要求0を判定する。installedログだけではtransformerの作動を証明しない。`NativeProbe.java`は対応するJNA JARをclasspathにして別途コンパイルし、udev/X11の解決先を比較するための非ゲームprobeである。QA agentは製品workerへ同梱しない。
+
+候補を固定してJUnit99件とbuild/installDistを確認し、固定51版の全件60,265 PNGが正式v1.0基準のencoded bytes・pathと一致した。追加ゲームagentを使わない全件比較と、Java8/17/21/25で校正したguardを追加する51版408 PNGの比較を分けて保存した。後者は全51起動で外部process開始要求0だった。固定12項目metadataとagent以外のsettingsが基準に一致し、変更したsettingsDigestの整合、公式入力2,842件・候補・基準の不変、全groupの正常終了と所有container/snapshot/iconの回収を確認した。旧workerでは同じguardが実gameの要求を検出し、診断例外が吸収されて正常終了する正controlも確認している。
+
+9種類のJNAで標準探索と明示探索のudev/X11解決先が一致し、10種類の公式OSHI JARの対象signatureを監査した。既存class301件のbytesは不変で、既存hook匿名class3件もdebug情報を除いて一致する。workerのhashが変わるため、既存icons出力の再開には新規出力先またはoverwriteを使用する。rawの保存形式は変更しない。[候補の検証記録](../qa/validation-2026-10-16-hardware-diagnostics.json)には元FAILと測定世代のhash、固定環境、guardの対象範囲を記載する。画像一致と要求0は対策の互換性・適用の検証であり、これだけでnative停止原因の解明とは扱わない。
+
+## ゲームから分離した停止再現と実OSHI API確認（#78、2026-10-16）
+
+同じ固定imageのJava21で、Minecraft・OSHI・追加agentを使わず、存在しない`lspci -vnnm`への`Runtime.exec`だけを呼ぶ対照を実行した。短命threadの生成・終了を加えない対照は10,000回すべてがIOExceptionで帰還した。生成・終了を並行させた条件は255回の入口に対し帰還254回で止まり、155秒の監督期限まで進行しなかった。最後の入口で記録した短命threadのJava本体到達数は8,232であり、native threadの終了数ではない。停止条件のreportはFAILのまま保全し、所有containerとDocker clientを期限付きで回収した。
+
+保存した9回の状態採取では、実在する19 taskのうち、要求元1 taskが終了済みthreadへの通知完了を待ち、残る18 taskが要求元の保持するlockを待っていた。終了済みthreadの状態は退役済み・通知未完了で固定され、通常の退役entry残存とは異なる。固定Rosetta binaryとの対応を別担当2名が照合した。この制御条件では、ゲーム・Datafixer・追加agentを必要としないRosettaのthread協調停止を確認した。退役確認・終了・signal送信の細かな順序は未観測であり、同じ環境・外部起動区間・多数のrt_mutex待ちを示したMinecraftの自然再発も、PI owner等が元記録にないため同一機序とは断定しない。原初回shieldとの同一性も未証明のまま維持する。
+
+製品対策との接続は、公式OSHI6.6.5を候補worker内の実変換器で変換する独立API試験で確認した。外部起動を拒否する校正済みguardを両条件に付け、元APIは要求marker1件を検出した。変換後は5秒間の104,323,196 API呼出しと43,424回の短命threadのJava本体到達を記録し、外部起動要求0・空結果・controller終了を確認した。いずれも正常終了し、所有container回収と入力・候補・sourceの不変を確認した。これは実変換器の適用確認であり、元と同じ自然timeout条件での故障率測定ではない。
+
+API確認用の`DiagnosticsConcurrencyCheck.java`は、候補workerをclasspathとしてJDK21で別途コンパイルする。公式OSHI・JNA・SLF4Jの3 JARを引数に渡し、校正済みguardとともに`original`、続いて`fixed`を別JVMで実行する。外部起動を防ぐため、両方に`-javaagent:<spawn-guard.jar>`を必ず指定する。ゲームworkerへこの確認classを同梱しない。
+
+```sh
+javac --release 21 -encoding UTF-8 -cp "$worker" -d "$check_classes" \
+  scripts/qa/hardware-diagnostics/DiagnosticsConcurrencyCheck.java
+java -Djna.platform.library.path=/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib:/lib \
+  -javaagent:"$guard" -cp "$check_classes:$worker" \
+  io.github.rs0325.mcicon.worker.DiagnosticsConcurrencyCheck original "$oshi" "$jna" "$slf4j"
+java -Djna.platform.library.path=/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib:/lib \
+  -javaagent:"$guard" -cp "$check_classes:$worker" \
+  io.github.rs0325.mcicon.worker.DiagnosticsConcurrencyCheck fixed "$oshi" "$jna" "$slf4j"
+```
+
+今回の対策は、確認済みの停止を誘発する外部診断経路をworkerから除く。保存済みの原初回失敗を遡及して原因確定するものではなく、#78はOPENを維持する。[検証記録](../qa/validation-2026-10-16-hardware-diagnostics.json)に、停止再現とAPI対照を既存の51版画像比較と区別して保存する。

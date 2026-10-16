@@ -28,6 +28,14 @@ exit 0=成功、1=起動/IO等の致命エラー、2=不正な引数/版/ID、3=
 
 メモリ予算は描画設定digestに含めず、manifest schema・raw出力・既存保存形式を変更しません。予算だけを変えた再開は従来の画像hash照合に従います。
 
+## workerのハードウェア診断
+
+描画workerでは、OSHIの外部コマンドによるハードウェア診断を実行しません。固定Mac/RosettaのLinux amd64環境で、OSHIの外部診断区間にゲームJVMが停止した事例への対策です。同じ環境では、ゲームを使わない外部プロセス生成とthread終了の並行条件でもRosettaの協調停止を確認しています。OSHI 1.1は既存の失敗契約である`null`、後続版は空リストを返します。CPU名など診断用の情報が空値やunknownになる場合がありますが、ゲーム本来の描画初期化は維持します。
+
+JNAの`jna.platform.library.path`が未指定の場合は、`/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib:/lib`を初期化前に設定し、`ldconfig`による自動列挙を避けます。指定済みの値は保持します。JNAによるnative libraryの読込み自体は継続し、固定imageのudev/X11の解決先を検証します。独自imageの追加library directoryを自動列挙する契約はありません。
+
+これらはworker内で適用し、公式JARの保存bytes、ホストJavaの動作、起動期限、retry方針は変更しません。対策後のworkerはagent hashが変わるため、旧iconsの再開には新しい出力先または明示overwriteが必要です。rawの再開条件は変わりません。
+
 ## Worker JSON Lines
 
 UTF-8、1行1JSON、stdin=request、stdout=protocolのみ、stderr=ゲームログ。coreは最初のreadyがprotocolVersion=1、contextProfile=canonical-v1、animationFrameZero=trueであることを要求します。profile/hookの不一致はWORKER_CONTEXT_MISMATCHです。catalog/render/shutdownには一意なrequestIdを付け、返答の不一致はその要求を失敗にします。要求と応答を混同して成功PNGへ採用しません。1行の上限はrequestが1,048,576、responseが16,777,216 Java文字（UTF-16 code unit）です。bytesの上限ではなく、readLine後に検査します。待受ポートは使いません。

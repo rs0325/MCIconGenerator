@@ -1,0 +1,184 @@
+{
+  "issue": 78,
+  "baseCommit": "36230583d5d8a52ab42a76020c6e2ec1a170c9c1",
+  "productionChanged": true,
+  "historicalCauseResolved": false,
+  "causeInvestigationContinues": true,
+  "conclusion": "ゲームから分離した外部プロセス生成とthread終了の並行条件で、終了済みthreadへの通知待ちによるRosettaの協調停止を確認。製品では不要な外部診断経路を除去し、固定51版のPNG・metadataと要求guardを検証済み。Minecraft自然再発・原初回との機序の同一性は未証明。",
+  "timeoutRetryChanged": false,
+  "identity": {
+    "workerSha256": "2e66c86e756439a81c972232bbfe8fe87c47c6fc63820f4cd6d658e0819141ae",
+    "previousFormalWorkerSha256": "edc897bca0a2accb85f540ab41c8ad4c9040d514ae0a44a2f273fcd3a607031c",
+    "coreSha256": "588d99801ac6211ecb34c6714ca17441c4da0cb249c4ee51e3cfd83472528af7",
+    "cliSha256": "c8ee4d7d41f13c263adb0d4c0ca514abf61057045c54be5e556663d8f074c4c3",
+    "coreAndCliEqualFormalRelease": true,
+    "imageId": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "host": "macOS15.7.7/Apple Silicon、Colima VZ/Rosetta、Linux6.8.0-117 aarch64上の固定amd64 image/Mesa25.2.8/llvmpipeLLVM20.1.2",
+    "sourceSnapshot": "未commitの固定candidate。release/tagは作成していない。"
+  },
+  "changes": {
+    "oshi": "ExecutingCommand.runNative static methodを対象とし、OSHI1.1は既存の失敗契約null、後続はmutable empty List。10種類の公式OSHI jarを静的監査。",
+    "jna": "明示propertyがない場合だけ固定imageの標準library探索先を設定し、getLinuxLdPathsによるldconfig subprocessを避ける。",
+    "cpuInformation": "診断のCPU情報は空/unknownになる場合がある。SystemReport/GLXの初期化全体は維持。",
+    "rendering": "既存301classはbytes一致。変更した既存hook匿名class3件もdebug情報を除いたbytes一致。",
+    "resume": "worker hashが変わるため、既存icons出力の再開は新規出力先またはoverwriteが必要。raw形式は不変。"
+  },
+  "checks": {
+    "junit": {
+      "tests": 99,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "buildAndInstallDist": true,
+    "all51": {
+      "versions": 51,
+      "pngs": 60265,
+      "pngBytesAndPathEqualFormal": true,
+      "fixedMetadataFields": 12,
+      "settingsExceptAgentEqual": true,
+      "settingsDigestValid": true,
+      "additionalGameAgent": false,
+      "forcedGroups": 0,
+      "remainingGroups": 0,
+      "inputAndCandidateAndSourceChanges": 0
+    },
+    "guard51": {
+      "versions": 51,
+      "pngs": 408,
+      "externalProcessStartRequests": 0,
+      "guardInstalled": 51,
+      "targetJavaPositiveControls": [
+        8,
+        17,
+        21,
+        25
+      ],
+      "oldWorkerPositiveControl": "旧workerの実gameで要求markerを検出。診断例外はgameに吸収されて正常終了した。marker個数をdistinct要求数とは扱わない。"
+    },
+    "jnaNativeResolution": {
+      "versions": [
+        "4.4.0",
+        "5.8.0",
+        "5.9.0",
+        "5.10.0",
+        "5.12.1",
+        "5.13.0",
+        "5.14.0",
+        "5.15.0",
+        "5.17.0"
+      ],
+      "defaultAndFixedStdoutEqual": true,
+      "udev": "/usr/lib/x86_64-linux-gnu/libudev.so.1.7.8",
+      "X11": "/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0"
+    },
+    "integratedRawAudit": true,
+    "actualOshiApi": {
+      "oshi": "6.6.5",
+      "jna": "5.15.0",
+      "slf4j": "2.0.16",
+      "java": 21,
+      "transformer": "固定candidate worker JAR内の実HardwareDiagnosticsTransformerを使用。再実装ではない。",
+      "guardedBothConditions": true,
+      "originalRequestMarkers": 1,
+      "fixedRequestMarkers": 0,
+      "fixedApiCalls": 104323196,
+      "startedJavaTargetBodies": 43424,
+      "creatorJoined": true,
+      "bothNaturalExitCode": 0,
+      "containerAbsentBoth": true,
+      "sourceChanges": 0,
+      "scope": "変換適用・既存API契約の確認。自然timeoutの故障率比較ではない。"
+    }
+  },
+  "naturalRecurrence": {
+    "plannedIds": 1384,
+    "completedJobs": 479,
+    "passedJobs": 478,
+    "failedJobs": 1,
+    "elapsedSeconds": 9517.170916292,
+    "complete": false,
+    "lastRecordedInterval": "OSHI lspci -vnnmの実行を含むrunNative区間",
+    "tasks": {
+      "rtMutexSchedule": 24,
+      "futexWaitQueue": 2
+    },
+    "rawProtocolBytes": 0,
+    "gameJcmdAttempts": 3,
+    "validGameJavaDumps": 0,
+    "causeNotYetProven": "元MC記録だけではexec内部・直後hook・例外処理の区別、Java main/Linux TID対応、PI ownerと通知待ち対象が未確定。別の純JVM停止と整合するが同一機序、原初回shieldとの歴史的同一性は未証明。"
+  },
+  "limits": [
+    "固定51版・固定Docker image・今回のMac/Rosetta条件での測定。Windowsや物理Linuxをこの候補で再測定したとは扱わない。",
+    "guardはJava ProcessBuilder.startの要求を検出する。container entrypointのXvfb起動や任意native fork全ての不在を示さない。",
+    "成功反復だけで原因解消とは扱わない。Issue78はOPENを維持。",
+    "入力・baseline・製品candidateとprivate元FAIL/測定は保全。"
+  ],
+  "sourcesSha256": {
+    "worker/src/main/java/io/github/rs0325/mcicon/worker/RenderAgent.java": "6dd4673467ed0d9d4097d1e5fbae05f262ecc5191c58eac67f7f0c9902e88d08",
+    "worker/src/main/java/io/github/rs0325/mcicon/worker/HardwareDiagnosticsTransformer.java": "abc07032cf4d01f50ed1e2c710cad71776cae8895b3c9fdb625aef154ada600f",
+    "scripts/qa/hardware-diagnostics/GuardCheck.java": "1aaf131953114e2494c776ea0af5ec0299928260095e719d697ca90c2a4966cb",
+    "scripts/qa/hardware-diagnostics/NativeProbe.java": "41c30bf9403422542a5d77f09ce2996a947a9a3889a9ac616c5446a147b825bc",
+    "scripts/qa/hardware-diagnostics/SpawnGuard.java": "b9cd1202a5a012af6f1a217b3966984bbd095f7c997577062949f31d8388703f",
+    "scripts/qa/hardware-diagnostics/build.py": "14e19da41eb0623ef9f9350bd65aeb592e1e31998cb3e3ecfd828d19698ab993",
+    "scripts/qa/hardware-diagnostics/DiagnosticsConcurrencyCheck.java": "1b48ac6e296f8bcf35942352c593d1a29943ac745a134f9632e0e8fb9b2d0c5c"
+  },
+  "privateEvidenceSha256": {
+    ".local/fix-all-1/report.json": "93d8f6efad6541f19180373f45785cdddb19ec3e6192363225f8684f9277d06b",
+    ".local/fix-guard-all-1/report.json": "8f7ff10478bc9f4cde85d68de66adfab4424b9b69894c2063d9a4e7071356ec7",
+    ".local/fix-integrated-audit-1.json": "dc4d4fb8e0bf1546bd59ffb414fe362b04960076adcce85184bb2b68d40e4d58",
+    ".local/fix-baseline-before.json": "41d5a50e0d415fea091d2a020105ce06ab32be93bf4c8aebb780b278fbb5a87a",
+    ".local/fix-worker-class-comparison.json": "e6f7545ecbcb0bb0dc3bf83eb91dad2891f14a36088c8912f5ef6f36693ea031",
+    ".local/fix-class-audit-v1/report.json": "ff93af9d061b6034c73baf32105821c31e6687fca64ea076852979986681f241",
+    ".local/command-audit-1/report.json": "78fdec1f1c2dbc36e6b500b9b905e74ca5330defae2f320ef1922fde0e175ce3",
+    ".local/jna-guard-calibration-2/report.json": "db44ea78f557f6a2b21be32009e416d95782da31040818d18180cf56aafe344f",
+    ".local/spawn-guard-build-1/report.json": "1f676d7fdbdbe6c5d5d1adadb0223cbeeb7a136d58f3aa600bc6a5b89883c42d",
+    ".local/public-guard-build-1/calibration-lineage.json": "d0ee7a097b3bc7bf1f997f73152071555418deef2ec02111a0276bd5e99b41de",
+    ".local/old-worker-guard-control-1/report.json": "b3ca90c9f00f13e5cce41927cfa4cb1a1b6c3a422ec53c86b26413e4c54c9572",
+    ".local/cause-v1/natural-failure-freeze-1.json": "8a5ef7f3ab6fda0abddb186d9b245d7d2303b34db8a4dddc56dd3f7a596c100c",
+    ".local/thread-lifecycle-control-1/report.json": "76130eda6c344eec16914e33156df62b92da53eddddfed0753f569c685db55f7",
+    ".local/thread-lifecycle-churn-1/report.json": "61dc66769577ab4e16c21504609dcb50a635448d78ead7c55bb38a512e2fb5a4",
+    ".local/thread-lifecycle-stall-freeze-1.json": "698455834bc4f9fb28b0bd98716d3673dcf44d42a24678105f161c6c5d4a7769",
+    ".local/thread-lifecycle-stall-final-freeze-1.json": "4e4202b828a30b560ec61e5d8335d1bc6d7d7c2aeac22af7577ce901a7618074",
+    ".local/rosetta-cooperation-map-v1.json": "bd895f42ecdf6c843490b7cf7d1570d26b4e1443a82abe7921a5bbfc7594cb47",
+    ".local/oshi-api-concurrency-result-1/report.json": "188ae12ca6bf00bb129d7330af57c3c6b0907f732230ea63c731e08a3eaa9882"
+  },
+  "plainJvmControl": {
+    "minecraft": false,
+    "oshi": false,
+    "additionalAgent": false,
+    "churnControllers": 0,
+    "entered": 10000,
+    "returned": 10000,
+    "completed": 10000,
+    "naturalExitCode": 0,
+    "sourceChanges": 0,
+    "containerAbsent": true
+  },
+  "plainJvmStall": {
+    "minecraft": false,
+    "oshi": false,
+    "additionalAgent": false,
+    "churnControllers": 1,
+    "entered": 255,
+    "returned": 254,
+    "unreturned": 1,
+    "lastEnterIndex": 254,
+    "startedJavaTargetBodiesAtLastEnter": 8232,
+    "observationDeadlineSeconds": 155,
+    "reportPassed": false,
+    "stalled": true,
+    "stateSamples": 9,
+    "liveTasks": 19,
+    "requesterNotificationWaiters": 1,
+    "otherLivePiWaiters": 18,
+    "notificationTargetKernelTaskPresent": false,
+    "notificationTargetRetired": true,
+    "notificationPending": true,
+    "sourceChanges": 0,
+    "containerAbsent": true,
+    "cleanupClientExitCode": 137,
+    "interpretation": "要求元が終了済みthreadの通知を待ち、他18 taskが要求元の保持lockを待つ停止状態を固定binaryと独立照合。停止FAILと採取・回収成功を区別。",
+    "unproven": "退役確認・exit・signal送信の細かな順序、元MC自然再発と原初回shieldとの同一性。"
+  }
+}

@@ -15,6 +15,9 @@ public final class RenderAgent {
     public static PrintStream protocol;
     public static CanonicalTransformer canonical;
     public static void premain(String argument,Instrumentation instrumentation) throws Exception {
+        // 固定Linux amd64 imageの標準探索先を渡し、JNAのldconfig子processも避ける。
+        if(System.getProperty("jna.platform.library.path")==null)
+            System.setProperty("jna.platform.library.path","/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib:/lib");
         protocol=System.out;
         System.setOut(System.err);
         config=new JsonParser().parse(new String(Files.readAllBytes(Paths.get(argument)),StandardCharsets.UTF_8)).getAsJsonObject();
@@ -22,6 +25,7 @@ public final class RenderAgent {
         canonical=new CanonicalTransformer(symbols,config.has("profile")&&config.get("profile").getAsString().startsWith("legacy-"));
         instrumentation.addTransformer(canonical);
         instrumentation.addTransformer(new ResourceTransformer(symbols,config.has("profile")&&config.get("profile").getAsString().startsWith("legacy-")));
+        instrumentation.addTransformer(new HardwareDiagnosticsTransformer());
         final String owner=config.has("hookClass")?config.get("hookClass").getAsString():"net.minecraft.client.Minecraft";
         final String target=symbols.actualClass(owner).replace('.','/');
         final String descriptor=config.has("hookDescriptor")?config.get("hookDescriptor").getAsString():"(Z)V";

@@ -11,7 +11,7 @@ class AgentPackagingTest {
         try(ZipFile jar=new ZipFile(System.getProperty("mcicon.agentJar"))) {
             assertNull(jar.getEntry("org/objectweb/asm/ClassReader.class"));
             assertNotNull(jar.getEntry("io/github/rs0325/mcicon/worker/shaded/asm/ClassReader.class"));
-            for(String name:new String[]{"RenderAgent","CanonicalTransformer","ResourceTransformer"}) {
+            for(String name:new String[]{"RenderAgent","CanonicalTransformer","ResourceTransformer","HardwareDiagnosticsTransformer"}) {
                 try(InputStream input=jar.getInputStream(jar.getEntry("io/github/rs0325/mcicon/worker/"+name+".class"))) {
                     String constants=new String(read(input),StandardCharsets.ISO_8859_1);
                     assertFalse(constants.contains("org/objectweb/asm/"),name);
