@@ -1310,3 +1310,47 @@ java -Djna.platform.library.path=/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu
 ```
 
 今回の対策は、確認済みの停止を誘発する外部診断経路をworkerから除く。保存済みの原初回失敗を遡及して原因確定するものではなく、#78はOPENを維持する。[検証記録](../qa/validation-2026-10-16-hardware-diagnostics.json)に、停止再現とAPI対照を既存の51版画像比較と区別して保存する。
+
+<a id="startup-notification-race"></a>
+
+## 停止通知とthread終了の競合を確定（#78、2026-10-16）
+
+追加調査で、固定Mac/Rosetta環境の外部プロセス生成時に、終了中のthreadへの協調停止通知が完了せず、要求元が保持するlockへ他threadも待機するデッドロックを確認した。純JVMの失敗前kernelイベント、停止後の内部状態、実Minecraft/OSHIでの同じ待ち構造、修正workerの外部起動要求0を対応させた。対策はPR #87でmainへ反映済みで、今回の差分は再現QAと原因記録だけである。以降は、それ以前の各節に記載した「原因未確定」の時点を更新する成果であり、元FAILや測定世代を変更しない。
+
+環境はApple Silicon/macOS 15.7.7、Colima VZ/Rosetta、Linux 6.8.0-117-generic aarch64、固定amd64 image `c498eda7…`、Java21.0.12.1。Rosetta binaryのSHA-256は`43b9694de12bb6531873fc99bdb55c76aaad067ad99540e6e724b04531836b4a`。別image・別Rosetta版・native x86_64一般の原因へ広げない。
+
+| 条件 | 結果と観測範囲 |
+|---|---|
+| 純JVM、Minecraft/OSHI/agentなし、短命thread生成1系列、kernel採取あり | 8,870入場・8,870帰還。通知system callの成功186,303件。正常対照 |
+| 同2系列、kernel採取あり | 6,200入場・6,199帰還で停止。要求元1 taskと他22 taskが待機。155秒の観測期限まで未復帰。元reportはFAILのまま |
+| 実Minecraft 1.21.4、正式v1.0 worker、実OSHI反復と短命thread生成2系列 | 900入場・899帰還で停止。要求元1 taskと他24 taskが待機。製品180秒期限でWORKER_TIMEOUT、CLI exit1 |
+| 同じQAの修正worker | 10,000入場・10,000帰還、外部起動要求0、8 PNGのpath/decoded RGBAが正式基準と一致、自然exit0 |
+
+純JVMの停止条件では、clone前のRosetta協調停止が退役threadへ通知を送る区間を、開始前に準備したcgroup限定の17 tracepoint×4 CPUで観測した。CLOCK_MONOTONIC上の順序は、通知system call入口`8749097733534ns`、対象のexit入口`8749097733702ns`、signal生成result0`8749097740670ns`、送信成功ret0`8749097745623ns`、対象のsched exit`8749097746085ns`だった。対象の生成から終了までsignal配送記録は0。最終のkernel 2,490,131件は保存イベント2,485,437件とSIG11集約4,694件に一致し、両lost counterは0だった。
+
+対象はnamespace TID361588 / VM TID712179で、9回の状態採取すべてで退役済み・通知1・要求元7が固定した。要求元NS7は対象状態の`S+224`を通常futex待ち、他22 taskは自身の`S+22c`のPI lockを待ち、そのownerはNS7だった。通知を解除する対象が終了した後も要求元が待ち続け、他taskへ待ちが波及する機序である。signal生成はqueue処理後のtracepointなので、queueの実メモリ書込み時刻や退役flagのload/storeの厳密な瞬間までは主張しない。このケースはsignal生成result0を観測しており、別のESRCH失敗分岐を原因としない。[Linuxのsignal実装](https://github.com/torvalds/linux/blob/v6.8/kernel/signal.c)、[tracepoint定義](https://github.com/torvalds/linux/blob/v6.8/include/trace/events/signal.h)、[終了処理](https://github.com/torvalds/linux/blob/v6.8/kernel/exit.c)と照合した。
+
+実Minecraftでは、worker変換後Mainの固定hashを確認し、実preloadの`o.g()`直前に実OSHIの`runNative(String[])`へ`lspci -vnnm`を渡すQAを1箇所だけ追加した。最大10,000呼出しまたは90秒の反復開始窓と、短命thread生成2系列の制御条件であり、通常ゲームの呼出し頻度ではない。90秒はblocking callを中断する期限ではなく、停止時は製品180秒期限で回収する。正式worker `edc897bc…`ではindex899の呼出し中に停止し、9採取すべてで終了済みNS78091への通知1・要求元NS24が固定した。NS24は対象の`S+224`を通常futex待ち、他24 taskは自身の`S+22c`をPI待ちしownerはNS24だった。raw protocolは0 bytes、182.145秒で製品起動期限に達した。追加QAのログlockだけで停止した状態ではない。実ゲーム側には失敗前kernel時系列を付けていないため、純JVMと同じsignal生成・未配送の分岐まで直接観測したとは扱わない。
+
+修正worker `2e66c86e…`では同じQAからの10,000呼出しがすべて戻り、校正済みguardで外部起動要求0、対象8 IDすべて成功、PNG比較8件・許容超過0、自然終了を確認した。old/fixed QAのclass bytesは同一で、resourceのguard有無だけを変える。修正側は帰還が速くthread churn量も異なり、guardも追加するため、成功回数や19.741秒という所要時間を故障率・性能の比較には使わない。経路除去の根拠は、実OSHI呼出しに対する外部起動要求0である。公式入力2,842件とsourceは前後不変、両ゲーム・採取reader・container・snapshot・一時iconは所有対象だけを回収し、残存0だった。ゲームなしの受入・観測・回収境界15条件も確認した。
+
+既に確認したJUnit99件、51版60,265 PNGのencoded bytes/path一致、guard付き51版408 PNG・外部起動要求0は、同じ修正workerの回帰根拠として再利用する。今回の8枚はpath/decoded RGBA比較であり、新たな全件比較やencoded bytes/metadata比較と混同しない。製品コード・180秒期限・retry・保存形式は今回変更しない。
+
+公開QAはJDK21とPython3.12で次のように作成する。`old_worker`は正式v1.0配布、`fixed_worker`はPR #87の検証済みworker、`cache`は専用の公式1.21.4入力を持つcache。builderは全5入力のhashを固定し、実Mainの変換・未知bytesのexit97拒否を両workerで検査する。ゲーム実行は行わない。生成されたagentは実測版とclass bytes・設定resourceが一致することを別途照合した。ZIP/JAR全体のhashは時刻等で異なるため、再buildしたJAR自体をnative実測済みとは呼ばない。
+
+```sh
+python3.12 scripts/qa/hardware-diagnostics/build-game-stress.py \
+  --cache "$cache" --old-worker "$old_worker" --fixed-worker "$fixed_worker" --out "$stress_build"
+python3.12 scripts/verify-startup-diagnostics.py \
+  --cache "$cache" --cli "$old_distribution/bin/mcicon" --out "$old_result" \
+  --version 1.21.4 --id shield --runs 1 --warm-cache --delayed-observation \
+  --stage-agent "$stress_build/old.jar"
+python3.12 scripts/verify-startup-diagnostics.py \
+  --cache "$cache" --cli "$fixed_distribution/bin/mcicon" --out "$fixed_result" \
+  --version 1.21.4 --id shield --runs 1 --warm-cache --delayed-observation \
+  --stage-agent "$stress_build/fixed.jar"
+```
+
+各出力先は新規にし、既にゲーム起動済みの専用warm cacheを直列で使う。公式入力だけを用意した初回cacheでは、old側の`--warm-cache`を外す。この例は公開診断の単品試験で、今回のprivate監督による8 ID・kernel/内部状態の採取を再実行するコマンドではない。`oshi-stress.tsv`の開始/完了、入場/帰還、guard要求と製品結果を併読し、起動成功だけをQA完了としない。意図的に停止を誘発し得るため、進行中の他試験へ混ぜない。
+
+今回確定したのは、固定環境の外部起動経路から実ゲームを停止させる機序と、対策によるその経路の除去である。Rosetta自体は修正せず、headless workerから不要な診断process生成を除いている。過去b/471と原初回shieldには通知owner・対象状態・失敗前時系列がなく、歴史的に全失敗が同じ機序だったことは証明できない。元FAILと世代差を保持し、同一と読み替えない。この証拠上の限界は、今回実測した原因と対策の対応とは区別する。[数値・世代・保存証拠のhash](../qa/validation-2026-10-16-startup-notification-race.json)を記録する。Issueのcloseは別途明示承認後に行う。
