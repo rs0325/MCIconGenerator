@@ -66,7 +66,7 @@ block-itemの関連・aliasを実レジストリから取得します。水等�
 
 rawの全件はtextures/item/**とtextures/block/**のPNG・存在する付随mcmetaです。entity等は明示texture IDで抽出します。アイテムIDとtexture IDは別概念です。animated sheet・解像度・alpha・bytesを保持します。
 
-1.0候補の描画はcanonical-v1です。固定51版のverified候補はopt-in不要ですが、同候補の全受入完了前に公開しません。暦日を2000-01-01 UTC、描画中の経過時刻を1000ms、partialTickを0、atlas animationを初期フレームに固定します。時計・コンパス等の動的propertyの乱数はseed=0に戻します。モデルのquad選択など、バニラ自身がseedを指定する乱数は保持します。黒・白背景の2回のネイティブ描画からstraight alphaを復元します。manifestのcontext.deterministic=trueは、同じ入力・adapter・settings・記録環境で固定状態を再現する契約です。受入対象は[契約](contracts.md#canonical-v1の受入)に記録したimage・Java・rendererと確認済みホスト条件に限ります。任意のGPU・独自image・別JDKへのRGBA一致や、missing modelの完全検出へ保証を広げません。同じDockerfileから再buildした別imageも同一受入とは扱いません。旧fixed-v1や別agentのiconsはsettingsDigestが変わるため再開を拒否し、新しい出力先または明示的な--overwriteを使います。rawの元bytesは維持します。
+公開済み1.0.0と修正版1.0.1の描画はcanonical-v1です。固定51版のverified版はopt-in不要です。各版の配布状況は配布ガイドとGitHub Releasesを参照してください。暦日を2000-01-01 UTC、描画中の経過時刻を1000ms、partialTickを0、atlas animationを初期フレームに固定します。時計・コンパス等の動的propertyの乱数はseed=0に戻します。モデルのquad選択など、バニラ自身がseedを指定する乱数は保持します。黒・白背景の2回のネイティブ描画からstraight alphaを復元します。manifestのcontext.deterministic=trueは、同じ入力・adapter・settings・記録環境で固定状態を再現する契約です。受入対象は[契約](contracts.md#canonical-v1の受入)に記録したimage・Java・rendererと確認済みホスト条件に限ります。任意のGPU・独自image・別JDKへのRGBA一致や、missing modelの完全検出へ保証を広げません。同じDockerfileから再buildした別imageも同一受入とは扱いません。旧fixed-v1や別agentのiconsはsettingsDigestが変わるため再開を拒否し、新しい出力先または明示的な--overwriteを使います。rawの元bytesは維持します。
 
 ## Java APIと配布物
 

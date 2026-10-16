@@ -1,6 +1,6 @@
 # CLI・Javaライブラリの配布
 
-公開された版と添付ファイルは[GitHub Releases](https://github.com/rs0325/MCIconGenerator/releases)で確認してください。公開済みの初回版は`0.1.0-preview.1`のGitHubプレリリースです。正式版候補`1.0.0`も、以下の4ファイルを配布する構成です。この公開済みpreviewの描画adapterはexperimentalで、opt-inが必要です。固定51版のcanonical-v1/verifiedを対象とする1.0候補の受入結果は[検証記録](validation.md)に分けて記録し、release/tagはまだ公開していません。1.0以前はAPIやmanifestの設定が変わる場合があります。変更時の再生成条件は各版のリリースノートで説明します。
+公開された版と添付ファイルは[GitHub Releases](https://github.com/rs0325/MCIconGenerator/releases)で確認してください。正式版`1.0.0`と旧`0.1.0-preview.1`を公開済みです。以下は、起動停止対策を含む修正版`1.0.1`の手順です。各版の配布物・tag・releaseの公開状況はGitHub Releasesを参照してください。1.0.0の配布物へ修正が遡って適用されるものではありません。固定51版のcanonical-v1/verifiedを対象とする受入条件は[検証記録](validation.md)を参照してください。
 
 ## 配布物と必要環境
 
@@ -17,7 +17,7 @@ core/CLIのホストにはJava 21以上、描画にはLinux amd64のDocker環境
 
 ## CLIを展開して使う
 
-同じ版の4ファイルを取得し、展開前にchecksumを確認します。以下は正式版候補`1.0.0`の手順です。GitHub Release/tagの公開前は候補の検証用に使い、公開済みpreviewを使う場合はファイル名・versionを`0.1.0-preview.1`に読み替え、描画に`--allow-experimental`を付けてください。
+同じ版の4ファイルを取得し、展開前にchecksumを確認します。以下は修正版`1.0.1`の手順です。GitHub Release/tagの公開前は候補の検証用に使い、公開済みpreviewを使う場合はファイル名・versionを`0.1.0-preview.1`に読み替え、描画に`--allow-experimental`を付けてください。
 
 macOSでは`shasum -a 256 -c SHA256SUMS`、Linuxでは`sha256sum -c SHA256SUMS`を実行します。Windows PowerShellでは次のように照合できます。
 
@@ -27,14 +27,14 @@ Get-Content SHA256SUMS | ForEach-Object {
     $actual = (Get-FileHash $parts[1] -Algorithm SHA256).Hash.ToLowerInvariant()
     if ($actual -ne $parts[0]) { throw "SHA-256 mismatch: $($parts[1])" }
 }
-Expand-Archive mcicon-1.0.0.zip -DestinationPath .
+Expand-Archive mcicon-1.0.1.zip -DestinationPath .
 ```
 
 macOS/Linuxでは次のように展開し、JavaがPATHから使えることを確認します。CLIは実行したディレクトリに既定cacheを作るため、管理する作業フォルダで実行してください。
 
 ```sh
-unzip mcicon-1.0.0.zip
-cd mcicon-1.0.0
+unzip mcicon-1.0.1.zip
+cd mcicon-1.0.1
 java -version
 bin/mcicon --version
 bin/mcicon --help
@@ -46,12 +46,12 @@ Windowsでは同じ配布物の`bin\mcicon.bat`を使用します。ソースの
 
 ```sh
 docker --context colima-mcicon buildx build --platform linux/amd64 --load \
-  -t mcicon-render:1.0.0 -f docker/Dockerfile .
+  -t mcicon-render:1.0.1 -f docker/Dockerfile .
 bin/mcicon doctor --version 1.20.6 --docker-context colima-mcicon \
-  --docker-image mcicon-render:1.0.0
+  --docker-image mcicon-render:1.0.1
 bin/mcicon render --version 1.20.6 --id stone --id player_head \
   --docker-context colima-mcicon \
-  --docker-image mcicon-render:1.0.0 --cache cache --out icons
+  --docker-image mcicon-render:1.0.1 --cache cache --out icons
 bin/mcicon extract --version 1.20.6 --texture minecraft:item/diamond --cache cache --out raw
 ```
 
@@ -68,10 +68,10 @@ Maven形式ZIPを展開すると`mcicon-library-<version>/maven`がローカルr
 ```groovy
 plugins { id 'application' }
 repositories {
-    maven { url = uri('/absolute/path/mcicon-library-1.0.0/maven') }
+    maven { url = uri('/absolute/path/mcicon-library-1.0.1/maven') }
     mavenCentral()
 }
-dependencies { implementation 'io.github.rs0325.mcicon:mcicon-core:1.0.0' }
+dependencies { implementation 'io.github.rs0325.mcicon:mcicon-core:1.0.1' }
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 application { mainClass = 'ExportExample' }
 ```
@@ -85,7 +85,7 @@ application { mainClass = 'ExportExample' }
 5. Docker image tag
 
 ```sh
-gradle run --args='/absolute/cache /absolute/api-output /absolute/worker-1.0.0-agent.jar colima-mcicon mcicon-render:1.0.0'
+gradle run --args='/absolute/cache /absolute/api-output /absolute/worker-1.0.1-agent.jar colima-mcicon mcicon-render:1.0.1'
 ```
 
 この例はofflineでdiamondの元PNGとstone/player_headの64pxアイコンを取得します。パスに空白がある場合は`--args`内でも各パスを二重引用符で囲んでください。worker JARはcore依存から自動取得されないため明示指定します。APIのジョブ・取消・closeの契約は[利用ガイド](usage.md)とcoreのjavadocを参照してください。
@@ -95,9 +95,9 @@ gradle run --args='/absolute/cache /absolute/api-output /absolute/worker-1.0.0-a
 リポジトリのソースで次を実行します。Gradle wrapperは9.8.1、ビルドにはJava 21が必要です。`releaseVersion`は生成物に記録するバージョンの指定で、tag作成や外部公開は行いません。
 
 ```sh
-./gradlew -PreleaseVersion=1.0.0 test prepareRelease
-python3 scripts/audit-distribution.py build/release --version 1.0.0
-python3 scripts/test-distribution-audit.py build/release --version 1.0.0
+./gradlew -PreleaseVersion=1.0.1 test prepareRelease
+python3 scripts/audit-distribution.py build/release --version 1.0.1
+python3 scripts/test-distribution-audit.py build/release --version 1.0.1
 ```
 
 `build/release/`に4ファイルが生成されます。`releaseVersion`未指定の通常buildは`0.1.0-SNAPSHOT`です。CLI表示とicons/raw manifestのtoolVersionは同じbuild versionを使用します。未リリースの形式に移行処理は追加していません。配布候補の生成、PRのmerge、GitHub Release公開は別操作です。
@@ -108,4 +108,4 @@ python3 scripts/test-distribution-audit.py build/release --version 1.0.0
 
 `1.0.0`の描画受入は固定51版と検証済みLinux amd64・Mesa Docker imageを対象にします。Dockerfileの再buildは、固定済みimage IDと同じbytes・画素を保証しません。ホスト別の実測範囲と配布候補の受入状況は[検証記録](validation.md)を参照してください。
 
-一過性のworker起動timeoutは[Issue #78](https://github.com/rs0325/MCIconGenerator/issues/78)で原因調査を継続しています。診断整備と後続の正常起動確認は、元の障害の原因解消を意味しません。失敗時はexit code・worker logと出力manifestを確認し、自動的な再試行は行いません。正式公開は配布受入の完了後に別途判断します。
+[Issue #78](https://github.com/rs0325/MCIconGenerator/issues/78)は、固定Mac/Rosetta環境の外部process生成とthread終了の競合を実証し、workerから不要な外部診断を除く対策を確認して完了しました。Rosetta自体の修正ではなく、過去すべての失敗の厳密な同一性は未証明として保持します。1.0.1はこの対策を含む構成ですが、公開済み1.0.0は含みません。worker hashが変わるため既存iconsの再開には新規出力先または明示`--overwrite`が必要です。rawの元bytes・保存形式は変更しません。失敗時はexit code・worker logと出力manifestを確認し、自動的な再試行は行いません。公開状況と添付ファイルはGitHub Releasesで確認してください。
