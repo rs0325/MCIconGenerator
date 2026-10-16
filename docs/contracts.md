@@ -30,7 +30,7 @@ exit 0=成功、1=起動/IO等の致命エラー、2=不正な引数/版/ID、3=
 
 ## workerのハードウェア診断
 
-描画workerでは、OSHIの外部コマンドによるハードウェア診断を実行しません。固定Mac/RosettaのLinux amd64環境で、OSHIの外部診断区間にゲームJVMが停止した事例への対策です。同じ環境では、ゲームを使わない外部プロセス生成とthread終了の並行条件でもRosettaの協調停止を確認しています。OSHI 1.1は既存の失敗契約である`null`、後続版は空リストを返します。CPU名など診断用の情報が空値やunknownになる場合がありますが、ゲーム本来の描画初期化は維持します。
+描画workerでは、OSHIの外部コマンドによるハードウェア診断を実行しません。固定Mac/RosettaのLinux amd64環境で、外部プロセス生成と短命threadの終了が競合すると、終了threadへの停止通知が未解除のまま全体をロック待ちにする機序を確認しました。実MinecraftのOSHI反復でも同じ通知・lock待ち構造を再現し、対策後は外部起動要求0と画像一致を確認しています。条件と歴史的な失敗との照合限界は[検証記録](validation.md#startup-notification-race)を参照してください。OSHI 1.1は既存の失敗契約である`null`、後続版は空リストを返します。CPU名など診断用の情報が空値やunknownになる場合がありますが、ゲーム本来の描画初期化は維持します。
 
 JNAの`jna.platform.library.path`が未指定の場合は、`/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib:/lib`を初期化前に設定し、`ldconfig`による自動列挙を避けます。指定済みの値は保持します。JNAによるnative libraryの読込み自体は継続し、固定imageのudev/X11の解決先を検証します。独自imageの追加library directoryを自動列挙する契約はありません。
 
