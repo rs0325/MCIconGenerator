@@ -2,7 +2,7 @@
 
 Minecraft Java Editionの元テクスチャと、インベントリ表示の透過PNGを取得する開発者向けCLI・Javaライブラリです。対象は1.13以降の正式版です。
 
-元PNG抽出、CLI・Java API、ローカルDockerでのバニラGUI描画を実装しています。1.0候補は2026-10-10固定の51版をcanonical-v1・verifiedの対象とします。同じ候補の全51版生成・独立全件反復・独立oracleとの131針比較の結果は[Issue #79](https://github.com/rs0325/MCIconGenerator/issues/79)に記録します。release/tagはまだ公開していません。描画状態と再現性の保証は記録した固定環境に限り、任意のGPU・image・JDKへ広げません。設計・進捗は[Issue #1](https://github.com/rs0325/MCIconGenerator/issues/1)、実測結果は[検証記録](docs/validation.md)で管理しています。
+元PNG抽出、CLI・Java API、ローカルDockerでのバニラGUI描画を実装しています。公開済み1.0.0は2026-10-10固定の51版をcanonical-v1・verifiedの対象とします。同じ候補の全51版生成・独立全件反復・独立oracleとの131針比較の結果は[Issue #79](https://github.com/rs0325/MCIconGenerator/issues/79)に記録しています。1.0.0の正式release/tagは公開済みです。1.0.1では起動停止対策を含み、配布版の公開状況はGitHub Releasesで確認できます。描画状態と再現性の保証は記録した固定環境に限り、任意のGPU・image・JDKへ広げません。設計・進捗は[Issue #1](https://github.com/rs0325/MCIconGenerator/issues/1)、実測結果は[検証記録](docs/validation.md)で管理しています。
 
 インストールとJavaライブラリの利用は[配布ガイド](docs/distribution.md)、操作例は[利用ガイド](docs/usage.md)を参照してください。公開された版は[GitHub Releases](https://github.com/rs0325/MCIconGenerator/releases)で確認できます。
 

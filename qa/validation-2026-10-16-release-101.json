@@ -1,0 +1,248 @@
+{
+  "issue": 89,
+  "version": "1.0.1",
+  "date": "2026-10-16",
+  "baseCommit": "0e035b7f27c7feddbc3b3eba763fef78958a264b",
+  "status": "1.0.1配布候補の3ホスト実測を完了。Git/tag/release公開前の検証記録。",
+  "acceptanceCompleted": true,
+  "productCodeChanged": false,
+  "candidateJarsSha256": {
+    "lib/core-1.0.1.jar": "0a409bf9d7ff62b1ecaa9eb5bb6c38db6dba65021908351d75b6b67d08378ffe",
+    "lib/cli-1.0.1.jar": "81c0547420344d009d2ee9fdd5827c7b03b8f1400f6724f00c0047b64339bbaf",
+    "worker/worker-agent.jar": "2e66c86e756439a81c972232bbfe8fe87c47c6fc63820f4cd6d658e0819141ae"
+  },
+  "runtimeCandidateArtifactsSha256": {
+    "mcicon-1.0.1.zip": "115e9559e46b35bfb16d72bedf68cf9c3e7601eb535efb4bca8682d53fbda0ee",
+    "worker-1.0.1-agent.jar": "2e66c86e756439a81c972232bbfe8fe87c47c6fc63820f4cd6d658e0819141ae",
+    "SHA256SUMS": "001b0a42e8481f42a929e930537a1ee2bf163c99b59c4ef0d5315c6ff5507fcc",
+    "mcicon-library-1.0.1.zip": "472dfbaa02a3381d8238274f0f986c61bb9b557840ab9d966c633c29feb1b205"
+  },
+  "junit": {
+    "tests": 99,
+    "failures": 0,
+    "build": "prepareRelease成功"
+  },
+  "distributionAudit": {
+    "passed": true,
+    "normalCases": 1,
+    "rejectionCases": 9,
+    "totalCases": 10
+  },
+  "runtimeHosts": {
+    "mac": {
+      "passed": true,
+      "helpVersion": true,
+      "rawVersions": 5,
+      "renderVersions": 5,
+      "pngCompared": 15,
+      "inputChanges": 0,
+      "ownedCleanupPassed": true
+    },
+    "linux": {
+      "passed": true,
+      "launcherRawVersions": 5,
+      "renderVersions": 5,
+      "pngCompared": 15,
+      "inputChanges": 0,
+      "ownedCleanupPassed": true,
+      "scope": "固定Linux amd64 Java21親containerから同じARM64 VM daemonへ接続。物理Linuxや任意環境の保証ではない。"
+    },
+    "windows": {
+      "state": "passed",
+      "executed": true,
+      "preflightStaticReview": "PASS",
+      "planArchiveSha256": "22c63a39bacbf17342ab4106c5a477f6cf0f755b99f1f3de3993475350ebe2d6",
+      "plannedRawVersions": 5,
+      "plannedRenderPngs": 15,
+      "launcherRawPassed": true,
+      "rawVersions": 5,
+      "libraryConsumerPassed": true,
+      "streamProbeCasesPassed": 4,
+      "deadlineFixtureOwnedCleanupPassed": true,
+      "renderGameJobsAttempted": 5,
+      "resultZipSha256": "9bff6e1cd70adfb9175c4813615b4620727bbda77d6954fb82ec5d78a9d61b7e",
+      "sourceAndNewCacheCheckedFilesEach": 958,
+      "sourceAndNewCacheChanges": 0,
+      "desktopStartAuthorized": true,
+      "passed": true,
+      "renderVersions": 5,
+      "renderPngsCompared": 15,
+      "ownedCleanupPassed": true,
+      "renderResultZipSha256": "e4dfd117a41fa2c6e7afcae6d47f64492cfe3a856fa67e116d34aacad2caab71",
+      "scope": "既存Docker Desktopを通常起動し同じSSH接続内で検証。ユーザー導入先のアプリを使用。新規software/OS再起動/設定変更なし。"
+    }
+  },
+  "libraryConsumer": {
+    "passed": true,
+    "exitCode": 0,
+    "toolVersion": "1.0.1",
+    "libraryCoreSha256": "0a409bf9d7ff62b1ecaa9eb5bb6c38db6dba65021908351d75b6b67d08378ffe",
+    "sourceSha256": "f1690e9dc31dd2c6246eab0f7a1eab3e478d20b15eb3593602dd1d06f91b3593",
+    "scope": "Maven形式library ZIPから独立javac/Java利用。旧5/6引数constructorとraw API。"
+  },
+  "lineage": {
+    "passed": true,
+    "modules": [
+      {
+        "module": "core",
+        "entryCount": 47,
+        "differences": [
+          {
+            "entry": "io/github/rs0325/mcicon/internal/IconExporter.class",
+            "onlyVersionUtf8Changed": true,
+            "changedUtf8Values": [
+              "1.0.1"
+            ]
+          },
+          {
+            "entry": "io/github/rs0325/mcicon/internal/RawExporter.class",
+            "onlyVersionUtf8Changed": true,
+            "changedUtf8Values": [
+              "1.0.1"
+            ]
+          },
+          {
+            "entry": "io/github/rs0325/mcicon/internal/ToolVersion.class",
+            "onlyVersionUtf8Changed": true,
+            "changedUtf8Values": [
+              "1.0.1"
+            ]
+          }
+        ],
+        "passed": true
+      },
+      {
+        "module": "cli",
+        "entryCount": 19,
+        "differences": [
+          {
+            "entry": "io/github/rs0325/mcicon/cli/Main.class",
+            "onlyVersionUtf8Changed": true,
+            "changedUtf8Values": [
+              "MCIconGenerator 1.0.1"
+            ]
+          }
+        ],
+        "passed": true
+      },
+      {
+        "module": "worker",
+        "entryCount": 348,
+        "differences": [],
+        "passed": true
+      }
+    ],
+    "workerFullJarSha256": "2e66c86e756439a81c972232bbfe8fe87c47c6fc63820f4cd6d658e0819141ae",
+    "scope": "core/CLIのVERSION定数は利用classへinlineされる。class constant poolの版文字列だけを1.0.0に戻すと全entry bytes一致。worker JAR全bytesは既存51版検証済み候補と同一。",
+    "previousOverStrictFailurePreserved": ".local/candidate-lineage-1.json"
+  },
+  "reusedRenderingEvidence": {
+    "workerJarBytesIdentical": true,
+    "record": "qa/validation-2026-10-16-hardware-diagnostics.json",
+    "versions": 51,
+    "pngs": 60265,
+    "guardVersions": 51,
+    "guardPngs": 408,
+    "externalProcessRequests": 0,
+    "historicalAllFailuresIdentityProven": false
+  },
+  "candidatePacking": "実測候補v1を保全し、実行JAR/launcherを保持して文書/QAを最終再packする。Maven repositoryのlastUpdatedと対応checksumも再生成される。内容差分と最終checksumは外部の最終配布監査/公開確認計画に固定し、同梱QAへZIP自身の自己参照hashを入れない。",
+  "retainedPreparationFailures": [
+    {
+      "kind": "Python PATH不足で検証開始前exit127",
+      "record": ".local/mac-distribution-101.log",
+      "resolution": "絶対Python3.12パスで新ログに実行、Mac全件成功"
+    },
+    {
+      "kind": "Linux cache metadataディレクトリ未作成",
+      "record": ".local/linux-prepare-101.py",
+      "resolution": "複製済み957入力を再検証し専用continuationで準備完了。ゲーム失敗ではない。"
+    },
+    {
+      "kind": "ToolVersion定数inlineを考慮しない過剰に厳密な比較",
+      "record": ".local/candidate-lineage-1.json",
+      "resolution": "全class constant poolを照合し版UTF8以外の差0。元FAILを保持。"
+    },
+    {
+      "kind": "Windowsコマンド長制限でQA開始前停止",
+      "record": ".local/windows-connect-v2.log",
+      "resolution": "同一SHAのスクリプトをファイル転送し短い入口へ変更。raw/APIまで成功。"
+    },
+    {
+      "kind": "Windows Docker Desktop Linux engine未起動",
+      "record": ".local/windows-results-v2-normalized/results-render-101/report.json",
+      "resolution": "v2/v3のゲーム開始前FAILを保全。明示許可で既存Desktopを通常起動し、同じ接続内のv4で5版15PNG成功。"
+    },
+    {
+      "kind": "Docker Desktopの既定Program Filesパスが不在",
+      "record": ".local/windows-start-desktop-v1.log",
+      "resolution": "既存docker.exeからユーザー導入先を読み取り確認し、同じ既存アプリを通常起動。"
+    },
+    {
+      "kind": "通常起動後に別SSH接続でengineが応答せず、18回の有限readiness確認失敗",
+      "record": ".local/windows-results-v3-normalized/docker-readiness-v3.json",
+      "resolution": "ゲーム開始0。元FAILを保全し、旧検証済み有限起動手順と描画を同一接続内で実行したv4が成功。SSH終了との厳密な因果自体は未証明。"
+    }
+  ],
+  "sourceAndEvidenceSha256": {
+    ".local/mac-distribution-101-v1/report.json": "cd5a3f8b07dc5ba329f15738322d3bc33c171815cf8f5433c2bb2d405b5c550a",
+    ".local/linux-render-host-v2-results/report.json": "ac281b6a8ebfb617c12218005cc8aa1408f2444675756266e921048a03d4345b",
+    ".local/linux-distribution-101/report.json": "4d6ee54d8c46fcf60d828bff030341ef67a9b6cad7fa93de7f147351bd04fcc3",
+    ".local/consumer/report.json": "8e3e87723c52ea3da7cb5bc3256e39d01522c6e4980652adb02b16c9e22ff3d9",
+    ".local/candidate-lineage-2.json": "9b256d2a58cfa35073bf95fbf9a251248c7ce20369d9b403aaac2caa9bce5e1f",
+    ".local/distribution-audit-1.json": "efe55e9074b8ccfc6d74dec748db98abeccd7c12b11bd0fbf6d7dff995b16c02",
+    ".local/verify-mac-distribution-101.py": "e157ff49e69a749eb35aa1fe61d03bea315b33c788a304251e6afad115ce54df",
+    ".local/linux-driver-101.py": "c204f82afaaf5c8ea8195771c4ccea951fccb8558f7e0f34d1138e972dd7733d",
+    ".local/linux-probe-101.py": "0535b4e71f005120eacb22a07f220811d385ecb0ee1984e2ceee3dc0a21b4ee2",
+    ".local/linux-raw-101.py": "a0f5efe57c80a93b8b2c89fd1ad555927eda9547d29558ec54f12d556fe0054d",
+    ".local/linux-prepare-101-continuation.py": "111eb4221b11aabbb83dd7b6843512aaa37c6cca4b2ca6d6cd405e7eddc79f98",
+    ".local/consumer/DistributionConsumer.java": "f1690e9dc31dd2c6246eab0f7a1eab3e478d20b15eb3593602dd1d06f91b3593",
+    ".local/windows-connect-v2.ps1": "6d42247b059fcad6bc51e1bfc7762d5ef2a7d71aeb9057af66341d8058d4f6ec",
+    ".local/windows/prepare.py": "9e020f569289c441d60794eb0e9f6f912be771ce35faac6962cce42a4610fce9",
+    ".local/windows/run-raw.py": "46b81ba5a3e00dc8cd357a07997948a9de9c01a7b661117cba8c2d315f1d4c8c",
+    ".local/windows/run-render.py": "964ac47ccf35c1e38868f11f830d33adda8babaef5c711ca328161c62296f575",
+    ".local/windows/check-inputs-after.py": "7332acccca954511bcf69c20e227d1e2d4b68ff8a736a0987c18f4653b38a302",
+    ".local/windows/render-v13/supervise-probe.py": "512c45a02e4369113db46bcb832d9d87bf11075768f11a61c83fd8d1ac0b5526",
+    ".local/windows/windows_guard_v9.py": "6d3591b1bf0b66b89e6641821dec93f41fd0c1164f20a55bc19c2d6fabf61afd",
+    ".local/input-cache-freeze.json": "56b8301f84a04b3fc9a2292b5fe6a9a4d01410e81a8949d529798df4845f868f",
+    ".local/windows-bundle-freeze-v2.json": "dba6578c05a033145c93f431d14966afc6cef967e4c2d379f69c4d0234531b77",
+    ".local/candidate-v1/freeze.json": "8ae6df4e626aa61ecccb1a60ff109a20e1e26325da984a489db03426699cf504",
+    ".local/prepare-release-101.log": "2470653e861c83f7ce7236a5ee0dd916c2b9e92261e24f2857c07a464ebd1e52",
+    ".local/distribution-rejection-tests-1.log": "a0df21eca9ae8d6e0789b74389b2765ed47ad404215abc079d4ca61212db6e50",
+    ".local/windows-results-v2-normalized/status.json": "5b816f2b1cb64820421cc565422ca9bdee4091c59efc2a307e3765a030c95bd2",
+    ".local/windows-results-v2-normalized/results-raw-101/report.json": "e4c5d48d41b70f3c6d5d48d390cb8219d2424d5e19340938cb2cbe3fafed2ebc",
+    ".local/windows-results-v2-normalized/results-render-101/report.json": "ac67cf82d00dacf7faffff40224e43d9c08287d4e7e8c7d919a54112531639e2",
+    ".local/windows-results-v2-normalized/probe-results/report.json": "eb5922c9a27757a1d9d32184f9b335686a141b5b8e4669aea6973c66ae217221",
+    ".local/windows-launch-v2.ps1": "b3288c340aa01902782c139cb3b3e936d3db5ef9adc4b18c5a1ec2f695b6a8f5",
+    ".local/windows-resume-v3-freeze.json": "e97d3dbaaaae8b752acdacda0ebf46429e2660a04f95a304d610cb28c4034554",
+    ".local/windows-inputs-after-raw.json": "abc08d48c2f9b393f8e9f5156dd773c4d855c748b326770b68e92160eb33a4c1",
+    ".local/windows-desktop-approval-plan.json": "e8c05e340b8f85f57dc5a48178dac0048e2c56b119348205e532219b151dcac7",
+    ".local/host-integrated-audit.json": "ec716bff36b730692f6ebf94cce1197ce05e8eb238a21ea9ef6b16770dfb3294",
+    ".local/audit-release-hosts.py": "4c849c81c46f0950756a72a6f3103dedf0f3b26049c776fcf24c38f096d841aa",
+    ".local/issue89-results-v4.zip": "e4dfd117a41fa2c6e7afcae6d47f64492cfe3a856fa67e116d34aacad2caab71",
+    ".local/issue89-results-v3.zip": "0163da4c35dfa3e2051fe9097e57c574a4ed177220c23d75b380803566c0d08e",
+    ".local/windows-resume-v4-freeze.json": "1ece6c09ece22e3eb9a4a3e08ba056b6a40f362c49f59416e2e2289a309aa6a7",
+    ".local/windows-resume-v4.ps1": "623ba8b66a031bc0f84c8cf0744aa060ea56cf21564298d23fee65e052909b6a",
+    ".local/windows-start-desktop-v2.ps1": "8b7344d9fa5977edf612227c20359fd881323ae10b57f786df9830081ddf8493",
+    ".local/windows-desktop-located.json": "9b574f18c528a9a613e6f129c417d973dccdce0f8aa865f2e21caa9a1c2e812a",
+    ".local/windows-results-v3-normalized/docker-readiness-v3.json": "1efba4c10587def4f28626a76ea12b5fc36160a5b64100f392e62d27249dc806",
+    ".local/windows-results-v4-normalized/status-v4.json": "9990572fe5acb7c93d904cc8cd13a3820c11f8c57f1948dd725689f7bab26f55",
+    ".local/windows-results-v4-normalized/desktop-start-v4.json": "dc5a7a5c2a9ed6dcd9e56366f1d8d50b4977fd70fd764a910d6b53842b0dcf95",
+    ".local/windows-results-v4-normalized/inputs-after.json": "abc08d48c2f9b393f8e9f5156dd773c4d855c748b326770b68e92160eb33a4c1",
+    ".local/windows-results-v4-normalized/results-render-101-v4/report.json": "6e58c5ec7dbd62675aac8ff551987a6bbf66902ddb4406145c7740d4ec4285ed",
+    ".local/windows-results-v4-normalized/resume-v4/run-render-v4.py": "992fb772344325b56f6e9d1a0d6a1a30866f9de1a095fc020166f886aeacb5ff",
+    ".local/windows-results-v4-normalized/resume-v4/start-desktop.ps1": "ea556d8d08240eba6385afead09ffbd97b600b1f3d2556cec74bf81b230996cc"
+  },
+  "integratedHostComparison": {
+    "passed": true,
+    "hosts": 3,
+    "renderPngs": 45,
+    "rawPngs": 15,
+    "encodedPngBytesAndPathsEqualBaseline": true,
+    "metadataExpectedChanges": [
+      "toolVersion 1.0.0→1.0.1",
+      "agentSha256と対応settingsDigest"
+    ],
+    "evidence": ".local/host-integrated-audit.json"
+  }
+}

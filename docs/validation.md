@@ -1354,3 +1354,13 @@ python3.12 scripts/verify-startup-diagnostics.py \
 各出力先は新規にし、既にゲーム起動済みの専用warm cacheを直列で使う。公式入力だけを用意した初回cacheでは、old側の`--warm-cache`を外す。この例は公開診断の単品試験で、今回のprivate監督による8 ID・kernel/内部状態の採取を再実行するコマンドではない。`oshi-stress.tsv`の開始/完了、入場/帰還、guard要求と製品結果を併読し、起動成功だけをQA完了としない。意図的に停止を誘発し得るため、進行中の他試験へ混ぜない。
 
 今回確定したのは、固定環境の外部起動経路から実ゲームを停止させる機序と、対策によるその経路の除去である。Rosetta自体は修正せず、headless workerから不要な診断process生成を除いている。過去b/471と原初回shieldには通知owner・対象状態・失敗前時系列がなく、歴史的に全失敗が同じ機序だったことは証明できない。元FAILと世代差を保持し、同一と読み替えない。この証拠上の限界は、今回実測した原因と対策の対応とは区別する。[数値・世代・保存証拠のhash](../qa/validation-2026-10-16-startup-notification-race.json)を記録する。Issueのcloseは別途明示承認後に行う。
+
+## 修正版1.0.1の配布準備（#89、2026-10-16）
+
+PR #87の起動停止対策とPR #88の原因記録を含む、未公開の1.0.1候補を作成した。JUnit99件、配布監査10条件（正常1・拒否9）に成功した。worker JARは既存の51版60,265 PNG一致・guard付き51版408 PNGの外部起動要求0を確認した候補と全bytesが一致する。core/CLIの差は、ToolVersionと利用classへinlineされた版表示のUTF8定数だけで、その他のclass/実行資源は一致する。
+
+実ZIPから展開した候補をMacとLinux親CLIで検証し、各5版の元diamond PNG抽出、各5版15 PNGのpath/RGBAと期待metadata、正常終了・所有回収・入力不変を確認した。対象は1.13・1.18.2・1.20.6・1.21.4・26.3。同じ固定amd64 image/Mesaでの結果であり、Linux親はARM64 VMのDocker daemonへ接続するcontainerで、物理Linuxや任意GPUの保証へ広げない。Maven形式ZIPのcoreを使う独立Java consumerも成功した。
+
+Windowsは接続許可を受けて候補v2を展開し、bat/help/version・5版raw・独立Java consumer・旧API binary・Job期限回収・転送4条件に成功した。旧入力と新cache各958ファイルの再照合も不変だった。初回の描画はDocker Desktop未起動でゲーム開始前にFAILとなり、追加許可を得て既存アプリを通常起動した。別接続のreadiness確認は18回で失敗したが、既存の有限起動手順と描画を同一SSH接続内で実行したv4では5版15PNG・期待metadata・自然終了・所有回収が成功した。SSH終了との厳密な因果まで断定せず、元FAILを保全する。Windowsコマンド長制限は同じSHAのスクリプトをファイル転送し、短い入口から実行して解消した。OS再起動・software導入・設定変更は行っていない。
+
+3ホスト各5版15枚、計45 PNGのencoded bytes/path/期待metadataと、各5版計15 rawの元bytesを独立再照合し、すべて一致した。実測候補v1を保持し、公開確認用に実行JAR/launcherを保持して文書/QAを最終再packし、Maven repositoryの生成時刻と対応checksumも再生成する。実測候補との内容差分と最終checksumを外部計画で監査する。配布候補の生成・Git merge・tag/release公開は別操作であり、今回の記録時点では未公開である。[受入状況・数値・証拠hash](../qa/validation-2026-10-16-release-101.json)を参照する。
