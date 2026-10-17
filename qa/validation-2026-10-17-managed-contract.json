@@ -1,0 +1,299 @@
+{
+  "issue": 91,
+  "status": "in-progress",
+  "baseCommit": "76f79a1b13da28c669f16301c377724519899a6e",
+  "productCodeChanged": false,
+  "publicApiImplemented": false,
+  "managedRuntimeAdopted": false,
+  "checks": {
+    "workerResource": {
+      "passed": true,
+      "toolVersion": "1.1.0-probe",
+      "agentSha256": "2e66c86e756439a81c972232bbfe8fe87c47c6fc63820f4cd6d658e0819141ae",
+      "scope": "薄いworker wrapper+nested agent resourceの契約実証。製品resolver未実装、署名/公開を実施していない",
+      "cases": [
+        {
+          "case": "classpath",
+          "expectedSuccess": true,
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": "flattened",
+          "expectedSuccess": true,
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": "duplicate",
+          "expectedSuccess": false,
+          "exit": 1,
+          "passed": true
+        },
+        {
+          "case": "corrupt",
+          "expectedSuccess": false,
+          "exit": 1,
+          "passed": true
+        }
+      ]
+    },
+    "macPreparation": {
+      "configurationSyntax": "passed",
+      "rosettaAvailabilityReadOnly": "installed",
+      "faultTestsPassed": true,
+      "firstFixtureFailure": "存在しないcommandのexit表記に旧値not-startedを期待したfixtureを訂正。元FAILログ保全。",
+      "vmStarted": true,
+      "renderExecuted": true,
+      "review": "v5 PASS",
+      "preservedPriorQa": "v3の9条件と元FAILを保全。v4は親先行exit子残存・wait非Timeout例外を追加し、client8/gate8を成功確認",
+      "firstV4FixtureFailure": "Darwin終了親getpgid ESRCHの観測を反映し、psで未reap親PGを照合する修正後の再試験で成功",
+      "syntheticCases": 16,
+      "normalControls": 2,
+      "rejectionOrRecoveryCases": 14,
+      "preparationPassed": true,
+      "normalStopPassed": true,
+      "stopped": true,
+      "clientGroupsCollected": 10,
+      "elapsedSeconds": 159.20523190498352,
+      "evidence": "private .local/probe/mac-v5/report.json",
+      "renderCandidate": "Mac単体v2/並列v4を実行しPASS。準備v5と実描画各runの証拠は別世代で保全"
+    },
+    "windows": {
+      "sshConnected": false,
+      "newDistributionImported": false,
+      "scripts": "bundle-v4-frozen-independent-review-passed-task-permission-pending-not-connected",
+      "consumerCompiled": true,
+      "renderExecuted": false,
+      "syntheticChecks": {
+        "controller": 18,
+        "outerSupervisor": 16,
+        "collector": 4,
+        "actualDockerInfoGate": 2,
+        "passed": true,
+        "dockerWrapper": 12
+      },
+      "bundle": {
+        "bytes": 828926655,
+        "sha256": "e42860c0d74ebe48b9e540805a7b4e7eb5d6c668aa15ddc24763927d375d9ba1",
+        "entries": 21,
+        "gameAssetsIncluded": false
+      }
+    },
+    "linuxRootless": {
+      "executed": false
+    },
+    "macSingleRender": {
+      "passed": true,
+      "version": "1.20.6",
+      "images": 3,
+      "size": 64,
+      "pngAndFullMetadataMatch": true,
+      "officialInputFiles": 244,
+      "metadataFiles": 1,
+      "inputUnchanged": true,
+      "temporaryWorkerFiles": 0,
+      "remainingContainers": 0,
+      "vmStopped": true,
+      "clientGroupsCollected": 12,
+      "evidence": "private .local/probe/mac-render-v2/report.json",
+      "parallelCancelExecuted": false
+    },
+    "macParallel": {
+      "passed": true,
+      "evidence": "private .local/probe/mac-parallel-v4/report.json",
+      "apiPassed": true,
+      "cancelledSucceeded": 1,
+      "completedSucceeded": 3,
+      "simultaneousRunning": true,
+      "cgroupEach": {
+        "memoryBytes": 2147483648,
+        "cpuQuotaRatio": 4
+      },
+      "retryPerformed": true,
+      "samplerErrors": 0,
+      "inputAUnchanged": true,
+      "inputBUnchanged": true,
+      "remainingContainers": 0,
+      "samplerStopped": true,
+      "vmStopped": true,
+      "clientGroupsCollected": 9,
+      "previousFailurePreserved": "private mac-parallel-v3/report.jsonとpost-run-audit.json",
+      "previousQaFailure": "Docker29.9の既知不在stderr小文字形式をsampler whitelistが未収録。元FAIL保全",
+      "previousRunPostAudit": {
+        "pngAndFullMetadataMatch": true,
+        "inputAUnchanged": true,
+        "inputBUnchanged": true,
+        "metadataUnchanged": true,
+        "temporaryFiles": 0,
+        "remainingContainers": 0,
+        "samplerStopped": true,
+        "vmStopped": true
+      },
+      "pngAndFullMetadataMatch": true
+    },
+    "sharedSchemas": {
+      "passed": true,
+      "scope": "構造schemaだけ。fixtureは非配布/非採用、署名や実artifact取得を検証していない",
+      "positive": 2,
+      "negative": 17,
+      "checks": [
+        {
+          "case": "runtime-positive",
+          "expectedValid": true,
+          "passed": true
+        },
+        {
+          "case": "update-positive",
+          "expectedValid": true,
+          "passed": true
+        },
+        {
+          "case": "unknown-protocol",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "invalid-agent-hash",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "missing-inventory-hash",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "runtime-cannot-contain-tool-payload",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "nested-path-traversal",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "absolute-helper-path",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "unknown-field",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "http-download",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "zero-size",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "negative-update-sequence",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "non-stable-channel",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "update-requires-tool-payload",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "update-descriptor-traversal",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "stable-prerelease-rejected",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "runtime-invalid-prerelease",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "missing-cpu-requirement",
+          "expectedValid": false,
+          "passed": true
+        },
+        {
+          "case": "unknown-cpu-requirement",
+          "expectedValid": false,
+          "passed": true
+        }
+      ],
+      "schemaHashes": {
+        "managed-runtime-v1.schema.json": "8eab0e941ceb3d2eb06b9f46bb837afa41f46a0f2c4565d9f4a6feae5ba8ad15",
+        "stable-update-v1.schema.json": "8976e015b6750fe4f7ecbe6c25945bbc7a7106686cee469855f7df09a5b57e38"
+      },
+      "evidence": "private .local/contract-v2/schema-report.json"
+    },
+    "publicContractContent": {
+      "passed": true,
+      "files": [
+        "docs/managed-runtime-1.1.md",
+        "qa/validation-2026-10-17-managed-contract.json",
+        "schemas/managed-runtime-v1.schema.json",
+        "schemas/stable-update-v1.schema.json"
+      ],
+      "privateAddressesOrPersonalPathsIncluded": false,
+      "secretsIncluded": false,
+      "gameAssetBytesIncluded": false,
+      "scope": "公開テキスト4fileだけ。公開PGP fingerprintは本人提示済み公開情報"
+    }
+  },
+  "remaining": [
+    "Windows新タスクの明示許可後、専用WSL方式で代表描画・所有回収を実証（v4候補の反証は完了）",
+    "Linux rootlessの追加phase許可と方式実証",
+    "OS下限・実配布bytesのlicense/notice/source・3host方式の最終確定",
+    "共有契約先行PRの反証とGit公開許可、以後も#91完成条件は継続"
+  ],
+  "sourcePins": {
+    "core/src/main/java/io/github/rs0325/mcicon/MCIconGenerator.java": "93af89a1846699d84e7e68d7968b3ef9ff24aa46753350d1b26221abb5af2ad5",
+    "core/src/main/java/io/github/rs0325/mcicon/WorkerOptions.java": "55bac650adcb5004fff87d714cbdd8afd65841cbdf67a22b209364897ab9b79b",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/WorkerClient.java": "14280fb546ead819589de5f45f83e6ff5a528731474d433f452ed6ded01bccb2",
+    "core/build.gradle": "fcc5fbf660cc30aad8d2192ce48c11c70cf47911b6e0c9d535aca3963e2970c7",
+    "worker/build.gradle": "eb610ecfb18567111634cfe8402868b43c4b20c3b4553e6169cb811fea2a9f54",
+    "docker/Dockerfile": "6fd2e046e7a204890edcc05731e5d6e1555cf7014b5d04256c695643032bb7fa"
+  },
+  "externalPrerequisites": {
+    "centralAccountNamespace": "io.github.rs0325-verified-user-confirmed",
+    "appleDeveloperId": "not-prepared-user-confirmed",
+    "windowsCodeSigning": "not-prepared-user-confirmed",
+    "accountRegistrationPerformed": false,
+    "paidContractPerformed": false,
+    "publicationPerformed": false,
+    "centralPublicPgpFingerprint": "B766BA473AF3178D42371A0F50562040DFAE0F27",
+    "centralPublicKeyFetch": "keys.openpgp.org HTTP 200 (root確認)",
+    "centralTokenIssued": "unconfirmed",
+    "privateKeyOrPassphraseReceived": false,
+    "updaterTrustKey": "separate-not-created",
+    "signingKeysCreatedByAgent": false
+  },
+  "sharedContract": {
+    "status": "v2-prepared-limited-review-pending",
+    "scope": [
+      "Java管理APIと既存API互換",
+      "worker nested resourceとmetadata",
+      "immutable runtime descriptorとstable更新manifest",
+      "helper/所有/取消境界",
+      "CLI bootstrapperとpayload Java runtimeの更新所有"
+    ],
+    "issue91Completed": false,
+    "hostImplementationIncluded": false,
+    "releaseArtifactPublished": false,
+    "subsequentStart": "共有契約確定commitを#92/#93の前提にする。3host実証は#91で継続"
+  }
+}

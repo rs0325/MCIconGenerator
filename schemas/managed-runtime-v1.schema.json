@@ -1,0 +1,334 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runtimeId",
+    "toolVersion",
+    "host",
+    "minimumOsVersion",
+    "helper",
+    "worker",
+    "rendering",
+    "artifacts"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "runtimeId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+    },
+    "toolVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$"
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "os",
+        "arch"
+      ],
+      "properties": {
+        "os": {
+          "enum": [
+            "macos",
+            "windows",
+            "linux"
+          ]
+        },
+        "arch": {
+          "enum": [
+            "aarch64",
+            "x86_64"
+          ]
+        }
+      }
+    },
+    "minimumOsVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "macOSはProductVersion、WindowsはNT build版、Linuxはkernel版。capability検査も別途必須。"
+    },
+    "helper": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocolVersion",
+        "artifactId",
+        "executable"
+      ],
+      "properties": {
+        "protocolVersion": {
+          "const": 1
+        },
+        "artifactId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+        },
+        "executable": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"
+        }
+      }
+    },
+    "worker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "toolVersion",
+        "agentSha256",
+        "protocolVersion",
+        "adapterSetSha256"
+      ],
+      "properties": {
+        "toolVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$"
+        },
+        "agentSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "protocolVersion": {
+          "const": 1
+        },
+        "adapterSetSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "rendering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platform",
+        "imageArtifactId",
+        "imageId",
+        "contextProfile",
+        "javaExecutables",
+        "mesaVersion",
+        "llvmVersion",
+        "environment",
+        "cpuRequirement"
+      ],
+      "properties": {
+        "platform": {
+          "const": "linux/amd64"
+        },
+        "imageArtifactId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+        },
+        "imageId": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "contextProfile": {
+          "const": "canonical-v1"
+        },
+        "javaExecutables": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "major",
+              "executable",
+              "sha256"
+            ],
+            "properties": {
+              "major": {
+                "enum": [
+                  8,
+                  17,
+                  21,
+                  25
+                ]
+              },
+              "executable": {
+                "type": "string",
+                "pattern": "^/[^\\s]+/bin/java$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "mesaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "llvmVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 1024
+          },
+          "propertyNames": {
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          }
+        },
+        "cpuRequirement": {
+          "const": "sse4.1"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 3,
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/artifact"
+          },
+          {
+            "properties": {
+              "role": {
+                "enum": [
+                  "host-helper",
+                  "guest-base",
+                  "renderer-image"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rs0325/MCIconGenerator/schemas/managed-runtime-v1.schema.json",
+  "title": "管理描画環境descriptor v1",
+  "description": "共有構造だけを固定する。実配布値とOS方式は#93/各OS実証後に発行する。",
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "role",
+        "url",
+        "bytes",
+        "sha256",
+        "unpackedBytes",
+        "format",
+        "inventoryPath",
+        "licenseFiles",
+        "noticeFiles",
+        "sourceArchives",
+        "inventorySha256"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+        },
+        "role": {
+          "enum": [
+            "host-helper",
+            "guest-base",
+            "renderer-image",
+            "tool-payload"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "unpackedBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "format": {
+          "enum": [
+            "zip",
+            "tar.gz",
+            "tar.xz",
+            "qcow2"
+          ]
+        },
+        "inventoryPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$",
+          "description": "descriptor同梱resource内のinventory位置。raw image自身のarchive entryとは限らない。"
+        },
+        "licenseFiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"
+          }
+        },
+        "noticeFiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"
+          }
+        },
+        "sourceArchives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "url",
+              "sha256"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "inventorySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}
