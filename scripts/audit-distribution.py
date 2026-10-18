@@ -90,7 +90,7 @@ def audit(directory, version):
                 if pom.findtext('m:' + key, namespaces=ns) != value:
                     failures.append('POMの' + key + 'が不一致')
             artifacts = {d.findtext('m:artifactId', namespaces=ns) for d in pom.findall('m:dependencies/m:dependency', ns)}
-            if artifacts != {'jackson-databind', 'mcicon-worker'}:
+            if artifacts != {'jackson-databind', 'mcicon-worker', 'commons-compress', 'xz'}:
                 failures.append('POMの依存関係が不一致')
         worker_coordinate = libroot + 'maven/io/github/rs0325/mcicon/mcicon-worker/' + version + '/'
         worker_jars = [n for n in library.namelist() if n.startswith(worker_coordinate) and n.endswith('.jar')]

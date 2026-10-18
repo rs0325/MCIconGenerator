@@ -54,7 +54,7 @@ tasks.named('run') { args layout.buildDirectory.dir('fixture').get().asFile.abso
             break
     report = {'version': args.version, 'source': 'local-candidate' if args.repository else 'mavenCentral',
               'workspace': str(workspace), 'initialGradleCacheEmpty': True, 'results': results,
-              'managedApi': '未実装の接続・実描画は#93後の結合受入で確認',
+              'managedApi': '6署名と固定信頼設定不足の明示失敗を確認。実描画・OS実機受入は未実施',
               'passed': len(results) == 2 and all(r['passed'] for r in results)}
     (output / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report, ensure_ascii=False, indent=2))
@@ -111,6 +111,19 @@ public class Consumer {
         MCIconGenerator.class.getMethod("render",RenderRequest.class,WorkerOptions.class);
         MCIconGenerator.class.getMethod("doctor",String.class,WorkerOptions.class);
         MCIconGenerator.class.getMethod("listEntries",String.class,WorkerOptions.class);
+        var managed=new ManagedOptions(root.resolve("runtime"),Duration.ofSeconds(2),startup,item,3072,2048);
+        MCIconGenerator.class.getMethod("renderManaged",RenderRequest.class);
+        MCIconGenerator.class.getMethod("renderManaged",RenderRequest.class,ManagedOptions.class);
+        MCIconGenerator.class.getMethod("doctorManaged",String.class);
+        MCIconGenerator.class.getMethod("doctorManaged",String.class,ManagedOptions.class);
+        MCIconGenerator.class.getMethod("listEntriesManaged",String.class);
+        MCIconGenerator.class.getMethod("listEntriesManaged",String.class,ManagedOptions.class);
+        try(MCIconGenerator generator=new MCIconGenerator(input,true,ProgressListener.NONE,new CancellationToken())) {
+            try {generator.doctorManaged("1.13",managed).join();throw new AssertionError("未発行runtimeを成功扱いしました");}
+            catch(java.util.concurrent.CompletionException failure) {
+                if(!(failure.getCause() instanceof McIconException cause)||!cause.code().equals("MANAGED_RUNTIME_INVALID"))throw failure;
+            }
+        }
         System.out.println("CONSUMER_OK "+worker.sha256());
     }
 }

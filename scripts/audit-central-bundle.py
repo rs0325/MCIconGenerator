@@ -60,7 +60,7 @@ def audit(bundle, version, require_signatures=False):
                     failures.append(artifact + ': POM情報不足 ' + field)
             dependencies = pom.findall('m:dependencies/m:dependency', ns)
             ids = {d.findtext('m:artifactId', namespaces=ns) for d in dependencies}
-            if ids != ({'jackson-databind', 'mcicon-worker'} if artifact == 'mcicon-core' else set()):
+            if ids != ({'jackson-databind', 'mcicon-worker', 'commons-compress', 'xz'} if artifact == 'mcicon-core' else set()):
                 failures.append(artifact + ': 依存集合不一致')
             for dependency in dependencies:
                 if dependency.findtext('m:artifactId', namespaces=ns) == 'mcicon-worker':

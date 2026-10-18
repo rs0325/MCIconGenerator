@@ -1,12 +1,12 @@
 # 1.1.0の管理描画環境と更新契約
 
-状態: Issue #91で検証中。共有API・artifact・descriptor・helper・更新責務を先行固定する候補であり、公開commit確定までは後続実装の前提にしない。Windows/Linux方式・OS下限・実配布bytesは未実証のまま分けて追跡する。
+状態: 共有契約はPR #100、worker配布/resolverはPR #101で固定済み。Issue #93で管理APIと内部runtime機構を接続した。本番pin/信頼鍵・実runtime配布物は未発行であり、固定信頼設定がなければ取得前に拒否する。各OS方式・OS下限・実配布bytesの受入は別に追跡する。
 
 起点は `76f79a1b13da28c669f16301c377724519899a6e`。製品の現在の動作は[契約v1](contracts.md)を正本とする。1.1.0でもJava利用側はJava 21以上、Minecraft資産は実行時に公式配信から取得し、ゲーム資産・認証情報を再配布しない。GitHub Actionsは使わない。
 
 ## 先行固定する範囲
 
-この変更は共有API・worker artifact・descriptor schema・helper起動境界・CLI更新所有者だけを固定する。製品resolver/runtime manager、各OS helper、Maven Centralやinstallerの公開を実装した変更ではない。#91の3ホスト実証と最終方式採用は未完了のまま継続する。
+#91の先行変更は共有API・worker artifact・descriptor schema・helper起動境界・CLI更新所有者だけを固定した。resolver/runtime managerの実装は#92/#93で行い、各OS helperやMaven Central/installerの公開とは区別する。#91の3ホスト実証と最終方式採用は未完了のまま継続する。
 
 ## 利用者の完成条件
 
@@ -31,9 +31,9 @@ VZは同じCPU archのguestを実行するため、Apple Siliconでamd64 guest�
 
 既存 `WorkerOptions` のrecord成分、旧5/6引数constructorと8引数constructor、`render(RenderRequest, WorkerOptions)`・`doctor(String, WorkerOptions)`・`listEntries(String, WorkerOptions)` を保持する。既存の明示Docker経路は自動取得・更新を行わない。CLIは旧Docker指定がなければ管理方式を既定にし、`--docker-context`・`--docker-image`・`--worker-jar`・`--java-home` を明示した既存利用は従来のDocker方式へ残す。管理方式の明示と旧Docker指定を混在させた場合は引数エラーとし、意図を推測して切り替えない。
 
-共有契約案は `ManagedOptions` と `renderManaged(RenderRequest, ManagedOptions)`・`doctorManaged(String, ManagedOptions)`・`listEntriesManaged(String, ManagedOptions)`。既存メソッドと別名にし、`render(request, null)` 等の既存sourceにoverload曖昧性を生じさせない。管理root、起動・個別期限、container/heapメモリを指定でき、既定factoryはOSごとの専用rootを選ぶ。`ManagedOptions` にDocker context・agentパス・ゲームJavaパスを要求しない。追加型・署名・Options・例外codeは今回の共有契約commitで固定し、Issue #92/#93の前提にする。Windows/Linux方式とOS下限の実証は#91の別残件として維持する。
+共有契約は `ManagedOptions` と `renderManaged(RenderRequest, ManagedOptions)`・`doctorManaged(String, ManagedOptions)`・`listEntriesManaged(String, ManagedOptions)`。既存メソッドと別名にし、`render(request, null)` 等の既存sourceにoverload曖昧性を生じさせない。管理root、起動・個別期限、container/heapメモリを指定でき、既定factoryはOSごとの専用rootを選ぶ。`ManagedOptions` にDocker context・agentパス・ゲームJavaパスを要求しない。追加型・署名・Options・例外codeは今回の共有契約commitで固定し、Issue #92/#93の前提にする。Windows/Linux方式とOS下限の実証は#91の別残件として維持する。
 
-### 管理APIの具体案
+### 管理APIの契約
 
 戻り値は既存型を使い、`renderManaged` は `CompletableFuture<ExportResult>`、`doctorManaged` は `CompletableFuture<DiagnosticReport>`、`listEntriesManaged` は `CompletableFuture<List<CatalogEntry>>` とする。各メソッドにはOptionsを受け取る版と、同じ設定の `ManagedOptions.defaults()` を使う引数1個の版を用意する。既存 `render` 等へ別Options型のoverloadは追加しない。
 
@@ -48,13 +48,13 @@ CompletableFuture<List<CatalogEntry>> listEntriesManaged(String version);
 CompletableFuture<List<CatalogEntry>> listEntriesManaged(String version, ManagedOptions options);
 ```
 
-このコードブロックは未実装の契約署名であり、1.0.1で呼べる使用例ではない。
+この署名は1.1.0開発sourceへ追加済みであり、1.0.1で呼べる使用例ではない。本番の固定pin・信頼鍵・runtimeが未発行の段階では、APIが存在しても描画環境の準備成功を保証しない。
 
 `ManagedOptions` は同じpackageのpublic recordとし、成分は `Path runtimeRoot`、`Duration preparationTimeout`、`Duration startupTimeout`、`Duration itemTimeout`、`int containerMemoryMiB`、`int heapMemoryMiB`。既定はOS標準root、準備15分、worker ready 180秒、個別要求30秒、container 3072 MiB/heap 2048 MiBとする。準備期限は初回download・helper準備・専用環境起動の全体に適用し、ゲームworkerのready待機と分ける。root/期限はnull不可、期限とcontainer/heapは正、heapはcontainer未満とし、不正なOptions構築は既存 `WorkerOptions` と同様に `IllegalArgumentException`。rootは利用時に絶対pathへ正規化し、未作成directoryを許可する。指定予算を黙って増減しない。
 
-管理APIの呼出しは、公式入力cacheに加えて `runtimeRoot` へ検証済みartifact・所有記録を書き、必要なら専用環境を起動する。`doctorManaged` も描画環境を準備してJava/Mesaを診断するが、全件描画やOS機能変更はしない。軽量なOS/arch確認と検証済みhelperの取得後、大容量guest/imageのdownload・VM起動より先に前提不足を診断する。不足時は不健康な既存 `DiagnosticReport` を返し、前提名と不足理由・必要操作をCheckへ記録する。入力の `offline` 設定は管理artifactの取得にも適用する。
+管理APIの呼出しは、公式入力cacheに加えて `runtimeRoot` へ検証済みartifact・所有記録を書き、必要なら専用環境を起動する。`doctorManaged` も描画環境を準備してJava/Mesaを診断するが、全件描画やOS機能変更はしない。軽量なOS/arch確認と検証済みhelperの取得後、大容量guest/imageのdownload・VM起動より先に前提不足を診断する。不足時は不健康な既存 `DiagnosticReport` を返し、前提名と不足理由・必要操作をCheckへ記録する。回収失敗も重なった場合は、suppressedの回収情報を含む元例外をFutureへ保持する。入力の `offline` 設定は管理artifactの取得にも適用する。
 
-取消は既存instanceの `CancellationToken` と `close()` の契約を引き継ぐ。個別描画の途中取消は未完了 `ExportResult`、管理環境の準備・検証・起動失敗はFutureの例外へ通知する。公開SPI、任意helper command、updater設定は管理Optionsへ加えない。この節は#91の具体化案であり、完成契約commitが確定するまで製品APIの存在を示さない。
+取消は既存instanceの `CancellationToken` と `close()` の契約を引き継ぐ。個別描画の途中取消は未完了 `ExportResult`、管理環境の準備・検証・起動失敗はFutureの例外へ通知する。公開SPI、任意helper command、updater設定は管理Optionsへ加えない。この契約に沿ったAPI接続とfixture検証を#93で実装した。実配布物と各OS helper、実機の受入は未完了である。
 
 `mcicon-core` は同版の `mcicon-worker` をruntime推移依存にする。cycleはなく、workerはMinecraft型を公開しない。worker artifactは薄いwrapper JARとし、`META-INF/mcicon/worker/agent.jar` に完全なagent JARを1個、`META-INF/mcicon/worker/version.properties` にtool版と内側agentのSHA-256を持つ。外側へagent classを重ねず、coreにもagent bytesを重複同梱しない。metadataはUTF-8/LFの2行 `toolVersion=<tool版>\nagentSha256=<小文字64桁SHA-256>\n` とし、重複keyや余分なkeyを許可しない。timestampや絶対build pathを含めない。agentJar生成後に同じbuildでmetadataとwrapperを生成し、core同梱descriptorも同じagent hashへ固定する。元JARの `CodeSource` がファイルであることを要求しない。coreはresource bytesをhash検証して専用cacheへ原子的に書き、ジョブごとのsnapshotを既存 `-javaagent` へ渡す。resource名の衝突・tool版違いは拒否する。fat JARによる単純な依存統合でresourceが失われる場合を互換保証には含めず、明確な不足診断とする。
 
@@ -121,7 +121,7 @@ root/
 
 signature・size/hash・path逸脱・link・展開上限・互換条件に失敗した世代は使用しない。同じruntimeIdに異なるdigestを上書きせず、内容digest別のimmutable世代へ置く。署名済み旧sequenceの再提示は自動更新として採用せず、復旧先は既にローカルで受入済みの旧世代に限定する。未準備offlineは失敗、準備済みofflineはpin済み世代を使う。
 
-構造は[managed-runtime-v1.schema.json](../schemas/managed-runtime-v1.schema.json)と[stable-update-v1.schema.json](../schemas/stable-update-v1.schema.json)を正本とする。schemaはruntimeで自動的に検証される実装の存在を示さず、#92/#93のparser/validatorが満たす入力契約とする。署名検証後に構造・互換・参照を検証し、追加fieldや未知protocolを黙って採用しない。
+構造は[managed-runtime-v1.schema.json](../schemas/managed-runtime-v1.schema.json)と[stable-update-v1.schema.json](../schemas/stable-update-v1.schema.json)を正本とする。schemaは#93の署名後parser/validatorが満たす入力契約である。本番のtrust/pin・実artifactの発行を示すものではない。署名検証後に構造・互換・参照を検証し、追加fieldや未知protocolを黙って採用しない。
 
 Schemaに加え、次を意味上の必須条件とする。artifact IDとOS/archの組は重複不可、helper/imageの参照IDは同じdescriptorの正しいroleに解決し、tool/worker版とcoreに同梱するagent hashは一致する。`javaExecutables` のmajorは重複不可とし、adapter集合が要求する全majorを含める。tool版はroot buildの `releaseVersion` と同じ構文、stable更新manifestの版はプレリリースを含まない `X.Y.Z` だけを許す。runtimeにはtool payloadを入れない。全相対pathは空segment・`.`・`..`・absolute・drive・backslashを拒否し、展開後も所有root外へ出さない。hostへ展開するarchiveのlinkは拒否する一方、guest baseのrootfs内部linkはhostへ展開せずOSのimport手段へ渡す。
 

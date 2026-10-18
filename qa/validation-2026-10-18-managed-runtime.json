@@ -1,0 +1,248 @@
+{
+  "issue": 93,
+  "status": "接続反証2件を修正し通常build/候補/独立consumer成功。最終限定反証待ち、Issue全体は実runtime発行等が未完了。",
+  "baseCommit": "3c001f678363dd7a9e38b6e47058d3edf239589e",
+  "branch": "feature/issue-93",
+  "owner": "issue93_runtime",
+  "java": "Temurin 21.0.9+10-LTS",
+  "os": "macOS arm64（fixture検証のみ）",
+  "verification": {
+    "normalBuild": "成功。一時initを使用しない通常build依存へ統合済み",
+    "buildCommand": "./gradlew build prepareRelease prepareCentralCandidate -PreleaseVersion=1.1.0 --offline --no-daemon",
+    "tests": {
+      "core": {
+        "tests": 111,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cli": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "worker": {
+        "tests": 32,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "candidateAudits": "配布と未署名Central候補のローカル監査成功。PGP署名・Central公開は未実施。",
+    "consumer": {
+      "version": "1.1.0",
+      "source": "local-candidate",
+      "workspace": "/Users/ryuman/Documents/ChatGPT/MinecraftIconGenerator/worktrees/issue-93-runtime-manager/MCIconGenerator/build/managed-review-fixes-consumer/consumer-p67eyjo2",
+      "initialGradleCacheEmpty": true,
+      "results": [
+        {
+          "metadata": "module",
+          "passed": true
+        },
+        {
+          "metadata": "pom",
+          "passed": true
+        }
+      ],
+      "managedApi": "6署名と固定信頼設定不足の明示失敗を確認。実描画・OS実機受入は未実施",
+      "passed": true
+    },
+    "warnings": [
+      "Javadocの未記載param等",
+      "Java 8 source/target廃止警告",
+      "Gradleの非推奨機能"
+    ],
+    "scope": "fixture/API/transportと通常buildの検証。本番runtime・実OS helper・実画像受入の成功ではない。"
+  },
+  "scope": [
+    "元bytes SHA-256とEd25519後のstrict UTF-8/JSON/互換・参照/path検証",
+    "HTTPS、部分取得再開、正確なsize/hash、期限/取消、file lock、offline、空き容量",
+    "host-helperのZIP/TAR/GZIP/XZ安全展開、guest/image元bytes保持、immutable世代確定・再検証",
+    "leaseの世代pin・owner照合・他job/不明証拠の回収拒否",
+    "固定helper protocol 1、argv分離、control応答・timeout・取消・release証拠保持",
+    "#92 resolverを使うManagedOptions/6公開APIと非同期・offline・取消/close接続",
+    "旧Options/APIと明示Docker経路を維持したperjob launch/診断/取消prefix接続",
+    "固定trust/resource不足、preflight前提不足の公開doctor report、interrupted cleanupの分類/証拠保持",
+    "恒久archive依存とOSS通知・候補監査・独立consumer"
+  ],
+  "gates": [
+    "本番pins/trust/resourceと実runtime artifactの発行・公開許諾",
+    "実packagerでadapter digest、TAR header/padding込みunpackedBytes、XZ64MiB制約とOS helperの結合を検証",
+    "inventory/SBOM/LICENSE/NOTICE/source/上流署名と実component対応の確定",
+    "OS固有resource所有schema/回収、実機実証、51版画像受入"
+  ],
+  "safety": "fixture鍵はテスト専用、本番pin/鍵/URL仮置きなし。VM起動/Windows接続/Git公開/PGP署名/Central公開なし。管理信頼設定不足は管理artifact取得・管理root書込前に拒否。renderの公式版情報取得と版受入は先に行う。世代/VMの自動削除は未実装。",
+  "files": {
+    "THIRD_PARTY_NOTICES.md": "705a0a5dfcf44dad6f1615cfd02121a78a8aac27ba5d6cc0564c6a7304a2611e",
+    "core/build.gradle": "9248c7b2f245a59ce24813c29cb7c88ca24fbe8ea4263d28e51793d75ad31211",
+    "core/src/main/java/io/github/rs0325/mcicon/MCIconGenerator.java": "b4cfa8527b51f8d7544dc609c47f55c7e0f821c7dbb295af7d754a304e943652",
+    "core/src/main/java/io/github/rs0325/mcicon/ManagedOptions.java": "716d30cdd0cf3da1f4edddece3443dd24d68476b8f6e456d4095f3d4effdb6bb",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/Diagnostics.java": "0b3669fd9d9ddc2d48697bed069ae5cb770af28706667772b19b6d6aa95a0e5b",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/WorkerClient.java": "5829f6b995f0d492000e0ee06d343789b4ada96f664826746cb8661d05950bac",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/WorkerLaunch.java": "f1b0a483af85c2de7c4aaefbab1768180afbbb97ca61acc7023092fbdc30c1b1",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/ManagedRuntime.java": "e377e9b709a7cf04b708f3a2a7c7582f2361b6ac0c5b1f4904eac02ba2f953bf",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeArchive.java": "5a3fe834e58916d8b11b23c9ff8fe2d5ee232f6a553e48acb457c056ff921a9f",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeDescriptor.java": "b19cfd1ab3ef3b547b8edd4f0d5941141925482364160d577d9e12cf661cf9e0",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeGeneration.java": "8dbc4494671f6c00c2957fb0904c43873e10c9b90a99abed37ad402d3a024096",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeHelper.java": "5304fbd8196324663950e6a5cdf61913d9fdda3f5082ecdf082d12484adaa63d",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeLease.java": "f9cc1f53171ac44db6f617d3a03a9ee150974a8608bc3807728625df8460a135",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeStore.java": "ee2977f22b04d1ed57b06e78b78b9bc89c4b3caae7c80812d5cf43a5047c7458",
+    "core/src/test/java/io/github/rs0325/mcicon/ManagedApiTest.java": "0255a935097e00f48e7a0ea5e1d33364ee1c471243aeb27b3cd26d0ae89479c2",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/WorkerLaunchTest.java": "05d181bf7526617cb82a05667af2ccc112fb639222e0d3eb9bef3ebdbe04a04a",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/LeaseLockProcess.java": "ebe91b3f9b38beeca5d8152f0302d6cafda3cf03d3b3788009aac23b67dbe01f",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/ManagedFixture.java": "e51817d7607d5f5328161856e92a2c95d2c1dbde9d7fe42a6decd1e8d118f4a0",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/ManagedRuntimeTest.java": "53fcbbdd440822d3a2466c9efecae366cefcab7ea998ccca51ad3933c844e15f",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeArchiveTest.java": "9cb373ce4cf995c1e4d9551e3f537d1dcc79d055695c6ff13872c982ac857e34",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeDescriptorTest.java": "bb41553f16930b7dae80ad15bc9c3fc41cc21f96caeda7b874119f16a1364b77",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeGenerationTest.java": "e6695c03fa9ec706f6583e84d62e6a8c4cb0f07ba7671a2255057eac6f361337",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeHelperTest.java": "e062046193a076008a998ff245bef73a66f64a3d42c2abcae1d562b8210e46ca",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeLeaseTest.java": "4ef6bdc6b94c4c98d5a0adda943228bc30913ccffbb9099d0deb0ec76cf02a0c",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeStoreTest.java": "1b905091c9ea5f4f25a261dc067ef3c38dfde898d2ea15e4a136929ae203ae96",
+    "docs/managed-runtime-1.1.md": "0b710afbc08423ac779b42bd4cd5fa0f456a8b8a5b85be10437a13d5569933b0",
+    "docs/managed-runtime-implementation.md": "0684c2bfe1f0c84a60a64f5c75bf747ab1c4deb570196dd2633c4ff4d3efea60",
+    "licenses/Commons-Codec.txt": "a8b651c340014f59e87ee958ecee1d27807fbe9291c74c180f52ed22b71bdb93",
+    "licenses/Commons-Compress.txt": "ae86c86c28a331a4f88ade7647622a2fa88b5eab80a25232a5ac5193abba4f65",
+    "licenses/Commons-IO.txt": "37efb3a670f1015a3ad17504f9cc167467a027da633c2c65a28fc39bfcef8c82",
+    "licenses/Commons-Lang.txt": "b04ba74480262348f18a163fc0cce98f6a2df688323b4b0b9304d375a72f72bf",
+    "licenses/XZ-for-Java.txt": "1e77ef26cee5216d6531e49cbf2f6111a0270dc7b322fc65477063c5aff88766",
+    "scripts/audit-central-bundle.py": "a56f80f321579650c23e9fea32e878eeccf42a5f471e880ceb14c7e6290b360b",
+    "scripts/audit-distribution.py": "eedcc6fe06af0c0cd9a0703edec0687aa7b9fd56e1c3fe813fbb7b75ff87db06",
+    "scripts/verify-maven-consumer.py": "982f74dce7417f311b58003ef75ee27eddb034c9290ac4fe234e48479ecbeab3"
+  },
+  "verificationBeforeReview": {
+    "command": "./gradlew :core:test --init-script /private/tmp/issue93-runtime-deps.gradle --offline --no-daemon",
+    "result": "成功",
+    "coreTests": 83,
+    "managedTests": 21,
+    "failures": 0,
+    "skipped": 0,
+    "normalBuild": "未実行。archive依存は一時initのみで本番build未統合",
+    "initScript": "allprojects {\n    afterEvaluate { p ->\n        if (p.name == 'core') {\n            p.dependencies.add('implementation', 'org.apache.commons:commons-compress:1.28.0')\n            p.dependencies.add('implementation', 'org.tukaani:xz:1.10')\n        }\n    }\n}\n"
+  },
+  "reviewCorrections": [
+    "idleの必須schema・identity・管理root/ジョブ整合と64 ASCII bytesのimmutable identity receipt照合。欠落/空/破損/異なるowner・host・descriptor・pid/不明開始時刻を拒否。",
+    "直接helper強制終了後は追加最大2秒で終了確認し、非終了は記録して失敗。元timeout/取消例外とcleanup失敗をsuppressedで保持。",
+    "generationコピーとhelper tree hashへchunkごとの取消/期限確認を適用。低速streamの途中期限と取消をテスト。",
+    "失敗時の一意な元stdout/stderr・exitCode・開始識別・直接process終了証拠をjob内に保持。不正JSON/status不整合/起動後取消/timeoutで検証。",
+    "receiptはtryLockでbusyを確認した後、同一read/write channelから読む。取得中のreceipt更新は禁止。macOSの同一JVM/別Java processでbusyfalseを検証、Windows実機成功とはしない。",
+    "別processテストは子終了/有限wait→reader close→executor終了の順へ修正。HELDなし生存fixtureで期限内終了を追加検証。製品sourceは変更なし。"
+  ],
+  "verificationBeforeConnection": {
+    "result": "初回反証4点の修正範囲で成功",
+    "runs": [
+      {
+        "phase": "4点修正後",
+        "command": "./gradlew :core:test --tests 'io.github.rs0325.mcicon.internal.managed.*' --init-script /private/tmp/issue93-runtime-deps.gradle --offline --no-daemon",
+        "tests": 27,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "phase": "最小receiptへの最終調整後",
+        "command": "./gradlew :core:test --tests 'io.github.rs0325.mcicon.internal.managed.RuntimeLeaseTest' --init-script /private/tmp/issue93-runtime-deps.gradle --offline --no-daemon",
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "phase": "Windows lock順序の互換懸念対応後",
+        "command": "./gradlew :core:test --tests 'io.github.rs0325.mcicon.internal.managed.RuntimeLeaseTest' --init-script /private/tmp/issue93-runtime-deps.gradle --offline --no-daemon",
+        "tests": 6,
+        "failures": 0,
+        "skipped": 0,
+        "platform": "macOS arm64。同一JVM/別Java processのbusy条件。Windows実機は未検証。"
+      },
+      {
+        "phase": "別process試験の後始末修正後",
+        "command": "./gradlew :core:test --tests 'io.github.rs0325.mcicon.internal.managed.RuntimeLeaseTest' --init-script /private/tmp/issue93-runtime-deps.gradle --offline --no-daemon",
+        "tests": 7,
+        "failures": 0,
+        "skipped": 0,
+        "fault": "HELDを出さず生存する子もreadLine timeout後に有限回収。製品source変更なし。",
+        "platform": "macOS arm64。Windows実機は未検証。"
+      }
+    ],
+    "coreRegression": "初回反証前83件成功。修正後は影響する内部型の関連27件と最終receipt差分の5件を検証。全体回帰の重複実行なし。",
+    "normalBuild": "未実行。archive依存は一時initのみで本番build未統合",
+    "initScript": "allprojects {\n    afterEvaluate { p ->\n        if (p.name == 'core') {\n            p.dependencies.add('implementation', 'org.apache.commons:commons-compress:1.28.0')\n            p.dependencies.add('implementation', 'org.tukaani:xz:1.10')\n        }\n    }\n}\n"
+  },
+  "contractBaseCommit": "9c01311c78fad487b46c60e71de0d1d3f27b6396",
+  "dependencyIntegration": {
+    "commons-compress": "1.28.0",
+    "xz": "1.10",
+    "commons-codec": "1.19.0",
+    "commons-io": "2.20.0",
+    "commons-lang3": "3.18.0",
+    "notices": "THIRD_PARTY_NOTICES.mdとlicenses/の元LICENSE/NOTICE/COPYINGに保持"
+  },
+  "productionRuntimeResources": [],
+  "verificationBeforeConnectionReview": {
+    "normalBuild": "成功。一時initを使用しない通常build依存へ統合済み",
+    "buildCommand": "./gradlew build prepareRelease prepareCentralCandidate -PreleaseVersion=1.1.0 --offline --no-daemon",
+    "tests": {
+      "core": {
+        "tests": 109,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cli": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "worker": {
+        "tests": 32,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "candidateAudits": "配布と未署名Central候補のローカル監査成功。PGP署名・Central公開は未実施。",
+    "consumer": {
+      "version": "1.1.0",
+      "source": "local-candidate",
+      "workspace": "/Users/ryuman/Documents/ChatGPT/MinecraftIconGenerator/worktrees/issue-93-runtime-manager/MCIconGenerator/build/managed-consumer/consumer-92j7e0pv",
+      "initialGradleCacheEmpty": true,
+      "results": [
+        {
+          "metadata": "module",
+          "passed": true
+        },
+        {
+          "metadata": "pom",
+          "passed": true
+        }
+      ],
+      "managedApi": "6署名と固定信頼設定不足の明示失敗を確認。実描画・OS実機受入は未実施",
+      "passed": true
+    },
+    "warnings": [
+      "Javadocの未記載param等",
+      "Java 8 source/target廃止警告",
+      "Gradleの非推奨機能"
+    ],
+    "scope": "fixture/API/transportと通常buildの検証。本番runtime・実OS helper・実画像受入の成功ではない。"
+  },
+  "connectionReviewCorrections": [
+    {
+      "target": "MCIconGenerator.renderManaged",
+      "change": "既存renderと同じ版受入をManagedRuntime.prepareより前に判定。公式manifest取得は元offline契約。拒否はpins不足より優先する。",
+      "tests": "unsupported/discovered/experimental同意不足/未登録/latest拒否と管理root/helper/artifact/lease未作成"
+    },
+    {
+      "target": "MCIconGenerator.doctorManaged",
+      "change": "前提不足でもsuppressedの回収失敗があればreportへ変換せず元例外をFutureへ保持。",
+      "tests": "公開doctorの分離fixtureでsetup-required+release failedを実行し、suppressed IO_FAILEDとactivelease保持を確認"
+    }
+  ],
+  "connectionReviewVerification": {
+    "relatedCommand": "./gradlew :core:test --tests 'io.github.rs0325.mcicon.ManagedApiTest' --tests 'io.github.rs0325.mcicon.RenderSupportTest' --tests 'io.github.rs0325.mcicon.internal.managed.ManagedRuntimeTest' -PreleaseVersion=1.1.0 --offline --no-daemon",
+    "relatedTests": 14,
+    "passed": true,
+    "normalBuild": "修正後build/prepareRelease/prepareCentralCandidate成功。core111/CLI5/worker32、失敗/skipなし。",
+    "independentConsumer": "修正後候補の空Gradle cache module/POM両モード成功。実画像受入ではない。"
+  }
+}

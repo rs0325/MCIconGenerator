@@ -9,23 +9,31 @@ import java.util.regex.Pattern;
 
 public final class Diagnostics {
     public static DiagnosticReport doctor(VersionService service, String version, WorkerOptions worker,CancellationToken token) throws IOException {
+        return doctor(service,version,worker,token,WorkerLaunch.docker(worker.dockerContext()));
+    }
+    public static DiagnosticReport doctor(VersionService service,String version,WorkerOptions worker,CancellationToken token,WorkerLaunch launch) throws IOException {
         VersionInfo exact = service.resolve(version);
-        int javaMajor = RuntimePreparer.runtimeJavaMajor(service.metadata(exact).path("javaVersion").path("majorVersion").asInt(exact.id().startsWith("1.13") || exact.id().startsWith("1.14") ? 8 : 21));
+        int javaMajor=javaMajor(service,exact);
         List<DiagnosticReport.Check> checks = new ArrayList<>();
         checks.add(new DiagnosticReport.Check("core_java", Runtime.version().feature() >= 21, "Java " + Runtime.version().feature()));
         boolean adapter;
         try {RuntimePreparer.profileFor(exact.id());adapter=true;}catch(McIconException unavailable){adapter=false;}
         checks.add(new DiagnosticReport.Check("adapter", adapter, adapter ? exact.support() : "ADAPTER_UNAVAILABLE"));
         checks.add(new DiagnosticReport.Check("agent", Files.isRegularFile(worker.agentJar()), "Rendering agent must exist"));
-        List<String> docker = List.of("docker", "--context", worker.dockerContext());
-        checks.add(command("docker_image", docker, List.of("image", "inspect", worker.dockerImage(), "--format", "{{.Os}}/{{.Architecture}} {{.Id}}"), 15,token));
+        if(launch.managed()&&!FilesSupport.hash(WorkerClient.readAgent(worker.agentJar())).equals(launch.expectedAgentSha256()))throw new McIconException("MANAGED_RUNTIME_INVALID","管理agentのhashが一致しません",1);
+        var imageCheck=command("docker_image", launch, List.of("image", "inspect", worker.dockerImage(), "--format", "{{.Os}}/{{.Architecture}} {{.Id}}"), 15,token);
+        if(launch.managed()&&imageCheck.passed()&&!imageCheck.detail().equals("linux/amd64 "+launch.expectedImageId()))throw new McIconException("MANAGED_RUNTIME_INVALID","管理imageのID/platformが一致しません",1);
+        checks.add(imageCheck);
         try {
-            WorkerJava java=workerJava(worker,worker.dockerImage(),javaMajor,token);
+            WorkerJava java=workerJava(worker,worker.dockerImage(),javaMajor,token,launch);
             checks.add(new DiagnosticReport.Check("worker_java",true,"Java "+java.version()));
-        }catch(McIconException failure){checks.add(new DiagnosticReport.Check("worker_java",false,failure.code()));}
-        token.check();checks.add(command("mesa", docker, List.of("run", "--rm", "--platform", "linux/amd64", "--network", "none", worker.dockerImage(), "glxinfo", "-B"), 45,token));
+        }catch(McIconException failure){if(failure.code().equals("MANAGED_RUNTIME_INVALID"))throw failure;checks.add(new DiagnosticReport.Check("worker_java",false,failure.code()));}
+        token.check();checks.add(command("mesa", launch, List.of("run", "--rm", "--platform", "linux/amd64", "--network", "none", worker.dockerImage(), "glxinfo", "-B"), 45,token));
         token.check();
         return new DiagnosticReport(exact.id(), checks.stream().allMatch(DiagnosticReport.Check::passed), checks);
+    }
+    public static int javaMajor(VersionService service,VersionInfo version) throws IOException {
+        return RuntimePreparer.runtimeJavaMajor(service.metadata(version).path("javaVersion").path("majorVersion").asInt(version.id().startsWith("1.13") || version.id().startsWith("1.14") ? 8 : 21));
     }
     record WorkerJava(String executable,int major,String version) {
         Map<String,Object> settings() {return Map.of("javaMajor",major,"javaVersion",version,"javaSelectionSha256",FilesSupport.hash(executable.getBytes(java.nio.charset.StandardCharsets.UTF_8)));}
@@ -41,26 +49,36 @@ public final class Diagnostics {
         return new WorkerJava(executable,major,version);
     }
     static WorkerJava workerJava(WorkerOptions worker,String image,int minimum,CancellationToken token) {
+        return workerJava(worker,image,minimum,token,WorkerLaunch.docker(worker.dockerContext()));
+    }
+    static WorkerJava workerJava(WorkerOptions worker,String image,int minimum,CancellationToken token,WorkerLaunch launch) {
         String executable=worker.javaHome()==null?(minimum==25?"/opt/java/openjdk/bin/java":"/opt/java/java"+minimum+"/bin/java")
                 :worker.javaHome().replaceAll("/+$","")+"/bin/java";
-        var check=command("worker_java",List.of("docker","--context",worker.dockerContext()),
+        var check=command("worker_java",launch,
                 List.of("run","--rm","--platform","linux/amd64","--network","none","--entrypoint",executable,image,"-version"),45,token);
         token.check();
         if(!check.passed())throw new McIconException("WORKER_JAVA_UNAVAILABLE","The selected Java is unavailable inside the Docker image",1);
-        return parseJava(executable,check.detail(),minimum);
+        WorkerJava java=parseJava(executable,check.detail(),minimum);
+        if(launch.managed()) {
+            String expected=launch.javaHashes().get(minimum);
+            var hash=command("worker_java_hash",launch,List.of("run","--rm","--platform","linux/amd64","--network","none","--entrypoint","sha256sum",image,executable),45,token);
+            token.check();
+            if(java.major()!=minimum||expected==null||!hash.passed()||!hash.detail().matches(Pattern.quote(expected)+"[ \t]+.*"))throw new McIconException("MANAGED_RUNTIME_INVALID","管理Javaのmajor/hashがdescriptorと一致しません",1);
+        }
+        return java;
     }
-    private static DiagnosticReport.Check command(String name, List<String> prefix, List<String> args, int seconds,CancellationToken token) {
-        List<String> command = new ArrayList<>(prefix); command.addAll(args);
+    private static DiagnosticReport.Check command(String name, WorkerLaunch launch, List<String> args, int seconds,CancellationToken token) {
+        List<String> command = new ArrayList<>(args);
         String container=null;
         if(args.getFirst().equals("run")) {
             container="mcicon-doctor-"+UUID.randomUUID();
-            command.add(prefix.size()+1,"--name");command.add(prefix.size()+2,container);
+            command.add(1,"--name");command.add(2,container);
         }
         Path log = null;
         Process process = null;
         try {
             log = Files.createTempFile("mcicon-diagnostic-", ".log");
-            process = new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
+            process = launch.command(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(seconds);
             while(!process.waitFor(100,TimeUnit.MILLISECONDS)) {
                 token.check();
@@ -77,8 +95,7 @@ public final class Diagnostics {
             if(container!=null) {
                 boolean interrupted=Thread.interrupted();
                 try {
-                    List<String> cleanup=new ArrayList<>(prefix);cleanup.addAll(List.of("rm","-f",container));
-                    Process removal=new ProcessBuilder(cleanup).redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+                    Process removal=launch.command(List.of("rm","-f",container)).redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
                     if(!removal.waitFor(10,TimeUnit.SECONDS))removal.destroyForcibly();
                 }catch(IOException ignored){}catch(InterruptedException e){interrupted=true;}
                 finally{if(interrupted)Thread.currentThread().interrupt();}
