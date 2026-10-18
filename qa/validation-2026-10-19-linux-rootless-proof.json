@@ -1,0 +1,205 @@
+{
+  "issue": 91,
+  "recordDate": "2026-10-19",
+  "baseCommit": "3cc725ec6319aa07869959b64bef9df6b6958d35",
+  "status": "linux-rootless-mac-arm64-guest-feasibility-passed",
+  "issue91Completed": false,
+  "productCodeChanged": false,
+  "linuxProductHelperImplemented": false,
+  "managedPublicApiAccepted": false,
+  "linuxAmd64HostAccepted": false,
+  "physicalLinuxAccepted": false,
+  "all51VersionsAccepted": false,
+  "finalRuntimeAdopted": false,
+  "scope": "Mac上の専用arm64 Linux VMで既Rosettaによるamd64 rendererをrootless実行した方式実証。Linux amd64 host/物理Linux/製品managed APIの受入へ拡張しない。",
+  "sourcePins": {
+    "cliVersion": "1.0.1",
+    "cliZipSha256": "a1e23fcfbd2baf597c6e02cf262c55f6d40278d676f579d6dbb9ea0701fdd387",
+    "rendererImage": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "rendererArchiveSha256": "1dcf9b4363583ed6c9cf5847aaf5648aaaf80a084f978b075d1b4fe483ed2e70",
+    "baseImageSha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+    "sourceExecutionFreezeSha256": "49e5cbfe394db20d4e253a9b84d32cec34e77ea55daaa13f3919c99e11ed7f0e",
+    "resultFreezeSha256": "32eac1f63fc512a6c7bb192d26eb18d391b0dbafbba7c75ecabbc56bed4c27f3",
+    "resultSmallFiles": 27,
+    "dockerUnpackOnly": [
+      {
+        "package": "docker-ce",
+        "version": "5:29.9.1-1~ubuntu.24.04~noble",
+        "bytes": 21022288,
+        "sha256": "3f9affcfd066100a255dc7c42ab7afd1dafbeec1790c3fa0e82a4ff875334d03"
+      },
+      {
+        "package": "docker-ce-cli",
+        "version": "5:29.9.1-1~ubuntu.24.04~noble",
+        "bytes": 15846484,
+        "sha256": "e9cfb10f2b52fbf7e744791cdd2fcf6e183accc19d8b781dfab5c9c68f697c60"
+      },
+      {
+        "package": "docker-ce-rootless-extras",
+        "version": "5:29.9.1-1~ubuntu.24.04~noble",
+        "bytes": 9129068,
+        "sha256": "976c969f2aff585e7cafe6285737234c6613fc708d4e60c6258c19115dae6b47"
+      },
+      {
+        "package": "containerd.io",
+        "version": "2.4.2-2~ubuntu.24.04~noble",
+        "bytes": 19567180,
+        "sha256": "a24f7d5dbe60f7d6e76fccc9c9713609311ab61536a7a01ef858e7eccc698d92"
+      }
+    ],
+    "osInstalled": [
+      {
+        "package": "libsubid4",
+        "version": "1:4.13+dfsg1-4ubuntu3.2",
+        "bytes": 23534,
+        "sha256": "00916edc15862421e803bec7e69d548c6ce281badf5d449498085a3b3710639f"
+      },
+      {
+        "package": "uidmap",
+        "version": "1:4.13+dfsg1-4ubuntu3.2",
+        "bytes": 26650,
+        "sha256": "052b1852a9ab03d931398a9d0060ef7c312f1b48bc4f4ee4533649bb958b634a"
+      },
+      {
+        "package": "libslirp0",
+        "version": "4.7.0-1ubuntu3.1",
+        "bytes": 61930,
+        "sha256": "57cdfe5bfbd6c63813bd47b2a7880a9503bee3e80c4f5ac305ea4616557f6030"
+      },
+      {
+        "package": "slirp4netns",
+        "version": "1.2.1-1build2",
+        "bytes": 34274,
+        "sha256": "c6d849427b983460007d2223788deeb46ce1afd6657307b00f39834db407ebac"
+      }
+    ]
+  },
+  "checks": {
+    "limitedProofPassed": true,
+    "independentAudit": "PASS",
+    "startedJST": "2026-10-19T07:42:27.422880+09:00",
+    "finishedJST": "2026-10-19T07:43:07.823904+09:00",
+    "hostArchitecture": "arm64",
+    "guestArchitecture": "arm64",
+    "rendererArchitecture": "amd64",
+    "existingRosettaUsed": true,
+    "vcpus": 4,
+    "vmMemoryGiB": 6,
+    "virtualDiskGiB": 24,
+    "hostFreeAndInactiveGateGiB": 8,
+    "hostFreeDiskGateGiB": 16,
+    "signedOsDependenciesInstalled": 4,
+    "installedOsBytes": 146388,
+    "dockerDebsUnpackedWithoutMaintainerScripts": 4,
+    "dockerDebBytes": 65565020,
+    "knownPackageSet": 667,
+    "knownRuntimeEntries": 243,
+    "rootlessSecurityOption": true,
+    "cgroupVersion": "2",
+    "cgroupDriver": "systemd",
+    "namespaceMapsAndParentIdentityVerified": true,
+    "newuidmapAndNewgidmapSetuidVerified": true,
+    "subidExistingRangeUnchanged": true,
+    "rootlessNetwork": "slirp4netns",
+    "detachNetworkNamespace": false,
+    "allTcpUdpPortForwardingIgnored": true,
+    "dedicatedSocketPaths": 1,
+    "writableMountRoots": 1,
+    "renderVersion": "1.20.6",
+    "images": [
+      {
+        "path": "assets/minecraft/textures/block/player_head.png",
+        "sha256": "038c9ae04f143a713d7642ef175f842a88d5e1025bc7ddff6c8a1a28c2a61b6f"
+      },
+      {
+        "path": "assets/minecraft/textures/block/stone.png",
+        "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+      },
+      {
+        "path": "assets/minecraft/textures/item/enchanted_book.png",
+        "sha256": "373a05ad4c320b1c310d5ef5c024ab95bf9c18076a3f9c03155bf2f1db548944"
+      }
+    ],
+    "pngBytesAndFullMetadataMatch": true,
+    "actualWorkerMemoryMaxBytes": 3221225472,
+    "actualWorkerCpuMax": "400000 100000",
+    "sourceInputUnchangedObservedByRun": true,
+    "copiedInputUnchangedObservedByRun": true,
+    "inputAuditMethod": "実runnerの全固定入力照合結果を限定独立監査が再利用。監査で大archiveや全入力を再hashしていない。",
+    "outputOwnerMatches": true,
+    "clientGroupsCollected": 17,
+    "allClientsExitZero": true,
+    "unitPidAndStartIdentityCheckedBeforeStop": true,
+    "unitMainPidZeroAfterStop": true,
+    "unitProcessesEmpty": true,
+    "containersEmpty": true,
+    "vmStoppedNormally": true,
+    "hostSocketCollected": true,
+    "originalConfigBytesRestored": true,
+    "baseAndRendererArchiveUnchangedObservedByRun": true,
+    "phaseAAndBothFailuresAndDiagnosticPreserved": true
+  },
+  "generations": [
+    {
+      "name": "first-phase-b",
+      "status": "failed",
+      "cause": "非rootのPID1 namespace readlinkがPermissionError。rootless info取得後、image load前。",
+      "freezeSha256": "d4163da06b9949fd4cfb0117dba237b8980ec0050700c02963fa7843cd2858d9"
+    },
+    {
+      "name": "known-state-resume-v3",
+      "status": "failed-before-runtime-start",
+      "cause": "unit modeを一律0644と断定した検証gateが拒否。",
+      "freezeSha256": "645264404752c318c0f051136b8dc23e8096f046347d1cd416205fe38306e3e9"
+    },
+    {
+      "name": "fixed-three-file-diagnostic",
+      "status": "passed",
+      "unitMode": "0664",
+      "unitUidMatches": true,
+      "unitGidMatches": true,
+      "rootFilesMode": "0644",
+      "allBodiesMatchPinnedSource": true,
+      "originalUmaskOrModifierProven": false,
+      "freezeSha256": "abf197a9865a1c635531664380a82976ab2f1ad9ff7c692759c2c8b31bd96a0b"
+    },
+    {
+      "name": "known-state-resume-v4",
+      "status": "passed",
+      "modeGate": "固定3pathごとのregular type/exact mode/UID/GID/body。一般のgroupwrite許可へ緩和しない。",
+      "nonVmDirectFixtures": 18,
+      "sourceIndependentReview": "PASS",
+      "resultIndependentAudit": "PASS"
+    }
+  ],
+  "privileges": {
+    "guestRootOsDependencyInstall": true,
+    "guestRootDedicatedAppArmorProfile": true,
+    "guestRootUid501SystemdDropinAndOneRestart": true,
+    "unknownUserWorkloadRejectedBeforeInitialInstall": true,
+    "sshSessionOutsideUserManagerVerified": true,
+    "fixedSudoPid1ReadOnlyDiagnostic": true,
+    "globalSysctlChanged": false,
+    "rootfulDockerInstalled": false,
+    "hostSoftwareInstalled": false,
+    "otherVmOrColimaOperated": false,
+    "newPackagesOrManagerRestartOnResume": false,
+    "ownedGuestFilesAndImageRetainedStopped": true
+  },
+  "budgets": {
+    "runClientWaitSeconds": 3600,
+    "cleanupClientWaitSeconds": 240,
+    "finiteSupervisorTailAdditional": true,
+    "strictWallClockTotalClaimed": false
+  },
+  "unaccepted": [
+    "#91最終方式・schema・配布条件の採用とclose",
+    "#95製品helperと製品managed CLI/APIの接続",
+    "#96 Linux amd64 host/物理Linuxでの受入、distribution/kernel下限",
+    "取消・並列・異常終了・再起動・offline新規再生成のrootless製品受入",
+    "#99固定51版・全件/反復/境界",
+    "本番runtimeの最終再配布・license/source・署名trust/inventory"
+  ],
+  "nextIssue96Prerequisite": "#91方式採用の確定commitを前提に実装する。本QAだけでは開始条件を満たしたと扱わない。",
+  "documentation": "../docs/managed-runtime-1.1.md"
+}
