@@ -109,3 +109,5 @@ python3 scripts/test-distribution-audit.py build/release --version 1.0.1
 `1.0.0`の描画受入は固定51版と検証済みLinux amd64・Mesa Docker imageを対象にします。Dockerfileの再buildは、固定済みimage IDと同じbytes・画素を保証しません。ホスト別の実測範囲と配布候補の受入状況は[検証記録](validation.md)を参照してください。
 
 [Issue #78](https://github.com/rs0325/MCIconGenerator/issues/78)は、固定Mac/Rosetta環境の外部process生成とthread終了の競合を実証し、workerから不要な外部診断を除く対策を確認して完了しました。Rosetta自体の修正ではなく、過去すべての失敗の厳密な同一性は未証明として保持します。1.0.1はこの対策を含む構成ですが、公開済み1.0.0は含みません。worker hashが変わるため既存iconsの再開には新規出力先または明示`--overwrite`が必要です。rawの元bytes・保存形式は変更しません。失敗時はexit code・worker logと出力manifestを確認し、自動的な再試行は行いません。公開状況と添付ファイルはGitHub Releasesで確認してください。
+
+1.1.0向けの同版worker推移依存とローカルCentral候補生成は[Centralガイド](maven-central.md)を参照してください。実公開前の候補とCentralで取得可能な版を区別します。

@@ -1,7 +1,9 @@
 plugins { id 'maven-publish' }
 dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
+    runtimeOnly project(':worker')
 }
+evaluationDependsOn(':worker')
 def toolVersion = project.version.toString()
 def versionSources = layout.buildDirectory.dir('generated/sources/toolVersion/java/main')
 tasks.register('generateToolVersion') {
@@ -33,16 +35,29 @@ publishing {
             pom {
                 name = 'MCIconGenerator Core'
                 description = 'バニラMinecraftのテクスチャとインベントリアイコンを取得するJava API'
-                url = 'https://github.com/rs0325/MCIconGenerator'
-                licenses { license { name = 'MIT License'; url = 'https://opensource.org/license/mit' } }
             }
         }
     }
-    repositories { maven { name = 'localBuild'; url = layout.buildDirectory.dir("maven/${project.version}") } }
 }
-tasks.register('cleanLocalPublication', Delete) {
-    delete layout.buildDirectory.dir("maven/${project.version}")
+
+def workerSources = layout.buildDirectory.dir('generated/sources/workerArtifact/java/main')
+tasks.register('generateWorkerArtifactInfo') {
+    dependsOn ':worker:agentJar'
+    inputs.file(project(':worker').tasks.named('agentJar').flatMap { it.archiveFile })
+    outputs.dir(workerSources)
+    doLast {
+        def hash = java.security.MessageDigest.getInstance('SHA-256').digest(project(':worker').tasks.named('agentJar').get().archiveFile.get().asFile.bytes).encodeHex().toString()
+        def source = new File(workerSources.get().asFile, 'io/github/rs0325/mcicon/internal/WorkerArtifactInfo.java')
+        source.parentFile.mkdirs()
+        source.setText("""package io.github.rs0325.mcicon.internal;
+
+final class WorkerArtifactInfo {
+    private WorkerArtifactInfo() {}
+    static final String SHA256 = "${hash}";
 }
-tasks.named('publishCorePublicationToLocalBuildRepository') {
-    dependsOn 'cleanLocalPublication'
+""", 'UTF-8')
+    }
 }
+sourceSets.main.java.srcDir(workerSources)
+tasks.named('compileJava') { dependsOn generateWorkerArtifactInfo }
+tasks.named('sourcesJar') { dependsOn generateWorkerArtifactInfo }

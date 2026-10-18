@@ -3,22 +3,30 @@ buildscript {
     dependencies { classpath 'org.ow2.asm:asm-commons:9.11' }
 }
 
+plugins { id 'maven-publish' }
+
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 import org.objectweb.asm.commons.Remapper
 import java.util.zip.ZipFile
 
+configurations {
+    agentLibraries
+    compileOnly.extendsFrom agentLibraries
+    testCompileOnly.extendsFrom agentLibraries
+    testRuntimeOnly.extendsFrom agentLibraries
+}
 dependencies {
-    implementation 'org.ow2.asm:asm:9.11'
-    implementation 'com.google.code.gson:gson:2.13.2'
+    agentLibraries 'org.ow2.asm:asm:9.11'
+    agentLibraries 'com.google.code.gson:gson:2.13.2'
 }
 // Older vanilla clients bundle an ASM version that cannot read their own newer
 // class-file version. Keep the agent's transformer independent of the game ASM.
 def shadedAgent = layout.buildDirectory.dir('shaded-agent')
 tasks.register('shadeAgent') {
     dependsOn classes
-    inputs.files(sourceSets.main.output, configurations.runtimeClasspath)
+    inputs.files(sourceSets.main.output, configurations.agentLibraries)
     outputs.dir(shadedAgent)
     doLast {
         def destination = shadedAgent.get().asFile
@@ -46,7 +54,7 @@ tasks.register('shadeAgent') {
                 if(file.isFile()) writeEntry(directory.toPath().relativize(file.toPath()).toString().replace('\\','/'), file.bytes)
             }
         }
-        configurations.runtimeClasspath.files.sort().each { jar ->
+        configurations.agentLibraries.files.sort().each { jar ->
             new ZipFile(jar).withCloseable { zip ->
                 zip.entries().each { entry ->
                     if(!entry.directory) zip.getInputStream(entry).withCloseable { stream -> writeEntry(entry.name,stream.bytes) }
@@ -69,4 +77,37 @@ assemble.dependsOn agentJar
 tasks.named('test') {
     dependsOn agentJar
     systemProperty 'mcicon.agentJar', tasks.named('agentJar').get().archiveFile.get().asFile.absolutePath
+}
+
+def wrapperResources = layout.buildDirectory.dir('generated/worker-wrapper')
+tasks.register('generateWorkerWrapper') {
+    dependsOn agentJar
+    inputs.file(tasks.named('agentJar').flatMap { it.archiveFile })
+    inputs.property('toolVersion', project.version.toString())
+    outputs.dir(wrapperResources)
+    doLast {
+        def directory = new File(wrapperResources.get().asFile, 'META-INF/mcicon/worker')
+        directory.mkdirs()
+        def bytes = tasks.named('agentJar').get().archiveFile.get().asFile.bytes
+        new File(directory, 'agent.jar').bytes = bytes
+        def hash = java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex()
+        new File(directory, 'version.properties').setText("toolVersion=${project.version}\nagentSha256=${hash}\n", 'UTF-8')
+    }
+}
+tasks.named('jar') {
+    dependsOn generateWorkerWrapper
+    exclude 'io/**'
+    from wrapperResources
+}
+publishing {
+    publications {
+        worker(MavenPublication) {
+            from components.java
+            artifactId = 'mcicon-worker'
+            pom {
+                name = 'MCIconGenerator Worker'
+                description = '同版coreが検証して展開する描画agentの薄いresource JAR'
+            }
+        }
+    }
 }
