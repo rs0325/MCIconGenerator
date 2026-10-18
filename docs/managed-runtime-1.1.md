@@ -168,7 +168,7 @@ brew/wingetの管理者はstable bootstrapperの更新を所有し、bootstrappe
 | worker薄wrapper/nested agent | private `1.1.0-probe` の通常classpath・resource保持flattened JARで元agent bytes一致、重複/破損拒否の計4条件成功 | 製品resolver・Maven公開は#92 |
 | Mac専用VZ環境 | v5準備と単体v2/並列v4が成功。単体3PNGと全metadata一致、並列A1PNG取消/B3PNG完走、A/B入力244+metadata1不変、cgroup各2GiB/CPU4、所有回収/通常停止 | 製品helperの同梱と51版受入。初回QA FAILと修正後新規run PASSは両方保全 |
 | Windows準備QA | 専用WSL bundle v4凍結、controller18/外側監督16/collector4/実Docker info gate2条件成功、wrapper12条件と2job consumerのjavac成功 | 差分反証済み。新タスク接続許可と新規WSL実証 |
-| Linux rootless | 要件調査 | 独立したLinux条件での実証 |
+| Linux rootless | Mac上のarm64 Linux guest＋既Rosettaで、専用rootless・1.20.6代表3PNG・実cgroup制限・所有回収を限定実証 | Linux amd64 host/物理Linux・製品helper・取消/並列・最終方式/配布条件は未受入 |
 
 ### 2026-10-19のWindows方式実証と残件
 
@@ -184,7 +184,7 @@ brew/wingetの管理者はstable bootstrapperの更新を所有し、bootstrappe
 | OS/WSL/CPU下限、実配布bytes・再配布条件 | 未完了 | 今回の観測版やguest apt導入を、最低対応版・製品runtime buildの受入に代用しない |
 | #95製品helper、host CLI/Java管理API、未準備/offline/再起動後/path境界 | 未受入 | 必要な#93前提と方式採用commit確定後に製品経路を実装・検証する |
 | #99固定51版・全件/反復/境界 | 未受入 | 今回の1.20.6代表3PNGから自動継承しない |
-| Linux rootlessと#91全体 | 未完了 | 独立Linux実証・最終方式・配布条件確定まで#91をcloseしない |
+| Linux rootlessと#91全体 | 未完了 | Linux amd64 host受入・最終方式・配布条件確定まで#91をcloseしない |
 
 このWindows記録は `Refs #91` の先行QAとし、製品helperの実装や最終方式採用を開始したとは扱わない。後続の前提commitは、上記main基準と、このQA/docs差分がレビュー・公開権限を経て確定したcommitを明示する。
 
@@ -199,3 +199,24 @@ Lima本体のApache-2.0 LICENSE/NOTICEと、同梱helper各componentの個別条
 Apple Developer IDとWindowsコード署名証明書は未準備。ローカルの未署名候補生成・検証と公開済みの状態を分ける。署名なしCLIの配布自体は候補となるが、Gatekeeper/SmartScreen等の警告なしで導入できるとは保証せず、installerごとの制約を公開前に示す。未署名配布を正式方針に確定したとは扱わず、更新descriptorの署名検証を省略しない。
 
 Centralは本人の公開tokenとartifact署名を利用できる状態の確認が残る。macOSのDeveloper ID/notarizationとWindows署名は本人のaccount・証明書・契約条件を確認してから公開手順へ進む。費用・署名方式・必要な本人操作を先に提示し、account登録・鍵作成・有料契約・公開を準備依頼から推定しない。秘密鍵・token・証明書秘密情報をrepositoryや検証ログへ保存しない。これらの未準備を理由に方式実証や未署名候補のローカル検証を省略しない。
+
+
+### 2026-10-19のLinux rootless方式実証と残件
+
+Mac上の専用arm64 Linux VZ VM 1台（4CPU/6GiB/24GiB）で、既installed Rosettaを使う固定amd64 rendererのrootless実行を確認した。既公開CLI1.0.1のhost Java21/Docker経路で1.20.6のstone・player_head・enchanted_bookを描画し、3PNGの全bytesとmanifest全metadataが固定参照に一致した。新しいmanaged CLI/APIや#96製品helperを通した結果ではない。
+
+署名metadataに結合した4 OS deb（146,388 bytes）だけをguestへ導入し、固定4 Docker deb（65,565,020 bytes）は専用runtimeへ展開した。公式launcherのNET=slirp4netns、DETACH_NETNS=falseを使い、rootfulサービスを導入せず専用user unitで起動した。既subuid/subgidは変更せず、uid/gid map、初期user namespaceとの差、daemon/親PIDの開始識別を測定前後で照合した。必要な権限はguest内のuidmap/network依存導入、対象UIDのsystemd委譲・限定restart、専用実行pathのAppArmor profile追加であり、global sysctl・host software・既存VM/Colimaは変更していない。製品では不足前提を診断し、これらの変更を無断実行しない契約を維持する。
+
+workerの実cgroup memory.max=3221225472、cpu.max=400000 100000を採取した。元入力と新cache不変・出力owner一致、17client全正常終了/reap、所有開始識別が一致するunitの停止・残process/container空、VM通常Stopped、専用socket回収、元config bytes復帰を確認した。実行は約40.40秒。3600秒処理待機と240秒cleanup待機は既有限supervisor尾部を別に持つ予算で、厳密なwallclock総上限ではない。許可済みguest package・専用unit/profile/dropin/runtime/imageは停止状態で保持し、削除していない。
+
+初回は非rootのPID1 namespace読み取りで失敗し、固定sudo読み取りとidentity測定窓を修正した。次の再開はunit modeを一律0644としたgateで停止した。別許可の固定3path診断ではunit regular0664、root2files regular0644、owner/group/bodyが期待と一致した。unit作成sourceはopen('x')の既定0666・umask非指定で実属性と整合するが、当時のumaskや変更者を証明したとは扱わない。3pathそれぞれのexact mode/UID/GID/type/body gateへ限定修正し、18直接fixtureと独立sourceレビュー後の新世代だけを成功と記録した。原2FAIL・診断raw・各source世代を保存し、成功結果は独立監査でも限定PASSとなった。
+
+| 範囲 | 状態 | 残件 |
+| --- | --- | --- |
+| arm64 Linux guest＋Rosettaのrootless単体方式 | 限定PASS | 既公開CLI経路での1.20.6代表3PNG・実limit・通常所有回収だけ |
+| Linux amd64 host/物理Linux、distribution/kernel下限 | 未受入 | 今回のMac VM結果を正式対応へ拡張しない |
+| #96製品helper、managed CLI/API、取消/並列/異常回収/再起動/offline再生成 | 未実装・未受入 | #91方式採用と確定前提commitの後に実装・受入する |
+| #95製品helper、#99固定51版・全件/反復/境界 | 本記録の対象外 | 代表3PNGから継承しない |
+| #91全体と最終artifact/配布条件 | 未完了 | 方式/schema・本番inventory/trust・license/sourceを確定し、closeは別操作 |
+
+[Linux限定QAと世代別証拠hash](../qa/validation-2026-10-19-linux-rootless-proof.json)を参照する。この補足はRefs #91であり、製品実装や#91 close、#96の開始条件成立を宣言しない。
