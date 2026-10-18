@@ -29,7 +29,7 @@ public final class RuntimeLease implements AutoCloseable {
             try {UUID.fromString(hostId);}catch(IllegalArgumentException failure){throw mismatch("管理rootのhostIdが不正です");}
             UUID job=UUID.randomUUID(),owner=UUID.randomUUID();
             Path directory=store.path("jobs/"+job);Files.createDirectories(directory.getParent());Files.createDirectory(directory);
-            FileChannel channel=FileChannel.open(directory.resolve("lease.lock"),StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE);
+            FileChannel channel=FileChannel.open(directory.resolve("lease.lock"),StandardOpenOption.CREATE_NEW,StandardOpenOption.READ,StandardOpenOption.WRITE);
             FileLock lock=null;
             try {
                 lock=channel.lock(ACTIVE_LOCK_OFFSET,ACTIVE_LOCK_LENGTH,false);ObjectNode identity=RuntimeDescriptor.JSON.createObjectNode();
@@ -49,6 +49,42 @@ public final class RuntimeLease implements AutoCloseable {
             }catch(IOException|RuntimeException failure){if(lock!=null)lock.release();channel.close();throw failure;}
         }
     }
+    /** 同じ信頼世代の終了coreだけを引き継ぐ。OS資源の回収可否は同版helperのreleaseへ委ねる。 */
+    static RuntimeLease tryRecovery(RuntimeStore store,RuntimeDescriptor descriptor,Path directory) throws IOException {
+        if(!Files.isDirectory(directory,LinkOption.NOFOLLOW_LINKS)||!directory.toRealPath().equals(directory))throw mismatch("旧job directoryが不正です");
+        Path file=directory.resolve("lease.json"),receipt=directory.resolve("lease.lock");
+        if(!Files.isRegularFile(receipt,LinkOption.NOFOLLOW_LINKS))throw mismatch("旧job receiptがありません");
+        FileChannel channel=FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE);FileLock lock=null;boolean retained=false;
+        try {
+            try {lock=channel.tryLock(ACTIVE_LOCK_OFFSET,ACTIVE_LOCK_LENGTH,false);}catch(OverlappingFileLockException busy){return null;}
+            if(lock==null)return null;store.check();
+            if(!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)||Files.size(file)>1024*1024)throw mismatch("旧leaseを安全に読み取れません");
+            JsonNode value=RuntimeDescriptor.read(Files.readAllBytes(file));Path host=store.path("host-id");
+            if(!Files.isRegularFile(host,LinkOption.NOFOLLOW_LINKS)||Files.size(host)>64||!validIdentity(value,directory.getFileName().toString(),Files.readString(host).trim()))throw mismatch("旧leaseの所有記録が不明です");
+            ObjectNode identity=((ObjectNode)value).deepCopy();identity.remove(List.of("state","resources"));
+            if(!matchesReceipt(channel,identity))throw mismatch("旧leaseのreceiptが一致しません");
+            if(!value.path("descriptorSha256").asText().equals(descriptor.digest())||!value.path("toolVersion").asText().equals(descriptor.toolVersion()))return null;
+            if(!value.path("workerSha256").asText().equals(descriptor.agentSha256())||!value.path("runtimeId").asText().equals(descriptor.runtimeId()))throw mismatch("旧leaseの実行世代が一致しません");
+            if(value.path("state").asText().equals("released"))return null;
+            if(!ownerDead(value.path("pid").longValue(),Instant.parse(value.path("processStartedAt").asText())))return null;
+            Path original=directory.resolve("descriptor.json");
+            if(!Files.isRegularFile(original,LinkOption.NOFOLLOW_LINKS)||Files.size(original)>1024*1024||!FilesSupport.hash(Files.readAllBytes(original)).equals(descriptor.digest()))throw mismatch("旧descriptorの元bytesが一致しません");
+            for(var artifact:descriptor.artifacts()) {
+                store.check();Path inventory=FilesSupport.safeResolve(directory,artifact.inventoryPath());
+                if(!inventory.toRealPath().equals(inventory)||!Files.isRegularFile(inventory,LinkOption.NOFOLLOW_LINKS)||Files.size(inventory)>4*1024*1024)throw mismatch("旧inventoryを安全に読み取れません");
+                descriptor.verifyInventory(artifact,Files.readAllBytes(inventory));
+            }
+            Path temp=directory.resolve("tmp");if(!Files.isDirectory(temp,LinkOption.NOFOLLOW_LINKS)||!temp.toRealPath().equals(temp))throw mismatch("旧job tmpが不正です");
+            RuntimeLease lease=new RuntimeLease(file,identity,channel,lock);lease.read();retained=true;return lease;
+        }finally {if(!retained)try {if(lock!=null)lock.release();}finally {channel.close();}}
+    }
+    static boolean ownerDead(long pid,Instant expectedStart) {
+        try {
+            var process=ProcessHandle.of(pid);if(process.isEmpty()||!process.get().isAlive())return true;
+            var started=process.get().info().startInstant();if(started.isPresent())return !started.get().equals(expectedStart);
+            if(!process.get().isAlive())return true;throw mismatch("旧coreの開始identityを確認できません");
+        }catch(SecurityException failure){throw mismatch("旧coreの生存状態を確認できません");}
+    }
     public Path file() {return file;}
     /** helperの書込み完了後だけ呼ぶ。immutableなfieldの追加・変更・削除を拒否する。 */
     public synchronized ObjectNode read() throws IOException {
@@ -62,7 +98,7 @@ public final class RuntimeLease implements AutoCloseable {
     }
     /** helperが所有照合と回収に成功した場合だけ記録する。失敗・不明時は元の証拠を残す。 */
     public synchronized void released() throws IOException {
-        ObjectNode value=read();
+        ObjectNode value=read();if(!matchesReceipt(channel,identity))throw mismatch("release時のreceiptが一致しません");
         if(!value.path("resources").isEmpty())throw mismatch("helperが回収済みresourceを残しています");
         value.put("state","released");FilesSupport.atomicWrite(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));
     }
@@ -88,11 +124,8 @@ public final class RuntimeLease implements AutoCloseable {
                     try {acquired=channel.tryLock(ACTIVE_LOCK_OFFSET,ACTIVE_LOCK_LENGTH,false);}catch(OverlappingFileLockException busy){return false;}
                     if(acquired==null)return false;
                     try {
-                        if(channel.size()!=64)return false;
-                        java.nio.ByteBuffer saved=java.nio.ByteBuffer.allocate(64);
-                        while(saved.hasRemaining())if(channel.read(saved)<0)return false;
                         ObjectNode actual=((ObjectNode)value).deepCopy();actual.remove(List.of("state","resources"));
-                        if(!Arrays.equals(saved.array(),receipt(actual)))return false;
+                        if(!matchesReceipt(channel,actual))return false;
                         if(!value.path("descriptorSha256").asText().equals(descriptor.digest()))continue;
                         if(!value.path("toolVersion").asText().equals(descriptor.toolVersion())||!value.path("workerSha256").asText().equals(descriptor.agentSha256())||!value.path("runtimeId").asText().equals(descriptor.runtimeId()))return false;
                         if(!value.path("state").asText().equals("released")||!value.path("resources").isObject()||!value.path("resources").isEmpty())return false;
@@ -101,6 +134,10 @@ public final class RuntimeLease implements AutoCloseable {
             }
         }
         return true;
+    }
+    private static boolean matchesReceipt(FileChannel channel,ObjectNode identity) throws IOException {
+        if(channel.size()!=64)return false;channel.position(0);java.nio.ByteBuffer saved=java.nio.ByteBuffer.allocate(64);
+        while(saved.hasRemaining())if(channel.read(saved)<0)return false;return Arrays.equals(saved.array(),receipt(identity));
     }
     static byte[] receipt(ObjectNode identity) throws IOException {
         byte[] bytes=RuntimeDescriptor.JSON.writer().with(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)

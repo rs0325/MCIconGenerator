@@ -1,0 +1,33 @@
+# 同世代の旧jobを回収するcore内部経路
+
+Issue #93の後続。公開API・helper protocol・lease形式は増やさない。対象はMacのcurrent tool exact版/current descriptorに束縛された旧active jobだけである。OS helperの実回収受入は未完了であり、このcore fixture成功を実VM/再起動の成功として扱わない。
+
+## 処理順序
+
+current pin/署名descriptor/inventory/workerとhelper原archive・全展開treeを検証した後、新lease作成/preflightより先に旧jobを検査する。既存jobの短い一覧取得だけをgenerations lockで排他し、helper待機中には保持しない。
+
+旧jobのlease.lock offset64/length1をnonblocking取得する。busyはskipし、取得後に元lease・厳密64byte receipt・root登録hostId・job path・immutable requirementsを再読する。tool/descriptorが異なる記録は更新せず、共有VM停止の参照からも消さない。現世代のworker/runtimeが不一致、開始identity不明、元descriptor/inventory破損、linkや不正tmpは回収せず証拠を保持する。
+
+保存PID/開始時刻に一致する生存coreはlockfreeでもskipする。保存開始時刻が既知で、OS上のPID不在または既知の別開始時刻でPID再使用を確認できる場合だけ候補とする。PIDが存在し現在の開始時刻が取得不能ならunknownとして拒否する。PID再使用先をkillしない。これは元coreの死亡分類でありOS資源停止の許可ではない。hostIdも管理rootの登録UUIDで、機械本人性を証明しない。
+
+候補について、旧jobの元descriptor bytes/inventoryとcurrent pinのhash対応、永続job配下tmpを確認する。同じ検証済みhelperを旧lease・専用TMP環境で既存releaseとして起動し、利用者HOME/PATHは渡さない。回復releaseは新prepareの残時間と取消tokenに従う。通常close時のcleanupは従来通り別枠10秒とし、旧leaseのpreparationDeadlineをreleaseへ再適用しない。
+
+helperのok/exit0だけで状態を進めない。coreがimmutable identity・receiptとresources空を再確認してreleasedをatomic記録する。失敗/取消/timeoutでは旧activeとraw stdout/cleanup証拠を保持し、corelockは有限解放する。RuntimeHelperの直接process終了はOS子孫やVZ/transport不在の証明ではない。
+
+## OS側の必須gate
+
+#94 releaseは現存する正当なanchorとready相当の完全所有情報を照合する。releaseからanchor register/recreateを呼ばず、missing/partial/別owner/UID/0700/target不一致は失敗してresourcesを保持する。短cacheが無いこと、boot差、PID不在をVM不存在として成功化しない。
+
+OS側のlock順はjob operation→global lifecycle→短resources更新lock。他jobのlock観測はnonblockingとする。全descriptorの他lease参照を見て、busy/unknownがあれば共有VMを停止しない。同世代の正当busy/live jobは予算内の共有利用を許容する。coreの世代別idleを全他lease不在へ流用しない。
+
+orphan prepareだけでなく、owner確認後に停止したdocker生成処理がcore死亡/releaseの後で再開する窓を塞ぐ必要がある。短い生成/登録区間のjob fenceと、旧transportが後から副作用を起こさない証拠が必要であり、現時点でOS受入済みではない。guard/client process groupの回収だけではdaemonの非同期create/start完了を証明できない。正常応答と完全所有実体による操作終端を、強制終了clientの回収から分ける。異常生成intentにdaemon終端証明が無ければunknownとしてactiveを保持する。coreはhelperがこの契約を満たす前提の入出力機構だけをfixtureで検証する。
+
+## 範囲外
+
+cache消失/reboot/rootcopy、core生存lockfreeの終了job、旧tool世代、Linux/Windowsの回復は初期対象外。tombstone/intentを含む初期対象は同bootのprocess crashであり、atomic renameをpowerloss/reboot耐久と同一視しない。active/unknownを自動clear・GCせず、旧世代に新helperやCLI stable highwaterを適用しない。異版cleanupには当時の信頼済みpayload/pin/helper保持契約が別途必要。
+
+本番pins/trust/実bundleは未発行。VM/SSH/OS実機、実anchor所有回収、orphan docker fence、51版描画の受入はこの変更で成功とはしない。元入力cacheと出力PNGを削除する経路は加えない。
+
+## 検証
+
+実子Java process終了identity、busy/live skip、旧tool/異descriptor不変、未知startと元証拠破損拒否、引継lock保持を検証する。test専用署名descriptor/shell helperでは、旧leaseのreleaseが新job作成より先であること、所有不足/未解放resources/取消/準備期限で旧leaseを保持することを確認する。fixtureの所有markerはOS anchorや実VZ本人性を代替しない。

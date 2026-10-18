@@ -108,6 +108,53 @@ class ManagedRuntimeTest {
         fixture=new Fixture(false);((ObjectNode)fixture.definition.json.get("artifacts").get(0)).put("inventoryPath","lease.json");fixture.publish();
         try(var loader=fixture.loader()) {Fixture current=fixture;RuntimeDescriptorTest.assertInvalid(()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,HOST,current.transport(downloads)));}assertEquals(0,downloads.get());
     }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void deadSameGenerationUsesOldLeaseBeforeNewPreparation() throws Exception {
+        Fixture fixture=new Fixture(false,false,true);var host=new RuntimeDescriptor.Host("macos","aarch64");((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path old=stale(fixture,host);Files.writeString(old.resolveSibling("fixture-anchor"),"test-only ownership proof");
+        try(var loader=fixture.loader();var managed=ManagedRuntime.prepare(options(),true,new CancellationToken(),loader,host,(u,o,t)->{throw new AssertionError("offlineで取得しました");})) {
+            assertEquals("released",RuntimeDescriptor.read(Files.readAllBytes(old)).path("state").asText());assertTrue(RuntimeDescriptor.read(Files.readAllBytes(old)).path("resources").isEmpty());
+            assertEquals("1",Files.readString(old.resolveSibling("fixture-job-count")));assertEquals(List.of("preflight","prepare","release","release"),Files.readAllLines(old.resolveSibling("fixture-operations")));
+            assertFalse(managed.launch().prefix().contains(old.toString()));
+        }
+    }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void missingFixtureOwnershipFailsRecoveryAndKeepsOldActiveEvidence() throws Exception {
+        Fixture fixture=new Fixture(false,false,true);var host=new RuntimeDescriptor.Host("macos","aarch64");((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path old=stale(fixture,host);byte[] before=Files.readAllBytes(old);
+        try(var loader=fixture.loader()) {
+            assertEquals("IO_FAILED",assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),true,new CancellationToken(),loader,host,(u,o,t)->{throw new AssertionError();})).code());
+        }
+        assertArrayEquals(before,Files.readAllBytes(old));try(var jobs=Files.list(old.getParent().getParent())){assertEquals(1,jobs.count());}
+        try(var logs=Files.list(old.getParent())){assertTrue(logs.anyMatch(p->p.getFileName().toString().endsWith(".result.json")));}
+    }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void helperOkCannotReleaseOldLeaseWithResourcesLeft() throws Exception {
+        Fixture fixture=new Fixture(false,false,true);var host=new RuntimeDescriptor.Host("macos","aarch64");((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path old=stale(fixture,host);Files.writeString(old.resolveSibling("fixture-no-clear"),"test-only incomplete release");byte[] before=Files.readAllBytes(old);
+        try(var loader=fixture.loader()) {assertEquals("MANAGED_OWNERSHIP_MISMATCH",assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),true,new CancellationToken(),loader,host,(u,o,t)->{throw new AssertionError();})).code());}
+        assertArrayEquals(before,Files.readAllBytes(old));try(var jobs=Files.list(old.getParent().getParent())){assertEquals(1,jobs.count());}
+    }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void recoveryReleaseUsesPreparationBudgetAndKeepsEvidenceOnTimeout() throws Exception {
+        Fixture fixture=new Fixture(false,false,true);var host=new RuntimeDescriptor.Host("macos","aarch64");((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path old=stale(fixture,host);Files.writeString(old.resolveSibling("fixture-slow"),"test-only slow release");byte[] before=Files.readAllBytes(old);
+        var shortBudget=new ManagedOptions(options().runtimeRoot(),Duration.ofMillis(200),Duration.ofSeconds(2),Duration.ofSeconds(1),3072,2048);
+        try(var loader=fixture.loader()) {assertTimeoutPreemptively(Duration.ofSeconds(3),()->assertThrows(IOException.class,()->ManagedRuntime.prepare(shortBudget,true,new CancellationToken(),loader,host,(u,o,t)->{throw new AssertionError();})));}
+        assertArrayEquals(before,Files.readAllBytes(old));try(var jobs=Files.list(old.getParent().getParent())){assertEquals(1,jobs.count());}
+        try(var channel=java.nio.channels.FileChannel.open(old.resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE);var lock=channel.tryLock(64,1,false)){assertNotNull(lock);}
+    }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void recoveryCancellationDoesNotStartAnotherJob() throws Exception {
+        Fixture fixture=new Fixture(false,false,true);var host=new RuntimeDescriptor.Host("macos","aarch64");((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path old=stale(fixture,host);Files.writeString(old.resolveSibling("fixture-slow"),"test-only slow release");byte[] before=Files.readAllBytes(old);var token=new CancellationToken();
+        try(var loader=fixture.loader();var executor=java.util.concurrent.Executors.newSingleThreadExecutor()) {
+            var future=executor.submit(()->ManagedRuntime.prepare(options(),true,token,loader,host,(u,o,t)->{throw new AssertionError();}));long deadline=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(2);
+            while(Files.readAllLines(old.resolveSibling("fixture-operations")).size()<4&&System.nanoTime()<deadline)Thread.sleep(5);
+            assertEquals(4,Files.readAllLines(old.resolveSibling("fixture-operations")).size());token.cancel();
+            var failure=assertThrows(java.util.concurrent.ExecutionException.class,()->future.get(3,java.util.concurrent.TimeUnit.SECONDS));assertEquals("CANCELLED",((McIconException)failure.getCause()).code());
+        }
+        assertArrayEquals(before,Files.readAllBytes(old));try(var jobs=Files.list(old.getParent().getParent())){assertEquals(1,jobs.count());}
+    }
+    private Path stale(Fixture fixture,RuntimeDescriptor.Host host) throws Exception {
+        Path file;try(var loader=fixture.loader();var managed=ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,host,fixture.transport(new AtomicInteger()))) {var prefix=managed.launch().prefix();file=Path.of(prefix.get(prefix.indexOf("--lease")+1));}
+        ObjectNode value=(ObjectNode)RuntimeDescriptor.read(Files.readAllBytes(file));value.putObject("resources").put("fixtureResource",true);Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));ManagedFixture.owner(file,ManagedFixture.deadOwner(root));return file;
+    }
     final class Fixture {
         final ManagedFixture definition=new ManagedFixture();
         final WorkerArtifact.Resolved worker=WorkerArtifact.resolve(root.resolve("worker-fixture"),new CancellationToken());
@@ -115,10 +162,12 @@ class ManagedRuntimeTest {
         final byte[] helper,image={1,2,3},inventory="test-only inventory".getBytes(StandardCharsets.UTF_8);
         byte[] descriptor;
         Fixture(boolean setup) throws Exception {this(setup,false);}
-        Fixture(boolean setup,boolean cleanupFails) throws Exception {
+        Fixture(boolean setup,boolean cleanupFails) throws Exception {this(setup,cleanupFails,false);}
+        Fixture(boolean setup,boolean cleanupFails,boolean recovery) throws Exception {
             String ok="{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}";
             String missing="{\"protocolVersion\":1,\"status\":\"setup-required\",\"diagnostics\":[{\"code\":\"FIXTURE_SETUP\",\"detail\":\"テスト専用の前提不足\",\"requiresPrivilege\":true,\"requiresRestart\":false}]}";
             String script="#!/bin/sh\nif [ \"$7\" = preflight ]; then /bin/cp \"$6\" \"${6%/*}/fixture-preflight-lease.json\" || exit 1; fi\n[ -f \"${6%/*}/descriptor.json\" ] || exit 1\nprintf '%s\\n' \"$7\" >> \"${6%/*}/fixture-operations\"\n"+(setup?"if [ \"$7\" = preflight ]; then printf '%s' '"+missing+"'; exit 2; fi\n":"")+(cleanupFails?"if [ \"$7\" = release ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; fi\n":"")+"printf '%s' '"+ok+"'\n";
+            if(recovery)script=script.replace("printf '%s' '"+ok+"'\n", "if [ \"$7\" = release ]; then if [ -f \"${6%/*}/fixture-no-clear\" ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}'; exit 0; fi; [ ! -f \"${6%/*}/fixture-slow\" ] || exec /bin/sleep 5; n=0; for j in \"$4\"/jobs/*/lease.json; do [ ! -f \"$j\" ] || n=$((n+1)); done; printf '%s' \"$n\" > \"${6%/*}/fixture-job-count\"; if /usr/bin/grep -q '\"fixtureResource\":true' \"$6\"; then [ -f \"${6%/*}/fixture-anchor\" ] || { printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; }; /usr/bin/sed 's/\"resources\":{\"fixtureResource\":true}/\"resources\":{}/' \"$6\" > \"$6.fixture-stage\" && /bin/mv \"$6.fixture-stage\" \"$6\" || exit 1; fi; fi\n"+"printf '%s' '"+ok+"'\n");
             ByteArrayOutputStream bytes=new ByteArrayOutputStream();try(ZipOutputStream zip=new ZipOutputStream(bytes)){zip.putNextEntry(new ZipEntry("bin/helper"));zip.write(script.getBytes(StandardCharsets.UTF_8));zip.closeEntry();}helper=bytes.toByteArray();
             definition.json.put("toolVersion",ToolVersion.VERSION);((ObjectNode)definition.json.get("worker")).put("toolVersion",ToolVersion.VERSION).put("agentSha256",worker.sha256()).put("adapterSetSha256",ManagedRuntime.adapterDigest(ManagedRuntime.class.getClassLoader()));
             ArrayNode java=(ArrayNode)definition.json.get("rendering").get("javaExecutables");java.removeAll();for(int major:List.of(8,17,21,25))java.addObject().put("major",major).put("executable","/opt/java/java"+major+"/bin/java").put("sha256",ManagedFixture.HASH);

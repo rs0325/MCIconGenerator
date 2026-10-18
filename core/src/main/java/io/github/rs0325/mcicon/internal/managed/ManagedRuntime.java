@@ -57,6 +57,7 @@ public final class ManagedRuntime implements AutoCloseable {
             byte[] bytes=resource(loader,path,4*1024*1024);descriptor.verifyInventory(artifact,bytes);inventories.put(path,bytes);
         }
         RuntimeGeneration generation=new RuntimeGeneration(store);Path executable=generation.helper(descriptor);
+        recover(store,descriptor,executable,token);store.check();
         RuntimeLease lease=RuntimeLease.create(store,descriptor,options,preparationDeadline);RuntimeHelper helper=null;
         try {
             FilesSupport.atomicWrite(lease.file().getParent().resolve("descriptor.json"),original);
@@ -74,6 +75,22 @@ public final class ManagedRuntime implements AutoCloseable {
             return new ManagedRuntime(options,descriptor,worker,lease,helper,launch);
         }catch(IOException|RuntimeException|Error failure) {
             try {release(helper,lease);}catch(Exception cleanup){failure.addSuppressed(cleanup);}throw failure;
+        }
+    }
+    private static void recover(RuntimeStore store,RuntimeDescriptor descriptor,Path executable,CancellationToken token) throws IOException {
+        if(!descriptor.host().os().equals("macos"))return;
+        List<Path> jobs;
+        try(var ignored=store.lock("generations")) {
+            Path directory=store.path("jobs");if(!Files.exists(directory,LinkOption.NOFOLLOW_LINKS))return;
+            if(!Files.isDirectory(directory,LinkOption.NOFOLLOW_LINKS))throw RuntimeLease.mismatch("jobsがdirectoryではありません");
+            try(var paths=Files.list(directory)){jobs=paths.toList();}
+        }
+        for(Path job:jobs) {
+            store.check();try(RuntimeLease lease=RuntimeLease.tryRecovery(store,descriptor,job)) {
+                if(lease==null)continue;
+                Map<String,String> environment=Map.of("TMPDIR",job.resolve("tmp").toString(),"TMP",job.resolve("tmp").toString(),"TEMP",job.resolve("tmp").toString());
+                requireOk(new RuntimeHelper(executable,store.root(),lease,environment).control("release",store.remaining(),token));
+            }
         }
     }
     public WorkerLaunch launch(){return launch;}
