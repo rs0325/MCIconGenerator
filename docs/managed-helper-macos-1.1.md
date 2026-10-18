@@ -54,6 +54,12 @@ worker応答は改行を含む元bytesを保持する。requestId、応答順序
 
 新候補はZIP tree検証に加え、`helpers/macos/qa/RuntimeArchiveFixture.java`をcoreの同packageから実行し、実`RuntimeArchive.extract`で全entryを展開する。全file集合/size/SHA、owner実行bit、展開後deep strict署名、TMP-only入口がinvalid lease拒否へ到達することを非VMで確認する。fixtureの成功はVM/描画受入を意味しない。
 
-Issue #94の残件は実再起動後のanchor現存cold-start、uninstall残存の実確認、ジョブ世代pinの更新切替と全51版等である。製品CLIのmanaged接続・最終package/trust/licenseも別gateを残す。完成条件を独断で後続Issueへ移さず、通常PR準備はRefs #94としてOPENを維持する。受入世代と旧FAILの留保は[QA記録](../qa/validation-2026-10-18-managed-helper-macos.json)を参照する。
+Issue #94の残件は実再起動後のanchor現存cold-start、uninstall残存の実確認、ジョブ世代pinの更新切替等である。製品CLIのmanaged接続・最終package/trust/licenseも別gateを残す。完成条件を独断で後続Issueへ移さず、通常PR準備はRefs #94としてOPENを維持する。受入世代と旧FAILの留保は[QA記録](../qa/validation-2026-10-18-managed-helper-macos.json)を参照する。
 
 追加のactive試験では、ユーザーがready期限内に手動再起動し、旧ready/resources・receipt・identity・journal全集合を保持したまま公開#104から別ended証拠で閉じた。旧13操作中の未settled start1件は正常完了を補わず、anchor明確欠落から同path新owner fresh VMを準備して3PNG/RGBA差分0・通常close/Stoppedを確認した。prebootの5子は正常reap、core1件のfinal/reapはOS終了で欠けるため実boot変更/元process identity死亡へ結合する。postbootの6子はすべて正常reap。限定独立結果auditはPASSで、OwnedStopped旧boot cold-startの成功とは分ける。
+
+## 全51版の固定pixel再受入
+
+確定main `0fd4b7d2` の分離buildとapp-image-v10を使用した。先行6版9,212PNGの保存画像と、同じ専用VMを再利用した残45版51,053PNGを正式canonical-v1受入時の両roundへ比較し、全51版60,265PNG・102比較のRGBA差分0を確認した。51lease released空、765操作終端、204完全container IDの削除/正常NotFound、206実行child回収、同実行境界Stoppedと末尾入力・旧環境不変の小監査は成功し、独立結果auditはPASS（追加指摘0）となった。
+
+初回の旧fixed baselineとの1.21.11 1,502枚RGB差FAILは保持する。正式受入baselineへの保存画像分析と残45実描画は別世代であり、元FAILを成功へ書き換えない。今回の固定pixel受入から代表World意味確認の保証範囲を拡張しない。#97/#98の実uninstall/更新接続、Intel/最低OS/最終配布と現存anchor旧boot OwnedStopped分岐の未実測を残し、Refs #94 OPENを維持する。

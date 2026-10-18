@@ -70,6 +70,12 @@ Apple Siliconの専用1VM・1jobで、8応答すべてexit 0と子process回収�
 
 別許可の最小試験は同root/descriptor/pathの旧正常releasedから新owner VM1台を固定base/offline closureで再構成した。全体30分/prepare20分/最終30秒予約、4CPU/9GiB/24GiB、空き40GiB以上に限定した。3PNG独立RGBA差分0、6子process回収、旧history/fresh資格消費、旧証拠不変、通常close/Stoppedを確認し、この範囲の独立結果auditはPASSとして記録する。署名を再利用し、新keyやOS再起動は追加していない。
 
-過去3anchor側の11資料欠落と永続31資料一致を現在baselineとして分離する。旧partialをclearせず、旧当時freezeと全FAILを保全する。anchor削除者/時刻は未trace。実再起動後のanchor現存cold-start、アンインストール残存実確認、世代pin更新、全51版、Intel/最低OS/最終配布は未完了であり、Refs #94 OPENを維持する。受入SHAと実行世代は[QA記録](../qa/validation-2026-10-18-managed-helper-macos.json)へ記載する。
+過去3anchor側の11資料欠落と永続31資料一致を現在baselineとして分離する。旧partialをclearせず、旧当時freezeと全FAILを保全する。anchor削除者/時刻は未trace。実再起動後のanchor現存cold-start、アンインストール残存実確認、世代pin更新、Intel/最低OS/最終配布は未完了であり、Refs #94 OPENを維持する。受入SHAと実行世代は[QA記録](../qa/validation-2026-10-18-managed-helper-macos.json)へ記載する。
 
 追加active試験(v9)は、旧3released/144pinを固定して既Stopped VMを再利用した。ユーザーが完成PNG readyの15分窓内に手動再起動し、公開#104で元activeの別ended証拠を保存して同path新ownerのmissing-freshへ進んだ。元identity/receipt/resources/journalを保持し、旧未settled start1件を正常化しない。3PNG/RGBA差分0・全5released・postboot6子reap・Stoppedを確認し、この範囲の限定独立結果auditはPASS（追加指摘0）である。preboot coreのfinal/reap欠落はOS終了の別分類とし、旧boot OwnedStopped cold-startは未実行である。
+
+## 全51版の固定pixel再受入
+
+確定main `0fd4b7d2` の分離buildとapp-image-v10を使用した。先行6版9,212PNGの保存画像と、同じ専用VMを再利用した残45版51,053PNGを正式canonical-v1受入時の両roundへ比較し、全51版60,265PNG・102比較のRGBA差分0を確認した。51lease released空、765操作終端、204完全container IDの削除/正常NotFound、206実行child回収、同実行境界Stoppedと末尾入力・旧環境不変の小監査は成功し、独立結果auditはPASS（追加指摘0）となった。
+
+初回の旧fixed baselineとの1.21.11 1,502枚RGB差FAILは保持する。正式受入baselineへの保存画像分析と残45実描画は別世代であり、元FAILを成功へ書き換えない。今回の固定pixel受入から代表World意味確認の保証範囲を拡張しない。#97/#98の実uninstall/更新接続、Intel/最低OS/最終配布と現存anchor旧boot OwnedStopped分岐の未実測を残し、Refs #94 OPENを維持する。
