@@ -20,7 +20,7 @@
 |---|---|---|---|
 | macOS arm64 | LimaのVZ arm64 guestとRosettaでLinux amd64を実行 | VZ自体はmacOS 13以上。製品の下限は署名・配布helper・実機試験後に確定 | 同梱helperの実行・再配布、Rosetta未準備時、画像、停止・回収 |
 | macOS x86_64 | VZのLinux amd64 guest | OS下限・対応CPUはIntel実機で確定 | 実機未確認。arm64の測定を流用しない |
-| Windows x86_64 | 専用WSL2 distribution内のLinux amd64 | WSL2・仮想化機能が必要。Windowsの下限は実証後に確定 | 未準備時の承認と再起動、専用distributionのimport/terminate、画像と回収 |
+| Windows x86_64 | 専用WSL2 distribution内のLinux amd64 | WSL2・仮想化機能が必要。今回の観測版は最低対応版を示さない | 小規模の準備・画像・回収は2026-10-19に成功。製品helper、未準備時の承認・再起動、下限・配布条件は未受入 |
 | Linux x86_64 | 専用領域のrootless container runtime | user namespace・subuid/subgid・cgroup等の条件を検査 | distributionとkernelの下限、rootless制約、画像と回収 |
 
 最初の実証対象はmacOS arm64・Windows x86_64・Linux x86_64とする。他のOS/archは未検証であり、公表対応へ追加する際は別に実証する。新たな非対応範囲を確定したとは扱わず、黙って別rendererやホストJavaへ切り替えない。仮想化機能・Rosetta・WSL・rootless前提が不足する場合、必要操作と再開コマンドを表示する。無断の昇格、OS再起動、system daemon導入、既存VM/WSL設定変更は行わない。
@@ -169,6 +169,24 @@ brew/wingetの管理者はstable bootstrapperの更新を所有し、bootstrappe
 | Mac専用VZ環境 | v5準備と単体v2/並列v4が成功。単体3PNGと全metadata一致、並列A1PNG取消/B3PNG完走、A/B入力244+metadata1不変、cgroup各2GiB/CPU4、所有回収/通常停止 | 製品helperの同梱と51版受入。初回QA FAILと修正後新規run PASSは両方保全 |
 | Windows準備QA | 専用WSL bundle v4凍結、controller18/外側監督16/collector4/実Docker info gate2条件成功、wrapper12条件と2job consumerのjavac成功 | 差分反証済み。新タスク接続許可と新規WSL実証 |
 | Linux rootless | 要件調査 | 独立したLinux条件での実証 |
+
+### 2026-10-19のWindows方式実証と残件
+
+主実証PASSと別世代の診断補足PASSを独立監査した。[Windows方式QA](../qa/validation-2026-10-19-windows-managed-proof.json)に結果・artifact hash・未達条件を記録する。記録の基準はmain `06d44c9d238b9e22a9c4aa0ab60f1f16fb1968b1`、private probeを凍結したrepository基準は共有契約時点の `9c01311c78fad487b46c60e71de0d1d3f27b6396`。probe scriptsのbytesは公開commitとは別に固定し、既存1.0.1 CLIで実行した。現在の1.1.0管理APIを通した製品受入ではない。
+
+既準備WSL2上の新しい専用distributionで、Ubuntu amd64・専用guest内のDocker/JREを準備した。1.20.6の代表3PNGと全metadataが一致し、2worker同時稼働でAは1PNG後に取消、Bは3PNG完走した。各containerの実cgroupは3GiB/CPU4、入力957件とmetadata1件は元・複製・guestで不変。所有engine・sampler・container/host jobを回収し、専用distributionのStopped、既登録/default/.wslconfig不変を確認した。専用disk・登録と全失敗原本は保持している。
+
+主実証のpreflightはWSL queryのexit0後にNUL除去で整形errorとなり、元reportの `passed=true/error3` は変更していない。別の読取補足で版/status/listのraw6件を先に保存してから整形し、全exit0・errorなし・raw hash/独立decode一致を確認した。観測はWindows `10.0.26200.9711`、WSL `3.0.3.0`、kernel `6.18.54.1-1`。元ParserError・Python alias拒否・コマンド長による輸送FAILも別世代で保持する。
+
+| 受入項目 | 状態 | 次の条件 |
+|---|---|---|
+| Windows専用WSLの小規模成立性 | 主実証・別診断ともPASS | 方式採用記録の確定commitを必要とする |
+| OS/WSL/CPU下限、実配布bytes・再配布条件 | 未完了 | 今回の観測版やguest apt導入を、最低対応版・製品runtime buildの受入に代用しない |
+| #95製品helper、host CLI/Java管理API、未準備/offline/再起動後/path境界 | 未受入 | 必要な#93前提と方式採用commit確定後に製品経路を実装・検証する |
+| #99固定51版・全件/反復/境界 | 未受入 | 今回の1.20.6代表3PNGから自動継承しない |
+| Linux rootlessと#91全体 | 未完了 | 独立Linux実証・最終方式・配布条件確定まで#91をcloseしない |
+
+このWindows記録は `Refs #91` の先行QAとし、製品helperの実装や最終方式採用を開始したとは扱わない。後続の前提commitは、上記main基準と、このQA/docs差分がレビュー・公開権限を経て確定したcommitを明示する。
 
 Mac準備QAはホストへRosettaを導入しない。Limaが未導入時に導入APIを呼び得るため、起動前に既存Virtualization.frameworkのavailabilityがinstalledであることを読み取り、不明・未導入なら拒否する。VM準備用のguest package導入は製品の固定runtime・再配布の実証ではない。
 

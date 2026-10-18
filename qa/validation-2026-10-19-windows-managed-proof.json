@@ -1,0 +1,231 @@
+{
+  "issue": 91,
+  "status": "windows-feasibility-and-separate-diagnostics-passed",
+  "recordDate": "2026-10-19",
+  "baseCommit": "06d44c9d238b9e22a9c4aa0ab60f1f16fb1968b1",
+  "issue91Completed": false,
+  "productCodeChanged": false,
+  "windowsProductHelperImplemented": false,
+  "windowsCandidateFeasibilityPassed": true,
+  "finalRuntimeAdopted": false,
+  "scope": "既存WSL2と仮想化機能を利用した専用distributionの準備・代表描画・並列取消・所有回収だけ。1.1.0製品helper/APIの受入ではない。",
+  "sourcePins": {
+    "cliVersion": "1.0.1",
+    "cliZipSha256": "a1e23fcfbd2baf597c6e02cf262c55f6d40278d676f579d6dbb9ea0701fdd387",
+    "api": "1.0.1の明示WorkerOptionsを使用する独立ManagedEnvironmentProbe",
+    "rendererImage": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "rootfs": "Ubuntu 24.04 amd64の固定rootfs",
+    "rootfsSha256": "820311e238ea34d76a8ca2643d6c01065212e9417109e7397d70472a236df261",
+    "originalBundle": {
+      "bytes": 828926655,
+      "sha256": "e42860c0d74ebe48b9e540805a7b4e7eb5d6c668aa15ddc24763927d375d9ba1",
+      "entries": 21
+    },
+    "encodingControlZipSha256": "83feee76b737d6eb821cec7b08d3ec33285f1ebf4466e87c9a11fa77109eb89d",
+    "preflightBomSha256": "d7a5e52da6d7d38108cc9c9ac1c418998b45f18e748e1ec0d807216b7b21ef6a"
+  },
+  "checks": {
+    "windowsFeasibility": {
+      "passed": true,
+      "independentAudit": "PASS",
+      "generation": "新encoding子root。旧bundleは読取参照、owner/cache/install/resultsは新世代へ分離。",
+      "hostOs": "Windows 11 Pro",
+      "hostArchitecture": "AMD64",
+      "observedOsVersion": "10.0.26200.9711",
+      "guestArchitecture": "x86_64",
+      "existingWsl2Used": true,
+      "newDistributionImported": true,
+      "guestAptInstalled": true,
+      "guestAptScope": "専用guest内だけdocker.io・openjdk-21-jre-headless・python3と依存。host software導入なし。",
+      "guestAvailableMemoryBytes": 32369106944,
+      "guestSse41": true,
+      "renderVersion": "1.20.6",
+      "images": [
+        {
+          "path": "assets/minecraft/textures/item/enchanted_book.png",
+          "sha256": "373a05ad4c320b1c310d5ef5c024ab95bf9c18076a3f9c03155bf2f1db548944"
+        },
+        {
+          "path": "assets/minecraft/textures/block/player_head.png",
+          "sha256": "038c9ae04f143a713d7642ef175f842a88d5e1025bc7ddff6c8a1a28c2a61b6f"
+        },
+        {
+          "path": "assets/minecraft/textures/block/stone.png",
+          "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+        }
+      ],
+      "pngAndFullMetadataMatch": true,
+      "parallel": {
+        "cancelled": {
+          "complete": false,
+          "succeeded": 1,
+          "failed": 2
+        },
+        "completed": {
+          "complete": true,
+          "succeeded": 3,
+          "failed": 0
+        },
+        "bothWorkersRunning": true,
+        "cgroup": [
+          [
+            "3221225472",
+            "400000 100000"
+          ],
+          [
+            "3221225472",
+            "400000 100000"
+          ]
+        ]
+      },
+      "inputFiles": 957,
+      "metadataFiles": 1,
+      "sourceInputUnchanged": true,
+      "copiedInputUnchanged": true,
+      "guestInputUnchanged": true,
+      "existingDistributionRegistrationsUnchanged": true,
+      "defaultUnchanged": true,
+      "globalWslConfigUnchanged": true,
+      "firstDistributionDefaultSideEffectObserved": false,
+      "samplerStopped": true,
+      "engineCollected": true,
+      "remainingContainers": 0,
+      "remainingHostJobActors": 0,
+      "dedicatedDistributionStopped": true,
+      "registrationAndDiskPreserved": true,
+      "localClientsReapedAndCollected": true,
+      "elapsedSeconds": 130.577,
+      "diagnosticGap": "元preflightの3 queryはexit0だがNUL除去のchar overloadで整形error。元passed=true/error3を保持し、このrun単独では版等の採取成功としない。"
+    },
+    "separateWslDiagnostics": {
+      "passed": true,
+      "independentAudit": "PASS",
+      "generation": "主実証と別の読取補足。元reportを修正しない。",
+      "queries": [
+        "--version",
+        "--status",
+        "--list --verbose"
+      ],
+      "queryExitCodes": [
+        0,
+        0,
+        0
+      ],
+      "queryErrors": 0,
+      "queryProcessesCollected": true,
+      "rawFiles": 6,
+      "rawSha256AndIndependentDecodeMatch": true,
+      "wslVersion": "3.0.3.0",
+      "kernelVersion": "6.18.54.1-1",
+      "observedWindowsVersion": "10.0.26200.9711",
+      "defaultWslVersion": 2,
+      "dedicatedDistributionStopped": true,
+      "existingDistributionStopped": true,
+      "additionalImportOrRender": false,
+      "localClientsReapedAndCollected": true
+    },
+    "syntheticChecksReused": {
+      "controller": 18,
+      "outerSupervisor": 16,
+      "collector": 4,
+      "dockerInfoGate": 2,
+      "dockerWrapper": 12,
+      "scope": "既成功記録を再利用。新実機成功と同じ検証として数え直さない。"
+    },
+    "preservedPriorFailures": [
+      {
+        "stage": "SSH接続・転送前確認",
+        "result": "接続timeout。再開前に許可された限定確認で復旧を確認。元記録保持。"
+      },
+      {
+        "stage": "最初の入口",
+        "result": "WindowsApps Python alias拒否。controller未開始、旧実体の限定確認後に絶対path/hashを固定。"
+      },
+      {
+        "stage": "最初のcontroller",
+        "result": "UTF8 BOMなしpreflightをPowerShell -Fileで解析してParserError。import未開始。旧9entry ZIPを保持。"
+      },
+      {
+        "stage": "AST検査入口",
+        "result": "大inline commandの輸送FAIL。短dispatchと新小ZIPへ分離。旧失敗保持。"
+      },
+      {
+        "stage": "主実証preflight診断",
+        "result": "元passed=true/error3を保持。後続の別raw保存世代で補足し、元probe欠陥を未修正と明記。"
+      }
+    ]
+  },
+  "privateEvidence": [
+    {
+      "role": "主実証ZIP・42entry",
+      "bytes": 68839,
+      "sha256": "f50c489c174ac4cc939aee478ab40b762610d021fce6537d9235e3641d9c67f6"
+    },
+    {
+      "role": "ZIP生成後の最終outer report",
+      "bytes": 1120,
+      "sha256": "a83c567afa85983da3973a7256cbd34a95abb5e9da0c9109e26b95b1a036529a"
+    },
+    {
+      "role": "診断補足ZIP・raw6とreport1",
+      "bytes": 1930,
+      "sha256": "3dc47c94711e833df7cd1584d2b28499c11a92c903eb00bc62a327d9bb82947e"
+    },
+    {
+      "role": "旧ParserError失敗ZIP・9entry",
+      "bytes": 5024,
+      "sha256": "2530759d28a16f92738dfdcec6164e368005388787f18855637c70900a7c811a"
+    }
+  ],
+  "acceptanceMatrix": [
+    {
+      "item": "Windows専用WSL方式の小規模成立性",
+      "status": "PASS",
+      "next": "方式採用記録の確定commitを別途必要とする。"
+    },
+    {
+      "item": "製品runtimeの実配布bytesと再配布条件",
+      "status": "未完了",
+      "next": "固定artifact/hash・license/notice/source・署名/信頼設定を確定。guest apt成功を代用しない。"
+    },
+    {
+      "item": "Windows/WSL/CPU最低条件",
+      "status": "未完了",
+      "next": "今回の観測版を最低対応版へ転記しない。別の下限実機受入が必要。"
+    },
+    {
+      "item": "#95製品helperとhost CLI/Java管理API境界",
+      "status": "未着手",
+      "next": "確定runtime前提と方式採用commit後に実装する。"
+    },
+    {
+      "item": "未準備/offline/再起動後再開/path境界",
+      "status": "未受入",
+      "next": "#95で製品経路を検証。今回の既準備WSL単一hostを流用しない。"
+    },
+    {
+      "item": "固定51版と全件/反復/境界",
+      "status": "未受入",
+      "next": "#99で実runtime世代ごとに検証。今回1.20.6代表3PNGのみ。"
+    },
+    {
+      "item": "Linux rootless方式と#91全体",
+      "status": "未完了",
+      "next": "独立Linux実証と最終方式・配布条件確定まで#91をcloseしない。"
+    }
+  ],
+  "proposedPrerequisites": {
+    "baseCommit": "06d44c9d238b9e22a9c4aa0ab60f1f16fb1968b1",
+    "windowsProofCommit": "この2file差分のレビューと公開権限を経て確定するcommit。未作成。",
+    "issue95Start": "rootが方式採用の未確定事項と#93必要前提を整理し、上記確定commitを引き継ぐまで製品helper変更を開始しない。"
+  },
+  "publication": {
+    "gitCommitCreated": false,
+    "pushed": false,
+    "pullRequestCreated": false,
+    "issueClosed": false,
+    "remoteActionsAfterDiagnostics": false
+  },
+  "probeSourceBaselineCommit": "9c01311c78fad487b46c60e71de0d1d3f27b6396",
+  "probeScriptsTrackedInBaselineCommit": false
+}
