@@ -1,0 +1,35 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':helper-common')
+}
+application {
+    mainClass = 'io.github.rs0325.mcicon.helper.macos.Main'
+}
+
+tasks.register('appImage', Exec) {
+    dependsOn 'installDist'
+    def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    doFirst {
+        if (!System.getProperty('os.name').toLowerCase().contains('mac')) {
+            throw new GradleException('macOS app-imageはmacOSで生成してください')
+        }
+        if (!providers.gradleProperty('macosPayloadDir').isPresent()) {
+            throw new GradleException('検証済みpayload directoryを-PmacosPayloadDirで指定してください')
+        }
+        commandLine 'python3', file('scripts/package-helper.py'),
+                '--jdk', launcher.get().metadata.installationPath.asFile,
+                '--input', layout.buildDirectory.dir('install/helper-macos/lib').get().asFile,
+                '--payload', file(providers.gradleProperty('macosPayloadDir').get()),
+                '--native', file('src/main/native'), '--output', layout.buildDirectory.dir('app-image').get().asFile
+    }
+}
+
+// 実probeの保存stdoutだけを再解析する、VMを使わない任意fixture。
+tasks.named('test') {
+    if (providers.gradleProperty('macosProbeFacts').isPresent()) {
+        systemProperty 'mcicon.macosProbeFacts', providers.gradleProperty('macosProbeFacts').get()
+    }
+}
