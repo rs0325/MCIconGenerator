@@ -10,6 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RuntimeHelperTest {
     @TempDir Path root;
+    @Test void commonControlExamplesMatchCoreConsumer() throws Exception {
+        var examples=RuntimeDescriptor.read(Files.readAllBytes(Path.of("..","schemas","managed-helper-v1.examples.json")));
+        for(var item:examples.get("control")) {
+            var response=item.get("response");var result=RuntimeHelper.parse(RuntimeDescriptor.JSON.writeValueAsBytes(response),item.path("exitCode").intValue());
+            assertEquals(response.path("status").asText().equals("ok"),result.ok());
+        }
+    }
     @Test void controlProtocolRejectsStatusExitAndUnknownFields() throws Exception {
         byte[] setup="{\"protocolVersion\":1,\"status\":\"setup-required\",\"diagnostics\":[{\"code\":\"MISSING\",\"detail\":\"前提が不足しています\",\"requiresPrivilege\":true,\"requiresRestart\":false}]}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
         assertFalse(RuntimeHelper.parse(setup,2).ok());RuntimeDescriptorTest.assertInvalid(()->RuntimeHelper.parse(setup,0));
@@ -22,7 +29,7 @@ class RuntimeHelperTest {
         Path executable=root.resolve("helper");
         Files.writeString(executable,"#!/bin/sh\nprintf '%s' '{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}'\n");
         assertTrue(executable.toFile().setExecutable(true));
-        try(var lease=RuntimeLease.create(store,new ManagedFixture().descriptor())) {
+        try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
             RuntimeHelper helper=new RuntimeHelper(executable,store.root(),lease,Map.of());
             assertTrue(helper.control("preflight",Duration.ofSeconds(1),new CancellationToken()).ok());
             assertTrue(helper.control("release",Duration.ofSeconds(1),new CancellationToken()).ok());
@@ -35,7 +42,7 @@ class RuntimeHelperTest {
         var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(5),(u,o,t)->{throw new AssertionError();});
         var descriptor=new ManagedFixture().descriptor();Path executable=root.resolve("helper");
         Files.writeString(executable,"#!/bin/sh\nexec /bin/sleep 5\n");assertTrue(executable.toFile().setExecutable(true));
-        try(var lease=RuntimeLease.create(store,descriptor)) {
+        try(var lease=ManagedFixture.lease(store,descriptor)) {
             RuntimeHelper helper=new RuntimeHelper(executable,store.root(),lease,Map.of());
             assertThrows(java.io.IOException.class,()->helper.control("release",Duration.ofMillis(50),new CancellationToken()));
             assertEquals("active",lease.read().path("state").asText());
@@ -49,7 +56,7 @@ class RuntimeHelperTest {
     void runningHelperCancellationWaitsAndKeepsRawEvidence() throws Exception {
         var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(5),(u,o,t)->{throw new AssertionError();});
         Path executable=root.resolve("helper");Files.writeString(executable,"#!/bin/sh\nprintf started > \"$6.started\"\nprintf partial\nexec /bin/sleep 5\n");assertTrue(executable.toFile().setExecutable(true));
-        try(var lease=RuntimeLease.create(store,new ManagedFixture().descriptor());var executor=java.util.concurrent.Executors.newSingleThreadExecutor()) {
+        try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor());var executor=java.util.concurrent.Executors.newSingleThreadExecutor()) {
             CancellationToken token=new CancellationToken();RuntimeHelper helper=new RuntimeHelper(executable,store.root(),lease,Map.of());
             var future=executor.submit(()->helper.control("prepare",Duration.ofSeconds(4),token));
             Path marker=Path.of(lease.file()+".started");long deadline=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(2);
@@ -67,7 +74,7 @@ class RuntimeHelperTest {
         var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(5),(u,o,t)->{throw new AssertionError();});
         for(String reply:List.of("invalid-json","{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}")) {
             Path executable=root.resolve("helper");Files.writeString(executable,"#!/bin/sh\nprintf '%s' '"+reply+"'\nexit 2\n");assertTrue(executable.toFile().setExecutable(true));
-            try(var lease=RuntimeLease.create(store,new ManagedFixture().descriptor())) {
+            try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
                 RuntimeHelper helper=new RuntimeHelper(executable,store.root(),lease,Map.of());assertThrows(Exception.class,()->helper.control("prepare",Duration.ofSeconds(1),new CancellationToken()));
                 var evidence=evidence(lease);assertEquals(2,evidence.path("exitCode").intValue());assertTrue(evidence.path("directProcessTerminated").asBoolean());
                 assertEquals(reply,Files.readString(lease.file().getParent().resolve(evidence.path("stdout").asText())));assertEquals("active",lease.read().path("state").asText());
@@ -95,7 +102,7 @@ class RuntimeHelperTest {
     }
     @Test void alreadyCancelledJobDoesNotStartHelper() throws Exception {
         var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(5),(u,o,t)->{throw new AssertionError();});
-        try(var lease=RuntimeLease.create(store,new ManagedFixture().descriptor())) {
+        try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
             RuntimeHelper helper=new RuntimeHelper(root.resolve("missing-helper"),store.root(),lease,Map.of());
             CancellationToken token=new CancellationToken();token.cancel();
             assertEquals("CANCELLED",assertThrows(io.github.rs0325.mcicon.McIconException.class,()->helper.control("prepare",Duration.ofSeconds(1),token)).code());
@@ -104,7 +111,7 @@ class RuntimeHelperTest {
     }
     @Test void dockerKeepsAbsolutePrefixAndArgumentsSeparate() throws Exception {
         var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(5),(u,o,t)->{throw new AssertionError();});
-        try(var lease=RuntimeLease.create(store,new ManagedFixture().descriptor())) {
+        try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
             RuntimeHelper helper=new RuntimeHelper(root.resolve("helper"),root.toRealPath(),lease,Map.of("MCICON_JOB","fixture"));
             ProcessBuilder builder=helper.docker(List.of("run","--name","contains spaces; $(literal)"));
             assertEquals(List.of(root.resolve("helper").toString(),"--protocol","1","--root",root.toRealPath().toString(),"--lease",lease.file().toString(),"docker","--","run","--name","contains spaces; $(literal)"),builder.command());

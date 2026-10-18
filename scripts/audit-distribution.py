@@ -28,7 +28,7 @@ def inspect_archive(data, name, failures):
                                    hashlib.sha256(archive.read(entry)).hexdigest() == JAVADOC_IMAGES[entry])
             if (entry.endswith(('.png', '.mcmeta', '.tiny')) and not documentation_image or
                     any(part in {'.local', '.mcicon-cache', 'natives-linux', 'objects'} for part in parts) or
-                    entry.startswith(('net/minecraft/', 'com/mojang/', 'io/github/rs0325/mcicon/qa/')) or
+                    entry.startswith(('net/minecraft/', 'com/mojang/', 'io/github/rs0325/mcicon/qa/', 'io/github/rs0325/mcicon/helper/')) or
                     '/assets/' in '/' + entry or '/scripts/qa/' in '/' + entry):
                 failures.append(name + ': 配布対象外 ' + entry)
             if entry.endswith('.jar'):

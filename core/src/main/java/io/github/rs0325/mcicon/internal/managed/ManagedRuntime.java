@@ -10,6 +10,7 @@ import java.nio.file.*;
 import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 /** 固定同梱の信頼設定から準備し、同じleaseと起動指定をジョブ終了まで保持する。 */
@@ -29,6 +30,7 @@ public final class ManagedRuntime implements AutoCloseable {
     }
     static ManagedRuntime prepare(ManagedOptions options,boolean offline,CancellationToken token,ClassLoader loader,RuntimeDescriptor.Host host,RuntimeStore.Transport transport) throws IOException {
         token.check();long deadline=System.nanoTime()+options.preparationTimeout().toNanos();
+        Instant preparationDeadline=Instant.now().plus(options.preparationTimeout());
         JsonNode pins;try {pins=RuntimeDescriptor.read(resource(loader,"pins.json",1024*1024));}catch(IOException failure){throw new McIconException("MANAGED_RUNTIME_INVALID","同梱pinの形式が不正です",1,failure);}RuntimeDescriptor.fields(pins,"schemaVersion","runtimes");RuntimeDescriptor.constant(pins,"schemaVersion",1);
         JsonNode selected=null;Set<RuntimeDescriptor.Host> hosts=new HashSet<>();
         for(JsonNode entry:RuntimeDescriptor.array(pins,"runtimes",1,6)) {
@@ -55,7 +57,7 @@ public final class ManagedRuntime implements AutoCloseable {
             byte[] bytes=resource(loader,path,4*1024*1024);descriptor.verifyInventory(artifact,bytes);inventories.put(path,bytes);
         }
         RuntimeGeneration generation=new RuntimeGeneration(store);Path executable=generation.helper(descriptor);
-        RuntimeLease lease=RuntimeLease.create(store,descriptor);RuntimeHelper helper=null;
+        RuntimeLease lease=RuntimeLease.create(store,descriptor,options,preparationDeadline);RuntimeHelper helper=null;
         try {
             FilesSupport.atomicWrite(lease.file().getParent().resolve("descriptor.json"),original);
             for(var entry:inventories.entrySet()) {

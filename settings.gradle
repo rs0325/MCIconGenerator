@@ -1,2 +1,3 @@
 rootProject.name = 'MCIconGenerator'
-include 'core', 'cli', 'worker'
+include 'core', 'cli', 'worker', 'helper-common'
+project(':helper-common').projectDir = file('helpers/common')

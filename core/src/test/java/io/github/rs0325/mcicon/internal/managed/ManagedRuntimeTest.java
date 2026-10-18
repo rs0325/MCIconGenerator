@@ -32,6 +32,9 @@ class ManagedRuntimeTest {
             assertEquals(fixture.worker.sha256(),managed.launch().expectedAgentSha256());assertTrue(Files.isRegularFile(managed.worker(21).agentJar()));
             List<String> prefix=managed.launch().prefix();lease=Path.of(prefix.get(prefix.indexOf("--lease")+1));
             assertArrayEquals(fixture.descriptor,Files.readAllBytes(lease.getParent().resolve("descriptor.json")));
+            var observed=RuntimeDescriptor.read(Files.readAllBytes(lease.getParent().resolve("fixture-preflight-lease.json"))).path("requirements");
+            assertEquals(options().containerMemoryMiB(),observed.path("containerMemoryMiB").intValue());assertEquals(options().heapMemoryMiB(),observed.path("heapMemoryMiB").intValue());assertEquals(4,observed.path("cpus").intValue());
+            assertTrue(java.time.Instant.parse(observed.path("preparationDeadline").asText()).isAfter(java.time.Instant.now()));
             assertArrayEquals(fixture.inventory,Files.readAllBytes(lease.getParent().resolve("inventory/helper.json")));
             assertEquals(List.of("preflight","prepare"),Files.readAllLines(lease.getParent().resolve("fixture-operations")));
             assertEquals(List.of("docker","--"),prefix.subList(prefix.size()-2,prefix.size()));
@@ -115,7 +118,7 @@ class ManagedRuntimeTest {
         Fixture(boolean setup,boolean cleanupFails) throws Exception {
             String ok="{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}";
             String missing="{\"protocolVersion\":1,\"status\":\"setup-required\",\"diagnostics\":[{\"code\":\"FIXTURE_SETUP\",\"detail\":\"テスト専用の前提不足\",\"requiresPrivilege\":true,\"requiresRestart\":false}]}";
-            String script="#!/bin/sh\n[ -f \"${6%/*}/descriptor.json\" ] || exit 1\nprintf '%s\\n' \"$7\" >> \"${6%/*}/fixture-operations\"\n"+(setup?"if [ \"$7\" = preflight ]; then printf '%s' '"+missing+"'; exit 2; fi\n":"")+(cleanupFails?"if [ \"$7\" = release ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; fi\n":"")+"printf '%s' '"+ok+"'\n";
+            String script="#!/bin/sh\nif [ \"$7\" = preflight ]; then /bin/cp \"$6\" \"${6%/*}/fixture-preflight-lease.json\" || exit 1; fi\n[ -f \"${6%/*}/descriptor.json\" ] || exit 1\nprintf '%s\\n' \"$7\" >> \"${6%/*}/fixture-operations\"\n"+(setup?"if [ \"$7\" = preflight ]; then printf '%s' '"+missing+"'; exit 2; fi\n":"")+(cleanupFails?"if [ \"$7\" = release ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; fi\n":"")+"printf '%s' '"+ok+"'\n";
             ByteArrayOutputStream bytes=new ByteArrayOutputStream();try(ZipOutputStream zip=new ZipOutputStream(bytes)){zip.putNextEntry(new ZipEntry("bin/helper"));zip.write(script.getBytes(StandardCharsets.UTF_8));zip.closeEntry();}helper=bytes.toByteArray();
             definition.json.put("toolVersion",ToolVersion.VERSION);((ObjectNode)definition.json.get("worker")).put("toolVersion",ToolVersion.VERSION).put("agentSha256",worker.sha256()).put("adapterSetSha256",ManagedRuntime.adapterDigest(ManagedRuntime.class.getClassLoader()));
             ArrayNode java=(ArrayNode)definition.json.get("rendering").get("javaExecutables");java.removeAll();for(int major:List.of(8,17,21,25))java.addObject().put("major",major).put("executable","/opt/java/java"+major+"/bin/java").put("sha256",ManagedFixture.HASH);

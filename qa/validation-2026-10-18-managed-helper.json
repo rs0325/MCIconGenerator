@@ -1,0 +1,141 @@
+{
+  "issue": 93,
+  "iteration": 2,
+  "status": "descriptor snapshot getterとJackson api依存を追加、common11件とOS向けconsumer compile成功。今回2点の限定反証待ち。Issue全体は未完了。",
+  "baseCommit": "0f629f53e067dfce9a28c993bf3830bb18866543",
+  "baseTree": "cebe4892a699da01fc2dc76363865171f36ea04e",
+  "branch": "feature/issue-93",
+  "owner": "issue93_runtime",
+  "java": "Temurin 21.0.9+10-LTS",
+  "os": "macOS arm64。Windows/Linux実機・VMは未実行。",
+  "scope": [
+    "immutable requirements受渡し、recursive receipt固定bytes、64/1稼働lockと別resources更新lock",
+    "非公開helper-common:固定argv/control、元descriptor/inventory/世代照合、resourcesだけのatomic CAS更新",
+    "Mac/Windows phase別閉schemaと意味検査、Linux非空resourcesは方式未採用として拒否",
+    "Java21 jpackage自己完結app-imageの配布契約。OS本体/packagerは含まない"
+  ],
+  "verification": {
+    "normalBuild": "./gradlew build prepareRelease prepareCentralCandidate -PreleaseVersion=1.1.0 --offline --no-daemon 成功",
+    "finalCoreRegression": "./gradlew :core:test -PreleaseVersion=1.1.0 --offline --no-daemon 成功",
+    "tests": {
+      "core": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cli": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "worker": {
+        "tests": 32,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "helpers/common": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "schema": "Draft202012Validator.check_schema+FormatChecker、lease1/control3/resources9期待結果一致",
+    "distribution": "候補監査成功、通常1+故障10=11条件成功（helper class混入含む）",
+    "central": "未署名候補の座標/依存/checksum監査成功。checksum再計算後のhelper class混入も拒否。公開座標は既存2件。",
+    "consumer": {
+      "version": "1.1.0",
+      "source": "local-candidate",
+      "workspace": "/Users/ryuman/Documents/ChatGPT/MinecraftIconGenerator/worktrees/issue-93-runtime-manager/MCIconGenerator/.local/issue-93-iteration2/consumer/consumer-6yv_vvcx",
+      "initialGradleCacheEmpty": true,
+      "results": [
+        {
+          "metadata": "module",
+          "passed": true
+        },
+        {
+          "metadata": "pom",
+          "passed": true
+        }
+      ],
+      "managedApi": "6署名と固定信頼設定不足の明示失敗を確認。実描画・OS実機受入は未実施",
+      "passed": true
+    },
+    "lockPlatform": "同一JVM範囲境界とMac別Java process receipt読取/busy拒否。Windows mandatory lock実機は未検証。",
+    "warnings": [
+      "既存Javadoc未記載param等",
+      "Java8 source/target廃止警告",
+      "Gradle非推奨機能"
+    ],
+    "reviewInterruption": {
+      "command": "./gradlew :helper-common:test -PreleaseVersion=1.1.0 --offline --no-daemon",
+      "result": "10件成功、失敗/error/skip 0",
+      "cases": [
+        "既存interrupt/free lockでInterruptedIOException、flag保持、lease元bytes不変",
+        "busy待機中interruptでowner解放を待たず有限終了、lease元bytes不変"
+      ],
+      "scope": "待機前・取得後・staging write/force/close後のatomic move直前にcheck。最後のcheckとmoveは不可分でなく、commit後中断を巻き戻さない。",
+      "precision": "従前のFileChannel read/writeが既存interruptを検知する場合があるため、free条件で必ずcommitする再現済bugとは扱わない。commit直前の実中断挿入試験やtest専用hookは追加せず、明示check位置と保証境界を確認。",
+      "fullRegression": "core/CLI/worker、配布/consumerは先の成功を再利用。関連変更は非公開helperとtests/docs/QAのみ。",
+      "permissionRetry": "初回は自動承認審査期限切れで未実行。危険判定ではなく、編集とmodule試験へ分離した1回再試行が実行成功。"
+    },
+    "relatedRetests": {
+      "interruption": {
+        "common": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "descriptorAndApi": {
+        "common": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "descriptorAndApi": {
+      "getter": "LeaseFile.descriptor() returns JsonNode.deepCopy。検証済JSON snapshotをOS preflightへ提供。元descriptor bytes/hash一致とnested host/rendering変更後の内部/元file不変をfixture確認。",
+      "dependency": "非公開helper-commonのJackson2.22.3をapi依存へ。公開JsonNode/ObjectNode型をOS consumerのcompile classpathへ伝播。",
+      "consumerCommand": "./gradlew -p .local/issue-93-iteration2/os-consumer compileJava --offline --no-daemon",
+      "consumerResult": "PASS。実際の独立Gradle Java callerがhelper-common projectだけを依存宣言し、Jackson直接依存無しでJsonNode/ObjectNodeとdescriptor/readをcompile。OS本体/native/VM実行は未実施。",
+      "moduleCommand": "./gradlew :helper-common:test -PreleaseVersion=1.1.0 --offline --no-daemon",
+      "scope": "全suite/公開候補/元source監査の先行成功は再利用。未存在OSmoduleのsettings接続は未追加。"
+    }
+  },
+  "uncompletedGates": [
+    "#94/#95 OS所有照合・lifecycle/transport・異常/並行/取消/実機受入",
+    "#96 Linux rootless方式未採用",
+    "実host-helper/guest/kernel/daemon/bundleの固定bytesとOSS/source/notice・Ubuntu署名chain",
+    "本番trustkey/pin/descriptor発行・公開先・製品runtime採用",
+    "51版画像受入・実描画受入"
+  ],
+  "independentReview": "先行共通scopeと中断修正はPASS。descriptor getter/Jackson api修正の限定反証待ち。",
+  "sourceSha256ExcludingThisReport": {
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/ManagedRuntime.java": "af4093451dc19a0d2aa25186f9df40b0c1b590c3282e6dda05fa1c1b3c44f199",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeLease.java": "2f64f8b5d237730e1dcf010fc891823a527c2deafab06dbed502f71ef1cae36f",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/LeaseLockProcess.java": "6a6e64e29004a9e60779e31f91c853da4aa796c74b8d567fad7dbccfd439972f",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/ManagedFixture.java": "a8f010832e0d0438ab664da558cfe6cb3e7f97f7d143e9ed44cde5176c969806",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/ManagedRuntimeTest.java": "e1181de1fd7c51e83b1f9e3765f63fb414739efb123439d81699c4a6e4edf7e2",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeGenerationTest.java": "f11231d904410af6b2bd9acdf96304a0bf9b71fd7a5ef37e8e2fdb178ebb7d11",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeHelperTest.java": "44ffa57f63880e27edd32a41ed96365382f749d3ed8fd9d0e38d342caac1877c",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeLeaseTest.java": "4714da7e505418724d43950794af7d93b56f992ae6460ff38e518d2a7f2093b8",
+    "docs/managed-helper-1.1.md": "e638decfabdb9e30480ece3adeaa4099aac31e86f214b90b1bc3492abe9b9752",
+    "docs/managed-runtime-1.1.md": "122aafc95eb7b5f43ef60fd0f3ee9921417fff8e4aad968e226e704a84af46cb",
+    "docs/managed-runtime-implementation.md": "d2f5d4c14e62e5214c55ba5df6a3b0281bbf99dd064ed51d890e880b36a9fcce",
+    "helpers/common/build.gradle": "496c4aa661fba2db0649b4341e84143400d3530265188212709fdcdb8e336b1b",
+    "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/HelperProtocol.java": "44de37f151a944d6955cae54349101e97a7d78862bf783c415c2d6c128d75e30",
+    "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/LeaseFile.java": "8d6c1346742c8a43025513382244c8a58852c957ef9ff29907ddf6cbd73a2fb5",
+    "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/ResourceRecords.java": "4f337edfb97da69f31627bcad55d78e060de4b5baf9ce432a99e2a77e310ded9",
+    "helpers/common/src/test/java/io/github/rs0325/mcicon/helper/HelperCommonTest.java": "a9dd17ea16f7bfc25b18ae0fab8b34ca5b0d2e73003749c6d59aa0d78687b1f6",
+    "schemas/managed-helper-v1.examples.json": "a041f98b1b7eb0a581c38d7f146223763a31e0895aabc1777b02edd77f6bd057",
+    "schemas/managed-helper-v1.schema.json": "55ff0b840c420363ccbdfe13e3a4bbab39d30a61a2093091343b43767fec9e6b",
+    "scripts/audit-central-bundle.py": "c0c1c6450d3b7983a728a4ae8647a90cfeeaa1f0fb3cf743602efc519e6cb224",
+    "scripts/audit-distribution.py": "8a473741ecbafc5358c75cb1c91a19fc1affca7c0e6585757cd70e02e69756ef",
+    "scripts/test-distribution-audit.py": "69d9154c4f04423f55cfefd7d9ba3fd8407fcde92cb08c2b9aa410050b8f92a3",
+    "settings.gradle": "343013e1eaa622d0790686fa3bde625f0ff960aeb00c68165c2e02738671629e"
+  },
+  "workingCorrectionBase": "e26e43bf70d71db45abe08600e9bd988905ac3be"
+}

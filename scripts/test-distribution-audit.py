@@ -43,6 +43,7 @@ def main():
              ('missing-worker', cli, root + 'worker/worker-agent.jar', None, 'CLI ZIPに不足'),
              ('pom-version', library, libroot + f'mcicon-core-{a.version}.pom', 'pom', 'POMのversionが不一致'),
              ('game-class', cli, root + f'lib/core-{a.version}.jar', 'class', '配布対象外'),
+             ('helper-class', cli, root + f'lib/core-{a.version}.jar', 'helper', '配布対象外'),
              ('qa-agent', cli, root + 'lib/fault-agent.jar', 'agent', '配布対象外'),
              ('fake-javadoc-image', library, libroot + f'mcicon-core-{a.version}-javadoc.jar', 'image', '配布対象外')]
     for name, archive, entry, replacement, expected in tests:
@@ -65,7 +66,9 @@ def main():
                             agent.writestr('io/github/rs0325/mcicon/qa/ResourcePackFaultAgent.class', b'QA class')
                         replacement = output.getvalue()
                     else:
-                        nested = 'net/minecraft/client/Minecraft.class' if replacement == 'class' else 'resources/glass.png'
+                        nested = {'class': 'net/minecraft/client/Minecraft.class',
+                                  'helper': 'io/github/rs0325/mcicon/helper/LeaseFile.class',
+                                  'image': 'resources/glass.png'}[replacement]
                         replacement = modify_zip(original, nested, b'not the documented bytes')
                 path.write_bytes(modify_zip(path.read_bytes(), entry, replacement))
                 sums = ''.join(hashlib.sha256(f.read_bytes()).hexdigest() + '  ' + f.name + '\n'

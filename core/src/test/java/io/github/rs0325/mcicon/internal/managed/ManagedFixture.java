@@ -25,6 +25,11 @@ final class ManagedFixture {
         ObjectNode item=array.addObject().put("id",id).put("role",role).put("url","https://fixture.invalid/"+id).put("bytes",1).put("sha256",HASH).put("unpackedBytes",100).put("format","zip").put("inventoryPath","inventory/"+id+".json").put("inventorySha256",HASH);
         item.putArray("licenseFiles").add("LICENSE");item.putArray("noticeFiles");item.putArray("sourceArchives");
     }
+    static RuntimeLease lease(RuntimeStore store,RuntimeDescriptor descriptor) throws Exception {
+        var timeout=java.time.Duration.ofSeconds(10);
+        var options=new io.github.rs0325.mcicon.ManagedOptions(store.root(),timeout,timeout,timeout,3072,2048);
+        return RuntimeLease.create(store,descriptor,options,java.time.Instant.now().plus(timeout));
+    }
     byte[] bytes() throws Exception {return RuntimeDescriptor.JSON.writeValueAsBytes(json);}
     byte[] sign(byte[] bytes) throws Exception {Signature signature=Signature.getInstance("Ed25519");signature.initSign(key.getPrivate());signature.update(bytes);return signature.sign();}
     RuntimeDescriptor.Pin pin(byte[] bytes) {return new RuntimeDescriptor.Pin(FilesSupport.hash(bytes),"1.1.0",HASH,HASH,new RuntimeDescriptor.Host("linux","x86_64"),Set.of(21));}

@@ -104,7 +104,7 @@ root/
   locks/
 ```
 
-ジョブleaseはtool/worker/runtime/descriptor digest、所有者token、開始時刻、host識別、process開始識別、専用VM/distribution/container名を保持する。PID単独や名前prefixだけで停止・削除しない。共有世代はleaseがなく、所有識別・lock取得・参照の不在が揃う時だけ回収する。出力PNG・元入力cacheは自動更新・通常uninstallで削除しない。
+ジョブleaseはtool/worker/runtime/descriptor digest、所有者token、開始時刻、host識別、process開始識別、worker予算/準備期限と専用VM/distribution/containerの所有recordを保持する。形式と排他範囲は[helper共通契約](managed-helper-1.1.md)で定める。PID単独や名前prefixだけで停止・削除しない。共有世代はleaseがなく、所有識別・lock取得・参照の不在が揃う時だけ回収する。出力PNG・元入力cacheは自動更新・通常uninstallで削除しない。
 
 実行時にmountするのは必要な入力・ジョブ専用領域だけ。ホーム全体・Docker socket・資格情報はゲームcontainerに渡さない。ゲームcontainerはnetworkなし。取得を担当するhost側とゲーム側を分ける。
 

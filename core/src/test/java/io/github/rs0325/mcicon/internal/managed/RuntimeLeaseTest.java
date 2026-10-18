@@ -12,15 +12,44 @@ import static org.junit.jupiter.api.Assertions.*;
 class RuntimeLeaseTest {
     @TempDir Path root;
     RuntimeStore store() throws Exception {return new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(10),(u,o,t)->{throw new AssertionError();});}
+    @Test void requirementsReachLeaseAndArePartOfImmutableReceipt() throws Exception {
+        var descriptor=new ManagedFixture().descriptor();var store=store();var deadline=java.time.Instant.parse("2026-10-18T00:15:00Z");
+        var options=new ManagedOptions(root,Duration.ofSeconds(10),Duration.ofSeconds(2),Duration.ofSeconds(1),6144,4096);
+        try(var lease=RuntimeLease.create(store,descriptor,options,deadline)) {
+            ObjectNode value=lease.read();var requirements=(ObjectNode)value.get("requirements");
+            assertEquals(6144,requirements.path("containerMemoryMiB").intValue());assertEquals(4096,requirements.path("heapMemoryMiB").intValue());
+            assertEquals(4,requirements.path("cpus").intValue());assertEquals(deadline.toString(),requirements.path("preparationDeadline").asText());
+            requirements.put("containerMemoryMiB",8192);Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(value));
+            assertEquals("MANAGED_OWNERSHIP_MISMATCH",assertThrows(McIconException.class,lease::read).code());
+        }
+    }
+    @Test void receiptFixtureSortsNestedFieldsAndKeepsLongIntegersExact() throws Exception {
+        var fixture=RuntimeDescriptor.read(Files.readAllBytes(Path.of("..","schemas","managed-helper-v1.examples.json"))).path("receipt");
+        ObjectNode identity=(ObjectNode)fixture.get("identity");assertEquals(9007199254740993L,identity.path("pid").longValue());
+        assertEquals(fixture.path("sha256").asText(),new String(RuntimeLease.receipt(identity),java.nio.charset.StandardCharsets.US_ASCII));
+        assertEquals(fixture.path("sha256").asText(),io.github.rs0325.mcicon.internal.FilesSupport.hash(fixture.path("canonicalUtf8").asText().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        ObjectNode reversed=RuntimeDescriptor.JSON.createObjectNode();var names=new ArrayList<String>();identity.path("requirements").fieldNames().forEachRemaining(names::add);Collections.reverse(names);
+        for(String name:names)reversed.set(name,identity.path("requirements").get(name));identity.set("requirements",reversed);
+        assertEquals(fixture.path("sha256").asText(),new String(RuntimeLease.receipt(identity),java.nio.charset.StandardCharsets.US_ASCII));
+    }
+    @Test void receiptRegionIsOutsideActiveLockAndExpiredPreparationDoesNotBlockRelease() throws Exception {
+        var store=store();var descriptor=new ManagedFixture().descriptor();var options=ManagedOptions.defaults();
+        var lease=RuntimeLease.create(store,descriptor,options,java.time.Instant.EPOCH);
+        try(lease;var channel=java.nio.channels.FileChannel.open(lease.file().resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE);
+                var receipt=channel.tryLock(0,64,false)) {
+            assertNotNull(receipt);assertEquals(64,channel.size());assertFalse(RuntimeLease.idle(store,descriptor));lease.released();
+        }
+        assertTrue(RuntimeLease.idle(store,descriptor));
+    }
     @Test void anotherJobAndUnreleasedEvidencePreventReclaim() throws Exception {
         var descriptor=new ManagedFixture().descriptor();var store=store();
-        RuntimeLease first=RuntimeLease.create(store,descriptor),second=RuntimeLease.create(store,descriptor);
+        RuntimeLease first=ManagedFixture.lease(store,descriptor),second=ManagedFixture.lease(store,descriptor);
         first.released();first.close();assertFalse(RuntimeLease.idle(store,descriptor));
         second.close();assertTrue(Files.exists(second.file()));assertFalse(RuntimeLease.idle(store,descriptor));
     }
     @Test void helperMustClearResourcesAndPreserveAllOwnershipFields() throws Exception {
         var descriptor=new ManagedFixture().descriptor();var store=store();
-        try(var lease=RuntimeLease.create(store,descriptor)) {
+        try(var lease=ManagedFixture.lease(store,descriptor)) {
             ObjectNode value=lease.read();((ObjectNode)value.get("resources")).put("vmId","foreign");Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(value));
             assertEquals("MANAGED_OWNERSHIP_MISMATCH",assertThrows(McIconException.class,lease::released).code());
             value.put("ownerId",UUID.randomUUID().toString());Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(value));
@@ -29,15 +58,15 @@ class RuntimeLeaseTest {
         }
     }
     @Test void pidAndStartMatchAreInsufficientAndUnknownLeaseIsConservative() throws Exception {
-        var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=RuntimeLease.create(store,descriptor);
+        var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=ManagedFixture.lease(store,descriptor);
         ObjectNode value=lease.read();assertEquals(ProcessHandle.current().pid(),value.path("pid").longValue());lease.close();
         assertFalse(RuntimeLease.idle(store,descriptor));Files.writeString(lease.file(),"{}");assertFalse(RuntimeLease.idle(store,descriptor));
     }
     @Test void releasedLeaseRequiresEveryIdentityFieldAndMatchingReceipt() throws Exception {
-        var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=RuntimeLease.create(store,descriptor);
+        var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=ManagedFixture.lease(store,descriptor);
         lease.released();lease.close();ObjectNode original=(ObjectNode)RuntimeDescriptor.read(Files.readAllBytes(lease.file()));
         assertTrue(RuntimeLease.idle(store,descriptor));
-        for(String field:List.of("schemaVersion","jobId","ownerId","hostId","pid","processStartedAt","createdAt","workerSha256","runtimeId","toolVersion","descriptorSha256","state","resources")) {
+        for(String field:List.of("schemaVersion","jobId","ownerId","hostId","pid","processStartedAt","createdAt","workerSha256","runtimeId","toolVersion","descriptorSha256","requirements","state","resources")) {
             ObjectNode missing=original.deepCopy();missing.remove(field);Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(missing));assertFalse(RuntimeLease.idle(store,descriptor),field);
         }
         for(String field:List.of("jobId","ownerId","hostId")) {
@@ -46,6 +75,10 @@ class RuntimeLeaseTest {
         ObjectNode changed=original.deepCopy();changed.put("pid",ProcessHandle.current().pid()+1);Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(changed));assertFalse(RuntimeLease.idle(store,descriptor));
         changed=original.deepCopy();changed.putNull("processStartedAt");Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(changed));assertFalse(RuntimeLease.idle(store,descriptor));
         changed=original.deepCopy();changed.put("descriptorSha256","b".repeat(64));Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(changed));assertFalse(RuntimeLease.idle(store,descriptor));
+        for(String field:List.of("containerMemoryMiB","heapMemoryMiB","cpus","preparationDeadline")) {
+            changed=original.deepCopy();((ObjectNode)changed.get("requirements")).remove(field);Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(changed));assertFalse(RuntimeLease.idle(store,descriptor),field);
+        }
+        changed=original.deepCopy();((ObjectNode)changed.get("requirements")).put("heapMemoryMiB",3072);Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(changed));assertFalse(RuntimeLease.idle(store,descriptor));
         Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(original));
         for(String receipt:List.of("{}","","z".repeat(64))) {Files.writeString(lease.file().resolveSibling("lease.lock"),receipt);assertFalse(RuntimeLease.idle(store,descriptor));}
     }
@@ -54,7 +87,7 @@ class RuntimeLeaseTest {
         assertTimeoutPreemptively(Duration.ofSeconds(6),()->checkExternalProcess(false));
     }
     private void checkExternalProcess(boolean announce) throws Exception {
-        var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=RuntimeLease.create(store,descriptor);lease.released();lease.close();
+        var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=ManagedFixture.lease(store,descriptor);lease.released();lease.close();
         String classpath=Path.of(LeaseLockProcess.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toString();
         Process process=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",classpath,LeaseLockProcess.class.getName(),lease.file().resolveSibling("lease.lock").toString(),Boolean.toString(announce)).redirectError(root.resolve("external-lock.stderr").toFile()).start();
         var executor=java.util.concurrent.Executors.newSingleThreadExecutor(Thread.ofPlatform().daemon().factory());
@@ -63,6 +96,9 @@ class RuntimeLeaseTest {
             var ready=executor.submit(output::readLine);
             if(announce) {
                 assertEquals("HELD",ready.get(3,java.util.concurrent.TimeUnit.SECONDS));assertFalse(RuntimeLease.idle(store,descriptor));
+                try(var receipt=java.nio.channels.FileChannel.open(lease.file().resolveSibling("lease.lock"),StandardOpenOption.READ)) {
+                    var bytes=java.nio.ByteBuffer.allocate(64);while(bytes.hasRemaining())assertTrue(receipt.read(bytes)>0);assertEquals(64,receipt.size());
+                }
                 input.write("release\n");input.flush();assertTrue(process.waitFor(3,java.util.concurrent.TimeUnit.SECONDS));assertEquals(0,process.exitValue());
             }else {
                 assertThrows(java.util.concurrent.TimeoutException.class,()->ready.get(100,java.util.concurrent.TimeUnit.MILLISECONDS));assertTrue(process.isAlive());
@@ -79,7 +115,7 @@ class RuntimeLeaseTest {
         assertTrue(RuntimeLease.idle(store,descriptor));
     }
     @Test void successfulReleaseIsIdleOnlyAfterFilelockEnds() throws Exception {
-        var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=RuntimeLease.create(store,descriptor);
+        var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=ManagedFixture.lease(store,descriptor);
         lease.released();assertFalse(RuntimeLease.idle(store,descriptor));lease.close();assertTrue(RuntimeLease.idle(store,descriptor));
     }
 }

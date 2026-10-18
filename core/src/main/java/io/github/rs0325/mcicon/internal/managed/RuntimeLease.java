@@ -1,8 +1,10 @@
 package io.github.rs0325.mcicon.internal.managed;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.McIconException;
+import io.github.rs0325.mcicon.ManagedOptions;
 import io.github.rs0325.mcicon.internal.FilesSupport;
 import java.io.IOException;
 import java.nio.channels.*;
@@ -12,13 +14,14 @@ import java.util.*;
 
 /** ジョブの世代と所有証拠を固定する。PID単独でプロセスやVMを停止しない。 */
 public final class RuntimeLease implements AutoCloseable {
+    static final long ACTIVE_LOCK_OFFSET=64,ACTIVE_LOCK_LENGTH=1;
     private final Path file;
     private final ObjectNode identity;
     private final FileChannel channel;
     private final FileLock lock;
     private boolean closed;
     private RuntimeLease(Path file,ObjectNode identity,FileChannel channel,FileLock lock) {this.file=file;this.identity=identity;this.channel=channel;this.lock=lock;}
-    public static RuntimeLease create(RuntimeStore store,RuntimeDescriptor descriptor) throws IOException {
+    public static RuntimeLease create(RuntimeStore store,RuntimeDescriptor descriptor,ManagedOptions options,Instant preparationDeadline) throws IOException {
         try(var ignored=store.lock("generations")) {
             Path host=store.path("host-id");
             if(!Files.exists(host))FilesSupport.atomicWrite(host,UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.US_ASCII));
@@ -29,13 +32,14 @@ public final class RuntimeLease implements AutoCloseable {
             FileChannel channel=FileChannel.open(directory.resolve("lease.lock"),StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE);
             FileLock lock=null;
             try {
-                lock=channel.lock();ObjectNode identity=RuntimeDescriptor.JSON.createObjectNode();
+                lock=channel.lock(ACTIVE_LOCK_OFFSET,ACTIVE_LOCK_LENGTH,false);ObjectNode identity=RuntimeDescriptor.JSON.createObjectNode();
                 identity.put("schemaVersion",1);identity.put("jobId",job.toString());identity.put("ownerId",owner.toString());
                 identity.put("toolVersion",descriptor.toolVersion());identity.put("workerSha256",descriptor.agentSha256());identity.put("runtimeId",descriptor.runtimeId());identity.put("descriptorSha256",descriptor.digest());
                 identity.put("hostId",hostId);identity.put("pid",ProcessHandle.current().pid());
                 var started=ProcessHandle.current().info().startInstant();
                 if(started.isPresent())identity.put("processStartedAt",started.get().toString());else identity.putNull("processStartedAt");
                 identity.put("createdAt",Instant.now().toString());
+                identity.putObject("requirements").put("containerMemoryMiB",options.containerMemoryMiB()).put("heapMemoryMiB",options.heapMemoryMiB()).put("cpus",4).put("preparationDeadline",preparationDeadline.toString());
                 identity=(ObjectNode)RuntimeDescriptor.JSON.readTree(RuntimeDescriptor.JSON.writeValueAsBytes(identity));
                 java.nio.ByteBuffer receipt=java.nio.ByteBuffer.wrap(receipt(identity));
                 while(receipt.hasRemaining())channel.write(receipt);channel.force(true);
@@ -81,7 +85,7 @@ public final class RuntimeLease implements AutoCloseable {
                 if(!validIdentity(value,directory.getFileName().toString(),hostId))return false;
                 try(FileChannel channel=FileChannel.open(lock,StandardOpenOption.READ,StandardOpenOption.WRITE)) {
                     FileLock acquired;
-                    try {acquired=channel.tryLock();}catch(OverlappingFileLockException busy){return false;}
+                    try {acquired=channel.tryLock(ACTIVE_LOCK_OFFSET,ACTIVE_LOCK_LENGTH,false);}catch(OverlappingFileLockException busy){return false;}
                     if(acquired==null)return false;
                     try {
                         if(channel.size()!=64)return false;
@@ -98,19 +102,25 @@ public final class RuntimeLease implements AutoCloseable {
         }
         return true;
     }
-    private static byte[] receipt(ObjectNode identity) throws IOException {
-        Map<String,JsonNode> fields=new TreeMap<>();identity.fields().forEachRemaining(field->fields.put(field.getKey(),field.getValue()));
-        return FilesSupport.hash(RuntimeDescriptor.JSON.writeValueAsBytes(fields)).getBytes(java.nio.charset.StandardCharsets.US_ASCII);
+    static byte[] receipt(ObjectNode identity) throws IOException {
+        byte[] bytes=RuntimeDescriptor.JSON.writer().with(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
+                .writeValueAsBytes(RuntimeDescriptor.JSON.convertValue(identity,Map.class));
+        return FilesSupport.hash(bytes).getBytes(java.nio.charset.StandardCharsets.US_ASCII);
     }
     private static boolean validIdentity(JsonNode value,String directory,String hostId) {
         try {
-            RuntimeDescriptor.fields(value,"schemaVersion","jobId","ownerId","toolVersion","workerSha256","runtimeId","descriptorSha256","hostId","pid","processStartedAt","createdAt","state","resources");
+            RuntimeDescriptor.fields(value,"schemaVersion","jobId","ownerId","toolVersion","workerSha256","runtimeId","descriptorSha256","hostId","pid","processStartedAt","createdAt","requirements","state","resources");
             RuntimeDescriptor.constant(value,"schemaVersion",1);
             String job=RuntimeDescriptor.text(value,"jobId",36),owner=RuntimeDescriptor.text(value,"ownerId",36),host=RuntimeDescriptor.text(value,"hostId",36);
             if(!UUID.fromString(job).toString().equals(job)||!job.equals(directory)||!UUID.fromString(owner).toString().equals(owner)||owner.equals(job)||!UUID.fromString(host).toString().equals(host)||!host.equals(hostId))return false;
             RuntimeDescriptor.version(value,"toolVersion");RuntimeDescriptor.hash(value,"workerSha256");RuntimeDescriptor.hash(value,"descriptorSha256");RuntimeDescriptor.id(value,"runtimeId");
             RuntimeDescriptor.positive(value,"pid");
             Instant.parse(RuntimeDescriptor.text(value,"processStartedAt",64));Instant.parse(RuntimeDescriptor.text(value,"createdAt",64));
+            JsonNode requirements=value.get("requirements");RuntimeDescriptor.fields(requirements,"containerMemoryMiB","heapMemoryMiB","cpus","preparationDeadline");
+            long memory=RuntimeDescriptor.positive(requirements,"containerMemoryMiB"),heap=RuntimeDescriptor.positive(requirements,"heapMemoryMiB");
+            if(memory>Integer.MAX_VALUE||heap>=memory)return false;
+            RuntimeDescriptor.constant(requirements,"cpus",4);String deadline=RuntimeDescriptor.text(requirements,"preparationDeadline",64);
+            if(!deadline.endsWith("Z"))return false;Instant.parse(deadline);
             RuntimeDescriptor.choice(value,"state","active","released");return value.get("resources").isObject();
         }catch(RuntimeException invalid){return false;}
     }

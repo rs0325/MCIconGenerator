@@ -29,7 +29,7 @@ class RuntimeGenerationTest {
         Map<String,byte[]> inventories=Map.of("inventory/helper.json",inventory,"inventory/image.json",inventory);
         Path installed=generation.prepare(descriptor,inventories);assertArrayEquals(image,Files.readAllBytes(installed.resolve("image.zip")));assertFalse(Files.exists(root.resolve("guest-only-link-fixture")));
         assertEquals(installed,generation.prepare(descriptor,inventories));assertEquals(1,images.get());
-        try(var lease=RuntimeLease.create(store,descriptor)) {
+        try(var lease=ManagedFixture.lease(store,descriptor)) {
             fixture.json.put("minimumOsVersion","5.16");var next=fixture.descriptor();Path newGeneration=generation.prepare(next,inventories);assertNotEquals(installed,newGeneration);assertTrue(Files.exists(installed));assertFalse(RuntimeLease.idle(store,descriptor));
         }
         Files.writeString(executable,"tampered");RuntimeDescriptorTest.assertInvalid(()->generation.helper(descriptor));
