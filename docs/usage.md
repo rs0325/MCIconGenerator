@@ -86,7 +86,9 @@ try (var generator = new MCIconGenerator(Path.of("cache"), false, ProgressListen
 `listVersions`, `listEntries`, `render`, `extract`, `doctor`, `cache` はCompletableFutureを返します。一つのgeneratorではジョブを順番に処理します。進捗callbackはジョブのスレッドで実行するため、同じgeneratorの別ジョブの完了をcallback内で待たないでください。別generatorは別cache/outputの利用を推奨します。CancellationToken.cancel()は途中のエクスポートを中断し、未完了のExportResult/manifestを返します。close()は実行中・待機中のFutureをCancellationExceptionで終了させ、executorとworkerの終了を要求します。完了済みの結果は保持します。close後の新規呼び出しはGENERATOR_CLOSEDのfailed Futureを返します。キャンセルしたgeneratorは新ジョブに再利用せず、新しいinstance/tokenを作ってください。
 
 ```sh
-./gradlew :cli:distZip :core:publishCorePublicationToLocalBuildRepository
+./gradlew :cli:distZip :core:publishCorePublicationToLocalBuildRepository :worker:publishWorkerPublicationToLocalBuildRepository
 ```
 
-CLI zipはcli/build/distributions、ライブラリのローカルMaven repositoryはcore/build/maven/<version>に生成します。開発時の座標は `io.github.rs0325.mcicon:mcicon-core:0.1.0-SNAPSHOT` です。配布候補の形式と公開状況は[配布ガイド](distribution.md)で説明します。1.0以前のAPIは変更される可能性があります。Minecraftクラスは公開APIに露出しません。配布物のworker JARは本プロジェクトのagentとASM/Gsonだけを含みます。
+CLI zipはcli/build/distributions、ライブラリのローカルMaven repositoryはbuild/maven/<version>に生成します。開発時の座標は `io.github.rs0325.mcicon:mcicon-core:0.1.0-SNAPSHOT` です。配布候補の形式と公開状況は[配布ガイド](distribution.md)で説明します。1.0以前のAPIは変更される可能性があります。Minecraftクラスは公開APIに露出しません。配布物のworker JARは本プロジェクトのagentとASM/Gsonだけを含みます。
+
+1.1.0向けのworker推移依存・Central公開準備・独立consumer検証は[Centralガイド](maven-central.md)を参照してください。管理APIの接続と実描画は後続の結合受入対象です。

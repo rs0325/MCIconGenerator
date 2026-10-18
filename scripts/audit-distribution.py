@@ -90,8 +90,30 @@ def audit(directory, version):
                 if pom.findtext('m:' + key, namespaces=ns) != value:
                     failures.append('POMの' + key + 'が不一致')
             artifacts = {d.findtext('m:artifactId', namespaces=ns) for d in pom.findall('m:dependencies/m:dependency', ns)}
-            if artifacts != {'jackson-databind'}:
+            if artifacts != {'jackson-databind', 'mcicon-worker'}:
                 failures.append('POMの依存関係が不一致')
+        worker_coordinate = libroot + 'maven/io/github/rs0325/mcicon/mcicon-worker/' + version + '/'
+        worker_jars = [n for n in library.namelist() if n.startswith(worker_coordinate) and n.endswith('.jar')]
+        if len(worker_jars) != 3:
+            failures.append('workerのbinary/sources/javadoc JARが不足または重複')
+        wrapper = worker_coordinate + 'mcicon-worker-' + version + '.jar'
+        if wrapper not in library.namelist():
+            failures.append('worker wrapperが不足')
+        else:
+            with zipfile.ZipFile(io.BytesIO(library.read(wrapper))) as worker:
+                agent_path = 'META-INF/mcicon/worker/agent.jar'
+                metadata_path = 'META-INF/mcicon/worker/version.properties'
+                if agent_path not in worker.namelist() or metadata_path not in worker.namelist():
+                    failures.append('worker wrapperのresourceが不足')
+                else:
+                    agent = worker.read(agent_path)
+                    if hashlib.sha256(agent).hexdigest() != hashes[names[2]]:
+                        failures.append('wrapper内agentと単独workerが不一致')
+                    expected = f'toolVersion={version}\nagentSha256={hashes[names[2]]}\n'.encode()
+                    if worker.read(metadata_path) != expected:
+                        failures.append('wrapperのmetadataが不一致')
+                if any(n.endswith('.class') for n in worker.namelist()):
+                    failures.append('wrapper外側にagent classが混入')
         jars = [n for n in library.namelist() if n.startswith(coordinate) and n.endswith('.jar')]
         if len(jars) != 3 or not any(n.endswith('-sources.jar') for n in jars) or not any(n.endswith('-javadoc.jar') for n in jars):
             failures.append('binary/sources/javadoc JARが不足または重複')

@@ -36,11 +36,11 @@ evaluationDependsOn(':cli')
 evaluationDependsOn(':worker')
 
 tasks.register('libraryZip', Zip) {
-    dependsOn ':core:publishCorePublicationToLocalBuildRepository'
+    dependsOn ':core:publishCorePublicationToLocalBuildRepository', ':worker:publishWorkerPublicationToLocalBuildRepository'
     archiveFileName = "mcicon-library-${project.version}.zip"
     destinationDirectory = layout.buildDirectory.dir('distributions')
     into("mcicon-library-${project.version}") {
-        from(project(':core').layout.buildDirectory.dir("maven/${project.version}")) { into 'maven' }
+        from(layout.buildDirectory.dir("maven/${project.version}")) { into 'maven' }
         from('LICENSE', 'THIRD_PARTY_NOTICES.md')
         from('licenses') { into 'licenses' }
         from('docs') { into 'docs' }
@@ -67,5 +67,62 @@ tasks.register('prepareRelease', Sync) {
             def hash = java.security.MessageDigest.getInstance('SHA-256').digest(new File(directory, name).bytes).encodeHex()
             "${hash}  ${name}\n"
         }.join('')
+    }
+}
+
+def localPublications = layout.buildDirectory.dir("maven/${project.version}")
+tasks.register('cleanLocalPublications', Delete) { delete localPublications }
+[project(':core'), project(':worker')].each { library ->
+    library.apply plugin: 'signing'
+    library.publishing {
+        repositories { maven { name = 'localBuild'; url = localPublications } }
+        publications.withType(MavenPublication).configureEach {
+            pom {
+                url = 'https://github.com/rs0325/MCIconGenerator'
+                licenses { license { name = 'MIT License'; url = 'https://opensource.org/license/mit' } }
+                developers { developer { id = 'rs0325'; name = 'rs0325'; url = 'https://github.com/rs0325' } }
+                scm {
+                    connection = 'scm:git:https://github.com/rs0325/MCIconGenerator.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/rs0325/MCIconGenerator.git'
+                    url = 'https://github.com/rs0325/MCIconGenerator'
+                }
+            }
+        }
+    }
+    if (providers.gradleProperty('signPublications').getOrElse('false').toBoolean()) {
+        library.signing {
+            useGpgCmd()
+            sign library.publishing.publications
+        }
+    }
+    library.tasks.withType(PublishToMavenRepository).configureEach {
+        dependsOn rootProject.tasks.named('cleanLocalPublications')
+    }
+    library.tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+}
+
+tasks.register('prepareCentralCandidate', Zip) {
+    dependsOn ':core:publishCorePublicationToLocalBuildRepository', ':worker:publishWorkerPublicationToLocalBuildRepository'
+    archiveFileName = "mcicon-central-${project.version}-candidate.zip"
+    destinationDirectory = layout.buildDirectory.dir('central')
+    from(localPublications) { include 'io/github/rs0325/mcicon/**'; exclude '**/maven-metadata*' }
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+tasks.register('prepareCentralBundle', Zip) {
+    dependsOn ':core:publishCorePublicationToLocalBuildRepository', ':worker:publishWorkerPublicationToLocalBuildRepository'
+    archiveFileName = "mcicon-central-${project.version}.zip"
+    destinationDirectory = layout.buildDirectory.dir('central')
+    from(localPublications) { include 'io/github/rs0325/mcicon/**'; exclude '**/maven-metadata*' }
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    doFirst {
+        if (project.version.toString().endsWith('-SNAPSHOT')) throw new GradleException('Central公開版にSNAPSHOTは使えません')
+        fileTree(localPublications).matching { include '**/*.jar', '**/*.pom', '**/*.module' }.each { artifact ->
+            if (!new File(artifact.path + '.asc').isFile()) throw new GradleException('Central bundleには全artifactの署名が必要です。署名許可後に-PsignPublications=trueを指定してください')
+        }
     }
 }
