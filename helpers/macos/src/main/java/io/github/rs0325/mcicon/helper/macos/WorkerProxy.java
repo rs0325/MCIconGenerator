@@ -1,0 +1,55 @@
+package io.github.rs0325.mcicon.helper.macos;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import java.io.*;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
+
+/** worker protocolの元line bytesを保ち、PNG公開だけを応答より先に行う。 */
+final class WorkerProxy {
+    record Pending(String id,String path,Path relative) {}
+    private WorkerProxy() {}
+    static int transfer(Process process,Snapshot snapshot) throws IOException {
+        Queue<Pending> pending=new ConcurrentLinkedQueue<>();AtomicReference<IOException> failure=new AtomicReference<>();
+        Thread.ofPlatform().daemon().name("mcicon-mac-worker-input").start(()-> {
+            OutputStream output=process.getOutputStream();
+            try(BufferedInputStream input=new BufferedInputStream(System.in)) {
+                Set<String> ids=new HashSet<>();byte[] line;
+                while((line=line(input,1024*1024))!=null) {
+                    JsonNode request=MacFiles.JSON.readTree(line);if(request==null||!request.isObject())throw new IOException("worker要求はobjectが必要です");String id=request.path("requestId").asText(),command=request.path("command").asText();
+                    if(id.isEmpty()||!ids.add(id)||!Set.of("render","catalog","shutdown").contains(command))throw new IOException("worker要求のID/commandが不正です");
+                    String path=command.equals("render")?request.path("path").asText():null;Path relative=path==null?null:snapshot.output(path);pending.add(new Pending(id,path,relative));output.write(line);output.flush();
+                }
+            }catch(IOException error){failure.set(error);process.destroy();}
+            finally {try{output.close();}catch(IOException error){failure.compareAndSet(null,error);process.destroy();}}
+        });
+        try {
+            relay(new BufferedInputStream(process.getInputStream()),System.out,pending,snapshot);
+            if(failure.get()!=null)throw failure.get();return process.waitFor();
+        }catch(InterruptedException error){Thread.currentThread().interrupt();throw new InterruptedIOException("worker輸送が中断されました");}
+        finally {if(process.isAlive())Commands.stop(process);}
+    }
+    static void relay(InputStream input,OutputStream output,Queue<Pending> pending,Snapshot snapshot) throws IOException {
+        byte[] line;boolean ready=false;
+        while((line=line(input,16*1024*1024))!=null) {
+            JsonNode response=MacFiles.JSON.readTree(line);if(response==null||!response.isObject())throw new IOException("worker応答はobjectが必要です");String type=response.path("type").asText();
+            if(type.equals("ready")) {if(ready||response.path("protocolVersion").asInt()!=1)throw new IOException("worker readyが一致しません");ready=true;}
+            else {
+                if(!ready)throw new IOException("worker readyより先に応答しました");
+                Pending request=pending.poll();if(request==null||!request.id().equals(response.path("requestId").asText())||!Set.of("result","error").contains(type))throw new IOException("worker応答の順序/IDが一致しません");
+                if(type.equals("result")&&request.relative()!=null) {
+                    if(!request.path().equals(response.path("result").path("path").asText()))throw new IOException("worker応答のPNG pathが一致しません");snapshot.publish(request.relative());
+                }
+            }
+            output.write(line);output.flush();
+        }
+        if(!pending.isEmpty())throw new IOException("worker応答が未完了です");
+    }
+    private static byte[] line(InputStream input,int limit) throws IOException {
+        ByteArrayOutputStream line=new ByteArrayOutputStream();int value;
+        while((value=input.read())!=-1) {if(line.size()>=limit)throw new IOException("worker protocol lineが上限を超えています");line.write(value);if(value=='\n')return line.toByteArray();}
+        if(line.size()!=0)throw new IOException("worker protocol lineが途中で終了しました");return null;
+    }
+}
