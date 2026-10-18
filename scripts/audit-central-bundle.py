@@ -30,6 +30,10 @@ def audit(bundle, version, require_signatures=False):
                     failures.append('artifactが不足: ' + name)
                     continue
                 data = archive.read(name)
+                if name.endswith('.jar'):
+                    with zipfile.ZipFile(io.BytesIO(data)) as jar:
+                        if any(entry.startswith('io/github/rs0325/mcicon/helper/') for entry in jar.namelist()):
+                            failures.append('helper内部moduleが公開JARへ混入: ' + name)
                 for algorithm in ('md5', 'sha1', 'sha256', 'sha512'):
                     checksum = name + '.' + algorithm
                     expected.add(checksum)

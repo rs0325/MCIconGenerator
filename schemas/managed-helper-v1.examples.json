@@ -1,0 +1,311 @@
+{
+  "receipt": {
+    "identity": {
+      "schemaVersion": 1,
+      "jobId": "00000000-0000-4000-8000-000000000001",
+      "ownerId": "00000000-0000-4000-8000-000000000002",
+      "toolVersion": "1.1.0",
+      "workerSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "runtimeId": "fixture",
+      "descriptorSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "hostId": "00000000-0000-4000-8000-000000000003",
+      "pid": 9007199254740993,
+      "processStartedAt": "2026-10-18T00:00:00Z",
+      "createdAt": "2026-10-18T00:00:01Z",
+      "requirements": {
+        "containerMemoryMiB": 3072,
+        "heapMemoryMiB": 2048,
+        "cpus": 4,
+        "preparationDeadline": "2026-10-18T00:15:00Z"
+      }
+    },
+    "canonicalUtf8": "{\"createdAt\":\"2026-10-18T00:00:01Z\",\"descriptorSha256\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"hostId\":\"00000000-0000-4000-8000-000000000003\",\"jobId\":\"00000000-0000-4000-8000-000000000001\",\"ownerId\":\"00000000-0000-4000-8000-000000000002\",\"pid\":9007199254740993,\"processStartedAt\":\"2026-10-18T00:00:00Z\",\"requirements\":{\"containerMemoryMiB\":3072,\"cpus\":4,\"heapMemoryMiB\":2048,\"preparationDeadline\":\"2026-10-18T00:15:00Z\"},\"runtimeId\":\"fixture\",\"schemaVersion\":1,\"toolVersion\":\"1.1.0\",\"workerSha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}",
+    "sha256": "d52b530c68e7ef0a9d53f092328f6462ac39b28584dbe181d52f9aa5a0a575d5"
+  },
+  "control": [
+    {
+      "exitCode": 0,
+      "response": {
+        "protocolVersion": 1,
+        "status": "ok",
+        "diagnostics": []
+      }
+    },
+    {
+      "exitCode": 2,
+      "response": {
+        "protocolVersion": 1,
+        "status": "setup-required",
+        "diagnostics": [
+          {
+            "code": "HOST_REQUIREMENT",
+            "detail": "必要なOS機能が不足しています",
+            "requiresPrivilege": true,
+            "requiresRestart": true
+          }
+        ]
+      }
+    },
+    {
+      "exitCode": 1,
+      "response": {
+        "protocolVersion": 1,
+        "status": "failed",
+        "diagnostics": [
+          {
+            "code": "OWNERSHIP_MISMATCH",
+            "detail": "専用環境の所有記録が一致しません",
+            "requiresPrivilege": false,
+            "requiresRestart": false
+          }
+        ]
+      }
+    }
+  ],
+  "resourceExamples": [
+    {
+      "name": "mac-starting",
+      "os": "macos",
+      "resources": {
+        "macos": {
+          "phase": "starting",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "instanceDir": "/fixture/lima/instance",
+          "containers": []
+        }
+      },
+      "schemaValid": true,
+      "helperValid": true
+    },
+    {
+      "name": "mac-ready",
+      "os": "macos",
+      "resources": {
+        "macos": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "instanceDir": "/fixture/lima/instance",
+          "containers": [],
+          "machineIdSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "hostAgent": {
+            "pid": 123,
+            "processStartedAt": "2026-10-18T00:00:00Z",
+            "bootSessionId": "fixture-session"
+          },
+          "dockerSocket": {
+            "path": "/fixture/docker.sock",
+            "dev": 1,
+            "ino": 2,
+            "uid": 501
+          },
+          "forwardConfigSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "guestOwnerMarkerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      },
+      "schemaValid": true,
+      "helperValid": true
+    },
+    {
+      "name": "windows-importing",
+      "os": "windows",
+      "resources": {
+        "windows": {
+          "phase": "importing",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "distribution": {
+            "name": "mcicon-fixture",
+            "basePath": "C:\\fixture\\wsl"
+          },
+          "transports": [
+            {
+              "id": "00000000-0000-4000-8000-000000000002"
+            }
+          ],
+          "containers": [
+            {
+              "name": "mcicon-fixture-job",
+              "transportId": "00000000-0000-4000-8000-000000000002"
+            }
+          ]
+        }
+      },
+      "schemaValid": true,
+      "helperValid": true
+    },
+    {
+      "name": "windows-ready",
+      "os": "windows",
+      "resources": {
+        "windows": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "distribution": {
+            "name": "mcicon-fixture",
+            "basePath": "C:\\fixture\\wsl",
+            "guid": "00000000-0000-4000-8000-000000000002",
+            "markerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          "transports": [
+            {
+              "id": "00000000-0000-4000-8000-000000000002",
+              "pid": 123,
+              "processStartedAt": "2026-10-18T00:00:00Z"
+            }
+          ],
+          "containers": [
+            {
+              "name": "mcicon-fixture-job",
+              "transportId": "00000000-0000-4000-8000-000000000002",
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          ],
+          "socketPath": "/fixture/docker.sock",
+          "guestJobPath": "/fixture/job"
+        }
+      },
+      "schemaValid": true,
+      "helperValid": true
+    },
+    {
+      "name": "unknown-socket-field",
+      "os": "macos",
+      "resources": {
+        "macos": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "instanceDir": "/fixture/lima/instance",
+          "containers": [],
+          "machineIdSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "hostAgent": {
+            "pid": 123,
+            "processStartedAt": "2026-10-18T00:00:00Z",
+            "bootSessionId": "fixture-session"
+          },
+          "dockerSocket": {
+            "path": "/fixture/docker.sock",
+            "dev": 1,
+            "ino": 2,
+            "uid": 501,
+            "process": {
+              "pid": 9
+            }
+          },
+          "forwardConfigSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "guestOwnerMarkerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      },
+      "schemaValid": false,
+      "helperValid": false
+    },
+    {
+      "name": "ready-missing-machine-id",
+      "os": "macos",
+      "resources": {
+        "macos": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "instanceDir": "/fixture/lima/instance",
+          "containers": [],
+          "hostAgent": {
+            "pid": 123,
+            "processStartedAt": "2026-10-18T00:00:00Z",
+            "bootSessionId": "fixture-session"
+          },
+          "dockerSocket": {
+            "path": "/fixture/docker.sock",
+            "dev": 1,
+            "ino": 2,
+            "uid": 501
+          },
+          "forwardConfigSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "guestOwnerMarkerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      },
+      "schemaValid": false,
+      "helperValid": false
+    },
+    {
+      "name": "ready-missing-guid",
+      "os": "windows",
+      "resources": {
+        "windows": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "distribution": {
+            "name": "mcicon-fixture",
+            "basePath": "C:\\fixture\\wsl",
+            "markerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          "transports": [
+            {
+              "id": "00000000-0000-4000-8000-000000000002",
+              "pid": 123,
+              "processStartedAt": "2026-10-18T00:00:00Z"
+            }
+          ],
+          "containers": [
+            {
+              "name": "mcicon-fixture-job",
+              "transportId": "00000000-0000-4000-8000-000000000002",
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          ],
+          "socketPath": "/fixture/docker.sock",
+          "guestJobPath": "/fixture/job"
+        }
+      },
+      "schemaValid": false,
+      "helperValid": false
+    },
+    {
+      "name": "linux-unadopted",
+      "os": "linux",
+      "resources": {
+        "linuxRootless": {
+          "instanceId": "00000000-0000-4000-8000-000000000002"
+        }
+      },
+      "schemaValid": false,
+      "helperValid": false
+    },
+    {
+      "name": "duplicate-transport-id",
+      "os": "windows",
+      "resources": {
+        "windows": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "distribution": {
+            "name": "mcicon-fixture",
+            "basePath": "C:\\fixture\\wsl",
+            "guid": "00000000-0000-4000-8000-000000000002",
+            "markerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          "transports": [
+            {
+              "id": "00000000-0000-4000-8000-000000000002",
+              "pid": 123,
+              "processStartedAt": "2026-10-18T00:00:00Z"
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000002",
+              "pid": 123,
+              "processStartedAt": "2026-10-18T00:00:00Z"
+            }
+          ],
+          "containers": [
+            {
+              "name": "mcicon-fixture-job",
+              "transportId": "00000000-0000-4000-8000-000000000002",
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          ],
+          "socketPath": "/fixture/docker.sock",
+          "guestJobPath": "/fixture/job"
+        }
+      },
+      "schemaValid": true,
+      "helperValid": false
+    }
+  ]
+}

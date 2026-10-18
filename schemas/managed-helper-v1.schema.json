@@ -1,0 +1,616 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "helper protocol 1のcontrol応答とlease。entrypointは$defs/lease、$defs/controlResponse。OS所有の意味検査は本文契約も必要。",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "instant": {
+      "type": "string",
+      "format": "date-time",
+      "maxLength": 64,
+      "pattern": "Z$"
+    },
+    "positive": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9223372036854775807
+    },
+    "nonnegative": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9223372036854775807
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "containerMemoryMiB",
+        "heapMemoryMiB",
+        "cpus",
+        "preparationDeadline"
+      ],
+      "properties": {
+        "containerMemoryMiB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "heapMemoryMiB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "cpus": {
+          "const": 4
+        },
+        "preparationDeadline": {
+          "$ref": "#/$defs/instant"
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "jobId",
+        "ownerId",
+        "toolVersion",
+        "workerSha256",
+        "runtimeId",
+        "descriptorSha256",
+        "hostId",
+        "pid",
+        "processStartedAt",
+        "createdAt",
+        "requirements"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "jobId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "ownerId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "toolVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$"
+        },
+        "workerSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "runtimeId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+        },
+        "descriptorSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "hostId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "pid": {
+          "$ref": "#/$defs/positive"
+        },
+        "processStartedAt": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "$ref": "#/$defs/instant"
+        },
+        "requirements": {
+          "$ref": "#/$defs/requirements"
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "detail",
+        "requiresPrivilege",
+        "requiresRestart"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16384
+        },
+        "requiresPrivilege": {
+          "type": "boolean"
+        },
+        "requiresRestart": {
+          "type": "boolean"
+        }
+      }
+    },
+    "controlResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocolVersion",
+        "status",
+        "diagnostics"
+      ],
+      "properties": {
+        "protocolVersion": {
+          "const": 1
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "setup-required",
+            "failed"
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 4096,
+          "items": {
+            "$ref": "#/$defs/diagnostic"
+          }
+        }
+      }
+    },
+    "transport": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/uuid"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "pid",
+            "processStartedAt"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/uuid"
+            },
+            "pid": {
+              "$ref": "#/$defs/positive"
+            },
+            "processStartedAt": {
+              "$ref": "#/$defs/instant"
+            }
+          }
+        }
+      ]
+    },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "transportId": {
+          "$ref": "#/$defs/uuid"
+        }
+      }
+    },
+    "hostAgent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pid",
+        "processStartedAt",
+        "bootSessionId"
+      ],
+      "properties": {
+        "pid": {
+          "$ref": "#/$defs/positive"
+        },
+        "processStartedAt": {
+          "$ref": "#/$defs/instant"
+        },
+        "bootSessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "dockerSocket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "dev",
+        "ino",
+        "uid"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "dev": {
+          "$ref": "#/$defs/nonnegative"
+        },
+        "ino": {
+          "$ref": "#/$defs/nonnegative"
+        },
+        "uid": {
+          "$ref": "#/$defs/nonnegative"
+        }
+      }
+    },
+    "macos": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "generationOwner",
+        "instanceDir",
+        "containers"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "starting",
+            "ready",
+            "releasing"
+          ]
+        },
+        "generationOwner": {
+          "$ref": "#/$defs/uuid"
+        },
+        "instanceDir": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "machineIdSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "hostAgent": {
+          "$ref": "#/$defs/hostAgent"
+        },
+        "dockerSocket": {
+          "$ref": "#/$defs/dockerSocket"
+        },
+        "forwardConfigSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "guestOwnerMarkerSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/container"
+              },
+              {
+                "not": {
+                  "required": [
+                    "transportId"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "const": "ready"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "machineIdSha256",
+              "hostAgent",
+              "dockerSocket",
+              "forwardConfigSha256",
+              "guestOwnerMarkerSha256"
+            ]
+          }
+        }
+      ]
+    },
+    "distribution": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "basePath"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "basePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "basePath",
+            "guid",
+            "markerSha256"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "basePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "guid": {
+              "$ref": "#/$defs/uuid"
+            },
+            "markerSha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        }
+      ]
+    },
+    "windows": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "generationOwner",
+        "distribution",
+        "transports",
+        "containers"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "importing",
+            "ready",
+            "releasing"
+          ]
+        },
+        "generationOwner": {
+          "$ref": "#/$defs/uuid"
+        },
+        "distribution": {
+          "$ref": "#/$defs/distribution"
+        },
+        "socketPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "guestJobPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "transports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/transport"
+          }
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/container"
+              },
+              {
+                "required": [
+                  "transportId"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "const": "ready"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "socketPath",
+              "guestJobPath"
+            ],
+            "properties": {
+              "distribution": {
+                "required": [
+                  "guid",
+                  "markerSha256"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "resources": {
+      "description": "Linux rootlessは方式未採用のため本schemaに成功branchを持たない。部分起動は所有回収許可を意味しない。",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "macos"
+          ],
+          "properties": {
+            "macos": {
+              "$ref": "#/$defs/macos"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "windows"
+          ],
+          "properties": {
+            "windows": {
+              "$ref": "#/$defs/windows"
+            }
+          }
+        }
+      ]
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "jobId",
+        "ownerId",
+        "toolVersion",
+        "workerSha256",
+        "runtimeId",
+        "descriptorSha256",
+        "hostId",
+        "pid",
+        "processStartedAt",
+        "createdAt",
+        "requirements",
+        "state",
+        "resources"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "jobId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "ownerId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "toolVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$"
+        },
+        "workerSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "runtimeId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+        },
+        "descriptorSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "hostId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "pid": {
+          "$ref": "#/$defs/positive"
+        },
+        "processStartedAt": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "$ref": "#/$defs/instant"
+        },
+        "requirements": {
+          "$ref": "#/$defs/requirements"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "released"
+          ]
+        },
+        "resources": {
+          "$ref": "#/$defs/resources"
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/lease"
+    },
+    {
+      "$ref": "#/$defs/controlResponse"
+    }
+  ]
+}
