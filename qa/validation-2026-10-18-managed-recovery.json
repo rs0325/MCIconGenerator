@@ -1,0 +1,77 @@
+{
+  "issue": 93,
+  "scope": "同tool/current descriptor旧active jobのMac core recovery機構。現存正当anchorと同版helper完全所有releaseが必須。",
+  "status": "独立重点反証で追加指摘0、core機構として条件付きPASS。実OS回収採用/reboot復旧/Issue全体完了ではない。",
+  "baseCommit": "eb8098ffbc1373907fd132e91c9ce6f49fea050f",
+  "baseTree": "84ca603c1221c44a7091c30b237a820d05f0adde",
+  "branch": "feature/issue-93",
+  "owner": "issue93_runtime",
+  "java": "Temurin21.0.9+10-LTS",
+  "os": "macOS arm64、実VM/SSH/OS回収なし",
+  "verification": {
+    "normalBuild": "./gradlew build prepareRelease prepareCentralCandidate -PreleaseVersion=1.1.0 --offline --no-daemon 成功",
+    "tests": {
+      "core": {
+        "tests": 124,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cli": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "worker": {
+        "tests": 32,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "helpers/common": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "related": "RuntimeLease/ManagedRuntime関連は初回にfixture期待失敗code1件を既存IO_FAILEDへ訂正、その後成功。新規9試験を含むcore全124件成功。",
+    "cases": [
+      "実子Java processが終了したPID/startを保存し旧lease lockを引継ぎ、busy/live ownerをskip",
+      "旧tool/異descriptorは不変、PID再使用の分類fixtureでもcurrent processを停止しない",
+      "保存start不明・receipt・descriptor元bytes・inventory破損を拒否し証拠保持",
+      "新job作成前に旧leaseで既存releaseを実行、ok/resources空後だけcore released",
+      "fixture所有不足/未解放resources/取消/prepare200ms期限でactive不変、新job未作成、有限lock解放"
+    ],
+    "processObservationLimit": "OS PID存在時のstart取得不能はunknownとして実装。実OSがstartを隠す状態の再現や他host死亡証明は行っていない。",
+    "audits": "配布と未署名Central候補のlocal監査成功。既存監査fault suite/独立consumerは公開API/依存変更なしのため今回は再実行していない。",
+    "warnings": [
+      "既存Javadoc param未記載等",
+      "Java8 source/target廃止/Gradle非推奨機能"
+    ]
+  },
+  "sharedBoundary": {
+    "mac94": "releaseはregistered/verifyのみ、anchor register/recreate禁止、missing/partial/完全所有不足はfailed+resources保持という担当合意。現Mac release実装/受入は前提未完成。",
+    "locks": "core旧lease64/1を終了まで保持。OS側job operation→global lifecycle→短resources更新。全descriptorの他lease観測はnonblocking。",
+    "deadline": "recovery releaseは新prepareのstore.remaining/tokenへ従う。通常close cleanupは別枠10秒。直接process強制終了の有限追加期限2秒はOS子孫不在証明ではない。"
+  },
+  "uncompletedGates": [
+    "実Mac現存anchor完全所有回収/並行/異常受入",
+    "orphan dockerのowner確認→生成/登録窓を塞ぐjob fenceと旧transport副作用不能証明",
+    "guard/client PG回収とdaemon非同期create/start終端は別。異常intentで終端不明ならactive保持。atomic renameはpowerloss/reboot耐久を保証しない。",
+    "cache消失/reboot/rootcopyの同host/既知不存在証明、core生存lockfreeの終了job",
+    "旧tool cleanupの信頼済payload/pin/helper保持とGC条件",
+    "本番bundle/trust/pins・OSS/source/Ubuntu署名chainと実51版描画",
+    "Windows/Linux recovery・実機は初期対象外"
+  ],
+  "independentReview": "今回core2filesと直接関連fixtures/doc/QAの独立重点反証で追加指摘0。core機構として条件付きPASS。94実anchor所有回収/orphan docker fence/daemon非同期終端等の未受入gateは維持。",
+  "sourceSha256ExcludingThisReport": {
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/ManagedRuntime.java": "8a96b2db0361f0b1df86f2b3f27146eac2ba6a35e787113f9a86b6a8fe8ecc10",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeLease.java": "36107181e9771c88b9498702332219052492b529ee6343a2ae36ab718ef09f52",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/ManagedFixture.java": "27780f77fd7acecc43e11b3a0d621a99b9a10417ea18b653394f4c6ef4048adf",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/ManagedRuntimeTest.java": "2912921da8ad31ea9926872a8c9c90887a838be801f89b98d89788181e605078",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeLeaseTest.java": "0b33a0b65414500e0567d26c7b75c0ff3f26c939c5122b8a020570cf54cc244c",
+    "docs/managed-runtime-recovery-1.1.md": "02efbb50dde23c91fdc263cda61745affd14e7bc95821343396171376e3f63d5"
+  }
+}

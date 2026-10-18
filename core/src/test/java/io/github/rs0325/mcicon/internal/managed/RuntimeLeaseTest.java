@@ -114,6 +114,42 @@ class RuntimeLeaseTest {
         }
         assertTrue(RuntimeLease.idle(store,descriptor));
     }
+    @Test void recoveryKeepsBusyAndLiveOwnerUntouched() throws Exception {
+        var store=store();var descriptor=new ManagedFixture().descriptor();
+        try(var lease=ManagedFixture.lease(store,descriptor)) {
+            byte[] before=Files.readAllBytes(lease.file());assertNull(RuntimeLease.tryRecovery(store,descriptor,lease.file().getParent()));assertArrayEquals(before,Files.readAllBytes(lease.file()));
+            lease.close();assertNull(RuntimeLease.tryRecovery(store,descriptor,lease.file().getParent()));assertArrayEquals(before,Files.readAllBytes(lease.file()));
+        }
+    }
+    @Test void deadOwnerRecoveryRetainsLockAndRequiresOriginalEvidence() throws Exception {
+        var store=store();var fixture=new ManagedFixture();byte[] inventory="fixture inventory".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        for(var artifact:fixture.json.withArray("artifacts"))((ObjectNode)artifact).put("inventorySha256",io.github.rs0325.mcicon.internal.FilesSupport.hash(inventory));
+        var descriptor=fixture.descriptor();var lease=ManagedFixture.lease(store,descriptor);Path file=lease.file(),job=file.getParent();lease.close();
+        ManagedFixture.owner(file,ManagedFixture.deadOwner(root));Files.write(job.resolve("descriptor.json"),fixture.bytes());Files.createDirectory(job.resolve("tmp"));Files.createDirectory(job.resolve("inventory"));
+        for(var artifact:descriptor.artifacts())Files.write(job.resolve(artifact.inventoryPath()),inventory);
+        byte[] original=Files.readAllBytes(job.resolve("descriptor.json"));Files.writeString(job.resolve("descriptor.json"),"{}");assertThrows(McIconException.class,()->RuntimeLease.tryRecovery(store,descriptor,job));Files.write(job.resolve("descriptor.json"),original);
+        Path inventoryFile=job.resolve(descriptor.artifacts().get(0).inventoryPath());Files.writeString(inventoryFile,"corrupt");assertThrows(McIconException.class,()->RuntimeLease.tryRecovery(store,descriptor,job));Files.write(inventoryFile,inventory);
+        try(var recovered=RuntimeLease.tryRecovery(store,descriptor,job)) {
+            assertNotNull(recovered);assertEquals(file,recovered.file());assertNull(RuntimeLease.tryRecovery(store,descriptor,job));
+            Files.writeString(file.resolveSibling("lease.lock"),"0".repeat(64),StandardOpenOption.WRITE);assertEquals("MANAGED_OWNERSHIP_MISMATCH",assertThrows(McIconException.class,recovered::released).code());
+        }
+        assertEquals("active",RuntimeDescriptor.read(Files.readAllBytes(file)).path("state").asText());
+        assertEquals("MANAGED_OWNERSHIP_MISMATCH",assertThrows(McIconException.class,()->RuntimeLease.tryRecovery(store,descriptor,job)).code());
+    }
+    @Test void recoveryRejectsUnknownStartWithoutClearing() throws Exception {
+        var store=store();var descriptor=new ManagedFixture().descriptor();var lease=ManagedFixture.lease(store,descriptor);Path file=lease.file();lease.close();
+        ObjectNode unknown=(ObjectNode)RuntimeDescriptor.read(Files.readAllBytes(file));unknown.putNull("processStartedAt");Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(unknown));byte[] before=Files.readAllBytes(file);
+        assertEquals("MANAGED_OWNERSHIP_MISMATCH",assertThrows(McIconException.class,()->RuntimeLease.tryRecovery(store,descriptor,file.getParent())).code());assertArrayEquals(before,Files.readAllBytes(file));
+    }
+    @Test void differentGenerationAndToolAreNotRecoveredAndPidReuseNeverKillsCurrentProcess() throws Exception {
+        var store=store();var descriptor=new ManagedFixture().descriptor();var lease=ManagedFixture.lease(store,descriptor);Path file=lease.file();lease.close();
+        var owner=new ManagedFixture.Owner(ProcessHandle.current().pid(),java.time.Instant.EPOCH);ManagedFixture.owner(file,owner);
+        assertTrue(RuntimeLease.ownerDead(owner.pid(),owner.started()));assertTrue(ProcessHandle.current().isAlive());
+        ObjectNode value=(ObjectNode)RuntimeDescriptor.read(Files.readAllBytes(file));value.put("descriptorSha256","b".repeat(64));Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));ObjectNode identity=value.deepCopy();identity.remove(List.of("state","resources"));Files.write(file.resolveSibling("lease.lock"),RuntimeLease.receipt(identity));
+        byte[] before=Files.readAllBytes(file);assertNull(RuntimeLease.tryRecovery(store,descriptor,file.getParent()));assertArrayEquals(before,Files.readAllBytes(file));
+        value.put("descriptorSha256",descriptor.digest()).put("toolVersion","1.0.1");Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));identity=value.deepCopy();identity.remove(List.of("state","resources"));Files.write(file.resolveSibling("lease.lock"),RuntimeLease.receipt(identity));
+        before=Files.readAllBytes(file);assertNull(RuntimeLease.tryRecovery(store,descriptor,file.getParent()));assertArrayEquals(before,Files.readAllBytes(file));assertTrue(ProcessHandle.current().isAlive());
+    }
     @Test void successfulReleaseIsIdleOnlyAfterFilelockEnds() throws Exception {
         var descriptor=new ManagedFixture().descriptor();var store=store();RuntimeLease lease=ManagedFixture.lease(store,descriptor);
         lease.released();assertFalse(RuntimeLease.idle(store,descriptor));lease.close();assertTrue(RuntimeLease.idle(store,descriptor));

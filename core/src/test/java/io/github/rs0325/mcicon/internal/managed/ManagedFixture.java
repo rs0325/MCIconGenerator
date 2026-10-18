@@ -30,6 +30,25 @@ final class ManagedFixture {
         var options=new io.github.rs0325.mcicon.ManagedOptions(store.root(),timeout,timeout,timeout,3072,2048);
         return RuntimeLease.create(store,descriptor,options,java.time.Instant.now().plus(timeout));
     }
+    record Owner(long pid,java.time.Instant started) {}
+    static Owner deadOwner(java.nio.file.Path directory) throws Exception {
+        var lock=java.nio.file.Files.createTempFile(directory,"owner-",".lock");
+        String classpath=java.nio.file.Path.of(LeaseLockProcess.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toString();
+        Process process=new ProcessBuilder(java.nio.file.Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",classpath,LeaseLockProcess.class.getName(),lock.toString(),"true").redirectError(directory.resolve("owner.stderr").toFile()).start();
+        var executor=java.util.concurrent.Executors.newSingleThreadExecutor(Thread.ofPlatform().daemon().factory());var output=process.inputReader();
+        try {
+            if(!"HELD".equals(executor.submit(output::readLine).get(3,java.util.concurrent.TimeUnit.SECONDS)))throw new AssertionError("fixture processが開始しませんでした");
+            var owner=new Owner(process.pid(),process.info().startInstant().orElseThrow());process.getOutputStream().write(0);process.getOutputStream().flush();
+            if(!process.waitFor(3,java.util.concurrent.TimeUnit.SECONDS)||process.exitValue()!=0)throw new AssertionError("fixture processが終了しませんでした");return owner;
+        }finally {
+            try {if(process.isAlive())process.destroyForcibly();if(!process.waitFor(2,java.util.concurrent.TimeUnit.SECONDS))throw new AssertionError("fixture processを回収できません");output.close();process.getOutputStream().close();}
+            finally {executor.shutdownNow();executor.awaitTermination(3,java.util.concurrent.TimeUnit.SECONDS);java.nio.file.Files.deleteIfExists(lock);}
+        }
+    }
+    static void owner(java.nio.file.Path file,Owner owner) throws Exception {
+        ObjectNode value=(ObjectNode)RuntimeDescriptor.read(java.nio.file.Files.readAllBytes(file));value.put("pid",owner.pid()).put("processStartedAt",owner.started().toString()).put("state","active");
+        java.nio.file.Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));ObjectNode identity=value.deepCopy();identity.remove(List.of("state","resources"));java.nio.file.Files.write(file.resolveSibling("lease.lock"),RuntimeLease.receipt(identity));
+    }
     byte[] bytes() throws Exception {return RuntimeDescriptor.JSON.writeValueAsBytes(json);}
     byte[] sign(byte[] bytes) throws Exception {Signature signature=Signature.getInstance("Ed25519");signature.initSign(key.getPrivate());signature.update(bytes);return signature.sign();}
     RuntimeDescriptor.Pin pin(byte[] bytes) {return new RuntimeDescriptor.Pin(FilesSupport.hash(bytes),"1.1.0",HASH,HASH,new RuntimeDescriptor.Host("linux","x86_64"),Set.of(21));}
