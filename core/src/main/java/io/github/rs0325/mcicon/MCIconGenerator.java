@@ -1,6 +1,7 @@
 package io.github.rs0325.mcicon;
 
 import io.github.rs0325.mcicon.internal.*;
+import io.github.rs0325.mcicon.internal.managed.ManagedRuntime;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.concurrent.*;
 public final class MCIconGenerator implements AutoCloseable {
     private final ExecutorService executor=Executors.newSingleThreadExecutor(Thread.ofPlatform().name("mcicon-job").factory());
     private final AssetStore assets;
+    private final boolean offline;
     private final VersionService versions;
     private final CancellationToken cancellation;
     private final ProgressListener progress;
@@ -40,7 +42,7 @@ public final class MCIconGenerator implements AutoCloseable {
      * @throws IllegalArgumentException 入力ディレクトリが存在しない、cacheと重なる、または解決できない場合
      */
     public MCIconGenerator(Path cache,boolean offline,ProgressListener progress,CancellationToken cancellation,Path minecraftDirectory) {
-        this.assets=new AssetStore(cache,offline,cancellation,minecraftDirectory);this.versions=new VersionService(assets);this.cancellation=cancellation;this.progress=progress;
+        this.offline=offline;this.assets=new AssetStore(cache,offline,cancellation,minecraftDirectory);this.versions=new VersionService(assets);this.cancellation=cancellation;this.progress=progress;
     }
     /** 公式metadataから1.13以降の正式版を新しい順に返す。未登録adapterの版も含む。 */
     public CompletableFuture<List<VersionInfo>> listVersions() {return submit(versions::list);}
@@ -62,20 +64,83 @@ public final class MCIconGenerator implements AutoCloseable {
      */
     public CompletableFuture<ExportResult> render(RenderRequest request,WorkerOptions options) {
         return submit(()-> {
-            VersionInfo version=versions.resolve(request.version());
-            switch(version.support()) {
-                case "verified" -> {}
-                case "experimental" -> {
-                    if(!request.allowExperimental())throw new McIconException("UNVERIFIED_VERSION","Rendering adapters are experimental; opt in with --allow-experimental",2);
-                }
-                default -> throw new McIconException("ADAPTER_UNAVAILABLE","No rendering adapter is available for "+version.id(),2);
-            }
+            VersionInfo version=renderVersion(request);
             progress.onProgress(new ProgressListener.ProgressEvent("prepare",version.id(),0,1));
             var runtime=new RuntimePreparer(assets,versions,cancellation).prepare(version);
             try(var worker=new WorkerClient(runtime,assets.root(),options,cancellation)) {
                 return new IconExporter(cancellation,progress).export(runtime,worker,worker.catalog(),request);
             }
         });
+    }
+    /** 既定の管理root・期限・予算でrenderManagedを実行する。 */
+    public CompletableFuture<ExportResult> renderManaged(RenderRequest request) {return renderManaged(request,ManagedOptions.defaults());}
+    /**
+     * 同梱固定版の管理環境を検証・準備し、PNGとmanifestを出力する。toolの更新やOS機能の導入は行わない。
+     * 最初にrenderと同じ版受入を判定し、拒否時は管理環境を準備しない。公式版情報の取得にも元instanceのofflineを適用する。
+     * 元instanceのoffline・取消状態を引き継ぎ、個別描画の途中取消は未完了結果、準備・起動失敗はFutureの例外となる。
+     * @param request 描画版・対象・出力先。対応版とexperimentalの扱いはrenderと同じ
+     * @param options 管理root・準備/起動/個別期限とゲームworkerの予算
+     * @return ジョブ全体の結果。管理設定不足・署名/hash不整合・所有不一致はMcIconExceptionのcodeで区別する
+     */
+    public CompletableFuture<ExportResult> renderManaged(RenderRequest request,ManagedOptions options) {
+        return submit(()-> {
+            VersionInfo version=renderVersion(request);
+            try(var managed=ManagedRuntime.prepare(options,offline,cancellation)) {
+                progress.onProgress(new ProgressListener.ProgressEvent("prepare",version.id(),0,1));
+                var runtime=new RuntimePreparer(assets,versions,cancellation).prepare(version);
+                try(var worker=new WorkerClient(runtime,assets.root(),managed.worker(runtime.javaMajor()),cancellation,managed.launch())) {
+                    return new IconExporter(cancellation,progress).export(runtime,worker,worker.catalog(),request);
+                }
+            }
+        });
+    }
+    /** 既定の管理root・期限・予算でdoctorManagedを実行する。 */
+    public CompletableFuture<DiagnosticReport> doctorManaged(String version) {return doctorManaged(version,ManagedOptions.defaults());}
+    /**
+     * 管理環境を準備し、指定版のJava・image・Mesaを診断する。全件描画は行わない。
+     * 前提不足は必要操作を含む不健康なreport、署名/hash・所有不一致やIO失敗はFutureの例外となる。
+     * 前提不足と回収失敗が重なった場合は、suppressedの回収失敗を含む元例外を保持する。
+     * @param version 診断対象の版
+     * @param options 管理環境のroot・期限・予算
+     * @return 描画環境の診断結果。元instanceのoffline・取消状態を引き継ぐ
+     */
+    public CompletableFuture<DiagnosticReport> doctorManaged(String version,ManagedOptions options) {
+        return submit(()-> {
+            try(var managed=ManagedRuntime.prepare(options,offline,cancellation)) {
+                var exact=versions.resolve(version);int major=Diagnostics.javaMajor(versions,exact);
+                return Diagnostics.doctor(versions,exact.id(),managed.worker(major),cancellation,managed.launch());
+            }catch(McIconException failure) {
+                if(!failure.code().equals("MANAGED_SETUP_REQUIRED")||failure.getSuppressed().length!=0)throw failure;
+                return new DiagnosticReport(version,false,List.of(new DiagnosticReport.Check("managed_setup",false,failure.code()+": "+failure.getMessage())));
+            }
+        });
+    }
+    /** 既定の管理root・期限・予算でlistEntriesManagedを実行する。 */
+    public CompletableFuture<List<CatalogEntry>> listEntriesManaged(String version) {return listEntriesManaged(version,ManagedOptions.defaults());}
+    /**
+     * 管理環境と公式入力を準備し、ゲームworkerの登録項目と除外理由を返す。
+     * @param version 対象版
+     * @param options 管理環境のroot・期限・予算
+     * @return 登録項目。準備・起動失敗や取消は元instanceと同じFutureの例外へ通知する
+     */
+    public CompletableFuture<List<CatalogEntry>> listEntriesManaged(String version,ManagedOptions options) {
+        return submit(()-> {
+            try(var managed=ManagedRuntime.prepare(options,offline,cancellation)) {
+                var runtime=new RuntimePreparer(assets,versions,cancellation).prepare(versions.resolve(version));
+                try(var worker=new WorkerClient(runtime,assets.root(),managed.worker(runtime.javaMajor()),cancellation,managed.launch())){return worker.catalog();}
+            }
+        });
+    }
+    private VersionInfo renderVersion(RenderRequest request) throws java.io.IOException {
+        VersionInfo version=versions.resolve(request.version());
+        switch(version.support()) {
+            case "verified" -> {}
+            case "experimental" -> {
+                if(!request.allowExperimental())throw new McIconException("UNVERIFIED_VERSION","Rendering adapters are experimental; opt in with --allow-experimental",2);
+            }
+            default -> throw new McIconException("ADAPTER_UNAVAILABLE","No rendering adapter is available for "+version.id(),2);
+        }
+        return version;
     }
     /** 元JARのPNG・付随mcmetaを元のbytesで保存する。Dockerと描画workerは使用しない。 */
     public CompletableFuture<ExportResult> extract(ExtractRequest request) {

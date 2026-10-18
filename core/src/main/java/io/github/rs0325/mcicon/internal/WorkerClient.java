@@ -17,6 +17,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
     private final BlockingQueue<JsonNode> messages=new LinkedBlockingQueue<>(256);
     private final CancellationToken token;
     private final WorkerOptions options;
+    private final WorkerLaunch launch;
     private final Path runDirectory;
     private final String renderer;
     private final String containerName="mcicon-worker-"+UUID.randomUUID();
@@ -25,12 +26,16 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
     private final Diagnostics.WorkerJava javaRuntime;
     private final Thread shutdownHook;
     public WorkerClient(RuntimePreparer.Prepared runtime,Path cache,WorkerOptions options,CancellationToken token) throws Exception {
-        this.token=token;this.options=options;
+        this(runtime,cache,options,token,WorkerLaunch.docker(options.dockerContext()));
+    }
+    public WorkerClient(RuntimePreparer.Prepared runtime,Path cache,WorkerOptions options,CancellationToken token,WorkerLaunch launch) throws Exception {
+        this.token=token;this.options=options;this.launch=launch;
         if(!Files.isRegularFile(options.agentJar()))throw new McIconException("WORKER_NOT_FOUND","Worker JAR not found; run :worker:agentJar or specify --worker-jar",1);
         byte[] agentBytes=readAgent(options.agentJar());
         agentSha256=FilesSupport.hash(agentBytes);
-        imageId=resolveImage(options,token);
-        javaRuntime=Diagnostics.workerJava(options,imageId,runtime.javaMajor(),token);
+        if(launch.managed()&&!agentSha256.equals(launch.expectedAgentSha256()))throw new McIconException("MANAGED_RUNTIME_INVALID","管理workerのagent hashがdescriptorと一致しません",1);
+        imageId=resolveImage(options,token,launch);
+        javaRuntime=Diagnostics.workerJava(options,imageId,runtime.javaMajor(),token,launch);
         cache=cache.toAbsolutePath().normalize();
         runDirectory=Files.createTempDirectory(cache,"worker-");
         Path agentSnapshot=runDirectory.resolve("worker-agent.jar");
@@ -45,10 +50,11 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
             Path game=runDirectory.resolve("game");Files.createDirectories(game);
             Files.writeString(game.resolve("options.txt"),"soundCategory_master:0.0\nguiScale:1\nmaxFps:60\nfullscreen:false\nonboardAccessibility:false\n");
             List<String> cp=new ArrayList<>();cp.add(inContainer(cache,runtime.client()));for(Path lib:runtime.libraries())cp.add(inContainer(cache,lib));
-            List<String> command=new ArrayList<>(List.of("docker","--context",options.dockerContext(),"run","--rm","--name",containerName,"-i","--platform","linux/amd64",
+            List<String> command=new ArrayList<>(List.of("run","--rm","--name",containerName,"-i","--platform","linux/amd64",
                     "--network","none","--memory",options.containerMemoryMiB()+"m","--cpus","4","-v",cache+":/mcicon/cache","-v",agentSnapshot+":/mcicon/worker.jar:ro",imageId));
             if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"-e");
             if(runtime.profile().equals("gui-26.3"))command.add(command.indexOf(imageId),"SDL_VIDEO_FORCE_EGL=1");
+            for(var entry:new TreeMap<>(launch.renderingEnvironment()).entrySet()){command.add(command.indexOf(imageId),"-e");command.add(command.indexOf(imageId),entry.getKey()+"="+entry.getValue());}
             String java=javaRuntime.executable();
             String run=inContainer(cache,runDirectory);
             command.addAll(List.of(java,"-Xmx"+options.heapMemoryMiB()+"m","-Djava.awt.headless=true","-Duser.timezone=UTC","-Djava.library.path="+inContainer(cache,runtime.natives()),
@@ -56,7 +62,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
                     "--username","MCIconGenerator","--version",runtime.version().id(),"--gameDir",run+"/game",
                     "--assetsDir",inContainer(cache,runtime.assets()),"--assetIndex",runtime.metadata().path("assetIndex").path("id").asText(),
                     "--accessToken","0","--uuid","00000000000000000000000000000000","--userType","legacy","--width","320","--height","240","--demo","--disableMultiplayer","--disableChat"));
-            ProcessBuilder builder=new ProcessBuilder(command).redirectError(runDirectory.resolve("worker.log").toFile());
+            ProcessBuilder builder=launch.command(command).redirectError(runDirectory.resolve("worker.log").toFile());
             process=builder.start();output=new BufferedWriter(new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8));
             initialized=true;
         } finally {if(!initialized)cleanupTemporaryFiles();}
@@ -127,14 +133,15 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
     public String agentSha256(){return agentSha256;}
     public String imageId(){return imageId;}
     public Diagnostics.WorkerJava javaRuntime(){return javaRuntime;}
-    private static String resolveImage(WorkerOptions options,CancellationToken token) throws Exception {
+    private static String resolveImage(WorkerOptions options,CancellationToken token,WorkerLaunch launch) throws Exception {
         token.check();
-        Process inspect=new ProcessBuilder("docker","--context",options.dockerContext(),"image","inspect",options.dockerImage(),"--format","{{.Id}}")
+        Process inspect=launch.command(List.of("image","inspect",options.dockerImage(),"--format","{{.Id}}"))
                 .redirectError(ProcessBuilder.Redirect.DISCARD).start();
         try {
             if(!inspect.waitFor(15,TimeUnit.SECONDS))throw new McIconException("DOCKER_UNAVAILABLE","Docker image inspection timed out",1);
             token.check();String id=new String(inspect.getInputStream().readNBytes(1024),StandardCharsets.UTF_8).trim();
             if(inspect.exitValue()!=0||!id.matches("sha256:[0-9a-f]{64}"))throw new McIconException("DOCKER_IMAGE_UNAVAILABLE","Build the rendering image in the selected Docker context first",1);
+            if(launch.managed()&&!id.equals(launch.expectedImageId()))throw new McIconException("MANAGED_RUNTIME_INVALID","管理imageのIDがdescriptorと一致しません",1);
             return id;
         }finally{if(inspect.isAlive())inspect.destroyForcibly();}
     }
@@ -142,7 +149,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
         process.destroyForcibly();
         boolean interrupted=Thread.interrupted();
         try {
-            Process cleanup=new ProcessBuilder("docker","--context",options.dockerContext(),"rm","-f",containerName)
+            Process cleanup=launch.command(List.of("rm","-f",containerName))
                     .redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
             if(!cleanup.waitFor(10,TimeUnit.SECONDS))cleanup.destroyForcibly();
         }catch(IOException ignored){}catch(InterruptedException e){interrupted=true;}
