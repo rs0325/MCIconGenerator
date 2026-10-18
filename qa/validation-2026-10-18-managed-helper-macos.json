@@ -300,21 +300,41 @@
       "limits": "非VM検証。v6/v7/v9の実機成功をv10実更新/rollback/全51版成功へ変換しない。",
       "review": "限定反証PASS（追加指摘0）、source40/evidence計75copy照合",
       "evidenceFreezeSha256": "d20e38fcf66e2539cc758bfbecf6dd57435d4ece684f72f4e2b15ccfae95b8c8"
+    },
+    "matrix51V10": {
+      "status": "実結果小監査・独立結果audit PASS（追加指摘0）",
+      "baseCommit": "0fd4b7d2a0481e0f4c588948ef7f6bc72af6b106",
+      "helperCandidate": "app-image-v10",
+      "versions": 51,
+      "pngs": 60265,
+      "formalCanonicalRoundComparisons": 102,
+      "differentIcons": 0,
+      "priorSixSavedPngs": 9212,
+      "remaining45RenderedPngs": 51053,
+      "releasedLeases": 51,
+      "settledOperations": 765,
+      "removedAndAbsentFullIds": 204,
+      "reapedExecutionChildren": 206,
+      "sameBoundaryFinalStatus": "Stopped",
+      "resultFreezeSha256": "6280c031807db72ee27f5b635e2a8d4d42156f0485a1b1a914f258b8552e4152",
+      "oldFixedBaselineFailurePreserved": true,
+      "limits": "固定pixel再受入。代表World意味保証を拡張しない。最終入力原本はstat、専用2コピー公式閉包2843bodyはSHA照合。旧fixed FAILと正式両round保存画像分析は別世代。"
     }
   },
   "notAccepted": [
     "実再起動後のanchor現存OwnedStopped cold-start/rootcopy自動回復",
     "アンインストール残存の実機確認（#97 package/#98 GCとの契約整理のみ）",
     "ジョブ世代pinの更新切替/管理環境更新（#98等共通依存）",
-    "全51版新環境受入",
     "Intel/最低OS/DeveloperID/notarization/Gatekeeper",
     "production CLIのmanaged接続/最終配布artifact",
     "全構成license/source/production trust"
   ],
   "publication": {
-    "commit": false,
-    "push": false,
-    "pullRequest": false
+    "pullRequest": 105,
+    "merged": true,
+    "mergeCommit": "0fd4b7d2a0481e0f4c588948ef7f6bc72af6b106",
+    "issueClosed": false,
+    "currentDocumentationUpdatePublished": false
   },
   "notes": [
     "stage1はv6、stage2はv7の当時source exactcopy。v9はpreboot通常close、正常released missing再構成、実active reboot missing-freshを別結果で記録。",
