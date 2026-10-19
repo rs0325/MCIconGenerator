@@ -2,7 +2,9 @@
 
 第1段はapp-image-v6、第2段はv7の当時sourceを限定受入した。host照合・reboot終了を加えたv9では、実再起動後の正常releasedからの欠落cache再構成と3PNG比較・通常closeを確認した。元active leaseの再起動終了・回復もanchor欠落のfresh分岐で実行し、この範囲の限定独立結果auditはPASS（追加指摘0）である。anchor現存の旧boot cold-startは未受入である。以下は実装の契約を記し、全OS・全版・製品配布受入の完了を意味しない。
 
-対象はApple Silicon上のLima 2.2.1/VZ、導入済みRosetta、aarch64 Ubuntu guest、linux/amd64 rendererである。Intel、macOS最低版、Developer ID、notarization、隔離属性による初回起動は受入未完了。単体fixtureとpackagingは実VMの成功を意味しない。
+初期対応はApple Silicon・macOS 15.7.7以降を候補とし、実機確認済みのOSは15.7.7だけである。Intelと15.7.7未満は初版の正式対象に含めない。Lima 2.2.1/VZ、導入済みのVM用Rosetta、aarch64 Ubuntu guest、linux/amd64 rendererを使用する。Developer ID、notarization、隔離属性による初回起動は受入未完了。単体fixtureとpackagingは実VMの成功を意味しない。
+
+host判定は署名済みdescriptorの`minimumOsVersion`を比較する。最終Mac descriptorは`15.7.7`に設定し、native probeのcompile target `13.0`を対応下限と混同しない。`native-acceptance.py`のfixture descriptorも`15.7.7`を使用する。preflightでは、Rosettaの未導入・非対応・観測不明とVZの非対応・観測不明を異なるsetup-required診断で伝える。未導入時はApple公式の案内と利用規約を確認し、導入への明示同意を必要とする。製品での同意・公式導入・完了後の再確認導線は#97と接続して検証する。本helperは導入操作を実行せず、未知状態を導入済みとして継続しない。
 
 ## 配布と固定入力
 
@@ -62,4 +64,4 @@ Issue #94の残件は実再起動後のanchor現存cold-start、uninstall残存�
 
 確定main `0fd4b7d2` の分離buildとapp-image-v10を使用した。先行6版9,212PNGの保存画像と、同じ専用VMを再利用した残45版51,053PNGを正式canonical-v1受入時の両roundへ比較し、全51版60,265PNG・102比較のRGBA差分0を確認した。51lease released空、765操作終端、204完全container IDの削除/正常NotFound、206実行child回収、同実行境界Stoppedと末尾入力・旧環境不変の小監査は成功し、独立結果auditはPASS（追加指摘0）となった。
 
-初回の旧fixed baselineとの1.21.11 1,502枚RGB差FAILは保持する。正式受入baselineへの保存画像分析と残45実描画は別世代であり、元FAILを成功へ書き換えない。今回の固定pixel受入から代表World意味確認の保証範囲を拡張しない。#97/#98の実uninstall/更新接続、Intel/最低OS/最終配布と現存anchor旧boot OwnedStopped分岐の未実測を残し、Refs #94 OPENを維持する。
+初回の旧fixed baselineとの1.21.11 1,502枚RGB差FAILは保持する。正式受入baselineへの保存画像分析と残45実描画は別世代であり、元FAILを成功へ書き換えない。今回の固定pixel受入から代表World意味確認の保証範囲を拡張しない。#97/#98の実uninstall/更新接続、macOS15.7.7以外の実測/最終配布と現存anchor旧boot OwnedStopped分岐の未実測を残し、Refs #94 OPENを維持する。

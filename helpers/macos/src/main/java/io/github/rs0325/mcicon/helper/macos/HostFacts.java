@@ -17,8 +17,15 @@ record HostFacts(long uid,String hostBindingSha256,String bootSessionId,long mem
     static HostFacts parse(JsonNode value,JsonNode descriptor) throws IOException {
         JsonNode host=descriptor.path("host");
         if(value==null||!value.isObject()||!host.path("os").asText().equals("macos")||!host.path("arch").asText().equals("aarch64")||!value.path("arch").asText().equals("aarch64"))throw new IOException("現在のMac helperはApple Siliconだけを対象にします");
-        if(!value.path("vz").asBoolean()||!value.path("rosetta").asText().equals("installed"))throw new IOException("VZまたは導入済みRosettaが必要です");
-        String version=value.path("osVersion").asText();if(compare(version,descriptor.path("minimumOsVersion").asText())<0)throw new IOException("descriptorのmacOS下限を満たしません");
+        if(!value.path("vz").isBoolean())throw new IOException("VZの利用可否を確認できません");
+        if(!value.path("vz").booleanValue())throw new IOException("このMacではVirtualization.frameworkを利用できません");
+        switch(value.path("rosetta").asText()) {
+            case "installed" -> {}
+            case "not-installed" -> throw new IOException("VM用Rosettaが未導入です。Apple公式の案内と利用規約を確認し、導入に明示的に同意した後で再実行してください");
+            case "not-supported" -> throw new IOException("このMacではVM用Rosettaを利用できません");
+            default -> throw new IOException("VM用Rosettaの導入状態を確認できません");
+        }
+        String version=value.path("osVersion").asText();if(compare(version,descriptor.path("minimumOsVersion").asText())<0)throw new IOException("この描画環境にはmacOS "+descriptor.path("minimumOsVersion").asText()+"以降が必要です");
         if(!value.path("uid").isIntegralNumber()||value.path("uid").asLong(-1)<0||!value.path("physicalMemory").canConvertToLong()||value.path("physicalMemory").asLong()<1||value.path("cpus").asInt()<4||value.path("bootSessionId").asText().isEmpty())throw new IOException("macOS能力の結果が不正です");
         String binding=value.path("hostBindingSha256").asText(),boot=value.path("bootSessionId").asText();
         if(!binding.matches("[0-9a-f]{64}"))throw new IOException("host bindingの読取結果が不正です");
