@@ -21,7 +21,7 @@ public final class PackageFixture {
             }
         }
         var payload=(com.fasterxml.jackson.databind.node.ObjectNode)f.manifest.path("platforms").get(0).get("payload");payload.put("bytes",Files.size(zip)).put("sha256",Seed.hash(zip));f.writeManifest();
-        Files.writeString(destination.resolve("QA-ONLY.txt"),"固定公開testvector署名。実CLI/JVMだけを用いる私用fixture。runtime descriptorは非配布fixtureで実managed描画を受入しない。\n");
+        Files.writeString(destination.resolve("QA-ONLY.txt"),"実行時JVM内だけの一時テスト鍵による署名。秘密鍵は保存しない。実CLI/JVMだけを用いる私用fixture。runtime descriptorは非配布fixtureで実managed描画を受入しない。\n");
         System.out.println(f.installed);
     }
 }

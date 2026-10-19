@@ -6,6 +6,8 @@ import io.github.rs0325.mcicon.internal.ToolVersion;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 import java.nio.file.Path;
+import java.io.IOException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.*;
 import java.util.concurrent.*;
 import java.time.Duration;
@@ -23,15 +25,31 @@ public final class Main implements Runnable {
     }
     static CommandLine commandLine() {
         Main root=new Main();
-        return new CommandLine(root).setExecutionExceptionHandler((exception,line,result)-> {
-            Throwable cause=exception;
-            while(cause instanceof CompletionException&&cause.getCause()!=null)cause=cause.getCause();
-            String code=cause instanceof McIconException m?m.code():cause instanceof IllegalArgumentException?"INVALID_REQUEST":"INTERNAL_ERROR";
-            int exit=cause instanceof McIconException m?m.exitCode():cause instanceof IllegalArgumentException?2:1;
-            line.getErr().println(code+": "+cause.getMessage());
-            if(root.debug)cause.printStackTrace(line.getErr());
-            line.getErr().flush();return exit;
-        });
+        return new CommandLine(root).setExecutionStrategy(parsed->{
+            try(StartupControl control=StartupControl.open(request(parsed),ToolVersion.VERSION,Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()))) {
+                for(CommandLine line:parsed.asCommandLineList()){Common common=common(line.getCommand());if(common!=null)common.startup=control;}
+                if(control!=null&&control.switching())return 0;return new CommandLine.RunLast().execute(parsed);
+            }catch(CommandLine.ExecutionException failure){throw failure;}
+            catch(Exception failure){return root.failure(failure,parsed.commandSpec().commandLine());}
+            finally{for(CommandLine line:parsed.asCommandLineList()){Common common=common(line.getCommand());if(common!=null)common.startup=null;}}
+        }).setExecutionExceptionHandler((exception,line,result)->root.failure(exception,line));
+    }
+    private int failure(Throwable cause,CommandLine line) {
+        while(cause instanceof CompletionException&&cause.getCause()!=null)cause=cause.getCause();
+        String code=cause instanceof McIconException m?m.code():cause instanceof IllegalArgumentException?"INVALID_REQUEST":"INTERNAL_ERROR";
+        int exit=cause instanceof McIconException m?m.exitCode():cause instanceof IllegalArgumentException?2:1;
+        line.getErr().println(code+": "+cause.getMessage());if(debug)cause.printStackTrace(line.getErr());line.getErr().flush();return exit;
+    }
+    private static Common common(Object command) {
+        return switch(command){case Render value->value.common;case Catalog value->value.common;case Doctor value->value.common;case Cache value->value.common;case Extract value->value.common;case Versions value->value.common;default->null;};
+    }
+    static ObjectNode request(CommandLine.ParseResult parsed) {
+        CommandLine.ParseResult leaf=parsed;boolean help=false,version=false;
+        while(true){help|=leaf.isUsageHelpRequested();version|=leaf.isVersionHelpRequested();if(!leaf.hasSubcommand())break;leaf=leaf.subcommand();}
+        Object command=leaf.commandSpec().userObject();Common common=common(command);WorkerArguments worker=switch(command){case Render value->value.worker;case Catalog value->value.worker;case Doctor value->value.worker;default->null;};
+        if(!help&&!version){if(command instanceof Render render)render.prepareRequest();else if(command instanceof Catalog catalog)catalog.prepareKind();}
+        boolean managed=!help&&!version&&worker!=null&&worker.managed();ManagedOptions options=managed?worker.managedOptions():ManagedOptions.defaults();
+        ObjectNode request=StartupControl.JSON.createObjectNode().put("command",help?"help":version?"version":command instanceof Main?"root":leaf.commandSpec().name()).put("managed",managed).put("offline",common!=null&&common.offline).put("help",help||version).put("preparationMillis",options.preparationTimeout().toMillis()).put("startupMillis",options.startupTimeout().toMillis()).put("itemMillis",options.itemTimeout().toMillis());request.set("args",StartupControl.JSON.valueToTree(parsed.originalArgs()));return request;
     }
     @Command(name="doctor",description="管理環境または指定DockerのJava・Mesa・adapterを診断します。")
     static final class Doctor implements Callable<Integer> {
@@ -64,12 +82,14 @@ public final class Main implements Runnable {
         }
     }
     static class Common {
+        StartupControl startup;
         @Option(names="--cache",description="Input cache directory.") Path cache=Path.of(".mcicon-cache");
         @Option(names="--offline",description="Use verified cached inputs only.") boolean offline;
         @Option(names="--minecraft-dir",description="既存インストールの公式入力を検証してcacheへコピーする。") Path minecraft;
         @Option(names="--json",description="Write structured JSON to stdout.") boolean json;
         MCIconGenerator generator(CancellationToken token) {
-            return new MCIconGenerator(cache,offline,event->System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total()),token,minecraft);
+            StartupControl control=startup;if(control!=null)control.cancellation(token::cancel);
+            return new MCIconGenerator(cache,offline,event->{if(control!=null&&event.phase().equals("startup-ready"))control.ready();System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total());},token,minecraft);
         }
     }
     // The standard help mixin also defines --version, which conflicts with the
@@ -114,11 +134,12 @@ public final class Main implements Runnable {
         @Mixin WorkerArguments worker;
         @Option(names="--version",required=true) String version;
         @Option(names="--kind",defaultValue="all") String kind;
+        String validatedKind;
+        void prepareKind(){if(!Set.of("all","item","block").contains(kind))throw new McIconException("INVALID_KIND","Kind must be all, item, or block",2);validatedKind=kind;}
         public Integer call() throws Exception {
-            if(!Set.of("all","item","block").contains(kind))throw new McIconException("INVALID_KIND","Kind must be all, item, or block",2);
             boolean managed=worker.managed();
             try(MCIconGenerator generator=common.generator(new CancellationToken())) {
-                List<CatalogEntry> entries=(managed?generator.listEntriesManaged(version,worker.managedOptions()):generator.listEntries(version,worker.options())).join().stream().filter(e->kind.equals("all")||e.kind().equals(kind)).toList();
+                List<CatalogEntry> entries=(managed?generator.listEntriesManaged(version,worker.managedOptions()):generator.listEntries(version,worker.options())).join().stream().filter(e->validatedKind.equals("all")||e.kind().equals(validatedKind)).toList();
                 if(common.json)System.out.println(Json.MAPPER.writeValueAsString(entries));
                 else for(CatalogEntry entry:entries)System.out.println(entry.id()+"\t"+entry.kind()+"\t"+entry.status());
                 return 0;
@@ -142,11 +163,13 @@ public final class Main implements Runnable {
             @Option(names="--id") List<String> ids;
             @Option(names="--all") boolean all;
         }
-        public Integer call() throws Exception {
-            RenderRequest request;
-            try {request=new RenderRequest(version,selection.ids==null?List.of():selection.ids.stream().map(ResourceId::parse).toList(),selection.all,kind,size,output,overwrite,failFast,allow);}
+        RenderRequest prepared;
+        void prepareRequest() {
+            try {prepared=new RenderRequest(version,selection.ids==null?List.of():selection.ids.stream().map(ResourceId::parse).toList(),selection.all,kind,size,output,overwrite,failFast,allow);}
             catch(IllegalArgumentException e){throw new McIconException("INVALID_REQUEST",e.getMessage(),2);}
-            boolean managed=worker.managed();
+        }
+        public Integer call() throws Exception {
+            RenderRequest request=prepared;boolean managed=worker.managed();
             CancellationToken token=new CancellationToken();Thread hook=new Thread(token::cancel,"mcicon-cancel");Runtime.getRuntime().addShutdownHook(hook);
             try(MCIconGenerator generator=common.generator(token)) {
                 ExportResult result=(managed?generator.renderManaged(request,worker.managedOptions()):generator.render(request,worker.options())).join();

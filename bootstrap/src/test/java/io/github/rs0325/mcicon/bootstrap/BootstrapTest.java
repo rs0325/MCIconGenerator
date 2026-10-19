@@ -3,6 +3,7 @@ package io.github.rs0325.mcicon.bootstrap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.nio.file.*;
 import java.io.*;
 import java.time.*;
@@ -17,6 +18,43 @@ class BootstrapTest {
     JsonNode state() throws IOException {return Seed.json(Files.readAllBytes(root().resolve("active.json")));}
     Path slot() throws IOException {JsonNode active=state().get("active");return root().resolve("tools/"+active.path("toolVersion").asText()+"/"+active.path("payloadSha256").asText());}
     List<Path> receipts() throws IOException {try(var paths=Files.list(root().resolve("runs"))){return paths.toList();}}
+    @Test void actualCliParserRunUsesBundledSlotAndPreservesOfflineDiagnostics() throws Exception {
+        Fixture f=fixture();
+        actualCli(f);
+        f.publish();assertEquals(0,f.bootstrap(root()).launch(List.of("cache","status","--offline","--cache",directory.resolve("cache").toString(),"--json")));
+        assertEquals(1,f.bootstrap(root()).launch(List.of("doctor","--version","1.20.6","--offline","--cache",directory.resolve("doctor-cache").toString())));
+        assertEquals(2,receipts().size());for(Path receipt:receipts())assertEquals("finished",Seed.json(Files.readAllBytes(receipt)).path("state").asText());
+    }
+    private void actualCli(Fixture f) throws Exception {
+        for(String entry:System.getProperty("bootstrap.testClasspath").split(java.io.File.pathSeparator)){Path path=Path.of(entry);String name=path.getFileName().toString();if(Files.isRegularFile(path)&&name.matches("(?:cli|core|worker|picocli|jackson.*|commons.*|xz)-.*\\.jar"))f.files.put("app/lib/"+name,Files.readAllBytes(path));}
+    }
+    @Test void actualParserSwitchExitsBeforeManagedPreparationAndIsReaped() throws Exception {
+        Fixture f=fixture();actualCli(f);f.publish();f.bootstrap(root()).repair();Path cache=directory.resolve("must-not-prepare");List<String> args=List.of("list","--version","1.20.6","--cache",cache.toString());
+        try(java.net.ServerSocket server=new java.net.ServerSocket(0,1,java.net.InetAddress.getByName("127.0.0.1"))) {
+            ObjectNode context=Seed.JSON.createObjectNode().put("protocol",2).put("port",server.getLocalPort()).put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString());context.set("slot",state().get("active"));String property="-Dmcicon.bootstrap.control="+Base64.getUrlEncoder().withoutPadding().encodeToString(Seed.JSON.writeValueAsBytes(context));
+            List<String> command=new ArrayList<>(List.of(slot().resolve("java/bin/java").toString(),property,"-cp",slot().resolve("app/lib/*").toString(),"io.github.rs0325.mcicon.cli.Main"));command.addAll(args);Process child=new ProcessBuilder(command).redirectOutput(directory.resolve("switch.stdout").toFile()).redirectError(directory.resolve("switch.stderr").toFile()).start();
+            try {
+                server.setSoTimeout(3000);try(java.net.Socket socket=server.accept()){JsonNode request=StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(3));assertEquals("list",request.path("command").asText());assertTrue(request.path("managed").asBoolean());assertFalse(request.path("offline").asBoolean());assertEquals(Seed.JSON.valueToTree(args),request.get("args"));assertEquals(context.get("slot"),request.get("slot"));StartupControl.write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type","SWITCH"));}
+                assertTrue(child.waitFor(3,TimeUnit.SECONDS));assertEquals(0,child.exitValue());assertFalse(Files.exists(cache));assertEquals("",Files.readString(directory.resolve("switch.stdout")));assertEquals("",Files.readString(directory.resolve("switch.stderr")));
+            }finally{if(child.isAlive()){child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}}
+        }
+    }
+    @Test void invalidPureArgumentsCannotSendRequestOrBecomeSuccessfulSwitch() throws Exception {
+        Fixture f=fixture();actualCli(f);f.publish();f.bootstrap(root()).repair();int index=0;
+        for(List<String> invalid:List.of(List.of("render","--version","1.20.6","--id","stone","--size","63"),List.of("render","--version","1.20.6","--id","../stone"),List.of("list","--version","1.20.6","--kind","bad"))) {
+            int trial=index++;Path cache=directory.resolve("bad-cache-"+trial),out=directory.resolve("bad-output-"+trial);List<String> args=new ArrayList<>(invalid);args.addAll(List.of("--cache",cache.toString()));if(args.getFirst().equals("render"))args.addAll(List.of("--out",out.toString()));
+            try(java.net.ServerSocket server=new java.net.ServerSocket(0,1,java.net.InetAddress.getByName("127.0.0.1"))) {
+                server.setSoTimeout(800);ObjectNode context=Seed.JSON.createObjectNode().put("protocol",2).put("port",server.getLocalPort()).put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString());context.set("slot",state().get("active"));String property="-Dmcicon.bootstrap.control="+Base64.getUrlEncoder().withoutPadding().encodeToString(Seed.JSON.writeValueAsBytes(context));
+                ExecutorService listener=Executors.newSingleThreadExecutor();var request=listener.submit(()->{try(java.net.Socket socket=server.accept()){StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(2));StartupControl.write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type","SWITCH"));return true;}catch(java.net.SocketTimeoutException absent){return false;}});
+                List<String> command=new ArrayList<>(List.of(slot().resolve("java/bin/java").toString(),property,"-cp",slot().resolve("app/lib/*").toString(),"io.github.rs0325.mcicon.cli.Main"));command.addAll(args);Process child=new ProcessBuilder(command).redirectOutput(directory.resolve("bad-"+trial+".stdout").toFile()).redirectError(directory.resolve("bad-"+trial+".stderr").toFile()).start();
+                try{assertTrue(child.waitFor(3,TimeUnit.SECONDS));assertEquals(2,child.exitValue());assertFalse(request.get(2,TimeUnit.SECONDS));assertFalse(Files.exists(cache));assertFalse(Files.exists(out));assertTrue(Files.readString(directory.resolve("bad-"+trial+".stderr")).startsWith(args.getFirst().equals("render")?"INVALID_REQUEST:":"INVALID_KIND:"));}
+                finally{if(child.isAlive()){child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}listener.shutdownNow();assertTrue(listener.awaitTermination(2,TimeUnit.SECONDS));}
+            }
+        }
+    }
+    @Test void oldProtocolCannotReachCommandSideEffects() throws Exception {
+        Fixture f=fixture();f.manifest.put("minimumBootstrapProtocol",1);f.writeManifest();Path marker=directory.resolve("must-not-exist");assertThrows(IOException.class,()->f.bootstrap(root()).launch(List.of("block",marker.toString())));assertFalse(Files.exists(marker));
+    }
     @Test void savedManifestUsesVerifiedBytesAfterPackageReplacement() throws Exception {
         Fixture f=fixture();Seed accepted=f.seed();byte[] original=Files.readAllBytes(f.installed.resolve("seed/stable.json")),signature=Files.readAllBytes(f.installed.resolve("seed/stable.json.sig"));
         f.manifest.put("sequence",2);f.writeManifest();Bootstrap bootstrap=f.bootstrap(root());bootstrap.directory(root());bootstrap.directory(root().resolve("staging"));bootstrap.directory(root().resolve("manifests"));bootstrap.saveManifest(accepted);

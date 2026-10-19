@@ -38,7 +38,7 @@ nonpurge uninstallはpackage所有fileだけを除去し、user root、runtime c
 
 ## ローカル検証と未受入
 
-`./gradlew --offline :bootstrap:test :bootstrap:build`で、署名/ZIPの拒否、同時初回、cachelost、同一seed repair、親死・割込み、保持receiptを直接fixtureで確認する。fixtureは既公開テストvectorを使用し、本番trustではない。
+`./gradlew --offline :bootstrap:test :bootstrap:build`で、署名/ZIPの拒否、同時初回、cachelost、同一seed repair、親死・割込み、保持receiptを直接fixtureで確認する。fixtureは実行時だけの一時Ed25519 KeyPairをJVMメモリ内で使用する。秘密鍵は保存・表示・外部送信せず、公開鍵と署名済みQA入力だけを保存する。本番trustには採用しない。
 
 Mac app-image候補は既存JDK 21と明示seed/public trustで作る。
 
@@ -48,6 +48,8 @@ Mac app-image候補は既存JDK 21と明示seed/public trustで作る。
   -PbootstrapTrustKey=/absolute/trust.der :bootstrap:appImage
 ```
 
-既存出力を上書きせず、jlink runtimeとapp-imageを生成し、通常codesign verifyとfile inventoryを残す。生成のための秘密鍵や新規署名鍵は作らない。`build/install/mcicon`の通常Java launcherをJava無しhost向け配布物とは扱わない。
+既存出力を上書きせず、jlink runtimeとapp-imageを生成し、通常codesign verifyとfile inventoryを残す。packagerは署名鍵を生成せず、明示された公開trustと署名済みseedだけを受け取る。`build/install/mcicon`の通常Java launcherをJava無しhost向け配布物とは扱わない。
 
 正式配布seed/trust、無Java実host、Developer ID/notarization、installer/Homebrew/winget、OS下限、実helper/描画、#98の更新/rollback/GCは未受入である。#98はこの初期slot/pin契約を前提とし、health切替の具体仕様は別成果で確定する。
+
+#98の先行接続ではpackage/署名seedのbootstrap制御をprotocol 2へ更新した。旧protocol 1の開発用seed/rootは新しいQA世代として再生成し、自動移行しない。worker/helperのprotocol 1は維持する。[起動controlの範囲と未実装部分](startup-control.md)を参照。
