@@ -1,6 +1,6 @@
 """検証済payloadとJava21から、linkの無い自己完結app-imageを生成する。"""
 from pathlib import Path
-import argparse,subprocess,json,hashlib,shutil,os,struct,plistlib
+import argparse,subprocess,json,hashlib,shutil,os,struct,plistlib,zipfile
 if not __debug__:raise RuntimeError("検証を省略するPython最適化設定は使用できません")
 p=argparse.ArgumentParser();p.add_argument('--jdk',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--payload',type=Path,required=True);p.add_argument('--native',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 assert not a.output.exists(),'既存app-imageは上書きしない';a.output.mkdir(parents=True);work=a.output/'staging';work.mkdir();runtime=work/'runtime';inputs=work/'input';inputs.mkdir()
@@ -13,6 +13,17 @@ support=inputs/'support';support.mkdir();shutil.copy2(a.payload/'payload.json',s
 for row in manifest['files']:
  target=support/row['path'];target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(a.payload/row['path'],target);target.chmod(0o755 if row['executable'] else 0o644)
 for jar in a.input.glob('*.jar'):shutil.copyfile(jar,inputs/jar.name)
+license_dir=support/'licenses';(license_dir/'mcicon').mkdir(parents=True)
+shutil.copyfile(Path(__file__).resolve().parents[3]/'LICENSE',license_dir/'mcicon/LICENSE')
+jar_documents={
+ 'jackson-annotations-2.22.jar':['META-INF/LICENSE','META-INF/NOTICE'],
+ 'jackson-core-2.22.3.jar':['META-INF/LICENSE','META-INF/NOTICE','META-INF/FastDoubleParser-LICENSE','META-INF/FastDoubleParser-ThirdParty-LICENSE','META-INF/Schubfach-LICENSE'],
+ 'jackson-databind-2.22.3.jar':['META-INF/LICENSE','META-INF/NOTICE']}
+for name,documents in jar_documents.items():
+ with zipfile.ZipFile(inputs/name) as jar:
+  for entry in documents:
+   matches=[item for item in jar.infolist() if item.filename==entry];assert len(matches)==1 and not matches[0].is_dir() and matches[0].file_size<1048576,'Jackson文書が不足/重複しています'
+   target=license_dir/'jackson'/name.removesuffix('.jar')/entry;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(jar.read(matches[0]));target.chmod(0o644)
 main=list(inputs.glob('helper-macos-*.jar'));assert len(main)==1,'helper-macos JARが一意でない'
 run(['/usr/bin/clang','-std=c17','-O2','-Wall','-Wextra','-Werror',a.native/'process-guard.c','-o',support/'process-guard'])
 run(['/usr/bin/swiftc','-O','-module-cache-path',work/'swift-cache','-target','arm64-apple-macosx13.0',a.native/'host-probe.swift','-o',support/'host-probe'])
