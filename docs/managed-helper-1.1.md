@@ -41,7 +41,34 @@ Macはstarting/ready/releasingの閉objectとする。readyには世代owner、i
 
 Windowsはimporting/ready/releasingの閉objectとする。distributionの名前/BasePathだけは生成前の意図、GUID/marker hashを持つものが登録済record。readyでは登録済情報とsocket/guest job pathを必須にする。意図やregistry差分が不明なdistributionを取り込まない。releasingでも削除にはready相当の実registry GUID/BasePath、host記録、guest markerの一致を必要とし、phase名だけで削除しない。transportはidだけの意図とPID/processStartedAtを伴う実体を区別し、containerのtransport IDを照合する。Job HANDLEは永続保存しない。
 
-containerのnameは作成意図であり、実生成後は完全IDと実inspect上のjob/owner/descriptor labelを照合する。label/imageの期待値はlease/descriptorから得て冗長保存しない。create→recordの窓は意図/CIDと所有labelで照合し、名前prefixだけで削除しない。Linux rootlessは方式未採用なので成功resources branchを定義せず拒否する。
+containerのnameは作成意図であり、実生成後は完全IDと実inspect上のjob/owner/descriptor labelを照合する。label/imageの期待値はlease/descriptorから得て冗長保存しない。create→recordの窓は意図/CIDと所有labelで照合し、名前prefixだけで削除しない。Linuxは以下のrootless候補方式の閉recordを使用する。recordの保存成功は実OSの所有や停止権限を証明しない。
+
+## Linux rootlessの所有record
+
+専用rootless Dockerとsystemd user unitを#96の実装候補とし、最初の受入候補をUbuntu 24.04/systemd/cgroup v2/x86_64 nativeとする。arm64 Linux guest＋Rosettaの方式実証は限定成功であり、正式OS範囲・最低版・物理Linux/amd64受入・製品helper実装の完了を示さない。固定amd64配布物・必要source/license/trustと実受入はrelease gateとして残す。
+
+`resources.linux` は次の閉objectとする。公開API・protocol 1・lease identity/receipt・CAS/lockは変更しない。未リリースの旧Linux形式への移行・省略fallbackは追加せず、未知branch/fieldを拒否する。
+
+| field | 保存する識別と必須条件 |
+| --- | --- |
+| phase / generationOwner / runtimeDir | starting/ready/releasing、世代UUID、正規化済みの絶対専用directory。全phaseで必須 |
+| hostBootId / uid / containers | Linux boot_id UUID、非rootの実UID、container意図/実体の配列。全phaseで必須 |
+| userUnit | name/path/sha256を持つ作成意図。nameは `mcicon-rootless-<generationOwner>.service`、pathの末尾も同名。readyでは実ControlGroupを必須とし、対象UIDのuser@UID.service配下かつ末尾が同unit名であることを検査 |
+| rootlesskit / dockerd | 実host PIDと/procのstartTicksの組。数値は64bit整数のまま保持し、PIDだけや異なるprocessの同一PIDを拒否。readyで両方必須 |
+| userNamespace | 実user namespaceのid、uid_map/gid_map元bytesのSHA-256。readyで必須 |
+| dockerSocket | path/dev/ino/uid。readyで必須、socket UIDはrecordの実UIDと一致。専用親directory0700と実socket型/ownerはOS側が確認 |
+
+Linux絶対pathは空segment・`.`・`..`・NUL・末尾slashを拒否する。unit/socket/世代rootはそれぞれ実path、専用marker/owner、期待body/modeをOS helperが確認し、他ユーザー設定や既存daemonの記録を取り込まない。UID501、GID1000、実証時の巨大subid rangeは製品の固定値にしない。
+
+containerはnameだけの作成意図と、name/id/startedAtを持つ実体を区別する。idとstartedAtは一方だけを保存できず、名前/IDの重複を拒否する。実体は完全IDとinspectのStartedAtで再照合し、job/owner/descriptor label・imageの期待値をlease/descriptorから得る。名前prefixやphaseだけでrmを許可しない。create/start/recordの窓では意図/CIDと実inspectを結合し、StartedAtの変化を無条件に上書きしない。
+
+starting/releasingはunitのcontrolGroupや実process/namespace/socketがない部分記録を保存できる。readyは全実identityを必要とするが、**readyの必須fieldやhashが揃ったことだけでは停止を許可しない**。OS helperはhost boot/UID、世代marker、unit file/実ControlGroup、両processのUID/PID/startTicks、namespace/maps、socketを実体と照合する。daemonとrootlesskitの初回identityをmap/namespace/socketの読取より前に採り、各読取後に同じPID/startTicks/UIDとnamespace、unit MainPID/ControlGroupを再確認してからready保存や回収へ進む。採取後に初めて開始識別を取る順序ではPID再利用の窓が残るため不可とする。
+
+停止時も同じ実測をやり直し、全他leaseの不在確認からunit停止まで専用lifecycle lockを保持する。欠落・再利用・別boot・未知/破損lease・unit/socket不一致では状態を保持して失敗し、partial recordを停止可能へ補完しない。release失敗時のactive保持と、coreだけがreleasedへ変更する契約は共通のままである。共通validatorは実OSを操作せず、#96がこの実測・停止・有限子孫回収を実装し受入する。
+
+OS前提不足はsetup-requiredで必要操作を示す。helperからsudo、OS依存導入、user manager全体restart、AppArmor/sysctl変更、rootful fallbackを自動実行しない。許可された実証初回のOS準備を製品の既定動作へ流用しない。
+
+固定fixtureは `schemas/managed-helper-linux-v1.examples.json` でJavaの直接validator/CAS試験とJSON schema試験を共有する。schemaは型/閉field/ready必須情報を検査し、UID/unit/cgroupの対応、process重複、container ID/名前の一意性は共通validatorでも意味検査する。これらのfixture成功をLinux実OSの所有・回収受入に数えない。
 
 ## transportと残件
 
