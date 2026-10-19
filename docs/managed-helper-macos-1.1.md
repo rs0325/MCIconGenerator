@@ -12,7 +12,7 @@ Java 21の共通helperをjlink/JREとjpackage native launcherへまとめる。h
 
 jpackageの既定ad-hoc署名は同梱Mach-Oの署名とentitlementsを除去するため、生成後に公式limactlの元bytesを復元する。outer appだけを非deepのad-hoc sealで整合し、内側limactlを再署名しない。元SHAとnetwork/client・server・virtualization entitlementsの完全一致、元manifestの全payload一致、inner strict/outer deep strictを生成時に確認する。アプリ本体へのVZ entitlement追加、Developer ID、ユーザー鍵・production鍵は使わない。
 
-Lima公式Darwin-arm64 archiveは38,328,082 bytes、SHA-256 `9e9eacce88f37e185c346bad73aa6136f738d8cdf8c3bb23cd42b071824bc66e`。同archiveにLinux-aarch64 guestagent.gzが含まれるため、固定guest構成のために別arch追加guestagent archiveを取得しない。固定YAMLではVZ/aarch64、containerd自動導入無効、default dependency解決無効、固定offline debだけを使う。`prepare-payload.py`は取得済みbytesを検証して別出力に準備し、導入やVM操作を行わない。debの配置basenameは`runc.deb` / `containerd.deb` / `docker.io.deb`に固定し、元版を含むfilename・公式snapshot URLはmanifestに保持する。これにより版の`~`を共通host archiveの相対pathへ持ち込まない。
+Lima公式Darwin-arm64 archiveは38,328,082 bytes、SHA-256 `9e9eacce88f37e185c346bad73aa6136f738d8cdf8c3bb23cd42b071824bc66e`。同archiveにLinux-aarch64 guestagent.gzが含まれるため、固定guest構成のために別arch追加guestagent archiveを取得しない。固定YAMLではVZ/aarch64、containerd自動導入無効、default dependency解決無効、固定offline debだけを使う。`prepare-payload.py`は取得済みbytesを検証して別出力に準備し、導入やVM操作を行わない。 固定3debの原copyrightは`--deb-copyrights <package名/copyrightを持つdirectory>`で渡し、対応版のsize/SHAを照合して`share/doc/ubuntu/<package名>/copyright`へ無改変で配置する。参照するfull license/NOTICEは別配布のsource/notice bundleとinventoryへ結合し、このcopyだけで個別条件の完了とは扱わない。debの配置basenameは`runc.deb` / `containerd.deb` / `docker.io.deb`に固定し、元版を含むfilename・公式snapshot URLはmanifestに保持する。これにより版の`~`を共通host archiveの相対pathへ持ち込まない。
 
 Ubuntu baseはcloud releaseの同一署名SUMSがqcow2とmanifestを結ぶ。Ubuntu snapshotは`20261017T000000Z`、noble/noble-updates/noble-securityのarm64を固定する。採用候補はdocker.io `29.1.3-0ubuntu3~24.04.2`、containerd `2.2.1-0ubuntu1~24.04.3`、runc `1.3.4-0ubuntu1~24.04.1`。署名索引・実deb/control/source bodyの照合証拠は私用保全資料にあるが、固定3debのoffline dpkgは第1段で成功した。kernel/base全体とLima同梱依存/JRE/rendererのlicense/source網羅監査は未完了である。
 
@@ -82,3 +82,7 @@ python3 helpers/macos/scripts/build-inventory.py \
 生成先の`inventory.json`を`inventoryPath`のclasspath resourceへ置き、`artifact-fragment.json`を同版worker/hash・helper protocolとともに共通発行側でdescriptorへ組み込む。source/notice bundleは配布資料への参照であり、runtimeに新roleやsourceの自動downloadを追加しない。最終helper bytesが未確定の候補を、flagや仮URLだけで正式成果へ昇格させない。実URL、正式trust/署名、core/payload同梱、#97/#98との実配布接続は別工程である。
 
 生成/拒否の合成条件は、`python3 helpers/macos/scripts/verify-inventory.py --output <未使用のfixture保存先>`で確認する。実artifact・VM・公開URL・署名を使わず、fixture URLを正式発行へ流用しない。
+
+配布app-image生成では`package-helper.py --app-version <release版>`を明示し、JAR artifact版・descriptor tool版・CFBundleVersion/CFBundleShortVersionStringを個別に確認する。省略時のjpackage既定版を正式版へ読み替えない。
+
+`appImage` taskも`project.version`を`--app-version`へ渡します。リリース候補ではrootの`-PreleaseVersion=1.1.0`により表示版とJAR artifact版を揃え、生成後のCFBundle値は別途照合します。
