@@ -31,6 +31,11 @@ for name,version,size,sha in packages:
  filename=f'{name}_{version}_arm64.deb';target=a.output/'offline/debs'/f'{name}.deb';target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(a.debs/filename,target);target.chmod(0o644)
  debs.append({'package':name,'version':version,'architecture':'arm64','path':target.relative_to(a.output).as_posix(),'sourceFilename':filename,'sourceUrl':'https://snapshot.ubuntu.com/ubuntu/20261017T000000Z/'+{'runc':'pool/main/r/runc-app/','containerd':'pool/main/c/containerd-app/','docker.io':'pool/universe/d/docker.io-app/'}[name]+filename})
 sources=a.output/'sources';sources.mkdir();shutil.copyfile(a.lima_source,sources/'lima-v2.2.1.tar.gz')
+with tarfile.open(a.lima_source,'r:gz') as archive:
+ member=archive.getmember('lima-2.2.1/NOTICE');assert member.isfile() and not member.linkname and member.size<1048576
+ notice_file=a.output/'share/doc/lima/NOTICE'
+ with archive.extractfile(member) as source,notice_file.open('xb') as output:shutil.copyfileobj(source,output)
+ notice_file.chmod(0o644)
 notice={'lima':{'version':'2.2.1','url':'https://github.com/lima-vm/lima/releases/download/v2.2.1/lima-2.2.1-Darwin-arm64.tar.gz','sha256':digest(a.lima),'license':'share/doc/lima/LICENSE','sourceUrl':'https://github.com/lima-vm/lima/archive/refs/tags/v2.2.1.tar.gz','sourceArchive':'sources/lima-v2.2.1.tar.gz','sourceSha256':digest(a.lima_source)},'ubuntuSnapshot':'https://snapshot.ubuntu.com/ubuntu/20261017T000000Z/','limits':['deb署名済索引の直接照合・source対応は別の保全済み証拠を参照','全guest/kernel/JRE/rendererのlicense/source完了を示さない','実offline dpkg・VM起動・Intel/OS下限は未検証','Lima同梱依存ライセンスの網羅監査は未完了']}
 (a.output/'NOTICE.json').write_text(json.dumps(notice,ensure_ascii=False,indent=2)+'\n')
 files=[]
