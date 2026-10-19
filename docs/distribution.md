@@ -59,6 +59,14 @@ WindowsではCLIパスを`bin\mcicon.bat`へ変え、Docker contextを利用環�
 
 初回成功後は同じcacheへ`--offline`を付けられます。全件はID指定の代わりに`--all`を使用します。[利用ガイド](usage.md)に単品・全件・raw・exit code・途中取消・再開、[出力契約](contracts.md)にmanifestを説明しています。Docker imageやworker hashが変わった場合は新規出力先で再生成してください。previewなど旧描画条件のicons manifestは、正式版候補の`canonical-v1`とsettingsDigestが一致しないため、同じ出力先への再開はできません。新規出力先、または明示した`--overwrite`で再生成してください。元テクスチャのbytesは変わりません。
 
+## 1.1.0開発版のCLI接続
+
+`doctor`・`list`・`render`は管理方式が既定です。`--runtime managed`でも明示できます。管理方式は同版coreの固定descriptorとhelperを使い、Docker環境へ黙って切り替えません。本番pin・信頼鍵・runtime配布物は未発行のため、現段階では管理準備成功を保証せず、不足・未対応を明確に拒否します。Java同梱bootstrapper・installer・更新の実装完了を示すものではありません。
+
+従来の`--docker-context`・`--docker-image`・`--worker-jar`・`--java-home`を一つでも明示した場合、値が既定値と同じでもDocker方式を選びます。`--runtime docker`なら旧既定context/imageも使えます。`--runtime managed`と旧Docker指定の併用、不正なmodeはexit 2です。`--java-home`は引き続きDocker image内のJavaを指し、ホストJREの選択には使いません。
+
+`--startup-timeout`・`--item-timeout`・`--memory-mib`・`--heap-mib`は両方式へ反映します。`--cache`は公式入力cacheのままで、管理runtimeのrootではありません。管理root・準備期限は`ManagedOptions.defaults()`のOS標準値を使います。`extract`・`versions`・`cache`は従来経路を保ち、管理環境やworker JARの準備を追加しません。
+
 ## Javaライブラリを使う
 
 Maven形式ZIPを展開すると`mcicon-library-<version>/maven`がローカルrepositoryになります。Maven Centralへの公開は行っていません。coreの依存JacksonはMaven Centralから通常どおり解決するため、利用者の最初のbuildではネットワーク接続が必要です。CLIを展開した`lib`には実行用依存JARも含まれます。
