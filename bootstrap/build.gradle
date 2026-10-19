@@ -1,0 +1,30 @@
+plugins { id 'application' }
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
+    implementation 'org.apache.commons:commons-compress:1.28.0'
+}
+application {
+    mainClass = 'io.github.rs0325.mcicon.bootstrap.Main'
+    applicationName = 'mcicon'
+}
+tasks.named('test') {
+    systemProperty 'bootstrap.testClasspath', sourceSets.test.runtimeClasspath.asPath
+}
+tasks.register('appImage', Exec) {
+    dependsOn 'installDist'
+    def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    doFirst {
+        for (String property : ['bootstrapSeedDir', 'bootstrapTrustKey']) {
+            if (!providers.gradleProperty(property).isPresent()) {
+                throw new GradleException("明示した検証対象入力を-P${property}で指定してください")
+            }
+        }
+        commandLine 'python3', file('scripts/package-bootstrap.py'),
+                '--jdk', launcher.get().metadata.installationPath.asFile,
+                '--input', new File(tasks.named('installDist').get().destinationDir, 'lib'),
+                '--seed', file(providers.gradleProperty('bootstrapSeedDir').get()),
+                '--trust', file(providers.gradleProperty('bootstrapTrustKey').get()),
+                '--version', project.version.toString(), '--owner', 'archive',
+                '--output', layout.buildDirectory.dir('app-image').get().asFile
+    }
+}
