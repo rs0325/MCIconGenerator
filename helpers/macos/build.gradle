@@ -23,6 +23,7 @@ tasks.register('appImage', Exec) {
                 '--jdk', launcher.get().metadata.installationPath.asFile,
                 '--input', layout.buildDirectory.dir('install/helper-macos/lib').get().asFile,
                 '--payload', file(providers.gradleProperty('macosPayloadDir').get()),
+                '--app-version', project.version.toString(),
                 '--native', file('src/main/native'), '--output', layout.buildDirectory.dir('app-image').get().asFile
     }
 }

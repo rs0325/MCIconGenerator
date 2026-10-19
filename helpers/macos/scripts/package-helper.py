@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse,subprocess,json,hashlib,shutil,os,struct,plistlib,zipfile
 if not __debug__:raise RuntimeError("検証を省略するPython最適化設定は使用できません")
-p=argparse.ArgumentParser();p.add_argument('--jdk',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--payload',type=Path,required=True);p.add_argument('--native',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--jdk',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--payload',type=Path,required=True);p.add_argument('--native',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--app-version',required=True);a=p.parse_args()
 assert not a.output.exists(),'既存app-imageは上書きしない';a.output.mkdir(parents=True);work=a.output/'staging';work.mkdir();runtime=work/'runtime';inputs=work/'input';inputs.mkdir()
 def run(args,timeout=90):subprocess.run([str(x) for x in args],check=True,timeout=timeout)
 manifest=json.loads((a.payload/'payload.json').read_text());assert manifest['schemaVersion']==1 and manifest['limaVersion']=='2.2.1';names=[]
@@ -49,7 +49,7 @@ for link in sorted(runtime.rglob('*')):
   target=link.resolve(strict=True);relative=link.relative_to(runtime);assert relative.parts[0]=='legal' and target.is_relative_to(runtime.resolve()) and target.is_file() and not target.is_symlink(),'未知/外向きruntime link';data=target.read_bytes();links.append({'path':relative.as_posix(),'target':os.readlink(link),'sha256':hashlib.sha256(data).hexdigest()});link.unlink();link.write_bytes(data);link.chmod(0o644)
 # jpackageが除去する公式limactlの署名を戻し、outer sealだけを整える。
 origin=(a.payload/'payload.json').read_bytes()
-run([a.jdk/'bin/jpackage','--type','app-image','--name','MCIconHelper','--input',inputs,'--main-jar',main[0].name,'--main-class','io.github.rs0325.mcicon.helper.macos.Main','--runtime-image',runtime,'--dest',a.output/'image'])
+run([a.jdk/'bin/jpackage','--type','app-image','--name','MCIconHelper','--app-version',a.app_version,'--input',inputs,'--main-jar',main[0].name,'--main-class','io.github.rs0325.mcicon.helper.macos.Main','--runtime-image',runtime,'--dest',a.output/'image'])
 app=a.output/'image/MCIconHelper.app';signing=[]
 for row in manifest['files']:
  file=app/'Contents/app/support'/row['path'];data=file.read_bytes();digest=hashlib.sha256(data).hexdigest()
