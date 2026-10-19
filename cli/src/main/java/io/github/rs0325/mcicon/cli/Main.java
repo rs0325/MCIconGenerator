@@ -33,15 +33,16 @@ public final class Main implements Runnable {
             line.getErr().flush();return exit;
         });
     }
-    @Command(name="doctor",description="Check the local Docker image, JVM, Mesa, and adapter.")
+    @Command(name="doctor",description="管理環境または指定DockerのJava・Mesa・adapterを診断します。")
     static final class Doctor implements Callable<Integer> {
         @Mixin Common common;
         @Mixin ReleaseHelp help;
         @Mixin WorkerArguments worker;
         @Option(names="--version",required=true) String version;
         public Integer call() throws Exception {
+            boolean managed=worker.managed();
             try(MCIconGenerator generator=common.generator(new CancellationToken())) {
-                DiagnosticReport report=generator.doctor(version,worker.options()).join();
+                DiagnosticReport report=(managed?generator.doctorManaged(version,worker.managedOptions()):generator.doctor(version,worker.options())).join();
                 if(common.json)System.out.println(Json.MAPPER.writeValueAsString(report));
                 else for(var check:report.checks())System.out.println((check.passed()?"PASS":"FAIL")+"\t"+check.name()+"\t"+check.detail());
                 return report.healthy()?0:1;
@@ -77,6 +78,8 @@ public final class Main implements Runnable {
         @Option(names={"-h","--help"},usageHelp=true,description="Show this help message and exit.") boolean help;
     }
     static class WorkerArguments {
+        @Spec Model.CommandSpec spec;
+        @Option(names="--runtime",description="実行方式: managed または docker。既定はmanaged、旧Docker指定があればdocker。") String runtime;
         @Option(names="--worker-jar",description="Rendering agent JAR.") Path agent;
         @Option(names="--docker-context",defaultValue="colima-mcicon") String context;
         @Option(names="--docker-image",defaultValue="mcicon-render:dev") String image;
@@ -85,6 +88,16 @@ public final class Main implements Runnable {
         @Option(names="--java-home",description="Docker image内のJavaディレクトリ。ホストのJavaは使用しない。") String javaHome;
         @Option(names="--memory-mib",defaultValue="3072",description="ゲームworkerのcontainerメモリ上限（正のMiB整数）。") int memory;
         @Option(names="--heap-mib",defaultValue="2048",description="ゲームworkerのJava heap上限（正のMiB整数、container未満）。") int heap;
+        boolean managed() {
+            if(runtime!=null&&!Set.of("managed","docker").contains(runtime))throw new IllegalArgumentException("--runtimeはmanagedまたはdockerを指定してください");
+            boolean docker=List.of("--docker-context","--docker-image","--worker-jar","--java-home").stream().anyMatch(spec.commandLine().getParseResult()::hasMatchedOption);
+            if("managed".equals(runtime)&&docker)throw new IllegalArgumentException("--runtime managedと旧Docker指定は併用できません");
+            return !"docker".equals(runtime)&&!docker;
+        }
+        ManagedOptions managedOptions() {
+            ManagedOptions defaults=ManagedOptions.defaults();
+            return new ManagedOptions(defaults.runtimeRoot(),defaults.preparationTimeout(),Duration.ofSeconds(startup),Duration.ofSeconds(timeout),memory,heap);
+        }
         WorkerOptions options() throws Exception {
             Path path=agent;
             if(path==null) {
@@ -103,8 +116,9 @@ public final class Main implements Runnable {
         @Option(names="--kind",defaultValue="all") String kind;
         public Integer call() throws Exception {
             if(!Set.of("all","item","block").contains(kind))throw new McIconException("INVALID_KIND","Kind must be all, item, or block",2);
+            boolean managed=worker.managed();
             try(MCIconGenerator generator=common.generator(new CancellationToken())) {
-                List<CatalogEntry> entries=generator.listEntries(version,worker.options()).join().stream().filter(e->kind.equals("all")||e.kind().equals(kind)).toList();
+                List<CatalogEntry> entries=(managed?generator.listEntriesManaged(version,worker.managedOptions()):generator.listEntries(version,worker.options())).join().stream().filter(e->kind.equals("all")||e.kind().equals(kind)).toList();
                 if(common.json)System.out.println(Json.MAPPER.writeValueAsString(entries));
                 else for(CatalogEntry entry:entries)System.out.println(entry.id()+"\t"+entry.kind()+"\t"+entry.status());
                 return 0;
@@ -132,9 +146,10 @@ public final class Main implements Runnable {
             RenderRequest request;
             try {request=new RenderRequest(version,selection.ids==null?List.of():selection.ids.stream().map(ResourceId::parse).toList(),selection.all,kind,size,output,overwrite,failFast,allow);}
             catch(IllegalArgumentException e){throw new McIconException("INVALID_REQUEST",e.getMessage(),2);}
+            boolean managed=worker.managed();
             CancellationToken token=new CancellationToken();Thread hook=new Thread(token::cancel,"mcicon-cancel");Runtime.getRuntime().addShutdownHook(hook);
             try(MCIconGenerator generator=common.generator(token)) {
-                ExportResult result=generator.render(request,worker.options()).join();
+                ExportResult result=(managed?generator.renderManaged(request,worker.managedOptions()):generator.render(request,worker.options())).join();
                 if(common.json)System.out.println(Json.MAPPER.writeValueAsString(result));
                 else System.out.printf("%s: %d succeeded, %d failed; manifest: %s%n",result.version(),result.succeeded(),result.failed(),result.manifest());
                 return result.exitCode();
