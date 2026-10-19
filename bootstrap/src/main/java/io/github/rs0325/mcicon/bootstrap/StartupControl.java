@@ -22,15 +22,26 @@ final class StartupControl implements AutoCloseable {
     String property() throws IOException {return "-D"+PROPERTY+"="+Base64.getUrlEncoder().withoutPadding().encodeToString(Seed.JSON.writeValueAsBytes(context));}
     JsonNode request(Process child) throws IOException {return request(child,Duration.ofSeconds(30));}
     JsonNode request(Process child,Duration timeout) throws IOException {
+        try(Session session=accept(child,timeout)){if(session==null)return null;session.send("RUN");return session.request;}
+    }
+    final class Session implements AutoCloseable {
+        final Socket socket;
+        final JsonNode request;
+        final long deadline;
+        Session(Socket socket,JsonNode request,long deadline){this.socket=socket;this.request=request;this.deadline=deadline;}
+        void send(String type) throws IOException {write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type",type),deadline);}
+        void ready(long end) throws IOException {JsonNode value=read(socket,end);Seed.fields(value,"protocol","type");Seed.constant(value,"protocol",2);Seed.exact(value,"type","READY");}
+        void go(long end) throws IOException {write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type","GO"),Math.min(end,System.nanoTime()+TimeUnit.SECONDS.toNanos(30)));}
+        @Override public void close() throws IOException {socket.close();}
+    }
+    Session accept(Process child,Duration timeout) throws IOException {
         long deadline=System.nanoTime()+timeout.toNanos();Socket accepted=null;
         while(accepted==null) {
             remaining(deadline);listener.setSoTimeout((int)Math.min(100,remaining(deadline)));
-            try{accepted=listener.accept();}catch(SocketTimeoutException pending){if(!child.isAlive()) {if(child.exitValue()==2)return null;throw Seed.invalid("REQUEST前にCLIが終了しました");}}
+            try{accepted=listener.accept();}catch(SocketTimeoutException pending){if(!child.isAlive()){if(child.exitValue()==2)return null;throw Seed.invalid("REQUEST前にCLIが終了しました");}}
         }
-        try(Socket socket=accepted) {
-            JsonNode request=read(socket,deadline);validate(request,child);
-            write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type","RUN"),deadline);return request;
-        }
+        try {JsonNode request=read(accepted,deadline);validate(request,child);return new Session(accepted,request,deadline);}
+        catch(IOException failure){try{accepted.close();}catch(IOException cleanup){failure.addSuppressed(cleanup);}throw failure;}
     }
     void validate(JsonNode value,Process child) throws IOException {
         Seed.fields(value,"protocol","type","nonce","invocation","slot","pid","startedAt","args","command","managed","offline","help","preparationMillis","startupMillis","itemMillis");Seed.constant(value,"protocol",2);Seed.exact(value,"type","REQUEST");

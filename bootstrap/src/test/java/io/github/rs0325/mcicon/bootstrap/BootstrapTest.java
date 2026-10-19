@@ -74,6 +74,19 @@ class BootstrapTest {
             }finally{if(child.isAlive()){child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}}
         }
     }
+    @Test void previouslyObservedChildFinishesEvenWhenStartIdentityDisappearsBeforeWait() throws Exception {
+        Fixture f=fixture();Bootstrap bootstrap=f.bootstrap(root());assertEquals(0,bootstrap.launch(List.of()));
+        for(int code:List.of(0,7)) {
+            Process child=new ProcessBuilder("/bin/sh","-c","read value; exit "+code).start();
+            try {
+                JsonNode observed=Bootstrap.identity(child.toHandle());String id=UUID.randomUUID().toString();ObjectNode record=Seed.JSON.createObjectNode().put("schemaVersion",1).put("kind","command").put("invocationId",id).put("state","running");record.set("slot",state().get("active"));record.set("bootstrap",Bootstrap.identity(ProcessHandle.current()));record.set("child",observed);record.putNull("exitCode");Path path=root().resolve("runs/"+id+".json");
+                try(var channel=bootstrap.create(path);var held=channel.lock()) {
+                    Bootstrap.write(channel,record);child.getOutputStream().write('\n');child.getOutputStream().close();assertTrue(child.waitFor(3,TimeUnit.SECONDS));assertTrue(child.info().startInstant().isEmpty());assertEquals(code,Bootstrap.awaitChild(child,channel,record));JsonNode finished=Seed.json(Bootstrap.read(channel,65536));assertEquals("finished",finished.path("state").asText());assertEquals(code,finished.path("exitCode").asInt());assertTrue(UpdatePreparation.sameProcess(observed,finished.get("child")));
+                }
+            }finally {if(child.isAlive()){child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}child.getInputStream().close();child.getOutputStream().close();child.getErrorStream().close();}
+        }
+        Path original=slot();Files.move(original,directory.resolve("held-slot-after-short-child"));bootstrap.repair();assertTrue(Files.isDirectory(original));
+    }
     @Test void parallelFreshDirectoriesArePrivateAndExistingPublicDirectoryIsRejected() throws Exception {
         Fixture f=fixture();Bootstrap bootstrap=f.bootstrap(root());ExecutorService pool=Executors.newFixedThreadPool(12);
         try {

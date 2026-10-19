@@ -1,0 +1,492 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rs0325/MCIconGenerator/schemas/bootstrap-state-v2.schema.json",
+  "title": "bootstrap更新stateと既receipt/configの保存契約",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "channel",
+    "host",
+    "active",
+    "pending",
+    "previous",
+    "highestAcceptedSequence",
+    "trialInvocation",
+    "preparation"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "channel": {
+      "const": "stable"
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "os",
+        "arch"
+      ],
+      "properties": {
+        "os": {
+          "enum": [
+            "macos",
+            "windows",
+            "linux"
+          ]
+        },
+        "arch": {
+          "enum": [
+            "aarch64",
+            "x86_64"
+          ]
+        }
+      }
+    },
+    "active": {
+      "$ref": "#/$defs/slot"
+    },
+    "pending": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/slot"
+        }
+      ]
+    },
+    "previous": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/slot"
+        }
+      ]
+    },
+    "highestAcceptedSequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9223372036854775807
+    },
+    "trialInvocation": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "uuid",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "preparation": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/preparation"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "toolVersion",
+        "payloadSha256",
+        "runtimeDescriptorSha256",
+        "manifestSha256"
+      ],
+      "properties": {
+        "toolVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "payloadSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "runtimeDescriptorSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "manifestSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pid",
+        "startedAt"
+      ],
+      "properties": {
+        "pid": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9223372036854775807
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "preparation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "invocation",
+        "phase",
+        "expiresAt",
+        "worker",
+        "receiptKey"
+      ],
+      "properties": {
+        "invocation": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "phase": {
+          "enum": [
+            "reserved",
+            "owned"
+          ]
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "worker": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/process"
+            }
+          ]
+        },
+        "receiptKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "const": "reserved"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "worker": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "worker": {
+                "$ref": "#/$defs/process"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "commandReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "invocationId",
+        "slot",
+        "bootstrap",
+        "state",
+        "child",
+        "exitCode"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "command"
+        },
+        "invocationId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "slot": {
+          "$ref": "#/$defs/slot"
+        },
+        "bootstrap": {
+          "$ref": "#/$defs/process"
+        },
+        "state": {
+          "enum": [
+            "launching",
+            "running",
+            "finished"
+          ]
+        },
+        "child": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/process"
+            }
+          ]
+        },
+        "exitCode": {
+          "type": [
+            "null",
+            "integer"
+          ],
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "launching"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "child": {
+                "type": "null"
+              },
+              "exitCode": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "child": {
+                "$ref": "#/$defs/process"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "finished"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "type": "integer"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "exitCode": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "preparationReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "invocationId",
+        "slot",
+        "bootstrap",
+        "state",
+        "child",
+        "exitCode",
+        "issuedAt",
+        "expiresAt",
+        "packagePin",
+        "result",
+        "receiptKey"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "preparation"
+        },
+        "invocationId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "slot": {
+          "$ref": "#/$defs/slot"
+        },
+        "bootstrap": {
+          "$ref": "#/$defs/process"
+        },
+        "state": {
+          "enum": [
+            "reserved",
+            "acked",
+            "running",
+            "finished"
+          ]
+        },
+        "child": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/process"
+            }
+          ]
+        },
+        "exitCode": {
+          "type": [
+            "null",
+            "integer"
+          ],
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "issuedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "packagePin": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "java",
+            "jars",
+            "metadata"
+          ],
+          "properties": {
+            "java": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "metadata": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "jars": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "result": {
+          "type": "string"
+        },
+        "receiptKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "reserved"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "child": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "child": {
+                "$ref": "#/$defs/process"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "finished"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "type": "integer"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "exitCode": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "autoUpdate"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "autoUpdate": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

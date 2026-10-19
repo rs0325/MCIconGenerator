@@ -18,7 +18,7 @@ final class Fixture {
     private final PrivateKey signingKey;
     Fixture(Path directory) throws Exception {
         installed=directory.resolve("package");Files.createDirectories(installed.resolve("seed"));host=Main.host();KeyPair pair=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();publicKey=pair.getPublic();signingKey=pair.getPrivate();
-        ObjectNode info=Seed.JSON.createObjectNode().put("schemaVersion",1).put("bootstrapVersion","1.1.0").put("bootstrapProtocol",2).put("owner","archive");info.set("host",Seed.JSON.valueToTree(host));Files.write(installed.resolve("bootstrap-package.json"),Seed.JSON.writeValueAsBytes(info));Files.write(installed.resolve("trust.der"),publicKey.getEncoded());
+        ObjectNode info=Seed.JSON.createObjectNode().put("schemaVersion",1).put("bootstrapVersion","1.1.0").put("bootstrapProtocol",2).put("owner","archive").putNull("stableManifestUrl");info.set("host",Seed.JSON.valueToTree(host));Files.write(installed.resolve("bootstrap-package.json"),Seed.JSON.writeValueAsBytes(info));Files.write(installed.resolve("trust.der"),publicKey.getEncoded());
         descriptor.put("schemaVersion",1).put("toolVersion","1.1.0");descriptor.set("host",Seed.JSON.valueToTree(host));descriptor.putObject("helper").put("protocolVersion",1);
         files.put("inventory/tool.json","{\"fixtureOnly\":true}".getBytes());files.put("LICENSE","fixture license".getBytes());
         String java=Path.of(System.getProperty("java.home"),"bin","java").toString().replace("'","'\"'\"'");files.put("java/bin/java",("#!/bin/sh\nexec '"+java+"' \"$@\"\n").getBytes());

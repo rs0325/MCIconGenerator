@@ -14,19 +14,20 @@ user rootはMacの`~/Library/Application Support/MCIconBootstrap`、Windowsの`%
 
 | path | 責務 |
 | --- | --- |
-| `active.json` | active参照と受入sequence。pending/previousは初段ではnullのみ |
+| `active.json` | active参照と受入sequence。pending/previousとtrial/準備owner参照を含む（更新契約は下記文書） |
 | `state.lock` | 検証・初期設置・起動pin作成・repairの排他 |
 | `tools/<toolVersion>/<payloadSha256>/` | 内容・実行属性を固定したtool slot |
 | `archives/<payloadSha256>.zip` | 同一署名seedの修復用原本 |
 | `manifests/<manifestSha256>/` | 受入済みmanifestと署名 |
 | `runs/<invocationId>.json` | 起動receipt。同じfileのlockを起動中保持 |
+| `logs/<invocationId>.stderr` | 更新準備processの診断。receiptとは分離 |
 | `staging/` | 検証中の生成物。失敗・unknownは残す |
 
 初回はstateだけでなく既slot/archive/manifest/receipt/stagingも空であることが必要で、state消失を初回へ再分類しない。stateは同一filesystemのatomic moveで公開し、非atomicなfallbackは使わない。
 
 ## 起動、修復、保全
 
-receiptを`launching`として永続化してから子を起動し、PID/start時刻を観測して`running`へ進める。bootstrapはslot参照のlockをCLI終了まで保持する。開始識別を観測した子を実際にwait/reapできた場合だけ`finished`とexit codeを記録する。短命で開始識別を取得できなかった子も直接Processをwait/reapして元exitを返すが、receiptは`launching`のunknownとして保持する。これはCLIの直接子の終端であり、helperやOS資源の回収証拠ではない。親死、部分書込み、子の未確認状態はunknownとして保持し、PIDだけで既存processを停止しない。
+receiptを`launching`として永続化してから子を起動し、PID/start時刻を観測して`running`へ進める。bootstrapはslot参照のlockをCLI終了まで保持する。開始時に観測した子identityを再利用し、実際にwait/reapできた場合だけ`finished`とexit codeを記録する。短命で開始識別を取得できなかった子も直接Processをwait/reapして元exitを返すが、receiptは`launching`のunknownとして保持する。これはCLIの直接子の終端であり、helperやOS資源の回収証拠ではない。親死、部分書込み、子の未確認状態はunknownとして保持し、PIDだけで既存processを停止しない。
 
 準備待機は5分。CLIの実行時間は元CLIの引数・予算に従い、準備期限で通常jobを打ち切らない。割込み時には所有する直接子へTERM、有限待機後KILLを行い、回収失敗は元failureのsuppressed例外として保持する。
 
@@ -34,7 +35,7 @@ receiptを`launching`として永続化してから子を起動し、PID/start�
 
 通常引数・stdio・CLI exit codeは子へ渡す。`--version`ではbootstrap版/ownerをstderrへ、元CLI版をstdoutへ出す。bootstrap不正は`BOOTSTRAP_INVALID`/exit 1、repairとの引数競合はexit 2となる。
 
-nonpurge uninstallはpackage所有fileだけを除去し、user root、runtime cache、PNG、任意API rootを除去しない契約である。今回の実装はpurge/GC/update/rollbackを行わない。実installerのuninstall/PATH/同時installは後段の受入対象である。
+nonpurge uninstallはpackage所有fileだけを除去し、user root、runtime cache、PNG、任意API rootを除去しない契約である。purge/GC/rollbackは行わない。更新の準備と次回適用は[更新契約](auto-update.md)を参照する。実installerのuninstall/PATH/同時installは後段の受入対象である。
 
 ## ローカル検証と未受入
 
@@ -50,6 +51,6 @@ Mac app-image候補は既存JDK 21と明示seed/public trustで作る。
 
 既存出力を上書きせず、jlink runtimeとapp-imageを生成し、通常codesign verifyとfile inventoryを残す。packagerは署名鍵を生成せず、明示された公開trustと署名済みseedだけを受け取る。`build/install/mcicon`の通常Java launcherをJava無しhost向け配布物とは扱わない。
 
-正式配布seed/trust、無Java実host、Developer ID/notarization、installer/Homebrew/winget、OS下限、実helper/描画、#98の更新/rollback/GCは未受入である。#98はこの初期slot/pin契約を前提とし、health切替の具体仕様は別成果で確定する。
+正式配布seed/trust、無Java実host、Developer ID/notarization、installer/Homebrew/winget、OS下限、実helper/描画、#98の更新/rollback/GCは未受入である。#98はこの初期slot/pin契約を前提とし、health切替の現在範囲は[更新契約](auto-update.md)を参照する。
 
 #98の先行接続ではpackage/署名seedのbootstrap制御をprotocol 2へ更新した。旧protocol 1の開発用seed/rootは新しいQA世代として再生成し、自動移行しない。worker/helperのprotocol 1は維持する。[起動controlの範囲と未実装部分](startup-control.md)を参照。

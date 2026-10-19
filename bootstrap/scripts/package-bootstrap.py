@@ -1,7 +1,7 @@
 """既JDKと明示seed/public trustから、自己完結Mac app-image候補を生成する。署名鍵は生成しない。"""
 from pathlib import Path
 import argparse,subprocess,shutil,hashlib,json,sys,platform
-p=argparse.ArgumentParser();p.add_argument('--jdk',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--seed',type=Path,required=True);p.add_argument('--trust',type=Path,required=True);p.add_argument('--version',required=True);p.add_argument('--owner',choices=['homebrew','winget','installer','archive'],required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--jdk',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--seed',type=Path,required=True);p.add_argument('--trust',type=Path,required=True);p.add_argument('--version',required=True);p.add_argument('--owner',choices=['homebrew','winget','installer','archive'],required=True);p.add_argument('--stable-manifest-url');p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 if sys.platform!='darwin':raise RuntimeError('初段app-imageの受入対象はMacのみです')
 if a.output.exists():raise RuntimeError('既存候補は上書きしません')
 for name in ['stable.json','stable.json.sig','tool.zip']:
@@ -19,7 +19,7 @@ for name in ['stable.json','stable.json.sig','tool.zip']:shutil.copyfile(a.seed/
 shutil.copyfile(a.trust,inputs/'trust.der')
 arch={'arm64':'aarch64','aarch64':'aarch64','x86_64':'x86_64'}.get(platform.machine())
 if arch is None:raise RuntimeError('未受入host archです')
-info={'schemaVersion':1,'bootstrapVersion':a.version,'bootstrapProtocol':2,'owner':a.owner,'host':{'os':'macos','arch':arch}}
+info={'schemaVersion':1,'bootstrapVersion':a.version,'bootstrapProtocol':2,'owner':a.owner,'stableManifestUrl':a.stable_manifest_url,'host':{'os':'macos','arch':arch}}
 (inputs/'bootstrap-package.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
 repo=Path(__file__).resolve().parents[2];shutil.copyfile(repo/'LICENSE',inputs/'LICENSE');shutil.copyfile(repo/'THIRD_PARTY_NOTICES.md',inputs/'THIRD_PARTY_NOTICES.md');shutil.copytree(repo/'licenses',inputs/'licenses')
 def run(args):subprocess.run([str(v) for v in args],stdin=subprocess.DEVNULL,check=True,timeout=120)
