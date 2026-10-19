@@ -1,0 +1,302 @@
+{
+  "description": "Linuxの構造と意味検査を共有する固定fixture。実OSの所有や停止権限を証明しない。",
+  "resourceExamples": [
+    {
+      "name": "linux-starting-intent",
+      "os": "linux",
+      "resources": {
+        "linux": {
+          "phase": "starting",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "runtimeDir": "/fixture/runtime",
+          "hostBootId": "00000000-0000-4000-8000-000000000003",
+          "uid": 1000,
+          "containers": []
+        }
+      },
+      "schemaValid": true,
+      "helperValid": true
+    },
+    {
+      "name": "linux-ready-owned-shape",
+      "os": "linux",
+      "resources": {
+        "linux": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "runtimeDir": "/fixture/runtime",
+          "hostBootId": "00000000-0000-4000-8000-000000000003",
+          "uid": 1000,
+          "containers": [
+            {
+              "name": "mcicon-intended"
+            },
+            {
+              "name": "mcicon-running",
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "startedAt": "2026-10-19T00:00:00Z"
+            }
+          ],
+          "userUnit": {
+            "name": "mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "path": "/fixture/systemd/mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "controlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/mcicon-rootless-00000000-0000-4000-8000-000000000002.service"
+          },
+          "rootlesskit": {
+            "pid": 9007199254740993,
+            "startTicks": 9007199254740994
+          },
+          "dockerd": {
+            "pid": 9007199254740995,
+            "startTicks": 9007199254740996
+          },
+          "userNamespace": {
+            "id": 4026532407,
+            "uidMapSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "gidMapSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "dockerSocket": {
+            "path": "/fixture/socket/docker.sock",
+            "dev": 1,
+            "ino": 2,
+            "uid": 1000
+          }
+        }
+      },
+      "schemaValid": true,
+      "helperValid": true
+    },
+    {
+      "name": "linux-releasing-partial-evidence",
+      "os": "linux",
+      "resources": {
+        "linux": {
+          "phase": "releasing",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "runtimeDir": "/fixture/runtime",
+          "hostBootId": "00000000-0000-4000-8000-000000000003",
+          "uid": 1000,
+          "containers": [],
+          "userUnit": {
+            "name": "mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "path": "/fixture/systemd/mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        }
+      },
+      "schemaValid": true,
+      "helperValid": true
+    },
+    {
+      "name": "linux-unknown-branch",
+      "os": "linux",
+      "resources": {
+        "linuxRootless": {
+          "instanceId": "00000000-0000-4000-8000-000000000002"
+        }
+      },
+      "schemaValid": false,
+      "helperValid": false
+    },
+    {
+      "name": "linux-ready-missing-cgroup",
+      "os": "linux",
+      "resources": {
+        "linux": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "runtimeDir": "/fixture/runtime",
+          "hostBootId": "00000000-0000-4000-8000-000000000003",
+          "uid": 1000,
+          "containers": [
+            {
+              "name": "mcicon-intended"
+            },
+            {
+              "name": "mcicon-running",
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "startedAt": "2026-10-19T00:00:00Z"
+            }
+          ],
+          "userUnit": {
+            "name": "mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "path": "/fixture/systemd/mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          "rootlesskit": {
+            "pid": 9007199254740993,
+            "startTicks": 9007199254740994
+          },
+          "dockerd": {
+            "pid": 9007199254740995,
+            "startTicks": 9007199254740996
+          },
+          "userNamespace": {
+            "id": 4026532407,
+            "uidMapSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "gidMapSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "dockerSocket": {
+            "path": "/fixture/socket/docker.sock",
+            "dev": 1,
+            "ino": 2,
+            "uid": 1000
+          }
+        }
+      },
+      "schemaValid": false,
+      "helperValid": false
+    },
+    {
+      "name": "linux-foreign-unit-generation",
+      "os": "linux",
+      "resources": {
+        "linux": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "runtimeDir": "/fixture/runtime",
+          "hostBootId": "00000000-0000-4000-8000-000000000003",
+          "uid": 1000,
+          "containers": [
+            {
+              "name": "mcicon-intended"
+            },
+            {
+              "name": "mcicon-running",
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "startedAt": "2026-10-19T00:00:00Z"
+            }
+          ],
+          "userUnit": {
+            "name": "mcicon-rootless-00000000-0000-4000-8000-000000000004.service",
+            "path": "/fixture/systemd/mcicon-rootless-00000000-0000-4000-8000-000000000004.service",
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "controlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/mcicon-rootless-00000000-0000-4000-8000-000000000002.service"
+          },
+          "rootlesskit": {
+            "pid": 9007199254740993,
+            "startTicks": 9007199254740994
+          },
+          "dockerd": {
+            "pid": 9007199254740995,
+            "startTicks": 9007199254740996
+          },
+          "userNamespace": {
+            "id": 4026532407,
+            "uidMapSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "gidMapSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "dockerSocket": {
+            "path": "/fixture/socket/docker.sock",
+            "dev": 1,
+            "ino": 2,
+            "uid": 1000
+          }
+        }
+      },
+      "schemaValid": true,
+      "helperValid": false
+    },
+    {
+      "name": "linux-foreign-socket-uid",
+      "os": "linux",
+      "resources": {
+        "linux": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "runtimeDir": "/fixture/runtime",
+          "hostBootId": "00000000-0000-4000-8000-000000000003",
+          "uid": 1000,
+          "containers": [
+            {
+              "name": "mcicon-intended"
+            },
+            {
+              "name": "mcicon-running",
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "startedAt": "2026-10-19T00:00:00Z"
+            }
+          ],
+          "userUnit": {
+            "name": "mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "path": "/fixture/systemd/mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "controlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/mcicon-rootless-00000000-0000-4000-8000-000000000002.service"
+          },
+          "rootlesskit": {
+            "pid": 9007199254740993,
+            "startTicks": 9007199254740994
+          },
+          "dockerd": {
+            "pid": 9007199254740995,
+            "startTicks": 9007199254740996
+          },
+          "userNamespace": {
+            "id": 4026532407,
+            "uidMapSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "gidMapSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "dockerSocket": {
+            "path": "/fixture/socket/docker.sock",
+            "dev": 1,
+            "ino": 2,
+            "uid": 1001
+          }
+        }
+      },
+      "schemaValid": true,
+      "helperValid": false
+    },
+    {
+      "name": "linux-aliased-process-identities",
+      "os": "linux",
+      "resources": {
+        "linux": {
+          "phase": "ready",
+          "generationOwner": "00000000-0000-4000-8000-000000000002",
+          "runtimeDir": "/fixture/runtime",
+          "hostBootId": "00000000-0000-4000-8000-000000000003",
+          "uid": 1000,
+          "containers": [
+            {
+              "name": "mcicon-intended"
+            },
+            {
+              "name": "mcicon-running",
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "startedAt": "2026-10-19T00:00:00Z"
+            }
+          ],
+          "userUnit": {
+            "name": "mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "path": "/fixture/systemd/mcicon-rootless-00000000-0000-4000-8000-000000000002.service",
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "controlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/mcicon-rootless-00000000-0000-4000-8000-000000000002.service"
+          },
+          "rootlesskit": {
+            "pid": 9007199254740993,
+            "startTicks": 9007199254740994
+          },
+          "dockerd": {
+            "pid": 9007199254740993,
+            "startTicks": 9007199254740996
+          },
+          "userNamespace": {
+            "id": 4026532407,
+            "uidMapSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "gidMapSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "dockerSocket": {
+            "path": "/fixture/socket/docker.sock",
+            "dev": 1,
+            "ino": 2,
+            "uid": 1000
+          }
+        }
+      },
+      "schemaValid": true,
+      "helperValid": false
+    }
+  ]
+}

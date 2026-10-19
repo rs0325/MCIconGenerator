@@ -493,8 +493,215 @@
         }
       ]
     },
+    "linuxPath": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 4096,
+      "pattern": "^/(?:[^/\\u0000]+/)*[^/\\u0000]+$",
+      "not": {
+        "pattern": "(?:^|/)\\.{1,2}(?:/|$)"
+      }
+    },
+    "linuxUserUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 256,
+          "pattern": "^mcicon-rootless-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.service$"
+        },
+        "path": {
+          "$ref": "#/$defs/linuxPath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "controlGroup": {
+          "$ref": "#/$defs/linuxPath"
+        }
+      }
+    },
+    "linuxProcess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pid",
+        "startTicks"
+      ],
+      "properties": {
+        "pid": {
+          "$ref": "#/$defs/positive"
+        },
+        "startTicks": {
+          "$ref": "#/$defs/nonnegative"
+        }
+      }
+    },
+    "linuxUserNamespace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "uidMapSha256",
+        "gidMapSha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/positive"
+        },
+        "uidMapSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "gidMapSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "linuxDockerSocket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "dev",
+        "ino",
+        "uid"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/linuxPath"
+        },
+        "dev": {
+          "$ref": "#/$defs/nonnegative"
+        },
+        "ino": {
+          "$ref": "#/$defs/nonnegative"
+        },
+        "uid": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967294
+        }
+      }
+    },
+    "linuxContainer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "startedAt": {
+          "$ref": "#/$defs/instant"
+        }
+      },
+      "dependentRequired": {
+        "id": [
+          "startedAt"
+        ],
+        "startedAt": [
+          "id"
+        ]
+      }
+    },
+    "linux": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "generationOwner",
+        "runtimeDir",
+        "hostBootId",
+        "uid",
+        "containers"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "starting",
+            "ready",
+            "releasing"
+          ]
+        },
+        "generationOwner": {
+          "$ref": "#/$defs/uuid"
+        },
+        "runtimeDir": {
+          "$ref": "#/$defs/linuxPath"
+        },
+        "hostBootId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "uid": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967294
+        },
+        "userUnit": {
+          "$ref": "#/$defs/linuxUserUnit"
+        },
+        "rootlesskit": {
+          "$ref": "#/$defs/linuxProcess"
+        },
+        "dockerd": {
+          "$ref": "#/$defs/linuxProcess"
+        },
+        "userNamespace": {
+          "$ref": "#/$defs/linuxUserNamespace"
+        },
+        "dockerSocket": {
+          "$ref": "#/$defs/linuxDockerSocket"
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/linuxContainer"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "const": "ready"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "userUnit",
+              "rootlesskit",
+              "dockerd",
+              "userNamespace",
+              "dockerSocket"
+            ],
+            "properties": {
+              "userUnit": {
+                "required": [
+                  "controlGroup"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
     "resources": {
-      "description": "Linux rootlessは方式未採用のため本schemaに成功branchを持たない。部分起動は所有回収許可を意味しない。",
+      "description": "Linuxを含む採用済みOSの閉じた所有記録。starting/releasingの部分記録は保存できるが、停止にはOS helperの実体再照合が必要。",
       "oneOf": [
         {
           "type": "object",
@@ -523,6 +730,18 @@
           "properties": {
             "windows": {
               "$ref": "#/$defs/windows"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "linux"
+          ],
+          "properties": {
+            "linux": {
+              "$ref": "#/$defs/linux"
             }
           }
         }
