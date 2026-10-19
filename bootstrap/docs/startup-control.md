@@ -1,0 +1,48 @@
+# bootstrap制御protocol 2
+
+#98の先行成果として、実CLI parserの判断と、管理workerの起動完了境界をbootstrapへ渡す。更新取得・pending適用・rollbackはまだ実装しない。製品bootstrapは現在のactiveを使い、REQUESTにRUNだけを返す。
+
+## 署名seedとの対応
+
+packageの`bootstrapProtocol`と署名manifestの`minimumBootstrapProtocol`を2に揃える。未対応protocolはCLIのcommandを起動する前に拒否する。worker protocol 1、helper protocol 1、runtime descriptor schema 1を変更する意味ではない。stable manifestのschemaVersionは1のまま、制御protocolの条件だけを更新する。
+
+1.1は未releaseなので、protocol 1の開発用seed/rootを自動移行しない。旧QA seed/rootは保持し、新しいprotocol 2の署名seedとfreshなQA rootを作り直す。旧結果を新版の検証結果へ書き換えない。正式trust/配信URLはこの成果では発行しない。
+
+## REQUESTと通常起動
+
+bootstrapは検証済みactiveを既invocation receiptとlockでpinし、slotのJava/CLIをparser起動用に開始する。CLIは実picocli parserの結果から、元argv・command・managed/Docker・offline・help/versionと予算をREQUESTにする。この受信より前に更新確認や候補選択を行う処理はない。
+
+controlは起動ごとの127.0.0.1 listener一つ、nonce、invocation、期待slotと子PID/start時刻を結合する。子JVM専用propertyでcontextを渡し、stdout/stderr/stdinはinheritIOのままにする。nonceを診断出力へ書かず、新しい永続control fileを作らない。受信field/順序/参照の不一致は失敗とし、他processを止める根拠にしない。
+
+frameは4byteの長さとUTF-8 JSONで最大64KiB。重複key・余分なfield・trailing JSONを拒否する。REQUESTの絶対期限は30秒、readの断片継続でも期限を延長しない。送信も期限でsocketを閉じる監督を持ち、監督を回収する。RUNの後は通常CLIの予算・引数・終了codeへ戻り、長いjobをREQUEST期限で停止しない。
+
+不正引数は本parserの元診断とexit 2を維持する。開始識別が取得できない短命子のreceiptはunknownとして保持する。CLIを更新のために二重parseするbootstrap独自引数モデルは持たない。
+
+## 次の成果が使う境界
+
+|応答/通知|境界|
+|---|---|
+|RUN|同じCLIで通常commandを実行する。現在の製品親が返す唯一の応答|
+|SWITCH|実parserが適格と判断したmanaged list/renderを、command/helper準備前に正常終了する。親は直接子の正常reap前に候補を開始しない|
+|PREPARE|適格managed list/renderの初期化だけを許可する。offline/help/明示Docker等は拒否する|
+|READY/GO|管理worker/catalog完了後、list結果公開またはIconExporterの呼出し前で同期停止し、親のGOを受けて続行する|
+
+`startup-ready`は既ProgressListenerの同期通知であり、coreはbootstrap stateや更新transactionを所有しない。CLIがcontrolとCancellationTokenへ接続する。準備監督の期限は実parserが得た管理準備・起動・個別予算の合計で、正の整数とoverflowを確認する。READY後のGO待機は絶対30秒。取消・親切断・期限・不正順序は例外として既resource closeへ進む。
+
+candidate自身のCLI JAR配置、tool版とpayload hashを期待slotへ照合する。候補と旧slotが同一であることを要求する比較ではない。
+
+SWITCH/PREPARE/READY/GOは直接fixtureで確認する接続契約であり、現在の製品bootstrapから自動trialを開始する機能ではない。親のRUN経路と同じ実CLI入口から試験する。
+
+ユーザーが選んだ将来の切替対象は「次の適格なmanaged list/render起動」。raw/help/version/raw取得や明示Dockerは旧active、offline・autoUpdate無効・明示tool pinでは暗黙更新/trialを行わない。この先行成果ではconfig/pin option/更新取得を実装せず、いずれの起動も既activeのままである。
+
+## unknownと未受入
+
+例外codeやclose例外無しだけから、candidate固有故障やOS資源の回収を証明しない。INIT_FAILEDの自動判定allowlistは空で、自動rollback/retryは一切しない。typedな発生元と回収証拠は後続contractとして確定する。pending/trialInvocation/previousの状態遷移、高水位更新、取得、GCも別成果である。
+
+直接fixtureは実CLIのREQUEST/RUN、parse-only SWITCHの正常回収とcache未生成、GO前のfixture出力遮断、親切断による取消、分割readの絶対期限、nonce/slot/argv/PIDの拒否を確認する。実managed描画・実installer・Java未導入実host・本番trust/更新配信の受入には代用しない。
+
+REQUESTの前にはCLI自身の純粋なrender/list引数検証も完了する。immutable RenderRequestと検証済みkindを同じcommand instanceで再利用し、不正ID・size・kindがSWITCHで成功へ変わらない。help/versionは必須値の未指定を許す標準動作を保ち、引数検証でcache/helper/outputを作らない。
+
+送信監督は開始が既に期限後なら待機せずsocketを閉じる。通常送信後に監督をinterruptして取り消した場合は閉じない。期限後の監督開始とblocking write解除を固定fixtureで確認する。
+
+この制御protocol変更は未release 1.1の開発用seed/rootへの影響であり、公開1.0.1の保存形式を変更するものではない。

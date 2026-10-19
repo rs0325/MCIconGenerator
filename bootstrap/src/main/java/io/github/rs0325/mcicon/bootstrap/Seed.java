@@ -23,7 +23,7 @@ final class Seed {
     Seed(Path source,PublicKey key,Host host) throws IOException {
         this.source=source;this.key=key;
         manifestBytes=read(source.resolve("stable.json"),1024*1024);signatureBytes=read(source.resolve("stable.json.sig"),64);signed(manifestBytes,signatureBytes,key);manifest=json(manifestBytes);manifestHash=hash(manifestBytes);
-        fields(manifest,"schemaVersion","channel","sequence","toolVersion","minimumBootstrapProtocol","platforms");constant(manifest,"schemaVersion",1);exact(manifest,"channel","stable");positive(manifest,"sequence");constant(manifest,"minimumBootstrapProtocol",1);version=version(manifest,"toolVersion");
+        fields(manifest,"schemaVersion","channel","sequence","toolVersion","minimumBootstrapProtocol","platforms");constant(manifest,"schemaVersion",1);exact(manifest,"channel","stable");positive(manifest,"sequence");constant(manifest,"minimumBootstrapProtocol",2);version=version(manifest,"toolVersion");
         JsonNode selected=null;Set<Host> seen=new HashSet<>();
         for(JsonNode row:array(manifest,"platforms",1,6)) {
             fields(row,"host","payload","runtimeDescriptor");JsonNode h=row.get("host");fields(h,"os","arch");Host candidate=new Host(choice(h,"os","macos","windows","linux"),choice(h,"arch","aarch64","x86_64"));

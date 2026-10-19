@@ -89,7 +89,8 @@ public final class MCIconGenerator implements AutoCloseable {
                 progress.onProgress(new ProgressListener.ProgressEvent("prepare",version.id(),0,1));
                 var runtime=new RuntimePreparer(assets,versions,cancellation).prepare(version);
                 try(var worker=new WorkerClient(runtime,assets.root(),managed.worker(runtime.javaMajor()),cancellation,managed.launch())) {
-                    return new IconExporter(cancellation,progress).export(runtime,worker,worker.catalog(),request);
+                    List<CatalogEntry> catalog=worker.catalog();progress.onProgress(new ProgressListener.ProgressEvent("startup-ready",version.id(),0,1));
+                    return new IconExporter(cancellation,progress).export(runtime,worker,catalog,request);
                 }
             }
         });
@@ -127,7 +128,7 @@ public final class MCIconGenerator implements AutoCloseable {
         return submit(()-> {
             try(var managed=ManagedRuntime.prepare(options,offline,cancellation)) {
                 var runtime=new RuntimePreparer(assets,versions,cancellation).prepare(versions.resolve(version));
-                try(var worker=new WorkerClient(runtime,assets.root(),managed.worker(runtime.javaMajor()),cancellation,managed.launch())){return worker.catalog();}
+                try(var worker=new WorkerClient(runtime,assets.root(),managed.worker(runtime.javaMajor()),cancellation,managed.launch())){List<CatalogEntry> catalog=worker.catalog();progress.onProgress(new ProgressListener.ProgressEvent("startup-ready",runtime.version().id(),0,1));return catalog;}
             }
         });
     }

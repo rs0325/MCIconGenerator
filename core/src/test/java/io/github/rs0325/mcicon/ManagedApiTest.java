@@ -22,11 +22,12 @@ class ManagedApiTest {
     }
     @Test void missingPublishedRuntimeFailsBeforeGameInputsAndDoesNotBecomeHealthyDoctor() throws Exception {
         seedManifest();
-        try(var generator=new MCIconGenerator(root.resolve("inputs"),true,ProgressListener.NONE,new CancellationToken())) {
+        List<String> phases=new ArrayList<>();
+        try(var generator=new MCIconGenerator(root.resolve("inputs"),true,event->phases.add(event.phase()),new CancellationToken())) {
             assertFailure("MANAGED_RUNTIME_INVALID",generator.renderManaged(request(),options()));
             assertFailure("MANAGED_RUNTIME_INVALID",generator.doctorManaged("1.13",options()));
             assertFailure("MANAGED_RUNTIME_INVALID",generator.listEntriesManaged("1.13",options()));
-            assertFalse(Files.exists(root.resolve("inputs/versions")));assertFalse(Files.exists(options().runtimeRoot()));
+            assertFalse(Files.exists(root.resolve("inputs/versions")));assertFalse(Files.exists(options().runtimeRoot()));assertFalse(phases.contains("startup-ready"));
         }
     }
     @Test void rejectedVersionsWinBeforeTrustAndAnyManagedPreparation() throws Exception {

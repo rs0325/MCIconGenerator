@@ -19,7 +19,7 @@ for name in ['stable.json','stable.json.sig','tool.zip']:shutil.copyfile(a.seed/
 shutil.copyfile(a.trust,inputs/'trust.der')
 arch={'arm64':'aarch64','aarch64':'aarch64','x86_64':'x86_64'}.get(platform.machine())
 if arch is None:raise RuntimeError('未受入host archです')
-info={'schemaVersion':1,'bootstrapVersion':a.version,'bootstrapProtocol':1,'owner':a.owner,'host':{'os':'macos','arch':arch}}
+info={'schemaVersion':1,'bootstrapVersion':a.version,'bootstrapProtocol':2,'owner':a.owner,'host':{'os':'macos','arch':arch}}
 (inputs/'bootstrap-package.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
 repo=Path(__file__).resolve().parents[2];shutil.copyfile(repo/'LICENSE',inputs/'LICENSE');shutil.copyfile(repo/'THIRD_PARTY_NOTICES.md',inputs/'THIRD_PARTY_NOTICES.md');shutil.copytree(repo/'licenses',inputs/'licenses')
 def run(args):subprocess.run([str(v) for v in args],stdin=subprocess.DEVNULL,check=True,timeout=120)

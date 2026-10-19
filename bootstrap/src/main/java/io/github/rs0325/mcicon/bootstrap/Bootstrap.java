@@ -21,7 +21,7 @@ final class Bootstrap {
     private final UserPrincipal owner;
     Bootstrap(Path installed,Path root,Seed.Host host) throws IOException {
         this.installed=installed.toAbsolutePath().normalize();this.root=root.toAbsolutePath().normalize();this.host=host;
-        canonical(this.installed);info=Seed.json(Seed.read(this.installed.resolve("bootstrap-package.json"),65536));Seed.fields(info,"schemaVersion","bootstrapVersion","bootstrapProtocol","owner","host");Seed.constant(info,"schemaVersion",1);Seed.constant(info,"bootstrapProtocol",1);Seed.version(info,"bootstrapVersion");Seed.choice(info,"owner","homebrew","winget","installer","archive");
+        canonical(this.installed);info=Seed.json(Seed.read(this.installed.resolve("bootstrap-package.json"),65536));Seed.fields(info,"schemaVersion","bootstrapVersion","bootstrapProtocol","owner","host");Seed.constant(info,"schemaVersion",1);Seed.constant(info,"bootstrapProtocol",2);Seed.version(info,"bootstrapVersion");Seed.choice(info,"owner","homebrew","winget","installer","archive");
         if(!info.path("host").equals(Seed.JSON.valueToTree(host)))throw Seed.invalid("package hostが一致しません");
         try {key=KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(Seed.read(this.installed.resolve("trust.der"),1024)));}
         catch(GeneralSecurityException failure){throw new IOException("packageの固定trustが未設定/不正です",failure);}
@@ -115,17 +115,19 @@ final class Bootstrap {
         if(started.isPresent()){record.put("state","finished").put("exitCode",code);write(channel,record);}return code;
     }
     int launch(List<String> arguments) throws IOException {
-        long deadline=System.nanoTime()+Duration.ofMinutes(5).toNanos();Path slot,run;FileChannel channel=null;FileLock held=null;ObjectNode record;Process child=null;IOException original=null;
+        long deadline=System.nanoTime()+Duration.ofMinutes(5).toNanos();Path slot,run;FileChannel channel=null;FileLock held=null;ObjectNode record;Process child=null;StartupControl control=null;IOException original=null;
         try {
             try(StateLock ignored=lock(deadline)) {
                 slot=prepare(false,deadline);JsonNode active=state().get("active");UUID id=UUID.randomUUID();run=root.resolve("runs/"+id+".json");channel=create(run);held=channel.lock();record=Seed.JSON.createObjectNode().put("schemaVersion",1).put("invocationId",id.toString()).put("state","launching");record.set("slot",active);record.set("bootstrap",identity(ProcessHandle.current()));record.putNull("child").putNull("exitCode");write(channel,record);
             }
             if(arguments.equals(List.of("--version"))||arguments.equals(List.of("-V")))System.err.println("Bootstrap "+Seed.text(info,"bootstrapVersion")+" (owner: "+Seed.text(info,"owner")+")");
-            List<String> command=new ArrayList<>(List.of(slot.resolve("java/bin/"+(host.os().equals("windows")?"java.exe":"java")).toString(),"-cp",slot.resolve("app/lib/*").toString(),"io.github.rs0325.mcicon.cli.Main"));command.addAll(arguments);
-            ProcessBuilder builder=new ProcessBuilder(command).inheritIO();child=builder.start();return awaitChild(child,channel,record);
+            control=new StartupControl(record.get("slot"),record.path("invocationId").asText(),arguments);
+            List<String> command=new ArrayList<>(List.of(slot.resolve("java/bin/"+(host.os().equals("windows")?"java.exe":"java")).toString(),control.property(),"-cp",slot.resolve("app/lib/*").toString(),"io.github.rs0325.mcicon.cli.Main"));command.addAll(arguments);
+            ProcessBuilder builder=new ProcessBuilder(command).inheritIO();child=builder.start();control.request(child);return awaitChild(child,channel,record);
         }catch(IOException failure){original=failure;throw failure;}
         finally {
             IOException cleanup=null;
+            try{if(control!=null)control.close();}catch(IOException failure){cleanup=failure;}
             boolean interrupted=Thread.interrupted();
             if(child!=null&&child.isAlive()) {
                 for(int phase=0;phase<2&&child.isAlive();phase++) {

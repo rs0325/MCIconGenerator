@@ -1,5 +1,6 @@
 plugins { id 'application' }
 dependencies {
+    testImplementation project(':cli')
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
     implementation 'org.apache.commons:commons-compress:1.28.0'
 }
