@@ -65,3 +65,20 @@ Issue #94の残件は実再起動後のanchor現存cold-start、uninstall残存�
 確定main `0fd4b7d2` の分離buildとapp-image-v10を使用した。先行6版9,212PNGの保存画像と、同じ専用VMを再利用した残45版51,053PNGを正式canonical-v1受入時の両roundへ比較し、全51版60,265PNG・102比較のRGBA差分0を確認した。51lease released空、765操作終端、204完全container IDの削除/正常NotFound、206実行child回収、同実行境界Stoppedと末尾入力・旧環境不変の小監査は成功し、独立結果auditはPASS（追加指摘0）となった。
 
 初回の旧fixed baselineとの1.21.11 1,502枚RGB差FAILは保持する。正式受入baselineへの保存画像分析と残45実描画は別世代であり、元FAILを成功へ書き換えない。今回の固定pixel受入から代表World意味確認の保証範囲を拡張しない。#97/#98の実uninstall/更新接続、macOS15.7.7以外の実測/最終配布と現存anchor旧boot OwnedStopped分岐の未実測を残し、Refs #94 OPENを維持する。
+
+## 配布inventoryの生成
+
+`helpers/macos/scripts/build-inventory.py`はMac host-helperの最終file manifest、component対応表、確定した公開URLから、inventoryと既存descriptorのartifact項目を生成する。対象はApple Silicon・`minimumOsVersion=15.7.7`のhost-helper ZIPだけであり、guest/rendererやtool payloadの発行、core resourceの同梱、署名は行わない。
+
+最終署名・packaging後のfile manifestをpinし、全fileのcomponent帰属とlicense/noticeの実path・本文size/SHAを確認する。大binaryの全tree/hash検証はpackagerの責務とし、生成器は繰り返さない。外部noticeは監査済みsource bundle manifestのpin・entry・size/SHAへ結合する。公開URLは固定asset向けの`https://ASCII DNS名/ASCII path`（正規`%HH`可）に限定し、query/fragment/userinfo/port/IP literal/Unicodeを扱わない。公開URLが未確定、この形式に適合しないURL、文書不在、link、pin不一致、未帰属file、inventoryのUTF-8 bytesが4 MiBを超える場合は発行を拒否する。通常fileとsource memberのsizeは空fileを含む非負整数、archive本体のsizeは正の整数として既存packager/coreと区別する。
+
+```text
+python3 helpers/macos/scripts/build-inventory.py \
+  --tree <最終MCIconHelper.app> --manifest <最終file-manifest.json> \
+  --components <component対応.json> --publication <確定公開先.json> \
+  --output <未使用の生成先>
+```
+
+生成先の`inventory.json`を`inventoryPath`のclasspath resourceへ置き、`artifact-fragment.json`を同版worker/hash・helper protocolとともに共通発行側でdescriptorへ組み込む。source/notice bundleは配布資料への参照であり、runtimeに新roleやsourceの自動downloadを追加しない。最終helper bytesが未確定の候補を、flagや仮URLだけで正式成果へ昇格させない。実URL、正式trust/署名、core/payload同梱、#97/#98との実配布接続は別工程である。
+
+生成/拒否の合成条件は、`python3 helpers/macos/scripts/verify-inventory.py --output <未使用のfixture保存先>`で確認する。実artifact・VM・公開URL・署名を使わず、fixture URLを正式発行へ流用しない。
