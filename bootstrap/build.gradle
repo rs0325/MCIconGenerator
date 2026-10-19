@@ -43,3 +43,26 @@ tasks.register('backgroundTest', Test) {
     systemProperty 'bootstrap.qaEvidenceRoot', layout.projectDirectory.dir('.local/background-evidence').asFile.absolutePath
     systemProperty 'bootstrap.distribution', layout.buildDirectory.dir('install/mcicon').get().asFile.absolutePath
 }
+
+tasks.register('verifyManagedRuntimePackage', JavaExec) {
+    dependsOn 'compileJava', ':core:jar'
+    classpath = files(sourceSets.main.output.classesDirs, configurations.compileClasspath)
+    mainClass = 'io.github.rs0325.mcicon.bootstrap.ManagedPackageVerifier'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    doFirst {
+        for (String property : ['managedRuntimeInputDir', 'bootstrapSeedDir', 'bootstrapTrustKey']) {
+            if (!providers.gradleProperty(property).isPresent()) {
+                throw new GradleException("正式packageには-P${property}の明示が必要です")
+            }
+        }
+        args project(':core').layout.buildDirectory.dir('generated/resources/managedRuntime').get().asFile,
+                file(providers.gradleProperty('bootstrapSeedDir').get()),
+                file(providers.gradleProperty('bootstrapTrustKey').get()), project.version.toString(),
+                project(':core').tasks.named('jar').get().archiveFile.get().asFile
+    }
+}
+tasks.named('appImage') { mustRunAfter 'verifyManagedRuntimePackage' }
+tasks.register('managedAppImage') {
+    dependsOn 'verifyManagedRuntimePackage', 'appImage'
+    description = '明示runtime resourcesと署名seedの同bytes検証後にMac app-imageを生成する'
+}

@@ -128,7 +128,7 @@ public final class ManagedRuntime implements AutoCloseable {
         RuntimeDescriptor.relative(path);List<URL> urls=Collections.list(loader.getResources(RESOURCE+path));if(urls.size()!=1)throw RuntimeDescriptor.invalid("固定同梱のruntime信頼設定/resourceが不足または重複しています: "+path);
         try(InputStream input=urls.getFirst().openStream()){byte[] bytes=input.readNBytes(maximum+1);if(bytes.length>maximum)throw RuntimeDescriptor.invalid("同梱runtime resourceが上限を超えています");return bytes;}
     }
-    private static void checkJobPath(String path) {
+    static void checkJobPath(String path) {
         RuntimeDescriptor.relative(path);String first=path.split("/")[0];if(Set.of("lease.json","lease.lock","descriptor.json","tmp").contains(first)||first.startsWith("helper-"))throw RuntimeDescriptor.invalid("inventoryがjobの所有記録またはlogに衝突しています");
     }
 }

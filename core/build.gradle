@@ -63,3 +63,41 @@ final class WorkerArtifactInfo {
 sourceSets.main.java.srcDir(workerSources)
 tasks.named('compileJava') { dependsOn generateWorkerArtifactInfo }
 tasks.named('sourcesJar') { dependsOn generateWorkerArtifactInfo }
+
+// 生成器はcompiled classesだけで動かし、未生成resource/JARを参照しない。
+def runtimeInput = providers.gradleProperty('managedRuntimeInputDir')
+def runtimeResources = layout.buildDirectory.dir('generated/resources/managedRuntime')
+tasks.register('generateManagedRuntimeResources', JavaExec) {
+    classpath = files(sourceSets.main.output.classesDirs, configurations.compileClasspath)
+    mainClass = 'io.github.rs0325.mcicon.internal.managed.RuntimeResourceGenerator'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    dependsOn 'compileJava', ':worker:agentJar'
+    inputs.property('enabled', runtimeInput.isPresent())
+    inputs.property('toolVersion', toolVersion)
+    inputs.files(sourceSets.main.output.classesDirs, configurations.compileClasspath)
+    if (runtimeInput.isPresent()) inputs.dir(rootProject.file(runtimeInput.get()))
+    inputs.file(project(':worker').tasks.named('agentJar').flatMap { it.archiveFile })
+    inputs.files(rootProject.file('adapters/legacy-mappings.json'), rootProject.file('adapters/releases.json'))
+    outputs.dir(runtimeResources)
+    doFirst {
+        delete runtimeResources
+        if (!runtimeInput.isPresent()) {
+            runtimeResources.get().asFile.mkdirs()
+            throw new StopExecutionException()
+        }
+        runtimeResources.get().asFile.parentFile.mkdirs()
+        args rootProject.file(runtimeInput.get()), runtimeResources.get().asFile, toolVersion,
+                project(':worker').tasks.named('agentJar').get().archiveFile.get().asFile, rootProject.projectDir
+    }
+}
+
+tasks.named('processResources') {
+    dependsOn 'generateManagedRuntimeResources'
+    from(runtimeResources)
+    doFirst {
+        if (!fileTree('src/main/resources/META-INF/mcicon/runtime').isEmpty()) {
+            throw new GradleException('runtime resourceは明示入力からだけ生成してください')
+        }
+        delete new File(destinationDir, 'META-INF/mcicon/runtime')
+    }
+}
