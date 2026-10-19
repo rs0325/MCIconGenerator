@@ -1,6 +1,6 @@
 # bootstrap制御protocol 2
 
-#98の先行成果として、実CLI parserの判断と、管理workerの起動完了境界をbootstrapへ渡す。更新取得・pending適用・rollbackはまだ実装しない。製品bootstrapは現在のactiveを使い、REQUESTにRUNだけを返す。
+#98の先行成果として、実CLI parserの判断と、管理workerの起動完了境界をbootstrapへ渡す。現在は[更新契約](auto-update.md)に従い、background準備と次の適格managed起動のtrialへ接続する。自動rollbackは有効化しない。
 
 ## 署名seedとの対応
 
@@ -22,22 +22,22 @@ frameは4byteの長さとUTF-8 JSONで最大64KiB。重複key・余分なfield�
 
 |応答/通知|境界|
 |---|---|
-|RUN|同じCLIで通常commandを実行する。現在の製品親が返す唯一の応答|
+|RUN|同じCLIで通常commandを実行する。通常commandの応答|
 |SWITCH|実parserが適格と判断したmanaged list/renderを、command/helper準備前に正常終了する。親は直接子の正常reap前に候補を開始しない|
 |PREPARE|適格managed list/renderの初期化だけを許可する。offline/help/明示Docker等は拒否する|
 |READY/GO|管理worker/catalog完了後、list結果公開またはIconExporterの呼出し前で同期停止し、親のGOを受けて続行する|
 
-`startup-ready`は既ProgressListenerの同期通知であり、coreはbootstrap stateや更新transactionを所有しない。CLIがcontrolとCancellationTokenへ接続する。準備監督の期限は実parserが得た管理準備・起動・個別予算の合計で、正の整数とoverflowを確認する。READY後のGO待機は絶対30秒。取消・親切断・期限・不正順序は例外として既resource closeへ進む。
+`startup-ready`は既ProgressListenerの同期通知であり、coreはbootstrap stateや更新transactionを所有しない。CLIがcontrolとCancellationTokenへ接続する。準備監督の期限は実parserが得た管理準備・起動・個別予算の合計で、正の整数とoverflowを確認する。READY後のGO待機は元初期化残期限と30秒の短い方で、延長しない。取消・親切断・期限・不正順序は例外として既resource closeへ進む。
 
 candidate自身のCLI JAR配置、tool版とpayload hashを期待slotへ照合する。候補と旧slotが同一であることを要求する比較ではない。
 
-SWITCH/PREPARE/READY/GOは直接fixtureで確認する接続契約であり、現在の製品bootstrapから自動trialを開始する機能ではない。親のRUN経路と同じ実CLI入口から試験する。
+SWITCH/PREPARE/READY/GOは直接fixtureで確認する接続契約であり、製品bootstrapは起動開始時pendingのある適格commandだけでこの経路を使う。親のRUN経路と同じ実CLI入口から試験する。
 
-ユーザーが選んだ将来の切替対象は「次の適格なmanaged list/render起動」。raw/help/version/raw取得や明示Dockerは旧active、offline・autoUpdate無効・明示tool pinでは暗黙更新/trialを行わない。この先行成果ではconfig/pin option/更新取得を実装せず、いずれの起動も既activeのままである。
+ユーザーが選んだ将来の切替対象は「次の適格なmanaged list/render起動」。raw/help/version/raw取得や明示Dockerは旧active、offline・autoUpdate無効・明示tool pinでは暗黙更新/trialを行わない。config/pinと更新の適用条件は更新契約へ接続する。
 
 ## unknownと未受入
 
-例外codeやclose例外無しだけから、candidate固有故障やOS資源の回収を証明しない。INIT_FAILEDの自動判定allowlistは空で、自動rollback/retryは一切しない。typedな発生元と回収証拠は後続contractとして確定する。pending/trialInvocation/previousの状態遷移、高水位更新、取得、GCも別成果である。
+例外codeやclose例外無しだけから、candidate固有故障やOS資源の回収を証明しない。INIT_FAILEDの自動判定allowlistは空で、自動rollback/retryは一切しない。typedな発生元と回収証拠は後続contractとして確定する。pending/trialInvocation/previous、高水位と取得は更新契約に従う。GCは未実装である。
 
 直接fixtureは実CLIのREQUEST/RUN、parse-only SWITCHの正常回収とcache未生成、GO前のfixture出力遮断、親切断による取消、分割readの絶対期限、nonce/slot/argv/PIDの拒否を確認する。実managed描画・実installer・Java未導入実host・本番trust/更新配信の受入には代用しない。
 

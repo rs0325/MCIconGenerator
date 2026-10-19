@@ -10,6 +10,7 @@ application {
 }
 tasks.named('test') {
     systemProperty 'bootstrap.testClasspath', sourceSets.test.runtimeClasspath.asPath
+    exclude '**/BackgroundPackageTest.class'
 }
 tasks.register('appImage', Exec) {
     dependsOn 'installDist'
@@ -27,5 +28,18 @@ tasks.register('appImage', Exec) {
                 '--trust', file(providers.gradleProperty('bootstrapTrustKey').get()),
                 '--version', project.version.toString(), '--owner', 'archive',
                 '--output', layout.buildDirectory.dir('app-image').get().asFile
+        if (providers.gradleProperty('bootstrapManifestUrl').isPresent()) {
+            args '--stable-manifest-url', providers.gradleProperty('bootstrapManifestUrl').get()
+        }
     }
+}
+
+tasks.register('backgroundTest', Test) {
+    dependsOn 'testClasses', 'installDist'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    include '**/BackgroundPackageTest.class'
+    systemProperty 'bootstrap.testClasspath', sourceSets.test.runtimeClasspath.asPath
+    systemProperty 'bootstrap.qaEvidenceRoot', layout.projectDirectory.dir('.local/background-evidence').asFile.absolutePath
+    systemProperty 'bootstrap.distribution', layout.buildDirectory.dir('install/mcicon').get().asFile.absolutePath
 }

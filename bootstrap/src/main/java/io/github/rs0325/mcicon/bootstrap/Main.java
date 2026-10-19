@@ -15,7 +15,9 @@ public final class Main {
             if(System.getProperty("jpackage.app-path")==null)throw Seed.invalid("Java同梱のpackage entryから起動してください");
             Path jar=Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());Seed.regular(jar);Seed.Host host=host();Bootstrap bootstrap=new Bootstrap(jar.getParent(),root(host),host);
             if(Arrays.asList(arguments).contains("--bootstrap-repair")){if(arguments.length!=1)throw new IllegalArgumentException("--bootstrap-repairは単独で指定してください");bootstrap.repair();return 0;}
-            return bootstrap.launch(List.of(arguments));
+            if(Arrays.asList(arguments).contains("--bootstrap-auto-update")){if(arguments.length!=2||!arguments[0].equals("--bootstrap-auto-update")||!Set.of("true","false").contains(arguments[1]))throw new IllegalArgumentException("--bootstrap-auto-update true|falseを単独で指定してください");new UpdatePreparation(bootstrap).configure(Boolean.parseBoolean(arguments[1]),System.nanoTime()+java.time.Duration.ofSeconds(30).toNanos());return 0;}
+            List<String> cli=new ArrayList<>(List.of(arguments));String pin=null;if(!cli.isEmpty()&&cli.getFirst().equals("--bootstrap-pin")){if(cli.size()<2)throw new IllegalArgumentException("--bootstrap-pinに指定版が必要です");pin=cli.remove(1);cli.removeFirst();}
+            return bootstrap.launch(cli,pin);
         }catch(Exception failure) {System.err.println("BOOTSTRAP_INVALID: "+failure.getMessage());return failure instanceof IllegalArgumentException?2:1;}
     }
     static Seed.Host host() throws java.io.IOException {

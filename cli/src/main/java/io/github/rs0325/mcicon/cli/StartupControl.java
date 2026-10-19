@@ -51,7 +51,7 @@ final class StartupControl implements AutoCloseable {
     void ready() {
         if(!prepare)return;
         try {
-            long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);ready=true;write(socket,JSON.createObjectNode().put("protocol",2).put("type","READY"),end);go.get(remaining(end),TimeUnit.MILLISECONDS);
+            long end=Math.min(deadline,System.nanoTime()+TimeUnit.SECONDS.toNanos(30));ready=true;write(socket,JSON.createObjectNode().put("protocol",2).put("type","READY"),end);go.get(remaining(end),TimeUnit.MILLISECONDS);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();cancel.run();throw new CompletionException(failure);}
         catch(IOException|ExecutionException|TimeoutException failure){cancel.run();throw new CompletionException(failure);}
     }
