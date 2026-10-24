@@ -66,3 +66,39 @@ tasks.register('managedAppImage') {
     dependsOn 'verifyManagedRuntimePackage', 'appImage'
     description = '明示runtime resourcesと署名seedの同bytes検証後にMac app-imageを生成する'
 }
+
+tasks.register('homebrewArchive', Exec) {
+    dependsOn 'installDist'
+    description = '明示seedとtrustからHomebrew所有のJava同梱archive候補を生成する'
+    def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    def output = layout.buildDirectory.dir('homebrew')
+    doFirst {
+        for (String property : ['bootstrapSeedDir', 'bootstrapTrustKey']) {
+            if (!providers.gradleProperty(property).isPresent()) {
+                throw new GradleException("明示した検証対象入力を-P${property}で指定してください")
+            }
+        }
+        commandLine 'python3', file('scripts/package-bootstrap.py'),
+                '--jdk', launcher.get().metadata.installationPath.asFile,
+                '--input', new File(tasks.named('installDist').get().destinationDir, 'lib'),
+                '--seed', file(providers.gradleProperty('bootstrapSeedDir').get()),
+                '--trust', file(providers.gradleProperty('bootstrapTrustKey').get()),
+                '--version', project.version.toString(), '--owner', 'homebrew',
+                '--output', output.get().dir('app-image').asFile
+        if (providers.gradleProperty('bootstrapManifestUrl').isPresent()) {
+            args '--stable-manifest-url', providers.gradleProperty('bootstrapManifestUrl').get()
+        }
+    }
+    doLast {
+        providers.exec {
+            commandLine 'python3', file('scripts/package-homebrew.py'), 'archive',
+                    '--app-image', output.get().dir('app-image/image/MCIconBootstrap.app').asFile,
+                    '--output', output.get().file("mcicon-bootstrap-${project.version}-macos.tar.gz").asFile
+        }.result.get().assertNormalExitValue()
+    }
+}
+tasks.named('homebrewArchive') { mustRunAfter 'verifyManagedRuntimePackage' }
+tasks.register('managedHomebrewArchive') {
+    dependsOn 'verifyManagedRuntimePackage', 'homebrewArchive'
+    description = '正式runtime resourcesと署名seedの検証後にHomebrew archiveを生成する'
+}
