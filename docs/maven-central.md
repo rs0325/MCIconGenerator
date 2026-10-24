@@ -29,14 +29,24 @@ python3 scripts/audit-distribution.py build/release --version 1.1.0-probe
 python3 scripts/audit-central-bundle.py \
   build/central/mcicon-central-1.1.0-probe-candidate.zip --version 1.1.0-probe
 python3 scripts/verify-maven-consumer.py --version 1.1.0-probe \
-  --repository build/maven/1.1.0-probe --output build/consumer-validation
+  --repository build/maven/1.1.0-probe \
+  --candidate-bundle build/central/mcicon-central-1.1.0-probe-candidate.zip \
+  --output build/consumer-validation
 ```
 
 ローカルMaven repositoryは `build/maven/<版>`、Central候補は `build/central/`、従来の配布候補は `build/release/` に生成する。core/workerのbinary・sources・javadoc・POM・Gradle metadataとchecksumを含める。POMにはMIT license、SCM、developer情報を持つ。publish系taskは同じ版のローカル出力を消してから生成するため、同じworktreeで別のpublish実行を並行しない。
 
 consumer検証は独立projectと空のGradle cacheを各metadata経路ごとに作り、coreの固定依存だけを宣言する。ローカル候補を指定した場合は `exclusiveContent` で本プロジェクトのgroupをそのrepositoryに限定し、候補のcore/workerが不足していてもCentralの同版へ切り替えない。ローカル候補のcore/workerとCentralの外部依存を解決し、合成したoffline入力によるrawのbytes保持、workerの推移依存とhash、旧5/6/8引数Optionsと既存メソッド署名を確認する。合成入力はMinecraft資産の再配布ではない。`--gradle <インストール済みGradleの絶対path>` を指定すれば、空cacheへのGradle本体の再downloadを避けられる。
 
-`--repository` を省略すると `mavenCentral()` だけを使う。実公開後はこの形で再実行し、再取得したartifact bytesを公開前候補と照合する。ローカル候補の成功をCentral実取得成功として扱わない。管理APIの実描画、runtime取得、51版・ホスト別受入は後続作業に残る。
+`--candidate-bundle` を指定すると、Gradleが実際に解決した同版core/workerのbinary JARを候補ZIP内の同座標とSHA-256で照合する。module/POMの両経路で取得元と候補のhash・一致結果をreportへ残し、片方でも異なれば検証を失敗にする。未指定時はbytesの照合を行わない。
+
+`--repository` を省略すると `mavenCentral()` だけを使う。実公開後は保全した公開前候補を指定し、次の形で再取得bytesを照合する。POM・sources・javadoc・署名は別途bundle監査と公開時検証を行う。ローカル候補の成功をCentral実取得成功として扱わない。管理APIの実描画、runtime取得、51版・ホスト別受入は後続作業に残る。
+
+```sh
+python3 scripts/verify-maven-consumer.py --version 1.1.0 \
+  --candidate-bundle build/central/mcicon-central-1.1.0-candidate.zip \
+  --output build/central-consumer-validation
+```
 
 ## 署名と実公開の境界
 
