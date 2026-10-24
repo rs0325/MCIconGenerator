@@ -51,6 +51,6 @@ Mac app-image候補は既存JDK 21と明示seed/public trustで作る。
 
 既存出力を上書きせず、jlink runtimeとapp-imageを生成し、通常codesign verifyとfile inventoryを残す。packagerは署名鍵を生成せず、明示された公開trustと署名済みseedだけを受け取る。`build/install/mcicon`の通常Java launcherをJava無しhost向け配布物とは扱わない。
 
-正式配布seed/trust、無Java実host、Developer ID/notarization、installer/Homebrew/winget、OS下限、実helper/描画、#98の更新/rollback/GCは未受入である。#98はこの初期slot/pin契約を前提とし、health切替の現在範囲は[更新契約](auto-update.md)を参照する。
+Homebrew向けarchiveとFormula候補の生成は[配布候補の手順](homebrew-distribution.md)を参照する。正式配布seed/trust、無Java実host、Developer ID/notarization、installer/Homebrew/wingetの実受入、OS下限、実helper/描画、#98の更新/rollback/GCは未受入である。#98はこの初期slot/pin契約を前提とし、health切替の現在範囲は[更新契約](auto-update.md)を参照する。
 
 #98の先行接続ではpackage/署名seedのbootstrap制御をprotocol 2へ更新した。旧protocol 1の開発用seed/rootは新しいQA世代として再生成し、自動移行しない。worker/helperのprotocol 1は維持する。[起動controlの範囲と未実装部分](startup-control.md)を参照。
