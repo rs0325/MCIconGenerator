@@ -1,22 +1,26 @@
 # Windows bootstrap の security reader
 
-`windows-security-reader.exe` は、seed 展開前の bootstrap が directory の所有者・raw DACL・型・identity を観測するための別 PE である。親の安全判定、新規 node の所有者設定、CLI 起動は後続 #97 の責務で、この reader は作成・ACL変更・削除・子起動・WSL操作を行わない。
+`windows-security-reader.exe` は、seed 展開前の bootstrap が directory chainとterminal通常fileの所有者・raw DACL・型・identity を観測するための別 PE である。親の安全判定、新規 node の所有者設定、CLI 起動は後続 #97 の責務で、この reader は作成・ACL変更・削除・子起動・WSL操作を行わない。
 
 ## 入力と観測
 
-stdin に一つの UTF-8 JSON を送って EOF にする。field 順は `schemaVersion`、`paths` に固定し、文字列は UTF-8、引用符・backslash・slash だけ JSON escape を受け付ける。Java caller の Jackson 出力と一致する専用形式で、汎用 JSON parser は追加しない。入力64KiB、最大64 directory。local drive rootから、一段ずつ直下の既存 directory を指定する。
+stdin に一つの UTF-8 JSON を送って EOF にする。reader IPCはschemaVersion 2で、field順は `schemaVersion`、`terminalType`、`paths` に固定し、文字列は UTF-8、引用符・backslash・slash だけ JSON escape を受け付ける。Java caller の Jackson 出力と一致する専用形式で、汎用 JSON parser は追加しない。入力64KiB、最大64 node。`read(List<Path>)`はlocal drive rootから既存directoryだけを指定する。`readFile(List<Path>)`は親chainを含め、最後の1nodeだけを通常fileとして指定する（最小2node）。file本文やEA/xattrは読まない。
 
 ```json
-{"schemaVersion":1,"paths":["C:\\","C:\\Users","C:\\Users\\example"]}
+{"schemaVersion":2,"terminalType":"directory","paths":["C:\\","C:\\Users","C:\\Users\\example"]}
 ```
 
 最初の drive root をアンカーとして開き、次の component は保持した parent を `NtCreateFile` の `RootDirectory` に指定する。`FILE_OPEN`、`FILE_DIRECTORY_FILE`、`FILE_OPEN_REPARSE_POINT`、child の `OBJ_DONT_REPARSE` を使い、read/write共有・delete非共有とする。絶対 path の再走査や同一 volume だけで親への帰属を推測しない。
 
+通常file terminalは `FILE_NON_DIRECTORY_FILE`、`READ_CONTROL|FILE_READ_ATTRIBUTES|SYNCHRONIZE` で開く。directoryの `FILE_TRAVERSE` と同値のfile `FILE_EXECUTE`、本文の `FILE_READ_DATA`、EAの `FILE_READ_EA` は要求しない。同handleのGetFileTypeがdiskであり、FileStandardInfo.Directory=false、属性が非directory/reparseなしであることも確認する。途中のfile、型不一致、API不明はunknownとなる。
+
+行の`nodeType`はdirectory/regular-file、`linkCount`はdirectoryではnull、通常fileでは1である。FileStandardInfoのNumberOfLinksが1以外、DeletePending=true、採取中に観測された差は元値付きunknownとする。複数hardlinkの観測を採用しない限定契約であり、解放後のalias不存在や不変は保証しない。file size/本文/EA/SACLをresponseへ増やさない。
+
 owner/DACL は `GetSecurityInfo`、型・reparse tag・volume/file ID は同じ保持 handle の `GetFileInformationByHandleEx` から得る。response の行順、parent index、relative name、parent ID を保持 handle と結合する。reparse、型不一致、API失敗、観測された identity/属性差は unknown とする。reparse/type拒否では実属性と tag も返す。
 
-DACL present/null/空を区別し、ALLOW/DENY の SID と raw uint32 mask を保持する。generic mask を NIO permissions へ変換しない。その他 ACE は header/type/flags と `unknown:true` を残し、黙って捨てない。ACL/ACE/出力の上限超過も unknown で、truncated な安全観測へ変換しない。
+DACL present/null/空を区別し、ALLOW/DENY の SID と raw uint32 mask を保持する。fileとdirectoryで同値bitの意味が異なるため、reader自身は権限の安全判定やgeneric mask展開を行わない。後続#97がnodeTypeに従い、fileのWRITE_DATA/APPEND_DATAとdirectoryのADD_FILE/ADD_SUBDIRECTORY、親DELETE_CHILDを区別する。generic mask を NIO permissions へ変換しない。その他 ACE は header/type/flags と `unknown:true` を残し、黙って捨てない。ACL/ACE/出力の上限超過も unknown で、truncated な安全観測へ変換しない。
 
-SD と属性は別 API による可変な観測である。全 chain の原子的 snapshot、途中変更の全検出、解放後の不変は保証しない。Java 側が後続の親安全 gate を通して初めて新規作成へ進める。同 SID・昇格管理者・SYSTEM は信頼範囲とし、既 Admin 所有 root の本人採用・ACL救済は行わない。
+SD と属性は別 API による可変な観測である。全 chain の原子的 snapshot、途中変更の全検出、解放後の不変は保証しない。Java 側が後続の親安全 gate を通して初めて新規作成へ進める。reader IPC1との混在は採用せず、JAR/PE/packageを同世代で固定する。未リリースのIPC移行/fallbackは追加せず、state/receipt/manifestとbuild/package metadataのschemaは変えない。同 SID・昇格管理者・SYSTEM は信頼範囲とし、既 Admin 所有 root の本人採用・ACL救済は行わない。
 
 ## 有限 caller と package 信頼
 
@@ -45,8 +49,10 @@ source は repo MIT。LLVM license/例外、MinGW COPYING群、project LICENSE/T
 
 Mac の protocol fixture と、実 native source を fake WinAPI へ接続する fixture は、relative parent・同 handle・raw mask/未知 ACE・API失敗・reparse・全 close を確認する。Java の実 pipe 代役は EOF、書込先停止、過大出力、途中 exit、package/schema 不正を検証する。実 PE による packaging test は source/build/license/import/hash と排他出力を確認する。いずれも実 Windows の kernel API 成功ではない。
 
-Windows単体受入では、固定JDK/Python/guardianと新専用rootを明示し、H:祖先は読取り、ACL/reparse/rename故障は本人新fixture内だけに限定する。directory変動を原子的snapshot成功へ付け替えず、本人 actor の期限・回収と unknown を保存する。実接続は別許可。製品 CLI/seed/key/repair/winget install をこの単体受入へ混ぜない。
+Windows単体受入では、固定JDK/Python/guardianと新専用rootを明示し、H:祖先は読取り、ACL/reparse/rename故障は本人新fixture内だけに限定する。directory変動を原子的snapshot成功へ付け替えず、本人 actor の期限・回収と unknown を保存する。新PEで既read(List)のdirectory正例（全行directory/linkCount=nullとparent/ID/SD対応）も受け入れ、fileだけの成功でdirectory契約維持としない。本文読取を許可しないmetadata専用fixture、hardlink count2拒否、未知ACE/raw mask、file型混同と期限回収も確認する。実接続は別許可。製品 CLI/seed/key/repair/winget install をこの単体受入へ混ぜない。
 
-関連: Refs #122, #97。
+関連: Refs #124, #122, #97。
 
 一次資料: [NtCreateFile](https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntcreatefile)、[OBJECT_ATTRIBUTES](https://learn.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_object_attributes)、[GetSecurityInfo](https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getsecurityinfo)、[GetFileInformationByHandleEx](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getfileinformationbyhandleex)、[DACL作成](https://learn.microsoft.com/en-us/windows/win32/secauthz/dacl-for-a-new-object)。
+
+通常fileの一次資料: [FILE_STANDARD_INFO](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_standard_info)、[GetFileType](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfiletype)。

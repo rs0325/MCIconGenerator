@@ -32,9 +32,12 @@ final class WindowsSecurityReader {
         JsonNode licenses=definition.get("licenses");if(!licenses.isArray()||licenses.isEmpty()||licenses.size()>32)throw Seed.invalid("reader license一覧が不正です");
         for(JsonNode row:licenses){Seed.fields(row,"path","bytes","sha256");String name=Seed.text(row,"path");Seed.relative(name);Path path=Seed.resolve(support,name);Seed.regular(path);if(Files.size(path)!=Seed.positive(row,"bytes")||Files.size(path)>4194304||!Seed.hash(path).equals(Seed.digest(row,"sha256")))throw Seed.invalid("reader licenseが不一致です");}
     }
-    JsonNode read(List<Path> paths) throws IOException {
-        if(paths.isEmpty()||paths.size()>64)throw Seed.invalid("reader path数が範囲外です");
-        var request=Seed.JSON.createObjectNode().put("schemaVersion",1);var names=request.putArray("paths");for(Path path:paths)names.add(path.toString());byte[] input=Seed.JSON.writeValueAsBytes(request);if(input.length>65536)throw Seed.invalid("reader入力が上限外です");
+    JsonNode read(List<Path> paths) throws IOException {return read(paths,false);}
+    /** drive rootから親directoryを含むchainの最後を通常fileとして観測する。本文は読まない。 */
+    JsonNode readFile(List<Path> paths) throws IOException {return read(paths,true);}
+    private JsonNode read(List<Path> paths,boolean terminalFile) throws IOException {
+        if(paths.isEmpty()||paths.size()>64||terminalFile&&paths.size()<2)throw Seed.invalid("reader path数が範囲外です");
+        var request=Seed.JSON.createObjectNode().put("schemaVersion",2).put("terminalType",terminalFile?"regular-file":"directory");var names=request.putArray("paths");for(Path path:paths)names.add(path.toString());byte[] input=Seed.JSON.writeValueAsBytes(request);if(input.length>65536)throw Seed.invalid("reader入力が上限外です");
         long end=clock.getAsLong()+TimeUnit.SECONDS.toNanos(5),cleanup=end+TimeUnit.SECONDS.toNanos(2);
         Process process=new ProcessBuilder(executable.toString()).start();ProcessHandle child=process.toHandle();
         AtomicReference<IOException> failure=new AtomicReference<>();ByteArrayOutputStream stdout=new ByteArrayOutputStream(),stderr=new ByteArrayOutputStream();
@@ -51,7 +54,7 @@ final class WindowsSecurityReader {
             }
             if(failure.get()!=null)throw failure.get();JsonNode value=Seed.json(stdout.toByteArray());
             if(process.exitValue()!=0||!value.path("status").asText().equals("observed"))throw new ObservationFailure(value,process.exitValue());
-            validate(value,paths);checkDeadline(end);return value;
+            validate(value,paths,terminalFile);checkDeadline(end);return value;
         }catch(InterruptedException error){Thread.currentThread().interrupt();original=new InterruptedIOException("readerを中断しました");original.initCause(error);throw original;}
         catch(IOException error){original=error;throw error;}
         finally {
@@ -73,10 +76,10 @@ final class WindowsSecurityReader {
         try(input){byte[] buffer=new byte[8192];int count;while((count=input.read(buffer))!=-1){if(count>maximum-output.size())throw new IOException("readerの出力が上限を超えました");output.write(buffer,0,count);}}
         catch(IOException error){failure.compareAndSet(null,error);}
     }
-    private static void validate(JsonNode value,List<Path> paths) throws IOException {
-        Seed.fields(value,"schemaVersion","status","tokenUserSid","rows");Seed.constant(value,"schemaVersion",1);sid(value,"tokenUserSid");JsonNode rows=value.get("rows");if(!rows.isArray()||rows.size()!=paths.size())throw Seed.invalid("reader行数が不一致です");
+    private static void validate(JsonNode value,List<Path> paths,boolean terminalFile) throws IOException {
+        Seed.fields(value,"schemaVersion","status","tokenUserSid","rows");Seed.constant(value,"schemaVersion",2);sid(value,"tokenUserSid");JsonNode rows=value.get("rows");if(!rows.isArray()||rows.size()!=paths.size())throw Seed.invalid("reader行数が不一致です");
         for(int i=0;i<rows.size();i++) {
-            JsonNode row=rows.get(i);Seed.fields(row,"index","path","parentIndex","relativeName","parentFileId","parentVolumeSerial","volumeSerial","fileId","fileAttributes","reparseTag","ownerSid","controlFlags","daclPresent","daclNull","aces");
+            JsonNode row=rows.get(i);Seed.fields(row,"index","path","parentIndex","relativeName","parentFileId","parentVolumeSerial","volumeSerial","fileId","nodeType","linkCount","fileAttributes","reparseTag","ownerSid","controlFlags","daclPresent","daclNull","aces");
             if(!row.path("index").isIntegralNumber()||!row.path("index").canConvertToInt()||row.path("index").intValue()!=i||!paths.get(i).toString().equals(Seed.text(row,"path")))throw Seed.invalid("reader path対応が不一致です");
             sid(row,"ownerSid");if(!Seed.text(row,"fileId").matches("[0-9a-f]{32}")||!Seed.text(row,"volumeSerial").matches("[0-9]{1,20}"))throw Seed.invalid("reader identityが不正です");
             for(String name:List.of("fileAttributes","reparseTag","controlFlags"))uint(row,name);
@@ -84,7 +87,9 @@ final class WindowsSecurityReader {
             if(i==0){for(String name:List.of("parentIndex","relativeName","parentFileId","parentVolumeSerial"))if(!row.path(name).isNull())throw Seed.invalid("reader root対応が不正です");}
             else if(!row.path("parentIndex").isIntegralNumber()||row.path("parentIndex").intValue()!=i-1||!row.path("parentFileId").equals(rows.get(i-1).path("fileId"))||!row.path("parentVolumeSerial").equals(rows.get(i-1).path("volumeSerial")))throw Seed.invalid("reader parent対応が不正です");
             if(i>0){String previous=paths.get(i-1).toString(),prefix=previous.endsWith("\\")?previous:previous+"\\",child=paths.get(i).toString();if(child.length()<=prefix.length()||!child.regionMatches(true,0,prefix,0,prefix.length())||!Seed.text(row,"relativeName").equals(child.substring(prefix.length())))throw Seed.invalid("reader relative componentが不一致です");}
-            if((row.path("fileAttributes").longValue()&16)==0||(row.path("fileAttributes").longValue()&1024)!=0||row.path("reparseTag").longValue()!=0)throw Seed.invalid("readerのdirectory/reparse観測が不正です");
+            boolean file=terminalFile&&i==paths.size()-1;Seed.exact(row,"nodeType",file?"regular-file":"directory");
+            if(file)Seed.constant(row,"linkCount",1);else if(!row.path("linkCount").isNull())throw Seed.invalid("directoryにfile linkCountがあります");
+            if(((row.path("fileAttributes").longValue()&16)!=0)==file||(row.path("fileAttributes").longValue()&1024)!=0||row.path("reparseTag").longValue()!=0)throw Seed.invalid("readerの型/reparse観測が不正です");
             JsonNode aces=row.get("aces");if(!aces.isArray()||aces.size()>256)throw Seed.invalid("reader ACE数が上限外です");for(JsonNode ace:aces){uint(ace,"type");uint(ace,"flags");uint(ace,"bytes");if(ace.path("type").longValue()>255||ace.path("flags").longValue()>255||ace.path("bytes").longValue()<4||ace.path("bytes").longValue()>65535)throw Seed.invalid("reader ACE headerが不正です");if(ace.path("unknown").isBoolean()&&ace.path("unknown").booleanValue()){Seed.fields(ace,"type","flags","bytes","unknown");if(ace.path("type").intValue()<2)throw Seed.invalid("reader未知ACE型が不正です");}else {Seed.fields(ace,"type","flags","bytes","rawMask","sid");if(ace.path("type").intValue()>1)throw Seed.invalid("reader ACE型が不正です");uint(ace,"rawMask");sid(ace,"sid");}}
         }
     }
