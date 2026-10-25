@@ -4,3 +4,5 @@ project(':helper-common').projectDir = file('helpers/common')
 include 'helper-macos'
 project(':helper-macos').projectDir = file('helpers/macos')
 include 'bootstrap'
+include 'helper-windows'
+project(':helper-windows').projectDir = file('helpers/windows')

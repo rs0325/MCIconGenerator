@@ -67,9 +67,9 @@ public final class ManagedRuntime implements AutoCloseable {
             Path temp=lease.file().getParent().resolve("tmp");Files.createDirectory(temp);Map<String,String> environment=new HashMap<>();
             environment.put("TMPDIR",temp.toString());environment.put("TMP",temp.toString());environment.put("TEMP",temp.toString());
             if(host.os().equals("windows"))for(String name:List.of("SystemRoot","WINDIR")){String value=System.getenv(name);if(value!=null)environment.put(name,value);}
-            helper=new RuntimeHelper(executable,store.root(),lease,environment);
+            helper=new RuntimeHelper(executable,store.root(),lease,environment,descriptor.host().os().equals("windows"));
             requireOk(helper.control("preflight",store.remaining(),token));
-            generation.prepare(descriptor,inventories);requireOk(helper.control("prepare",store.remaining(),token));store.check();
+            generation.prepare(descriptor,inventories);if(host.os().equals("windows"))helper.keep(store.remaining(),token,false);requireOk(helper.control("prepare",store.remaining(),token));store.check();
             ProcessBuilder prefix=helper.docker(List.of());Map<Integer,String> hashes=new TreeMap<>();for(var java:descriptor.javaExecutables())hashes.put(java.major(),java.sha256());
             WorkerLaunch launch=new WorkerLaunch(prefix.command(),prefix.environment(),descriptor.imageId(),descriptor.agentSha256(),hashes,descriptor.environment());
             return new ManagedRuntime(options,descriptor,worker,lease,helper,launch);
@@ -78,7 +78,7 @@ public final class ManagedRuntime implements AutoCloseable {
         }
     }
     private static void recover(RuntimeStore store,RuntimeDescriptor descriptor,Path executable,CancellationToken token) throws IOException {
-        if(!descriptor.host().os().equals("macos"))return;
+        if(!Set.of("macos","windows").contains(descriptor.host().os()))return;
         List<Path> jobs;
         try(var ignored=store.lock("generations")) {
             Path directory=store.path("jobs");if(!Files.exists(directory,LinkOption.NOFOLLOW_LINKS))return;
@@ -88,8 +88,9 @@ public final class ManagedRuntime implements AutoCloseable {
         for(Path job:jobs) {
             store.check();try(RuntimeLease lease=RuntimeLease.tryRecovery(store,descriptor,job)) {
                 if(lease==null)continue;
-                Map<String,String> environment=Map.of("TMPDIR",job.resolve("tmp").toString(),"TMP",job.resolve("tmp").toString(),"TEMP",job.resolve("tmp").toString());
-                requireOk(new RuntimeHelper(executable,store.root(),lease,environment).control("release",store.remaining(),token));
+                Map<String,String> environment=new HashMap<>(Map.of("TMPDIR",job.resolve("tmp").toString(),"TMP",job.resolve("tmp").toString(),"TEMP",job.resolve("tmp").toString()));
+                if(descriptor.host().os().equals("windows"))for(String key:List.of("SystemRoot","WINDIR")){String value=System.getenv(key);if(value!=null)environment.put(key,value);}
+                requireOk(new RuntimeHelper(executable,store.root(),lease,environment,descriptor.host().os().equals("windows")).control("release",store.remaining(),token));
             }
         }
     }

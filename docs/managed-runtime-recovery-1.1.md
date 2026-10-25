@@ -1,6 +1,6 @@
 # 同世代の旧jobを回収するcore内部経路
 
-Issue #93の後続。公開API・helper protocol・lease形式は増やさない。対象はMacのcurrent tool exact版/current descriptorに束縛された旧active jobだけである。OS helperの実回収受入は未完了であり、このcore fixture成功を実VM/再起動の成功として扱わない。
+Issue #93の後続。公開API・helper protocol・lease形式は増やさない。対象はMac/Windowsのcurrent tool exact版/current descriptorに束縛された旧active jobである。WindowsはH-C18 v3で同bootのready本人死亡後のprepare回復・peer描画継続・正常closeを限定受入した。core fixtureやこの確認をACK前死亡/partial import・同時release・実再起動・全51版・新Mac実VMの成功として扱わない。
 
 ## 処理順序
 
@@ -10,7 +10,7 @@ current pin/署名descriptor/inventory/workerとhelper原archive・全展開tree
 
 保存PID/開始時刻に一致する生存coreはlockfreeでもskipする。保存開始時刻が既知で、OS上のPID不在または既知の別開始時刻でPID再使用を確認できる場合だけ候補とする。PIDが存在し現在の開始時刻が取得不能ならunknownとして拒否する。PID再使用先をkillしない。これは元coreの死亡分類でありOS資源停止の許可ではない。hostIdも管理rootの登録UUIDで、機械本人性を証明しない。
 
-候補について、旧jobの元descriptor bytes/inventoryとcurrent pinのhash対応、永続job配下tmpを確認する。同じ検証済みhelperを旧lease・専用TMP環境で既存releaseとして起動し、利用者HOME/PATHは渡さない。回復releaseは新prepareの残時間と取消tokenに従う。通常close時のcleanupは従来通り別枠10秒とし、旧leaseのpreparationDeadlineをreleaseへ再適用しない。
+候補について、旧jobの元descriptor bytes/inventoryとcurrent pinのhash対応、永続job配下tmpを確認する。同じ検証済みhelperを旧lease・専用TMP環境で既存releaseとして起動し、利用者HOME/PATHは渡さない。Windowsではnative起動に必要なSystemRoot/WINDIRと、検証済みhelper実行fileの親配下appだけを指す子process用PATHを追加する。回復releaseは新prepareの残時間と取消tokenに従う。通常close時のcleanupは従来通り別枠10秒とし、旧leaseのpreparationDeadlineをreleaseへ再適用しない。
 
 helperのok/exit0だけで状態を進めない。coreがimmutable identity・receiptとresources空を再確認してreleasedをatomic記録する。失敗/取消/timeoutでは旧activeとraw stdout/cleanup証拠を保持し、corelockは有限解放する。RuntimeHelperの直接process終了はOS子孫やVZ/transport不在の証明ではない。
 
@@ -24,10 +24,14 @@ orphan prepareだけでなく、owner確認後に停止したdocker生成処理�
 
 ## 範囲外
 
-cache消失/reboot/rootcopy、core生存lockfreeの終了job、旧tool世代、Linux/Windowsの回復は初期対象外。tombstone/intentを含む初期対象は同bootのprocess crashであり、atomic renameをpowerloss/reboot耐久と同一視しない。active/unknownを自動clear・GCせず、旧世代に新helperやCLI stable highwaterを適用しない。異版cleanupには当時の信頼済みpayload/pin/helper保持契約が別途必要。
+cache消失/rootcopy、core生存lockfreeの終了job、旧tool世代、Linuxの回復は初期対象外。Macのtombstone/intentを含む初期対象は同bootのprocess crashであり、atomic renameをpowerloss/reboot耐久と同一視しない。active/unknownを自動clear・GCせず、旧世代に新helperやCLI stable highwaterを適用しない。異版cleanupには当時の信頼済みpayload/pin/helper保持契約が別途必要。
 
-本番pins/trust/実bundleは未発行。VM/SSH/OS実機、実anchor所有回収、orphan docker fence、51版描画の受入はこの変更で成功とはしない。元入力cacheと出力PNGを削除する経路は加えない。
+Windows #95はSID/root/descriptor/generation anchorとregistry GUID/BasePath、guest markerを照合する。native Jobレシートとguest cgroup fenceは別々に確認し、片方だけでresourcesを空にしない。boot差による旧host actor終了分類後も、guestの旧container diskは完全ID/元labelで回収する。専用distroがStoppedであることとnative Jobの回収を分ける。marker不在、曖昧import、unknown transportや不明な他leaseは証拠を保持する。samebootのmissing doneはguard死亡だけではclearしない。曖昧createのdaemon終端不明、一時name不在でもintentを保持する。Windows同boot ready本人死亡回復は限定受入したが、実reboot/boot差は未受入で、[helperの契約とgate](../helpers/windows/README.md)を参照する。
+
+本番pins/trust/実bundleは未発行。Windows同bootのready本人死亡回復・peer描画継続・正常closeはH-C18 v3で限定受入した。新Mac VM/SSHと実anchor所有回収、ACK前死亡/partial import・orphan docker fence・実reboot・全51版描画は未受入である。元入力cacheと出力PNGを削除する経路は加えない。
 
 ## 検証
 
-実子Java process終了identity、busy/live skip、旧tool/異descriptor不変、未知startと元証拠破損拒否、引継lock保持を検証する。test専用署名descriptor/shell helperでは、旧leaseのreleaseが新job作成より先であること、所有不足/未解放resources/取消/準備期限で旧leaseを保持することを確認する。fixtureの所有markerはOS anchorや実VZ本人性を代替しない。
+実子Java process終了identity、busy/live skip、旧tool/異descriptor不変、未知startと元証拠破損拒否、引継lock保持を検証する。test専用署名descriptor/shell helperでは、旧leaseのreleaseが新job作成より先であること、所有不足/未解放resources/取消/準備期限で旧leaseを保持することを確認する。Windows descriptorでも回復の順序・未解放resources・準備残時間を検査する。Unix上のWindows descriptor fixtureはZIP内にUnix実行modeを持つテストshellであり、製品PE/native Jobを代替しない。fixtureの所有markerはOS anchorや実VZ本人性を代替しない。
+
+#95でhelper内部のargv/snapshot/protocol転送をcommonへ集約したため、Mac/Windowsとも新しいhelper JAR世代となる。既存Macの51版/私用包装#193の確認はこの新generationの実機検証を代替しない。共通化後のcommon/Mac/Windows/core fixtureとbuildを実施し、Windowsのnative安全5・strict拒否・app-image包装・同boot限定製品経路はH-C18 v3で受入した。新Mac VM実受入やWindowsの残る異常系・全51版は別gateに残す。

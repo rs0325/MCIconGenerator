@@ -14,16 +14,27 @@ public final class HelperProtocol {
     static final ObjectMapper JSON=JsonMapper.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
             .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
     private HelperProtocol() {}
-    public record Command(Path root,Path lease,String operation,List<String> dockerArguments) {}
+    public record Keeper(long pid,long started,String attempt,Instant deadline,boolean recovery) {}
+    public record Command(Path root,Path lease,String operation,List<String> dockerArguments,Keeper keeper) {
+        public Command(Path root,Path lease,String operation,List<String> dockerArguments){this(root,lease,operation,dockerArguments,null);}
+    }
     public record Diagnostic(String code,String detail,boolean requiresPrivilege,boolean requiresRestart) {}
     /** 固定argvを解釈する。shell文字列やhost PATHへ変換しない。 */
     public static Command parse(String[] args) throws IOException {
         if(args.length<7||!args[0].equals("--protocol")||!args[1].equals("1")||!args[2].equals("--root")||!args[4].equals("--lease"))throw invalid("helper引数が一致しません");
         Path root=Path.of(args[3]),lease=Path.of(args[5]);if(!root.isAbsolute()||!lease.isAbsolute())throw invalid("helperには絶対pathが必要です");
-        String operation=args[6];List<String> docker=List.of();
+        String operation=args[6];List<String> docker=List.of();Keeper keeper=null;
         if(operation.equals("docker")) {if(args.length<9||!args[7].equals("--"))throw invalid("Docker argvが不足しています");docker=List.copyOf(Arrays.asList(args).subList(8,args.length));}
+        else if(operation.equals("keep")) {
+            if(args.length!=16||!args[7].equals("--controller")||!args[10].equals("--attempt")||!args[12].equals("--deadline")||!args[14].equals("--recovery"))throw invalid("keeper引数が一致しません");
+            try {
+                long pid=Long.parseLong(args[8]),started=Long.parseLong(args[9]);String attempt=UUID.fromString(args[11]).toString();Instant deadline=Instant.parse(args[13]);
+                if(pid<1||started<1||!attempt.equals(args[11])||!Set.of("true","false").contains(args[15]))throw invalid("keeper controllerが不正です");
+                keeper=new Keeper(pid,started,attempt,deadline,Boolean.parseBoolean(args[15]));
+            }catch(IllegalArgumentException|java.time.DateTimeException failure){throw invalid("keeper identityが不正です");}
+        }
         else if(args.length!=7||!Set.of("preflight","prepare","release").contains(operation))throw invalid("helper操作が一致しません");
-        return new Command(root.normalize(),lease.normalize(),operation,docker);
+        return new Command(root.normalize(),lease.normalize(),operation,docker,keeper);
     }
     /** controlだけのUTF-8応答。Docker/workerのstdoutには書き込まない。 */
     public static byte[] response(String status,List<Diagnostic> diagnostics) throws IOException {

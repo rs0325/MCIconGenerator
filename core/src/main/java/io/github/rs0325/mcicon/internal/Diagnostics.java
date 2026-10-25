@@ -21,14 +21,14 @@ public final class Diagnostics {
         checks.add(new DiagnosticReport.Check("adapter", adapter, adapter ? exact.support() : "ADAPTER_UNAVAILABLE"));
         checks.add(new DiagnosticReport.Check("agent", Files.isRegularFile(worker.agentJar()), "Rendering agent must exist"));
         if(launch.managed()&&!FilesSupport.hash(WorkerClient.readAgent(worker.agentJar())).equals(launch.expectedAgentSha256()))throw new McIconException("MANAGED_RUNTIME_INVALID","管理agentのhashが一致しません",1);
-        var imageCheck=command("docker_image", launch, List.of("image", "inspect", worker.dockerImage(), "--format", "{{.Os}}/{{.Architecture}} {{.Id}}"), 15,token);
-        if(launch.managed()&&imageCheck.passed()&&!imageCheck.detail().equals("linux/amd64 "+launch.expectedImageId()))throw new McIconException("MANAGED_RUNTIME_INVALID","管理imageのID/platformが一致しません",1);
+        var image=command("docker_image", launch, List.of("image", "inspect", worker.dockerImage(), "--format", "{{.Os}}/{{.Architecture}} {{.Id}}"), 15,token);var imageCheck=image.check();
+        if(launch.managed()&&imageCheck.passed()&&!image.stdout().trim().equals("linux/amd64 "+launch.expectedImageId()))throw new McIconException("MANAGED_RUNTIME_INVALID","管理imageのID/platformが一致しません",1);
         checks.add(imageCheck);
         try {
             WorkerJava java=workerJava(worker,worker.dockerImage(),javaMajor,token,launch);
             checks.add(new DiagnosticReport.Check("worker_java",true,"Java "+java.version()));
         }catch(McIconException failure){if(failure.code().equals("MANAGED_RUNTIME_INVALID"))throw failure;checks.add(new DiagnosticReport.Check("worker_java",false,failure.code()));}
-        token.check();checks.add(command("mesa", launch, List.of("run", "--rm", "--platform", "linux/amd64", "--network", "none", worker.dockerImage(), "glxinfo", "-B"), 45,token));
+        token.check();checks.add(command("mesa", launch, List.of("run", "--rm", "--platform", "linux/amd64", "--network", "none", worker.dockerImage(), "glxinfo", "-B"), 45,token).check());
         token.check();
         return new DiagnosticReport(exact.id(), checks.stream().allMatch(DiagnosticReport.Check::passed), checks);
     }
@@ -57,39 +57,46 @@ public final class Diagnostics {
         var check=command("worker_java",launch,
                 List.of("run","--rm","--platform","linux/amd64","--network","none","--entrypoint",executable,image,"-version"),45,token);
         token.check();
-        if(!check.passed())throw new McIconException("WORKER_JAVA_UNAVAILABLE","The selected Java is unavailable inside the Docker image",1);
-        WorkerJava java=parseJava(executable,check.detail(),minimum);
+        if(!check.check().passed())throw new McIconException("WORKER_JAVA_UNAVAILABLE","The selected Java is unavailable inside the Docker image",1);
+        WorkerJava java=parseJava(executable,check.stderr(),minimum);
         if(launch.managed()) {
             String expected=launch.javaHashes().get(minimum);
             var hash=command("worker_java_hash",launch,List.of("run","--rm","--platform","linux/amd64","--network","none","--entrypoint","sha256sum",image,executable),45,token);
             token.check();
-            if(java.major()!=minimum||expected==null||!hash.passed()||!hash.detail().matches(Pattern.quote(expected)+"[ \t]+.*"))throw new McIconException("MANAGED_RUNTIME_INVALID","管理Javaのmajor/hashがdescriptorと一致しません",1);
+            if(java.major()!=minimum||expected==null||!hash.check().passed()||!hash.stdout().equals(expected+"  "+executable+"\n"))throw new McIconException("MANAGED_RUNTIME_INVALID","管理Javaのmajor/hashがdescriptorと一致しません",1);
         }
         return java;
     }
-    private static DiagnosticReport.Check command(String name, WorkerLaunch launch, List<String> args, int seconds,CancellationToken token) {
+    private record CommandResult(DiagnosticReport.Check check,String stdout,String stderr) {}
+    private static CommandResult command(String name, WorkerLaunch launch, List<String> args, int seconds,CancellationToken token) {
         List<String> command = new ArrayList<>(args);
         String container=null;
         if(args.getFirst().equals("run")) {
             container="mcicon-doctor-"+UUID.randomUUID();
             command.add(1,"--name");command.add(2,container);
         }
-        Path log = null;
+        Path log = null,errorLog = null;
         Process process = null;
         try {
-            log = Files.createTempFile("mcicon-diagnostic-", ".log");
-            process = launch.command(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
+            log = Files.createTempFile("mcicon-diagnostic-", ".log");errorLog=Files.createTempFile("mcicon-diagnostic-error-", ".log");
+            process = launch.command(command).redirectOutput(log.toFile()).redirectError(errorLog.toFile()).start();
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(seconds);
             while(!process.waitFor(100,TimeUnit.MILLISECONDS)) {
                 token.check();
-                if(System.nanoTime()>=deadline){process.destroyForcibly();return new DiagnosticReport.Check(name,false,"Diagnostic timed out");}
+                if(System.nanoTime()>=deadline){process.destroyForcibly();return new CommandResult(new DiagnosticReport.Check(name,false,"Diagnostic timed out"),"","");}
             }
-            String detail;
-            try (InputStream input = Files.newInputStream(log)) { detail = new String(input.readNBytes(65536), java.nio.charset.StandardCharsets.UTF_8).trim(); }
-            return new DiagnosticReport.Check(name, process.exitValue() == 0, detail);
+            long size=Files.size(log),errorSize=Files.size(errorLog);
+            if(size>65536||errorSize>65536-size)return new CommandResult(new DiagnosticReport.Check(name,false,"Diagnostic応答が上限を超えました"),"","");
+            String stdout,stderr;
+            try(InputStream output=Files.newInputStream(log);InputStream error=Files.newInputStream(errorLog)) {
+                byte[] out=output.readNBytes((int)size),err=error.readNBytes((int)errorSize);
+                if(out.length!=size||err.length!=errorSize||Files.size(log)!=size||Files.size(errorLog)!=errorSize)return new CommandResult(new DiagnosticReport.Check(name,false,"Diagnostic応答が変化しました"),"","");
+                stdout=new String(out,java.nio.charset.StandardCharsets.UTF_8);stderr=new String(err,java.nio.charset.StandardCharsets.UTF_8);
+            }
+            return new CommandResult(new DiagnosticReport.Check(name,process.exitValue()==0,(stdout+stderr).trim()),stdout,stderr);
         } catch (Exception e) {
             if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            return new DiagnosticReport.Check(name, false, e.getClass().getSimpleName());
+            return new CommandResult(new DiagnosticReport.Check(name,false,e.getClass().getSimpleName()),"","");
         } finally {
             if(process != null && process.isAlive()) process.destroyForcibly();
             if(container!=null) {
@@ -101,6 +108,7 @@ public final class Diagnostics {
                 finally{if(interrupted)Thread.currentThread().interrupt();}
             }
             if(log != null)try { Files.deleteIfExists(log); } catch(IOException ignored) {}
+            if(errorLog != null)try { Files.deleteIfExists(errorLog); } catch(IOException ignored) {}
         }
     }
     public static CacheReport cache(Path root, boolean verify, CancellationToken token) throws IOException {

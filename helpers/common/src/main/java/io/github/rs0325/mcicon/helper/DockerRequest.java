@@ -1,13 +1,14 @@
-package io.github.rs0325.mcicon.helper.macos;
+package io.github.rs0325.mcicon.helper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-/** 現coreの固定argvだけを受け取り、host bindをjob snapshotへ限定する。 */
-record DockerRequest(String name,List<String> create,List<String> process,Path cache,Path agent,boolean worker) {
-    static DockerRequest parse(List<String> argv,JsonNode descriptor,JsonNode lease,String guestCache,String generation) throws IOException {
+/** OS helper内部の固定argv解釈結果。host bindはjob snapshotへ置換し、公開libraryのSPIにはしない。 */
+public record DockerRequest(String name,List<String> create,List<String> process,Path cache,Path agent,boolean worker) {
+    /** descriptor/lease予算外のargvを拒否し、guestCacheと世代labelを付けたcreate argvを返す。 */
+    public static DockerRequest parse(List<String> argv,JsonNode descriptor,JsonNode lease,String guestCache,String generation) throws IOException {
         if(argv.isEmpty()||!argv.getFirst().equals("run"))throw new IOException("固定run引数が必要です");
         List<String> create=new ArrayList<>(List.of("create"));Set<String> once=new HashSet<>();String name=null,entry=null;Path cache=null,agent=null;boolean interactive=false,rm=false;int index=1;String image=descriptor.path("rendering").path("imageId").asText();
         while(index<argv.size()&&argv.get(index).startsWith("-")) {

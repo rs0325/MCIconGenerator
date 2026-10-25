@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "issue": 95,
+  "issueClosed": false,
+  "status": "limited-windows-product-acceptance-pass",
+  "validationDate": "2026-10-25",
+  "scope": [
+    "native safety 5",
+    "fixed witness rejection",
+    "app-image packaging",
+    "QA signed runtime resources",
+    "same-boot ready owner death recovery",
+    "peer same-worker three PNG and normal close"
+  ],
+  "artifacts": {
+    "nativeSourceSha256": "2c3e374f3db5406a8181b091edf22a6edd3c7d5035b7a0a6f87d0a4e10a91456",
+    "nativePEBytes": 1506816,
+    "nativePESha256": "b72ca49b2ac725e9d555b2655e368060c043214700e959152973634a4d2e951a",
+    "commonJarSha256": "433f89e19f21eb51ee25f0084365c53a3d9f4f535ae621eb0b57b828f93b7bca",
+    "windowsJarSha256": "419021815fd5283b727b96f9e64ad6cde9309949e09a76d76d6455dc53c06214",
+    "coreJarSha256": "456fadedafb751051a5a480e2592c30bb3461c3320aa0681c5def0cdad8dde11"
+  },
+  "environment": {
+    "jdkVersion": "21.0.12.1",
+    "jdkArchitecture": "x86_64",
+    "jdkImplementor": "Eclipse Adoptium",
+    "jdkFiveFilesMatchedOfficialAsset": true,
+    "hostToolsReverifiedAtExecution": true,
+    "guestStateFromPriorMigrationAdopted": false
+  },
+  "results": {
+    "nativeSafety5": true,
+    "knownSafetyActorsTerminal": 17,
+    "safetyDoneReceipts": 3,
+    "safetyUnknownReceiptsRetained": 2,
+    "strictRejectGuardExit": 1,
+    "strictRejectNoJobNoChild": true,
+    "strictRejectNormalCommandSuccess": false,
+    "packaging": true,
+    "publish": true,
+    "ownerDeathRecovery": true,
+    "aExplicitForceExit": 1,
+    "oldAJobEmptyReceipt": true,
+    "oldAGuardExitActuallyObserved": false,
+    "cPrepareAndManagedClose": true,
+    "bSameWorkerThreePNG": true,
+    "threeCoreProcessesCollected": true,
+    "allThreeLeasesReleasedResourcesEmpty": true,
+    "productOwnedDistroStopReceipt": true,
+    "registeredDiskPreserved": true,
+    "oldRegistrationsPreserved": 30,
+    "newOwnedRegistration": 1,
+    "defaultAndConfigUnchanged": true,
+    "independentRunningStateQueried": false,
+    "allFourClientsCollected": true
+  },
+  "imageComparison": {
+    "version": "1.20.6",
+    "size": 64,
+    "ids": [
+      "minecraft:enchanted_book",
+      "minecraft:player_head",
+      "minecraft:stone"
+    ],
+    "referenceManifestAndActualManifestEntrySha256Equal": true,
+    "threeActualPNGBytesMatchSha256": true
+  },
+  "privateEvidence": {
+    "rawFreezeSha256": "8d0ab614c07b41ad4915273634d37e1c65fd32f9f5f278783fce5466ed0ccb72",
+    "finalFreezeSha256": "63ae83172910cc68924abc7c6adb5252bd7f79431d74fcd97731d2ce0a02730c",
+    "resultZipBytes": 678551,
+    "resultZipSha256": "7cc95eb134f473a06886ffcfb17b403d48fab1433d03065032b9edc97a77a826",
+    "rawPubliclyIncluded": false
+  },
+  "boundaries": {
+    "productionKeysIssued": false,
+    "privateQAKeyPersisted": false,
+    "resourceDirectoryIndependentlyCollected": false,
+    "resourceEvidence": "published frame + actual consumer + publish/job inventory equality",
+    "oldFailuresOverwritten": false,
+    "currentProjectionWholeSourceClassMatch": "e48main + fixed #95 overlay: all core/common/Windows/worker-agent class bytes match accepted jars; all unpacked entries also compared; Mac fixture only"
+  },
+  "notAccepted": [
+    "death before ACK/partial import",
+    "simultaneous release",
+    "real boot difference/reboot",
+    "all 51 versions with current helpers",
+    "minimum OS/WSL and unprepared-host consent",
+    "new Mac helper native VM acceptance",
+    "production rootfs/license/source closure/trust/signing/SmartScreen"
+  ],
+  "projectionBuild": {
+    "baseCommit": "e48aedbe187d1f577a8bffc55ce135549f1ab010",
+    "overlayPaths": 55,
+    "gradleWorkers": 1,
+    "maxHeapMiB": 512,
+    "offline": true,
+    "trackedWorktreeChanged": false,
+    "allFiveJarBytesSha256MatchAccepted": true,
+    "classCounts": {
+      "core": 64,
+      "common": 13,
+      "windows": 18,
+      "worker": 0,
+      "agent": 307
+    },
+    "macOsFixtureOnly": true
+  }
+}
