@@ -102,3 +102,17 @@ tasks.register('managedHomebrewArchive') {
     dependsOn 'verifyManagedRuntimePackage', 'homebrewArchive'
     description = '正式runtime resourcesと署名seedの検証後にHomebrew archiveを生成する'
 }
+
+// Windows image用の入力へ、事前buildしたreaderをseedと独立に同梱する。
+tasks.register('stageWindowsSecurityReader', Exec) {
+    dependsOn installDist
+    doFirst {
+        for (String name : ['windowsSecurityNativeDir', 'windowsBootstrapInputDir', 'windowsBootstrapOutputDir']) {
+            if (!providers.gradleProperty(name).isPresent()) throw new GradleException("-P${name}が必要です")
+        }
+        commandLine 'python3', file('scripts/stage-windows-security-reader.py'),
+                '--input', file(providers.gradleProperty('windowsBootstrapInputDir').get()),
+                '--native', file(providers.gradleProperty('windowsSecurityNativeDir').get()),
+                '--output', file(providers.gradleProperty('windowsBootstrapOutputDir').get())
+    }
+}
