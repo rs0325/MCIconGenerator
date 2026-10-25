@@ -33,6 +33,11 @@ class PackageTest(unittest.TestCase):
         with self.assertRaises(RuntimeError): pe_imports(file)
         with self.assertRaises(RuntimeError): verify(self.native, SOURCE)
 
+    def test_protocol_source_record_mismatch_rejected(self):
+        record = self.native / 'build.json'; value = json.loads(record.read_text()); value['sources'][1]['sha256'] = '0' * 64; record.write_text(json.dumps(value))
+        with self.assertRaises(RuntimeError): stager.stage(self.inputs, self.native, self.output, SOURCE)
+        self.assertFalse(self.output.exists())
+
     def test_reserved_support_and_input_link_rejected(self):
         (self.inputs / 'support').mkdir(); (self.inputs / 'support/windows-security-reader-build.json').write_text('preserve')
         with self.assertRaises(RuntimeError): stager.stage(self.inputs, self.native, self.output, SOURCE)
