@@ -29,6 +29,14 @@ class HelperCommonTest {
         var command=HelperProtocol.parse(new String[]{"--protocol","1","--root",path,"--lease",lease,"docker","--","run","-v",path+":/cache","image"});assertEquals(path+":/cache",command.dockerArguments().get(2));
         for(String[] args:List.of(new String[]{"--protocol","2","--root",path,"--lease",lease,"prepare"},new String[]{"--protocol","1","--root","relative","--lease",lease,"prepare"},new String[]{"--protocol","1","--root",path,"--lease",lease,"docker","--"},new String[]{"--protocol","1","--root",path,"--lease",lease,"release","extra"}))assertThrows(IOException.class,()->HelperProtocol.parse(args));
     }
+    @Test void keeperHasFixedInternalArgumentsWithoutChangingExistingControl() throws Exception {
+        String[] args={"--protocol","1","--root",root.toString(),"--lease",root.resolve("lease.json").toString(),"keep","--controller","42","23","--attempt","00000000-0000-0000-0000-000000000001","--deadline","2026-10-21T00:00:00Z","--recovery","false"};
+        var parsed=HelperProtocol.parse(args);assertEquals(42,parsed.keeper().pid());assertFalse(parsed.keeper().recovery());assertTrue(parsed.dockerArguments().isEmpty());
+        for(int index:List.of(1,7,8,9,10,11,12,13,14,15)){String[] invalid=args.clone();invalid[index]="invalid";assertThrows(IOException.class,()->HelperProtocol.parse(invalid));}
+        assertThrows(IOException.class,()->HelperProtocol.parse(Arrays.copyOf(args,args.length-1)));
+        for(String operation:List.of("preflight","prepare","release")){String[] old=Arrays.copyOf(args,7);old[6]=operation;assertNull(HelperProtocol.parse(old).keeper());}
+        assertEquals(0,HelperProtocol.exitCode("ok"));
+    }
     @Test void resourcesAndSchemaUseTheSameClosedFixtures() throws Exception {
         for(var item:examples().get("resourceExamples")) {
             if(item.path("helperValid").booleanValue())assertDoesNotThrow(()->ResourceRecords.validate(item.get("resources"),item.path("os").asText()),item.path("name").asText());

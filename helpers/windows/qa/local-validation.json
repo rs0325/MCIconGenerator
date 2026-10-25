@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "issue": 95,
+  "baseCommit": "290d0fcb723fca3fca2cbc151b08a221fd9dec21",
+  "status": "historical-local-validation-with-current-limited-h-c18-pass",
+  "validation": {
+    "gradleCommand": ":helper-common:build :helper-macos:build :helper-windows:build :core:build :cli:assemble",
+    "jvmMajor": 21,
+    "testSuites": [
+      {
+        "module": "helpers/windows",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "helpers/common",
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "helpers/macos",
+        "tests": 45,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      {
+        "module": "core",
+        "tests": 127,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "guestbridgeDirectFunctionTests": 3,
+    "pythonSyntax": "passed",
+    "cliAssemble": "passed",
+    "diffCheck": "passed",
+    "regressionAfterReview": "passed",
+    "macSkippedReason": "実probe保存stdout指定時だけの1件は未指定のためskip",
+    "nativeDirectFunctionCases": 15,
+    "nativeArtifactFixtures": 3,
+    "gradleOffline": true,
+    "gradleWorkers": 2,
+    "gradleJavadocWarnings": "既存/移動classの警告あり、build成功。",
+    "nativeSourceBuildNoticePins": "passed-with-reused-exact-crossbuild-no-recompile"
+  },
+  "notAccepted": [
+    "Windows app-image/JRE packaging",
+    "current native attachedworker and product cancellation/recovery beyond five isolated QA cases",
+    "real boot difference and crash/reboot recovery",
+    "prepared rootfs distribution closure and actual ABI",
+    "representative renderer/2job cancellation/offline",
+    "51 Minecraft versions",
+    "minimum OS/WSL and unprepared-host setup consent",
+    "production trust/signing/license/source closure"
+  ],
+  "boundaries": {
+    "publicApiProtocolSchemaChanged": false,
+    "productionPinsIssued": false,
+    "realWindowsConnection": "separate authorized A-current five-case QA; no WSL command/guest operation",
+    "issueClosed": false,
+    "priorIssue91ProofAdoptedAsProductAcceptance": false
+  },
+  "reviewFixes": [
+    "pendingCreate without daemon terminal proof remains unknown, including temporary name absence",
+    "sameboot missing done remains unknown even after guard death/kill",
+    "stop/join use absolute remaining budget with reserved reap time and suppressed primary errors",
+    "all active container memory budgets plus guest overhead checked against actual guest capacity"
+  ],
+  "sharedHelperInternals": [
+    "DockerRequest",
+    "Snapshot",
+    "WorkerProxy"
+  ],
+  "previousMacNativeOrPackageEvidenceReusedForNewJar": false,
+  "previousBaseCommit": "6db04335d2af4ca1f4fdad165b63196cde1c9156",
+  "nativeFactsContrast": {
+    "sourceSha256": "932c366edd7d7a909e96fb482db7d7b093f6105ec58181d372d9de6f0ff58e87",
+    "artifactSha256": "a14c23cdbed4de8663e81aa072e3b96ec731180f91897ec169cd88a957ed4896",
+    "artifactBytes": 1476608,
+    "controlGuardExit": 125,
+    "candidateGuardExit": 0,
+    "candidateChildExit": 0,
+    "candidateActiveTail": [
+      1,
+      0
+    ],
+    "candidateQueries": 2,
+    "sameBootOnly": true,
+    "actualBootDifferenceAccepted": false,
+    "bothOwnedJobsTerminalProven": true,
+    "actorSnapshotNotCollected": true,
+    "guestState": "unknown",
+    "accurateDrainElapsedNotCollected": true,
+    "bothCasesPSRunWindowMilliseconds": 475,
+    "newProductRuntimeAcceptanceInherited": false
+  },
+  "nativeCurrentAcceptance": {
+    "sourceSha256": "932c366edd7d7a909e96fb482db7d7b093f6105ec58181d372d9de6f0ff58e87",
+    "artifactSha256": "a14c23cdbed4de8663e81aa072e3b96ec731180f91897ec169cd88a957ed4896",
+    "artifactBytes": 1476608,
+    "inputZipSha256": "7dc0fefe2ad9014c10ea98bd2d024dea31337c0884c8a10edd83d5dd9eb0bfc5",
+    "resultFreezeSha256": "ab2dad9a2181688e4d6744eb00323c7710a766dd721f0eb34c2904d598e9afdd",
+    "independentRawAudit": "PASS",
+    "cases": [
+      {
+        "case": "argv",
+        "actualGuardExit": 0,
+        "terminalRecord": "done"
+      },
+      {
+        "case": "descendant",
+        "actualGuardExit": 125,
+        "terminalRecord": "done"
+      },
+      {
+        "case": "parent-death",
+        "actualGuardExit": 125,
+        "terminalRecord": "done"
+      },
+      {
+        "case": "guard-death",
+        "actualGuardExit": 125,
+        "terminalRecord": "missing-done-unknown-retained"
+      },
+      {
+        "case": "deadline",
+        "actualGuardExit": 125,
+        "terminalRecord": "missing-done-unknown-retained"
+      }
+    ],
+    "knownActorsTerminal": 17,
+    "unknownActorsAbsentProven": false,
+    "allResourcesClearProven": false,
+    "doneRecords": 3,
+    "unknownRecordsRetained": 2,
+    "allSkillClientsReaped": true,
+    "skillClients": 4,
+    "sameBootFacts8AndConfigEqual": true,
+    "actualBootDifferenceAccepted": false,
+    "wholeElapsedSeconds": 9.295890374996816,
+    "WSLCommandExecuted": false,
+    "guestState": "unknown",
+    "BExecuted": false,
+    "productRuntimeAcceptanceInherited": false
+  },
+  "currentWindowsProductEvidence": "h-c18-2026-10-25.json",
+  "historicalFieldsNote": "以下のvalidation/native factsは各過去source世代の記録。現source build/class対応は別固定し、古い成功を転用しない。"
+}

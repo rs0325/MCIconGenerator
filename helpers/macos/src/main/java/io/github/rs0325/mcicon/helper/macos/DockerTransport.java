@@ -1,5 +1,8 @@
 package io.github.rs0325.mcicon.helper.macos;
 
+import io.github.rs0325.mcicon.helper.DockerRequest;
+import io.github.rs0325.mcicon.helper.Snapshot;
+import io.github.rs0325.mcicon.helper.WorkerProxy;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -33,7 +36,7 @@ final class DockerTransport {
         }
         IOException transportFailure=null;int exit=1;
         try {
-            if(snapshot!=null)exit=WorkerProxy.transfer(process,snapshot);
+            if(snapshot!=null)exit=WorkerProxy.transfer(process,snapshot,Commands::stop);
             else {try{exit=process.waitFor();}catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException("診断輸送が中断されました");}}
         }catch(IOException failure){transportFailure=failure;}
         finally {if(process.isAlive())try{Commands.stop(process);}catch(IOException failure){if(transportFailure==null)transportFailure=failure;else transportFailure.addSuppressed(failure);}}

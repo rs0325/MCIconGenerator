@@ -1,4 +1,4 @@
-package io.github.rs0325.mcicon.helper.macos;
+package io.github.rs0325.mcicon.helper;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DockerRequestTest {
     private ObjectNode descriptor() {
-        ObjectNode descriptor=MacFiles.JSON.createObjectNode();var render=descriptor.putObject("rendering");render.put("imageId","sha256:"+"a".repeat(64));render.putArray("javaExecutables").addObject().put("executable","/opt/java/java21/bin/java");render.putObject("environment").put("LIBGL_ALWAYS_SOFTWARE","1");return descriptor;
+        ObjectNode descriptor=HelperProtocol.JSON.createObjectNode();var render=descriptor.putObject("rendering");render.put("imageId","sha256:"+"a".repeat(64));render.putArray("javaExecutables").addObject().put("executable","/opt/java/java21/bin/java");render.putObject("environment").put("LIBGL_ALWAYS_SOFTWARE","1");return descriptor;
     }
-    private ObjectNode lease() {ObjectNode lease=MacFiles.JSON.createObjectNode().put("jobId",UUID.randomUUID().toString()).put("ownerId",UUID.randomUUID().toString()).put("descriptorSha256","b".repeat(64));lease.putObject("requirements").put("containerMemoryMiB",1024);return lease;}
+    private ObjectNode lease() {ObjectNode lease=HelperProtocol.JSON.createObjectNode().put("jobId",UUID.randomUUID().toString()).put("ownerId",UUID.randomUUID().toString()).put("descriptorSha256","b".repeat(64));lease.putObject("requirements").put("containerMemoryMiB",1024);return lease;}
     private List<String> worker() {return List.of("run","--rm","--name","mcicon-worker-"+UUID.randomUUID(),"-i","--platform","linux/amd64","--network","none","--memory","1024m","--cpus","4","-v","/private/cache:/mcicon/cache","-v","/private/cache/worker-one/worker-agent.jar:/mcicon/worker.jar:ro","sha256:"+"a".repeat(64),"/opt/java/java21/bin/java","-version");}
     @Test void 正規bindだけをguestのjob限定snapshotへ変換する() throws Exception {
         DockerRequest request=DockerRequest.parse(worker(),descriptor(),lease(),"/mcicon/jobs/job/cache","owner");assertTrue(request.worker());assertEquals("create",request.create().getFirst());assertFalse(request.create().contains("--rm"));assertTrue(request.create().contains("/mcicon/jobs/job/cache:/mcicon/cache"));assertTrue(request.create().contains("/mcicon/jobs/job/cache/worker-one/worker-agent.jar:/mcicon/worker.jar:ro"));assertTrue(request.create().stream().anyMatch(value->value.startsWith("io.github.rs0325.mcicon.jobId=")));

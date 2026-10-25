@@ -151,6 +151,26 @@ class ManagedRuntimeTest {
         }
         assertArrayEquals(before,Files.readAllBytes(old));try(var jobs=Files.list(old.getParent().getParent())){assertEquals(1,jobs.count());}
     }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void windowsRecoveryRunsBeforeNewLease() throws Exception {
+        Fixture fixture=new Fixture(false,false,true);var host=new RuntimeDescriptor.Host("windows","x86_64");((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path old=stale(fixture,host);Files.writeString(old.resolveSibling("fixture-anchor"),"test-only ownership proof");
+        try(var loader=fixture.loader();var managed=ManagedRuntime.prepare(options(),true,new CancellationToken(),loader,host,(u,o,t)->{throw new AssertionError("offlineで取得しました");})) {
+            assertEquals("released",RuntimeDescriptor.read(Files.readAllBytes(old)).path("state").asText());assertEquals("1",Files.readString(old.resolveSibling("fixture-job-count")));assertFalse(managed.launch().prefix().contains(old.toString()));
+        }
+    }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void windowsIncompleteReleaseCannotClearOldLeaseOrCreateNewJob() throws Exception {
+        Fixture fixture=new Fixture(false,false,true);var host=new RuntimeDescriptor.Host("windows","x86_64");((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path old=stale(fixture,host);Files.writeString(old.resolveSibling("fixture-no-clear"),"test-only incomplete release");byte[] before=Files.readAllBytes(old);
+        try(var loader=fixture.loader()){assertEquals("MANAGED_OWNERSHIP_MISMATCH",assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),true,new CancellationToken(),loader,host,(u,o,t)->{throw new AssertionError();})).code());}
+        assertArrayEquals(before,Files.readAllBytes(old));try(var jobs=Files.list(old.getParent().getParent())){assertEquals(1,jobs.count());}
+    }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void windowsRecoveryHonorsRemainingPreparationBudget() throws Exception {
+        Fixture fixture=new Fixture(false,false,true);var host=new RuntimeDescriptor.Host("windows","x86_64");((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path old=stale(fixture,host);Files.writeString(old.resolveSibling("fixture-slow"),"test-only slow release");byte[] before=Files.readAllBytes(old);
+        var budget=new ManagedOptions(options().runtimeRoot(),Duration.ofMillis(200),Duration.ofSeconds(2),Duration.ofSeconds(1),3072,2048);
+        try(var loader=fixture.loader()){assertTimeoutPreemptively(Duration.ofSeconds(3),()->assertThrows(IOException.class,()->ManagedRuntime.prepare(budget,true,new CancellationToken(),loader,host,(u,o,t)->{throw new AssertionError();})));}
+        assertArrayEquals(before,Files.readAllBytes(old));
+    }
     private Path stale(Fixture fixture,RuntimeDescriptor.Host host) throws Exception {
         Path file;try(var loader=fixture.loader();var managed=ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,host,fixture.transport(new AtomicInteger()))) {var prefix=managed.launch().prefix();file=Path.of(prefix.get(prefix.indexOf("--lease")+1));}
         ObjectNode value=(ObjectNode)RuntimeDescriptor.read(Files.readAllBytes(file));value.putObject("resources").put("fixtureResource",true);Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));ManagedFixture.owner(file,ManagedFixture.deadOwner(root));return file;
@@ -168,7 +188,8 @@ class ManagedRuntimeTest {
             String missing="{\"protocolVersion\":1,\"status\":\"setup-required\",\"diagnostics\":[{\"code\":\"FIXTURE_SETUP\",\"detail\":\"テスト専用の前提不足\",\"requiresPrivilege\":true,\"requiresRestart\":false}]}";
             String script="#!/bin/sh\nif [ \"$7\" = preflight ]; then /bin/cp \"$6\" \"${6%/*}/fixture-preflight-lease.json\" || exit 1; fi\n[ -f \"${6%/*}/descriptor.json\" ] || exit 1\nprintf '%s\\n' \"$7\" >> \"${6%/*}/fixture-operations\"\n"+(setup?"if [ \"$7\" = preflight ]; then printf '%s' '"+missing+"'; exit 2; fi\n":"")+(cleanupFails?"if [ \"$7\" = release ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; fi\n":"")+"printf '%s' '"+ok+"'\n";
             if(recovery)script=script.replace("printf '%s' '"+ok+"'\n", "if [ \"$7\" = release ]; then if [ -f \"${6%/*}/fixture-no-clear\" ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}'; exit 0; fi; [ ! -f \"${6%/*}/fixture-slow\" ] || exec /bin/sleep 5; n=0; for j in \"$4\"/jobs/*/lease.json; do [ ! -f \"$j\" ] || n=$((n+1)); done; printf '%s' \"$n\" > \"${6%/*}/fixture-job-count\"; if /usr/bin/grep -q '\"fixtureResource\":true' \"$6\"; then [ -f \"${6%/*}/fixture-anchor\" ] || { printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; }; /usr/bin/sed 's/\"resources\":{\"fixtureResource\":true}/\"resources\":{}/' \"$6\" > \"$6.fixture-stage\" && /bin/mv \"$6.fixture-stage\" \"$6\" || exit 1; fi; fi\n"+"printf '%s' '"+ok+"'\n");
-            ByteArrayOutputStream bytes=new ByteArrayOutputStream();try(ZipOutputStream zip=new ZipOutputStream(bytes)){zip.putNextEntry(new ZipEntry("bin/helper"));zip.write(script.getBytes(StandardCharsets.UTF_8));zip.closeEntry();}helper=bytes.toByteArray();
+            if(recovery)script=script.replace("[ -f \"${6%/*}/descriptor.json\" ] || exit 1\n", "[ -f \"${6%/*}/descriptor.json\" ] || exit 1\nif [ \"$7\" = keep ]; then printf '{\"state\":\"ready\",\"attempt\":\"%s\",\"controllerPid\":%s,\"controllerStarted\":%s}\\n' \"${12}\" \"$9\" \"${10}\"; IFS= read -r frame || exit 1; /bin/cat >/dev/null; set -- \"$1\" \"$2\" \"$3\" \"$4\" \"$5\" \"$6\" release; fi\n");
+            ByteArrayOutputStream bytes=new ByteArrayOutputStream();try(var zip=new org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream(bytes)){var entry=new org.apache.commons.compress.archivers.zip.ZipArchiveEntry("bin/helper");entry.setUnixMode(0100700);zip.putArchiveEntry(entry);zip.write(script.getBytes(StandardCharsets.UTF_8));zip.closeArchiveEntry();}helper=bytes.toByteArray();
             definition.json.put("toolVersion",ToolVersion.VERSION);((ObjectNode)definition.json.get("worker")).put("toolVersion",ToolVersion.VERSION).put("agentSha256",worker.sha256()).put("adapterSetSha256",ManagedRuntime.adapterDigest(ManagedRuntime.class.getClassLoader()));
             ArrayNode java=(ArrayNode)definition.json.get("rendering").get("javaExecutables");java.removeAll();for(int major:List.of(8,17,21,25))java.addObject().put("major",major).put("executable","/opt/java/java"+major+"/bin/java").put("sha256",ManagedFixture.HASH);
             for(int i=0;i<2;i++){byte[] artifact=i==0?helper:image;((ObjectNode)definition.json.get("artifacts").get(i)).put("bytes",artifact.length).put("sha256",FilesSupport.hash(artifact)).put("unpackedBytes",16384).put("inventorySha256",FilesSupport.hash(inventory));}

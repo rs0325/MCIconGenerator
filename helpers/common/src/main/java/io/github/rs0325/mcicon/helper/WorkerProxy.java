@@ -1,4 +1,4 @@
-package io.github.rs0325.mcicon.helper.macos;
+package io.github.rs0325.mcicon.helper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.*;
@@ -7,34 +7,41 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** worker protocolの元line bytesを保ち、PNG公開だけを応答より先に行う。 */
-final class WorkerProxy {
+/** OS helper内部のstdio転送。元line bytesを保ち、PNG公開を応答より先に行う。 */
+public final class WorkerProxy {
     record Pending(String id,String path,Path relative) {}
     private WorkerProxy() {}
-    static int transfer(Process process,Snapshot snapshot) throws IOException {
+    /** OS側の絶対回収予算内で停止し、終了不明では例外にする。 */
+    @FunctionalInterface public interface Stopper {void stop(Process process) throws IOException;}
+    /** helper所有のSystem.in/outと子stdioを転送する。失敗時の有限停止をstopperへ依頼する。 */
+    public static int transfer(Process process,Snapshot snapshot,Stopper stopper) throws IOException {
         Queue<Pending> pending=new ConcurrentLinkedQueue<>();AtomicReference<IOException> failure=new AtomicReference<>();
-        Thread.ofPlatform().daemon().name("mcicon-mac-worker-input").start(()-> {
+        Thread.ofPlatform().daemon().name("mcicon-worker-input").start(()-> {
             OutputStream output=process.getOutputStream();
             try(BufferedInputStream input=new BufferedInputStream(System.in)) {
                 Set<String> ids=new HashSet<>();byte[] line;
                 while((line=line(input,1024*1024))!=null) {
-                    JsonNode request=MacFiles.JSON.readTree(line);if(request==null||!request.isObject())throw new IOException("worker要求はobjectが必要です");String id=request.path("requestId").asText(),command=request.path("command").asText();
+                    JsonNode request=HelperProtocol.JSON.readTree(line);if(request==null||!request.isObject())throw new IOException("worker要求はobjectが必要です");String id=request.path("requestId").asText(),command=request.path("command").asText();
                     if(id.isEmpty()||!ids.add(id)||!Set.of("render","catalog","shutdown").contains(command))throw new IOException("worker要求のID/commandが不正です");
                     String path=command.equals("render")?request.path("path").asText():null;Path relative=path==null?null:snapshot.output(path);pending.add(new Pending(id,path,relative));output.write(line);output.flush();
                 }
-            }catch(IOException error){failure.set(error);process.destroy();}
-            finally {try{output.close();}catch(IOException error){failure.compareAndSet(null,error);process.destroy();}}
+            }catch(IOException error){failure.set(error);try{stopper.stop(process);}catch(IOException cleanup){if(cleanup!=error)error.addSuppressed(cleanup);}}
+            finally {try{output.close();}catch(IOException error){failure.compareAndSet(null,error);try{stopper.stop(process);}catch(IOException cleanup){IOException original=failure.get();if(cleanup!=original)original.addSuppressed(cleanup);}}}
         });
+        IOException error=null;int exit=1;
         try {
             relay(new BufferedInputStream(process.getInputStream()),System.out,pending,snapshot);
-            if(failure.get()!=null)throw failure.get();return process.waitFor();
-        }catch(InterruptedException error){Thread.currentThread().interrupt();throw new InterruptedIOException("worker輸送が中断されました");}
-        finally {if(process.isAlive())Commands.stop(process);}
+            if(failure.get()!=null)throw failure.get();exit=process.waitFor();
+        }catch(InterruptedException interrupted){Thread.currentThread().interrupt();error=new InterruptedIOException("worker輸送が中断されました");}
+        catch(IOException failed){error=failed;}
+        finally {if(process.isAlive())try{stopper.stop(process);}catch(IOException cleanup){if(error==null)error=cleanup;else error.addSuppressed(cleanup);}}
+        IOException inputFailure=failure.get();if(inputFailure!=null&&inputFailure!=error){if(error!=null)inputFailure.addSuppressed(error);error=inputFailure;}
+        if(error!=null)throw error;return exit;
     }
     static void relay(InputStream input,OutputStream output,Queue<Pending> pending,Snapshot snapshot) throws IOException {
         byte[] line;boolean ready=false;
         while((line=line(input,16*1024*1024))!=null) {
-            JsonNode response=MacFiles.JSON.readTree(line);if(response==null||!response.isObject())throw new IOException("worker応答はobjectが必要です");String type=response.path("type").asText();
+            JsonNode response=HelperProtocol.JSON.readTree(line);if(response==null||!response.isObject())throw new IOException("worker応答はobjectが必要です");String type=response.path("type").asText();
             if(type.equals("ready")) {if(ready||response.path("protocolVersion").asInt()!=1)throw new IOException("worker readyが一致しません");ready=true;}
             else {
                 if(!ready)throw new IOException("worker readyより先に応答しました");
