@@ -15,9 +15,10 @@ int main(int argc,char** argv){
     if(mode=="file-reparse")reparse=true;if(mode=="file-close-failure")failClose=true;if(mode=="file-open-failure")failAt=2;
     if(mode=="file-id-changed")fileIdChanged=true;if(mode=="file-security-failure")securityFailure=true;
     if(mode=="middle-file"){middleFile=true;request.replace(request.size()-2,2,",\"C:\\\\child\\\\last\"]}");}
+    if(mode=="token-owner-error")ownerQueryFailure=true;if(mode=="token-owner-invalid")ownerSidInvalid=true;if(mode=="token-owner-size")ownerSizeInvalid=true;
     int result=wmain();
     assert(live.empty()&&opened==closed&&localAllocations==localFrees);
-    if(mode=="normal"||mode=="zero-eof"||mode=="exact-limit"||mode=="file"){assert(result==0&&parents==std::vector<unsigned>({0,1})&&securityHandles==std::vector<unsigned>({1,2}));}
+    if(mode=="normal"||mode=="zero-eof"||mode=="exact-limit"||mode=="file"){assert(tokenQueries==std::vector<int>({TokenUser,TokenUser,TokenOwner,TokenOwner}));assert(result==0&&parents==std::vector<unsigned>({0,1})&&securityHandles==std::vector<unsigned>({1,2}));}
     else assert(result==1);
     return 0;
 }

@@ -32,6 +32,9 @@ using BYTE=uint8_t;using DWORD=uint32_t;using USHORT=uint16_t;using ULONG=uint32
 #define ACCESS_DENIED_ACE_TYPE 1
 #define TOKEN_QUERY 8
 #define TokenUser 1
+#define TokenOwner 4
+#define ERROR_INSUFFICIENT_BUFFER 122
+using TOKEN_INFORMATION_CLASS=int;
 #define CSTR_EQUAL 2
 #define TRUE 1
 #define FALSE 0
@@ -60,12 +63,13 @@ struct UNICODE_STRING {USHORT Length,MaximumLength;wchar_t* Buffer;};
 struct OBJECT_ATTRIBUTES {ULONG Length;HANDLE RootDirectory;UNICODE_STRING* ObjectName;ULONG Attributes;};
 struct IO_STATUS_BLOCK {};
 struct TOKEN_USER {struct {PSID Sid;} User;};
+struct TOKEN_OWNER {PSID Owner;};
 struct FILE_STANDARD_INFO {int64_t AllocationSize,EndOfFile;DWORD NumberOfLinks;BOOL DeletePending,Directory;};
 enum {FileAttributeTagInfo,FileIdInfo,FileStandardInfo};
 struct MockNode {unsigned id;bool file=false;};
 static std::map<HANDLE,MockNode> live;
 static std::vector<unsigned> parents,securityHandles;
-static std::string request="{\"schemaVersion\":2,\"terminalType\":\"directory\",\"paths\":[\"C:\\\\\",\"C:\\\\child\"]}";
+static std::string request="{\"schemaVersion\":3,\"terminalType\":\"directory\",\"paths\":[\"C:\\\\\",\"C:\\\\child\"]}";
 static size_t consumed=0;
 static unsigned opened=0,closed=0,localAllocations=0,localFrees=0,failAt=0;
 static bool reparse=false,failClose=false;
@@ -73,6 +77,7 @@ static bool brokenPipe=true,readError=false,fileMode=false,terminalDirectory=fal
 static DWORD fileKind=FILE_TYPE_DISK,links=1;static unsigned standardCalls=0,changeLinksAt=0;
 static std::map<HANDLE,unsigned> idCalls;
 static DWORD lastError=5;
+static bool ownerQueryFailure=false,ownerSidInvalid=false,ownerSizeInvalid=false;static std::vector<int> tokenQueries;
 static DWORD GetLastError(){return lastError;}
 static void SetLastError(DWORD value){lastError=value;}
 static DWORD GetFileType(HANDLE h){assert(live.at(h).file);if(fileKind==FILE_TYPE_UNKNOWN)lastError=standardFailure?5:0;return fileKind;}
@@ -83,7 +88,7 @@ static BOOL CloseHandle(HANDLE h){assert(live.erase(h)==1);closed++;return !fail
 static void* LocalFree(void* p){localFrees++;std::free(p);return nullptr;}
 static int MultiByteToWideChar(unsigned,unsigned,const char* p,int n,wchar_t* out,int){if(out)for(int i=0;i<n;i++)out[i]=(unsigned char)p[i];return n;}
 static int WideCharToMultiByte(unsigned,unsigned,const wchar_t* p,int n,char* out,int,void*,void*){if(out)for(int i=0;i<n;i++)out[i]=(char)p[i];return n;}
-static BOOL ConvertSidToStringSidW(PSID,LPWSTR* out){const wchar_t* s=L"S-1-1-0";*out=(LPWSTR)std::malloc((std::wcslen(s)+1)*sizeof(wchar_t));std::wcscpy(*out,s);localAllocations++;return TRUE;}
+static BOOL ConvertSidToStringSidW(PSID value,LPWSTR* out){const wchar_t* s=value==(PSID)(uintptr_t)77?L"S-1-5-32-544":L"S-1-1-0";*out=(LPWSTR)std::malloc((std::wcslen(s)+1)*sizeof(wchar_t));std::wcscpy(*out,s);localAllocations++;return TRUE;}
 static BOOL IsValidSid(PSID p){return p!=nullptr;}
 static DWORD GetLengthSid(PSID){return 12;}
 static BOOL GetFileInformationByHandleEx(HANDLE h,int kind,void* out,DWORD){auto n=live.at(h);
@@ -99,7 +104,7 @@ static BOOL GetSecurityDescriptorDacl(void*,BOOL* present,PACL* a,BOOL* defaulte
 static BOOL IsValidAcl(PACL){return TRUE;}
 static BOOL GetAce(PACL,DWORD i,void** p){static ACCESS_ALLOWED_ACE allow{{0,0,sizeof(ACCESS_ALLOWED_ACE)},0xc0020000U,1,{0,0,0}};static ACE_HEADER unknown{42,0,4};*p=i?(void*)&unknown:(void*)&allow;return TRUE;}
 static BOOL OpenProcessToken(HANDLE,DWORD,HANDLE* h){*h=(HANDLE)(uintptr_t)100;live[*h]={100};opened++;return TRUE;}
-static BOOL GetTokenInformation(HANDLE,int,void* p,DWORD,DWORD* n){*n=sizeof(TOKEN_USER);if(p)((TOKEN_USER*)p)->User.Sid=p;return p!=nullptr;}
+static BOOL GetTokenInformation(HANDLE h,int kind,void* p,DWORD,DWORD* n){assert(h==(HANDLE)(uintptr_t)100);tokenQueries.push_back(kind);*n=ownerSizeInvalid&&kind==TokenOwner?65537:sizeof(TOKEN_USER);if(kind==TokenOwner&&ownerQueryFailure){*n=0;lastError=5;return FALSE;}if(p){if(kind==TokenUser)((TOKEN_USER*)p)->User.Sid=p;else {assert(kind==TokenOwner);((TOKEN_OWNER*)p)->Owner=ownerSidInvalid?nullptr:(PSID)(uintptr_t)77;}}if(!p)lastError=ERROR_INSUFFICIENT_BUFFER;return p!=nullptr;}
 static int CompareStringOrdinal(const wchar_t* a,int n,const wchar_t* b,int,bool){return std::wcsncmp(a,b,n)==0?CSTR_EQUAL:0;}
 static BOOL ReadFile(HANDLE h,char* out,DWORD maximum,DWORD* n,void*){assert(h==GetStdHandle(STD_INPUT_HANDLE));if(readError){lastError=5;return FALSE;}size_t count=std::min<size_t>(maximum,request.size()-consumed);if(!count&&brokenPipe){lastError=ERROR_BROKEN_PIPE;return FALSE;}std::memcpy(out,request.data()+consumed,count);consumed+=count;*n=(DWORD)count;return TRUE;}
 static NTSTATUS NtCreateFile(HANDLE* h,DWORD access,OBJECT_ATTRIBUTES* object,IO_STATUS_BLOCK*,void*,DWORD,DWORD share,DWORD disposition,DWORD options,void*,DWORD){

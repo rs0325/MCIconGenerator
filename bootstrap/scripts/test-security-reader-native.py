@@ -10,13 +10,14 @@ with tempfile.TemporaryDirectory(prefix='mcicon-reader-fixture-') as folder:
     (stage / 'reader-source.inc').write_text(source)
     binary = stage / 'fixture'
     subprocess.run([str(args.cxx), '-std=c++17', '-Wall', '-Wextra', '-Werror', '-include', str(root / 'src/test/native/security-api-fixture.h'), '-I', str(stage), '-I', str(root / 'src/main/native'), str(root / 'src/test/native/security-api-fixture.cpp'), '-o', str(binary)], check=True, timeout=30)
-    modes = ['normal', 'zero-eof', 'read-error', 'exact-limit', 'over-limit', 'open-failure', 'reparse', 'close-failure', 'file', 'file-hardlink-zero', 'file-hardlink-two', 'file-hardlink-max', 'file-links-changed', 'file-links-late', 'file-delete-pending', 'file-standard-failure', 'file-type-pipe', 'file-type-unknown', 'file-type-error', 'file-directory', 'file-standard-directory', 'file-reparse', 'file-close-failure', 'file-open-failure', 'file-id-changed', 'file-security-failure', 'middle-file']
+    modes = ['normal', 'zero-eof', 'read-error', 'exact-limit', 'over-limit', 'open-failure', 'reparse', 'close-failure', 'file', 'file-hardlink-zero', 'file-hardlink-two', 'file-hardlink-max', 'file-links-changed', 'file-links-late', 'file-delete-pending', 'file-standard-failure', 'file-type-pipe', 'file-type-unknown', 'file-type-error', 'file-directory', 'file-standard-directory', 'file-reparse', 'file-close-failure', 'file-open-failure', 'file-id-changed', 'file-security-failure', 'middle-file','token-owner-error','token-owner-invalid','token-owner-size']
     for mode in modes:
         result = subprocess.run([str(binary), mode], check=True, capture_output=True, text=True, timeout=5)
         print(json.dumps({'mode': mode, 'stdout': result.stdout, 'stderr': result.stderr, 'exit': result.returncode, 'collected': True}), flush=True)
         value = json.loads(result.stdout)
-        assert value['schemaVersion'] == 2
+        assert value['schemaVersion'] == 3
         if mode in ['normal', 'zero-eof', 'exact-limit', 'file']:
+            assert value['tokenDefaultOwnerSid']=='S-1-5-32-544' and value['tokenUserSid']=='S-1-1-0'
             assert value['status'] == 'observed' and value['rows'][1]['parentIndex'] == 0
             assert value['rows'][0]['aces'][0]['rawMask'] == 0xc0020000
             assert value['rows'][0]['aces'][1]['unknown'] is True
@@ -25,6 +26,7 @@ with tempfile.TemporaryDirectory(prefix='mcicon-reader-fixture-') as folder:
             assert value['rows'][1]['linkCount'] == (1 if mode == 'file' else None)
         else:
             assert value['status'] == 'unknown'
+            if mode == 'token-owner-error': assert value['errorStage'] == 'token-owner' and value['win32OrNtStatus'] == 5
             if mode == 'read-error': assert value['errorStage'] == 'stdin' and value['win32OrNtStatus'] == 5
             if mode == 'over-limit': assert value['errorStage'] == 'stdin-size'
             if mode in ['file-hardlink-zero', 'file-hardlink-two', 'file-hardlink-max', 'file-links-changed', 'file-links-late']: assert value['errorStage'] == 'hardlink-count' and value['linkCount'] != 1

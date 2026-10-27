@@ -8,6 +8,7 @@
 #include <set>
 #include <iostream>
 #include <sstream>
+#include <utility>
 #include "security-protocol.h"
 
 #ifndef OBJ_DONT_REPARSE
@@ -40,7 +41,9 @@ static std::string security(HANDLE handle){Local memory;PSID owner=nullptr;PACL 
             if(header->AceType==ACCESS_ALLOWED_ACE_TYPE||header->AceType==ACCESS_DENIED_ACE_TYPE){auto* ace=(ACCESS_ALLOWED_ACE*)raw;if(header->AceSize<offsetof(ACCESS_ALLOWED_ACE,SidStart)+8)throw Failure{"ace-size",ERROR_INVALID_ACL};PSID principal=&ace->SidStart;check(IsValidSid(principal),"ace-sid");if(offsetof(ACCESS_ALLOWED_ACE,SidStart)+GetLengthSid(principal)>header->AceSize)throw Failure{"ace-sid-size",ERROR_INVALID_ACL};out<<",\"rawMask\":"<<(uint32_t)ace->Mask<<",\"sid\":"<<escaped(sid(principal));}
             else out<<",\"unknown\":true";out<<'}';}
     }out<<']';return out.str();}
-static std::string token(){Handle handle;check(OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&handle.value),"token");DWORD bytes=0;GetTokenInformation(handle.value,TokenUser,nullptr,0,&bytes);if(!bytes||bytes>65536)throw Failure{"token-size",ERROR_INVALID_DATA};std::vector<BYTE> data(bytes);check(GetTokenInformation(handle.value,TokenUser,data.data(),bytes,&bytes),"token-user");return sid(((TOKEN_USER*)data.data())->User.Sid);}
+static std::pair<std::string,std::string> token(){Handle handle;check(OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&handle.value),"token");
+    auto query=[&](TOKEN_INFORMATION_CLASS kind,const char* stage){DWORD bytes=0;if(GetTokenInformation(handle.value,kind,nullptr,0,&bytes))throw Failure{stage,ERROR_INVALID_DATA};DWORD error=GetLastError();if(error!=ERROR_INSUFFICIENT_BUFFER)throw Failure{stage,error};if(!bytes||bytes>65536)throw Failure{"token-size",ERROR_INVALID_DATA};std::vector<BYTE> data(bytes);check(GetTokenInformation(handle.value,kind,data.data(),bytes,&bytes),stage);return sid(kind==TokenUser?((TOKEN_USER*)data.data())->User.Sid:((TOKEN_OWNER*)data.data())->Owner);};
+    auto user=query(TokenUser,"token-user"),owner=query(TokenOwner,"token-owner");return {user,owner};}
 static std::wstring component(const std::wstring& path,const std::wstring& parent){std::wstring prefix=parent;if(prefix.back()!=L'\\')prefix+=L'\\';if(path.size()<=prefix.size()||CompareStringOrdinal(path.data(),(int)prefix.size(),prefix.data(),(int)prefix.size(),TRUE)!=CSTR_EQUAL)throw Failure{"path-chain",ERROR_INVALID_NAME};std::wstring name=path.substr(prefix.size());if(name==L"."||name==L".."||name.find_first_of(L"\\/:\"<>|?*\r\n")!=std::wstring::npos||name.back()==L'.'||name.back()==L' ')throw Failure{"path-component",ERROR_INVALID_NAME};return name;}
 static std::string read(){ULONGLONG end=GetTickCount64()+5000;
     std::string input;char buffer[4096];DWORD n=0;while(true){deadline(end);if(!ReadFile(GetStdHandle(STD_INPUT_HANDLE),buffer,sizeof(buffer),&n,nullptr)){DWORD error=GetLastError();if(error==ERROR_BROKEN_PIPE)break;throw Failure{"stdin",error};}if(!n)break;if(input.size()+n>65536)throw Failure{"stdin-size",ERROR_BUFFER_OVERFLOW};input.append(buffer,n);}Request request=Request::parse(input);
@@ -57,6 +60,6 @@ static std::string read(){ULONGLONG end=GetTickCount64()+5000;
         if(!same(observed,identity(handle->value)))throw Failure{"node-changed",ERROR_INVALID_DATA};if(file)regularFile(handle->value,observed);paths.push_back(path);identities.push_back(observed);handles.push_back(std::move(handle));rows.push_back(row.str());
     }
     for(size_t i=0;i<handles.size();i++){deadline(end);if(!same(identities[i],identity(handles[i]->value)))throw Failure{"ancestor-changed",ERROR_INVALID_DATA};if(request.terminalType=="regular-file"&&i+1==handles.size())regularFile(handles[i]->value,identities[i]);}
-    std::string out="{\"schemaVersion\":2,\"status\":\"observed\",\"tokenUserSid\":"+escaped(token())+",\"rows\":[";for(size_t i=0;i<rows.size();i++){if(i)out+=',';out+=rows[i];}out+="]}";if(out.size()>1048576)throw Failure{"stdout-size",ERROR_BUFFER_OVERFLOW};deadline(end);return out;
+    auto identity=token();std::string out="{\"schemaVersion\":3,\"status\":\"observed\",\"tokenUserSid\":"+escaped(identity.first)+",\"tokenDefaultOwnerSid\":"+escaped(identity.second)+",\"rows\":[";for(size_t i=0;i<rows.size();i++){if(i)out+=',';out+=rows[i];}out+="]}";if(out.size()>1048576)throw Failure{"stdout-size",ERROR_BUFFER_OVERFLOW};deadline(end);return out;
 }
-int wmain(){try{std::string out=read();if(cleanupUnknown)throw Failure{"cleanup",ERROR_INVALID_HANDLE};std::cout<<out<<std::endl;return std::cout?0:1;}catch(const Failure& error){std::cout<<"{\"schemaVersion\":2,\"status\":\"unknown\",\"errorStage\":"<<escaped(error.stage)<<",\"win32OrNtStatus\":"<<error.error<<error.raw<<",\"cleanupUnknown\":"<<(cleanupUnknown?"true":"false")<<'}'<<std::endl;return 1;}catch(const std::exception& error){std::cout<<"{\"schemaVersion\":2,\"status\":\"unknown\",\"errorStage\":"<<escaped(error.what())<<'}'<<std::endl;return 1;}}
+int wmain(){try{std::string out=read();if(cleanupUnknown)throw Failure{"cleanup",ERROR_INVALID_HANDLE};std::cout<<out<<std::endl;return std::cout?0:1;}catch(const Failure& error){std::cout<<"{\"schemaVersion\":3,\"status\":\"unknown\",\"errorStage\":"<<escaped(error.stage)<<",\"win32OrNtStatus\":"<<error.error<<error.raw<<",\"cleanupUnknown\":"<<(cleanupUnknown?"true":"false")<<'}'<<std::endl;return 1;}catch(const std::exception& error){std::cout<<"{\"schemaVersion\":3,\"status\":\"unknown\",\"errorStage\":"<<escaped(error.what())<<'}'<<std::endl;return 1;}}

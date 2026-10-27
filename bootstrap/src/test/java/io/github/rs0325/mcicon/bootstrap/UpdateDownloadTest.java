@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UpdateDownloadTest {
     @TempDir Path directory;
+    Bootstrap bootstrap;
+    @org.junit.jupiter.api.BeforeEach void fixture() throws Exception {directory=directory.toRealPath();bootstrap=new Fixture(directory.resolve("fixture")).bootstrap(directory);}
     static final class Client extends HttpClient {
         final java.util.function.Function<HttpRequest,CompletableFuture<HttpResponse<InputStream>>> reply;
         final AtomicInteger calls=new AtomicInteger();
@@ -41,23 +43,23 @@ class UpdateDownloadTest {
     }
     private long deadline(){return System.nanoTime()+Duration.ofSeconds(3).toNanos();}
     @Test void exactBytesAreWrittenWithoutNetworkAndOversizeRemainsPartial() throws Exception {
-        byte[] bytes={1,2,3};Client client=new Client(r->CompletableFuture.completedFuture(new Reply(r,200,new ByteArrayInputStream(bytes),Map.of())));Path target=directory.resolve("exact");UpdateDownload.get(client,URI.create("https://fixture.invalid/file"),target,3,deadline());assertArrayEquals(bytes,Files.readAllBytes(target));assertEquals(1,client.calls.get());
-        Path partial=directory.resolve("partial");assertThrows(IOException.class,()->UpdateDownload.get(client,URI.create("https://fixture.invalid/file"),partial,2,deadline()));assertTrue(Files.exists(partial));assertEquals(0,Files.size(partial));
+        byte[] bytes={1,2,3};Client client=new Client(r->CompletableFuture.completedFuture(new Reply(r,200,new ByteArrayInputStream(bytes),Map.of())));Path target=directory.resolve("exact");UpdateDownload.get(bootstrap,client,URI.create("https://fixture.invalid/file"),target,3,deadline());assertArrayEquals(bytes,Files.readAllBytes(target));assertEquals(1,client.calls.get());
+        Path partial=directory.resolve("partial");assertThrows(IOException.class,()->UpdateDownload.get(bootstrap,client,URI.create("https://fixture.invalid/file"),partial,2,deadline()));assertTrue(Files.exists(partial));assertEquals(0,Files.size(partial));
     }
     @Test void insecureInitialAndRedirectTargetsAreRejectedBeforeTheirRequest() throws Exception {
-        Client client=new Client(r->CompletableFuture.completedFuture(new Reply(r,302,InputStream.nullInputStream(),Map.of("location",List.of("http://fixture.invalid/insecure")))));assertThrows(IOException.class,()->UpdateDownload.get(client,URI.create("http://fixture.invalid/file"),directory.resolve("one"),3,deadline()));assertEquals(0,client.calls.get());assertThrows(IOException.class,()->UpdateDownload.get(client,URI.create("https://fixture.invalid/file"),directory.resolve("two"),3,deadline()));assertEquals(1,client.calls.get());
+        Client client=new Client(r->CompletableFuture.completedFuture(new Reply(r,302,InputStream.nullInputStream(),Map.of("location",List.of("http://fixture.invalid/insecure")))));assertThrows(IOException.class,()->UpdateDownload.get(bootstrap,client,URI.create("http://fixture.invalid/file"),directory.resolve("one"),3,deadline()));assertEquals(0,client.calls.get());assertThrows(IOException.class,()->UpdateDownload.get(bootstrap,client,URI.create("https://fixture.invalid/file"),directory.resolve("two"),3,deadline()));assertEquals(1,client.calls.get());
     }
     @Test void continuousProgressCannotExtendTheTransferDeadline() throws Exception {
         InputStream slow=new InputStream(){int count;public int read(){try{Thread.sleep(15);}catch(InterruptedException failure){Thread.currentThread().interrupt();}return count++<100?1:-1;}@Override public int read(byte[] b,int offset,int length){int value=read();if(value<0)return -1;b[offset]=(byte)value;return 1;}};
-        Client client=new Client(r->CompletableFuture.completedFuture(new Reply(r,200,slow,Map.of())));long start=System.nanoTime();assertThrows(IOException.class,()->UpdateDownload.get(client,URI.create("https://fixture.invalid/file"),directory.resolve("slow"),100,start+Duration.ofMillis(60).toNanos()));assertTrue(System.nanoTime()-start<Duration.ofSeconds(1).toNanos());
+        Client client=new Client(r->CompletableFuture.completedFuture(new Reply(r,200,slow,Map.of())));long start=System.nanoTime();assertThrows(IOException.class,()->UpdateDownload.get(bootstrap,client,URI.create("https://fixture.invalid/file"),directory.resolve("slow"),100,start+Duration.ofMillis(60).toNanos()));assertTrue(System.nanoTime()-start<Duration.ofSeconds(1).toNanos());
     }
     @Test void stalledReadIsClosedByTheOriginalAbsoluteDeadline() throws Exception {
         CountDownLatch closed=new CountDownLatch(1);InputStream blocked=new InputStream(){public int read() throws IOException {try{closed.await();}catch(InterruptedException failure){Thread.currentThread().interrupt();}throw new IOException("closed");}@Override public void close(){closed.countDown();}};
-        Client client=new Client(r->CompletableFuture.completedFuture(new Reply(r,200,blocked,Map.of())));long start=System.nanoTime();assertThrows(IOException.class,()->UpdateDownload.get(client,URI.create("https://fixture.invalid/file"),directory.resolve("blocked"),100,start+Duration.ofMillis(60).toNanos()));assertEquals(0,closed.getCount());assertTrue(System.nanoTime()-start<Duration.ofSeconds(1).toNanos());
+        Client client=new Client(r->CompletableFuture.completedFuture(new Reply(r,200,blocked,Map.of())));long start=System.nanoTime();assertThrows(IOException.class,()->UpdateDownload.get(bootstrap,client,URI.create("https://fixture.invalid/file"),directory.resolve("blocked"),100,start+Duration.ofMillis(60).toNanos()));assertEquals(0,closed.getCount());assertTrue(System.nanoTime()-start<Duration.ofSeconds(1).toNanos());
     }
     @Test void missingHeadersTimeOutAndTheLateBodyIsClosed() throws Exception {
         CompletableFuture<HttpResponse<InputStream>> response=new CompletableFuture<>(){@Override public boolean cancel(boolean interrupt){return false;}};Client client=new Client(r->response);CountDownLatch closed=new CountDownLatch(1);InputStream body=new ByteArrayInputStream(new byte[]{1}){@Override public void close(){closed.countDown();}};
-        assertThrows(IOException.class,()->UpdateDownload.get(client,URI.create("https://fixture.invalid/file"),directory.resolve("headers"),1,System.nanoTime()+Duration.ofMillis(40).toNanos()));HttpRequest request=HttpRequest.newBuilder(URI.create("https://fixture.invalid/file")).build();response.complete(new Reply(request,200,body,Map.of()));assertTrue(closed.await(1,TimeUnit.SECONDS));assertFalse(Files.exists(directory.resolve("headers")));
+        assertThrows(IOException.class,()->UpdateDownload.get(bootstrap,client,URI.create("https://fixture.invalid/file"),directory.resolve("headers"),1,System.nanoTime()+Duration.ofMillis(40).toNanos()));HttpRequest request=HttpRequest.newBuilder(URI.create("https://fixture.invalid/file")).build();response.complete(new Reply(request,200,body,Map.of()));assertTrue(closed.await(1,TimeUnit.SECONDS));assertFalse(Files.exists(directory.resolve("headers")));
     }
     @Test void signedOldSequenceAndSameVersionCannotAdvanceHighWater() throws Exception {
         Fixture f=new Fixture(directory.toRealPath());var state=Seed.JSON.createObjectNode().put("highestAcceptedSequence",1);state.set("active",f.seed().reference());assertThrows(IOException.class,()->UpdateDownload.newer(f.seed(),state));f.manifest.put("sequence",2);f.writeManifest();assertThrows(IOException.class,()->UpdateDownload.newer(f.seed(),state));f.manifest.put("toolVersion","1.1.1");f.writeManifest();UpdateDownload.newer(f.seed(),state);assertEquals(1,state.path("highestAcceptedSequence").asInt());

@@ -32,13 +32,15 @@ final class WindowsSecurityReader {
         JsonNode licenses=definition.get("licenses");if(!licenses.isArray()||licenses.isEmpty()||licenses.size()>32)throw Seed.invalid("reader license一覧が不正です");
         for(JsonNode row:licenses){Seed.fields(row,"path","bytes","sha256");String name=Seed.text(row,"path");Seed.relative(name);Path path=Seed.resolve(support,name);Seed.regular(path);if(Files.size(path)!=Seed.positive(row,"bytes")||Files.size(path)>4194304||!Seed.hash(path).equals(Seed.digest(row,"sha256")))throw Seed.invalid("reader licenseが不一致です");}
     }
-    JsonNode read(List<Path> paths) throws IOException {return read(paths,false);}
+    JsonNode read(List<Path> paths) throws IOException {return read(paths,false,Long.MAX_VALUE);}
     /** drive rootから親directoryを含むchainの最後を通常fileとして観測する。本文は読まない。 */
-    JsonNode readFile(List<Path> paths) throws IOException {return read(paths,true);}
-    private JsonNode read(List<Path> paths,boolean terminalFile) throws IOException {
+    JsonNode readFile(List<Path> paths) throws IOException {return read(paths,true,Long.MAX_VALUE);}
+    JsonNode read(List<Path> paths,long deadline) throws IOException {return read(paths,false,deadline);}
+    JsonNode readFile(List<Path> paths,long deadline) throws IOException {return read(paths,true,deadline);}
+    private JsonNode read(List<Path> paths,boolean terminalFile,long deadline) throws IOException {
         if(paths.isEmpty()||paths.size()>64||terminalFile&&paths.size()<2)throw Seed.invalid("reader path数が範囲外です");
-        var request=Seed.JSON.createObjectNode().put("schemaVersion",2).put("terminalType",terminalFile?"regular-file":"directory");var names=request.putArray("paths");for(Path path:paths)names.add(path.toString());byte[] input=Seed.JSON.writeValueAsBytes(request);if(input.length>65536)throw Seed.invalid("reader入力が上限外です");
-        long end=clock.getAsLong()+TimeUnit.SECONDS.toNanos(5),cleanup=end+TimeUnit.SECONDS.toNanos(2);
+        var request=Seed.JSON.createObjectNode().put("schemaVersion",3).put("terminalType",terminalFile?"regular-file":"directory");var names=request.putArray("paths");for(Path path:paths)names.add(path.toString());byte[] input=Seed.JSON.writeValueAsBytes(request);if(input.length>65536)throw Seed.invalid("reader入力が上限外です");
+        long end=Math.min(deadline,clock.getAsLong()+TimeUnit.SECONDS.toNanos(5)),cleanup=end+TimeUnit.SECONDS.toNanos(2);checkDeadline(end);
         Process process=new ProcessBuilder(executable.toString()).start();ProcessHandle child=process.toHandle();
         AtomicReference<IOException> failure=new AtomicReference<>();ByteArrayOutputStream stdout=new ByteArrayOutputStream(),stderr=new ByteArrayOutputStream();
         List<Thread> tasks=new ArrayList<>();IOException original=null;
@@ -77,7 +79,7 @@ final class WindowsSecurityReader {
         catch(IOException error){failure.compareAndSet(null,error);}
     }
     private static void validate(JsonNode value,List<Path> paths,boolean terminalFile) throws IOException {
-        Seed.fields(value,"schemaVersion","status","tokenUserSid","rows");Seed.constant(value,"schemaVersion",2);sid(value,"tokenUserSid");JsonNode rows=value.get("rows");if(!rows.isArray()||rows.size()!=paths.size())throw Seed.invalid("reader行数が不一致です");
+        Seed.fields(value,"schemaVersion","status","tokenUserSid","tokenDefaultOwnerSid","rows");Seed.constant(value,"schemaVersion",3);sid(value,"tokenUserSid");sid(value,"tokenDefaultOwnerSid");JsonNode rows=value.get("rows");if(!rows.isArray()||rows.size()!=paths.size())throw Seed.invalid("reader行数が不一致です");
         for(int i=0;i<rows.size();i++) {
             JsonNode row=rows.get(i);Seed.fields(row,"index","path","parentIndex","relativeName","parentFileId","parentVolumeSerial","volumeSerial","fileId","nodeType","linkCount","fileAttributes","reparseTag","ownerSid","controlFlags","daclPresent","daclNull","aces");
             if(!row.path("index").isIntegralNumber()||!row.path("index").canConvertToInt()||row.path("index").intValue()!=i||!paths.get(i).toString().equals(Seed.text(row,"path")))throw Seed.invalid("reader path対応が不一致です");
