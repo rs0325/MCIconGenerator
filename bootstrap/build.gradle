@@ -116,3 +116,31 @@ tasks.register('stageWindowsSecurityReader', Exec) {
                 '--output', file(providers.gradleProperty('windowsBootstrapOutputDir').get())
     }
 }
+
+// 明示署名seedと現在coreの検証後にWindows候補を生成する。
+tasks.register('windowsAppImage', Exec) {
+    dependsOn 'installDist', ':core:jar'
+    description = 'Windows x64のJava同梱app-image/ZIP候補を明示入力から生成する'
+    def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    doFirst {
+        for (String name : ['windowsPackagingPython', 'managedRuntimeInputDir', 'bootstrapSeedDir', 'bootstrapTrustKey', 'windowsSecurityNativeDir', 'windowsBootstrapOwner', 'windowsBootstrapOutputDir']) {
+            if (!providers.gradleProperty(name).isPresent()) throw new GradleException("-P${name}が必要です")
+        }
+        def python = new File(providers.gradleProperty('windowsPackagingPython').get())
+        if (!python.isAbsolute() || !python.isFile()) throw new GradleException('windowsPackagingPythonは既存Pythonの絶対pathが必要です')
+        commandLine python, file('scripts/package-windows-bootstrap.py'),
+                '--jdk', launcher.get().metadata.installationPath.asFile,
+                '--input', new File(tasks.named('installDist').get().destinationDir, 'lib'),
+                '--seed', file(providers.gradleProperty('bootstrapSeedDir').get()),
+                '--trust', file(providers.gradleProperty('bootstrapTrustKey').get()),
+                '--resources', project(':core').layout.buildDirectory.dir('generated/resources/managedRuntime').get().asFile,
+                '--core', project(':core').tasks.named('jar').get().archiveFile.get().asFile,
+                '--native', file(providers.gradleProperty('windowsSecurityNativeDir').get()),
+                '--version', project.version.toString(), '--owner', providers.gradleProperty('windowsBootstrapOwner').get(),
+                '--os', 'windows', '--arch', 'x86_64',
+                '--output', file(providers.gradleProperty('windowsBootstrapOutputDir').get())
+        if (providers.gradleProperty('bootstrapManifestUrl').isPresent()) {
+            args '--stable-manifest-url', providers.gradleProperty('bootstrapManifestUrl').get()
+        }
+    }
+}
