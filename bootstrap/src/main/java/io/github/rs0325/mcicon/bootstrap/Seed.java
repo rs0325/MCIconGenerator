@@ -38,19 +38,22 @@ final class Seed {
     }
     private static void paths(JsonNode value,String field,int minimum) throws IOException {Set<String> seen=new HashSet<>();for(JsonNode path:array(value,field,minimum,100000)){if(!path.isTextual()||!seen.add(path.textValue()))throw invalid("文書pathが重複/不正です");relative(path.textValue());}}
     void verifyArchive(Path archive,long deadline) throws IOException {regular(archive);if(Files.size(archive)!=positive(payload,"bytes")||!hash(archive,deadline).equals(hash))throw invalid("seed ZIPのsize/hashが不一致です");}
-    void extract(Path archive,Path destination,long deadline) throws IOException {
-        verifyArchive(archive,deadline);Files.createDirectory(destination);if(Files.getFileStore(destination).supportsFileAttributeView("posix"))Files.setPosixFilePermissions(destination,java.nio.file.attribute.PosixFilePermissions.fromString("rwx------"));Set<String> names=new HashSet<>();long total=0;
+    void extract(Bootstrap files,Path archive,Path destination,long deadline) throws IOException {unpack(Objects.requireNonNull(files),archive,destination,deadline);}
+    /** 包装検証toolの新規一時directory専用。利用者stateの展開には使用しない。 */
+    void extractForPackage(Path archive,Path destination,long deadline) throws IOException {unpack(null,archive,destination,deadline);}
+    private void unpack(Bootstrap files,Path archive,Path destination,long deadline) throws IOException {
+        check(deadline);verifyArchive(archive,deadline);check(deadline);if(files!=null&&!files.host.os().equals("windows"))files=null;if(files==null){Files.createDirectory(destination);if(Files.getFileStore(destination).supportsFileAttributeView("posix"))Files.setPosixFilePermissions(destination,java.nio.file.attribute.PosixFilePermissions.fromString("rwx------"));}else files.newDirectory(destination,deadline);check(deadline);Set<String> names=new HashSet<>();long total=0;
         try(ZipFile zip=ZipFile.builder().setPath(archive).get()) {
             var entries=zip.getEntries();while(entries.hasMoreElements()) {
                 check(deadline);ZipArchiveEntry entry=entries.nextElement();String raw=StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT).decode(java.nio.ByteBuffer.wrap(entry.getRawName())).toString();String name=entry.isDirectory()&&raw.endsWith("/")?raw.substring(0,raw.length()-1):raw;relative(name);
                 int kind=entry.getUnixMode()&0170000;if(entry.isUnixSymlink()||kind!=0&&kind!=0100000&&kind!=0040000||!zip.canReadEntryData(entry)||!names.add(name)||!raw.equals(entry.getName()))throw invalid("ZIPのlink/特殊/重複entryを拒否しました");
-                Path target=destination.resolve(name);if(entry.isDirectory()){Files.createDirectories(target);continue;}
-                long size=entry.getSize();if(size<0||size>positive(payload,"unpackedBytes")-total)throw invalid("展開上限を超えています");Files.createDirectories(target.getParent());long written=0;
-                try(InputStream input=zip.getInputStream(entry);OutputStream output=Files.newOutputStream(target,StandardOpenOption.CREATE_NEW)) {byte[] buffer=new byte[65536];int count;while((count=input.read(buffer))!=-1){check(deadline);if(count>size-written)throw invalid("ZIP entry sizeを超えています");output.write(buffer,0,count);written+=count;}}
-                if(written!=size)throw invalid("ZIP entryが途中です");total+=written;if((entry.getUnixMode()&0111)!=0&&!target.toFile().setExecutable(true,true))throw invalid("実行属性を設定できません");
+                Path target=destination.resolve(name);if(entry.isDirectory()){if(files==null)Files.createDirectories(target);else files.directory(target,deadline);check(deadline);continue;}
+                long size=entry.getSize();if(size<0||size>positive(payload,"unpackedBytes")-total)throw invalid("展開上限を超えています");if(files==null)Files.createDirectories(target.getParent());else files.directory(target.getParent(),deadline);check(deadline);long written=0;
+                try(InputStream input=zip.getInputStream(entry);OutputStream output=files==null?Files.newOutputStream(target,StandardOpenOption.CREATE_NEW):java.nio.channels.Channels.newOutputStream(files.create(target,deadline))) {check(deadline);byte[] buffer=new byte[65536];int count;while((count=input.read(buffer))!=-1){check(deadline);if(count>size-written)throw invalid("ZIP entry sizeを超えています");output.write(buffer,0,count);written+=count;}}
+                if(written!=size)throw invalid("ZIP entryが途中です");total+=written;check(deadline);if((entry.getUnixMode()&0111)!=0&&!target.toFile().setExecutable(true,true))throw invalid("実行属性を設定できません");
             }
         }
-        verifyContents(destination);
+        check(deadline);verifyContents(destination);check(deadline);
     }
     void verifyContents(Path slot) throws IOException {
         Path inventory=resolve(slot,text(payload,"inventoryPath"));if(!hash(read(inventory,4*1024*1024)).equals(digest(payload,"inventorySha256")))throw invalid("inventory hashが不一致です");
@@ -61,8 +64,19 @@ final class Seed {
         for(String name:List.of("cli","core","worker"))regular(resolve(slot,"app/lib/"+name+"-"+version+".jar"));regular(resolve(slot,"app/worker/worker-agent.jar"));
     }
     JsonNode reference() {return JSON.createObjectNode().put("toolVersion",version).put("payloadSha256",hash).put("runtimeDescriptorSha256",descriptorHash).put("manifestSha256",manifestHash);}
-    static Map<String,String> tree(Path directory,long deadline) throws IOException {
-        Map<String,String> values=new TreeMap<>();try(var paths=Files.walk(directory)){for(Path path:paths.toList()){check(deadline);if(path.equals(directory))continue;String name=directory.relativize(path).toString().replace('\\','/');if(Files.isSymbolicLink(path)||!Files.getOwner(path,LinkOption.NOFOLLOW_LINKS).equals(Files.getOwner(directory,LinkOption.NOFOLLOW_LINKS)))throw invalid("slotのlink/所有が不一致です");if(Files.isDirectory(path,LinkOption.NOFOLLOW_LINKS))values.put(name,"directory");else {regular(path);values.put(name,Files.size(path)+":"+hash(path,deadline)+":"+Files.isExecutable(path));}}}return values;
+    static Map<String,String> tree(Bootstrap files,Path directory,long deadline) throws IOException {
+        Map<String,String> values=new TreeMap<>();tree(files,directory,directory,deadline,values);return values;
+    }
+    private static void tree(Bootstrap files,Path root,Path path,long deadline,Map<String,String> values) throws IOException {
+        check(deadline);boolean directory=Files.isDirectory(path,LinkOption.NOFOLLOW_LINKS);
+        if(files.host.os().equals("windows")){if(directory)files.directory(path,deadline);else files.file(path,deadline);}
+        else if(Files.isSymbolicLink(path)||!Files.getOwner(path,LinkOption.NOFOLLOW_LINKS).equals(Files.getOwner(root,LinkOption.NOFOLLOW_LINKS)))throw invalid("slotのlink/所有が不一致です");
+        check(deadline);String name=root.relativize(path).toString().replace('\\','/');
+        if(directory) {
+            if(!path.equals(root))values.put(name,"directory");
+            try(DirectoryStream<Path> children=Files.newDirectoryStream(path)){for(Path child:children)tree(files,root,child,deadline,values);}
+        } else {regular(path);values.put(name,Files.size(path)+":"+hash(path,deadline)+":"+Files.isExecutable(path));}
+        check(deadline);
     }
     static JsonNode json(byte[] raw) throws IOException {try {return JSON.readTree(StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT).decode(java.nio.ByteBuffer.wrap(raw)).toString());}catch(RuntimeException failure){throw new IOException("JSONが不正です",failure);}}
     static byte[] read(Path path,int maximum) throws IOException {regular(path);if(Files.size(path)>maximum)throw invalid("fileが上限を超えています");try(InputStream input=Files.newInputStream(path)){byte[] raw=input.readNBytes(maximum+1);if(raw.length>maximum)throw invalid("fileが上限を超えています");return raw;}}

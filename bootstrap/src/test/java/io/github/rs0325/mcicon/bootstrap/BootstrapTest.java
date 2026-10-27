@@ -18,6 +18,46 @@ class BootstrapTest {
     JsonNode state() throws IOException {return Seed.json(Files.readAllBytes(root().resolve("active.json")));}
     Path slot() throws IOException {JsonNode active=state().get("active");return root().resolve("tools/"+active.path("toolVersion").asText()+"/"+active.path("payloadSha256").asText());}
     List<Path> receipts() throws IOException {try(var paths=Files.list(root().resolve("runs"))){return paths.toList();}}
+    @Test void atomicRejectsExistingLinkOrDirectoryBeforeCreatingStage() throws Exception {
+        Bootstrap b=fixture().bootstrap(root());b.directory(root());Path staging=root().resolve("staging");b.directory(staging);
+        Path target=root().resolve("config.json"),outside=directory.toRealPath().resolve("outside");Files.writeString(outside,"keep");Files.createSymbolicLink(target,outside);
+        assertThrows(IOException.class,()->b.atomic(target,Seed.JSON.createObjectNode()));assertTrue(Files.isSymbolicLink(target));assertEquals("keep",Files.readString(outside));
+        try(var files=Files.list(staging)){assertEquals(0,files.count());}
+        Files.delete(target);Files.createDirectory(target);
+        assertThrows(IOException.class,()->b.atomic(target,Seed.JSON.createObjectNode()));assertTrue(Files.isDirectory(target,LinkOption.NOFOLLOW_LINKS));
+        try(var files=Files.list(staging)){assertEquals(0,files.count());}
+    }
+    @Test void atomicRejectsUnknownExistenceBeforeCreatingStage() throws Exception {
+        org.junit.jupiter.api.Assumptions.assumeTrue(Files.getFileStore(directory).supportsFileAttributeView("posix"));
+        Bootstrap b=fixture().bootstrap(root());b.directory(root());Path staging=root().resolve("staging"),blocked=root().resolve("blocked");b.directory(staging);b.directory(blocked);Path target=blocked.resolve("config.json");Files.writeString(target,"keep");
+        var permissions=Files.getPosixFilePermissions(blocked);Files.setPosixFilePermissions(blocked,Set.of());
+        try {
+            assertFalse(Files.exists(target,LinkOption.NOFOLLOW_LINKS));assertFalse(Files.notExists(target,LinkOption.NOFOLLOW_LINKS));
+            assertThrows(IOException.class,()->b.atomic(target,Seed.JSON.createObjectNode()));
+            try(var files=Files.list(staging)){assertEquals(0,files.count());}
+        }finally {Files.setPosixFilePermissions(blocked,permissions);}
+        assertEquals("keep",Files.readString(target));
+    }
+    @Test void unknownStateAndConfigAreNotMissingDefaults() throws Exception {
+        org.junit.jupiter.api.Assumptions.assumeTrue(Files.getFileStore(directory).supportsFileAttributeView("posix"));
+        Bootstrap b=fixture().bootstrap(root());b.directory(root());Path active=root().resolve("active.json"),config=root().resolve("config.json");Files.writeString(active,"keep-active");Files.writeString(config,"keep-config");
+        var permissions=Files.getPosixFilePermissions(root());Files.setPosixFilePermissions(root(),Set.of());
+        try {
+            assertFalse(Files.exists(active,LinkOption.NOFOLLOW_LINKS));assertFalse(Files.notExists(active,LinkOption.NOFOLLOW_LINKS));
+            assertFalse(Files.exists(config,LinkOption.NOFOLLOW_LINKS));assertFalse(Files.notExists(config,LinkOption.NOFOLLOW_LINKS));
+            assertThrows(IOException.class,b::state);assertThrows(IOException.class,()->new UpdatePreparation(b).enabled());
+        }finally {Files.setPosixFilePermissions(root(),permissions);}
+        assertEquals("keep-active",Files.readString(active));assertEquals("keep-config",Files.readString(config));
+    }
+    @Test void expiredBudgetDoesNotCreateOrReplaceManagedFiles() throws Exception {
+        Fixture f=fixture();Bootstrap b=f.bootstrap(root());long expired=System.nanoTime()-1;
+        assertThrows(IOException.class,()->b.directory(root(),expired));assertFalse(Files.exists(root()));
+        b.directory(root());b.directory(root().resolve("staging"));Path target=root().resolve("config.json");Files.writeString(target,"keep");
+        assertThrows(IOException.class,()->b.atomic(target,Seed.JSON.createObjectNode(),expired));
+        assertThrows(IOException.class,()->b.create(root().resolve("new"),expired));
+        assertThrows(IOException.class,()->new UpdatePreparation(b).configure(false,expired));
+        assertEquals("keep",Files.readString(target));assertFalse(Files.exists(root().resolve("new")));try(var paths=Files.list(root().resolve("staging"))){assertEquals(0,paths.count());}
+    }
     @Test void actualCliParserRunUsesBundledSlotAndPreservesOfflineDiagnostics() throws Exception {
         Fixture f=fixture();
         actualCli(f);
@@ -97,6 +137,13 @@ class BootstrapTest {
             }
             if(Files.getFileStore(directory).supportsFileAttributeView("posix")){Path existing=directory.toRealPath().resolve("public");Files.createDirectory(existing,java.nio.file.attribute.PosixFilePermissions.asFileAttribute(java.nio.file.attribute.PosixFilePermissions.fromString("rwxr-xr-x")));assertThrows(IOException.class,()->bootstrap.directory(existing));assertEquals(java.nio.file.attribute.PosixFilePermissions.fromString("rwxr-xr-x"),Files.getPosixFilePermissions(existing));}
         }finally{pool.shutdownNow();assertTrue(pool.awaitTermination(3,TimeUnit.SECONDS));}
+    }
+    @Test void launcherWildcardAndArgumentsRemainSingleArgumentsUnderSpacePath() throws Exception {
+        Path base=directory.toRealPath().resolve("space path");Files.createDirectory(base);Fixture f=new Fixture(base);Path observed=base.resolve("java-arguments");
+        String capture=observed.toString().replace("'","'\"'\"'");byte[] launcher=f.files.get("java/bin/java");String script=new String(launcher,java.nio.charset.StandardCharsets.UTF_8).replace("exec ","printf '%s\\n' \"$@\" > '"+capture+"'\nexec ");f.files.put("java/bin/java",script.getBytes(java.nio.charset.StandardCharsets.UTF_8));f.publish();
+        Bootstrap bootstrap=f.bootstrap(base.resolve("state"));assertEquals(0,bootstrap.launch(List.of("space value","literal*","日本語")));
+        List<String> argv=Files.readAllLines(observed,java.nio.charset.StandardCharsets.UTF_8);JsonNode active=Seed.json(Files.readAllBytes(base.resolve("state/active.json"))).get("active");Path slot=base.resolve("state/tools/"+active.path("toolVersion").asText()+"/"+active.path("payloadSha256").asText());
+        assertEquals("-cp",argv.get(1));assertEquals(slot.resolve("app/lib").toString()+File.separator+"*",argv.get(2));assertEquals(List.of("space value","literal*","日本語"),argv.subList(4,argv.size()));
     }
     @Test void initialSeedStartsRealJavaChildAndRecordsItsExit() throws Exception {
         Fixture f=fixture();assertEquals(7,f.bootstrap(root()).launch(List.of("exit7","日本語","space value")));JsonNode state=state();assertEquals(1,state.path("highestAcceptedSequence").asInt());assertTrue(state.path("pending").isNull());

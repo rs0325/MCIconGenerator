@@ -27,7 +27,7 @@ final class ManagedPackageVerifier {
         byte[] descriptor=required(expected,Seed.text(selected,"descriptorPath")),signature=required(expected,Seed.text(selected,"descriptorPath")+".sig");if(!Seed.hash(descriptor).equals(Seed.digest(selected,"descriptorSha256")))throw Seed.invalid("resource descriptor pinが不一致です");Seed.signed(descriptor,signature,key);
         Path temporary=Files.createTempDirectory("mcicon-managed-package-");Exception original=null;
         try {
-            Path slot=temporary.resolve("slot");seed.extract(seedDirectory.resolve("tool.zip"),slot,System.nanoTime()+java.time.Duration.ofMinutes(10).toNanos());
+            Path slot=temporary.resolve("slot");seed.extractForPackage(seedDirectory.resolve("tool.zip"),slot,System.nanoTime()+java.time.Duration.ofMinutes(10).toNanos());
             Path definition=Seed.resolve(slot,Seed.text(seed.platform.get("runtimeDescriptor"),"path"));if(!Arrays.equals(descriptor,Seed.read(definition,1024*1024))||!Arrays.equals(signature,Seed.read(Path.of(definition+".sig"),64)))throw Seed.invalid("seedとcoreのdescriptor署名bytesが異なります");
             String agent=Seed.text(Seed.json(descriptor).get("worker"),"agentSha256");if(!agent.equals(Seed.hash(slot.resolve("app/worker/worker-agent.jar"))))throw Seed.invalid("payload agentとruntime指定が異なります");
             Path core=slot.resolve("app/lib/core-"+version+".jar");Seed.regular(currentCore);if(Files.size(core)!=Files.size(currentCore)||!Seed.hash(core).equals(Seed.hash(currentCore)))throw Seed.invalid("payload coreと現在buildしたcore JAR全体が異なります");Set<String> seen=new HashSet<>();
