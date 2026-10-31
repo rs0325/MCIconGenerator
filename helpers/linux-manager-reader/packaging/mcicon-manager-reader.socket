@@ -1,0 +1,15 @@
+[Unit]
+Description=MCIcon user manager read-only endpoint
+
+[Socket]
+ListenStream=/run/mcicon-manager-reader.sock
+SocketMode=0666
+SocketUser=root
+SocketGroup=root
+Accept=yes
+MaxConnections=8
+Backlog=1
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target
