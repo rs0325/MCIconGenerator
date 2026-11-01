@@ -48,6 +48,13 @@ final class Bootstrap {
         if(Files.getFileStore(path).supportsFileAttributeView("posix")){var mode=PosixFilePermissions.fromString("rwx------");if(!Files.getPosixFilePermissions(path,LinkOption.NOFOLLOW_LINKS).equals(mode))throw Seed.invalid("private directoryのmodeが不一致です");}
     Seed.check(deadline);}
     void file(Path path,long deadline) throws IOException {Seed.check(deadline);if(windows!=null){windows.verify(path.toAbsolutePath().normalize(),true,deadline);return;}Seed.regular(path);canonical(path);if(!Files.getOwner(path,LinkOption.NOFOLLOW_LINKS).equals(owner))throw Seed.invalid("bootstrap fileの所有が不明です");Seed.check(deadline);}
+    /** 更新receiptの資格を確認し、同じ物理fileとの照合に使うOS固有keyを返す。 */
+    String fileIdentity(Path path,long deadline) throws IOException {Seed.check(deadline);
+        if(windows!=null)return windows.fileIdentity(path.toAbsolutePath().normalize(),deadline);
+        file(path,deadline);Object key=Files.readAttributes(path,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey();
+        if(key==null||key.toString().isEmpty()||key.toString().length()>512)throw Seed.invalid("receipt fileKey取得不可のためunknown保持します");
+        Seed.check(deadline);return key.toString();
+    }
     private static void canonical(Path path) throws IOException {for(Path p=path;p!=null;p=p.getParent())if(Files.isSymbolicLink(p))throw Seed.invalid("bootstrap pathにlinkがあります");}
     FileChannel create(Path path,long deadline) throws IOException {Seed.check(deadline);
         if(windows!=null)return windows.create(path.toAbsolutePath().normalize(),deadline);

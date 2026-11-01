@@ -20,6 +20,20 @@ class UpdatePreparationTest {
         JsonNode record=UpdatePreparation.receipt(Seed.json(Seed.read(prep.path(id),65536)));assertEquals("reserved",record.path("state").asText());assertTrue(record.path("child").isNull());assertEquals(id,b.state().path("preparation").path("invocation").asText());
         assertNull(prep.reserve(initial,pin(),Instant.now(),deadline()));assertNull(prep.reserve(b.state(),pin(),Instant.now(),deadline()));
     }
+    @Test void oldReceiptKeyIsNotMigratedOrFenced() throws Exception {
+        Bootstrap b=bootstrap();UpdatePreparation prep=new UpdatePreparation(b);String id=prep.reserve(b.state(),pin(),Instant.now().minusSeconds(360),deadline());
+        ObjectNode state=(ObjectNode)b.state(),record;
+        try(FileChannel channel=FileChannel.open(prep.path(id),StandardOpenOption.READ)){record=(ObjectNode)UpdatePreparation.readReceipt(channel);}
+        ((ObjectNode)state.get("preparation")).put("receiptKey","old-windows-key");record.put("receiptKey","old-windows-key");
+        try(FileChannel channel=FileChannel.open(prep.path(id),StandardOpenOption.WRITE)){Bootstrap.write(channel,record);}b.atomic(b.root.resolve("active.json"),state);byte[] before=Files.readAllBytes(prep.path(id));
+        assertThrows(IOException.class,()->prep.reserve(state,pin(),Instant.now(),deadline()));assertEquals(state,b.state());assertArrayEquals(before,Files.readAllBytes(prep.path(id)));
+    }
+    @Test void childRejectsChangedIdentityBeforeAckAndReleasesLock() throws Exception {
+        Bootstrap b=bootstrap();UpdatePreparation prep=new UpdatePreparation(b);String id=prep.reserve(b.state(),pin(),Instant.now(),deadline());ObjectNode record;
+        try(FileChannel channel=FileChannel.open(prep.path(id),StandardOpenOption.READ,StandardOpenOption.WRITE)){record=(ObjectNode)UpdatePreparation.readReceipt(channel);assertEquals(b.fileIdentity(prep.path(id),deadline()),record.path("receiptKey").asText());record.put("receiptKey","other-file");Bootstrap.write(channel,record);}
+        byte[] before=Files.readAllBytes(prep.path(id));assertThrows(IOException.class,()->PreparationMain.run(b.installed,b.root,id));assertArrayEquals(before,Files.readAllBytes(prep.path(id)));
+        try(FileChannel channel=FileChannel.open(prep.path(id),StandardOpenOption.READ,StandardOpenOption.WRITE);FileLock lock=channel.tryLock()){assertNotNull(lock);assertTrue(record.path("child").isNull());}
+    }
     @Test void expiryWithoutReceiptLockNeverPermitsAnotherWorker() throws Exception {
         Bootstrap b=bootstrap();UpdatePreparation prep=new UpdatePreparation(b);String id=prep.reserve(b.state(),pin(),Instant.now().minusSeconds(360),deadline());JsonNode before=b.state();
         try(FileChannel channel=FileChannel.open(prep.path(id),StandardOpenOption.READ,StandardOpenOption.WRITE);FileLock held=channel.lock()){assertNull(prep.reserve(before,pin(),Instant.now(),deadline()));assertEquals(before,b.state());}
