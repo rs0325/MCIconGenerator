@@ -15,6 +15,22 @@ class UpdatePreparationTest {
     private long deadline(){return System.nanoTime()+Duration.ofSeconds(5).toNanos();}
     private Bootstrap bootstrap() throws Exception {directory=directory.toRealPath();Fixture fixture=new Fixture(directory);Bootstrap b=fixture.bootstrap(directory.resolve("root"));assertEquals(0,b.launch(java.util.List.of()));return b;}
     private JsonNode pin(){ObjectNode pin=Seed.JSON.createObjectNode().put("java","a".repeat(64)).put("metadata","b".repeat(64));pin.putObject("jars").put("bootstrap.jar","c".repeat(64));return pin;}
+    @Test void childClasspathKeepsWildcardOutsideTheInstalledPath() throws Exception {
+        directory=directory.toRealPath();Fixture fixture=new Fixture(directory);Bootstrap b=fixture.bootstrap(directory.resolve("root"));b.repair();((ObjectNode)b.info).put("stableManifestUrl","https://fixture.invalid/stable.json");
+        Path runtime=fixture.installed.getParent().resolve(b.host.os().equals("macos")?"runtime/Contents/Home":"runtime");
+        for(var row:fixture.files.entrySet())if(row.getKey().startsWith("java/")){Path target=runtime.resolve(row.getKey().substring(5));Files.createDirectories(target.getParent());Files.write(target,row.getValue());}
+        if(!b.host.os().equals("windows"))Files.setPosixFilePermissions(runtime.resolve("bin/java"),java.nio.file.attribute.PosixFilePermissions.fromString("rwx------"));
+        try(var jar=new java.util.jar.JarOutputStream(Files.newOutputStream(fixture.installed.resolve("empty.jar")))){}
+        String home=System.getProperty("java.home");Path recording=directory.resolve("child.jfr");
+        try(var events=new jdk.jfr.Recording()) {
+            events.enable("jdk.ProcessStart");events.start();
+            try {System.setProperty("java.home",runtime.toString());assertThrows(IOException.class,()->new UpdatePreparation(b).start(System.nanoTime()+Duration.ofSeconds(20).toNanos()));}
+            finally {System.setProperty("java.home",home);}
+            events.stop();events.dump(recording);
+        }
+        var starts=jdk.jfr.consumer.RecordingFile.readAllEvents(recording).stream().filter(e->e.getEventType().getName().equals("jdk.ProcessStart")&&e.getString("command").contains(PreparationMain.class.getName())).toList();
+        assertEquals(1,starts.size());assertTrue(starts.getFirst().getString("command").contains("-cp "+fixture.installed+java.io.File.separator+"* "+PreparationMain.class.getName()));
+    }
     @Test void reservationPrecedesStartAndSecondOwnerCannotObtainPermit() throws Exception {
         Bootstrap b=bootstrap();UpdatePreparation prep=new UpdatePreparation(b);JsonNode initial=b.state();String id=prep.reserve(initial,pin(),Instant.now(),deadline());assertNotNull(id);
         JsonNode record=UpdatePreparation.receipt(Seed.json(Seed.read(prep.path(id),65536)));assertEquals("reserved",record.path("state").asText());assertTrue(record.path("child").isNull());assertEquals(id,b.state().path("preparation").path("invocation").asText());
