@@ -3,6 +3,7 @@ package io.github.rs0325.mcicon.cli;
 import io.github.rs0325.mcicon.*;
 import io.github.rs0325.mcicon.internal.Json;
 import io.github.rs0325.mcicon.internal.ToolVersion;
+import io.github.rs0325.mcicon.internal.WindowsDataHome;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 import java.nio.file.Path;
@@ -83,13 +84,14 @@ public final class Main implements Runnable {
     }
     static class Common {
         StartupControl startup;
-        @Option(names="--cache",description="Input cache directory.") Path cache=Path.of(".mcicon-cache");
+        @Option(names="--cache",description="Input cache directory.") Path cache;
         @Option(names="--offline",description="Use verified cached inputs only.") boolean offline;
         @Option(names="--minecraft-dir",description="既存インストールの公式入力を検証してcacheへコピーする。") Path minecraft;
         @Option(names="--json",description="Write structured JSON to stdout.") boolean json;
         MCIconGenerator generator(CancellationToken token) {
             StartupControl control=startup;if(control!=null)control.cancellation(token::cancel);
-            return new MCIconGenerator(cache,offline,event->{if(control!=null&&event.phase().equals("startup-ready"))control.ready();System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total());},token,minecraft);
+            Path data=WindowsDataHome.configuredRoot(),input=cache!=null?cache:data!=null?data.resolve("cache"):Path.of(".mcicon-cache");
+            return new MCIconGenerator(input,offline,event->{if(control!=null&&event.phase().equals("startup-ready"))control.ready();System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total());},token,minecraft);
         }
     }
     // The standard help mixin also defines --version, which conflicts with the

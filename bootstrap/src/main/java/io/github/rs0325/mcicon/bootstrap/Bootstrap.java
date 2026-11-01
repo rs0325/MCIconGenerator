@@ -1,6 +1,7 @@
 package io.github.rs0325.mcicon.bootstrap;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.github.rs0325.mcicon.internal.WindowsDataHome;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.*;
 import java.nio.channels.*;
@@ -20,14 +21,26 @@ final class Bootstrap {
     final JsonNode info;
     private final UserPrincipal owner;
     private final WindowsPrivateFiles windows;
+    private final Path dataRoot;
     Bootstrap(Path installed,Path root,Seed.Host host) throws IOException {
         this.installed=installed.toAbsolutePath().normalize();this.root=root.toAbsolutePath().normalize();this.host=host;
+        dataRoot=host.os().equals("windows")?WindowsDataHome.configuredRoot():null;
         canonical(this.installed);info=Seed.json(Seed.read(this.installed.resolve("bootstrap-package.json"),65536));Seed.fields(info,"schemaVersion","bootstrapVersion","bootstrapProtocol","owner","host","stableManifestUrl");if(!info.path("stableManifestUrl").isNull())Seed.https(Seed.text(info,"stableManifestUrl"));Seed.constant(info,"schemaVersion",1);Seed.constant(info,"bootstrapProtocol",2);Seed.version(info,"bootstrapVersion");Seed.choice(info,"owner","homebrew","winget","installer","archive");
         if(!info.path("host").equals(Seed.JSON.valueToTree(host)))throw Seed.invalid("package hostが一致しません");
         try {key=KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(Seed.read(this.installed.resolve("trust.der"),1024)));}
         catch(GeneralSecurityException failure){throw new IOException("packageの固定trustが未設定/不正です",failure);}
         owner=host.os().equals("windows")?null:FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByName(System.getProperty("user.name"));
         windows=host.os().equals("windows")?new WindowsPrivateFiles(this.installed,this.root):null;
+    }
+    ProcessBuilder configureChild(ProcessBuilder builder,long deadline) throws IOException {
+        if(dataRoot!=null) {
+            Path temp=root.resolve("tmp");directory(temp,deadline);
+            builder.command().add(1,"-Djava.io.tmpdir="+temp);
+            builder.environment().keySet().removeIf(name->name.equalsIgnoreCase("MCICON_DATA_HOME")||name.equalsIgnoreCase("TMP")||name.equalsIgnoreCase("TEMP"));
+            builder.environment().put("MCICON_DATA_HOME",dataRoot.toString());
+            builder.environment().put("TMP",temp.toString());builder.environment().put("TEMP",temp.toString());
+        }
+        return builder;
     }
     void directory(Path path) throws IOException {directory(path,Long.MAX_VALUE);}
     void file(Path path) throws IOException {file(path,Long.MAX_VALUE);}
@@ -185,7 +198,7 @@ String[] parts=pin.split("@",-1);if(parts.length!=2||!parts[0].matches("[0-9]+\\
             if(arguments.equals(List.of("--version"))||arguments.equals(List.of("-V")))System.err.println("Bootstrap "+Seed.text(info,"bootstrapVersion")+" (owner: "+Seed.text(info,"owner")+")");
             control=new StartupControl(reference,record.path("invocationId").asText(),arguments);
             List<String> command=new ArrayList<>(List.of(slot.resolve("java/bin/"+(host.os().equals("windows")?"java.exe":"java")).toString(),control.property(),"-cp",slot.resolve("app/lib").toString()+File.separator+"*","io.github.rs0325.mcicon.cli.Main"));command.addAll(arguments);
-            Seed.check(deadline);child=new ProcessBuilder(command).inheritIO().start();Seed.check(deadline);
+            Seed.check(deadline);child=configureChild(new ProcessBuilder(command),deadline).inheritIO().start();Seed.check(deadline);
             var started=child.info().startInstant();if(started.isPresent()){record.put("state","running");record.set("child",Seed.JSON.createObjectNode().put("pid",child.pid()).put("startedAt",started.get().toString()));write(channel,record);}
             try(StartupControl.Session session=control.accept(child,Duration.ofSeconds(30))) {
                 if(session==null)return new LaunchResult(awaitChild(child,channel,record),null,null,null);

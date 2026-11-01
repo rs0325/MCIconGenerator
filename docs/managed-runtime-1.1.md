@@ -90,7 +90,7 @@ renderingのCPU要件は `cpuRequirement: "sse4.1"` に固定し、helperは対�
 
 ## 配置と所有
 
-CLIの設定・状態root候補はmacOS `~/Library/Application Support/MCIconGenerator`、Windows `%LOCALAPPDATA%\MCIconGenerator`、Linux `${XDG_DATA_HOME:-~/.local/share}/mcicon`。cacheは各OS標準cache領域に分ける。Java APIはrootを明示できる。利用者のoutputはこのrootへ取り込まない。
+管理runtimeの既定rootはmacOS `~/Library/Application Support/MCIconGenerator`、Windows `%LOCALAPPDATA%\MCIconGenerator`、Linux `${XDG_DATA_HOME:-~/.local/share}/mcicon`。Windowsで任意の`MCICON_DATA_HOME`を指定すると`ManagedOptions.defaults()`はその配下`runtime`を選ぶ。明示constructorのrootは環境変数を参照せず優先し、不正な環境変数ではdefaultsが`IllegalArgumentException`となる。入力cacheは別領域で、CLIの未指定cacheだけを変数配下`cache`へ切り替える。利用者のoutputは取り込まない。[Windows保存先の契約・保証範囲](usage.md#Windowsのデータ保存先)を参照。
 
 ```text
 root/

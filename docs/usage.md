@@ -22,7 +22,7 @@ buildx pluginがCLIから見つからないHomebrew環境では `/opt/homebrew/l
 
 ## CLI
 
-配布ZIPのインストール・Maven形式ライブラリの使い方は[配布ガイド](distribution.md)を参照してください。以下では配布物の `bin/mcicon`（Windowsでは `bin/mcicon.bat`）、またはソースbuildの `cli/build/install/mcicon/bin/mcicon` を `mcicon` と表記します。全コマンドで `--help` を使えます。既定cacheは `.mcicon-cache` です。
+配布ZIPのインストール・Maven形式ライブラリの使い方は[配布ガイド](distribution.md)を参照してください。以下では配布物の `bin/mcicon`（Windowsでは `bin/mcicon.bat`）、またはソースbuildの `cli/build/install/mcicon/bin/mcicon` を `mcicon` と表記します。全コマンドで `--help` を使えます。既定cacheはCWD相対の `.mcicon-cache` で、Windowsでは下記の環境変数で変更できます。
 
 ```sh
 mcicon versions --json
@@ -55,6 +55,34 @@ HTTPS取得は1試行あたりredirect・本文を含めて2分、最大3試行�
 初回はオンラインで完了させ、同じcacheに `--offline` を付けて再実行できます。offline時も公式SHA-1・sizeまたは記録済みSHA-256を照合します。cache verifyは記録済みSHA-256のある入力を検証する機能で、cache内のすべてのファイルが検証対象という意味ではありません。破損した入力はオンライン準備時に修復します。
 
 同じ出力先はサイズ、元JAR、mappings、worker agent、描画環境等が一致するジョブで再利用してください。条件が変わったら別の `--out` または `--overwrite` を使います。overwriteは今回選択したファイルに対して働き、以前の別IDのファイルを一括削除しません。PNG・manifestはそれぞれ原子的に保存します。複数ファイル全体が一つのトランザクションではないので、途中終了後はmanifestのhash照合から再開してください。icons/rawとも書き込み前に選択IDと必要な付随mcmetaを予約し、16件ごと・失敗時・終了時にmanifestを更新します。クラッシュ後の未確定ファイルは再生成します。OUTPUT_EXISTSとされた所有権不明のファイルは、再開しても上書きしません。明示overwriteの受理後は新たな予約として再開できます。ツール専用の `.mcicon-<数字>.part` が残った場合は、次のエクスポートがロック取得後に回収します。
+
+## Windowsのデータ保存先
+
+任意のプロセス環境変数`MCICON_DATA_HOME`で、Windowsの保存先をまとめて指定できます。通常のdrive付き絶対pathを指定してください。空白を含むpathも使えますが、値自体に引用符を含めません。
+
+```powershell
+$env:MCICON_DATA_HOME = 'H:\MCIconData'
+mcicon cache status --offline --json
+mcicon render --version 1.21.4 --id diamond --out 'H:\MCIconOutput'
+```
+
+| 対象 | 指定時の既定先 | 未指定時 |
+| --- | --- | --- |
+| bootstrap state・署名slot・更新記録 | `<MCICON_DATA_HOME>/bootstrap` | `%LOCALAPPDATA%/MCIconBootstrap`（未設定はhome配下AppData/Local） |
+| 管理runtime | `<MCICON_DATA_HOME>/runtime` | `%LOCALAPPDATA%/MCIconGenerator`（未設定はhome配下AppData/Local） |
+| CLIの入力cache | `<MCICON_DATA_HOME>/cache` | CWD相対の`.mcicon-cache` |
+| bootstrapが起動するCLI/trial・更新準備子のtemp | `<MCICON_DATA_HOME>/bootstrap/tmp` | JVM/プロセスの既定 |
+| export出力 | 必須の`--out` | 同左 |
+
+明示`--cache`、Java APIの明示`ManagedOptions.runtimeRoot`を優先し、`--out`は変更しません。相対`--cache`と`--out`はCWD基準です。Hへ揃える受入では明示cache/outもHの絶対pathを指定します。全利用者へのH強制や同volume強制は行いません。直接Java APIへ渡す入力cacheも従来どおり明示引数です。
+
+相対path、drive相対（`H:relative`）、root相対、UNC、device/拡張prefix、空・不正な値は入力エラーです。値のtrim・環境変数展開や旧既定先へのfallbackは行いません。bootstrapは`BOOTSTRAP_INVALID`/終了2、CLIは`INVALID_REQUEST`/終了2、`ManagedOptions.defaults()`は`IllegalArgumentException`になります。不正値はCLIの明示`--cache`でも救済しません。明示`ManagedOptions` constructorは環境変数を参照しません。macOS/Linuxは変数を参照せず、既定先を維持します。
+
+指定先は独立した保存領域となり、旧C等のstate/cache/slotを探索・採用・コピー・削除・移行しません。新規準備・再取得が必要です。bootstrapのroot・親・既tmpのowner/ACL/reparse/未知状態に対する既存の拒否条件を維持し、不適格なHrootを自動修復しません。program prefixとdata rootは別で、通常uninstallはdataを保持する責務境界です。uninstallerの実装はこの指定機能に含みません。
+
+H配置の保証は本機能対応済みと確認した固定bootstrap・seed・core/CLI・選択slot・trial/更新候補の組合せが対象です。署名とbootstrap protocol 2だけでは未対応の旧版も選択できるため、旧版へ変数を渡すだけではHを保証しません。受入では各配布物の版・識別子・ハッシュと通常/pin/更新の選択経路を固定して利用先を確認します。旧Cのtree/hash不変は無変更の証拠であり、未読取・未採用は解決した各rootとconsumerの実利用先/入出力先で別途確認します。OS全体のread監査を保証する機能ではありません。
+
+bootstrapは上記2種類の子だけに正規化した変数、`-Djava.io.tmpdir`、`TMP`/`TEMP`を渡します。最初のbootstrap JVM自身、bootstrapを経由しない直接CLI/core API、build時ManagedPackageVerifier、OS/JVM・外部runtimeが別途選ぶtempのH配置は保証対象外です。正式H専用entry/installerの値供給、winget受入、Hrootの資格修復は別作業です。Windows実機でのH配置受入は未実施です。
 
 ## 取得対象
 

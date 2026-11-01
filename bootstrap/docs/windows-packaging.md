@@ -64,3 +64,11 @@ Gradleの`windowsAppImage`はinstallDist/core JARに依存し、同じ入口へ�
 局所testは固定crossbuild nativeの実stagingと、代役JDK toolによる引数/排他/不一致・license欠損改変/全bytes拒否を確認する。placeholder JAR/runtime/seedを使うため実JVM・署名seed検証・Windows jlink/jpackage成功を示さない。実機では別の具体許可で固定入力から生成し、新artifactのhelp/version/offline-cache/repair、独立OS lineageと3receipt、全本人回収と監査を受け入れる。
 
 この生成物はinstallerが提供する実体・全reparse拒否・他標準userの書換え拒否prefixの代替ではない。reader自身のhashでその外部前提を循環証明しない。正式配置ACL、実winget install、標準非admin一般、upgrade/uninstall、本番署名/配布は別成果。Refs #97であり、#97全体の完了を意味しない。
+
+## 任意のdata rootとH配置の受入範囲
+
+対応済み候補は利用者プロセスの`MCICON_DATA_HOME`から、`bootstrap/runtime/cache`の各既定先とbootstrap子専用の`bootstrap/tmp`を導出する。packagerやinstallerへ値供給の仕組みを追加する変更ではない。program prefixとdata rootを分離し、通常uninstallはdataを保持する責務境界とする。詳細な優先順・失敗・移行なし・temp範囲は[利用ガイド](../../docs/usage.md#Windowsのデータ保存先)を参照。
+
+H受入は本機能対応済みの固定bootstrap/seed/core/CLI/slot/更新候補の版・配布物識別子・hashを記録し、normal・pin・trial/更新経路ごとにbootstrap/runtime/cacheと出力の実利用先を確認する。既存署名検証/protocol 2だけでresolver対応済みとは判断しない。旧Cのtree/hash不変は無変更だけを示すため、未採用・未読取は各rootとconsumerの入出力先で別途確認する。OS全read監査は保証しない。
+
+実機のHroot資格・owner/ACL/reparse拒否・cold準備/doctor/render・所有回収は別許可の実機検証が必要で、現時点では未確認。最初のbootstrap JVM、直接CLI/core、build時verifier、OS/外部runtimeが別途使うtempはH保証の対象外。正式H entry/installer・winget・本番H変更・資格修復・uninstaller実装の完了を意味しない。

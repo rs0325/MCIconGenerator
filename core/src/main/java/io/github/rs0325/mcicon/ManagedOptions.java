@@ -1,6 +1,7 @@
 package io.github.rs0325.mcicon;
 
 import java.nio.file.Path;
+import io.github.rs0325.mcicon.internal.WindowsDataHome;
 import java.time.Duration;
 import java.util.Locale;
 
@@ -21,11 +22,18 @@ public record ManagedOptions(Path runtimeRoot,Duration preparationTimeout,Durati
         if(runtimeRoot==null||preparationTimeout==null||startupTimeout==null||itemTimeout==null||preparationTimeout.isNegative()||preparationTimeout.isZero()||startupTimeout.isNegative()||startupTimeout.isZero()||itemTimeout.isNegative()||itemTimeout.isZero())throw new IllegalArgumentException("管理rootと正の期限を指定してください");
         if(containerMemoryMiB<=0||heapMemoryMiB<=0||heapMemoryMiB>=containerMemoryMiB)throw new IllegalArgumentException("メモリ上限は正のMiB整数で、heapはcontainer未満にしてください");
     }
-    /** OS標準の専用root、準備15分・起動180秒・要求30秒、container 3072/heap 2048 MiB。 */
+    /**
+     * OS標準の専用root、準備15分・起動180秒・要求30秒、container 3072/heap 2048 MiB。
+     * WindowsでMCICON_DATA_HOMEに通常drive付き絶対pathを指定すると、正規化した配下runtimeを使う。
+     * 未指定Windowsおよび他OSでは従来の既定を維持し、不正指定時は旧rootへfallbackしない。
+     * 明示constructorのruntimeRootは環境変数を参照せず、そのまま優先する。
+     * @return 既定の管理環境設定。directory作成や既存データ移行は行わない
+     * @throws IllegalArgumentException WindowsのMCICON_DATA_HOMEが不正な場合
+     */
     public static ManagedOptions defaults() {
         String os=System.getProperty("os.name").toLowerCase(Locale.ROOT);Path home=Path.of(System.getProperty("user.home"));Path root;
         if(os.contains("mac"))root=home.resolve("Library/Application Support/MCIconGenerator");
-        else if(os.contains("win")){String local=System.getenv("LOCALAPPDATA");root=local==null?home.resolve("AppData/Local/MCIconGenerator"):Path.of(local).resolve("MCIconGenerator");}
+        else if(os.contains("win")){Path data=WindowsDataHome.configuredRoot();String local=System.getenv("LOCALAPPDATA");root=data!=null?data.resolve("runtime"):local==null?home.resolve("AppData/Local/MCIconGenerator"):Path.of(local).resolve("MCIconGenerator");}
         else {String data=System.getenv("XDG_DATA_HOME");root=data==null?home.resolve(".local/share/mcicon"):Path.of(data).resolve("mcicon");}
         return new ManagedOptions(root,Duration.ofMinutes(15),Duration.ofSeconds(180),Duration.ofSeconds(30),3072,2048);
     }
