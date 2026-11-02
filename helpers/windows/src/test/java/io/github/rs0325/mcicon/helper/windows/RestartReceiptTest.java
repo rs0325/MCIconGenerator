@@ -16,6 +16,7 @@ class RestartReceiptTest {
     WslDistribution distribution;
     String attempt;
     @BeforeEach void setup() throws Exception {
+        temporary=temporary.toRealPath();
         lease=new OwnershipTest().lease();HostFacts before=new OwnershipTest().host(OwnershipTest.DEFAULT,List.of(new HostFacts.Distribution("existing",OwnershipTest.DEFAULT,"C:\\existing",2)));
         distribution=new WslDistribution(temporary.toRealPath(),lease,before);ObjectNode owner=distribution.reserve(before);Files.createDirectory(distribution.basePath);
         host=new OwnershipTest().host(OwnershipTest.DEFAULT,List.of(new HostFacts.Distribution(distribution.name,UUID.randomUUID().toString(),distribution.basePath.toString(),2)));

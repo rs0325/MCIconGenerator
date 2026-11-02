@@ -39,7 +39,7 @@ class PrepareIntegrationTest {
         boolean windows=System.getProperty("os.name").startsWith("Windows");String java=Path.of(System.getProperty("java.home"),"bin",windows?"java.exe":"java").toString();List<String> paths=new ArrayList<>();
         for(Class<?> type:List.of(PrepareIntegrationTest.class,WindowsFiles.class,com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class))paths.add(Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()).toString());
         launcher=tmp.resolve(windows?"fixture.cmd":"fixture");String cp=String.join(File.pathSeparator,paths);
-        Files.writeString(launcher,windows?"@echo off\r\nset MCICON_FIXTURE_CMD=1\r\n\""+java+"\" -cp \""+cp+"\" "+Guest.class.getName()+" %*\r\nexit /b %errorlevel%\r\n":"#!/bin/sh\nexec '"+java+"' -cp '"+cp+"' "+Guest.class.getName()+" \"$@\"\n");if(!windows)assertTrue(launcher.toFile().setExecutable(true,true));
+        Files.writeString(launcher,windows?"@echo off\r\nset MCICON_FIXTURE_CMD=1\r\n\""+java+"\" -cp \""+cp+"\" "+Guest.class.getName()+" %*\r\nexit /b %errorlevel%\r\n":"#!/bin/sh\nexec '"+java+"' -cp '"+cp+"' '"+Guest.class.getName()+"' \"$@\"\n");if(!windows)assertTrue(launcher.toFile().setExecutable(true,true));
         mode("valid");
     }
     void saveLease() throws Exception {WindowsFiles.write(leasePath,lease);lease=(ObjectNode)WindowsFiles.json(leasePath);ObjectNode identity=lease.deepCopy();identity.remove(List.of("state","resources"));Files.write(leasePath.resolveSibling("lease.lock"),LeaseFile.receipt(identity));}
