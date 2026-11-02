@@ -12,9 +12,19 @@ Java 21の自己完結app-imageと同梱native Job入口から、検証済みpre
 
 guestbridge ABI 1は専用daemon/socket/data-root、元job/owner/descriptor/generation label、完全container IDを扱う。create前にintentを保存する。正常full ID応答が無いcreateはdaemon側の終端証明が無い限りunknownを保持し、一時的なname一覧0件でもintentを消さない。start supervisorとDocker clientはjob専用cgroup v2へ入り、releaseはfenceを閉じて`cgroup.kill`後の`populated 0`を確認する。元guest bootが変わったrecordは旧actorの終了として分類し、旧container diskは再照合して回収する。guard終了だけではguest終了にしない。
 
-guestの`init`/`hello`はowner・bridge/engine pinの照合後、同じlifecycle lock内で専用distro-local cgroup rootを毎回確認する。初期emptyで現在所属・namespace/mount・root/leaf構造が一致するときだけcpu/memory/pidsを供給しreadbackする。既3controller供給済みならBのbuilder子やactive jobがあっても検証のみとし、partial供給は自動修復しない。hello失敗後のreleaseを含む経路でも、新daemon生成直前に同じ確認を必須とし、既存daemonの本人照合・回収は妨げない。root供給は個別jobのreleaseで解除せず、kernel状態をrootfsや永続ready recordへ保存しない。専用namespaceの同定はWSL実装と現viewの整合に基づく判断であり、他distro無影響の絶対証明ではない。H-C18 v3では本sourceとexact bytesが一致する固定guest bridgeをprepared rootfsに収録し、Windows同bootのready本人死亡後のprepare回復、別coreの同worker描画継続と正常releaseを限定受入した。ACK前死亡/partial import・曖昧createの終端・同時release・実reboot・全51版は未受入である。
+guestの`init`/`hello`はowner・bridge/engine pinの照合後、同じlifecycle lock内で専用distro-local cgroup rootを毎回確認する。初期emptyで現在所属・namespace/mount・root/leaf構造が一致するときだけcpu/memory/pidsを供給しreadbackする。既3controller供給済みならBのbuilder子やactive jobがあっても検証のみとし、partial供給は自動修復しない。専用daemon準備では新daemon生成直前に同じ確認を必須とし、releaseは新生成せず既存daemonの本人照合・回収を行う。root供給は個別jobのreleaseで解除せず、kernel状態をrootfsや永続ready recordへ保存しない。専用namespaceの同定はWSL実装と現viewの整合に基づく判断であり、他distro無影響の絶対証明ではない。旧H-C18 v3では当時のsourceとexact bytesが一致する固定guest bridgeをprepared rootfsに収録し、Windows同bootのready本人死亡後のprepare回復、別coreの同worker描画継続と正常releaseを限定受入した。ACK前死亡/partial import・曖昧createの終端・同時release・実reboot・全51版は未受入である。
 
 他leaseは全descriptorを走査し、busy/unknownがあれば専用distroを止めない。専用distroの停止にはGUID/BasePath照合、専用`--terminate`、正常`--list --running --quiet`による不在確認を要求する。停止receiptを残し、同じguest kernel bootのまま再起動した場合のdaemon再準備と、説明不能なdaemon消失を分ける。登録解除・VHD削除・既存distro/default/global config変更・global shutdownは行わない。
+
+停止receiptの`lastStop.boot`はhost bootであり、guest kernel bootとは別である。通常keep/helloはreceiptを消費しない。prepareはjob journal→generation lockを取得し、fresh ownerとready keeperを照合して`daemon-prepare`意図を保存する。ownerの`restartClaim`は`stop`（停止ID/host boot、初回はnull）、job/owner/descriptorの`identity`、`keeperAttempt`を固定する。他attemptの未確定claimはlock解放やhelper死亡だけでは奪わない。
+
+専用`daemon-prepare`はlifecycle→job fence lock内でmarker/pin、稼働keeper本人とattempt、開いたfenceを確認する。guestの`daemon-prepare.json`へpendingをspawn前に保存し、daemonのgeneration/guest boot/PID/startとDocker labelを確認したready証明を保存してACKする。同じclaimの再要求は保存済みready本人の照合だけを許し、pendingや失効本人から再spawnしない。新しい停止IDはhostで肯定した新停止の証明を前提とする。初回生成・guest boot変更もこの専用操作内に限り許可し、一般要求の`restartAllowed`は常にfalse、通常/recovery releaseもdaemonを生成しない。
+
+hostはACKのmarker/pin/claimとdaemon本人の証明、およびbridgeのstate/done/completionと実終了値を照合し、owner全体の比較付き更新でreceipt/claimを除去して`preparedDaemon`へ証明を保存する。その後journalをsettledにし、ownerを再読込してload→CPU probeへ進む。消費後・settled前の中断は同じ保存証明とguestの本人照合でのみ再確定する。load/CPU失敗でreceiptは復活しない。host/guestの保存を跨ぐ原子的トランザクションではなく、曖昧なspawn/ACK/保存はpending/unknownとして保持する。
+
+writerFailureではwriterがnativeを破棄せず、監督側が元期限内で自然終端と有限回収を行う。bridgeもkeeperと同形式のcompletionを保存する（bridgeのclientはnative state）。job tmpの`native-<UUID>.diagnostic.json`へ入力失敗種別、実native exit、照合済みcompletion、肯定Job0、回収・unknown、stdout/stderr総bytes・適用上限・超過とstderr切断をatomic保存する。stdoutはサイズだけを調べ、通常1MiB・fetch 64MiBの適用上限を記録する。共通の`outputLimitExceeded`はどちらかの超過でtrueになる。stderrは先頭/末尾各8192 bytesの有限読取りから固定guest reasonとnative accounting行だけを抽出し、任意文字列を出さない。固定reasonは末尾から消えても先頭側から別項目へ残す。保存失敗時は一時出力を保持し、保存/cleanup失敗を元失敗に併記する。helperの単一制御JSONにも同じ要約を載せる。
+
+この内部形式は未リリースであり旧QA root/distroを移行しない。旧証拠を保全し、helper JAR・bridge/rootfs・native PE・payload/inventory・descriptor/signatureを同じ新世代へ再pinして、新rootから検証する。過去のH-C18/v7の受入を新bytesへ流用しない。
 
 ## Prepared rootfsとpayload
 
@@ -59,6 +69,7 @@ Java fixtureはargv/protocol/snapshot、登録衝突、GUID/BasePath/SID、未�
 ```text
 ./gradlew :helper-windows:test :core:test
 python3 helpers/windows/scripts/test-guestbridge.py
+python3 helpers/windows/scripts/test-daemon.py
 python3.12 helpers/windows/scripts/test-native-completion.py --cxx /usr/bin/clang++
 # Macで検査済toolchainだけを指定（自動取得なし。手順はscripts/native-build.md）
 python3.12 helpers/windows/scripts/build-native.py --toolchain <verified directory> --archive <fixed archive> --source <absolute windows-host.cpp> --output <new native directory>

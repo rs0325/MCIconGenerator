@@ -29,11 +29,14 @@ static void record(const std::wstring& path,const std::string& value){
  if(path==L"record.completion.json"){s.now+=s.saveCost;if(s.saveFailure&&s.saveFailure!=4)throw std::runtime_error(s.saveFailure==1?"create-new":s.saveFailure==2?"partial-write":"flush");s.completion=value;}
  if(path==L"record.done.json"){if(s.saveFailure==4)throw std::runtime_error("done-flush");s.done=true;}
 }
-static int invokeRecorded(){std::wstring base=L"record";std::string receipt="{}";struct{DWORD dwProcessId=55;}process;Handle child(11),thread(12);bool keeper=true,bridge=false;HANDLE witness=10;DWORD witnessPid=42;ULONGLONG witnessStart=23;struct{HANDLE value;}job{8},parent{9};
+static int invokeRecorded(bool bridge=false){std::wstring base=L"record";std::string receipt="{}";struct{DWORD dwProcessId=55;}process;Handle child(11),thread(12);bool keeper=!bridge;HANDLE witness=10;DWORD witnessPid=42;ULONGLONG witnessStart=23;struct{HANDLE value;}job{8},parent{9};
 #include "native-client.inc"
 }
 static void failed(const char* expected){bool threw=false;try{invoke();}catch(const std::runtime_error& e){threw=true;require(std::string(e.what())==expected);}require(threw);}
 int main(){unsigned tests=0;
+ s=State{};s.active={0};require(invokeRecorded(true)==0&&s.done&&s.completion.find("drain-empty")!=std::string::npos&&s.completion.find("\"client\":{}")!=std::string::npos);tests++;
+ s=State{};s.active={1};require(invokeRecorded(true)==0&&s.done&&s.kill==1&&s.completion.find("command-empty")!=std::string::npos);tests++;
+ s=State{};s.active={1};s.witnessEnds=601;s.terminationCost=2;require(invokeRecorded(true)==125&&s.done&&s.completion.find("owner-death-cleanup")!=std::string::npos);tests++;
  s=State{};require(invoke()==0&&s.query==2&&s.kill==0&&s.now==110&&s.closed.size()==2);tests++;
  s=State{};s.childExit=7;require(invoke()==7&&s.kill==0);tests++;
  s=State{};s.active={0};require(invoke()==0&&s.now==100&&s.kill==0&&s.observed==0);tests++;

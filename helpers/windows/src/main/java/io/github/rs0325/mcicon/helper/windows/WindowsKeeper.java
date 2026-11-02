@@ -133,9 +133,9 @@ final class WindowsKeeper {
         byte[] bytes;try(InputStream input=Files.newInputStream(file,LinkOption.NOFOLLOW_LINKS)){bytes=input.readNBytes(4097);}if(bytes.length>4096)throw new IOException("keeper completionが上限を超えました");
         JsonNode value=WindowsFiles.JSON.readTree(bytes);if(value==null||!value.isObject()||value.size()!=7||!value.path("schema").isIntegralNumber()||!value.path("schema").canConvertToInt()||value.path("schema").asLong()!=1||!value.path("client").equals(client)||!value.path("jobEmpty").isBoolean()||!value.path("jobEmpty").asBoolean()||!value.path("childKnown").isBoolean())throw new IOException("keeper completionの本人/形式が一致しません");
         JsonNode planned=value.path("plannedGuardExit"),child=value.path("childExit");boolean known=value.path("childKnown").asBoolean();String phase=value.path("phase").asText();
-        if(!planned.isIntegralNumber()||!planned.canConvertToInt()||planned.intValue()!=exit||!Set.of("drain-empty","owner-death-cleanup","residual-terminated").contains(phase))throw new IOException("keeper completionの実終了値/phaseが一致しません");
+        if(!planned.isIntegralNumber()||!planned.canConvertToInt()||planned.intValue()!=exit||!Set.of("drain-empty","command-empty","owner-death-cleanup","residual-terminated").contains(phase))throw new IOException("keeper completionの実終了値/phaseが一致しません");
         if(known? !child.isIntegralNumber()||!child.canConvertToLong()||child.longValue()<0||child.longValue()>0xffffffffL : !child.isNull())throw new IOException("keeper child終了値が不明又は不正です");
-        if(phase.equals("drain-empty")? !known||Integer.toUnsignedLong(exit)!=child.longValue() : exit!=125||!known&&!phase.equals("owner-death-cleanup"))throw new IOException("keeper completionの終端条件が矛盾しています");
+        if(phase.equals("drain-empty")||phase.equals("command-empty")? !known||Integer.toUnsignedLong(exit)!=child.longValue()||phase.equals("command-empty")&&exit!=0 : exit!=125||!known&&!phase.equals("owner-death-cleanup"))throw new IOException("keeper completionの終端条件が矛盾しています");
         return value;
     }
     JsonNode value(){return record.deepCopy();}

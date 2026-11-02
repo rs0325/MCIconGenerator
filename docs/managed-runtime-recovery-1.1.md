@@ -14,6 +14,10 @@ current pin/署名descriptor/inventory/workerとhelper原archive・全展開tree
 
 helperのok/exit0だけで状態を進めない。coreがimmutable identity・receiptとresources空を再確認してreleasedをatomic記録する。失敗/取消/timeoutでは旧activeとraw stdout/cleanup証拠を保持し、corelockは有限解放する。RuntimeHelperの直接process終了はOS子孫やVZ/transport不在の証明ではない。
 
+Windowsの停止receiptはkeep/helloでは消費しない。通常prepareの専用daemon準備だけが、停止ID・host boot・job/owner/descriptor・keeper attemptを固定した永続claimを使う。guestはlifecycle/fence lock下でspawn前intentと準備済みdaemonのguest boot/PID/start/labelを保存し、同じclaimの再確認で二重spawnしない。hostは準備ACKと肯定native終端を照合してreceipt/claimを一回消費し、保存済み準備証明をjournalへ確定した後、fresh ownerでloadへ進む。消費後・journal確定前の中断も保存証明と同じdaemon本人だけを再照合する。異なる未確定claimの奪取や回復操作中のdaemon新生成は拒否し、肯定した新停止までpending/unknownを保持する。
+
+入力pipe失敗はguest自然終了値を消さずに有限回収し、native prefixに結び付いた診断を保存する。入力失敗・実native exit・照合済みchild exit/phase・肯定Job0・unknownと固定guest reasonは別項目であり、guard死亡/回収値からguest成功を推測しない。未リリースの内部owner/guest保存形式を変更するため、旧QAデータは保全し、新しいhelper/bridge/native/payload/descriptor世代と新rootを使う。詳細は`helpers/windows/README.md`の停止receipt契約に従う。
+
 ## OS側の必須gate
 
 #94 releaseは現存する正当なanchorとready相当の完全所有情報を照合する。releaseからanchor register/recreateを呼ばず、missing/partial/別owner/UID/0700/target不一致は失敗してresourcesを保持する。短cacheが無いこと、boot差、PID不在をVM不存在として成功化しない。
