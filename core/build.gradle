@@ -1,4 +1,5 @@
 plugins { id 'maven-publish' }
+sourceSets.main.java.srcDir(rootProject.file('shared/src/main/java'))
 dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
     runtimeOnly project(':worker')

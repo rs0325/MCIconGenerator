@@ -12,6 +12,10 @@ stable manifestはchannel/sequence/toolVersion/minimumBootstrapProtocolとplatfo
 
 user rootはMacの`~/Library/Application Support/MCIconBootstrap`、Windowsの`%LOCALAPPDATA%/MCIconBootstrap`、Linuxの`$XDG_DATA_HOME/mcicon-bootstrap`（未指定は`~/.local/share/mcicon-bootstrap`）を候補とする。Mac以外のpackage実受入は未実施である。
 
+Windowsでは任意の`MCICON_DATA_HOME`を指定すると、その配下`bootstrap`をuser rootにする。通常drive付き絶対pathだけを受理し、不正指定は`BOOTSTRAP_INVALID`/終了2となり旧既定先へfallbackしない。旧領域の探索・移行は行わない。CLI/trialと更新準備子には正規化envとroot配下`tmp`を`java.io.tmpdir`・`TMP`・`TEMP`へ渡す。tmpにも既存owner/ACL/親gateを適用する。最初のbootstrap JVMのtempは対象外。[利用方法と全保証範囲](../../docs/usage.md#Windowsのデータ保存先)を参照。
+
+署名/protocol 2適合だけでは旧CLI/coreを含むseed・pin・更新候補を排除しない。H受入は本機能対応済み固定bootstrap/seed/core/CLI/選択slot/trial・更新候補だけに限定し、版・hashと各経路の実利用先を確認する。新guardやprotocol/schema変更、旧版互換実装は追加しない。
+
 | path | 責務 |
 | --- | --- |
 | `active.json` | active参照と受入sequence。pending/previousとtrial/準備owner参照を含む（更新契約は下記文書） |

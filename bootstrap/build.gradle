@@ -1,4 +1,5 @@
 plugins { id 'application' }
+sourceSets.main.java.srcDir(rootProject.file('shared/src/main/java'))
 dependencies {
     testImplementation project(':cli')
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.22.3'

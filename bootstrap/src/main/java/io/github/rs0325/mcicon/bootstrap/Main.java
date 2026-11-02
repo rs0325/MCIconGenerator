@@ -1,6 +1,7 @@
 package io.github.rs0325.mcicon.bootstrap;
 
 import java.nio.file.*;
+import io.github.rs0325.mcicon.internal.WindowsDataHome;
 import java.util.*;
 
 /** 同梱Javaからbootstrapを開始し、選択slotのCLIへargv/stdio/exitを渡す。 */
@@ -26,7 +27,7 @@ public final class Main {
     static Path root(Seed.Host host) {
         Path home=Path.of(System.getProperty("user.home"));return switch(host.os()) {
             case "macos"->home.resolve("Library/Application Support/MCIconBootstrap");
-            case "windows"->{String local=System.getenv("LOCALAPPDATA");yield (local==null?home.resolve("AppData/Local"):Path.of(local)).resolve("MCIconBootstrap");}
+            case "windows"->{Path data=WindowsDataHome.configuredRoot();if(data!=null)yield data.resolve("bootstrap");String local=System.getenv("LOCALAPPDATA");yield (local==null?home.resolve("AppData/Local"):Path.of(local)).resolve("MCIconBootstrap");}
             default->{String data=System.getenv("XDG_DATA_HOME");yield (data==null?home.resolve(".local/share"):Path.of(data)).resolve("mcicon-bootstrap");}
         };
     }
