@@ -17,9 +17,9 @@ public final class PreparationMain {
         return Thread.ofPlatform().daemon().name("mcicon-update-deadline").start(()->{try{long nanos=deadline-System.nanoTime();if(nanos>0)TimeUnit.NANOSECONDS.sleep(nanos);TimeUnit.SECONDS.sleep(5);Runtime.getRuntime().halt(124);}catch(InterruptedException stopped){}});
     }
     static void run(Path installed,Path root,String id) throws IOException {
-        Bootstrap b=new Bootstrap(installed,root,Main.host());UpdatePreparation prep=new UpdatePreparation(b);Path path=prep.path(id);b.file(path,System.nanoTime()+TimeUnit.SECONDS.toNanos(5));
+        Bootstrap b=new Bootstrap(installed,root,Main.host());UpdatePreparation prep=new UpdatePreparation(b);Path path=prep.path(id);long startupDeadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);b.file(path,startupDeadline);
         long deadline;try(FileChannel channel=FileChannel.open(path,StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);FileLock held=channel.tryLock()) {
-            if(held==null)throw Seed.invalid("更新receiptが既に稼働しています");ObjectNode record=(ObjectNode)UpdatePreparation.readReceipt(channel);if(!UpdatePreparation.fileKey(path).equals(record.path("receiptKey").asText())||!id.equals(record.path("invocationId").asText())||!record.path("state").asText().equals("reserved"))throw Seed.invalid("更新intentを再開しません");
+            Seed.check(startupDeadline);if(held==null)throw Seed.invalid("更新receiptが既に稼働しています");ObjectNode record=(ObjectNode)UpdatePreparation.readReceipt(channel);if(!b.fileIdentity(path,startupDeadline).equals(record.path("receiptKey").asText())||!id.equals(record.path("invocationId").asText())||!record.path("state").asText().equals("reserved"))throw Seed.invalid("更新intentを再開しません");
             Duration remaining=Duration.between(Instant.now(),UpdatePreparation.instant(record,"expiresAt"));if(remaining.isNegative()||remaining.isZero())throw Seed.invalid("更新intentは期限切れです");deadline=System.nanoTime()+Math.min(remaining.toNanos(),UpdatePreparation.BUDGET.toNanos());Thread guard=guard(deadline);
             IOException original=null;
             try {

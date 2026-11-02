@@ -20,7 +20,7 @@ class SeedTest {
         first.manifest.put("sequence",2);first.writeManifest();assertEquals(2,first.seed().manifest.path("sequence").asInt());
     }
     @Test void verifiesTemporaryTestSignatureAndExactArchiveTree() throws Exception {
-        Fixture f=fixture();Seed seed=f.seed();Path extracted=directory.resolve("extracted");seed.extract(f.bootstrap(directory),f.installed.resolve("seed/tool.zip"),extracted,deadline());assertTrue(Files.isExecutable(extracted.resolve("java/bin/java")));assertEquals("1.1.0",seed.version);
+        Fixture f=fixture();Seed seed=f.seed();Path extracted=directory.resolve("extracted");seed.extract(f.bootstrap(directory),f.installed.resolve("seed/tool.zip"),extracted,deadline());assertTrue(Files.isExecutable(extracted.resolve(f.host.os().equals("windows")?"java/bin/java.exe":"java/bin/java")));assertEquals("1.1.0",seed.version);
     }
     @Test void posixSlotRetainsExistingDirectoryModes() throws Exception {
         org.junit.jupiter.api.Assumptions.assumeTrue(Files.getFileStore(directory).supportsFileAttributeView("posix"));

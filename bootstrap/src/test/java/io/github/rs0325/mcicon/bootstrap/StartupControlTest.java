@@ -27,6 +27,7 @@ class StartupControlTest {
         }finally{socket.close();writer.shutdownNow();assertTrue(writer.awaitTermination(2,TimeUnit.SECONDS));}
     }
     @Test void nonceArgsSlotAndProcessAreBoundToTheOwnedChild() throws Exception {
+        org.junit.jupiter.api.Assumptions.assumeTrue(java.nio.file.Files.isExecutable(java.nio.file.Path.of("/bin/sleep")));
         Process child=new ProcessBuilder("/bin/sleep","3").start();
         try(StartupControl control=new StartupControl(slot(),UUID.randomUUID().toString(),List.of("--help"))) {
             String property=control.property();var context=Seed.json(Base64.getUrlDecoder().decode(property.substring(property.indexOf('=')+1)));
@@ -36,6 +37,7 @@ class StartupControlTest {
         }finally{child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}
     }
     @Test void missingRequestHasAFiniteAbsoluteBudget() throws Exception {
+        org.junit.jupiter.api.Assumptions.assumeTrue(java.nio.file.Files.isExecutable(java.nio.file.Path.of("/bin/sleep")));
         Process child=new ProcessBuilder("/bin/sleep","3").start();try(StartupControl control=new StartupControl(slot(),UUID.randomUUID().toString(),List.of())){long start=System.nanoTime();assertThrows(SocketTimeoutException.class,()->control.request(child,Duration.ofMillis(100)));assertTrue(System.nanoTime()-start<TimeUnit.SECONDS.toNanos(1));}finally{child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}
     }
 }

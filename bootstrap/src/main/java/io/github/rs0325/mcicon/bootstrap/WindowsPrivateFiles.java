@@ -19,6 +19,9 @@ final class WindowsPrivateFiles {
         this.root=root;reader=new WindowsSecurityReader(installed);NTSystem token=new NTSystem();user=token.getUserSID();
         principal=FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByName(token.getDomain()+"\\"+token.getName());
     }
+    WindowsPrivateFiles(Path root,WindowsSecurityReader reader,String user,UserPrincipal principal) {
+        this.root=root;this.reader=reader;this.user=user;this.principal=principal;
+    }
     private static boolean trusted(String sid,String user){return sid.equals(user)||sid.equals("S-1-5-32-544")||sid.equals("S-1-5-18");}
     static long mask(long raw) throws IOException {
         if((raw&~0xf01f01ffL)!=0)throw Seed.invalid("未知のWindows access maskです");
@@ -60,6 +63,11 @@ final class WindowsPrivateFiles {
     void verify(Path path,boolean file,long deadline) throws IOException {Seed.check(deadline);
         if(!path.startsWith(root))throw Seed.invalid("managed root外の所有検査です");observe(path,file,false,false,deadline);
     Seed.check(deadline);}
+    String fileIdentity(Path path,long deadline) throws IOException {Seed.check(deadline);
+        if(!path.startsWith(root))throw Seed.invalid("managed root外の所有検査です");
+        JsonNode value=observe(path,true,false,false,deadline),row=value.path("rows").get(value.path("rows").size()-1);
+        String key="windows-file-id-v1:"+Seed.text(row,"volumeSerial")+":"+Seed.text(row,"fileId");Seed.check(deadline);return key;
+    }
     private FileAttribute<List<AclEntry>> attributes() {
         List<AclEntry> acl=List.of(AclEntry.newBuilder().setType(AclEntryType.ALLOW).setPrincipal(principal).setPermissions(EnumSet.allOf(AclEntryPermission.class)).build());
         return new FileAttribute<>() {public String name(){return "acl:acl";}public List<AclEntry> value(){return acl;}};
@@ -67,8 +75,15 @@ final class WindowsPrivateFiles {
     void directory(Path path,long deadline) throws IOException {Seed.check(deadline);
         if(!Files.notExists(path,LinkOption.NOFOLLOW_LINKS)){verify(path,false,deadline);return;}
         Path parent=path.getParent();if(Files.notExists(parent,LinkOption.NOFOLLOW_LINKS))directory(parent,deadline);
-        createDirectory(path,deadline);
+        try {createDirectory(path,deadline);}catch(FileAlreadyExistsException raced){settle(path,deadline);}
     Seed.check(deadline);}
+    /** 並行作成に負けた側が、勝者のowner確定までの短い間だけ待って既存directoryを検証する。 */
+    private void settle(Path path,long deadline) throws IOException {
+        for(int attempt=0;;attempt++)try {verify(path,false,deadline);return;}catch(IOException unsettled) {
+            if(attempt==49)throw unsettled;
+            try {Thread.sleep(20);}catch(InterruptedException interrupted) {Thread.currentThread().interrupt();throw new InterruptedIOException("directory作成の競合待機が中断されました");}
+        }
+    }
     void createDirectory(Path path,long deadline) throws IOException {Seed.check(deadline);
         if(!path.startsWith(root)&&!root.startsWith(path))throw Seed.invalid("managed rootと無関係なdirectoryです");
         observe(path.getParent(),false,true,true,deadline);Seed.check(deadline);Files.createDirectory(path,attributes());Seed.check(deadline);Files.setOwner(path,principal);JsonNode value=observe(path,false,false,false,deadline);if(!value.path("rows").get(value.path("rows").size()-1).path("ownerSid").asText().equals(user))throw Seed.invalid("新directoryの本人所有を確認できません");

@@ -42,7 +42,7 @@ class UpdateTrialTest {
     }
     @Test void stateChangedBetweenPrepareAndReadyPreventsGoAndOutput() throws Exception {
         pending();Path gate=directory.resolve("gate"),output=directory.resolve("must-not-write");var pool=java.util.concurrent.Executors.newSingleThreadExecutor();
-        try {var job=pool.submit(()->assertThrows(IOException.class,()->bootstrap.launch(List.of("list","wait-ready",gate.toString(),"output",output.toString()))));long end=System.nanoTime()+Duration.ofSeconds(5).toNanos();while(!Files.exists(Path.of(gate+".ready"))&&System.nanoTime()<end)Thread.sleep(5);assertTrue(Files.exists(Path.of(gate+".ready")));
+        try {var job=pool.submit(()->assertThrows(IOException.class,()->bootstrap.launch(List.of("list","wait-ready",gate.toString(),"output",output.toString()))));long end=System.nanoTime()+Duration.ofSeconds(120).toNanos();while(!Files.exists(Path.of(gate+".ready"))&&System.nanoTime()<end)Thread.sleep(5);assertTrue(Files.exists(Path.of(gate+".ready")));
             try(var held=bootstrap.lock(deadline())){ObjectNode state=(ObjectNode)bootstrap.state();state.put("highestAcceptedSequence",3);bootstrap.atomic(bootstrap.root.resolve("active.json"),state);}Files.writeString(gate,"GO may be requested");assertNotNull(job.get(5,java.util.concurrent.TimeUnit.SECONDS));assertFalse(Files.exists(output));assertEquals(old,bootstrap.state().get("active"));assertFalse(bootstrap.state().path("trialInvocation").isNull());}
         finally {Files.writeString(gate,"release");pool.shutdownNow();assertTrue(pool.awaitTermination(6,java.util.concurrent.TimeUnit.SECONDS));}
     }

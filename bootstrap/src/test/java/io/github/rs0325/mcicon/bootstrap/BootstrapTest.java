@@ -14,13 +14,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class BootstrapTest {
     @TempDir Path directory;
     Fixture fixture() throws Exception {return new Fixture(directory.toRealPath());}
+    static String java() {return System.getProperty("os.name").startsWith("Windows")?"java/bin/java.exe":"java/bin/java";}
+    static void link(Path link,Path target) throws IOException {
+        try {Files.createSymbolicLink(link,target);}catch(FileSystemException unprivileged){org.junit.jupiter.api.Assumptions.abort("symlink作成権限がありません");}
+    }
     Path root() throws IOException {return directory.toRealPath().resolve("state");}
     JsonNode state() throws IOException {return Seed.json(Files.readAllBytes(root().resolve("active.json")));}
     Path slot() throws IOException {JsonNode active=state().get("active");return root().resolve("tools/"+active.path("toolVersion").asText()+"/"+active.path("payloadSha256").asText());}
     List<Path> receipts() throws IOException {try(var paths=Files.list(root().resolve("runs"))){return paths.toList();}}
     @Test void atomicRejectsExistingLinkOrDirectoryBeforeCreatingStage() throws Exception {
         Bootstrap b=fixture().bootstrap(root());b.directory(root());Path staging=root().resolve("staging");b.directory(staging);
-        Path target=root().resolve("config.json"),outside=directory.toRealPath().resolve("outside");Files.writeString(outside,"keep");Files.createSymbolicLink(target,outside);
+        Path target=root().resolve("config.json"),outside=directory.toRealPath().resolve("outside");Files.writeString(outside,"keep");link(target,outside);
         assertThrows(IOException.class,()->b.atomic(target,Seed.JSON.createObjectNode()));assertTrue(Files.isSymbolicLink(target));assertEquals("keep",Files.readString(outside));
         try(var files=Files.list(staging)){assertEquals(0,files.count());}
         Files.delete(target);Files.createDirectory(target);
@@ -72,7 +76,7 @@ class BootstrapTest {
         Fixture f=fixture();actualCli(f);f.publish();f.bootstrap(root()).repair();Path cache=directory.resolve("must-not-prepare");List<String> args=List.of("list","--version","1.20.6","--cache",cache.toString());
         try(java.net.ServerSocket server=new java.net.ServerSocket(0,1,java.net.InetAddress.getByName("127.0.0.1"))) {
             ObjectNode context=Seed.JSON.createObjectNode().put("protocol",2).put("port",server.getLocalPort()).put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString());context.set("slot",state().get("active"));String property="-Dmcicon.bootstrap.control="+Base64.getUrlEncoder().withoutPadding().encodeToString(Seed.JSON.writeValueAsBytes(context));
-            List<String> command=new ArrayList<>(List.of(slot().resolve("java/bin/java").toString(),property,"-cp",slot().resolve("app/lib/*").toString(),"io.github.rs0325.mcicon.cli.Main"));command.addAll(args);Process child=new ProcessBuilder(command).redirectOutput(directory.resolve("switch.stdout").toFile()).redirectError(directory.resolve("switch.stderr").toFile()).start();
+            List<String> command=new ArrayList<>(List.of(slot().resolve(java()).toString(),property,"-cp",slot().resolve("app/lib")+File.separator+"*","io.github.rs0325.mcicon.cli.Main"));command.addAll(args);Process child=new ProcessBuilder(command).redirectOutput(directory.resolve("switch.stdout").toFile()).redirectError(directory.resolve("switch.stderr").toFile()).start();
             try {
                 server.setSoTimeout(3000);try(java.net.Socket socket=server.accept()){JsonNode request=StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(3));assertEquals("list",request.path("command").asText());assertTrue(request.path("managed").asBoolean());assertFalse(request.path("offline").asBoolean());assertEquals(Seed.JSON.valueToTree(args),request.get("args"));assertEquals(context.get("slot"),request.get("slot"));StartupControl.write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type","SWITCH"));}
                 assertTrue(child.waitFor(3,TimeUnit.SECONDS));assertEquals(0,child.exitValue());assertFalse(Files.exists(cache));assertEquals("",Files.readString(directory.resolve("switch.stdout")));assertEquals("",Files.readString(directory.resolve("switch.stderr")));
@@ -86,7 +90,7 @@ class BootstrapTest {
             try(java.net.ServerSocket server=new java.net.ServerSocket(0,1,java.net.InetAddress.getByName("127.0.0.1"))) {
                 server.setSoTimeout(800);ObjectNode context=Seed.JSON.createObjectNode().put("protocol",2).put("port",server.getLocalPort()).put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString());context.set("slot",state().get("active"));String property="-Dmcicon.bootstrap.control="+Base64.getUrlEncoder().withoutPadding().encodeToString(Seed.JSON.writeValueAsBytes(context));
                 ExecutorService listener=Executors.newSingleThreadExecutor();var request=listener.submit(()->{try(java.net.Socket socket=server.accept()){StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(2));StartupControl.write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type","SWITCH"));return true;}catch(java.net.SocketTimeoutException absent){return false;}});
-                List<String> command=new ArrayList<>(List.of(slot().resolve("java/bin/java").toString(),property,"-cp",slot().resolve("app/lib/*").toString(),"io.github.rs0325.mcicon.cli.Main"));command.addAll(args);Process child=new ProcessBuilder(command).redirectOutput(directory.resolve("bad-"+trial+".stdout").toFile()).redirectError(directory.resolve("bad-"+trial+".stderr").toFile()).start();
+                List<String> command=new ArrayList<>(List.of(slot().resolve(java()).toString(),property,"-cp",slot().resolve("app/lib")+File.separator+"*","io.github.rs0325.mcicon.cli.Main"));command.addAll(args);Process child=new ProcessBuilder(command).redirectOutput(directory.resolve("bad-"+trial+".stdout").toFile()).redirectError(directory.resolve("bad-"+trial+".stderr").toFile()).start();
                 try{assertTrue(child.waitFor(3,TimeUnit.SECONDS));assertEquals(2,child.exitValue());assertFalse(request.get(2,TimeUnit.SECONDS));assertFalse(Files.exists(cache));assertFalse(Files.exists(out));assertTrue(Files.readString(directory.resolve("bad-"+trial+".stderr")).startsWith(args.getFirst().equals("render")?"INVALID_REQUEST:":"INVALID_KIND:"));}
                 finally{if(child.isAlive()){child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}listener.shutdownNow();assertTrue(listener.awaitTermination(2,TimeUnit.SECONDS));}
             }
@@ -102,6 +106,7 @@ class BootstrapTest {
         Files.write(f.installed.resolve("seed/stable.json.sig"),new byte[64]);bootstrap.saveManifest(accepted);assertEquals(accepted.reference(),new Seed(stored,f.publicKey,f.host).reference());
     }
     @Test void exitedChildWithoutStartIdentityKeepsUnknownButReturnsActualExit() throws Exception {
+        org.junit.jupiter.api.Assumptions.assumeTrue(Files.isExecutable(Path.of("/bin/sh")));
         for(int code:List.of(0,7)) {
             Process child=new ProcessBuilder("/bin/sh","-c","exit "+code).start();
             try {
@@ -117,7 +122,7 @@ class BootstrapTest {
     @Test void previouslyObservedChildFinishesEvenWhenStartIdentityDisappearsBeforeWait() throws Exception {
         Fixture f=fixture();Bootstrap bootstrap=f.bootstrap(root());assertEquals(0,bootstrap.launch(List.of()));
         for(int code:List.of(0,7)) {
-            Process child=new ProcessBuilder("/bin/sh","-c","read value; exit "+code).start();
+            org.junit.jupiter.api.Assumptions.assumeTrue(Files.isExecutable(Path.of("/bin/sh")));Process child=new ProcessBuilder("/bin/sh","-c","read value; exit "+code).start();
             try {
                 JsonNode observed=Bootstrap.identity(child.toHandle());String id=UUID.randomUUID().toString();ObjectNode record=Seed.JSON.createObjectNode().put("schemaVersion",1).put("kind","command").put("invocationId",id).put("state","running");record.set("slot",state().get("active"));record.set("bootstrap",Bootstrap.identity(ProcessHandle.current()));record.set("child",observed);record.putNull("exitCode");Path path=root().resolve("runs/"+id+".json");
                 try(var channel=bootstrap.create(path);var held=channel.lock()) {
@@ -131,7 +136,7 @@ class BootstrapTest {
         Fixture f=fixture();Bootstrap bootstrap=f.bootstrap(root());ExecutorService pool=Executors.newFixedThreadPool(12);
         try {
             for(int round=0;round<12;round++) {
-                Path path=directory.toRealPath().resolve("parallel-"+round+"/nested");CountDownLatch start=new CountDownLatch(1);List<Future<?>> calls=new ArrayList<>();
+                Path path=(f.host.os().equals("windows")?root():directory.toRealPath()).resolve("parallel-"+round+"/nested");CountDownLatch start=new CountDownLatch(1);List<Future<?>> calls=new ArrayList<>();
                 for(int i=0;i<12;i++)calls.add(pool.submit(()->{start.await();bootstrap.directory(path);if(Files.getFileStore(path).supportsFileAttributeView("posix"))assertEquals(java.nio.file.attribute.PosixFilePermissions.fromString("rwx------"),Files.getPosixFilePermissions(path));return null;}));
                 start.countDown();for(Future<?> call:calls)call.get(5,TimeUnit.SECONDS);
             }
@@ -140,7 +145,7 @@ class BootstrapTest {
     }
     @Test void launcherWildcardAndArgumentsRemainSingleArgumentsUnderSpacePath() throws Exception {
         Path base=directory.toRealPath().resolve("space path");Files.createDirectory(base);Fixture f=new Fixture(base);Path observed=base.resolve("java-arguments");
-        String capture=observed.toString().replace("'","'\"'\"'");byte[] launcher=f.files.get("java/bin/java");String script=new String(launcher,java.nio.charset.StandardCharsets.UTF_8).replace("exec ","printf '%s\\n' \"$@\" > '"+capture+"'\nexec ");f.files.put("java/bin/java",script.getBytes(java.nio.charset.StandardCharsets.UTF_8));f.publish();
+        String capture=observed.toString().replace("'","'\"'\"'");byte[] launcher=f.files.get("java/bin/java");org.junit.jupiter.api.Assumptions.assumeTrue(launcher!=null);String script=new String(launcher,java.nio.charset.StandardCharsets.UTF_8).replace("exec ","printf '%s\\n' \"$@\" > '"+capture+"'\nexec ");f.files.put("java/bin/java",script.getBytes(java.nio.charset.StandardCharsets.UTF_8));f.publish();
         Bootstrap bootstrap=f.bootstrap(base.resolve("state"));assertEquals(0,bootstrap.launch(List.of("space value","literal*","日本語")));
         List<String> argv=Files.readAllLines(observed,java.nio.charset.StandardCharsets.UTF_8);JsonNode active=Seed.json(Files.readAllBytes(base.resolve("state/active.json"))).get("active");Path slot=base.resolve("state/tools/"+active.path("toolVersion").asText()+"/"+active.path("payloadSha256").asText());
         assertEquals("-cp",argv.get(1));assertEquals(slot.resolve("app/lib").toString()+File.separator+"*",argv.get(2));assertEquals(List.of("space value","literal*","日本語"),argv.subList(4,argv.size()));
@@ -163,7 +168,7 @@ class BootstrapTest {
     }
     @Test void parallelInitialLaunchesShareOneImmutableSlot() throws Exception {
         Fixture f=fixture();ExecutorService pool=Executors.newFixedThreadPool(2);
-        try {var a=pool.submit(()->f.bootstrap(root()).launch(List.of("first")));var b=pool.submit(()->f.bootstrap(root()).launch(List.of("second")));assertEquals(0,a.get(15,TimeUnit.SECONDS));assertEquals(0,b.get(15,TimeUnit.SECONDS));assertEquals(2,receipts().size());try(var paths=Files.list(root().resolve("tools/1.1.0"))){assertEquals(1,paths.count());}}
+        try {var a=pool.submit(()->f.bootstrap(root()).launch(List.of("first")));var b=pool.submit(()->f.bootstrap(root()).launch(List.of("second")));assertEquals(0,a.get(90,TimeUnit.SECONDS));assertEquals(0,b.get(90,TimeUnit.SECONDS));assertEquals(2,receipts().size());try(var paths=Files.list(root().resolve("tools/1.1.0"))){assertEquals(1,paths.count());}}
         finally {pool.shutdownNow();assertTrue(pool.awaitTermination(3,TimeUnit.SECONDS));}
     }
     @Test void olderPackageSeedDoesNotDowngradeExistingAcceptedState() throws Exception {
@@ -173,11 +178,11 @@ class BootstrapTest {
         Fixture f=fixture();f.bootstrap(root()).launch(List.of());Files.move(slot(),directory.resolve("held-slot"));Files.writeString(root().resolve("runs/partial.json"),"{unfinished");assertThrows(IOException.class,()->f.bootstrap(root()).repair());assertEquals("{unfinished",Files.readString(root().resolve("runs/partial.json")));
     }
     @Test void symlinkRootAndUnknownTrustFailBeforeInstallation() throws Exception {
-        Fixture f=fixture();Path target=directory.resolve("outside");Files.createDirectory(target);Path link=directory.resolve("linked");Files.createSymbolicLink(link,target);assertThrows(IOException.class,()->f.bootstrap(link).repair());assertFalse(Files.exists(target.resolve("active.json")));
+        Fixture f=fixture();Path target=directory.resolve("outside");Files.createDirectory(target);Path link=directory.resolve("linked");link(link,target);assertThrows(IOException.class,()->f.bootstrap(link).repair());assertFalse(Files.exists(target.resolve("active.json")));
         Files.write(f.installed.resolve("trust.der"),new byte[]{1});assertThrows(IOException.class,()->f.bootstrap(root()));assertFalse(Files.exists(root()));
     }
     @Test void interruptedWaitStillReapsOwnChildAndPreservesUnknown() throws Exception {
-        Fixture f=fixture();Path marker=directory.resolve("interrupt-ready");var failure=new java.util.concurrent.atomic.AtomicReference<Throwable>();var interrupted=new java.util.concurrent.atomic.AtomicBoolean();
+        Fixture f=fixture();org.junit.jupiter.api.Assumptions.assumeFalse(f.host.os().equals("windows"),"Windowsのreceipt lockは別handleの読取りを拒否する");Path marker=directory.resolve("interrupt-ready");var failure=new java.util.concurrent.atomic.AtomicReference<Throwable>();var interrupted=new java.util.concurrent.atomic.AtomicBoolean();
         Thread parent=Thread.ofPlatform().start(()->{try{f.bootstrap(root()).launch(List.of("block",marker.toString()));}catch(Throwable error){failure.set(error);interrupted.set(Thread.currentThread().isInterrupted());}});ProcessHandle child=null;Instant started=null;
         try {
             long end=System.nanoTime()+Duration.ofSeconds(10).toNanos();while(!Files.exists(marker)&&System.nanoTime()<end)Thread.sleep(10);assertTrue(Files.exists(marker));JsonNode receipt=Seed.json(Files.readAllBytes(receipts().getFirst()));child=ProcessHandle.of(receipt.path("child").path("pid").asLong()).orElseThrow();started=Instant.parse(receipt.path("child").path("startedAt").asText());
@@ -188,7 +193,7 @@ class BootstrapTest {
         }
     }
     @Test void parentDeathLeavesUnknownReceiptAndDoesNotAuthorizeRepair() throws Exception {
-        Fixture f=fixture();Path marker=directory.resolve("child-ready");Process parent=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin/java").toString(),"-cp",System.getProperty("bootstrap.testClasspath"),BootstrapProcess.class.getName(),f.installed.toString(),root().toString(),"block",marker.toString()).redirectOutput(directory.resolve("parent.stdout").toFile()).redirectError(directory.resolve("parent.stderr").toFile()).start();ProcessHandle child=null;Instant start=null;
+        Fixture f=fixture();org.junit.jupiter.api.Assumptions.assumeFalse(f.host.os().equals("windows"),"Windowsのreceipt lockは別handleの読取りを拒否する");Path marker=directory.resolve("child-ready");Process parent=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin/java").toString(),"-cp",System.getProperty("bootstrap.testClasspath"),BootstrapProcess.class.getName(),f.installed.toString(),root().toString(),"block",marker.toString()).redirectOutput(directory.resolve("parent.stdout").toFile()).redirectError(directory.resolve("parent.stderr").toFile()).start();ProcessHandle child=null;Instant start=null;
         try {
             long end=System.nanoTime()+Duration.ofSeconds(10).toNanos();JsonNode receipt=null;
             while(System.nanoTime()<end){if(Files.isDirectory(root().resolve("runs")))for(Path path:receipts())try {JsonNode value=Seed.json(Files.readAllBytes(path));if(value.path("state").asText().equals("running"))receipt=value;}catch(IOException partial){}if(receipt!=null&&Files.exists(marker))break;Thread.sleep(10);}

@@ -30,7 +30,6 @@ final class UpdatePreparation {
         if(!value.path("result").isTextual())throw Seed.invalid("更新診断が不正です");return value;
     }
     static String key(JsonNode value,String field) throws IOException {String key=Seed.text(value,field);if(key.length()>512)throw Seed.invalid("receipt fileKeyが上限外です");return key;}
-    static String fileKey(Path path) throws IOException {Object key=Files.readAttributes(path,java.nio.file.attribute.BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey();if(key==null||key.toString().isEmpty()||key.toString().length()>512)throw Seed.invalid("receipt fileKey取得不可のためunknown保持します");return key.toString();}
     static JsonNode readReceipt(FileChannel channel) throws IOException {return receipt(Seed.json(Bootstrap.read(channel,65536)));}
     Path path(String id) throws IOException {uuid(id);return bootstrap.root.resolve("runs/"+id+".json");}
     boolean enabled() throws IOException {return enabled(Long.MAX_VALUE);}
@@ -53,10 +52,10 @@ final class UpdatePreparation {
         JsonNode old=expected.get("preparation");
         if(old!=null&&!old.isNull()) {
             if(!now.isAfter(instant(old,"expiresAt")))return null;
-            Path path=path(Seed.text(old,"invocation"));bootstrap.file(path,deadline);String inode=fileKey(path);if(!inode.equals(key(old,"receiptKey")))throw Seed.invalid("予約時receipt inodeと一致しません");
+            Path path=path(Seed.text(old,"invocation"));String inode=bootstrap.fileIdentity(path,deadline);if(!inode.equals(key(old,"receiptKey")))throw Seed.invalid("予約時receipt inodeと一致しません");
             try(FileChannel channel=FileChannel.open(path,StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
                 FileLock held;try{held=channel.tryLock();}catch(OverlappingFileLockException busy){return null;}if(held==null)return null;
-                try(held){JsonNode record=readReceipt(channel);if(!record.path("invocationId").equals(old.get("invocation"))||!record.path("expiresAt").equals(old.get("expiresAt"))||!inode.equals(key(record,"receiptKey"))||!inode.equals(fileKey(path)))throw Seed.invalid("旧更新receiptが変化しました");return reserveLocked(expected,pin,now,deadline);}
+                try(held){JsonNode record=readReceipt(channel);if(!record.path("invocationId").equals(old.get("invocation"))||!record.path("expiresAt").equals(old.get("expiresAt"))||!inode.equals(key(record,"receiptKey"))||!inode.equals(bootstrap.fileIdentity(path,deadline)))throw Seed.invalid("旧更新receiptが変化しました");return reserveLocked(expected,pin,now,deadline);}
             }
         }
         return reserveLocked(expected,pin,now,deadline);
@@ -65,7 +64,7 @@ final class UpdatePreparation {
         try(var ignored=bootstrap.lock(deadline)) {
             ObjectNode state=(ObjectNode)bootstrap.state(deadline);if(!state.equals(expected)||!enabled(deadline)||!state.path("pending").isNull()||!state.path("trialInvocation").isNull())return null;
             String id=UUID.randomUUID().toString();Instant expiry=now.plus(BUDGET);ObjectNode record=Seed.JSON.createObjectNode().put("schemaVersion",1).put("kind","preparation").put("invocationId",id).put("state","reserved").put("issuedAt",now.toString()).put("expiresAt",expiry.toString()).put("result","");record.set("slot",state.get("active"));record.set("bootstrap",Bootstrap.identity(ProcessHandle.current()));record.putNull("child").putNull("exitCode");record.set("packagePin",pin);
-            String inode;try(FileChannel channel=bootstrap.create(path(id),deadline)){inode=fileKey(path(id));record.put("receiptKey",inode);Seed.check(deadline);Bootstrap.write(channel,record);Seed.check(deadline);}ObjectNode preparation=Seed.JSON.createObjectNode().put("invocation",id).put("phase","reserved").put("expiresAt",expiry.toString()).put("receiptKey",inode);preparation.putNull("worker");state.set("preparation",preparation);bootstrap.atomic(bootstrap.root.resolve("active.json"),state,deadline);Seed.check(deadline);return id;
+            String inode;try(FileChannel channel=bootstrap.create(path(id),deadline)){inode=bootstrap.fileIdentity(path(id),deadline);record.put("receiptKey",inode);Seed.check(deadline);Bootstrap.write(channel,record);Seed.check(deadline);}ObjectNode preparation=Seed.JSON.createObjectNode().put("invocation",id).put("phase","reserved").put("expiresAt",expiry.toString()).put("receiptKey",inode);preparation.putNull("worker");state.set("preparation",preparation);bootstrap.atomic(bootstrap.root.resolve("active.json"),state,deadline);Seed.check(deadline);return id;
         }
     }
     static boolean sameProcess(JsonNode first,JsonNode second) throws IOException {Bootstrap.process(first);Bootstrap.process(second);return Seed.positive(first,"pid")==Seed.positive(second,"pid")&&Seed.text(first,"startedAt").equals(Seed.text(second,"startedAt"));}
@@ -80,7 +79,7 @@ final class UpdatePreparation {
         Process child=null;boolean transferred=false;IOException original=null;
         try {
             Path executable=Path.of(System.getProperty("java.home"),"bin",bootstrap.host.os().equals("windows")?"java.exe":"java"),error=bootstrap.root.resolve("logs/"+id+".stderr");try(var ignored=bootstrap.create(error,ackDeadline)){}
-            Seed.check(ackDeadline);child=new ProcessBuilder(executable.toString(),"-cp",bootstrap.installed.resolve("*").toString(),PreparationMain.class.getName(),bootstrap.installed.toString(),bootstrap.root.toString(),id).redirectError(error.toFile()).start();
+            Seed.check(ackDeadline);child=new ProcessBuilder(executable.toString(),"-cp",bootstrap.installed.toString()+File.separator+"*",PreparationMain.class.getName(),bootstrap.installed.toString(),bootstrap.root.toString(),id).redirectError(error.toFile()).start();
             int size=java.nio.ByteBuffer.wrap(receive(child.getInputStream(),4,ackDeadline)).getInt();if(size<1||size>65536)throw Seed.invalid("更新ACKが上限外です");JsonNode ack=Seed.json(receive(child.getInputStream(),size,ackDeadline));
             Seed.fields(ack,"invocation","worker");if(!id.equals(Seed.text(ack,"invocation"))||!sameProcess(Bootstrap.identity(child.toHandle()),ack.get("worker")))throw Seed.invalid("更新ACK所有が不一致です");
             try(var ignored=bootstrap.lock(ackDeadline)){ObjectNode state=(ObjectNode)bootstrap.state(ackDeadline);if(!id.equals(state.path("preparation").path("invocation").asText())||!state.path("preparation").path("phase").asText().equals("reserved")||!enabled(ackDeadline))throw Seed.invalid("更新予約が変化しました");ObjectNode prep=(ObjectNode)state.get("preparation");prep.put("phase","owned");prep.set("worker",ack.get("worker"));bootstrap.atomic(bootstrap.root.resolve("active.json"),state,ackDeadline);}
