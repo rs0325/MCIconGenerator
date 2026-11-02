@@ -25,6 +25,14 @@ class ManagedRuntimeTest {
         var failure=assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),ManagedRuntime.class.getClassLoader(),HOST,(u,o,t)->{downloads.incrementAndGet();throw new AssertionError();}));
         assertEquals("MANAGED_RUNTIME_INVALID",failure.code());assertEquals(0,downloads.get());assertFalse(Files.exists(options().runtimeRoot()));
     }
+    @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void Windows入力失敗の安全な要約がprotocolからIO_FAILEDへ残る() throws Exception {
+        String detail="Windows入力/実行失敗: {\"inputFailure\":\"INPUT_IO_FAILED\",\"nativeExit\":23,\"completion\":{\"childKnown\":true,\"childExit\":23,\"phase\":\"drain-empty\"},\"guestReason\":\"DAEMON_RESTART_DENIED\"}";
+        Fixture fixture=new Fixture(false,false,false,detail);
+        try(var loader=fixture.loader()) {
+            McIconException failure=assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,HOST,fixture.transport(new AtomicInteger())));
+            assertEquals("IO_FAILED",failure.code());assertTrue(failure.getMessage().contains(detail));assertTrue(failure.getMessage().contains("WINDOWS_RUNTIME_FAILED"));
+        }
+    }
     @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void pinnedWorkerHelperGenerationAndOfflineShareOneLease() throws Exception {
         Fixture fixture=new Fixture(false);AtomicInteger downloads=new AtomicInteger();Path lease;
         try(var loader=fixture.loader();var managed=ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,HOST,fixture.transport(downloads))) {
@@ -183,12 +191,17 @@ class ManagedRuntimeTest {
         byte[] descriptor;
         Fixture(boolean setup) throws Exception {this(setup,false);}
         Fixture(boolean setup,boolean cleanupFails) throws Exception {this(setup,cleanupFails,false);}
-        Fixture(boolean setup,boolean cleanupFails,boolean recovery) throws Exception {
+        Fixture(boolean setup,boolean cleanupFails,boolean recovery) throws Exception {this(setup,cleanupFails,recovery,null);}
+        Fixture(boolean setup,boolean cleanupFails,boolean recovery,String prepareFailure) throws Exception {
             String ok="{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}";
             String missing="{\"protocolVersion\":1,\"status\":\"setup-required\",\"diagnostics\":[{\"code\":\"FIXTURE_SETUP\",\"detail\":\"テスト専用の前提不足\",\"requiresPrivilege\":true,\"requiresRestart\":false}]}";
             String script="#!/bin/sh\nif [ \"$7\" = preflight ]; then /bin/cp \"$6\" \"${6%/*}/fixture-preflight-lease.json\" || exit 1; fi\n[ -f \"${6%/*}/descriptor.json\" ] || exit 1\nprintf '%s\\n' \"$7\" >> \"${6%/*}/fixture-operations\"\n"+(setup?"if [ \"$7\" = preflight ]; then printf '%s' '"+missing+"'; exit 2; fi\n":"")+(cleanupFails?"if [ \"$7\" = release ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; fi\n":"")+"printf '%s' '"+ok+"'\n";
             if(recovery)script=script.replace("printf '%s' '"+ok+"'\n", "if [ \"$7\" = release ]; then if [ -f \"${6%/*}/fixture-no-clear\" ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}'; exit 0; fi; [ ! -f \"${6%/*}/fixture-slow\" ] || exec /bin/sleep 5; n=0; for j in \"$4\"/jobs/*/lease.json; do [ ! -f \"$j\" ] || n=$((n+1)); done; printf '%s' \"$n\" > \"${6%/*}/fixture-job-count\"; if /usr/bin/grep -q '\"fixtureResource\":true' \"$6\"; then [ -f \"${6%/*}/fixture-anchor\" ] || { printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; }; /usr/bin/sed 's/\"resources\":{\"fixtureResource\":true}/\"resources\":{}/' \"$6\" > \"$6.fixture-stage\" && /bin/mv \"$6.fixture-stage\" \"$6\" || exit 1; fi; fi\n"+"printf '%s' '"+ok+"'\n");
             if(recovery)script=script.replace("[ -f \"${6%/*}/descriptor.json\" ] || exit 1\n", "[ -f \"${6%/*}/descriptor.json\" ] || exit 1\nif [ \"$7\" = keep ]; then printf '{\"state\":\"ready\",\"attempt\":\"%s\",\"controllerPid\":%s,\"controllerStarted\":%s}\\n' \"${12}\" \"$9\" \"${10}\"; IFS= read -r frame || exit 1; /bin/cat >/dev/null; set -- \"$1\" \"$2\" \"$3\" \"$4\" \"$5\" \"$6\" release; fi\n");
+            if(prepareFailure!=null) {
+                ObjectNode response=RuntimeDescriptor.JSON.createObjectNode().put("protocolVersion",1).put("status","failed");response.putArray("diagnostics").addObject().put("code","WINDOWS_RUNTIME_FAILED").put("detail",prepareFailure).put("requiresPrivilege",false).put("requiresRestart",false);
+                script=script.replace("#!/bin/sh\n","#!/bin/sh\nif [ \"$7\" = prepare ]; then printf '%s' '"+response+"'; exit 1; fi\n");
+            }
             ByteArrayOutputStream bytes=new ByteArrayOutputStream();try(var zip=new org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream(bytes)){var entry=new org.apache.commons.compress.archivers.zip.ZipArchiveEntry("bin/helper");entry.setUnixMode(0100700);zip.putArchiveEntry(entry);zip.write(script.getBytes(StandardCharsets.UTF_8));zip.closeArchiveEntry();}helper=bytes.toByteArray();
             definition.json.put("toolVersion",ToolVersion.VERSION);((ObjectNode)definition.json.get("worker")).put("toolVersion",ToolVersion.VERSION).put("agentSha256",worker.sha256()).put("adapterSetSha256",ManagedRuntime.adapterDigest(ManagedRuntime.class.getClassLoader()));
             ArrayNode java=(ArrayNode)definition.json.get("rendering").get("javaExecutables");java.removeAll();for(int major:List.of(8,17,21,25))java.addObject().put("major",major).put("executable","/opt/java/java"+major+"/bin/java").put("sha256",ManagedFixture.HASH);

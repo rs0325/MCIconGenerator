@@ -9,6 +9,13 @@ SOCKET = '/run/mcicon/docker.sock'
 DOCKER = ['/usr/bin/docker', '--host', 'unix://' + SOCKET]
 OWNER = ROOT / 'owner.json'
 
+class BridgeFailure(RuntimeError):
+    def __init__(self, reason, detail):
+        super().__init__(detail); self.reason = reason
+
+def reject(ok, reason, detail):
+    if not ok: raise BridgeFailure(reason, detail)
+
 def require(ok, detail):
     if not ok: raise RuntimeError(detail)
 
@@ -46,7 +53,7 @@ def process_start(pid):
 def marker(request):
     require(request['abi'] == 1, 'ABI不一致')
     expected = request['marker']
-    require(read(OWNER) == expected, 'guest所有marker不一致')
+    reject(read(OWNER) == expected, 'OWNERSHIP_MISMATCH', 'guest所有marker不一致')
     require(digest('/usr/lib/mcicon/guestbridge.py') == request['bridgeSha256'], 'bridge pin不一致')
     for path, sha in request['engines'].items():
         require(path in ['/usr/bin/dockerd', '/usr/bin/docker', '/usr/bin/containerd', '/usr/bin/runc'] and digest(path) == sha, 'engine pin不一致')
@@ -119,26 +126,57 @@ def daemon(owner, restart_allowed, allow_start=True):
     label = 'io.github.rs0325.mcicon.generation=' + owner['generationOwner']
     if pidfile.exists():
         record = read(pidfile)
-        require(record['generation'] == owner['generationOwner'], 'daemon世代不一致')
+        reject(record['generation'] == owner['generationOwner'], 'OWNERSHIP_MISMATCH', 'daemon世代不一致')
         if record['boot'] == BOOT.read_text().strip():
             if process_start(record['pid']) == record['started']:
-                require(label in json.loads(docker(['info', '--format', '{{json .Labels}}'])), 'daemon label不一致'); return
-            require(restart_allowed, '停止receiptのないdaemon消失またはPID再使用')
-    require(allow_start, '回復中のdaemon新生成拒否')
+                reject(label in json.loads(docker(['info', '--format', '{{json .Labels}}'])), 'OWNERSHIP_MISMATCH', 'daemon label不一致'); return record
+            reject(restart_allowed, 'DAEMON_RESTART_DENIED', '停止receiptのないdaemon消失またはPID再使用')
+    reject(allow_start, 'DAEMON_PREPARATION_UNKNOWN', '回復中のdaemon新生成拒否')
     ensure_delegation()
     pathlib.Path('/run/mcicon').mkdir(mode=0o700, exist_ok=True)
-    log = (ROOT / 'dockerd.log').open('ab', buffering=0)
-    child = subprocess.Popen(['/usr/bin/dockerd', '--host', 'unix://' + SOCKET, '--data-root', str(ROOT / 'docker'), '--exec-root', '/run/mcicon/docker', '--pidfile', '/run/mcicon/dockerd.pid', '--bridge', 'none', '--iptables=false', '--ip6tables=false', '--ip-forward=false', '--ip-masq=false', '--userland-proxy=false', '--label', label], stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
+    with (ROOT / 'dockerd.log').open('ab', buffering=0) as log:
+        child = subprocess.Popen(['/usr/bin/dockerd', '--host', 'unix://' + SOCKET, '--data-root', str(ROOT / 'docker'), '--exec-root', '/run/mcicon/docker', '--pidfile', '/run/mcicon/dockerd.pid', '--bridge', 'none', '--iptables=false', '--ip6tables=false', '--ip-forward=false', '--ip-masq=false', '--userland-proxy=false', '--label', label], stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
     started = process_start(child.pid); require(started is not None, 'daemon開始identity不明')
-    write(pidfile, {'generation': owner['generationOwner'], 'boot': BOOT.read_text().strip(), 'pid': child.pid, 'started': started})
+    record = {'generation': owner['generationOwner'], 'boot': BOOT.read_text().strip(), 'pid': child.pid, 'started': started}
+    write(pidfile, record)
     end = time.monotonic() + 20
     while time.monotonic() < end:
         require(child.poll() is None, 'daemon開始失敗')
         try:
-            if label in json.loads(docker(['info', '--format', '{{json .Labels}}'])): return
+            if label in json.loads(docker(['info', '--format', '{{json .Labels}}'])): return record
         except (RuntimeError, subprocess.TimeoutExpired): pass
         time.sleep(.1)
     raise RuntimeError('daemon開始期限超過')
+
+def prepare_daemon(request, owner):
+    claim = request['claim']; attempt = claim['keeperAttempt']; stop = claim['stop']
+    reject(claim['identity'] == identity(request) and str(uuid.UUID(attempt)) == attempt, 'OWNERSHIP_MISMATCH', '準備claim所有不一致')
+    if stop is not None:
+        reject(str(uuid.UUID(stop['id'])) == stop['id'] and str(uuid.UUID(stop['boot'])) == stop['boot'], 'OWNERSHIP_MISMATCH', '停止receipt不正')
+    path = job_directory(request)
+    with (path / 'fence.lock').open('a+b') as fence:
+        fcntl.flock(fence, fcntl.LOCK_EX)
+        record = read(path / 'fence.json'); keeper = record.get('keeper', {})
+        reject(not record['closed'] and record['identity'] == identity(request) and keeper.get('attempt') == attempt and keeper.get('identity') == identity(request) and keeper.get('boot') == BOOT.read_text().strip() and process_start(keeper.get('pid', 0)) == keeper.get('started') and keeper.get('started') is not None, 'OWNERSHIP_MISMATCH', '準備keeper/fence不一致')
+        saved = ROOT / 'daemon-prepare.json'
+        previous = read(saved) if saved.exists() else None
+        if previous is not None:
+            same = previous['claim'] == claim
+            same_stop = stop is not None and previous['claim']['stop'] == stop
+            reject(not same_stop or same, 'DAEMON_PREPARATION_UNKNOWN', '別attemptの停止receipt再利用拒否')
+            if same:
+                reject(previous['state'] == 'ready', 'DAEMON_PREPARATION_UNKNOWN', 'daemon準備intent未確定')
+                proof = previous['proof']
+                reject(proof['daemon']['boot'] == BOOT.read_text().strip(), 'DAEMON_PREPARATION_UNKNOWN', '準備daemon boot不一致')
+                actual = daemon(owner, False, False)
+                reject(actual == proof['daemon'], 'DAEMON_PREPARATION_UNKNOWN', '準備daemon本人不明')
+                return proof
+            reject(previous['state'] == 'ready' or stop is not None and stop != previous['claim']['stop'], 'DAEMON_PREPARATION_UNKNOWN', '未確定準備の奪取拒否')
+        write(saved, {'state': 'pending', 'claim': claim})
+        actual = daemon(owner, stop is not None)
+        proof = {'abi': 1, 'ready': True, 'claim': claim, 'marker': owner, 'bridgeSha256': request['bridgeSha256'], 'boot': BOOT.read_text().strip(), 'daemon': actual, 'labelVerified': True}
+        write(saved, {'state': 'ready', 'claim': claim, 'proof': proof})
+        return proof
 
 def job_directory(request):
     job, owner = request['jobId'], request['ownerId']
@@ -220,7 +258,11 @@ def main(request):
             output({'abi': 1, 'identity': identity(request), 'marker': owner, 'bridgeSha256': request['bridgeSha256'], 'boot': BOOT.read_text().strip(), 'memoryBytes': memory, 'cpus': os.cpu_count(), 'keeper': keeper})
             fcntl.flock(lifecycle, fcntl.LOCK_UN)
             return wait_keeper(request)
-        if operation != 'release-recover': daemon(owner, request['restartAllowed'])
+        if operation == 'daemon-prepare':
+            try: output(prepare_daemon(request, owner)); return
+            except BridgeFailure: raise
+            except Exception as failure: raise BridgeFailure('DAEMON_PREPARATION_UNKNOWN', 'daemon準備未確定') from failure
+        if operation not in ['release', 'release-recover']: daemon(owner, False, False)
         if operation == 'load':
             child = subprocess.run(DOCKER + ['image', 'load'], stdin=0, stdout=sys.stderr, stderr=sys.stderr, timeout=request['timeoutSeconds'])
             require(child.returncode == 0, 'image load失敗'); output(json.loads(docker(['image', 'inspect', request['imageId'], '--format', '{{json .}}']))); return
@@ -237,7 +279,7 @@ def main(request):
                 if operation == 'release-recover':
                     require(record['closed'], '回復work fence未閉鎖')
                     require('pendingCreate' not in record, 'daemon create終端不明のためintentを保持')
-                    if record['containers']: daemon(owner, False, False)
+                if record['containers']: daemon(owner, False, False)
                 record['closed'] = True; write(record_path, record)
                 guest_boot = BOOT.read_text().strip()
                 for actor in record['actors']:
@@ -319,7 +361,8 @@ def cli():
             data += byte; require(len(data) <= 1048576, 'bridge envelope過大')
         result = main(json.loads(data.decode('utf-8')))
         sys.exit(0 if result is None else result)
-    except Exception:
-        print('専用guestbridge操作に失敗しました', file=sys.stderr); sys.exit(1)
+    except Exception as failure:
+        reason = failure.reason if isinstance(failure, BridgeFailure) else 'GUEST_OPERATION_FAILED'
+        print('MCICON_GUEST_REASON=' + reason, file=sys.stderr); sys.exit(1)
 
 if __name__ == '__main__': cli()

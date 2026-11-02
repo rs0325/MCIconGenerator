@@ -226,10 +226,11 @@ class DelegationTest(unittest.TestCase):
         state = self.root / 'state'; state.mkdir(); marker = {'generationOwner': str(uuid.uuid4())}
         request = {'abi':1, 'marker':marker, 'restartAllowed':False}
         with patch.object(bridge, 'ROOT', state), patch.object(bridge, 'marker', return_value=marker), patch.object(bridge, 'ensure_delegation', side_effect=RuntimeError('partial')) as ensure, patch.object(bridge.subprocess, 'Popen') as spawn:
-            for operation in ['hello','release']:
-                with self.assertRaisesRegex(RuntimeError, 'partial'): bridge.main(request | {'operation':operation})
-            self.assertEqual(ensure.call_count, 2); spawn.assert_not_called()
-    def test_existing_owned_daemon_can_release_without_new_start_gate(self):
+            with self.assertRaisesRegex(RuntimeError, 'partial'): bridge.main(request | {'operation':'hello'})
+            request.update(jobId=str(uuid.uuid4()), ownerId=str(uuid.uuid4()), descriptorSha256='a'*64)
+            with contextlib.redirect_stdout(io.StringIO()): bridge.main(request | {'operation':'release'})
+            self.assertEqual(ensure.call_count, 1); spawn.assert_not_called()
+    def test_empty_fence_release_does_not_use_new_start_gate(self):
         state = self.root / 'state'; state.mkdir(); marker = {'generationOwner': str(uuid.uuid4())}
         request = {'abi':1, 'operation':'release', 'marker':marker, 'restartAllowed':False, 'jobId':str(uuid.uuid4()), 'ownerId':str(uuid.uuid4()), 'descriptorSha256':'a'*64}
         boot = self.root / 'boot'; boot.write_text('fixture-boot')

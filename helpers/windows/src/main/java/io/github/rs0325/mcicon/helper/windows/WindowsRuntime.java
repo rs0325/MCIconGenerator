@@ -57,12 +57,23 @@ final class WindowsRuntime {
     void prepare() throws IOException {
         LeaseFile.Artifact image=lease.verifiedArtifact("renderer-image");
         try(OperationJournal journal=journal();var ignored=lock()) {
-            journal.settledRequired();ObjectNode owner=ready();JsonNode keeper=keeperRecord();commands.keeper(keeper);
+            journal.active();ObjectNode owner=ready();JsonNode keeper=keeperRecord();commands.keeper(keeper);
             JsonNode resources=lease.read().path("resources").path("windows");
             if(resources.path("transports").size()!=1||!resources.path("containers").isEmpty()||!resources.path("transports").get(0).path("id").asText().equals(keeper.path("attempt").asText()))throw new IOException("prepare前のkeeper資源が一致しません");
             LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseが不明です");long guestRequired=GuestBudget.requiredBytes(lease.read().path("requirements").path("containerMemoryMiB").asLong(),others.memoryMiB());
-            journal.begin("prepare",facts().boot());
+            String boot=facts().boot(),attempt=keeper.path("attempt").asText();
+            if(journal.pending()&&!journal.state().path("operation").asText().equals("daemon-prepare"))journal.settledRequired();
+            if(!journal.pending())journal.begin("daemon-prepare",boot);
             JsonNode hello=call(request("hello",owner).put("memoryBytes",guestRequired),null);verifyHello(hello,owner);GuestBudget.require(hello.path("memoryBytes").asLong(),guestRequired);
+            if(!owner.has("lastStop")&&!owner.has("restartClaim")&&owner.path("preparedDaemon").path("claim").path("keeperAttempt").asText().equals(attempt)&&owner.path("preparedDaemon").path("claim").path("identity").equals(identity())) {
+                JsonNode proof=call(request("daemon-prepare",owner).set("claim",owner.path("preparedDaemon").path("claim")),null);
+                if(!proof.equals(owner.path("preparedDaemon")))throw new IOException("消費済みdaemon準備証明が一致しません");journal.settled(proof);
+            } else {
+                owner=distribution.claimStop(owner,identity(),attempt,boot);
+                JsonNode proof=call(request("daemon-prepare",owner).set("claim",owner.path("restartClaim")),null);verifyHello(proof,owner);
+                owner=distribution.consumeStop(owner,proof);journal.settled(proof);
+            }
+            owner=distribution.verify(facts());journal.begin("prepare",boot);
             ObjectNode load=request("load",owner).put("imageId",imageId());JsonNode actual=call(load,image.path());
             if(!actual.path("Id").asText().equals(imageId())||!actual.path("Os").asText().equals("linux")||!actual.path("Architecture").asText().equals("amd64"))throw new IOException("renderer ID/platformが一致しません");
             journal.settled(actual);new DockerTransport(this).cpuProbe(journal,owner);
@@ -79,7 +90,7 @@ final class WindowsRuntime {
             Path rootfs=rootfs(base);Commands.zero(commands.capture(List.of(wsl.toString(),"--import",distribution.name,distribution.basePath.toString(),rootfs.toString(),"--version","2"),commands.left(Duration.ofMinutes(3))),"専用prepared WSL import");
             distribution.registered(owner,facts(),WindowsFiles.hash(WindowsFiles.JSON.writeValueAsBytes(distribution.marker(owner))));owner=distribution.owner();owner.put("needsInit",true);
         }
-        distribution.consumeStop(owner);return owner;
+        return owner;
     }
     void keeperResource(ObjectNode owner,JsonNode keeper) throws IOException {
         ObjectNode resources=distribution.resource(owner,"ready",job());JsonNode prior=lease.read().path("resources").path("windows");
@@ -136,7 +147,7 @@ final class WindowsRuntime {
     ObjectNode identity() throws IOException {ObjectNode value=WindowsFiles.JSON.createObjectNode();JsonNode current=lease.read();for(String key:List.of("jobId","ownerId","descriptorSha256"))value.set(key,current.required(key));return value;}
     ObjectNode request(String operation,ObjectNode owner) throws IOException {
         ObjectNode value=identity().put("abi",1).put("operation",operation).put("bridgeSha256",payload.manifest.path("guestBase").path("bridgeSha256").asText()).put("memoryBytes",Math.max(8L*1024*1024*1024,(lease.read().path("requirements").path("containerMemoryMiB").asLong()*2+1024)*1024*1024)).put("timeoutSeconds",Math.max(1,commands.left(Duration.ofMinutes(3)).toSeconds()));
-        value.put("restartAllowed",owner.has("lastStop")).put("cpuProbeSha256",payload.manifest.path("guestBase").path("cpuProbeSha256").asText());value.set("marker",distribution.marker(owner));value.set("engines",payload.manifest.path("guestBase").required("engines"));return value;
+        value.put("restartAllowed",false).put("cpuProbeSha256",payload.manifest.path("guestBase").path("cpuProbeSha256").asText());value.set("marker",distribution.marker(owner));value.set("engines",payload.manifest.path("guestBase").required("engines"));return value;
     }
     List<String> guest(){return List.of(wsl.toString(),"--distribution",distribution.name,"--user","root","--exec","/usr/bin/python3","/usr/lib/mcicon/guestbridge.py");}
     JsonNode call(ObjectNode request,Path input) throws IOException {Commands.Result result=commands.request(guest(),WindowsFiles.JSON.writeValueAsBytes(request),input,commands.left(Duration.ofMinutes(3)));Commands.zero(result,"専用guestbridge "+request.path("operation").asText());JsonNode value=WindowsFiles.JSON.readTree(result.stdout());if(value==null||!value.isObject())throw new IOException("guestbridge応答が不正です");return value;}

@@ -24,6 +24,39 @@ class CommandsTest {
         assertEquals(original,commands.end());assertThrows(IOException.class,()->commands.capture(List.of("/fixture-facts"),Duration.ofSeconds(3)));assertEquals(original,commands.end());
         try(var files=Files.list(temporary)){assertFalse(files.anyMatch(path->path.toString().endsWith(".intent.json")));}
     }
+    @Test void 入力pipe失敗でも実終端と固定reasonを保存して応答へ渡す() throws Exception {
+        Commands commands=commands();var keeper=WindowsFiles.JSON.createObjectNode().put("state","ready");keeper.putObject("client").put("clientPid",1).put("clientStarted",1);commands.keeper(keeper);
+        Path input=temporary.resolve("input.bin");Files.write(input,new byte[4*1024*1024]);
+        IOException failure=assertThrows(IOException.class,()->commands.request(List.of("/fixture-input-early"),"{\"operation\":\"load\"}".getBytes(StandardCharsets.UTF_8),input,Duration.ofSeconds(5)));
+        assertTrue(failure.getMessage().contains("INPUT_IO_FAILED"));assertTrue(failure.getMessage().contains("DAEMON_RESTART_DENIED"));assertTrue(failure.getMessage().contains("\"nativeExit\":23"));assertTrue(failure.getMessage().contains("\"childExit\":23"));assertTrue(failure.getMessage().contains("\"jobEmpty\":true"));
+        try(var files=Files.list(temporary)){Path saved=files.filter(path->path.toString().endsWith(".diagnostic.json")).findFirst().orElseThrow();assertEquals(23,WindowsFiles.json(saved).path("completion").path("childExit").asInt());}
+        byte[] response=io.github.rs0325.mcicon.helper.HelperProtocol.response("failed",List.of(new io.github.rs0325.mcicon.helper.HelperProtocol.Diagnostic("WINDOWS_RUNTIME_FAILED",failure.getMessage(),false,false)));assertTrue(new String(response,StandardCharsets.UTF_8).contains("INPUT_IO_FAILED"));assertTrue(response.length<16000);
+    }
+    @Test void stdoutだけが超過しても保存JSONとprotocolの両方に原因を残す() throws Exception {
+        Commands commands=commands();var keeper=WindowsFiles.JSON.createObjectNode().put("state","ready");keeper.putObject("client").put("clientPid",1).put("clientStarted",1);commands.keeper(keeper);
+        IOException failure=assertThrows(IOException.class,()->commands.request(List.of("/fixture-stdout-large"),"{\"operation\":\"load\"}".getBytes(StandardCharsets.UTF_8),null,Duration.ofSeconds(5)));
+        try(var files=Files.list(temporary)){var saved=WindowsFiles.json(files.filter(path->path.toString().endsWith(".diagnostic.json")).findFirst().orElseThrow());assertEquals(1024*1024+1,saved.path("stdoutBytes").asLong());assertEquals(1024*1024,saved.path("stdoutLimitBytes").asLong());assertTrue(saved.path("outputLimitExceeded").asBoolean());assertEquals(0,saved.path("stderrBytes").asLong());}
+        var response=io.github.rs0325.mcicon.helper.HelperProtocol.response("failed",List.of(new io.github.rs0325.mcicon.helper.HelperProtocol.Diagnostic("WINDOWS_RUNTIME_FAILED",failure.getMessage(),false,false)));String message=WindowsFiles.JSON.readTree(response).path("diagnostics").get(0).path("detail").asText();assertTrue(message.contains("\"stdoutBytes\":1048577"));assertTrue(message.contains("\"stdoutLimitBytes\":1048576"));assertTrue(message.contains("\"outputLimitExceeded\":true"));
+    }
+    @Test void 入力失敗の欠落不一致過大空出力と保存失敗は成功にしない() throws Exception {
+        Commands commands=commands();var keeper=WindowsFiles.JSON.createObjectNode().put("state","ready");keeper.putObject("client").put("clientPid",1).put("clientStarted",1);commands.keeper(keeper);Path input=temporary.resolve("input.bin");Files.write(input,new byte[4*1024*1024]);
+        for(String mode:List.of("missing","mismatch","large","empty","savefail","timeout")) {
+            IOException failure=assertThrows(IOException.class,()->commands.request(List.of("/fixture-input-"+mode),"{\"operation\":\"load\"}".getBytes(StandardCharsets.UTF_8),input,Duration.ofMillis(mode.equals("timeout")?800:5000)));
+            assertTrue(failure.getMessage().length()<16000);assertFalse(failure.getMessage().contains("secret-not-retained"));
+            if(mode.equals("missing")||mode.equals("mismatch"))assertTrue(failure.getMessage().contains("\"jobEmpty\":false"));
+            if(mode.equals("large")){assertTrue(failure.getMessage().contains("DAEMON_RESTART_DENIED"));assertTrue(failure.getMessage().contains("\"outputLimitExceeded\":true"));}
+            if(mode.equals("savefail"))assertTrue(failure.getMessage().contains("diagnosticSaveFailed"));
+            if(!mode.equals("timeout"))assertTrue(failure.getMessage().contains("INPUT_IO_FAILED"));
+        }
+    }
+    @Test void 入力待機中の割込みでも元期限とunknownを保つ() throws Exception {
+        Commands commands=commands();var keeper=WindowsFiles.JSON.createObjectNode().put("state","ready");keeper.putObject("client").put("clientPid",1).put("clientStarted",1);commands.keeper(keeper);
+        Path input=temporary.resolve("input.bin");Files.write(input,new byte[4*1024*1024]);var failure=new java.util.concurrent.atomic.AtomicReference<IOException>();var interrupted=new java.util.concurrent.atomic.AtomicBoolean();
+        Thread task=Thread.ofVirtual().start(()->{try{commands.request(List.of("/fixture-input-timeout"),"{\"operation\":\"load\"}".getBytes(StandardCharsets.UTF_8),input,Duration.ofSeconds(10));}catch(IOException error){failure.set(error);interrupted.set(Thread.currentThread().isInterrupted());}});
+        long end=System.nanoTime()+Duration.ofSeconds(5).toNanos();boolean ready=false;
+        while(System.nanoTime()<end){try(var files=Files.list(temporary)){ready=files.anyMatch(path->path.toString().endsWith(".state.json"));}if(ready)break;Thread.sleep(10);}
+        task.interrupt();task.join(Duration.ofSeconds(4));assertTrue(ready);assertFalse(task.isAlive());assertTrue(interrupted.get());assertNotNull(failure.get());assertTrue(failure.get().getMessage().contains("INTERRUPTED"));assertTrue(failure.get().getMessage().contains("\"jobEmpty\":false"));
+    }
     @Test void shell展開せずUnicodeと空白を固定argvとして渡す() throws Exception {
         Commands commands=commands();List<String> args=List.of("/fixture-command","日本語 space","$(echo forbidden)","quote\"slash\\");Commands.Result result=commands.capture(args,Duration.ofSeconds(3));assertEquals(0,result.exit());assertEquals(WindowsFiles.JSON.valueToTree(args),WindowsFiles.JSON.readTree(result.stdout()));commands.reap(OwnershipTest.BOOT,WindowsFiles.JSON.createArrayNode());
     }
