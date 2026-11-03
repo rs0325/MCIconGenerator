@@ -1,6 +1,6 @@
 # Maven Centralと同版workerの公開準備
 
-Issue #92の先行実装は、core/workerのローカルMaven配布、薄いworker JAR、内部resolverを提供する。Centralへのupload・検証・公開と、#93以降の管理API接続・実描画は未実施。`1.1.0-probe` はローカル検証用の版であり、公開済みstable版ではない。root buildの既定版は変更しない。
+Issue #92の先行実装は、core/workerのローカルMaven配布、薄いworker JAR、内部resolverを提供する。Centralへのupload・検証・公開は未実施。`1.1.0-probe` はローカル検証用の版であり、公開済みstable版ではない。root buildの既定版は変更しない。
 
 ## 利用側の固定依存
 
@@ -38,9 +38,11 @@ python3 scripts/verify-maven-consumer.py --version 1.1.0-probe \
 
 consumer検証は独立projectと空のGradle cacheを各metadata経路ごとに作り、coreの固定依存だけを宣言する。ローカル候補を指定した場合は `exclusiveContent` で本プロジェクトのgroupをそのrepositoryに限定し、候補のcore/workerが不足していてもCentralの同版へ切り替えない。ローカル候補のcore/workerとCentralの外部依存を解決し、合成したoffline入力によるrawのbytes保持、workerの推移依存とhash、旧5/6/8引数Optionsと既存メソッド署名を確認する。合成入力はMinecraft資産の再配布ではない。`--gradle <インストール済みGradleの絶対path>` を指定すれば、空cacheへのGradle本体の再downloadを避けられる。
 
+`--managed-runtime <準備済みruntime root>` を指定すると、consumerがその正式runtime入力で `doctorManaged` の正常診断とfixture一件の `renderManaged` 成功を要求する。省略時は従来どおり未公開runtimeを `MANAGED_RUNTIME_INVALID` として確認し、reportの管理API欄を「未実施」とする。管理runtimeの実artifact・署名・固定信頼設定が未発行のため、この入力は別途用意されたruntime rootに限る。実描画の成否はホストOSのhelper、仮想化/コンテナ機能、対応条件にも依存する。描画入力は合成したMinecraft fixtureであり、公式ゲーム資産や別ホスト/OSの受入を検証しない。
+
 `--candidate-bundle` を指定すると、Gradleが実際に解決した同版core/workerのbinary JARを候補ZIP内の同座標とSHA-256で照合する。module/POMの両経路で取得元と候補のhash・一致結果をreportへ残し、片方でも異なれば検証を失敗にする。未指定時はbytesの照合を行わない。
 
-`--repository` を省略すると `mavenCentral()` だけを使う。実公開後は保全した公開前候補を指定し、次の形で再取得bytesを照合する。POM・sources・javadoc・署名は別途bundle監査と公開時検証を行う。ローカル候補の成功をCentral実取得成功として扱わない。管理APIの実描画、runtime取得、51版・ホスト別受入は後続作業に残る。
+`--repository` を省略すると `mavenCentral()` だけを使う。実公開後は保全した公開前候補を指定し、次の形で再取得bytesを照合する。POM・sources・javadoc・署名は別途bundle監査と公開時検証を行う。ローカル候補の成功をCentral実取得成功として扱わない。runtime取得、51版・ホスト別受入は後続作業に残る。
 
 ```sh
 python3 scripts/verify-maven-consumer.py --version 1.1.0 \

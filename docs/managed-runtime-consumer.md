@@ -1,0 +1,5 @@
+# 管理runtimeを使ったconsumer確認
+
+`--managed-runtime`には、1.13の管理環境rootを指定する。検証器はversion manifest、version metadata、client.jar、legacy mappingsのfeather/intermediary JAR、asset indexと`.ogg`以外のasset object、Linux amd64向けlibraries/native classifierの存在を事前確認し、consumerから`doctorManaged`を呼び出す。現行APIの`renderManaged`はgenerator生成時のcacheを入力に使い、`ManagedOptions`のrootを描画入力として使用しないため、このconsumer検証では描画を実行せず「未実施」と記録する。doctorManagedの呼出し前後は実行ごとのnonceを含む行単位マーカーで判定する。実際の管理runtimeを使った描画成功は未検証である。
+
+`doctorManaged`の呼出し前後と実行ごとのnonceを含む行単位マーカーで呼出状況を記録する。例外終了は実行・失敗として扱い、コンパイル失敗はGradleのcompile task失敗行で判定する。指定runtimeを使った`renderManaged`は実行せず、未実施として報告する。
