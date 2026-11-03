@@ -120,3 +120,23 @@ try (var generator = new MCIconGenerator(Path.of("cache"), false, ProgressListen
 CLI zipはcli/build/distributions、ライブラリのローカルMaven repositoryはbuild/maven/<version>に生成します。開発時の座標は `io.github.rs0325.mcicon:mcicon-core:0.1.0-SNAPSHOT` です。配布候補の形式と公開状況は[配布ガイド](distribution.md)で説明します。1.0以前のAPIは変更される可能性があります。Minecraftクラスは公開APIに露出しません。配布物のworker JARは本プロジェクトのagentとASM/Gsonだけを含みます。
 
 1.1.0向けのworker推移依存・Central公開準備・独立consumer検証は[Centralガイド](maven-central.md)を参照してください。管理APIの接続と実描画は後続の結合受入対象です。
+
+## 1.1.0管理版への移行
+
+1.1.0は1.0.1の更新版として同じ保存領域を引き継ぐものではありません。`MCICON_DATA_HOME`を新たに指定した場合も、そのrootは独立領域となり、旧rootの設定・cache・runtime・署名slotを探索、コピー、移行、削除しません。必要な入力は新しいrootへ準備し直してください。1.0.1の配布物と1.1.0の管理bootstrapは別所有者として導入し、同じ`mcicon`コマンド名が競合する場合は利用する配布経路を一つに決めます。配布経路ごとの導入方法は[配布ガイド](distribution.md)を参照してください。
+
+管理bootstrapのstable自動更新は既定で有効です。無効化するには単独コマンドで次を実行します。これは当該bootstrapの設定を更新し、更新準備用processやhelper準備を起動しません。
+
+```sh
+mcicon --bootstrap-auto-update false
+```
+
+設定はユーザー領域の`config.json`に保存されます。再有効化は`true`を指定します。offline起動はその起動での更新取得を抑止しますが、別の起動で既に許可された取得を停止しません。更新候補は署名・hash等の検証と準備を終えてpendingに保存され、次の適格なmanaged list/render起動で適用されます。実行中のジョブは開始時の世代を使い続けます。raw/extract、help、version、doctor、cache、明示Docker経路は自動更新準備の対象外です。詳細は[更新契約](../bootstrap/docs/auto-update.md)を参照してください。
+
+通常のアンインストールはinstaller/package managerが所有するprogram filesだけを除去します。ユーザー領域のtool/runtime slot、cache、生成PNG、raw出力、任意API rootは保持されます。purgeを実行したり、これらを削除したりする前に必要なデータを利用者自身で退避してください。package破損は同じ配布経路で再設置し、seed管理bootstrapは`mcicon --bootstrap-repair`で欠損のみを修復できます。実installer・brew・wingetの導入、更新、アンインストールの受入状況は[1.1.0受入台帳](../qa/acceptance-1.1.0.md)を参照してください。
+
+### 既存iconsの再開と再生成
+
+途中のicons出力はmanifestのhashと現在の`sourceSha256`・worker/runtime renderer digest・`settingsDigest`が一致する場合だけ再開できます。digestが一致しない既存iconsは拒否され、異なるworker/runtimeで混在した出力には追記されません。新しい出力先へ再生成するか、対象を確認したうえで明示的に`--overwrite`を指定してください。`--overwrite`は今回選択したファイルだけに作用します。不要になった過去PNGの一括削除はしません。元rawのbytesと既存のユーザー出力は自動削除・移動されません。再生成が必要でも元rawは保持し、必要な生成物だけを別出力先へ作成してください。
+
+1.1.0の固定51版・3ホスト、配布経路、Central取得・署名を含む受入状態は[台帳](../qa/acceptance-1.1.0.md)に記録します。台帳の1.0.1実績は1.1.0の受入を意味しません。日本語release本文案は[下書き](release-notes-1.1.0-draft.md)で、正式公開前に未完了項目を解消して更新する必要があります。
