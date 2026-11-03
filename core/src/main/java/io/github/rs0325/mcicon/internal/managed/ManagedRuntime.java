@@ -12,6 +12,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Supplier;
 
 /** 固定同梱の信頼設定から準備し、同じleaseと起動指定をジョブ終了まで保持する。 */
 public final class ManagedRuntime implements AutoCloseable {
@@ -26,24 +27,18 @@ public final class ManagedRuntime implements AutoCloseable {
         this.options=options;this.descriptor=descriptor;this.worker=worker;this.lease=lease;this.helper=helper;this.launch=launch;
     }
     public static ManagedRuntime prepare(ManagedOptions options,boolean offline,CancellationToken token) throws IOException {
-        return prepare(options,offline,token,ManagedRuntime.class.getClassLoader(),host(),RuntimeStore.https(token));
+        return prepare(options,offline,token,ManagedRuntime.class.getClassLoader(),host(),()->RuntimeStore.https(token));
     }
     static ManagedRuntime prepare(ManagedOptions options,boolean offline,CancellationToken token,ClassLoader loader,RuntimeDescriptor.Host host,RuntimeStore.Transport transport) throws IOException {
+        return prepare(options,offline,token,loader,host,()->transport);
+    }
+    private static ManagedRuntime prepare(ManagedOptions options,boolean offline,CancellationToken token,ClassLoader loader,RuntimeDescriptor.Host host,Supplier<RuntimeStore.Transport> transport) throws IOException {
         token.check();long deadline=System.nanoTime()+options.preparationTimeout().toNanos();
         Instant preparationDeadline=Instant.now().plus(options.preparationTimeout());
-        JsonNode pins;try {pins=RuntimeDescriptor.read(resource(loader,"pins.json",1024*1024));}catch(IOException failure){throw new McIconException("MANAGED_RUNTIME_INVALID","同梱pinの形式が不正です",1,failure);}RuntimeDescriptor.fields(pins,"schemaVersion","runtimes");RuntimeDescriptor.constant(pins,"schemaVersion",1);
-        JsonNode selected=null;Set<RuntimeDescriptor.Host> hosts=new HashSet<>();
-        for(JsonNode entry:RuntimeDescriptor.array(pins,"runtimes",1,6)) {
-            RuntimeDescriptor.fields(entry,"host","descriptorPath","descriptorSha256","trustKeyPath");
-            JsonNode platform=entry.get("host");RuntimeDescriptor.fields(platform,"os","arch");
-            var candidate=new RuntimeDescriptor.Host(RuntimeDescriptor.choice(platform,"os","macos","windows","linux"),RuntimeDescriptor.choice(platform,"arch","aarch64","x86_64"));
-            if(!hosts.add(candidate))throw RuntimeDescriptor.invalid("同梱pinのhostが重複しています");
-            RuntimeDescriptor.relative(RuntimeDescriptor.text(entry,"descriptorPath",512));RuntimeDescriptor.relative(RuntimeDescriptor.text(entry,"trustKeyPath",512));RuntimeDescriptor.hash(entry,"descriptorSha256");
-            if(candidate.equals(host))selected=entry;
-        }
+        JsonNode selected=selectPins(loader,host);
         if(selected==null)throw new McIconException("MANAGED_SETUP_REQUIRED","このOS/arch用の管理runtimeは発行されていません: "+host.os()+"/"+host.arch(),1);
         long remaining=deadline-System.nanoTime();if(remaining<=0)throw new java.net.http.HttpTimeoutException("管理環境の準備期限を超えました");
-        RuntimeStore store=new RuntimeStore(options.runtimeRoot(),offline,token,Duration.ofNanos(remaining),transport);
+        RuntimeStore store=new RuntimeStore(options.runtimeRoot(),offline,token,Duration.ofNanos(remaining),transport.get());
         store.check();WorkerArtifact.Resolved worker=WorkerArtifact.resolve(store.root(),token);store.check();
         String descriptorPath=selected.get("descriptorPath").asText();byte[] original=resource(loader,descriptorPath,1024*1024),signature=resource(loader,descriptorPath+".sig",64);
         PublicKey key;
@@ -76,6 +71,28 @@ public final class ManagedRuntime implements AutoCloseable {
         }catch(IOException|RuntimeException|Error failure) {
             try {release(helper,lease);}catch(Exception cleanup){failure.addSuppressed(cleanup);}throw failure;
         }
+    }
+    private static JsonNode selectPins(ClassLoader loader,RuntimeDescriptor.Host host) throws IOException {
+        byte[] bytes;
+        try {bytes=resource(loader,"pins.json",1024*1024);}
+        catch(McIconException failure){throw BundledPinsFailure.wrap(failure);}
+        catch(IOException failure){throw new McIconException("MANAGED_RUNTIME_INVALID","同梱pinの形式が不正です",1,failure);}
+        JsonNode pins;
+        try {pins=RuntimeDescriptor.read(bytes);}
+        catch(IOException failure){throw BundledPinsFailure.wrap(failure);}
+        try {
+            RuntimeDescriptor.fields(pins,"schemaVersion","runtimes");RuntimeDescriptor.constant(pins,"schemaVersion",1);
+            JsonNode selected=null;Set<RuntimeDescriptor.Host> hosts=new HashSet<>();
+            for(JsonNode entry:RuntimeDescriptor.array(pins,"runtimes",1,6)) {
+                RuntimeDescriptor.fields(entry,"host","descriptorPath","descriptorSha256","trustKeyPath");
+                JsonNode platform=entry.get("host");RuntimeDescriptor.fields(platform,"os","arch");
+                var candidate=new RuntimeDescriptor.Host(RuntimeDescriptor.choice(platform,"os","macos","windows","linux"),RuntimeDescriptor.choice(platform,"arch","aarch64","x86_64"));
+                if(!hosts.add(candidate))throw RuntimeDescriptor.invalid("同梱pinのhostが重複しています");
+                RuntimeDescriptor.relative(RuntimeDescriptor.text(entry,"descriptorPath",512));RuntimeDescriptor.relative(RuntimeDescriptor.text(entry,"trustKeyPath",512));RuntimeDescriptor.hash(entry,"descriptorSha256");
+                if(candidate.equals(host))selected=entry;
+            }
+            return selected;
+        }catch(McIconException failure){throw BundledPinsFailure.wrap(failure);}
     }
     private static void recover(RuntimeStore store,RuntimeDescriptor descriptor,Path executable,CancellationToken token) throws IOException {
         if(!Set.of("macos","windows").contains(descriptor.host().os()))return;

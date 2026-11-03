@@ -70,6 +70,9 @@ class WindowsPackageTest(unittest.TestCase):
 
     def test_generation_preserves_space_argv_and_all_tree_bytes(self):
         audit = self.generate()
+        self.assertEqual(audit['package']['schemaVersion'], 1)
+        self.assertEqual(audit['package']['bootstrapProtocol'], 3)
+        self.assertEqual(json.loads((self.output / 'image/mcicon/app/bootstrap-package.json').read_text(encoding='utf-8')), audit['package'])
         self.assertFalse(audit['privateKeyGenerated'])
         self.assertEqual([Path(args[0]).name for args in self.calls], ['java.exe', 'jlink.exe', 'jpackage.exe'])
         self.assertEqual(self.calls[0][self.calls[0].index('-cp') + 1], ';'.join(str(p) for p in sorted(self.inputs.glob('*.jar'))))

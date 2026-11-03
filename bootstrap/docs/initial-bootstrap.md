@@ -8,6 +8,8 @@
 
 packageのapp入力はbootstrap JARと依存JAR、`bootstrap-package.json`、`trust.der`、`seed/stable.json`、`seed/stable.json.sig`、`seed/tool.zip`である。trustは配布側が指定する公開鍵であり、自己採用や鍵生成のfallbackはない。正式URL・本番trust・製品署名配布はまだ確定していない。
 
+Mac・Windowsの生成器は`bootstrap-package.json`に`bootstrapProtocol: 3`を出力する。package metadataの`schemaVersion: 1`は変更せず、command receipt・保存状態のschema 3とは区別する。Windows installerは前段metadataとimage・ZIPの一致を確認して同じmetadataを引き継ぐ。
+
 stable manifestはchannel/sequence/toolVersion/minimumBootstrapProtocolとplatform別tool-payload ZIPのsize/hash/unpackedBytes、inventory/runtime descriptorの参照を閉じる。manifest署名、対象host、ZIP実bytes、展開上限、entryの重複/外向きpath/link、inventoryとdescriptorのhash、必要なJava/CLI/core/worker/licenseを初期設置前に確認する。descriptorの全runtime契約と実helper受入は既coreの責務であり、この初期設置の成功では代用しない。
 
 user rootはMacの`~/Library/Application Support/MCIconBootstrap`、Windowsの`%LOCALAPPDATA%/MCIconBootstrap`、Linuxの`$XDG_DATA_HOME/mcicon-bootstrap`（未指定は`~/.local/share/mcicon-bootstrap`）を候補とする。Mac以外のpackage実受入は未実施である。
@@ -57,4 +59,4 @@ Mac app-image候補は既存JDK 21と明示seed/public trustで作る。
 
 Homebrew向けarchiveとFormula候補の生成は[配布候補の手順](homebrew-distribution.md)を参照する。正式配布seed/trust、無Java実host、Developer ID/notarization、installer/Homebrew/wingetの実受入、OS下限、実helper/描画、#98の更新/rollback/GCは未受入である。#98はこの初期slot/pin契約を前提とし、health切替の現在範囲は[更新契約](auto-update.md)を参照する。
 
-#98の先行接続ではpackage/署名seedのbootstrap制御をprotocol 2へ更新した。旧protocol 1の開発用seed/rootは新しいQA世代として再生成し、自動移行しない。worker/helperのprotocol 1は維持する。[起動controlの範囲と未実装部分](startup-control.md)を参照。
+#98の復旧実装はpackage/実CLIのbootstrap制御にprotocol 3、state/command receiptにschema 3を要求する。旧開発用rootは保全して新しいQA世代を再生成し、自動移行しない。worker/helper/descriptor protocol 1と署名Seed生成契約は維持する。生成器のmetadataはprotocol 3へ合わせ、対応CLIを含む実packageの生成・受入は配布統合側に残る。[起動control](startup-control.md)と[復旧契約](initialization-recovery.md)を参照。

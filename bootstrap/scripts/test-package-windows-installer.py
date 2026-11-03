@@ -31,7 +31,7 @@ def fixture(root):
     installer.write_json(support / 'windows-security-reader.json', {'licenses': [
         {'path': path.relative_to(support).as_posix(), 'bytes': path.stat().st_size, 'sha256': installer.digest(path)}
         for path in installer.image_packager.tree(support / 'security-reader') if path.is_file()]})
-    package = {'schemaVersion': 1, 'bootstrapVersion': '1.1.0', 'bootstrapProtocol': 2, 'owner': 'winget',
+    package = {'schemaVersion': 1, 'bootstrapVersion': '1.1.0', 'bootstrapProtocol': 3, 'owner': 'winget',
                'host': {'os': 'windows', 'arch': 'x86_64'}, 'stableManifestUrl': None}
     installer.write_json(image / 'app/bootstrap-package.json', package)
     refresh(candidate, package)

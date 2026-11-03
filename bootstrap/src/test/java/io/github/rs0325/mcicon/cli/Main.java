@@ -7,8 +7,12 @@ public final class Main {
         java.nio.file.Path jar=java.nio.file.Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());String version=jar.getParent().getParent().getParent().getParent().getFileName().toString();
         try(StartupControl control=StartupControl.open(request,version,jar)){
             if(control!=null&&control.switching())return;
+            if(version.equals("1.1.0")&&java.util.Arrays.asList(args).contains("old-fail"))throw new java.io.IOException("fixture old job failed");
             if(java.util.Arrays.asList(args).contains("init-fail"))throw new java.io.IOException("fixture init failed");
-            int waiting=java.util.Arrays.asList(args).indexOf("wait-ready");if(waiting>=0){java.nio.file.Path gate=java.nio.file.Path.of(args[waiting+1]);java.nio.file.Files.writeString(java.nio.file.Path.of(gate+".ready"),"before READY");long end=System.nanoTime()+java.time.Duration.ofSeconds(3).toNanos();while(!java.nio.file.Files.exists(gate)){if(System.nanoTime()>=end)throw new java.io.IOException("fixture gate timeout");Thread.sleep(5);}}
+            int waiting=java.util.Arrays.asList(args).indexOf("wait-ready");if(waiting>=0){java.nio.file.Path gate=java.nio.file.Path.of(args[waiting+1]);java.nio.file.Files.writeString(java.nio.file.Path.of(gate+".ready"),"before READY");long end=System.nanoTime()+java.time.Duration.ofSeconds(30).toNanos();while(!java.nio.file.Files.exists(gate)){if(System.nanoTime()>=end)throw new java.io.IOException("fixture gate timeout");Thread.sleep(5);}}
+            if(version.equals("1.1.1")&&java.util.Arrays.asList(args).contains("candidate-fail")) {
+                control.failed("BUNDLED_PINS_INVALID",java.util.Arrays.asList(args).contains("cleanup-unknown")?"UNKNOWN":"NOT_STARTED");throw new java.io.IOException("fixture typed candidate failed");
+            }
             if(managed&&control!=null)control.ready();
             int output=java.util.Arrays.asList(args).indexOf("output");if(output>=0)java.nio.file.Files.writeString(java.nio.file.Path.of(args[output+1]),"fixture output after GO");
         }

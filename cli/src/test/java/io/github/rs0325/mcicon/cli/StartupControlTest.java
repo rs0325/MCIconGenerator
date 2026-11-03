@@ -24,7 +24,7 @@ class StartupControlTest {
     @Test void watcherStartedAfterDeadlineClosesAndUnblocksOwnedWrite() throws Exception {
         BlockedSocket socket=new BlockedSocket();ExecutorService writer=Executors.newSingleThreadExecutor();
         try {
-            var result=writer.submit(()->assertThrows(IOException.class,()->StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",2),System.nanoTime()+TimeUnit.SECONDS.toNanos(30))));
+            var result=writer.submit(()->assertThrows(IOException.class,()->StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",3),System.nanoTime()+TimeUnit.SECONDS.toNanos(30))));
             assertTrue(socket.entered.await(1,TimeUnit.SECONDS));StartupControl.expire(socket,System.nanoTime()-1);assertEquals(0,socket.closed.getCount());assertNotNull(result.get(2,TimeUnit.SECONDS));
         }finally{socket.close();writer.shutdownNow();assertTrue(writer.awaitTermination(2,TimeUnit.SECONDS));}
     }
@@ -37,14 +37,14 @@ class StartupControlTest {
     }
     ObjectNode request(){ObjectNode value=StartupControl.JSON.createObjectNode().put("command","render").put("managed",true).put("offline",false).put("help",false).put("preparationMillis",5000).put("startupMillis",1000).put("itemMillis",1000);value.putArray("args").add("render");return value;}
     Path jar() throws Exception {Path path=directory.resolve("1.1.0/"+"a".repeat(64)+"/app/lib/cli.jar");Files.createDirectories(path.getParent());Files.write(path,new byte[]{1});return path;}
-    ObjectNode context(int port) {ObjectNode value=StartupControl.JSON.createObjectNode().put("protocol",2).put("port",port).put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString());value.putObject("slot").put("toolVersion","1.1.0").put("payloadSha256","a".repeat(64)).put("runtimeDescriptorSha256","b".repeat(64)).put("manifestSha256","c".repeat(64));return value;}
+    ObjectNode context(int port) {ObjectNode value=StartupControl.JSON.createObjectNode().put("protocol",3).put("port",port).put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString());value.putObject("slot").put("toolVersion","1.1.0").put("payloadSha256","a".repeat(64)).put("runtimeDescriptorSha256","b".repeat(64)).put("manifestSha256","c".repeat(64));return value;}
     void property(ObjectNode context) throws Exception {System.setProperty(StartupControl.PROPERTY,Base64.getUrlEncoder().withoutPadding().encodeToString(StartupControl.JSON.writeValueAsBytes(context)));}
     @Test void runAndParseOnlySwitchUseTheSameControlWithoutSideEffects() throws Exception {
         Path jar=jar();for(String type:List.of("RUN","SWITCH")) {
             try(ServerSocket server=new ServerSocket(0,1,InetAddress.getByName("127.0.0.1"))) {
                 property(context(server.getLocalPort()));ExecutorService pool=Executors.newSingleThreadExecutor();
                 try {
-                    var peer=pool.submit(()->{try(Socket socket=server.accept()){var value=StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(2));assertEquals("REQUEST",value.path("type").asText());StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",2).put("type",type));}return null;});
+                    var peer=pool.submit(()->{try(Socket socket=server.accept()){var value=StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(2));assertEquals("REQUEST",value.path("type").asText());StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",3).put("type",type));}return null;});
                     try(StartupControl control=StartupControl.open(request(),"1.1.0",jar)){assertEquals(type.equals("SWITCH"),control.switching());}peer.get(3,TimeUnit.SECONDS);
                 }finally{System.clearProperty(StartupControl.PROPERTY);pool.shutdownNow();assertTrue(pool.awaitTermination(3,TimeUnit.SECONDS));}
             }
@@ -55,7 +55,7 @@ class StartupControlTest {
             try(ServerSocket server=new ServerSocket(0,1,InetAddress.getByName("127.0.0.1"))) {
                 property(context(server.getLocalPort()));ExecutorService pool=Executors.newSingleThreadExecutor();CountDownLatch ready=new CountDownLatch(1),release=new CountDownLatch(1);AtomicBoolean cancelled=new AtomicBoolean(),closed=new AtomicBoolean();Path png=directory.resolve("png-"+sendGo);
                 try {
-                    var peer=pool.submit(()->{try(Socket socket=server.accept()){StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(2));StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",2).put("type","PREPARE"));assertEquals("READY",StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(2)).path("type").asText());ready.countDown();assertTrue(release.await(2,TimeUnit.SECONDS));assertFalse(Files.exists(png));if(sendGo)StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",2).put("type","GO"));}return null;});
+                    var peer=pool.submit(()->{try(Socket socket=server.accept()){StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(2));StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",3).put("type","PREPARE"));assertEquals("READY",StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(2)).path("type").asText());ready.countDown();assertTrue(release.await(2,TimeUnit.SECONDS));assertFalse(Files.exists(png));if(sendGo)StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",3).put("type","GO"));}return null;});
                     try(StartupControl control=StartupControl.open(request(),"1.1.0",jar)) {
                         control.cancellation(()->cancelled.set(true));Thread job=Thread.ofPlatform().start(()->{try{control.ready();Files.write(png,new byte[]{1});}catch(Exception failure){assertFalse(sendGo);}finally{closed.set(true);}});
                         try{assertTrue(ready.await(2,TimeUnit.SECONDS));assertFalse(Files.exists(png));release.countDown();job.join(3000);assertFalse(job.isAlive());assertEquals(sendGo,Files.exists(png));assertEquals(!sendGo,cancelled.get());assertTrue(closed.get());}finally{release.countDown();if(job.isAlive()){job.interrupt();job.join(2000);}}
@@ -63,6 +63,24 @@ class StartupControlTest {
                 }finally{release.countDown();System.clearProperty(StartupControl.PROPERTY);pool.shutdownNow();assertTrue(pool.awaitTermination(3,TimeUnit.SECONDS));}
             }
         }
+    }
+    @Test void typedPreResourceFailureAndGenericPermissionErrorHaveDifferentEvidence() throws Exception {
+        Path jar=jar();
+        for(boolean bundled:List.of(true,false))try(ServerSocket server=new ServerSocket(0,1,InetAddress.getByName("127.0.0.1"))) {
+            ObjectNode context=context(server.getLocalPort());property(context);ExecutorService pool=Executors.newSingleThreadExecutor();
+            try {
+                var peer=pool.submit(()->{try(Socket socket=server.accept()){var request=StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(3));StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",3).put("type","PREPARE"));var failure=StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(3));for(String name:List.of("nonce","invocation","slot","pid","startedAt"))assertEquals(request.get(name),failure.get(name));return failure;}});
+                try(StartupControl control=StartupControl.open(request(),"1.1.0",jar)) {
+                    Throwable cause=new AccessDeniedException("fixture");
+                    if(bundled)cause=assertThrows(io.github.rs0325.mcicon.McIconException.class,()->io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(io.github.rs0325.mcicon.ManagedOptions.defaults(),false,new io.github.rs0325.mcicon.CancellationToken()));
+                    control.initializationFailure(new CompletionException(cause));var failure=peer.get(3,TimeUnit.SECONDS);assertEquals("FAILED",failure.path("type").asText());assertEquals(bundled?"BUNDLED_PINS_INVALID":"UNKNOWN",failure.path("failure").asText());assertEquals(bundled?"NOT_STARTED":"UNKNOWN",failure.path("cleanup").asText());assertTrue(failure.path("jobs").isEmpty());
+                }
+            }finally{System.clearProperty(StartupControl.PROPERTY);pool.shutdownNow();assertTrue(pool.awaitTermination(3,TimeUnit.SECONDS));}
+        }
+    }
+    @Test void protocolTwoContextIsRejectedBeforeConnecting() throws Exception {
+        Path jar=jar();ObjectNode context=context(1);context.put("protocol",2);property(context);
+        try{assertThrows(IOException.class,()->StartupControl.open(request(),"1.1.0",jar));}finally{System.clearProperty(StartupControl.PROPERTY);}
     }
     @Test void candidateChecksItsOwnSlotAndRejectsWrongExpectedIdentity() throws Exception {Path jar=jar();ObjectNode slot=(ObjectNode)context(1).get("slot");StartupControl.verifySlot(slot,"1.1.0",jar);slot.put("payloadSha256","d".repeat(64));assertThrows(IOException.class,()->StartupControl.verifySlot(slot,"1.1.0",jar));}
     @Test void fragmentedFrameStillHonoursAbsoluteDeadlineAndSizeLimit() throws Exception {

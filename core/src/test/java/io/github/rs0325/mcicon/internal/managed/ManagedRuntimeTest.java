@@ -23,7 +23,25 @@ class ManagedRuntimeTest {
     @Test void missingTrustConfigurationFailsBeforeNetworkOrRootWrite() throws Exception {
         AtomicInteger downloads=new AtomicInteger();
         var failure=assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),ManagedRuntime.class.getClassLoader(),HOST,(u,o,t)->{downloads.incrementAndGet();throw new AssertionError();}));
-        assertEquals("MANAGED_RUNTIME_INVALID",failure.code());assertEquals(0,downloads.get());assertFalse(Files.exists(options().runtimeRoot()));
+        assertEquals("MANAGED_RUNTIME_INVALID",failure.code());assertInstanceOf(BundledPinsFailure.class,failure.getCause());assertEquals(0,downloads.get());assertFalse(Files.exists(options().runtimeRoot()));
+    }
+    @Test void pinsPermissionFailureRemainsUnknownAndNeverStartsResources() {
+        var loader=new ClassLoader(null) {
+            @Override public Enumeration<URL> getResources(String name) throws IOException {throw new AccessDeniedException("fixture pins");}
+        };
+        var failure=assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,HOST,(u,o,t)->{throw new AssertionError("取得してはいけません");}));
+        assertEquals("MANAGED_RUNTIME_INVALID",failure.code());assertInstanceOf(AccessDeniedException.class,failure.getCause());
+        assertFalse(Files.exists(options().runtimeRoot()));
+    }
+    @Test void invalidBundledPinsAreTypedBeforeAnyStoreOrJobExists() throws Exception {
+        Path resources=root.resolve("resources"),pins=resources.resolve("META-INF/mcicon/runtime/pins.json");Files.createDirectories(pins.getParent());
+        for(String value:List.of("{","{}","{\"schemaVersion\":1,\"runtimes\":[]}")) {
+            Files.writeString(pins,value);
+            try(var loader=new URLClassLoader(new URL[]{resources.toUri().toURL()},null)) {
+                var failure=assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,HOST,(u,o,t)->{throw new AssertionError("取得してはいけません");}));
+                assertInstanceOf(BundledPinsFailure.class,failure.getCause());assertFalse(Files.exists(options().runtimeRoot()));
+            }
+        }
     }
     @Test @EnabledOnOs({OS.MAC,OS.LINUX}) void Windows入力失敗の安全な要約がprotocolからIO_FAILEDへ残る() throws Exception {
         String detail="Windows入力/実行失敗: {\"inputFailure\":\"INPUT_IO_FAILED\",\"nativeExit\":23,\"completion\":{\"childKnown\":true,\"childExit\":23,\"phase\":\"drain-empty\"},\"guestReason\":\"DAEMON_RESTART_DENIED\"}";

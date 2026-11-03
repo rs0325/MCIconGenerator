@@ -104,7 +104,7 @@ def package(jdk, inputs, seed, trust, resources, core, native, version, owner, h
     (app_input / 'seed').mkdir()
     for name in ('stable.json', 'stable.json.sig', 'tool.zip'): shutil.copyfile(seed / name, app_input / 'seed' / name)
     shutil.copyfile(trust, app_input / 'trust.der')
-    info = {'schemaVersion': 1, 'bootstrapVersion': version, 'bootstrapProtocol': 2, 'owner': owner,
+    info = {'schemaVersion': 1, 'bootstrapVersion': version, 'bootstrapProtocol': 3, 'owner': owner,
             'stableManifestUrl': stable_manifest_url, 'host': {'os': host_os, 'arch': arch}}
     with (app_input / 'bootstrap-package.json').open('x', encoding='utf-8') as stream:
         json.dump(info, stream, ensure_ascii=False, indent=2); stream.write('\n')

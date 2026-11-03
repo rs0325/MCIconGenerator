@@ -17,6 +17,7 @@ final class UpdateDownload {
         String[] a=first.split("\\."),b=second.split("\\.");for(int i=0;i<3;i++){int result=new java.math.BigInteger(a[i]).compareTo(new java.math.BigInteger(b[i]));if(result!=0)return result;}return 0;
     }
     static void newer(Seed seed,JsonNode state) throws IOException {
+        if(Bootstrap.badCandidate(seed.reference(),state))throw Seed.invalid("不良payloadの再適用を拒否しました");
         if(Seed.positive(seed.manifest,"sequence")<=Seed.positive(state,"highestAcceptedSequence")||version(seed.version,Seed.text(state.path("active"),"toolVersion"))<=0)throw Seed.invalid("旧sequence/同版以下の暗黙更新を拒否しました");
     }
     static void prepare(UpdatePreparation prep,String id,JsonNode worker,JsonNode pin,HttpClient client,long deadline) throws IOException {
