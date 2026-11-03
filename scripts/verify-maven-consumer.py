@@ -5,6 +5,8 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
+import secrets
 import subprocess
 import tempfile
 import zipfile
@@ -81,19 +83,27 @@ def managed_runtime_missing(root):
 def managed_api_result(runtime_supplied, markers, stage):
     if not runtime_supplied:
         return '未実施: --managed-runtime 未指定'
-    if 'MANAGED_RENDER_OK' in markers:
-        return '実施: doctorManaged・renderManaged'
-    if 'MANAGED_DOCTOR_OK' in markers:
-        return f'一部実施: doctorManaged、renderManaged未実施（{stage}）'
-    return f'未実施（{stage}）'
+    doctor = markers.get('doctor', '未実施')
+    if doctor == '未実施':
+        doctor += f'（{stage}）'
+    return f"managed API: doctorManaged={doctor}、renderManaged=未実施（指定runtimeは描画入力に接続されない）"
 
 
 def managed_failure_stage(output, exit_code):
     if not exit_code:
         return '実行前'
-    if 'compileJava' in output or 'compileTestJava' in output or 'compilation failed' in output.lower():
+    if re.search(r"(?m)^> Task :(?:compileJava|compileTestJava) FAILED\s*$", output):
         return 'Gradleコンパイル失敗'
     return 'Gradle実行失敗'
+
+
+def managed_markers(output, nonce):
+    events = set(re.findall(rf"(?m)^MCICON_MANAGED:{re.escape(nonce)}:(DOCTOR_START|DOCTOR_END)$", output))
+    if 'DOCTOR_END' in events:
+        return {'doctor': '呼出完了'}
+    if 'DOCTOR_START' in events:
+        return {'doctor': '実行・失敗'}
+    return {'doctor': '未実施'}
 
 
 def main():
@@ -130,6 +140,7 @@ tasks.named('run') {
     args layout.buildDirectory.dir('fixture').get().asFile.absolutePath
     if (providers.gradleProperty('managedRuntime').isPresent()) {
         args providers.gradleProperty('managedRuntime').get()
+        args providers.gradleProperty('managedNonce').get()
     }
 }
 tasks.register('recordResolvedArtifacts') {
@@ -153,18 +164,20 @@ tasks.register('recordResolvedArtifacts') {
     (sources / 'Consumer.java').write_text(JAVA, encoding='utf-8')
     environment = dict(os.environ)
     results = []
+    nonce = secrets.token_hex(16)
     for mode in ['module', 'pom']:
         environment['GRADLE_USER_HOME'] = str(workspace / (mode + '-gradle-home'))
         command = [str(args.gradle.resolve()), '-p', str(project), 'clean', 'run', 'recordResolvedArtifacts',
                    '--no-daemon', '-PconsumerVersion=' + args.version]
         if args.managed_runtime and not missing_runtime:
             command.append('-PmanagedRuntime=' + str(args.managed_runtime.resolve()))
+            command.append('-PmanagedNonce=' + nonce)
         if mode == 'pom':
             command.append('-PpomOnly=true')
         result = subprocess.run(command, env=environment, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (workspace / (mode + '.log')).write_text(result.stdout, encoding='utf-8')
         passed = result.returncode == 0 and 'CONSUMER_OK' in result.stdout
-        managed_markers = [marker for marker in ('MANAGED_DOCTOR_OK', 'MANAGED_RENDER_OK') if marker in result.stdout]
+        execution = managed_markers(result.stdout, nonce)
         comparisons = []
         if passed and args.candidate_bundle:
             artifacts = json.loads((project / 'build/resolved-artifacts.json').read_text(encoding='utf-8'))
@@ -172,7 +185,7 @@ tasks.register('recordResolvedArtifacts') {
             passed = all(item['passed'] for item in comparisons)
         results.append({'metadata': mode, 'artifactComparisons': comparisons, 'passed': passed,
                         'gradleExitCode': result.returncode, 'failureStage': managed_failure_stage(result.stdout, result.returncode),
-                        'managedApiMarkers': managed_markers})
+                        'managedApiMarkers': execution})
         if result.returncode:
             print(result.stdout[-8000:])
             break
@@ -182,7 +195,9 @@ tasks.register('recordResolvedArtifacts') {
               'managedRuntimeMissing': missing_runtime,
               'managedApi': ('未実施: runtime入力不足（' + ', '.join(missing_runtime) + ')' if missing_runtime else
                              managed_api_result(args.managed_runtime is not None,
-                                                [marker for result in results for marker in result['managedApiMarkers']],
+                                                next((result['managedApiMarkers'] for result in results
+                                                      if result['managedApiMarkers']['doctor'] != '未実施'),
+                                                     results[-1]['managedApiMarkers'] if results else {'doctor': '未実施'}),
                                                 results[-1]['failureStage'] if results else '実行前')),
               'passed': len(results) == 2 and all(r['passed'] for r in results) and not missing_runtime}
     (output / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
@@ -250,13 +265,10 @@ public class Consumer {
         MCIconGenerator.class.getMethod("listEntriesManaged",String.class,ManagedOptions.class);
         try(MCIconGenerator generator=new MCIconGenerator(input,true,ProgressListener.NONE,new CancellationToken())) {
             if(args.length>1) {
+                System.out.println("MCICON_MANAGED:"+args[2]+":DOCTOR_START");
                 var diagnostic=generator.doctorManaged("1.13",managed).join();
-                System.out.println("MANAGED_DOCTOR_OK");
+                System.out.println("MCICON_MANAGED:"+args[2]+":DOCTOR_END");
                 if(!diagnostic.healthy())throw new AssertionError("正式managed runtimeのdoctorに失敗: "+diagnostic);
-                var rendered=generator.renderManaged(new RenderRequest("1.13",List.of(ResourceId.parse("minecraft:item/test")),false,
-                        "item",16,out.resolve("managed"),false,false,false),managed).join();
-                System.out.println("MANAGED_RENDER_OK");
-                if(!rendered.complete()||rendered.succeeded()!=1)throw new AssertionError("managed描画に失敗: "+rendered);
             } else {
                 try {generator.doctorManaged("1.13",managed).join();throw new AssertionError("未発行runtimeを成功扱いしました");}
                 catch(java.util.concurrent.CompletionException failure) {
