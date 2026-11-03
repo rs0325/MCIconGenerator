@@ -9,9 +9,18 @@
 - **要別ホスト**: 対象host/OS上の実機確認が必要。
 - **要外部公開許可**: Centralや配布先への公開、署名、アカウント操作が必要。許可前は未実施。
 
+## 対応OS
+
+| 区分 | OS / architecture | 受入上の扱い |
+|---|---|---|
+| 正式対応 | Windows 11 x64 | 対象host。下記の製品受入項目は別途記録し、未検証の条件を達成扱いにしない。 |
+| 正式対応 | macOS 15.7.7 / Apple Silicon (arm64) | 既存のmacOS実機記録に基づく対象。1.1.0製品受入の未完了項目は下記台帳に残す。 |
+| 実験的・未保証 | Linux x86_64、WSL | 方式実証・限定確認の範囲に限り、正式対応や製品受入を意味しない。 |
+| 対象外 | Windows arm64、Linux arm64 | v1.1.0の対応対象に含めない。 |
+
 | 項目 | 状態 | 根拠・確認できた範囲 | 残りの受入条件 |
 |---|---|---|---|
-| macOS arm64・Windows x86_64・Linux x86_64の1.1.0製品受入 | 未確認 / 要別ホスト | `docs/managed-runtime-1.1.md`は3 hostを初期実証対象とする。`qa/validation-2026-10-18-managed-helper-macos.json`、`qa/validation-2026-10-19-windows-managed-proof.json`、`qa/validation-2026-10-19-linux-rootless-proof.json`はそれぞれ限定条件の記録で、製品の全受入ではない。Windows記録はWindows 11 Pro / AMD64上でのWSL2 feasibility実測、Linux記録はMac上のarm64 Linux guestでRosettaを使ったrootless feasibility実証であり、どちらも製品受入ではない。 | 各OSの正式bootstrap/helper/runtimeで固定51版の受入を行い、実行・失敗・回収範囲を記録する。Windows/Linuxの限定実証を各OSの製品受入へ拡張しない。 |
+| 正式対応OSでの1.1.0製品受入 | 未確認 / 要別ホスト | 対象は上記のWindows 11 x64とmacOS 15.7.7 / Apple Silicon。`qa/validation-2026-10-18-managed-helper-macos.json`はmacOS helperの限定確認で、製品の全受入ではない。Windows記録はWindows 11 Pro / AMD64上のWSL2 feasibility実測であり、Windows製品受入ではない。Linux記録はMac上のarm64 Linux guestでRosettaを使ったrootless feasibility実証であり、Linux製品受入ではない。 | 正式対応OSの正式bootstrap/helper/runtimeで固定51版の受入を行い、実行・失敗・回収範囲を記録する。 |
 | 固定51版の版集合・adapter境界 | 未確認 | `docs/compatibility.md`と`qa/validation-2026-10-16-release-101.json`に固定51版の1.0.1実績がある。1.1.0 managed runtime実描画の合格記録ではない。 | 1.1.0正式runtime/worker/descriptorをpinし、同じ固定51版を対象にする。 |
 | 1.1.0固定51版の全件PNG・manifest監査 | 未確認 | 1.0.1では全件成果の記録がある。1.1.0については`qa/validation-2026-10-18-managed-runtime.json`等が「51版画像受入」を未完了としている。 | 全件生成後にPNG/hash/metadata/path/source/settings/renderer/runtime digestを監査する。 |
 | 全件の独立反復・境界/代表比較 | 未確認 | 1.0.1の独立反復記録は1.1.0管理環境の再現性を証明しない。managed helper/runtime記録は全51版受入を未達としている。 | 別generationで同条件を反復し、境界版と代表比較を記録する。 |

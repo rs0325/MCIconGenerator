@@ -9,7 +9,17 @@
 - 署名・hashで検証するstable更新。更新は実行中のjobを差し替えず、次の適格な起動で適用する。
 - Homebrew、Windows installer/wingetなどの配布経路。
 
-上記は1.1.0の目標・契約として文書化されている内容です。公開済みの機能として確定していません。対応OS、OS下限、installerの利用方法、更新URL、署名状態は正式受入後に記載します。
+上記は1.1.0の目標・契約として文書化されている内容です。公開済みの機能として確定していません。OS下限、installerの利用方法、更新URL、署名状態は正式受入後に記載します。対応OS区分と受入状況は以下のとおりです。
+
+### 対応OS
+
+| 区分 | OS / architecture |
+|---|---|
+| 正式対応 | Windows 11 x64、macOS 15.7.7 / Apple Silicon (arm64) |
+| 実験的・未保証 | Linux x86_64、WSL |
+| 対象外 | Windows arm64、Linux arm64 |
+
+この区分は1.1.0の製品受入完了を意味しません。受入状況は[台帳](../qa/acceptance-1.1.0.md)を参照してください。
 
 ## 移行と既存データ
 
@@ -22,7 +32,7 @@
 
 ## 公開前に確定する項目
 
-- 3 hostの固定51版・全件・独立反復・境界受入。
+- 正式対応OSでの固定51版・全件・独立反復・境界受入。
 - installer、Homebrew、wingetの正式artifactを用いた導入・更新・アンインストール。
 - raw/offline経路、独立Gradle consumer、Central再取得と署名検証。
 - stable更新の本番trust/pin/URLと新規環境からの再取得確認。

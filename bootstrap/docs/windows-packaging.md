@@ -1,5 +1,7 @@
 # Windows x64 bootstrap の候補生成
 
+このpackage候補はWindows x64向けであり、v1.1.0の正式対応OSとしてはWindows 11 x64を対象とする。Windows arm64は対象外である。候補生成やpackage単体の検証は、Windows 11上の製品受入完了を意味しない。
+
 `package-windows-bootstrap.py` は、明示した署名済み seed と現在の core/runtime resources を検証して、Java 同梱 app-image と ZIP 候補を新規生成する。秘密鍵の生成・署名・起動・installer・winget 操作は行わない。
 
 ## 入力と責務

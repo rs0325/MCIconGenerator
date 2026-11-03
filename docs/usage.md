@@ -4,6 +4,8 @@
 
 core/CLIにはJava 21以上が必要です。ゲーム資産は実行時に公式配信元から取得します。描画workerは専用作業ディレクトリを使い、利用者のワールドやLauncher設定を読みません。認証資格情報を要求・保存せず、バニラクライアントのdemo初期化経路を利用します。Dockerの描画プロセスはnetwork=noneです。
 
+v1.1.0の正式対応OSはWindows 11 x64とmacOS 15.7.7 / Apple Silicon (arm64)です。Linux x86_64とWSLは実験的・未保証で、Windows arm64とLinux arm64は対象外です。受入の完了状況は[受入台帳](../qa/acceptance-1.1.0.md)を参照してください。
+
 ```sh
 ./gradlew test :cli:installDist
 docker buildx build --platform linux/amd64 --load -t mcicon-render:dev -f docker/Dockerfile .

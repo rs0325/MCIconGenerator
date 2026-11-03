@@ -1,6 +1,6 @@
 # Homebrew向けJava同梱archive候補
 
-#97のHomebrew向け配布候補をローカルで生成する。初版はApple Silicon・macOS 15.7.7以降を対象とするJava同梱app、prefixから相対位置で起動する`bin/mcicon`、file inventory、明示URL/hashから生成するFormulaを対象とする。tap公開先・本番trust・署名アカウントは入力から推測しない。
+#97のHomebrew向け配布候補をローカルで生成する。候補はApple Silicon・macOS 15.7.7以降向けのJava同梱app、prefixから相対位置で起動する`bin/mcicon`、file inventory、明示URL/hashから生成するFormulaを対象とする。候補のOS条件は製品受入や公開済み配布を意味しない。v1.1.0の正式対応OSはWindows 11 x64とmacOS 15.7.7 / Apple Silicon (arm64)、Linux x86_64とWSLは実験的・未保証、Windows arm64とLinux arm64は対象外である。tap公開先・本番trust・署名アカウントは入力から推測しない。
 
 ## 生成入力
 
