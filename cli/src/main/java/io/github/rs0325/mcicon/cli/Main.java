@@ -84,6 +84,7 @@ public final class Main implements Runnable {
     }
     static class Common {
         StartupControl startup;
+        @Spec(Spec.Target.MIXEE) Model.CommandSpec mixee;
         @Option(names="--cache",description="Input cache directory.") Path cache;
         @Option(names="--offline",description="Use verified cached inputs only.") boolean offline;
         @Option(names="--minecraft-dir",description="既存インストールの公式入力を検証してcacheへコピーする。") Path minecraft;
@@ -91,7 +92,16 @@ public final class Main implements Runnable {
         MCIconGenerator generator(CancellationToken token) {
             StartupControl control=startup;if(control!=null)control.cancellation(token::cancel);
             Path data=WindowsDataHome.configuredRoot(),input=cache!=null?cache:data!=null?data.resolve("cache"):Path.of(".mcicon-cache");
-            return new MCIconGenerator(input,offline,event->{if(control!=null&&event.phase().equals("startup-ready"))control.ready();System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total());},token,minecraft);
+            return new MCIconGenerator(input,offline,listener(control),token,minecraft);
+        }
+        ProgressListener listener(StartupControl control) {
+            return new ProgressListener() {
+                @Override public void onProgress(ProgressEvent event){if(control!=null&&event.phase().equals("startup-ready"))control.ready();System.err.printf("%s %s %d/%d%n",event.phase(),event.id(),event.completed(),event.total());}
+                @Override public void onDiagnostic(String id,Throwable cause) {
+                    if(!((Main)mixee.root().userObject()).debug)return;
+                    var err=mixee.commandLine().getErr();err.println("DIAGNOSTIC "+id);cause.printStackTrace(err);err.flush();
+                }
+            };
         }
     }
     // The standard help mixin also defines --version, which conflicts with the

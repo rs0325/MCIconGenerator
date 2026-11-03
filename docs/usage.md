@@ -42,7 +42,7 @@ mcicon cache verify --json
 
 `--id` と `--texture` は反復可能です。各々の `--all` と併用できません。namespace省略時はminecraft、`--kind` はall/item/block、`--size` は16/32/64/128/256/512です。`--json` の結果はstdout、進捗はstderrに出ます。
 
-準備やI/Oの失敗を調べる場合は `mcicon --debug ...` または各サブコマンドの `--debug` を指定できます。通常のエラーコード・終了コードを保持し、原因例外とstack traceをstderrへ追加します。stdoutのJSONには診断を混ぜません。traceにはローカルのパスや例外メッセージが含まれます。
+準備やI/Oの失敗を調べる場合は `mcicon --debug ...` または各サブコマンドの `--debug` を指定できます。通常のエラーコード・終了コードを保持し、原因例外とstack traceをstderrへ追加します。項目単位の描画失敗は結果のcode・messageを変えず、`--debug`時だけ元の例外（cause・suppressed含む）を項目ID付きでstderrへ出します。stdoutのJSONには診断を混ぜません。traceにはローカルのパスや例外メッセージが含まれます。
 
 描画のオプションは `--worker-jar`、`--docker-context`（既定colima-mcicon）、`--docker-image`（既定mcicon-render:dev）、`--startup-timeout`（180秒）、`--item-timeout`（30秒）です。他のDocker contextでは明示してください。ゲームJVMはimage内の版別Javaを使います。`--java-home /opt/java/java21` のようにimage内のLinux絶対ディレクトリを指定すると、そのJavaを起動前に検査し、必要major未満なら失敗します。ホストのJavaはマウントしません。1.17系は既存runtime契約に合わせてJava17 LTSを下限にします。明示した新しいmajorでの描画互換性は保証せず、失敗時に別Javaへ切り替えません。
 

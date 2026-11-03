@@ -46,6 +46,36 @@ class IconRecoveryTest {
         assertEquals(Json.MAPPER.valueToTree(List.of(252,252,252)),Json.MAPPER.readTree(manifest.toFile()).path("context").path("lightmapFullBrightRgb"));
         FakeWorker cached=new FakeWorker(-1);assertTrue(exporter.export(runtime,cached,catalog,request()).complete());assertEquals(0,cached.calls);
     }
+    @Test void renderFailureKeepsOriginalExceptionAsDiagnosticWithoutChangingPublicContract() throws Exception {
+        var diagnostics=new HashMap<String,Throwable>();
+        var listener=new ProgressListener() {
+            public void onProgress(ProgressEvent event){}
+            @Override public void onDiagnostic(String id,Throwable cause){diagnostics.put(id,cause);}
+        };
+        var worker=new FakeWorker(-1){public Path render(String id,int size) throws Exception {
+            Path file=directory.resolve("invalid.png");Files.write(file,new byte[]{1,2,3});return file;
+        }};
+        var result=new IconExporter(new CancellationToken(),listener).export(runtime(),worker,catalog(1),request());
+        var entry=result.entries().get(0);
+        assertEquals("RENDER_FAILED",entry.code());assertEquals("Inventory icon export failed",entry.message());
+        assertEquals("Invalid worker PNG",diagnostics.get("minecraft:sample_00").getMessage());
+        assertFalse(Files.exists(directory.resolve("invalid.png")));
+    }
+    @Test void temporaryPngDeleteFailureDoesNotHideTheRenderFailure() throws Exception {
+        var diagnostics=new HashMap<String,Throwable>();
+        var listener=new ProgressListener() {
+            public void onProgress(ProgressEvent event){}
+            @Override public void onDiagnostic(String id,Throwable cause){diagnostics.put(id,cause);}
+        };
+        var worker=new FakeWorker(-1){public Path render(String id,int size) throws Exception {
+            Path folder=Files.createDirectories(directory.resolve("not-a-png"));Files.write(folder.resolve("child"),new byte[]{1});return folder;
+        }};
+        var result=new IconExporter(new CancellationToken(),listener).export(runtime(),worker,catalog(1),request());
+        assertEquals("RENDER_FAILED",result.entries().get(0).code());
+        var cause=diagnostics.get("minecraft:sample_00");
+        assertTrue(cause instanceof javax.imageio.IIOException);
+        assertTrue(Arrays.stream(cause.getSuppressed()).anyMatch(DirectoryNotEmptyException.class::isInstance));
+    }
     @Test void changedJavaVersionOrSelectionCannotReusePreviousIcons() throws Exception {
         var runtime=runtime();var exporter=new IconExporter(new CancellationToken(),ProgressListener.NONE);
         assertTrue(exporter.export(runtime,new FakeWorker(-1),catalog(1),request()).complete());

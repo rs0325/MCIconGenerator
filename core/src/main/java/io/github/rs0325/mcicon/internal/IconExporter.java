@@ -53,13 +53,16 @@ public final class IconExporter {
                         }
                         if(Files.exists(target)&&(previous==null||"OUTPUT_EXISTS".equals(previous.code()))&&!request.overwrite())throw new McIconException("OUTPUT_EXISTS","Unverified output exists; use --overwrite",2);
                         Path image=worker.render(entry.id(),request.size());
+                        Throwable failure=null;
                         try {
                             var decoded=ImageIO.read(image.toFile());
                             if(decoded==null||decoded.getWidth()!=request.size()||decoded.getHeight()!=request.size()||!decoded.getColorModel().hasAlpha())throw new IOException("Invalid worker PNG");
                             byte[] data=Files.readAllBytes(image);FilesSupport.atomicWrite(target,data);
                             entries.put(entry.id(),new ExportResult.Entry(entry.id(),entry.kind(),"success",path,FilesSupport.hash(data),null,Map.of(),null,null));
-                        }finally{Files.deleteIfExists(image);}
+                        }catch(Throwable t){failure=t;throw t;}
+                        finally{try{Files.deleteIfExists(image);}catch(IOException deleteFailure){if(failure==null)throw deleteFailure;failure.addSuppressed(deleteFailure);}}
                     } catch(Exception e) {
+                        progress.onDiagnostic(entry.id(),e);
                         entries.put(entry.id(),new ExportResult.Entry(entry.id(),entry.kind(),"failed",path,null,null,Map.of(),e instanceof McIconException m?m.code():"RENDER_FAILED",e instanceof McIconException m?m.getMessage():"Inventory icon export failed"));
                         if(request.failFast()||token.isCancelled())aborted=true;
                     }
