@@ -17,7 +17,7 @@ final class StartupControl implements AutoCloseable {
     private final List<String> arguments;
     StartupControl(JsonNode slot,String invocation,List<String> arguments) throws IOException {
         this.arguments=List.copyOf(arguments);listener=new ServerSocket(0,1,InetAddress.getByName("127.0.0.1"));
-        context=Seed.JSON.createObjectNode().put("protocol",2).put("port",listener.getLocalPort()).put("nonce",UUID.randomUUID().toString()).put("invocation",invocation);context.set("slot",slot);
+        context=Seed.JSON.createObjectNode().put("protocol",3).put("port",listener.getLocalPort()).put("nonce",UUID.randomUUID().toString()).put("invocation",invocation);context.set("slot",slot);
     }
     String property() throws IOException {return "-D"+PROPERTY+"="+Base64.getUrlEncoder().withoutPadding().encodeToString(Seed.JSON.writeValueAsBytes(context));}
     JsonNode request(Process child) throws IOException {return request(child,Duration.ofSeconds(30));}
@@ -29,9 +29,17 @@ final class StartupControl implements AutoCloseable {
         final JsonNode request;
         final long deadline;
         Session(Socket socket,JsonNode request,long deadline){this.socket=socket;this.request=request;this.deadline=deadline;}
-        void send(String type) throws IOException {write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type",type),deadline);}
-        void ready(long end) throws IOException {JsonNode value=read(socket,end);Seed.fields(value,"protocol","type");Seed.constant(value,"protocol",2);Seed.exact(value,"type","READY");}
-        void go(long end) throws IOException {write(socket,Seed.JSON.createObjectNode().put("protocol",2).put("type","GO"),Math.min(end,System.nanoTime()+TimeUnit.SECONDS.toNanos(30)));}
+        void send(String type) throws IOException {write(socket,Seed.JSON.createObjectNode().put("protocol",3).put("type",type),deadline);}
+        JsonNode ready(long end) throws IOException {
+            JsonNode value=read(socket,end);
+            if(value.path("type").asText().equals("FAILED")) {
+                failure(value);
+                for(String name:List.of("nonce","invocation","slot","pid","startedAt"))if(!value.path(name).equals(request.path(name)))throw Seed.invalid("失敗通知の試行identityが一致しません");
+                return value;
+            }
+            Seed.fields(value,"protocol","type");Seed.constant(value,"protocol",3);Seed.exact(value,"type","READY");return null;
+        }
+        void go(long end) throws IOException {write(socket,Seed.JSON.createObjectNode().put("protocol",3).put("type","GO"),Math.min(end,System.nanoTime()+TimeUnit.SECONDS.toNanos(30)));}
         @Override public void close() throws IOException {socket.close();}
     }
     Session accept(Process child,Duration timeout) throws IOException {
@@ -44,11 +52,17 @@ final class StartupControl implements AutoCloseable {
         catch(IOException failure){try{accepted.close();}catch(IOException cleanup){failure.addSuppressed(cleanup);}throw failure;}
     }
     void validate(JsonNode value,Process child) throws IOException {
-        Seed.fields(value,"protocol","type","nonce","invocation","slot","pid","startedAt","args","command","managed","offline","help","preparationMillis","startupMillis","itemMillis");Seed.constant(value,"protocol",2);Seed.exact(value,"type","REQUEST");
+        Seed.fields(value,"protocol","type","nonce","invocation","slot","pid","startedAt","args","command","managed","offline","help","preparationMillis","startupMillis","itemMillis");Seed.constant(value,"protocol",3);Seed.exact(value,"type","REQUEST");
         if(!value.path("nonce").equals(context.get("nonce"))||!value.path("invocation").equals(context.get("invocation"))||!value.path("slot").equals(context.get("slot"))||!value.path("args").equals(Seed.JSON.valueToTree(arguments)))throw Seed.invalid("CLI REQUESTの起動参照が一致しません");
         if(Seed.positive(value,"pid")!=child.pid()||!child.info().startInstant().orElseThrow(()->Seed.invalid("CLI開始識別が読めません")).toString().equals(Seed.text(value,"startedAt")))throw Seed.invalid("CLI REQUESTのprocessが一致しません");
         Seed.choice(value,"command","help","version","root","cache","versions","extract","doctor","list","render");for(String name:List.of("managed","offline","help"))if(!value.path(name).isBoolean())throw Seed.invalid("CLI REQUESTのbooleanが不正です");
         for(String name:List.of("preparationMillis","startupMillis","itemMillis"))Seed.positive(value,name);
+    }
+    static void failure(JsonNode value) throws IOException {
+        Seed.fields(value,"protocol","type","nonce","invocation","slot","pid","startedAt","failure","cleanup","jobs");Seed.constant(value,"protocol",3);Seed.exact(value,"type","FAILED");
+        UpdatePreparation.uuid(Seed.text(value,"nonce"));UpdatePreparation.uuid(Seed.text(value,"invocation"));Bootstrap.reference(value.get("slot"));Seed.positive(value,"pid");try{java.time.Instant.parse(Seed.text(value,"startedAt"));}catch(RuntimeException invalid){throw Seed.invalid("失敗通知の開始時刻が不正です");}
+        Seed.choice(value,"failure","BUNDLED_PINS_INVALID","UNKNOWN");Seed.choice(value,"cleanup","NOT_STARTED","UNKNOWN");
+        if(!value.path("jobs").isArray()||!value.path("jobs").isEmpty())throw Seed.invalid("未対応のjob回収証拠です");
     }
     static long remaining(long deadline) throws IOException {if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("bootstrap制御を中断しました");long nanos=deadline-System.nanoTime();if(nanos<=0)throw new SocketTimeoutException("bootstrap制御の絶対期限を超えました");return Math.max(1,Math.min(Integer.MAX_VALUE,(nanos+999999)/1000000));}
     static JsonNode read(Socket socket,long deadline) throws IOException {

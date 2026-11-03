@@ -1,12 +1,12 @@
-# bootstrap制御protocol 2
+# bootstrap制御protocol 3
 
-#98の先行成果として、実CLI parserの判断と、管理workerの起動完了境界をbootstrapへ渡す。現在は[更新契約](auto-update.md)に従い、background準備と次の適格managed起動のtrialへ接続する。自動rollbackは有効化しない。
+#98の先行成果として、実CLI parserの判断と、管理workerの起動完了境界をbootstrapへ渡す。現在は[更新契約](auto-update.md)に従い、background準備と次の適格managed起動のtrialへ接続する。資源生成前の同梱pins不正だけを[復旧契約](initialization-recovery.md)に従って自動切戻しする。
 
 ## 署名seedとの対応
 
-packageの`bootstrapProtocol`と署名manifestの`minimumBootstrapProtocol`を2に揃える。未対応protocolはCLIのcommandを起動する前に拒否する。worker protocol 1、helper protocol 1、runtime descriptor schema 1を変更する意味ではない。stable manifestのschemaVersionは1のまま、制御protocolの条件だけを更新する。
+packageの`bootstrapProtocol`と実制御相手に3を要求し、protocol 2を拒否する。署名Seedの`minimumBootstrapProtocol`=2の生成・読取契約は本作業で変更しない。protocol 3対応package/CLIの生成は配布統合側の依存である。worker protocol 1、helper protocol 1、runtime descriptor schema 1を変更する意味ではない。stable manifestのschemaVersionは1のまま、制御protocolの条件だけを更新する。
 
-1.1は未releaseなので、protocol 1の開発用seed/rootを自動移行しない。旧QA seed/rootは保持し、新しいprotocol 2の署名seedとfreshなQA rootを作り直す。旧結果を新版の検証結果へ書き換えない。正式trust/配信URLはこの成果では発行しない。
+1.1は未releaseなので、旧protocol/schemaの開発用seed/rootを自動移行しない。旧QA seed/rootは保持し、protocol 3対応CLI/packageとschema 3のfreshなQA rootを作り直す。旧結果を新版の検証結果へ書き換えない。正式trust/配信URLはこの成果では発行しない。
 
 ## REQUESTと通常起動
 
@@ -18,7 +18,7 @@ frameは4byteの長さとUTF-8 JSONで最大64KiB。重複key・余分なfield�
 
 不正引数は本parserの元診断とexit 2を維持する。開始識別が取得できない短命子のreceiptはunknownとして保持する。CLIを更新のために二重parseするbootstrap独自引数モデルは持たない。
 
-## 次の成果が使う境界
+## 初期化と適用の境界
 
 |応答/通知|境界|
 |---|---|
@@ -26,6 +26,7 @@ frameは4byteの長さとUTF-8 JSONで最大64KiB。重複key・余分なfield�
 |SWITCH|実parserが適格と判断したmanaged list/renderを、command/helper準備前に正常終了する。親は直接子の正常reap前に候補を開始しない|
 |PREPARE|適格managed list/renderの初期化だけを許可する。offline/help/明示Docker等は拒否する|
 |READY/GO|管理worker/catalog完了後、list結果公開またはIconExporterの呼出し前で同期停止し、親のGOを受けて続行する|
+|FAILED|READY前の失敗と回収境界をREQUESTの試行identityに結合して通知する。全fieldと復旧条件は復旧契約へ従う|
 
 `startup-ready`は既ProgressListenerの同期通知であり、coreはbootstrap stateや更新transactionを所有しない。CLIがcontrolとCancellationTokenへ接続する。準備監督の期限は実parserが得た管理準備・起動・個別予算の合計で、正の整数とoverflowを確認する。READY後のGO待機は元初期化残期限と30秒の短い方で、延長しない。取消・親切断・期限・不正順序は例外として既resource closeへ進む。
 
@@ -37,7 +38,7 @@ SWITCH/PREPARE/READY/GOは直接fixtureで確認する接続契約であり、�
 
 ## unknownと未受入
 
-例外codeやclose例外無しだけから、candidate固有故障やOS資源の回収を証明しない。INIT_FAILEDの自動判定allowlistは空で、自動rollback/retryは一切しない。typedな発生元と回収証拠は後続contractとして確定する。pending/trialInvocation/previous、高水位と取得は更新契約に従う。GCは未実装である。
+例外codeやclose例外無しだけから、candidate固有故障やOS資源の回収を証明しない。復旧allowlistはcore内部の型で確定したBUNDLED_PINS_INVALIDとNOT_STARTED/jobs=[]の組合せだけであり、helper/worker起動後の失敗はUNKNOWNを保持する。証拠とreceipt/stateのCASを[復旧契約](initialization-recovery.md)で定義する。pending/trialInvocation/previous、高水位と取得は更新契約に従う。GCは未実装である。
 
 直接fixtureは実CLIのREQUEST/RUN、parse-only SWITCHの正常回収とcache未生成、GO前のfixture出力遮断、親切断による取消、分割readの絶対期限、nonce/slot/argv/PIDの拒否を確認する。実managed描画・実installer・Java未導入実host・本番trust/更新配信の受入には代用しない。
 

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.github.rs0325.mcicon.McIconException;
+import io.github.rs0325.mcicon.internal.managed.BundledPinsFailure;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -22,7 +24,9 @@ final class StartupControl implements AutoCloseable {
     private final CompletableFuture<Void> go=new CompletableFuture<>();
     private volatile Runnable cancel=()->{};
     private volatile boolean ready,failed;
+    private boolean notified;
     private Thread reader;
+    private ObjectNode identity;
     private StartupControl(Socket socket,boolean prepare,long deadline){this.socket=socket;this.prepare=prepare;this.deadline=deadline;}
     static StartupControl open(ObjectNode request,String version,Path cliJar) throws IOException {
         String encoded=System.getProperty(PROPERTY);if(encoded==null)return null;if(encoded.length()>16384)throw new IOException("bootstrap制御contextが上限外です");
@@ -30,14 +34,14 @@ final class StartupControl implements AutoCloseable {
         fields(context,"protocol","port","nonce","invocation","slot");protocol(context);if(!context.path("port").isIntegralNumber()||!context.path("port").canConvertToInt()||context.path("port").intValue()<1||context.path("port").intValue()>65535)throw new IOException("bootstrap制御protocol/portが不正です");
         for(String name:List.of("nonce","invocation"))try{UUID.fromString(context.path(name).asText());}catch(IllegalArgumentException failure){throw new IOException("bootstrap制御識別が不正です",failure);}
         verifySlot(context.path("slot"),version,cliJar);
-        request.put("protocol",2).put("type","REQUEST");request.set("nonce",context.get("nonce"));request.set("invocation",context.get("invocation"));request.set("slot",context.get("slot"));request.put("pid",ProcessHandle.current().pid()).put("startedAt",ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("CLI開始識別が読めません")).toString());
+        request.put("protocol",3).put("type","REQUEST");request.set("nonce",context.get("nonce"));request.set("invocation",context.get("invocation"));request.set("slot",context.get("slot"));request.put("pid",ProcessHandle.current().pid()).put("startedAt",ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("CLI開始識別が読めません")).toString());
         Socket socket=new Socket();boolean connected=false;
         try {
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);socket.connect(new InetSocketAddress(InetAddress.getByName("127.0.0.1"),context.get("port").intValue()),(int)remaining(deadline));write(socket,request,deadline);JsonNode response=read(socket,deadline);fields(response,"protocol","type");protocol(response);
             String type=response.path("type").asText();if(!Set.of("RUN","SWITCH","PREPARE").contains(type))throw new IOException("bootstrap制御順序が不正です");
             if(!type.equals("RUN")&&(!request.path("managed").asBoolean()||request.path("offline").asBoolean()||request.path("help").asBoolean()||!Set.of("list","render").contains(request.path("command").asText())))throw new IOException("非適格commandへのtrial指示を拒否しました");
             long budget;try{for(String field:List.of("preparationMillis","startupMillis","itemMillis"))if(!request.path(field).isIntegralNumber()||!request.path(field).canConvertToLong()||request.path(field).longValue()<=0)throw new ArithmeticException();budget=Math.addExact(Math.addExact(request.path("preparationMillis").longValue(),request.path("startupMillis").longValue()),request.path("itemMillis").longValue());budget=Math.addExact(System.nanoTime(),Duration.ofMillis(budget).toNanos());}catch(ArithmeticException failure){throw new IOException("bootstrap初期化予算が不正です",failure);}
-            StartupControl result=new StartupControl(socket,type.equals("PREPARE"),budget);result.switching=type.equals("SWITCH");if(result.prepare)result.monitor();else socket.close();connected=true;return result;
+            StartupControl result=new StartupControl(socket,type.equals("PREPARE"),budget);result.identity=request.deepCopy();result.switching=type.equals("SWITCH");if(result.prepare)result.monitor();else socket.close();connected=true;return result;
         }finally{if(!connected)socket.close();}
     }
     private boolean switching;
@@ -51,9 +55,21 @@ final class StartupControl implements AutoCloseable {
     void ready() {
         if(!prepare)return;
         try {
-            long end=Math.min(deadline,System.nanoTime()+TimeUnit.SECONDS.toNanos(30));ready=true;write(socket,JSON.createObjectNode().put("protocol",2).put("type","READY"),end);go.get(remaining(end),TimeUnit.MILLISECONDS);
+            long end=Math.min(deadline,System.nanoTime()+TimeUnit.SECONDS.toNanos(30));ready=true;write(socket,JSON.createObjectNode().put("protocol",3).put("type","READY"),end);go.get(remaining(end),TimeUnit.MILLISECONDS);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();cancel.run();throw new CompletionException(failure);}
         catch(IOException|ExecutionException|TimeoutException failure){cancel.run();throw new CompletionException(failure);}
+    }
+    void initializationFailure(Throwable cause) throws IOException {
+        while(cause instanceof CompletionException&&cause.getCause()!=null)cause=cause.getCause();
+        if(cause instanceof McIconException&&cause.getCause() instanceof BundledPinsFailure&&cause.getSuppressed().length==0)failed("BUNDLED_PINS_INVALID","NOT_STARTED");
+        else failed("UNKNOWN","UNKNOWN");
+    }
+    void failed(String failure,String cleanup) throws IOException {
+        if(!prepare||ready||failed||notified)return;
+        notified=true;
+        ObjectNode value=JSON.createObjectNode().put("protocol",3).put("type","FAILED").put("failure",failure).put("cleanup",cleanup);
+        for(String name:List.of("nonce","invocation","slot","pid","startedAt"))value.set(name,identity.get(name));
+        value.putArray("jobs");write(socket,value,Math.min(deadline,System.nanoTime()+TimeUnit.SECONDS.toNanos(30)));
     }
     private void monitor() {
         reader=Thread.ofPlatform().name("mcicon-bootstrap-control").start(()-> {
@@ -63,7 +79,7 @@ final class StartupControl implements AutoCloseable {
             }catch(Exception failure){failed=true;cancel.run();go.completeExceptionally(failure);}
         });
     }
-    private static void protocol(JsonNode node) throws IOException {if(!node.path("protocol").isIntegralNumber()||!node.path("protocol").canConvertToInt()||node.path("protocol").intValue()!=2)throw new IOException("bootstrap制御protocolが不一致です");}
+    private static void protocol(JsonNode node) throws IOException {if(!node.path("protocol").isIntegralNumber()||!node.path("protocol").canConvertToInt()||node.path("protocol").intValue()!=3)throw new IOException("bootstrap制御protocolが不一致です");}
     private static void fields(JsonNode node,String...names) throws IOException {if(node==null||!node.isObject())throw new IOException("bootstrap制御objectが必要です");Set<String> expected=Set.of(names);if(node.size()!=expected.size())throw new IOException("bootstrap制御fieldが不正です");for(String name:names)if(!node.has(name))throw new IOException("bootstrap制御fieldが不足しています");}
     static long remaining(long deadline) throws IOException {if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("bootstrap制御を中断しました");long value=deadline-System.nanoTime();if(value<=0)throw new SocketTimeoutException("bootstrap制御の絶対期限を超えました");return Math.max(1,Math.min(Integer.MAX_VALUE,(value+999999)/1000000));}
     static JsonNode read(Socket socket,long deadline) throws IOException {int size=ByteBuffer.wrap(receive(socket,4,deadline)).getInt();if(size<1||size>65536)throw new IOException("bootstrap制御messageが上限外です");return JSON.readTree(receive(socket,size,deadline));}

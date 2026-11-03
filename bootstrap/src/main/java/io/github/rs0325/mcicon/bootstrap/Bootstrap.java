@@ -3,6 +3,7 @@ package io.github.rs0325.mcicon.bootstrap;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.rs0325.mcicon.internal.WindowsDataHome;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.io.*;
 import java.nio.channels.*;
 import java.nio.file.*;
@@ -25,7 +26,7 @@ final class Bootstrap {
     Bootstrap(Path installed,Path root,Seed.Host host) throws IOException {
         this.installed=installed.toAbsolutePath().normalize();this.root=root.toAbsolutePath().normalize();this.host=host;
         dataRoot=host.os().equals("windows")?WindowsDataHome.configuredRoot():null;
-        canonical(this.installed);info=Seed.json(Seed.read(this.installed.resolve("bootstrap-package.json"),65536));Seed.fields(info,"schemaVersion","bootstrapVersion","bootstrapProtocol","owner","host","stableManifestUrl");if(!info.path("stableManifestUrl").isNull())Seed.https(Seed.text(info,"stableManifestUrl"));Seed.constant(info,"schemaVersion",1);Seed.constant(info,"bootstrapProtocol",2);Seed.version(info,"bootstrapVersion");Seed.choice(info,"owner","homebrew","winget","installer","archive");
+        canonical(this.installed);info=Seed.json(Seed.read(this.installed.resolve("bootstrap-package.json"),65536));Seed.fields(info,"schemaVersion","bootstrapVersion","bootstrapProtocol","owner","host","stableManifestUrl");if(!info.path("stableManifestUrl").isNull())Seed.https(Seed.text(info,"stableManifestUrl"));Seed.constant(info,"schemaVersion",1);Seed.constant(info,"bootstrapProtocol",3);Seed.version(info,"bootstrapVersion");Seed.choice(info,"owner","homebrew","winget","installer","archive");
         if(!info.path("host").equals(Seed.JSON.valueToTree(host)))throw Seed.invalid("package hostが一致しません");
         try {key=KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(Seed.read(this.installed.resolve("trust.der"),1024)));}
         catch(GeneralSecurityException failure){throw new IOException("packageの固定trustが未設定/不正です",failure);}
@@ -99,8 +100,14 @@ final class Bootstrap {
     }
     private void roots(long deadline) throws IOException {Seed.check(deadline);for(String name:List.of("staging","tools","archives","manifests","runs","logs"))directory(root.resolve(name),deadline);Seed.check(deadline);}
     JsonNode state(long deadline) throws IOException {Seed.check(deadline);
-        Path path=root.resolve("active.json");if(Files.notExists(path,LinkOption.NOFOLLOW_LINKS)){Seed.check(deadline);return null;}file(path,deadline);JsonNode value=Seed.json(Seed.read(path,65536));Seed.fields(value,"schemaVersion","channel","host","active","pending","previous","highestAcceptedSequence","trialInvocation","preparation");Seed.constant(value,"schemaVersion",2);Seed.exact(value,"channel","stable");Seed.positive(value,"highestAcceptedSequence");
-        if(!value.path("host").equals(Seed.JSON.valueToTree(host)))throw Seed.invalid("host/更新状態が未対応です");reference(value.get("active"));for(String field:List.of("pending","previous"))if(!value.path(field).isNull())reference(value.get(field));if(!value.path("trialInvocation").isNull())UpdatePreparation.uuid(Seed.text(value,"trialInvocation"));UpdatePreparation.validate(value.get("preparation"));Seed.check(deadline);return value;
+        Path path=root.resolve("active.json");if(Files.notExists(path,LinkOption.NOFOLLOW_LINKS)){Seed.check(deadline);return null;}file(path,deadline);JsonNode value=Seed.json(Seed.read(path,65536));Seed.constant(value,"schemaVersion",3);Seed.fields(value,"schemaVersion","channel","host","active","pending","previous","highestAcceptedSequence","trialInvocation","preparation","badCandidates");Seed.exact(value,"channel","stable");Seed.positive(value,"highestAcceptedSequence");
+        if(!value.path("host").equals(Seed.JSON.valueToTree(host)))throw Seed.invalid("host/更新状態が未対応です");reference(value.get("active"));for(String field:List.of("pending","previous"))if(!value.path(field).isNull())reference(value.get(field));if(!value.path("trialInvocation").isNull())UpdatePreparation.uuid(Seed.text(value,"trialInvocation"));UpdatePreparation.validate(value.get("preparation"));
+        for(JsonNode bad:Seed.array(value,"badCandidates",0,32)) {
+            Seed.fields(bad,"slot","previousActive","argsSha256","sequence","invocation","child","receiptKey","initialization");reference(bad.get("slot"));reference(bad.get("previousActive"));Seed.digest(bad,"argsSha256");Seed.positive(bad,"sequence");UpdatePreparation.uuid(Seed.text(bad,"invocation"));process(bad.get("child"));Seed.text(bad,"receiptKey");StartupControl.failure(bad.get("initialization"));
+            JsonNode failure=bad.get("initialization");if(!bad.path("slot").equals(failure.path("slot"))||!bad.path("invocation").equals(failure.path("invocation"))||!bad.path("child").path("pid").equals(failure.path("pid"))||!bad.path("child").path("startedAt").equals(failure.path("startedAt"))||!recoverable(failure))throw Seed.invalid("不良候補の証拠が矛盾しています");
+            if(Seed.positive(bad,"sequence")>Seed.positive(value,"highestAcceptedSequence"))throw Seed.invalid("不良候補が高水位を超えています");
+        }
+        Seed.check(deadline);return value;
     }
     static void reference(JsonNode value) throws IOException {Seed.fields(value,"toolVersion","payloadSha256","runtimeDescriptorSha256","manifestSha256");Seed.version(value,"toolVersion");for(String name:List.of("payloadSha256","runtimeDescriptorSha256","manifestSha256"))Seed.digest(value,name);}
     Seed accepted(JsonNode state,long deadline) throws IOException {Seed.check(deadline);return accepted(state.get("active"),state,deadline);}
@@ -133,7 +140,7 @@ final class Bootstrap {
         if(existing==null) {
             for(String name:List.of("runs","tools","staging","archives","manifests","logs"))try(var paths=Files.list(root.resolve(name))){if(paths.findAny().isPresent())throw Seed.invalid("部分生成/state消失を初回へ再baselineしません");}
             seed=new Seed(installed.resolve("seed"),key,host);copyArchive(seed,deadline);saveManifest(seed,deadline);Path slot=verifySlot(seed,deadline);
-            ObjectNode value=Seed.JSON.createObjectNode().put("schemaVersion",2).put("channel","stable");value.set("host",Seed.JSON.valueToTree(host));value.set("active",seed.reference());value.putNull("pending").putNull("previous").putNull("trialInvocation").putNull("preparation").put("highestAcceptedSequence",Seed.positive(seed.manifest,"sequence"));atomic(root.resolve("active.json"),value,deadline);Seed.check(deadline);return slot;
+            ObjectNode value=Seed.JSON.createObjectNode().put("schemaVersion",3).put("channel","stable");value.set("host",Seed.JSON.valueToTree(host));value.set("active",seed.reference());value.putNull("pending").putNull("previous").putNull("trialInvocation").putNull("preparation").put("highestAcceptedSequence",Seed.positive(seed.manifest,"sequence"));value.putArray("badCandidates");atomic(root.resolve("active.json"),value,deadline);Seed.check(deadline);return slot;
         }
         seed=accepted(existing,deadline);
         Seed.check(deadline);if(Files.notExists(slot(seed),LinkOption.NOFOLLOW_LINKS)) {
@@ -150,7 +157,10 @@ final class Bootstrap {
         }}
     }
     private JsonNode receipt(FileChannel channel) throws IOException {
-        JsonNode value=Seed.json(read(channel,65536));if(value.path("kind").asText().equals("preparation"))return UpdatePreparation.receipt(value);Seed.fields(value,"schemaVersion","kind","invocationId","slot","bootstrap","state","child","exitCode");Seed.exact(value,"kind","command");Seed.constant(value,"schemaVersion",1);try{UUID.fromString(Seed.text(value,"invocationId"));}catch(IllegalArgumentException failure){throw new IOException("invocation UUIDが不正です",failure);}reference(value.get("slot"));process(value.get("bootstrap"));String state=Seed.choice(value,"state","launching","running","finished");
+        JsonNode value=Seed.json(read(channel,65536));if(value.path("kind").asText().equals("preparation"))return UpdatePreparation.receipt(value);Seed.constant(value,"schemaVersion",3);Seed.fields(value,"schemaVersion","kind","invocationId","slot","bootstrap","state","child","exitCode","startup","initialization","receiptKey","argsSha256");Seed.exact(value,"kind","command");try{UUID.fromString(Seed.text(value,"invocationId"));}catch(IllegalArgumentException failure){throw new IOException("invocation UUIDが不正です",failure);}reference(value.get("slot"));process(value.get("bootstrap"));String state=Seed.choice(value,"state","launching","running","finished");
+        Seed.digest(value,"argsSha256");Seed.choice(value,"startup","request","run","switch","prepare","ready","go","failed");Seed.text(value,"receiptKey");
+        if(!value.path("initialization").isNull()){StartupControl.failure(value.get("initialization"));if(!value.path("startup").asText().equals("failed"))throw Seed.invalid("失敗receiptのphaseが不一致です");}
+        else if(value.path("startup").asText().equals("failed"))throw Seed.invalid("失敗receiptの証拠が欠落しています");
         if(state.equals("launching")){if(!value.path("child").isNull()||!value.path("exitCode").isNull())throw Seed.invalid("launching receiptが矛盾しています");}
         else {process(value.get("child"));if(state.equals("running")&&!value.path("exitCode").isNull()||state.equals("finished")&&(!value.path("exitCode").isIntegralNumber()||!value.path("exitCode").canConvertToInt()))throw Seed.invalid("child結果が矛盾しています");}return value;
     }
@@ -164,7 +174,7 @@ final class Bootstrap {
         int code;try{code=child.waitFor();}catch(InterruptedException e){Thread.currentThread().interrupt();throw new InterruptedIOException("CLI待機を中断しました");}
         if(identified){record.put("state","finished").put("exitCode",code);write(channel,record);}return code;
     }
-    private record LaunchResult(int code,JsonNode request,String trial,JsonNode pending) {}
+    private record LaunchResult(int code,JsonNode request,String trial,JsonNode pending,boolean recovered) {}
     int launch(List<String> arguments) throws IOException {return launch(arguments,null);}
     int launch(List<String> arguments,String pin) throws IOException {
         String[] pinned=pin==null?null:parsePin(pin);long deadline=System.nanoTime()+Duration.ofMinutes(5).toNanos();Path selected;JsonNode reference,pending;
@@ -172,7 +182,10 @@ final class Bootstrap {
         LaunchResult first=command(arguments,selected,reference,pending,null,null,pin==null,deadline);
         if(first.trial()==null)return first.code();
         Path candidate;try(StateLock ignored=lock(deadline)){JsonNode current=state(deadline);if(!first.trial().equals(current.path("trialInvocation").asText())||!current.path("pending").equals(first.pending()))throw Seed.invalid("trial予約が変化しました");Seed seed=accepted(first.pending(),current,deadline);candidate=verifySlot(seed,deadline);}
-        return command(arguments,candidate,first.pending(),null,first.trial(),first.request(),false,deadline).code();
+        LaunchResult result=command(arguments,candidate,first.pending(),null,first.trial(),first.request(),false,deadline);
+        if(!result.recovered())return result.code();
+        try(StateLock ignored=lock(deadline)){JsonNode current=state(deadline);if(!reference.equals(current.get("active"))||!new UpdatePreparation(this).enabled(deadline))throw Seed.invalid("復旧後の継続条件が変化しました");selected=verifySlot(accepted(current,deadline),deadline);}
+        return command(arguments,selected,reference,null,null,null,false,deadline).code();
     }
     private Seed managedSeed(Path path,long deadline) throws IOException {Seed.check(deadline);directory(path,deadline);file(path.resolve("stable.json"),deadline);file(path.resolve("stable.json.sig"),deadline);Seed seed=new Seed(path,key,host);Seed.check(deadline);return seed;}
     private Seed accepted(JsonNode reference,JsonNode state,long deadline) throws IOException {Seed.check(deadline);
@@ -189,11 +202,30 @@ String[] parts=pin.split("@",-1);if(parts.length!=2||!parts[0].matches("[0-9]+\\
     private void activate(String trial,JsonNode reference,JsonNode expectedState,long deadline) throws IOException {
         try(StateLock ignored=lock(deadline)){ObjectNode state=(ObjectNode)state(deadline);if(!trial.equals(state.path("trialInvocation").asText())||!reference.equals(state.get("pending"))||!state.equals(expectedState)||!new UpdatePreparation(this).enabled(deadline))throw Seed.invalid("READY後の適用CAS条件が変化しました");state.set("previous",state.get("active"));state.set("active",reference);state.putNull("pending").putNull("trialInvocation");atomic(root.resolve("active.json"),state,deadline);}
     }
+    static boolean badCandidate(JsonNode reference,JsonNode state) {
+        for(JsonNode bad:state.path("badCandidates"))if(bad.path("slot").path("payloadSha256").equals(reference.path("payloadSha256")))return true;
+        return false;
+    }
+    private static boolean recoverable(JsonNode failure) {
+        return failure.path("failure").asText().equals("BUNDLED_PINS_INVALID")&&failure.path("cleanup").asText().equals("NOT_STARTED")&&failure.path("jobs").isArray()&&failure.path("jobs").isEmpty();
+    }
+    void recoverTrial(String trial,JsonNode reference,JsonNode expected,Path run,FileChannel channel,JsonNode record,long deadline) throws IOException {
+        try(StateLock ignored=lock(deadline)) {
+            ObjectNode current=(ObjectNode)state(deadline);
+            if(!current.equals(expected)||!trial.equals(current.path("trialInvocation").asText())||!reference.equals(current.get("pending"))||!new UpdatePreparation(this).enabled(deadline)||badCandidate(reference,current))throw Seed.invalid("復旧CAS条件が変化しました");
+            if(current.path("badCandidates").size()>=32)throw Seed.invalid("不良候補記録の上限に達しました");
+            JsonNode failure=record.get("initialization");if(!recoverable(failure)||!failure.path("invocation").asText().equals(trial)||!failure.path("slot").equals(reference)||Seed.positive(record.path("child"),"pid")!=Seed.positive(failure,"pid")||!record.path("child").path("startedAt").equals(failure.path("startedAt")))throw Seed.invalid("復旧証拠の試行identityが不一致です");
+            Seed candidate=accepted(reference,current,deadline);verifySlot(accepted(current,deadline),deadline);
+            if(!fileIdentity(run,deadline).equals(Seed.text(record,"receiptKey"))||!receipt(channel).equals(Seed.json(Seed.JSON.writeValueAsBytes(record)))||!record.path("state").asText().equals("finished")||!record.path("startup").asText().equals("failed")||!record.path("slot").equals(reference)||!record.path("invocationId").asText().equals(trial))throw Seed.invalid("復旧receiptの所有証拠が変化しました");
+            ObjectNode bad=Seed.JSON.createObjectNode().put("sequence",Seed.positive(candidate.manifest,"sequence")).put("invocation",trial).put("receiptKey",Seed.text(record,"receiptKey"));bad.set("slot",reference);bad.set("previousActive",current.get("active"));bad.put("argsSha256",Seed.digest(record,"argsSha256"));bad.set("child",record.get("child"));bad.set("initialization",failure);((ArrayNode)current.get("badCandidates")).add(bad);
+            current.putNull("pending").putNull("trialInvocation");atomic(root.resolve("active.json"),current,deadline);
+        }
+    }
     private LaunchResult command(List<String> arguments,Path slot,JsonNode reference,JsonNode pending,String trial,JsonNode expectedRequest,boolean automatic,long deadline) throws IOException {
         Path run;JsonNode transaction;FileChannel channel=null;FileLock held=null;ObjectNode record;Process child=null;StartupControl control=null;IOException original=null;
         try {
             try(StateLock ignored=lock(deadline)) {
-                transaction=trial==null?null:state(deadline);if(trial!=null&&(!trial.equals(transaction.path("trialInvocation").asText())||!reference.equals(transaction.get("pending"))))throw Seed.invalid("候補開始前の予約が変化しました");String id=trial==null?UUID.randomUUID().toString():trial;run=root.resolve("runs/"+id+".json");channel=create(run,deadline);held=channel.lock();record=Seed.JSON.createObjectNode().put("schemaVersion",1).put("kind","command").put("invocationId",id).put("state","launching");record.set("slot",reference);record.set("bootstrap",identity(ProcessHandle.current()));record.putNull("child").putNull("exitCode");write(channel,record);
+                transaction=trial==null?null:state(deadline);if(trial!=null&&(!trial.equals(transaction.path("trialInvocation").asText())||!reference.equals(transaction.get("pending"))))throw Seed.invalid("候補開始前の予約が変化しました");String id=trial==null?UUID.randomUUID().toString():trial;run=root.resolve("runs/"+id+".json");channel=create(run,deadline);held=channel.lock();record=Seed.JSON.createObjectNode().put("schemaVersion",3).put("kind","command").put("invocationId",id).put("state","launching");record.set("slot",reference);record.set("bootstrap",identity(ProcessHandle.current()));record.putNull("child").putNull("exitCode").putNull("initialization").put("startup","request").put("receiptKey",fileIdentity(run,deadline)).put("argsSha256",Seed.hash(Seed.JSON.writeValueAsBytes(arguments)));write(channel,record);
             }
             if(arguments.equals(List.of("--version"))||arguments.equals(List.of("-V")))System.err.println("Bootstrap "+Seed.text(info,"bootstrapVersion")+" (owner: "+Seed.text(info,"owner")+")");
             control=new StartupControl(reference,record.path("invocationId").asText(),arguments);
@@ -201,23 +233,32 @@ String[] parts=pin.split("@",-1);if(parts.length!=2||!parts[0].matches("[0-9]+\\
             Seed.check(deadline);child=configureChild(new ProcessBuilder(command),deadline).inheritIO().start();Seed.check(deadline);
             var started=child.info().startInstant();if(started.isPresent()){record.put("state","running");record.set("child",Seed.JSON.createObjectNode().put("pid",child.pid()).put("startedAt",started.get().toString()));write(channel,record);}
             try(StartupControl.Session session=control.accept(child,Duration.ofSeconds(30))) {
-                if(session==null)return new LaunchResult(awaitChild(child,channel,record),null,null,null);
+                if(session==null)return new LaunchResult(awaitChild(child,channel,record),null,null,null,false);
                 if(trial!=null) {
                     compareRequest(expectedRequest,session.request);if(!eligible(session.request))throw Seed.invalid("候補が適格なmanaged起動ではありません");
                     long millis;try{millis=Math.addExact(Math.addExact(Seed.positive(session.request,"preparationMillis"),Seed.positive(session.request,"startupMillis")),Seed.positive(session.request,"itemMillis"));}catch(ArithmeticException failure){throw new IOException("trial予算が上限外です",failure);}
                     long end;try{end=Math.addExact(System.nanoTime(),Duration.ofMillis(millis).toNanos());}catch(ArithmeticException failure){throw new IOException("trial予算が上限外です",failure);}
-                    session.send("PREPARE");session.ready(end);long goDeadline=Math.min(end,System.nanoTime()+TimeUnit.SECONDS.toNanos(30));activate(trial,reference,transaction,goDeadline);session.go(goDeadline);
+                    record.put("startup","prepare");write(channel,record);session.send("PREPARE");JsonNode failure=session.ready(end);
+                    if(failure!=null) {
+                        record.put("startup","failed");record.set("initialization",failure);write(channel,record);
+                        try{if(!child.waitFor(StartupControl.remaining(end),TimeUnit.MILLISECONDS))throw Seed.invalid("失敗CLIの終端が未確認です");}catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new InterruptedIOException("失敗CLIの終端待機を中断しました");}
+                        int code=awaitChild(child,channel,record);
+                        if(!recoverable(failure))throw Seed.invalid("候補固有故障・資源回収完了を確定できません");
+                        recoverTrial(trial,reference,transaction,run,channel,record,end);
+                        return new LaunchResult(code,session.request,null,null,true);
+                    }
+                    record.put("startup","ready");write(channel,record);long goDeadline=Math.min(end,System.nanoTime()+TimeUnit.SECONDS.toNanos(30));activate(trial,reference,transaction,goDeadline);record.put("startup","go");write(channel,record);session.go(goDeadline);
                 } else {
                     String next=null;
                     if(automatic&&eligible(session.request)) {
                         UpdatePreparation prep=new UpdatePreparation(this);
-                        try(StateLock ignored=lock(session.deadline)){ObjectNode current=(ObjectNode)state(session.deadline);if(prep.enabled(session.deadline)&&pending!=null&&!pending.isNull()&&pending.equals(current.get("pending"))&&reference.equals(current.get("active"))&&current.path("trialInvocation").isNull()){next=UUID.randomUUID().toString();current.put("trialInvocation",next);atomic(root.resolve("active.json"),current,session.deadline);}}
+                        try(StateLock ignored=lock(session.deadline)){ObjectNode current=(ObjectNode)state(session.deadline);if(prep.enabled(session.deadline)&&pending!=null&&!pending.isNull()&&pending.equals(current.get("pending"))&&reference.equals(current.get("active"))&&current.path("trialInvocation").isNull()&&!badCandidate(pending,current)){next=UUID.randomUUID().toString();current.put("trialInvocation",next);atomic(root.resolve("active.json"),current,session.deadline);}}
                         if(next==null&&pending!=null&&pending.isNull())try{prep.start(session.deadline);}catch(IOException failure){System.err.println("UPDATE_NOT_APPLIED: "+failure.getMessage());}
                     }
-                    if(next!=null){session.send("SWITCH");int code=awaitChild(child,channel,record);if(code!=0)throw Seed.invalid("旧parserの正常終了を確認できません");return new LaunchResult(code,session.request,next,pending);}
-                    session.send("RUN");
+                    if(next!=null){record.put("startup","switch");write(channel,record);session.send("SWITCH");int code=awaitChild(child,channel,record);if(code!=0)throw Seed.invalid("旧parserの正常終了を確認できません");return new LaunchResult(code,session.request,next,pending,false);}
+                    record.put("startup","run");write(channel,record);session.send("RUN");
                 }
-                return new LaunchResult(awaitChild(child,channel,record),session.request,null,null);
+                return new LaunchResult(awaitChild(child,channel,record),session.request,null,null,false);
             }
         }catch(IOException failure){original=failure;throw failure;}
         finally {

@@ -29,7 +29,9 @@ public final class Main implements Runnable {
         return new CommandLine(root).setExecutionStrategy(parsed->{
             try(StartupControl control=StartupControl.open(request(parsed),ToolVersion.VERSION,Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()))) {
                 for(CommandLine line:parsed.asCommandLineList()){Common common=common(line.getCommand());if(common!=null)common.startup=control;}
-                if(control!=null&&control.switching())return 0;return new CommandLine.RunLast().execute(parsed);
+                if(control!=null&&control.switching())return 0;
+                try{return new CommandLine.RunLast().execute(parsed);}
+                catch(CommandLine.ExecutionException failure){if(control!=null)try{control.initializationFailure(failure.getCause());}catch(IOException notification){failure.addSuppressed(notification);}throw failure;}
             }catch(CommandLine.ExecutionException failure){throw failure;}
             catch(Exception failure){return root.failure(failure,parsed.commandSpec().commandLine());}
             finally{for(CommandLine line:parsed.asCommandLineList()){Common common=common(line.getCommand());if(common!=null)common.startup=null;}}
