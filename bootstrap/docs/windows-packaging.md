@@ -65,6 +65,51 @@ Gradleの`windowsAppImage`はinstallDist/core JARに依存し、同じ入口へ�
 
 この生成物はinstallerが提供する実体・全reparse拒否・他標準userの書換え拒否prefixの代替ではない。reader自身のhashでその外部前提を循環証明しない。正式配置ACL、実winget install、標準非admin一般、upgrade/uninstall、本番署名/配布は別成果。Refs #97であり、#97全体の完了を意味しない。
 
+## user向けMSI・winget候補の生成と静的監査
+
+`package-windows-installer.py`は前段の`packaging.json`がある候補directoryを入力にし、未署名MSI、winget manifest候補、checksumと静的監査記録を新しいdirectoryに作る。前段のJava/Seed生成・更新manifest・自動更新処理は変更しない。
+
+生成器はPython標準機能と、導入済みのWiX 3の`candle.exe`・`light.exe`・`dark.exe`を使用する。確認環境はWiX 3.14。既存のJava同梱app-imageを再利用し、WiXのMSI file/component・Environment・MajorUpgradeで配置・PATH・更新を表す。独自installer実行系やPATHを書き換えるcustom action、追加Python依存は導入しない。WiXは生成環境だけの依存で、製品payloadには同梱しない。WiXの導入・更新・ライセンス確認は生成環境側で行う。この選択はローカル候補用であり、正式配布toolchainの保守・署名方針は未確定。
+
+| 項目 | 候補の契約 |
+|---|---|
+| インストール先 | `%LOCALAPPDATA%\Programs\MCIconGenerator`。per-user、x64、limited privileges。`ALLUSERS`指定をLaunchConditionで拒否。独自の任意prefix選択UIは持たない |
+| PATH | MSI Environment tableでユーザーPATH末尾へ`[INSTALLFOLDER]`を追加し、uninstall時に当該要素を除去。machine PATHは変更しない。空白を含むPATH要素へ引用符は追加しない。既存shellへの反映は未検証で、利用時は新しいshellを使う |
+| 更新の所有者 | payload/tool slot・runtime cacheの更新は既存bootstrapper。MSIに含むbootstrap本体・同梱Java・trust・reader・seedの置換はinstaller/winget。`bootstrap-package.json`のownerは前段の`installer`/`winget`を保持し、別のowner文字列は追加しない |
+| upgrade | bootstrapの数値`major.minor.patch`をMSI版に使用（上限255.255.65535）。同一UpgradeCodeと版ごとのProductCodeによるMajorUpgrade。候補buildごとにProductCodeは新規となり、正式公開時は確定MSIを固定する。同版の実upgradeやdowngrade拒否は未検証 |
+| uninstall | MSIが所有する配布fileとHKCU製品component key、空になった配布directoryだけを除去。cache・slot・`MCICON_DATA_HOME`・生成PNGへ向けた削除処理、再帰削除、custom actionは持たない。これらのデータはprogram prefix外に置く |
+| 空白path | 全外部toolを引数配列で実行し、WiXのsourceはXMLエスケープする。空白を含む生成元・出力・監査pathで実buildを試験する。実install先での動作は未検証 |
+| 権限拒否 | 生成先作成やtool実行の拒否・非0終了・120秒timeoutはエラーとして伝播し、完了記録を作らない。昇格・ACL変更・再試行fallbackはしない。install先/PATH/registryの実権限拒否は別の実機受入が必要 |
+
+入力は`installer`または`winget`所有の同版Windows x64 app-imageに限定する。前段の完了status・image全file bytes・ZIP一覧/全bytes/checksum・package metadataを照合する。project licenseと第三者通知はリポジトリ正本、reader licenseは前段reader metadataの一覧/size/hashに結ぶ。同梱Javaの`runtime/legal/`も必須とする。署名seedの検証をこの段で代替せず、前段の正式verifierを通した入力を使用する。監査JSON/checksum自体の署名や、同時に改変された記録の真正性は保証しない。
+
+```powershell
+& 'C:\tools\Python\python.exe' bootstrap/scripts/package-windows-installer.py build `
+  --candidate 'C:\new candidate' --version 1.1.0 `
+  --wix 'C:\Program Files (x86)\WiX Toolset v3.14\bin' `
+  --output 'C:\installer candidate'
+
+& 'C:\tools\Python\python.exe' bootstrap/scripts/package-windows-installer.py audit `
+  --candidate 'C:\installer candidate' `
+  --wix 'C:\Program Files (x86)\WiX Toolset v3.14\bin' `
+  --scratch 'C:\new static audit'
+```
+
+出力先の親directoryは事前に用意し、出力先と監査scratchは未使用pathを指定する。前段入力は変更しない。出力には`payload/`、`installer.wxs`、WiX中間物、`candidate.msi`、`extracted/`、`winget.yaml`、`SHA256SUMS`、`installer-audit.json`を残す。失敗時は途中出力を保全し、完了記録がなければ完成候補に扱わない。再実行で既存候補を上書きしない。
+
+buildはWiX標準検証を有効のまま実行する。続いてWindows Installer APIでMSIをread-onlyに開き、版/識別子/user scope・PATH・file/component/directoryの配置・HKCU key・空directoryのuninstall・custom action不在を照合する。`dark.exe`で埋込cabinetを展開して全fileのsize/hashを入力と照合し、MSIのSHA-256をmanifest/checksumへ結ぶ。`audit`はこれらとWiX定義を再照合する。MSIを起動するAPIや`msiexec`は使用しない。WiXのICE91はuser directoryをmachine installで全userへコピーできないという警告で、合成fixtureではfileごとに発生した。警告・検証は無効化していない。
+
+`winget.yaml`は追加YAML依存を避けたJSON表記のYAML 1.2 singleton候補。`InstallerType=msi`、`Scope=user`、`Architecture=x64`、`Commands=[mcicon]`、版、ローカルMSIのhash/ProductCodeを出力する。`InstallerUrl=PENDING_PUBLIC_HTTPS_URL`は意図的に配布URLとして無効で、提出可能manifestではない。正式版・PackageIdentifierの登録可否・HTTPS URLは未確定。コード署名後はMSI bytesが変わるため、InstallerSha256/ProductCodeを正式artifactから再取得する。installerType等の実winget schema/審査適合は未確認で、静的監査成功をwingetの受入と扱わない。
+
+検証入口は次のとおり。合成imageのlauncher/Java/seedはダミーで、正式配布候補・起動成功の証拠ではない。
+
+```powershell
+& 'C:\tools\Python\python.exe' bootstrap/scripts/test-package-windows-installer.py `
+  --wix 'C:\Program Files (x86)\WiX Toolset v3.14\bin'
+```
+
+任意の`--fixture-output <新規directory>`は同じ合成入力で実MSIを生成・再監査し、レビュー用に保持する（通常のunittestとは別実行）。本変更ではコード署名、実install/upgrade/uninstall、PATHの実反映、正式配置のACL/reparse資格・他userによる書換え拒否、標準非admin実機、実winget検証/外部審査/公開、正式署名seedの起動を実行しない。installerのprefix全体の安全性や#97全体の完成は依然として未受入。Issue本文と本候補の接続確認、正式入力による統合buildも残件とする。
+
 ## 任意のdata rootとH配置の受入範囲
 
 対応済み候補は利用者プロセスの`MCICON_DATA_HOME`から、`bootstrap/runtime/cache`の各既定先とbootstrap子専用の`bootstrap/tmp`を導出する。packagerやinstallerへ値供給の仕組みを追加する変更ではない。program prefixとdata rootを分離し、通常uninstallはdataを保持する責務境界とする。詳細な優先順・失敗・移行なし・temp範囲は[利用ガイド](../../docs/usage.md#Windowsのデータ保存先)を参照。
