@@ -40,6 +40,8 @@ fileKeyはJDK/OS固有表現をstateとreceiptへ保存する。取得不可・�
 
 PREPAREの外側transaction期限は実preparation/startup/item予算の和で、READY/GOは残期限と30秒の短い方とする。core内部のcold処理がその和で必ず完了する保証ではなく、公開ManagedOptionsの期限意味も変更しない。候補固有故障/実資源回収のtyped証拠が無いため、同jobの旧版fallback・自動retry/rollbackは行わない。旧active保持だけを復旧完了とは呼ばない。GCも実装せず旧slot/不明receiptを保持する。
 
+復旧を許可する最小条件、既存証拠で判定できない理由、追加情報を所有するlayerと再開条件は[初期化失敗の復旧設計メモ](initialization-recovery.md)を参照する。現行API/protocol/schemaを維持したままの自動復旧は有効化しない。
+
 ## 保存形式と検証範囲
 
 [bootstrap state schema 2](../../schemas/bootstrap-state-v2.schema.json)と既receiptのkindを使用する。未release1.1の旧開発root/packageは新しいQA世代へ再生成し、移行/fallbackしない。bootstrap制御はprotocol2のまま、Minecraft worker/helper/descriptor protocol1も不変である。
