@@ -10,7 +10,7 @@ from unittest import mock
 
 
 class BootstrapPackageTest(unittest.TestCase):
-    def test_generation_uses_protocol_three_in_image_and_audit(self):
+    def test_generation_uses_protocol_four_in_image_and_audit(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             inputs = root / 'lib'; inputs.mkdir()
@@ -18,7 +18,7 @@ class BootstrapPackageTest(unittest.TestCase):
             seed = root / 'seed'; seed.mkdir()
             for name in ('stable.json', 'stable.json.sig', 'tool.zip'):
                 (seed / name).write_bytes(b'fixture-not-signed')
-            trust = root / 'trust.der'; trust.write_bytes(b'fixture-trust')
+            trust = root / 'trust-set.bin'; trust.write_bytes(b'MCITRS1\n' + bytes.fromhex('302a300506032b6570032100') + bytes([1]) * 32 + bytes.fromhex('302a300506032b6570032100') + b'\x58' + b'\x66' * 31)
             output = root / 'candidate'
             script = Path(__file__).with_name('package-bootstrap.py')
             args = [str(script), '--jdk', str(root / 'jdk'), '--input', str(inputs),
@@ -41,7 +41,8 @@ class BootstrapPackageTest(unittest.TestCase):
                 runpy.run_path(str(script), run_name='__main__')
             metadata = json.loads((output / 'image/MCIconBootstrap.app/Contents/app/bootstrap-package.json').read_text())
             self.assertEqual(metadata['schemaVersion'], 1)
-            self.assertEqual(metadata['bootstrapProtocol'], 3)
+            self.assertEqual(metadata['bootstrapProtocol'], 4)
+            self.assertEqual((output / 'image/MCIconBootstrap.app/Contents/app/trust-set.bin').read_bytes(), trust.read_bytes())
             self.assertEqual(metadata['host'], {'os': 'macos', 'arch': 'aarch64'})
             self.assertEqual(json.loads((output / 'packaging.json').read_text())['package'], metadata)
             self.assertEqual(calls, ['jlink', 'jpackage', 'codesign'])

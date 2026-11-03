@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.github.rs0325.mcicon.McIconException;
 import io.github.rs0325.mcicon.internal.FilesSupport;
+import io.github.rs0325.mcicon.internal.TrustSet;
 import java.net.URI;
-import java.security.*;
 import java.util.*;
 
 /** 署名済み元bytesと同梱pinを照合した、不変の管理環境指定。更新channelは参照しない。 */
@@ -24,11 +24,10 @@ public record RuntimeDescriptor(String digest,String runtimeId,String toolVersio
     public record Pin(String descriptorSha256,String toolVersion,String agentSha256,String adapterSetSha256,Host host,Set<Integer> javaMajors) {}
 
     /** hashとEd25519を元bytesで検証してから、schemaと意味上の互換条件を検証する。 */
-    public static RuntimeDescriptor verify(byte[] original,byte[] signature,PublicKey trustKey,Pin pin) {
+    public static RuntimeDescriptor verify(byte[] original,byte[] signature,TrustSet trustKey,Pin pin) {
         try {
             if(original.length>1024*1024||!FilesSupport.hash(original).equals(pin.descriptorSha256()))throw invalid("descriptorの固定hashが一致しません");
-            Signature verifier=Signature.getInstance("Ed25519");verifier.initVerify(trustKey);verifier.update(original);
-            if(!verifier.verify(signature))throw invalid("descriptorの署名が一致しません");
+            trustKey.verify(original,signature);
             JsonNode root=read(original);
             fields(root,"schemaVersion","runtimeId","toolVersion","host","minimumOsVersion","helper","worker","rendering","artifacts");
             constant(root,"schemaVersion",1);

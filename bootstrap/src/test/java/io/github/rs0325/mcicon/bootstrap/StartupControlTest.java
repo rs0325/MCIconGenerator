@@ -22,7 +22,7 @@ class StartupControlTest {
     @Test void watcherStartedAfterDeadlineClosesAndUnblocksOwnedWrite() throws Exception {
         BlockedSocket socket=new BlockedSocket();ExecutorService writer=Executors.newSingleThreadExecutor();
         try {
-            var result=writer.submit(()->assertThrows(IOException.class,()->StartupControl.write(socket,Seed.JSON.createObjectNode().put("protocol",3),System.nanoTime()+TimeUnit.SECONDS.toNanos(30))));
+            var result=writer.submit(()->assertThrows(IOException.class,()->StartupControl.write(socket,Seed.JSON.createObjectNode().put("protocol",4),System.nanoTime()+TimeUnit.SECONDS.toNanos(30))));
             assertTrue(socket.entered.await(1,TimeUnit.SECONDS));StartupControl.expire(socket,System.nanoTime()-1);assertEquals(0,socket.closed.getCount());assertNotNull(result.get(2,TimeUnit.SECONDS));
         }finally{socket.close();writer.shutdownNow();assertTrue(writer.awaitTermination(2,TimeUnit.SECONDS));}
     }
@@ -31,15 +31,15 @@ class StartupControlTest {
         Process child=new ProcessBuilder("/bin/sleep","3").start();
         try(StartupControl control=new StartupControl(slot(),UUID.randomUUID().toString(),List.of("--help"))) {
             String property=control.property();var context=Seed.json(Base64.getUrlDecoder().decode(property.substring(property.indexOf('=')+1)));
-            ObjectNode request=Seed.JSON.createObjectNode().put("protocol",3).put("type","REQUEST").put("pid",child.pid()).put("startedAt",child.info().startInstant().orElseThrow().toString()).put("command","help").put("managed",false).put("offline",false).put("help",true).put("preparationMillis",1).put("startupMillis",1).put("itemMillis",1);
+            ObjectNode request=Seed.JSON.createObjectNode().put("protocol",4).put("type","REQUEST").put("pid",child.pid()).put("startedAt",child.info().startInstant().orElseThrow().toString()).put("command","help").put("managed",false).put("offline",false).put("help",true).put("preparationMillis",1).put("startupMillis",1).put("itemMillis",1);
             for(String key:List.of("nonce","invocation","slot"))request.set(key,context.get(key));request.set("args",Seed.JSON.valueToTree(List.of("--help")));control.validate(request,child);
             for(String field:List.of("nonce","invocation","slot","args","pid","startedAt","protocol")){ObjectNode changed=request.deepCopy();changed.put(field,"wrong");assertThrows(IOException.class,()->control.validate(changed,child),field);}
         }finally{child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}
     }
     @Test void failureNotificationRejectsDifferentTrialProcessSlotAndOldProtocol() throws Exception {
-        for(String changed:List.of("none","nonce","invocation","slot","pid","startedAt","protocol","jobs","extra")) {
+        for(String changed:List.of("none","nonce","invocation","slot","pid","startedAt","protocol","protocol3","jobs","extra")) {
             ObjectNode request=Seed.JSON.createObjectNode().put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString()).put("pid",ProcessHandle.current().pid()).put("startedAt",java.time.Instant.now().toString());request.set("slot",slot());request=(ObjectNode)Seed.json(Seed.JSON.writeValueAsBytes(request));
-            ObjectNode failure=request.deepCopy().put("protocol",3).put("type","FAILED").put("failure","BUNDLED_PINS_INVALID").put("cleanup","NOT_STARTED");failure.putArray("jobs");
+            ObjectNode failure=request.deepCopy().put("protocol",4).put("type","FAILED").put("failure","BUNDLED_PINS_INVALID").put("cleanup","NOT_STARTED");failure.putArray("jobs");
             switch(changed) {
                 case "none"->{}
                 case "nonce","invocation"->failure.put(changed,UUID.randomUUID().toString());
@@ -47,6 +47,7 @@ class StartupControlTest {
                 case "pid"->failure.put("pid",ProcessHandle.current().pid()+1);
                 case "startedAt"->failure.put("startedAt",java.time.Instant.EPOCH.toString());
                 case "protocol"->failure.put("protocol",2);
+                case "protocol3"->failure.put("protocol",3);
                 case "jobs"->failure.withArray("jobs").addObject().put("job","unproven");
                 case "extra"->failure.put("extra",true);
             }

@@ -1,12 +1,12 @@
-# bootstrap制御protocol 3
+# bootstrap制御protocol 4
 
 #98の先行成果として、実CLI parserの判断と、管理workerの起動完了境界をbootstrapへ渡す。現在は[更新契約](auto-update.md)に従い、background準備と次の適格managed起動のtrialへ接続する。資源生成前の同梱pins不正だけを[復旧契約](initialization-recovery.md)に従って自動切戻しする。
 
 ## 署名seedとの対応
 
-packageの`bootstrapProtocol`と実制御相手に3を要求し、protocol 2を拒否する。署名Seedの`minimumBootstrapProtocol`=2の生成・読取契約は本作業で変更しない。protocol 3対応package/CLIの生成は配布統合側の依存である。worker protocol 1、helper protocol 1、runtime descriptor schema 1を変更する意味ではない。stable manifestのschemaVersionは1のまま、制御protocolの条件だけを更新する。
+packageの`bootstrapProtocol`と実制御相手に4を要求し、protocol 2/3を拒否する。署名Seedの`minimumBootstrapProtocol`=4を必要とする。protocol 4対応package/CLIの生成は配布統合側の依存である。worker protocol 1、helper protocol 1、runtime descriptor schema 1を変更する意味ではない。stable manifestのschemaVersionは1のまま、制御protocolの条件だけを更新する。
 
-1.1は未releaseなので、旧protocol/schemaの開発用seed/rootを自動移行しない。旧QA seed/rootは保持し、protocol 3対応CLI/packageとschema 3のfreshなQA rootを作り直す。旧結果を新版の検証結果へ書き換えない。正式trust/配信URLはこの成果では発行しない。
+1.1は未releaseなので、旧protocol/schemaの開発用seed/rootを自動移行しない。旧QA seed/rootは保持し、protocol 4対応CLI/packageとschema 4のfreshなQA rootを作り直す。旧結果を新版の検証結果へ書き換えない。正式trust/配信URLはこの成果では発行しない。
 
 ## REQUESTと通常起動
 

@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.CancellationToken;
 import io.github.rs0325.mcicon.internal.FilesSupport;
+import io.github.rs0325.mcicon.internal.TrustSet;
 import java.io.*;
 import java.net.URLClassLoader;
 import java.nio.file.*;
-import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
 import java.time.Duration;
 import java.util.*;
 
@@ -26,7 +25,7 @@ final class RuntimeResourceGenerator {
         if(!definition.path("finalBytesConfirmed").isBoolean()||!definition.path("finalBytesConfirmed").booleanValue())throw RuntimeDescriptor.invalid("最終bytes採用が必要です");
         String agentHash=FilesSupport.hash(agent,"SHA-256"),adapterHash;
         try(var loader=new URLClassLoader(new java.net.URL[]{adapters.toUri().toURL()},null)){adapterHash=ManagedRuntime.adapterDigest(loader);}
-        Map<String,byte[]> resources=new TreeMap<>();Set<String> trustPaths=new HashSet<>();Set<RuntimeDescriptor.Host> hosts=new HashSet<>();ObjectNode pins=RuntimeDescriptor.JSON.createObjectNode().put("schemaVersion",1);var entries=pins.putArray("runtimes");
+        byte[] trustBytes=null;Map<String,byte[]> resources=new TreeMap<>();Set<String> trustPaths=new HashSet<>();Set<RuntimeDescriptor.Host> hosts=new HashSet<>();ObjectNode pins=RuntimeDescriptor.JSON.createObjectNode().put("schemaVersion",1);var entries=pins.putArray("runtimes");
         Path scratch=Files.createTempDirectory(output.toAbsolutePath().getParent(),"runtime-validation-");Exception original=null;
         try {
             RuntimeStore store=new RuntimeStore(scratch.resolve("store"),true,new CancellationToken(),Duration.ofMinutes(10),(u,o,t)->{throw new AssertionError("生成時のnetworkは禁止です");});
@@ -34,8 +33,8 @@ final class RuntimeResourceGenerator {
                 RuntimeDescriptor.fields(entry,"host","descriptorPath","descriptorSha256","trustKeyPath");JsonNode h=entry.get("host");RuntimeDescriptor.fields(h,"os","arch");
                 var host=new RuntimeDescriptor.Host(RuntimeDescriptor.choice(h,"os","macos","windows","linux"),RuntimeDescriptor.choice(h,"arch","aarch64","x86_64"));if(!hosts.add(host))throw RuntimeDescriptor.invalid("hostが重複しています");
                 String path=RuntimeDescriptor.relative(RuntimeDescriptor.text(entry,"descriptorPath",512)),trustPath=RuntimeDescriptor.relative(RuntimeDescriptor.text(entry,"trustKeyPath",512));
-                byte[] raw=read(input,path,1024*1024),signature=read(input,path+".sig",64),der=read(input,trustPath,1024);
-                PublicKey key=KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(der));
+                byte[] raw=read(input,path,1024*1024),signature=read(input,path+".sig",64),der=read(input,trustPath,TrustSet.SIZE);
+                TrustSet key=TrustSet.parse(der);if(trustBytes==null)trustBytes=der;else if(!Arrays.equals(trustBytes,der))throw RuntimeDescriptor.invalid("host間の信頼集合が不一致です");
                 RuntimeDescriptor descriptor=RuntimeDescriptor.verify(raw,signature,key,new RuntimeDescriptor.Pin(RuntimeDescriptor.hash(entry,"descriptorSha256"),version,agentHash,adapterHash,host,Set.of(8,17,21,25)));
                 add(resources,path,raw);add(resources,path+".sig",signature);
                 if(trustPaths.add(trustPath))add(resources,trustPath,der);else if(!Arrays.equals(resources.get(trustPath),der))throw RuntimeDescriptor.invalid("共有trustが不一致です");

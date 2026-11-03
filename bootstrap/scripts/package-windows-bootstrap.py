@@ -12,6 +12,7 @@ import subprocess
 import sys
 import zipfile
 from urllib.parse import urlsplit
+from trust_set import read as read_trust
 from security_artifact import LICENSES, digest, require
 
 REPO = Path(__file__).resolve().parents[2]
@@ -63,6 +64,7 @@ def package(jdk, inputs, seed, trust, resources, core, native, version, owner, h
     jars = sorted(inputs.glob('*.jar'))
     for path in [inputs / main, trust, core, jdk / 'release', *[jdk / 'bin' / name for name in ('java.exe', 'jlink.exe', 'jpackage.exe')], *[seed / name for name in ('stable.json', 'stable.json.sig', 'tool.zip')], *jars]:
         require(path.is_file() and not path.is_symlink(), '同版JAR/seed/trust/現在core/JDKの通常fileが必要です')
+    read_trust(trust)
     release = dict(line.split('=', 1) for line in (jdk / 'release').read_text(encoding='utf-8').splitlines() if '=' in line)
     require(release.get('JAVA_VERSION', '').startswith('"21.') and release.get('OS_ARCH') == '"x86_64"' and release.get('OS_NAME') == '"Windows"', 'Windows x64 Java21 JDKが必要です')
     for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):
@@ -103,8 +105,8 @@ def package(jdk, inputs, seed, trust, resources, core, native, version, owner, h
     app_input = stage / 'input'; shutil.copytree(staged, app_input)
     (app_input / 'seed').mkdir()
     for name in ('stable.json', 'stable.json.sig', 'tool.zip'): shutil.copyfile(seed / name, app_input / 'seed' / name)
-    shutil.copyfile(trust, app_input / 'trust.der')
-    info = {'schemaVersion': 1, 'bootstrapVersion': version, 'bootstrapProtocol': 3, 'owner': owner,
+    shutil.copyfile(trust, app_input / 'trust-set.bin')
+    info = {'schemaVersion': 1, 'bootstrapVersion': version, 'bootstrapProtocol': 4, 'owner': owner,
             'stableManifestUrl': stable_manifest_url, 'host': {'os': host_os, 'arch': arch}}
     with (app_input / 'bootstrap-package.json').open('x', encoding='utf-8') as stream:
         json.dump(info, stream, ensure_ascii=False, indent=2); stream.write('\n')
@@ -112,12 +114,12 @@ def package(jdk, inputs, seed, trust, resources, core, native, version, owner, h
     shutil.copytree(REPO / 'licenses', app_input / 'licenses')
     expected = inventory(app_input)
     input_records = {row['path']: row for row in expected}
-    app_paths = set(staged_records) | {'seed/stable.json', 'seed/stable.json.sig', 'seed/tool.zip', 'trust.der', 'bootstrap-package.json', 'LICENSE', 'THIRD_PARTY_NOTICES.md'} | {'licenses/' + path.relative_to(REPO / 'licenses').as_posix() for path in project_licenses}
+    app_paths = set(staged_records) | {'seed/stable.json', 'seed/stable.json.sig', 'seed/tool.zip', 'trust-set.bin', 'bootstrap-package.json', 'LICENSE', 'THIRD_PARTY_NOTICES.md'} | {'licenses/' + path.relative_to(REPO / 'licenses').as_posix() for path in project_licenses}
     require(set(input_records) == app_paths, 'app入力の集合が不一致です')
     for row in staged_files:
         require(input_records[row['path']] == row, 'staged入力とapp入力のbytesが不一致です')
     verified_records = {row['path']: row for row in verified_inputs}
-    copied = [(path, path.name) for path in jars] + [(seed / name, 'seed/' + name) for name in ('stable.json', 'stable.json.sig', 'tool.zip')] + [(trust, 'trust.der'), *[(REPO / name, name) for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md')], *[(path, 'licenses/' + path.relative_to(REPO / 'licenses').as_posix()) for path in project_licenses]]
+    copied = [(path, path.name) for path in jars] + [(seed / name, 'seed/' + name) for name in ('stable.json', 'stable.json.sig', 'tool.zip')] + [(trust, 'trust-set.bin'), *[(REPO / name, name) for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md')], *[(path, 'licenses/' + path.relative_to(REPO / 'licenses').as_posix()) for path in project_licenses]]
     for source, target in copied:
         original = verified_records[str(source)]; record = input_records[target]
         require(record['bytes'] == original['bytes'] and record['sha256'] == original['sha256'], '検証済み入力とコピー先のbytesが不一致です')

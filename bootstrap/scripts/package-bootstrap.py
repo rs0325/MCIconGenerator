@@ -1,5 +1,6 @@
 """既JDKと明示seed/public trustから、自己完結Mac app-image候補を生成する。署名鍵は生成しない。"""
 from pathlib import Path
+from trust_set import read as read_trust
 import argparse,subprocess,shutil,hashlib,json,sys,platform
 p=argparse.ArgumentParser();p.add_argument('--jdk',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--seed',type=Path,required=True);p.add_argument('--trust',type=Path,required=True);p.add_argument('--version',required=True);p.add_argument('--owner',choices=['homebrew','winget','installer','archive'],required=True);p.add_argument('--stable-manifest-url');p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 if sys.platform!='darwin':raise RuntimeError('初段app-imageの受入対象はMacのみです')
@@ -8,6 +9,7 @@ for name in ['stable.json','stable.json.sig','tool.zip']:
  source=a.seed/name
  if not source.is_file() or source.is_symlink():raise RuntimeError('明示seed通常fileが必要です')
 if not a.trust.is_file() or a.trust.is_symlink() or a.trust.stat().st_size>1024:raise RuntimeError('明示public trust通常fileが必要です')
+read_trust(a.trust)
 main='bootstrap-'+a.version+'.jar'
 if not (a.input/main).is_file():raise RuntimeError('同版bootstrap JARがありません')
 a.output.mkdir(parents=True,mode=0o700);stage=a.output/'staging';stage.mkdir(mode=0o700);inputs=stage/'input';inputs.mkdir();runtime=stage/'runtime'
@@ -16,10 +18,10 @@ for source in a.input.glob('*.jar'):
  shutil.copyfile(source,inputs/source.name)
 (inputs/'seed').mkdir()
 for name in ['stable.json','stable.json.sig','tool.zip']:shutil.copyfile(a.seed/name,inputs/'seed'/name)
-shutil.copyfile(a.trust,inputs/'trust.der')
+shutil.copyfile(a.trust,inputs/'trust-set.bin')
 arch={'arm64':'aarch64','aarch64':'aarch64','x86_64':'x86_64'}.get(platform.machine())
 if arch is None:raise RuntimeError('未受入host archです')
-info={'schemaVersion':1,'bootstrapVersion':a.version,'bootstrapProtocol':3,'owner':a.owner,'stableManifestUrl':a.stable_manifest_url,'host':{'os':'macos','arch':arch}}
+info={'schemaVersion':1,'bootstrapVersion':a.version,'bootstrapProtocol':4,'owner':a.owner,'stableManifestUrl':a.stable_manifest_url,'host':{'os':'macos','arch':arch}}
 (inputs/'bootstrap-package.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
 repo=Path(__file__).resolve().parents[2];shutil.copyfile(repo/'LICENSE',inputs/'LICENSE');shutil.copyfile(repo/'THIRD_PARTY_NOTICES.md',inputs/'THIRD_PARTY_NOTICES.md');shutil.copytree(repo/'licenses',inputs/'licenses')
 def run(args):subprocess.run([str(v) for v in args],stdin=subprocess.DEVNULL,check=True,timeout=120)

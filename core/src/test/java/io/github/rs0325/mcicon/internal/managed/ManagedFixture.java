@@ -3,15 +3,19 @@ package io.github.rs0325.mcicon.internal.managed;
 import com.fasterxml.jackson.databind.node.*;
 import io.github.rs0325.mcicon.internal.FilesSupport;
 import java.security.*;
+import io.github.rs0325.mcicon.internal.TrustSet;
+import io.github.rs0325.mcicon.internal.TrustFixtures;
 import java.util.*;
 
 /** テスト専用鍵と非配布fixture。本番の信頼鍵・配布URLとして使用しない。 */
 final class ManagedFixture {
     static final String HASH="a".repeat(64);
-    final KeyPair key;
+    final KeyPair key,recovery;
+    final byte[] trustBytes;
+    final TrustSet trust;
     final ObjectNode json;
     ManagedFixture() throws Exception {
-        key=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        key=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();recovery=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();trustBytes=TrustFixtures.bytes(key.getPublic(),recovery.getPublic());trust=TrustSet.parse(trustBytes);
         json=RuntimeDescriptor.JSON.createObjectNode();json.put("schemaVersion",1);json.put("runtimeId","fixture");json.put("toolVersion","1.1.0");
         json.putObject("host").put("os","linux").put("arch","x86_64");json.put("minimumOsVersion","5.15");
         json.putObject("helper").put("protocolVersion",1).put("artifactId","helper").put("executable","bin/helper");
@@ -52,5 +56,5 @@ final class ManagedFixture {
     byte[] bytes() throws Exception {return RuntimeDescriptor.JSON.writeValueAsBytes(json);}
     byte[] sign(byte[] bytes) throws Exception {Signature signature=Signature.getInstance("Ed25519");signature.initSign(key.getPrivate());signature.update(bytes);return signature.sign();}
     RuntimeDescriptor.Pin pin(byte[] bytes) {return new RuntimeDescriptor.Pin(FilesSupport.hash(bytes),"1.1.0",HASH,HASH,new RuntimeDescriptor.Host("linux","x86_64"),Set.of(21));}
-    RuntimeDescriptor descriptor() throws Exception {byte[] bytes=bytes();return RuntimeDescriptor.verify(bytes,sign(bytes),key.getPublic(),pin(bytes));}
+    RuntimeDescriptor descriptor() throws Exception {byte[] bytes=bytes();return RuntimeDescriptor.verify(bytes,sign(bytes),trust,pin(bytes));}
 }

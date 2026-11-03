@@ -1,10 +1,9 @@
 package io.github.rs0325.mcicon.bootstrap;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.github.rs0325.mcicon.internal.TrustSet;
 import java.io.*;
 import java.nio.file.*;
-import java.security.KeyFactory;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 import java.util.jar.JarFile;
 
@@ -19,11 +18,11 @@ final class ManagedPackageVerifier {
         Map<String,byte[]> expected=new TreeMap<>();Path prefix=resources.resolve(PREFIX);
         if(!Files.isDirectory(prefix,LinkOption.NOFOLLOW_LINKS)||Files.isSymbolicLink(resources))throw Seed.invalid("明示生成runtime resourceが必要です");
         try(var paths=Files.walk(prefix)){for(Path file:paths.toList()){if(Files.isSymbolicLink(file))throw Seed.invalid("resource linkは拒否します");if(Files.isDirectory(file,LinkOption.NOFOLLOW_LINKS))continue;expected.put(resources.relativize(file).toString().replace('\\','/'),Seed.read(file,4*1024*1024));}}
+        byte[] trustBytes=Seed.read(trust,TrustSet.SIZE);var key=TrustSet.parse(trustBytes);
         JsonNode pins=Seed.json(expected.get(PREFIX+"pins.json"));Seed.fields(pins,"schemaVersion","runtimes");Seed.constant(pins,"schemaVersion",1);JsonNode selected=null;Set<JsonNode> hosts=new HashSet<>();var host=Seed.JSON.valueToTree(Main.host());
-        for(JsonNode entry:Seed.array(pins,"runtimes",1,6)){Seed.fields(entry,"host","descriptorPath","descriptorSha256","trustKeyPath");if(!hosts.add(entry.get("host")))throw Seed.invalid("resource hostが重複しています");if(host.equals(entry.get("host")))selected=entry;}
+        for(JsonNode entry:Seed.array(pins,"runtimes",1,6)){Seed.fields(entry,"host","descriptorPath","descriptorSha256","trustKeyPath");if(!hosts.add(entry.get("host")))throw Seed.invalid("resource hostが重複しています");if(!Arrays.equals(trustBytes,required(expected,Seed.text(entry,"trustKeyPath"))))throw Seed.invalid("runtimeとpackageの公開trustが異なります");if(host.equals(entry.get("host")))selected=entry;}
         if(selected==null)throw Seed.invalid("package host用resourceがありません");
-        byte[] der=Seed.read(trust,1024),runtimeTrust=required(expected,Seed.text(selected,"trustKeyPath"));if(!Arrays.equals(der,runtimeTrust))throw Seed.invalid("runtimeとpackageの公開trustが異なります");
-        var key=KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(der));Seed seed=new Seed(seedDirectory,key,Main.host());if(!seed.version.equals(version))throw Seed.invalid("package版とseed版が不一致です");
+        Seed seed=new Seed(seedDirectory,key,Main.host());if(!seed.version.equals(version))throw Seed.invalid("package版とseed版が不一致です");
         byte[] descriptor=required(expected,Seed.text(selected,"descriptorPath")),signature=required(expected,Seed.text(selected,"descriptorPath")+".sig");if(!Seed.hash(descriptor).equals(Seed.digest(selected,"descriptorSha256")))throw Seed.invalid("resource descriptor pinが不一致です");Seed.signed(descriptor,signature,key);
         Path temporary=Files.createTempDirectory("mcicon-managed-package-");Exception original=null;
         try {

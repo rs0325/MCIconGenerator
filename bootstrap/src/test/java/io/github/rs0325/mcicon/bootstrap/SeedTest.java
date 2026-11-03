@@ -15,8 +15,8 @@ class SeedTest {
     long deadline(){return System.nanoTime()+Duration.ofSeconds(10).toNanos();}
     @Test void temporaryFixtureKeysOnlyValidateTheirOwnSignedSeed() throws Exception {
         Fixture first=new Fixture(directory.toRealPath().resolve("first")),second=new Fixture(directory.toRealPath().resolve("second"));
-        assertFalse(java.util.Arrays.equals(first.publicKey.getEncoded(),second.publicKey.getEncoded()));first.seed();second.seed();
-        assertThrows(IOException.class,()->new Seed(first.installed.resolve("seed"),second.publicKey,first.host));
+        assertFalse(java.util.Arrays.equals(first.trustBytes,second.trustBytes));first.seed();second.seed();
+        assertThrows(IOException.class,()->new Seed(first.installed.resolve("seed"),second.trust,first.host));
         first.manifest.put("sequence",2);first.writeManifest();assertEquals(2,first.seed().manifest.path("sequence").asInt());
     }
     @Test void verifiesTemporaryTestSignatureAndExactArchiveTree() throws Exception {
@@ -38,7 +38,7 @@ class SeedTest {
     @Test void unknownFieldDuplicateHostAndProtocolAreRejected() throws Exception {
         Fixture f=fixture();f.manifest.put("extra",true);f.writeManifest();assertThrows(IOException.class,f::seed);f.manifest.remove("extra");
         ((ArrayNode)f.manifest.get("platforms")).add(f.manifest.path("platforms").get(0).deepCopy());f.writeManifest();assertThrows(IOException.class,f::seed);((ArrayNode)f.manifest.get("platforms")).remove(1);
-        for(int protocol:new int[]{1,3}){f.manifest.put("minimumBootstrapProtocol",protocol);f.writeManifest();assertThrows(IOException.class,f::seed);}
+        for(int protocol:new int[]{1,2,3,5}){f.manifest.put("minimumBootstrapProtocol",protocol);f.writeManifest();assertThrows(IOException.class,f::seed);}
     }
     @Test void duplicateJsonKeyIsRejectedAfterSignature() throws Exception {
         Fixture f=fixture();byte[] raw=Files.readAllBytes(f.installed.resolve("seed/stable.json"));byte[] duplicate=("{\"schemaVersion\":1,"+new String(raw,java.nio.charset.StandardCharsets.UTF_8).substring(1)).getBytes(java.nio.charset.StandardCharsets.UTF_8);Files.write(f.installed.resolve("seed/stable.json"),duplicate);Files.write(f.installed.resolve("seed/stable.json.sig"),f.sign(duplicate));assertThrows(IOException.class,f::seed);
