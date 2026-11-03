@@ -21,7 +21,20 @@ class RuntimeResourceGeneratorTest {
     }
     @Test void rejectsUnadoptedBytes() throws Exception {Input input=new Input();input.definition.put("finalBytesConfirmed",false);input.save();assertThrows(Exception.class,input::generate);assertFalse(Files.exists(input.output));}
     @Test void rejectsInvalidSignature() throws Exception {Input input=new Input();Files.write(input.dir.resolve("descriptor.json.sig"),new byte[64]);assertThrows(Exception.class,input::generate);}
-    @Test void rejectsUntrustedKey() throws Exception {Input input=new Input();Files.write(input.dir.resolve("trust.der"),KeyPairGenerator.getInstance("Ed25519").generateKeyPair().getPublic().getEncoded());assertThrows(Exception.class,input::generate);}
+    @Test void rejectsUntrustedKey() throws Exception {Input input=new Input();Files.write(input.dir.resolve("trust-set.bin"),new ManagedFixture().trustBytes);assertThrows(Exception.class,input::generate);}
+    @Test void acceptsRecoverySignedDescriptorAndEmitsBothPublicKeys() throws Exception {
+        Input input=new Input();byte[] bytes=input.fixture.bytes();var signer=java.security.Signature.getInstance("Ed25519");signer.initSign(input.fixture.recovery.getPrivate());signer.update(bytes);Files.write(input.dir.resolve("descriptor.json.sig"),signer.sign());
+        Path output=input.generate();assertArrayEquals(input.fixture.trustBytes,Files.readAllBytes(output.resolve("META-INF/mcicon/runtime/trust-set.bin")));
+    }
+    @Test void rejectsLegacySingleKeyWithoutGeneratingResources() throws Exception {
+        Input input=new Input();Files.write(input.dir.resolve("trust-set.bin"),input.fixture.key.getPublic().getEncoded());assertThrows(Exception.class,input::generate);assertFalse(Files.exists(input.output));
+    }
+    @Test void rejectsDifferentTrustSetsAcrossHosts() throws Exception {
+        Input input=new Input();ManagedFixture other=new ManagedFixture();other.json.removeAll();other.json.setAll(input.fixture.json.deepCopy());other.json.putObject("host").put("os","windows").put("arch","x86_64");byte[] bytes=other.bytes();
+        Files.write(input.dir.resolve("other.json"),bytes);Files.write(input.dir.resolve("other.json.sig"),other.sign(bytes));Files.write(input.dir.resolve("other-trust.bin"),other.trustBytes);
+        var entry=((ArrayNode)input.definition.get("runtimes")).addObject().put("descriptorPath","other.json").put("descriptorSha256",FilesSupport.hash(bytes)).put("trustKeyPath","other-trust.bin");entry.set("host",other.json.get("host"));input.save();
+        assertEquals("host間の信頼集合が不一致です",assertThrows(Exception.class,input::generate).getMessage());assertFalse(Files.exists(input.output));
+    }
     @Test void rejectsAgentMismatch() throws Exception {Input input=new Input();Files.write(input.agent,new byte[]{2});assertThrows(Exception.class,input::generate);}
     @Test void rejectsAdapterMismatch() throws Exception {Input input=new Input();Files.writeString(input.adapters.resolve("adapters/releases.json"),"changed");assertThrows(Exception.class,input::generate);}
     @Test void rejectsToolMismatch() throws Exception {Input input=new Input();assertThrows(Exception.class,()->RuntimeResourceGenerator.generate(input.dir,input.output,"1.2.0",input.agent,input.adapters));}
@@ -41,13 +54,13 @@ class RuntimeResourceGeneratorTest {
             String adapterHash;try(var loader=new java.net.URLClassLoader(new java.net.URL[]{adapters.toUri().toURL()},null)){adapterHash=ManagedRuntime.adapterDigest(loader);}
             ((ObjectNode)fixture.json.get("worker")).put("agentSha256",FilesSupport.hash(new byte[]{1})).put("adapterSetSha256",adapterHash);
             ArrayNode java=((ObjectNode)fixture.json.get("rendering")).putArray("javaExecutables");for(int major:List.of(8,17,21,25))java.addObject().put("major",major).put("executable","/opt/java/java"+major+"/bin/java").put("sha256",ManagedFixture.HASH);
-            Files.createDirectory(dir.resolve("inventory"));Files.createDirectory(dir.resolve("artifacts"));Files.write(dir.resolve("trust.der"),fixture.key.getPublic().getEncoded());
+            Files.createDirectory(dir.resolve("inventory"));Files.createDirectory(dir.resolve("artifacts"));Files.write(dir.resolve("trust-set.bin"),fixture.trustBytes);
             for(var artifact:fixture.json.path("artifacts")){String id=artifact.path("id").asText();byte[] inventory="{}".getBytes();Files.write(dir.resolve("inventory/"+id+".json"),inventory);((ObjectNode)artifact).put("inventorySha256",FilesSupport.hash(inventory));}
             helper("bin/helper");byte[] image={7};Files.write(dir.resolve("artifacts/image.zip"),image);((ObjectNode)fixture.json.path("artifacts").get(1)).put("bytes",image.length).put("sha256",FilesSupport.hash(image));
             definition.put("schemaVersion",1).put("finalBytesConfirmed",true);definition.putArray("runtimes").addObject().set("host",fixture.json.get("host").deepCopy());publish();
         }
         void helper(String name) throws Exception {Path path=dir.resolve("artifacts/helper.zip");try(var zip=new ZipArchiveOutputStream(path)){var entry=new ZipArchiveEntry(name);entry.setUnixMode(0100700);zip.putArchiveEntry(entry);zip.write(new byte[]{1});zip.closeArchiveEntry();}((ObjectNode)fixture.json.path("artifacts").get(0)).put("bytes",Files.size(path)).put("sha256",FilesSupport.hash(path,"SHA-256"));}
-        void publish() throws Exception {byte[] bytes=fixture.bytes();Files.write(dir.resolve("descriptor.json"),bytes);Files.write(dir.resolve("descriptor.json.sig"),fixture.sign(bytes));((ObjectNode)definition.path("runtimes").get(0)).put("descriptorPath","descriptor.json").put("descriptorSha256",FilesSupport.hash(bytes)).put("trustKeyPath","trust.der");save();}
+        void publish() throws Exception {byte[] bytes=fixture.bytes();Files.write(dir.resolve("descriptor.json"),bytes);Files.write(dir.resolve("descriptor.json.sig"),fixture.sign(bytes));((ObjectNode)definition.path("runtimes").get(0)).put("descriptorPath","descriptor.json").put("descriptorSha256",FilesSupport.hash(bytes)).put("trustKeyPath","trust-set.bin");save();}
         void save() throws Exception {Files.write(dir.resolve("input.json"),RuntimeDescriptor.JSON.writeValueAsBytes(definition));}
         Path generate() throws Exception {RuntimeResourceGenerator.generate(dir,output,"1.1.0",agent,adapters);return output;}
     }

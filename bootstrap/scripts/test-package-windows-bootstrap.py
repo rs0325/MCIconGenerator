@@ -29,7 +29,7 @@ class WindowsPackageTest(unittest.TestCase):
         self.seed = self.root / 'seed'; self.seed.mkdir()
         for name in ('stable.json', 'stable.json.sig', 'tool.zip'): (self.seed / name).write_bytes(b'fixture-input-not-signed')
         (self.seed / 'not-distributed.txt').write_bytes(b'not-part-of-seed')
-        self.trust = self.root / 'trust.der'; self.trust.write_bytes(b'fixture-public-trust')
+        self.trust = self.root / 'trust-set.bin'; self.trust.write_bytes(b'MCITRS1\n' + bytes.fromhex('302a300506032b6570032100') + bytes([1]) * 32 + bytes.fromhex('302a300506032b6570032100') + b'\x58' + b'\x66' * 31)
         self.core = self.root / 'core.jar'; self.core.write_bytes(b'fixture-current-core')
         self.resources = self.root / 'resources'; self.resources.mkdir(); (self.resources / 'pins.json').write_bytes(b'fixture-resources')
         self.native = self.root / 'native'; shutil.copytree(NATIVE, self.native)
@@ -71,7 +71,8 @@ class WindowsPackageTest(unittest.TestCase):
     def test_generation_preserves_space_argv_and_all_tree_bytes(self):
         audit = self.generate()
         self.assertEqual(audit['package']['schemaVersion'], 1)
-        self.assertEqual(audit['package']['bootstrapProtocol'], 3)
+        self.assertEqual(audit['package']['bootstrapProtocol'], 4)
+        self.assertEqual((self.output / 'image/mcicon/app/trust-set.bin').read_bytes(), self.trust.read_bytes())
         self.assertEqual(json.loads((self.output / 'image/mcicon/app/bootstrap-package.json').read_text(encoding='utf-8')), audit['package'])
         self.assertFalse(audit['privateKeyGenerated'])
         self.assertEqual([Path(args[0]).name for args in self.calls], ['java.exe', 'jlink.exe', 'jpackage.exe'])
@@ -89,6 +90,15 @@ class WindowsPackageTest(unittest.TestCase):
         self.output.mkdir(); (self.output / 'keep').write_bytes(b'keep')
         with self.assertRaises(RuntimeError): self.generate()
         self.assertEqual((self.output / 'keep').read_bytes(), b'keep'); self.assertEqual(self.calls, [])
+
+    def test_invalid_or_legacy_trust_stops_before_tools_or_output(self):
+        original = self.trust.read_bytes()
+        invalid = original[8:20] + b'\x02' + bytes(31)
+        for data in (original[8:52], original[:52], original + original[8:52], original[:52] + original[8:52], b'invalid',
+                     original[:52] + invalid, original[:8] + invalid + original[52:]):
+            self.trust.write_bytes(data)
+            with self.subTest(length=len(data)), self.assertRaises(ValueError): self.generate()
+            self.assertFalse(self.output.exists()); self.assertEqual(self.calls, [])
 
     def test_verifier_failure_or_timeout_stops_before_runtime(self):
         for failure in ('verifier', 'timeout'):

@@ -9,7 +9,7 @@
 ```sh
 ./gradlew --offline -PreleaseVersion=1.1.0 \
   -PbootstrapSeedDir=/absolute/seed \
-  -PbootstrapTrustKey=/absolute/trust.der \
+  -PbootstrapTrustKey=/absolute/trust-set.bin \
   :bootstrap:homebrewArchive
 ```
 

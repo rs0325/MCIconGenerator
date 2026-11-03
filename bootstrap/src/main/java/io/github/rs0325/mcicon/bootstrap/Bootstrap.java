@@ -2,14 +2,13 @@ package io.github.rs0325.mcicon.bootstrap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.rs0325.mcicon.internal.WindowsDataHome;
+import io.github.rs0325.mcicon.internal.TrustSet;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.io.*;
 import java.nio.channels.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
-import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
 import java.time.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +17,8 @@ import java.util.concurrent.TimeUnit;
 final class Bootstrap {
     final Path installed,root;
     final Seed.Host host;
-    final PublicKey key;
+    final TrustSet key;
+    private final String trustHash;
     final JsonNode info;
     private final UserPrincipal owner;
     private final WindowsPrivateFiles windows;
@@ -26,10 +26,9 @@ final class Bootstrap {
     Bootstrap(Path installed,Path root,Seed.Host host) throws IOException {
         this.installed=installed.toAbsolutePath().normalize();this.root=root.toAbsolutePath().normalize();this.host=host;
         dataRoot=host.os().equals("windows")?WindowsDataHome.configuredRoot():null;
-        canonical(this.installed);info=Seed.json(Seed.read(this.installed.resolve("bootstrap-package.json"),65536));Seed.fields(info,"schemaVersion","bootstrapVersion","bootstrapProtocol","owner","host","stableManifestUrl");if(!info.path("stableManifestUrl").isNull())Seed.https(Seed.text(info,"stableManifestUrl"));Seed.constant(info,"schemaVersion",1);Seed.constant(info,"bootstrapProtocol",3);Seed.version(info,"bootstrapVersion");Seed.choice(info,"owner","homebrew","winget","installer","archive");
+        canonical(this.installed);info=Seed.json(Seed.read(this.installed.resolve("bootstrap-package.json"),65536));Seed.fields(info,"schemaVersion","bootstrapVersion","bootstrapProtocol","owner","host","stableManifestUrl");if(!info.path("stableManifestUrl").isNull())Seed.https(Seed.text(info,"stableManifestUrl"));Seed.constant(info,"schemaVersion",1);Seed.constant(info,"bootstrapProtocol",4);Seed.version(info,"bootstrapVersion");Seed.choice(info,"owner","homebrew","winget","installer","archive");
         if(!info.path("host").equals(Seed.JSON.valueToTree(host)))throw Seed.invalid("package hostが一致しません");
-        try {key=KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(Seed.read(this.installed.resolve("trust.der"),1024)));}
-        catch(GeneralSecurityException failure){throw new IOException("packageの固定trustが未設定/不正です",failure);}
+        byte[] trust=Seed.read(this.installed.resolve("trust-set.bin"),TrustSet.SIZE);key=TrustSet.parse(trust);trustHash=Seed.hash(trust);
         owner=host.os().equals("windows")?null:FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByName(System.getProperty("user.name"));
         windows=host.os().equals("windows")?new WindowsPrivateFiles(this.installed,this.root):null;
     }
@@ -100,7 +99,7 @@ final class Bootstrap {
     }
     private void roots(long deadline) throws IOException {Seed.check(deadline);for(String name:List.of("staging","tools","archives","manifests","runs","logs"))directory(root.resolve(name),deadline);Seed.check(deadline);}
     JsonNode state(long deadline) throws IOException {Seed.check(deadline);
-        Path path=root.resolve("active.json");if(Files.notExists(path,LinkOption.NOFOLLOW_LINKS)){Seed.check(deadline);return null;}file(path,deadline);JsonNode value=Seed.json(Seed.read(path,65536));Seed.constant(value,"schemaVersion",3);Seed.fields(value,"schemaVersion","channel","host","active","pending","previous","highestAcceptedSequence","trialInvocation","preparation","badCandidates");Seed.exact(value,"channel","stable");Seed.positive(value,"highestAcceptedSequence");
+        Path path=root.resolve("active.json");if(Files.notExists(path,LinkOption.NOFOLLOW_LINKS)){Seed.check(deadline);return null;}file(path,deadline);JsonNode value=Seed.json(Seed.read(path,65536));Seed.constant(value,"schemaVersion",4);Seed.fields(value,"schemaVersion","trustSetSha256","channel","host","active","pending","previous","highestAcceptedSequence","trialInvocation","preparation","badCandidates");Seed.exact(value,"trustSetSha256",trustHash);Seed.exact(value,"channel","stable");Seed.positive(value,"highestAcceptedSequence");
         if(!value.path("host").equals(Seed.JSON.valueToTree(host)))throw Seed.invalid("host/更新状態が未対応です");reference(value.get("active"));for(String field:List.of("pending","previous"))if(!value.path(field).isNull())reference(value.get(field));if(!value.path("trialInvocation").isNull())UpdatePreparation.uuid(Seed.text(value,"trialInvocation"));UpdatePreparation.validate(value.get("preparation"));
         for(JsonNode bad:Seed.array(value,"badCandidates",0,32)) {
             Seed.fields(bad,"slot","previousActive","argsSha256","sequence","invocation","child","receiptKey","initialization");reference(bad.get("slot"));reference(bad.get("previousActive"));Seed.digest(bad,"argsSha256");Seed.positive(bad,"sequence");UpdatePreparation.uuid(Seed.text(bad,"invocation"));process(bad.get("child"));Seed.text(bad,"receiptKey");StartupControl.failure(bad.get("initialization"));
@@ -140,7 +139,7 @@ final class Bootstrap {
         if(existing==null) {
             for(String name:List.of("runs","tools","staging","archives","manifests","logs"))try(var paths=Files.list(root.resolve(name))){if(paths.findAny().isPresent())throw Seed.invalid("部分生成/state消失を初回へ再baselineしません");}
             seed=new Seed(installed.resolve("seed"),key,host);copyArchive(seed,deadline);saveManifest(seed,deadline);Path slot=verifySlot(seed,deadline);
-            ObjectNode value=Seed.JSON.createObjectNode().put("schemaVersion",3).put("channel","stable");value.set("host",Seed.JSON.valueToTree(host));value.set("active",seed.reference());value.putNull("pending").putNull("previous").putNull("trialInvocation").putNull("preparation").put("highestAcceptedSequence",Seed.positive(seed.manifest,"sequence"));value.putArray("badCandidates");atomic(root.resolve("active.json"),value,deadline);Seed.check(deadline);return slot;
+            ObjectNode value=Seed.JSON.createObjectNode().put("schemaVersion",4).put("trustSetSha256",trustHash).put("channel","stable");value.set("host",Seed.JSON.valueToTree(host));value.set("active",seed.reference());value.putNull("pending").putNull("previous").putNull("trialInvocation").putNull("preparation").put("highestAcceptedSequence",Seed.positive(seed.manifest,"sequence"));value.putArray("badCandidates");atomic(root.resolve("active.json"),value,deadline);Seed.check(deadline);return slot;
         }
         seed=accepted(existing,deadline);
         Seed.check(deadline);if(Files.notExists(slot(seed),LinkOption.NOFOLLOW_LINKS)) {

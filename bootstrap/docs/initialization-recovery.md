@@ -1,6 +1,6 @@
 # 初期化失敗からの自動復旧
 
-#98の実装範囲。bootstrap制御をprotocol 3、active stateとcommand receiptをschema 3へ更新する。公開API（ManagedOptions等）とMinecraft worker/helper/descriptor protocol 1は変更しない。外部依存を追加せず、既存の署名slot検証、receipt lock、file identity、state lockと期待stateのCASを再利用する。
+#98の実装範囲。bootstrap制御をprotocol 4、active stateをschema 4、command receiptをschema 3とする。公開API（ManagedOptions等）とMinecraft worker/helper/descriptor protocol 1は変更しない。外部依存を追加せず、既存の署名slot検証、receipt lock、file identity、state lockと期待stateのCASを再利用する。
 
 ## 候補固有故障と回収境界
 
@@ -10,15 +10,15 @@
 
 helper/worker起動後の失敗・release成功・resources空は試行全体の回収完了を証明しないため、現時点ではUNKNOWNである。既存protocol 1の回収を拡張せず、jobを伴う通知も受け入れない。OS helperの実資源回収、未知transport、遅延intentを復旧対象へ広げるには、別途その終端証拠の設計・受入が必要である。
 
-## Protocol 3
+## Protocol 4
 
-REQUEST/RUN/SWITCH/PREPARE/READY/GOは既存の意味と有限期限を維持し、各messageのprotocolを3にする。protocol 2の相手は厳密検証で拒否する。READY後・GO前に結果公開やExporterを呼び出さない。
+REQUEST/RUN/SWITCH/PREPARE/READY/GOは既存の意味と有限期限を維持し、各messageのprotocolを4にする。protocol 2/3の相手は厳密検証で拒否する。READY後・GO前に結果公開やExporterを呼び出さない。
 
 PREPAREに限り、READYの代わりに次のFAILEDを送れる。CLIはコマンド終了処理を経て、制御socketを閉じる前に送信する。親切断・READY以降・期限切れでは復旧通知を生成しない。
 
 | field | 内容 |
 | --- | --- |
-| protocol/type | 3 / FAILED |
+| protocol/type | 4 / FAILED |
 | nonce/invocation/slot/pid/startedAt | その接続のREQUESTと完全一致する試行・候補・CLI process |
 | failure | BUNDLED_PINS_INVALID または UNKNOWN |
 | cleanup | NOT_STARTED または UNKNOWN |
@@ -26,9 +26,9 @@ PREPAREに限り、READYの代わりに次のFAILEDを送れる。CLIはコマ�
 
 親は全fieldを厳密検査し、REQUESTのargv・parser判断・予算と候補slotも照合する。FAILEDをdurable receiptへ保存し、直接子を有限期限でwait/reapする。EOF・timeout・未知field・置換identityはUNKNOWNのまま保持し、READYや回収完了へ読み替えない。直接子の終了だけでは復旧しない。
 
-## Schema 3と復旧CAS
+## State schema 4と復旧CAS
 
-[state/receipt schema 3](../../schemas/bootstrap-state-v3.schema.json)を正本とする。preparation receiptとconfigはschema 1のまま。旧schema 2の定義は履歴として保持する。
+[state schema 4・receipt schema 3](../../schemas/bootstrap-state-v4.schema.json)を正本とする。preparation receiptとconfigはschema 1のまま。旧state schema 2/3の定義は履歴として保持する。信頼集合指紋の結合は[信頼集合](trust-set.md)に従う。
 
 - command receiptにstartup（request/run/switch/prepare/ready/go/failed）、initialization（FAILEDの全証拠またはnull）、receiptKey、argsSha256を追加する。argv hashはJSON化した元argv bytesのSHA-256。invocationId、候補slot、親子PID/開始時刻と合わせて試行へ結合する。
 - READY受信、FAILED受信、GO送信前をreceiptへ保存する。goは送信許可の記録であり到達証明ではない。CAS後GO喪失を復旧対象にしない。
@@ -55,9 +55,9 @@ FAILEDを受け取れない場合、回収不明、receipt欠落/置換、state/
 
 ## 未リリース形式と包装への依存
 
-schema 2 state、schema 1 command receipt、protocol 2制御相手・package metadataは未対応として拒否し、移行・互換fallbackを追加しない。旧rootは調査に必要なreceipt/slotを保全し、別の新しいQA root/packageを再生成する。旧rootを消失stateとして再baselineしない。
+schema 2/3 state、schema 1 command receipt、protocol 2/3制御相手・package metadataは未対応として拒否し、移行・互換fallbackを追加しない。旧rootは調査に必要なreceipt/slotを保全し、別の新しいQA root/packageを再生成する。旧rootを消失stateとして再baselineしない。
 
-bootstrap-package.jsonのbootstrapProtocolは3が必要であり、Mac・Windows生成器の出力も3へ合わせる。package metadataのschemaVersion=1と署名SeedのminimumBootstrapProtocol=2は生成・読取契約を変更しない。これは旧CLI payloadをprotocol 3へ変換するものではなく、実CLIがprotocol 2なら起動時に拒否する。installerは前段metadataを引き継ぎ、配布統合側でprotocol 3対応CLIを含む実packageを生成・受入する必要がある。
+bootstrap-package.jsonのbootstrapProtocolは4が必要であり、Mac・Windows生成器の出力も4へ合わせる。package metadataのschemaVersion=1は維持し、署名SeedのminimumBootstrapProtocolは4を必要とする。これは旧CLI payloadをprotocol 4へ変換するものではなく、実CLIがprotocol 2なら起動時に拒否する。installerは前段metadataを引き継ぎ、配布統合側でprotocol 4対応CLIを含む実packageを生成・受入する必要がある。
 
 ## 検証
 

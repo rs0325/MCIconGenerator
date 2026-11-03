@@ -19,6 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class ManagedRuntimeTest {
     @TempDir Path root;
     static final RuntimeDescriptor.Host HOST=new RuntimeDescriptor.Host("linux","x86_64");
+    @Test void legacySingleTrustKeyIsRejectedWithoutStartingHelperOrDownloading() throws Exception {
+        Fixture fixture=new Fixture(false);fixture.write("trust/fixture.der",fixture.definition.key.getPublic().getEncoded());AtomicInteger downloads=new AtomicInteger();
+        try(var loader=fixture.loader()) {
+            var failure=assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,HOST,fixture.transport(downloads)));
+            assertEquals("MANAGED_RUNTIME_INVALID",failure.code());assertInstanceOf(IOException.class,failure.getCause());assertFalse(failure.getCause() instanceof BundledPinsFailure);assertEquals(0,downloads.get());
+        }
+    }
     ManagedOptions options(){return new ManagedOptions(root.resolve("runtime"),Duration.ofSeconds(5),Duration.ofSeconds(2),Duration.ofSeconds(1),3072,2048);}
     @Test void missingTrustConfigurationFailsBeforeNetworkOrRootWrite() throws Exception {
         AtomicInteger downloads=new AtomicInteger();
@@ -227,7 +234,7 @@ class ManagedRuntimeTest {
             publish();
         }
         void publish() throws Exception {
-            descriptor=definition.bytes();write("linux-x86_64/descriptor.json",descriptor);write("linux-x86_64/descriptor.json.sig",definition.sign(descriptor));write("trust/fixture.der",definition.key.getPublic().getEncoded());write("inventory/helper.json",inventory);write("inventory/image.json",inventory);
+            descriptor=definition.bytes();write("linux-x86_64/descriptor.json",descriptor);write("linux-x86_64/descriptor.json.sig",definition.sign(descriptor));write("trust/fixture.der",definition.trustBytes);write("inventory/helper.json",inventory);write("inventory/image.json",inventory);
             ObjectNode pins=RuntimeDescriptor.JSON.createObjectNode().put("schemaVersion",1);ObjectNode entry=pins.putArray("runtimes").addObject();entry.set("host",definition.json.get("host").deepCopy());entry.put("descriptorPath","linux-x86_64/descriptor.json").put("descriptorSha256",FilesSupport.hash(descriptor)).put("trustKeyPath","trust/fixture.der");write("pins.json",RuntimeDescriptor.JSON.writeValueAsBytes(pins));
         }
         void write(String path,byte[] bytes) throws IOException {Path target=resources.resolve(path);Files.createDirectories(target.getParent());Files.write(target,bytes);}

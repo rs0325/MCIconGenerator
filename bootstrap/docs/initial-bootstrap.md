@@ -6,9 +6,9 @@
 
 ## 入力と配置
 
-packageのapp入力はbootstrap JARと依存JAR、`bootstrap-package.json`、`trust.der`、`seed/stable.json`、`seed/stable.json.sig`、`seed/tool.zip`である。trustは配布側が指定する公開鍵であり、自己採用や鍵生成のfallbackはない。正式URL・本番trust・製品署名配布はまだ確定していない。
+packageのapp入力はbootstrap JARと依存JAR、`bootstrap-package.json`、`trust-set.bin`、`seed/stable.json`、`seed/stable.json.sig`、`seed/tool.zip`である。trustは配布側が指定する運用鍵・回復鍵の公開鍵集合であり、自己採用や鍵生成のfallbackはない。正式URL・本番trust・製品署名配布はまだ確定していない。
 
-Mac・Windowsの生成器は`bootstrap-package.json`に`bootstrapProtocol: 3`を出力する。package metadataの`schemaVersion: 1`は変更せず、command receipt・保存状態のschema 3とは区別する。Windows installerは前段metadataとimage・ZIPの一致を確認して同じmetadataを引き継ぐ。
+Mac・Windowsの生成器は`bootstrap-package.json`に`bootstrapProtocol: 4`を出力する。package metadataの`schemaVersion: 1`は変更せず、command receipt schema 3・保存状態schema 4とは区別する。Windows installerは前段metadataとimage・ZIPの一致を確認して同じmetadataを引き継ぐ。
 
 stable manifestはchannel/sequence/toolVersion/minimumBootstrapProtocolとplatform別tool-payload ZIPのsize/hash/unpackedBytes、inventory/runtime descriptorの参照を閉じる。manifest署名、対象host、ZIP実bytes、展開上限、entryの重複/外向きpath/link、inventoryとdescriptorのhash、必要なJava/CLI/core/worker/licenseを初期設置前に確認する。descriptorの全runtime契約と実helper受入は既coreの責務であり、この初期設置の成功では代用しない。
 
@@ -52,11 +52,11 @@ Mac app-image候補は既存JDK 21と明示seed/public trustで作る。
 ```sh
 ./gradlew --offline -PreleaseVersion=1.1.0 \
   -PbootstrapSeedDir=/absolute/seed \
-  -PbootstrapTrustKey=/absolute/trust.der :bootstrap:appImage
+  -PbootstrapTrustKey=/absolute/trust-set.bin :bootstrap:appImage
 ```
 
 既存出力を上書きせず、jlink runtimeとapp-imageを生成し、通常codesign verifyとfile inventoryを残す。packagerは署名鍵を生成せず、明示された公開trustと署名済みseedだけを受け取る。`build/install/mcicon`の通常Java launcherをJava無しhost向け配布物とは扱わない。
 
 Homebrew向けarchiveとFormula候補の生成は[配布候補の手順](homebrew-distribution.md)を参照する。正式配布seed/trust、無Java実host、Developer ID/notarization、installer/Homebrew/wingetの実受入、OS下限、実helper/描画、#98の更新/rollback/GCは未受入である。#98はこの初期slot/pin契約を前提とし、health切替の現在範囲は[更新契約](auto-update.md)を参照する。
 
-#98の復旧実装はpackage/実CLIのbootstrap制御にprotocol 3、state/command receiptにschema 3を要求する。旧開発用rootは保全して新しいQA世代を再生成し、自動移行しない。worker/helper/descriptor protocol 1と署名Seed生成契約は維持する。生成器のmetadataはprotocol 3へ合わせ、対応CLIを含む実packageの生成・受入は配布統合側に残る。[起動control](startup-control.md)と[復旧契約](initialization-recovery.md)を参照。
+#98の復旧実装はpackage/実CLIのbootstrap制御にprotocol 4、stateにschema 4、command receiptにschema 3を要求する。旧開発用rootは保全して新しいQA世代を再生成し、自動移行しない。worker/helper/descriptor protocol 1は維持し、署名SeedのminimumBootstrapProtocolは4とする。生成器のmetadataはprotocol 4へ合わせ、対応CLIを含む実packageの生成・受入は配布統合側に残る。[起動control](startup-control.md)と[復旧契約](initialization-recovery.md)を参照。

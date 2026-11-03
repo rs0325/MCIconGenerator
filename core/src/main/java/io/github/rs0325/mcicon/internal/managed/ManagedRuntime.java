@@ -7,8 +7,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -41,9 +39,9 @@ public final class ManagedRuntime implements AutoCloseable {
         RuntimeStore store=new RuntimeStore(options.runtimeRoot(),offline,token,Duration.ofNanos(remaining),transport.get());
         store.check();WorkerArtifact.Resolved worker=WorkerArtifact.resolve(store.root(),token);store.check();
         String descriptorPath=selected.get("descriptorPath").asText();byte[] original=resource(loader,descriptorPath,1024*1024),signature=resource(loader,descriptorPath+".sig",64);
-        PublicKey key;
-        try {key=KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(resource(loader,selected.get("trustKeyPath").asText(),1024)));}
-        catch(GeneralSecurityException failure){throw new McIconException("MANAGED_RUNTIME_INVALID","同梱信頼鍵が不正です",1,failure);}
+        TrustSet key;
+        try {key=TrustSet.parse(resource(loader,selected.get("trustKeyPath").asText(),TrustSet.SIZE));}
+        catch(IOException failure){throw new McIconException("MANAGED_RUNTIME_INVALID","同梱信頼鍵が不正です",1,failure);}
         RuntimeDescriptor descriptor=RuntimeDescriptor.verify(original,signature,key,new RuntimeDescriptor.Pin(selected.get("descriptorSha256").asText(),ToolVersion.VERSION,worker.sha256(),adapterDigest(loader),host,Set.of(8,17,21,25)));
         Map<String,byte[]> inventories=new TreeMap<>();
         for(var artifact:descriptor.artifacts()) {

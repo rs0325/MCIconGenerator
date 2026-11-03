@@ -17,11 +17,12 @@ installer = importlib.util.module_from_spec(spec); spec.loader.exec_module(insta
 def fixture(root):
     candidate = root / 'input with space'; image = candidate / 'image/mcicon'
     files = ['mcicon.exe', 'app/mcicon.cfg', 'runtime/bin/java.exe', 'runtime/legal/java.base/LICENSE',
-             'app/bootstrap-1.1.0.jar', 'app/support/windows-security-reader.exe', 'app/trust.der',
+             'app/bootstrap-1.1.0.jar', 'app/support/windows-security-reader.exe', 'app/trust-set.bin',
              'app/seed/stable.json', 'app/seed/stable.json.sig', 'app/seed/tool.zip']
     files += ['app/support/security-reader/licenses/' + name for name in installer.LICENSES]
     for name in files:
         path = image / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(b'fixture-not-runtime-or-signed-seed')
+    (image / 'app/trust-set.bin').write_bytes(b'MCITRS1\n' + bytes.fromhex('302a300506032b6570032100') + bytes([1]) * 32 + bytes.fromhex('302a300506032b6570032100') + b'\x58' + b'\x66' * 31)
     for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):
         shutil.copyfile(installer.REPO / name, image / 'app' / name)
         target = image / 'app/support/security-reader/licenses/mcicon' / name
@@ -31,7 +32,7 @@ def fixture(root):
     installer.write_json(support / 'windows-security-reader.json', {'licenses': [
         {'path': path.relative_to(support).as_posix(), 'bytes': path.stat().st_size, 'sha256': installer.digest(path)}
         for path in installer.image_packager.tree(support / 'security-reader') if path.is_file()]})
-    package = {'schemaVersion': 1, 'bootstrapVersion': '1.1.0', 'bootstrapProtocol': 3, 'owner': 'winget',
+    package = {'schemaVersion': 1, 'bootstrapVersion': '1.1.0', 'bootstrapProtocol': 4, 'owner': 'winget',
                'host': {'os': 'windows', 'arch': 'x86_64'}, 'stableManifestUrl': None}
     installer.write_json(image / 'app/bootstrap-package.json', package)
     refresh(candidate, package)

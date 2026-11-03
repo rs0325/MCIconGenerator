@@ -6,6 +6,8 @@ import java.nio.file.*;
 import java.security.*;
 import java.util.*;
 import java.io.*;
+import io.github.rs0325.mcicon.internal.TrustSet;
+import io.github.rs0325.mcicon.internal.TrustFixtures;
 import java.util.jar.*;
 import org.junit.jupiter.api.Assumptions;
 
@@ -16,20 +18,25 @@ final class Fixture {
     final Map<String,byte[]> files=new LinkedHashMap<>();
     final ObjectNode manifest=Seed.JSON.createObjectNode(),descriptor=Seed.JSON.createObjectNode();
     final PublicKey publicKey;
-    private final PrivateKey signingKey;
-    Fixture(Path directory) throws Exception {
+    final byte[] trustBytes;
+    final TrustSet trust;
+    private PrivateKey signingKey;
+    private final PrivateKey recoveryKey;
+    Fixture(Path directory) throws Exception {this(directory,false);}
+    /** package検証だけの場合はJava起動・利用者state操作を行わない。 */
+    Fixture(Path directory,boolean packageOnly) throws Exception {
         String reader=System.getenv("MCICON_WINDOWS_READER_STAGE");
-        Assumptions.assumeTrue(!System.getProperty("os.name").startsWith("Windows")||reader!=null,"Windows実機ではstage済みreaderの環境変数が必要");
+        Assumptions.assumeTrue(packageOnly||!System.getProperty("os.name").startsWith("Windows")||reader!=null,"Windows実機ではstage済みreaderの環境変数が必要");
         installed=directory.resolve("package");Files.createDirectories(installed.resolve("seed"));
-        if(reader!=null&&System.getProperty("os.name").startsWith("Windows")){Path source=Path.of(reader,"support");try(var tree=Files.walk(source)){for(Path from:(Iterable<Path>)tree::iterator){Path to=installed.resolve("support").resolve(source.relativize(from).toString());if(Files.isDirectory(from))Files.createDirectories(to);else Files.copy(from,to);}}}host=Main.host();KeyPair pair=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();publicKey=pair.getPublic();signingKey=pair.getPrivate();
-        ObjectNode info=Seed.JSON.createObjectNode().put("schemaVersion",1).put("bootstrapVersion","1.1.0").put("bootstrapProtocol",3).put("owner","archive").putNull("stableManifestUrl");info.set("host",Seed.JSON.valueToTree(host));Files.write(installed.resolve("bootstrap-package.json"),Seed.JSON.writeValueAsBytes(info));Files.write(installed.resolve("trust.der"),publicKey.getEncoded());
+        if(!packageOnly&&reader!=null&&System.getProperty("os.name").startsWith("Windows")){Path source=Path.of(reader,"support");try(var tree=Files.walk(source)){for(Path from:(Iterable<Path>)tree::iterator){Path to=installed.resolve("support").resolve(source.relativize(from).toString());if(Files.isDirectory(from))Files.createDirectories(to);else Files.copy(from,to);}}}host=Main.host();KeyPair pair=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();publicKey=pair.getPublic();signingKey=pair.getPrivate();KeyPair recovery=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();recoveryKey=recovery.getPrivate();trustBytes=TrustFixtures.bytes(publicKey,recovery.getPublic());trust=TrustSet.parse(trustBytes);
+        ObjectNode info=Seed.JSON.createObjectNode().put("schemaVersion",1).put("bootstrapVersion","1.1.0").put("bootstrapProtocol",4).put("owner","archive").putNull("stableManifestUrl");info.set("host",Seed.JSON.valueToTree(host));Files.write(installed.resolve("bootstrap-package.json"),Seed.JSON.writeValueAsBytes(info));Files.write(installed.resolve("trust-set.bin"),trustBytes);
         descriptor.put("schemaVersion",1).put("toolVersion","1.1.0");descriptor.set("host",Seed.JSON.valueToTree(host));descriptor.putObject("helper").put("protocolVersion",1);
         files.put("inventory/tool.json","{\"fixtureOnly\":true}".getBytes());files.put("LICENSE","fixture license".getBytes());
-        String java=Path.of(System.getProperty("java.home"),"bin","java").toString().replace("'","'\"'\"'");if(host.os().equals("windows")){Path runtime=windowsRuntime();try(var tree=Files.walk(runtime)){for(Path file:(Iterable<Path>)tree.filter(Files::isRegularFile)::iterator)files.put("java/"+runtime.relativize(file).toString().replace('\\','/'),Files.readAllBytes(file));}}else files.put("java/bin/java",("#!/bin/sh\nexec '"+java+"' \"$@\"\n").getBytes());
+        String java=Path.of(System.getProperty("java.home"),"bin","java").toString().replace("'","'\"'\"'");if(host.os().equals("windows")&&packageOnly)files.put("java/bin/java.exe",new byte[]{1});else if(host.os().equals("windows")){Path runtime=windowsRuntime();try(var tree=Files.walk(runtime)){for(Path file:(Iterable<Path>)tree.filter(Files::isRegularFile)::iterator)files.put("java/"+runtime.relativize(file).toString().replace('\\','/'),Files.readAllBytes(file));}}else files.put("java/bin/java",("#!/bin/sh\nexec '"+java+"' \"$@\"\n").getBytes());
         ByteArrayOutputStream data=new ByteArrayOutputStream();try(JarOutputStream jar=new JarOutputStream(data)){for(String path:List.of("io/github/rs0325/mcicon/cli/Main.class","io/github/rs0325/mcicon/cli/StartupControl.class")){jar.putNextEntry(new JarEntry(path));try(InputStream in=getClass().getResourceAsStream("/"+path)){jar.write(Objects.requireNonNull(in).readAllBytes());}jar.closeEntry();}}
         for(Class<?> type:List.of(com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class)){Path jar=Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI());files.put("app/lib/"+jar.getFileName(),Files.readAllBytes(jar));}
         files.put("app/lib/cli-1.1.0.jar",data.toByteArray());files.put("app/lib/core-1.1.0.jar",new byte[]{1});files.put("app/lib/worker-1.1.0.jar",new byte[]{1});files.put("app/worker/worker-agent.jar",new byte[]{1});
-        manifest.put("schemaVersion",1).put("channel","stable").put("sequence",1).put("toolVersion","1.1.0").put("minimumBootstrapProtocol",2);ObjectNode platform=manifest.putArray("platforms").addObject();platform.set("host",Seed.JSON.valueToTree(host));
+        manifest.put("schemaVersion",1).put("channel","stable").put("sequence",1).put("toolVersion","1.1.0").put("minimumBootstrapProtocol",4);ObjectNode platform=manifest.putArray("platforms").addObject();platform.set("host",Seed.JSON.valueToTree(host));
         ObjectNode payload=platform.putObject("payload").put("id","tool").put("role","tool-payload").put("url","https://fixture.invalid/tool.zip").put("format","zip").put("inventoryPath","inventory/tool.json").put("inventorySha256",Seed.hash(files.get("inventory/tool.json")));payload.putArray("licenseFiles").add("LICENSE");payload.putArray("noticeFiles");payload.putArray("sourceArchives");platform.putObject("runtimeDescriptor").put("path","runtime/descriptor.json");publish();
     }
     /** slotで起動できる最小runtimeをJVMごとに一度だけjlinkで作る。 */
@@ -41,6 +48,7 @@ final class Fixture {
             try {Files.move(built,runtime,StandardCopyOption.ATOMIC_MOVE);}catch(FileSystemException lost) {if(!Files.exists(runtime))throw lost;}}
         return runtime;
     }
+    void useRecoveryKey() throws Exception {signingKey=recoveryKey;publish();}
     byte[] sign(byte[] body) throws Exception {
         Signature signature=Signature.getInstance("Ed25519");signature.initSign(signingKey);signature.update(body);return signature.sign();
     }
@@ -55,7 +63,7 @@ final class Fixture {
             if(extra!=null){ZipArchiveEntry entry=new ZipArchiveEntry(extra);entry.setUnixMode(extra.equals("link")?0120777:0100600);zip.putArchiveEntry(entry);zip.write(new byte[]{1});zip.closeArchiveEntry();}
         }return bytes.toByteArray();
     }
-    Seed seed() throws Exception {return new Seed(installed.resolve("seed"),publicKey,host);}
+    Seed seed() throws Exception {return new Seed(installed.resolve("seed"),trust,host);}
     Bootstrap bootstrap(Path root) throws IOException {return new Bootstrap(installed,root,host);}
     void replaceZip(byte[] bytes) throws Exception {Files.write(installed.resolve("seed/tool.zip"),bytes);ObjectNode payload=(ObjectNode)manifest.path("platforms").get(0).get("payload");payload.put("bytes",bytes.length).put("sha256",Seed.hash(bytes)).put("unpackedBytes",10000000);writeManifest();}
 }

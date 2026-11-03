@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.compress.archivers.zip.*;
 import java.io.*;
+import io.github.rs0325.mcicon.internal.TrustSet;
 import java.net.URI;
 import java.nio.charset.*;
 import java.nio.file.*;
@@ -16,14 +17,14 @@ final class Seed {
     static final ObjectMapper JSON=JsonMapper.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
     record Host(String os,String arch) {}
     final Path source;
-    final PublicKey key;
+    final TrustSet key;
     final byte[] manifestBytes,signatureBytes;
     final JsonNode manifest,platform,payload;
     final String manifestHash,version,hash,descriptorHash;
-    Seed(Path source,PublicKey key,Host host) throws IOException {
+    Seed(Path source,TrustSet key,Host host) throws IOException {
         this.source=source;this.key=key;
         manifestBytes=read(source.resolve("stable.json"),1024*1024);signatureBytes=read(source.resolve("stable.json.sig"),64);signed(manifestBytes,signatureBytes,key);manifest=json(manifestBytes);manifestHash=hash(manifestBytes);
-        fields(manifest,"schemaVersion","channel","sequence","toolVersion","minimumBootstrapProtocol","platforms");constant(manifest,"schemaVersion",1);exact(manifest,"channel","stable");positive(manifest,"sequence");constant(manifest,"minimumBootstrapProtocol",2);version=version(manifest,"toolVersion");
+        fields(manifest,"schemaVersion","channel","sequence","toolVersion","minimumBootstrapProtocol","platforms");constant(manifest,"schemaVersion",1);exact(manifest,"channel","stable");positive(manifest,"sequence");constant(manifest,"minimumBootstrapProtocol",4);version=version(manifest,"toolVersion");
         JsonNode selected=null;Set<Host> seen=new HashSet<>();
         for(JsonNode row:array(manifest,"platforms",1,6)) {
             fields(row,"host","payload","runtimeDescriptor");JsonNode h=row.get("host");fields(h,"os","arch");Host candidate=new Host(choice(h,"os","macos","windows","linux"),choice(h,"arch","aarch64","x86_64"));
@@ -80,7 +81,7 @@ final class Seed {
     }
     static JsonNode json(byte[] raw) throws IOException {try {return JSON.readTree(StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT).decode(java.nio.ByteBuffer.wrap(raw)).toString());}catch(RuntimeException failure){throw new IOException("JSONが不正です",failure);}}
     static byte[] read(Path path,int maximum) throws IOException {regular(path);if(Files.size(path)>maximum)throw invalid("fileが上限を超えています");try(InputStream input=Files.newInputStream(path)){byte[] raw=input.readNBytes(maximum+1);if(raw.length>maximum)throw invalid("fileが上限を超えています");return raw;}}
-    static void signed(byte[] bytes,byte[] signature,PublicKey key) throws IOException {try {if(signature.length!=64)throw invalid("署名は64bytesが必要です");Signature verifier=Signature.getInstance("Ed25519");verifier.initVerify(key);verifier.update(bytes);if(!verifier.verify(signature))throw invalid("署名が一致しません");}catch(GeneralSecurityException failure){throw new IOException("署名を検証できません",failure);}}
+    static void signed(byte[] bytes,byte[] signature,TrustSet key) throws IOException {key.verify(bytes,signature);}
     static String hash(byte[] bytes) {try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));}catch(NoSuchAlgorithmException e){throw new AssertionError(e);}}
     static String hash(Path path) throws IOException {return hash(path,Long.MAX_VALUE);}
     static String hash(Path path,long deadline) throws IOException {try(InputStream input=Files.newInputStream(path)){MessageDigest digest=MessageDigest.getInstance("SHA-256");byte[] buffer=new byte[65536];int count;while((count=input.read(buffer))!=-1){check(deadline);digest.update(buffer,0,count);}return HexFormat.of().formatHex(digest.digest());}catch(NoSuchAlgorithmException e){throw new AssertionError(e);}}

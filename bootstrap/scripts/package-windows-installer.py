@@ -57,9 +57,11 @@ def input_image(candidate, version):
 
 def check_image(image, info):
     version = info['bootstrapVersion']
+    require(info['bootstrapProtocol'] == 4, 'bootstrap protocol 4が必要です')
+    image_packager.read_trust(image / 'app/trust-set.bin')
     require(json.loads((image / 'app/bootstrap-package.json').read_text(encoding='utf-8')) == info, 'package metadataが不一致です')
     required = ['mcicon.exe', 'runtime/bin/java.exe', 'app/mcicon.cfg', 'app/support/windows-security-reader.exe',
-                'app/seed/stable.json', 'app/seed/stable.json.sig', 'app/seed/tool.zip', 'app/trust.der',
+                'app/seed/stable.json', 'app/seed/stable.json.sig', 'app/seed/tool.zip', 'app/trust-set.bin',
                 'app/bootstrap-' + version + '.jar']
     for name in required: require((image / name).is_file(), '配布必須fileが不足しています: ' + name)
     licenses = [(REPO / name, 'app/' + name) for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md')]

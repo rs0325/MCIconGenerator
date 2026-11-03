@@ -10,7 +10,7 @@
 |---|---|
 | `--jdk` | Windows x64 Java 21 JDK。`release` と java/jlink/jpackage の通常fileが必要 |
 | `--input` | 同版 bootstrap と依存 JAR だけを直下に持つ installDist/lib。既 reader は混ぜない |
-| `--seed` / `--trust` | 署名済み stable.json・stable.json.sig・tool.zip と公開 DER。配布へコピーするseedはこの3fileだけ |
+| `--seed` / `--trust` | 署名済み stable.json・stable.json.sig・tool.zip と固定2鍵の `trust-set.bin`。配布へコピーするseedはこの3fileだけ |
 | `--resources` / `--core` | 同じ生成runtime resourcesと現在core JAR。payload core全bytesとの一致を既ManagedPackageVerifierが検査 |
 | `--native` | 既build入口の固定reader/build.json/licenses。既stagerがsource/toolchain/PE/import/licenseを検査 |
 | `--version` / `--owner` | 同版。ownerはwinget/installer/archive。package manager領域は自己更新しない |
@@ -21,6 +21,8 @@
 verifier後のJAR追加・欠落・差替えをコピー前後と成功境界で拒否する。staged入力は元JARと既stagerのPE/build/metadata/license一覧だけに限定し、元native入力・検証記録・コピー先・app入力を同bytesへ結ぶ。
 
 生成環境にはPython 3.12以降とJDK 21を用意する。Pythonは生成開発環境だけの依存で、配布後の利用者には要求しない。
+
+信頼集合の形式と公開鍵の差し込みは[運用鍵・回復鍵の信頼集合](trust-set.md)に従う。metadataのbootstrapProtocolは4を出力し、installerも同じ値と信頼集合形式を検査する。旧単一鍵DERは同梱しない。
 
 ## 処理と出力
 

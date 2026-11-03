@@ -11,11 +11,11 @@
   "host": {"os": "macos", "arch": "aarch64"},
   "descriptorPath": "descriptors/macos-aarch64.json",
   "descriptorSha256": "検証対象descriptor元bytesのSHA-256",
-  "trustKeyPath": "trust.der"
+  "trustKeyPath": "trust-set.bin"
 }
 ```
 
-SHA欄の説明文字列は入力値ではない。descriptorと64byteの隣接 `.sig`、X509 Ed25519公開鍵、descriptorが参照する全inventoryを同directory内の相対pathへ置く。各artifactの実archiveは `artifacts/<id>.<format>` に置く。同じ入力集合で異なるbytesのartifactには異なるIDを使う。link、配置衝突、host重複を認めない。
+SHA欄の説明文字列は入力値ではない。descriptorと64byteの隣接 `.sig`、[運用鍵・回復鍵の信頼集合](../bootstrap/docs/trust-set.md)、descriptorが参照する全inventoryを同directory内の相対pathへ置く。各artifactの実archiveは `artifacts/<id>.<format>` に置く。同じ入力集合で異なるbytesのartifactには異なるIDを使う。link、配置衝突、host重複を認めない。
 
 `finalBytesConfirmed` がfalse、署名・tool版・agent・adapter集合・host・Java major集合が不一致、inventory hashが不正、artifactの実size/SHAが不一致の場合は生成を拒否する。host helperは既 `RuntimeArchive` で展開を検証し、entryの存在・実行属性を確かめる。guest/renderer archiveは元bytesの検証だけを行い、hostへ展開しない。未発行URLや未採用candidateを通すためにflagを書き換えない。URLは既descriptorのHTTPS規則に従い、URLが到達可能であることまではローカル生成で証明しない。
 
@@ -40,13 +40,13 @@ artifact元bytes → inventory → descriptor/署名 → pins/resources → core
 ./gradlew --offline -PreleaseVersion=1.1.0 \
   -PmanagedRuntimeInputDir=/absolute/path/to/verified-inputs \
   -PbootstrapSeedDir=/absolute/path/to/seed \
-  -PbootstrapTrustKey=/absolute/path/to/public-trust.der \
+  -PbootstrapTrustKey=/absolute/path/to/public-trust-set.bin \
   :bootstrap:managedAppImage
 ```
 
-3propertyのいずれかが未指定でも失敗する。`managedRuntimeInputDir` の相対指定はrepository起点、既 `bootstrapSeedDir` / `bootstrapTrustKey` の相対指定はbootstrap project起点を維持する。混同を避けるには絶対pathを使う。`verifyManagedRuntimePackage` は現 `:core:jar` 完成後に動き、署名seedを既 `Seed` で検証・有限展開し、同hostの公開trust DER、descriptorと署名の元bytes、payload内coreの全runtime resource、実agent hashを比較する。さらにpayload内core JARの全size/SHAを当該buildのcore JARへ一致させ、旧coreへ新resourceだけを載せた組合せも拒否する。他のpayload JARがruntime resourceを重複提供する場合も拒否する。検査後のapp生成は既packagerを再利用する。
+3propertyのいずれかが未指定でも失敗する。`managedRuntimeInputDir` の相対指定はrepository起点、既 `bootstrapSeedDir` / `bootstrapTrustKey` の相対指定はbootstrap project起点を維持する。混同を避けるには絶対pathを使う。`verifyManagedRuntimePackage` は現 `:core:jar` 完成後に動き、署名seedを既 `Seed` で検証・有限展開し、全hostの公開信頼集合、descriptorと署名の元bytes、payload内coreの全runtime resource、実agent hashを比較する。さらにpayload内core JARの全size/SHAを当該buildのcore JARへ一致させ、旧coreへ新resourceだけを載せた組合せも拒否する。他のpayload JARがruntime resourceを重複提供する場合も拒否する。検査後のapp生成は既packagerを再利用する。
 
-同一descriptor/.sigをseedにも同梱するため、runtime公開trustとpackage/seed公開trustのDERは一致を必須とする。別署名・dual-signature・新しい鍵回転の仕組みは追加しない。公開鍵だけを入力し、生成器は秘密鍵を受け取らない。PGPのMaven署名やAppleのコード署名とは責務・鍵が異なる。
+同一descriptor/.sigをseedにも同梱するため、runtime公開trustとpackage/seed公開trustの正規化済み96bytesは一致を必須とする。署名は64bytesのまま、信頼集合の2鍵のいずれかで受理する。鍵集合の自動更新やdual-signatureは追加しない。公開鍵だけを入力し、生成器は秘密鍵を受け取らない。PGPのMaven署名やAppleのコード署名とは責務・鍵が異なる。
 
 既 `appImage` は合成QAにも使う低位入口として残す。その成功を正式runtimeの受入とは表示しない。`managedAppImage` の検査成功も、公開URLの可用性、本番trust採用、installer、Developer ID/notarization、実managed描画を保証しない。
 
@@ -56,4 +56,4 @@ artifact元bytes → inventory → descriptor/署名 → pins/resources → core
 
 この成果はRefs #93、関連 #94/#97の生成接続部分である。Mac一式のQAだけで3OSのMaven core正式対応とは呼ばない。発行対象host全体の入力は、それぞれの確定artifact・署名・source/noticeから集約する。未発行hostは既契約どおりsetup-requiredとし、偽のentryを作らない。
 
-Mac helper196候補（196はfile数）はfinal採用と3asset URLが未確定で、renderer source URL、本番Ed25519 trust、Apple配布方式、最終candidateのVM受入も残る。正式inputの完成前にproduction resourcesを仮値で発行しない。resource追加はcore JARとpayload/seedのhashを変えるため、採用後のpackage・managed受入はfresh世代で実施する。未release 1.1開発rootの黙った移行は追加しない。worker/helper protocol1、bootstrap protocol2、公開APIとruntime保存schemaは変更しない。
+Mac helper196候補（196はfile数）はfinal採用と3asset URLが未確定で、renderer source URL、本番Ed25519 trust、Apple配布方式、最終candidateのVM受入も残る。正式inputの完成前にproduction resourcesを仮値で発行しない。resource追加はcore JARとpayload/seedのhashを変えるため、採用後のpackage・managed受入はfresh世代で実施する。未release 1.1開発rootの黙った移行は追加しない。worker/helper/descriptor protocol 1、公開APIとruntime保存schemaは維持し、bootstrapはprotocol 4・state schema 4を使用する。

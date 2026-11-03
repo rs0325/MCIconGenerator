@@ -40,11 +40,11 @@ fileKeyはJDK/OS固有表現をstateとreceiptへ保存する。取得不可・�
 
 PREPAREの外側transaction期限は実preparation/startup/item予算の和で、READY/GOは残期限と30秒の短い方とする。core内部のcold処理がその和で必ず完了する保証ではなく、公開ManagedOptionsの期限意味も変更しない。自動復旧は資源生成前の同梱pins不正に限定する。helper/worker起動後の失敗を自動復旧へ昇格せず、旧active保持だけを復旧完了とは呼ばない。GCも実装せず旧slot/不明receiptを保持する。
 
-故障allowlist、protocol 3通知、schema 3の試行・不良候補記録、排他/CASとunknownの再開条件は[初期化失敗の復旧契約](initialization-recovery.md)を参照する。同じ不良payloadは取得時・local pendingの両方で再適用を防ぐ。
+故障allowlist、protocol 4通知、schema 4の試行・不良候補記録、排他/CASとunknownの再開条件は[初期化失敗の復旧契約](initialization-recovery.md)を参照する。同じ不良payloadは取得時・local pendingの両方で再適用を防ぐ。
 
 ## 保存形式と検証範囲
 
-[bootstrap state schema 3](../../schemas/bootstrap-state-v3.schema.json)とcommand receipt schema 3を使用する。preparation receipt/configはschema 1を維持する。未release1.1の旧開発root/packageは新しいQA世代へ再生成し、移行/fallbackしない。bootstrap制御とpackage metadataはprotocol 3を必要とし、旧protocol 2を拒否する。Minecraft worker/helper/descriptor protocol 1は不変である。#97の包装・Seed生成は変更せず、protocol 3対応packageの生成は配布統合側の依存として残る。
+[bootstrap state schema 4](../../schemas/bootstrap-state-v4.schema.json)とcommand receipt schema 3を使用する。preparation receipt/configはschema 1を維持する。未release1.1の旧開発root/packageは新しいQA世代へ再生成し、移行/fallbackしない。bootstrap制御とpackage metadataはprotocol 4を必要とし、旧protocol 2/3を拒否する。Minecraft worker/helper/descriptor protocol 1は不変である。Mac・Windowsの包装は同じ信頼集合とprotocol 4を出力する。署名SeedのminimumBootstrapProtocolも4を必要とする。
 
 直接fixtureでは所有予約・別JVMのOS lock・inode置換・自己期限、有限HTTP代役、署名取得からpending保存、disable競合、適格trial/非適格据置・明示pin・初期化失敗unknownを確認する。Mac app-imageではTLS鍵不要の127.0.0.1 handshake保留により親終了後worker継続と失敗終端を確認する。HttpClient代役の取得成功は実TLS配信成功ではない。
 

@@ -34,7 +34,7 @@ final class StartupControl implements AutoCloseable {
         fields(context,"protocol","port","nonce","invocation","slot");protocol(context);if(!context.path("port").isIntegralNumber()||!context.path("port").canConvertToInt()||context.path("port").intValue()<1||context.path("port").intValue()>65535)throw new IOException("bootstrap制御protocol/portが不正です");
         for(String name:List.of("nonce","invocation"))try{UUID.fromString(context.path(name).asText());}catch(IllegalArgumentException failure){throw new IOException("bootstrap制御識別が不正です",failure);}
         verifySlot(context.path("slot"),version,cliJar);
-        request.put("protocol",3).put("type","REQUEST");request.set("nonce",context.get("nonce"));request.set("invocation",context.get("invocation"));request.set("slot",context.get("slot"));request.put("pid",ProcessHandle.current().pid()).put("startedAt",ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("CLI開始識別が読めません")).toString());
+        request.put("protocol",4).put("type","REQUEST");request.set("nonce",context.get("nonce"));request.set("invocation",context.get("invocation"));request.set("slot",context.get("slot"));request.put("pid",ProcessHandle.current().pid()).put("startedAt",ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("CLI開始識別が読めません")).toString());
         Socket socket=new Socket();boolean connected=false;
         try {
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);socket.connect(new InetSocketAddress(InetAddress.getByName("127.0.0.1"),context.get("port").intValue()),(int)remaining(deadline));write(socket,request,deadline);JsonNode response=read(socket,deadline);fields(response,"protocol","type");protocol(response);
@@ -55,7 +55,7 @@ final class StartupControl implements AutoCloseable {
     void ready() {
         if(!prepare)return;
         try {
-            long end=Math.min(deadline,System.nanoTime()+TimeUnit.SECONDS.toNanos(30));ready=true;write(socket,JSON.createObjectNode().put("protocol",3).put("type","READY"),end);go.get(remaining(end),TimeUnit.MILLISECONDS);
+            long end=Math.min(deadline,System.nanoTime()+TimeUnit.SECONDS.toNanos(30));ready=true;write(socket,JSON.createObjectNode().put("protocol",4).put("type","READY"),end);go.get(remaining(end),TimeUnit.MILLISECONDS);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();cancel.run();throw new CompletionException(failure);}
         catch(IOException|ExecutionException|TimeoutException failure){cancel.run();throw new CompletionException(failure);}
     }
@@ -67,7 +67,7 @@ final class StartupControl implements AutoCloseable {
     void failed(String failure,String cleanup) throws IOException {
         if(!prepare||ready||failed||notified)return;
         notified=true;
-        ObjectNode value=JSON.createObjectNode().put("protocol",3).put("type","FAILED").put("failure",failure).put("cleanup",cleanup);
+        ObjectNode value=JSON.createObjectNode().put("protocol",4).put("type","FAILED").put("failure",failure).put("cleanup",cleanup);
         for(String name:List.of("nonce","invocation","slot","pid","startedAt"))value.set(name,identity.get(name));
         value.putArray("jobs");write(socket,value,Math.min(deadline,System.nanoTime()+TimeUnit.SECONDS.toNanos(30)));
     }
@@ -79,7 +79,7 @@ final class StartupControl implements AutoCloseable {
             }catch(Exception failure){failed=true;cancel.run();go.completeExceptionally(failure);}
         });
     }
-    private static void protocol(JsonNode node) throws IOException {if(!node.path("protocol").isIntegralNumber()||!node.path("protocol").canConvertToInt()||node.path("protocol").intValue()!=3)throw new IOException("bootstrap制御protocolが不一致です");}
+    private static void protocol(JsonNode node) throws IOException {if(!node.path("protocol").isIntegralNumber()||!node.path("protocol").canConvertToInt()||node.path("protocol").intValue()!=4)throw new IOException("bootstrap制御protocolが不一致です");}
     private static void fields(JsonNode node,String...names) throws IOException {if(node==null||!node.isObject())throw new IOException("bootstrap制御objectが必要です");Set<String> expected=Set.of(names);if(node.size()!=expected.size())throw new IOException("bootstrap制御fieldが不正です");for(String name:names)if(!node.has(name))throw new IOException("bootstrap制御fieldが不足しています");}
     static long remaining(long deadline) throws IOException {if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("bootstrap制御を中断しました");long value=deadline-System.nanoTime();if(value<=0)throw new SocketTimeoutException("bootstrap制御の絶対期限を超えました");return Math.max(1,Math.min(Integer.MAX_VALUE,(value+999999)/1000000));}
     static JsonNode read(Socket socket,long deadline) throws IOException {int size=ByteBuffer.wrap(receive(socket,4,deadline)).getInt();if(size<1||size>65536)throw new IOException("bootstrap制御messageが上限外です");return JSON.readTree(receive(socket,size,deadline));}
