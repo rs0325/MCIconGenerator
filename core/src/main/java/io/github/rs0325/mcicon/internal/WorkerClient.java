@@ -15,6 +15,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
     private final Process process;
     private final BufferedWriter output;
     private final BlockingQueue<JsonNode> messages=new LinkedBlockingQueue<>(256);
+    private volatile Exception readerFailure;
     private final CancellationToken token;
     private final WorkerOptions options;
     private final WorkerLaunch launch;
@@ -74,7 +75,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
                     if(line.length()>16*1024*1024)throw new IOException("Worker message too large");
                     messages.put(Json.MAPPER.readTree(line));
                 }
-            }catch(Exception e){process.destroy();}
+            }catch(Exception e){readerFailure=e;process.destroy();}
         });
         try {
             JsonNode hello=await(options.startupTimeout());
@@ -124,7 +125,7 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
         long end=System.nanoTime()+timeout.toNanos();
         while(System.nanoTime()<end) {
             token.check();JsonNode message=messages.poll(100,TimeUnit.MILLISECONDS);if(message!=null)return message;
-            if(!process.isAlive())throw new McIconException("WORKER_EXITED","Worker exited before replying; inspect the cache worker log",1);
+            if(!process.isAlive())throw new McIconException("WORKER_EXITED","Worker exited before replying; inspect the cache worker log",1,readerFailure);
         }
         terminate();throw new McIconException("WORKER_TIMEOUT","Worker did not reply within its timeout",1);
     }

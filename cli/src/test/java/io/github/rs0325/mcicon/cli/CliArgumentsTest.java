@@ -28,6 +28,18 @@ class CliArgumentsTest {
             else assertTrue(err.toString().contains("Caused by: java.io.IOException: synthetic preparation failure"));
         }
     }
+    @Test void debugPrintsItemDiagnosticsToStderrOnlyWhenEnabled() {
+        for(boolean debug:new boolean[]{false,true}) {
+            StringWriter err=new StringWriter();
+            CommandLine line=Main.commandLine().setErr(new PrintWriter(err));
+            var args=new ArrayList<>(List.of("render","--version","1.21.4","--id","stone","--out","out"));
+            if(debug)args.add(0,"--debug");
+            line.parseArgs(args.toArray(String[]::new));
+            var render=(Main.Render)line.getSubcommands().get("render").getCommand();
+            render.common.listener(null).onDiagnostic("minecraft:stone",new IllegalStateException("original failure"));
+            assertEquals(debug,err.toString().contains("DIAGNOSTIC minecraft:stone")&&err.toString().contains("java.lang.IllegalStateException: original failure"));
+        }
+    }
     @Test void everySubcommandShowsHelpWithoutRequiredArgumentsOrIo() {
         assertEquals(0,Main.execute("--help"));
         for(String command:new String[]{"versions","list","render","extract","doctor","cache"}) {
