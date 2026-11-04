@@ -6,3 +6,4 @@ gradlew text eol=lf
 docker/Dockerfile text eol=lf
 docker/packages.lock text eol=lf
 qa/renderer-repro-2026-11-04-packages.tsv text eol=lf
+qa/renderer-source*.json text eol=lf
