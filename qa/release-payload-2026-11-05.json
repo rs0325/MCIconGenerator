@@ -1,0 +1,523 @@
+{
+  "task": "milestone-release-payload-r3",
+  "baseCommit": "d8400457eca4141e5c3123743bd6d2fefd6cbe2c",
+  "version": "1.1.0",
+  "sequence": 1,
+  "sequencePublicConsistency": "主担当による後続確認待ち",
+  "descriptorVerification": [
+    {
+      "descriptor": {
+        "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/descriptors/windows-x86_64.json",
+        "bytes": 278044,
+        "sha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294"
+      },
+      "signature": {
+        "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/descriptors/windows-x86_64.json.sig",
+        "bytes": 64,
+        "sha256": "aa30b8c398bcf155246b709b70bdb43048ed5f7467394667e660140bb1c32fdb"
+      },
+      "trustKeyChecks": [
+        {
+          "keySha256": "8dc54c096f222fb1665e19446debec844e2c726d20cc91eab2a392f1e6902f5a",
+          "exitCode": 1,
+          "output": "Signature Verification Failure\nC8D00000:error:030000EA:digital envelope routines:EVP_DigestVerify:provider signature failure:../openssl-3.5.9/crypto/evp/m_sigver.c:781:ED25519 digest_verify:"
+        },
+        {
+          "keySha256": "0e468cc27d1fdad02bc90e2fb8de58a39152333c408a940f27f99df591dd9ccf",
+          "exitCode": 0,
+          "output": "Signature Verified Successfully"
+        }
+      ]
+    },
+    {
+      "descriptor": {
+        "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/descriptors/macos-aarch64.json",
+        "bytes": 374519,
+        "sha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101"
+      },
+      "signature": {
+        "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/descriptors/macos-aarch64.json.sig",
+        "bytes": 64,
+        "sha256": "3b867dbdcc833be57d2ec96388b1a63d9a339a17247c0280f315af6ba979a2ef"
+      },
+      "trustKeyChecks": [
+        {
+          "keySha256": "8dc54c096f222fb1665e19446debec844e2c726d20cc91eab2a392f1e6902f5a",
+          "exitCode": 1,
+          "output": "Signature Verification Failure\n58E90000:error:030000EA:digital envelope routines:EVP_DigestVerify:provider signature failure:../openssl-3.5.9/crypto/evp/m_sigver.c:781:ED25519 digest_verify:"
+        },
+        {
+          "keySha256": "0e468cc27d1fdad02bc90e2fb8de58a39152333c408a940f27f99df591dd9ccf",
+          "exitCode": 0,
+          "output": "Signature Verified Successfully"
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/descriptors/macos-aarch64.json",
+      "bytes": 374519,
+      "sha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/descriptors/macos-aarch64.json.sig",
+      "bytes": 64,
+      "sha256": "3b867dbdcc833be57d2ec96388b1a63d9a339a17247c0280f315af6ba979a2ef"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/descriptors/windows-x86_64.json",
+      "bytes": 278044,
+      "sha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/descriptors/windows-x86_64.json.sig",
+      "bytes": 64,
+      "sha256": "aa30b8c398bcf155246b709b70bdb43048ed5f7467394667e660140bb1c32fdb"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/inventories/macos-aarch64/mcicon-renderer-1.1.0-linux-amd64.json",
+      "bytes": 458587,
+      "sha256": "6fa7c6b7cf59053fe44aae8bea5fe180d75a88ccd49cb065e4a3d765c2728408"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/inventories/mcicon-guest-1.1.0-macos-aarch64.json",
+      "bytes": 419206,
+      "sha256": "7f439b243cd781198ede6b70d9ccaad8a11686a2a658bc3233081f307274e392"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/inventories/mcicon-guest-1.1.0-windows-x86_64.json",
+      "bytes": 162114,
+      "sha256": "f05a9ac3ce42db46c8bf7f6feaad5f2e0da01369e8affdfcaeedf5801bc2752b"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/inventories/mcicon-helper-1.1.0-macos-aarch64.json",
+      "bytes": 80921,
+      "sha256": "d5db2f6306d55b4149081a52c836c392a6753f62e4ba49e7db116168c1512c1d"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/inventories/mcicon-helper-1.1.0-windows-x86_64.json",
+      "bytes": 78623,
+      "sha256": "b1eb2eec77eef369884203bd034bf306f67fd1d7949d64b7fa640a61bf203f06"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/inventories/windows-x86_64/mcicon-renderer-1.1.0-linux-amd64.json",
+      "bytes": 458587,
+      "sha256": "6fa7c6b7cf59053fe44aae8bea5fe180d75a88ccd49cb065e4a3d765c2728408"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/mcicon-operating.pub.der",
+      "bytes": 44,
+      "sha256": "8dc54c096f222fb1665e19446debec844e2c726d20cc91eab2a392f1e6902f5a"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/mcicon-recovery.pub.der",
+      "bytes": 44,
+      "sha256": "0e468cc27d1fdad02bc90e2fb8de58a39152333c408a940f27f99df591dd9ccf"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/pins.json",
+      "bytes": 450,
+      "sha256": "778bbe4acb75da6487a54ecdb00c3eaae521269460e9ea628afa3b8f86512236"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/generated/resources/managedRuntime/META-INF/mcicon/runtime/trust-set.bin",
+      "bytes": 96,
+      "sha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283"
+    }
+  ],
+  "jars": [
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/core/build/libs/core-1.1.0.jar",
+      "bytes": 427817,
+      "sha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/worker/build/libs/worker-1.1.0-agent.jar",
+      "bytes": 535302,
+      "sha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/worker/build/libs/worker-1.1.0.jar",
+      "bytes": 489342,
+      "sha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/cli/build/libs/cli-1.1.0.jar",
+      "bytes": 37317,
+      "sha256": "8c03a2dd1932fdab8b506e85f3ff0458198fc738005cfdbf3cb75f2290d9d334"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/bootstrap/build/libs/bootstrap-1.1.0.jar",
+      "bytes": 91974,
+      "sha256": "51bba7e2dd2f89ab762f96b9216a53fbb459fc0f7340412507ef6c8f2bcad1b5"
+    }
+  ],
+  "payloadChecks": [
+    {
+      "host": "windows-x86_64",
+      "archive": {
+        "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/payloads/mcicon-tool-1.1.0-windows-x86_64.zip",
+        "bytes": 37126358,
+        "sha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3"
+      },
+      "inventoryEntries": 245,
+      "unpackedBytes": 93912415,
+      "result": "全entryのsize/hashとcore/agent/trust一致"
+    },
+    {
+      "host": "macos-aarch64",
+      "archive": {
+        "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/payloads/mcicon-tool-1.1.0-macos-aarch64.zip",
+        "bytes": 35983846,
+        "sha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d"
+      },
+      "inventoryEntries": 190,
+      "unpackedBytes": 96994945,
+      "result": "全entryのsize/hashとcore/agent/trust一致"
+    }
+  ],
+  "stableManifest": {
+    "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/payloads/stable.json",
+    "bytes": 16283,
+    "sha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+  },
+  "productionResourceGeneration": "RuntimeResourceGeneratorによる署名・pin・agent・adapter・全実archive検証成功",
+  "coreResourceComparison": "生成全resourceとJARの元bytes一致、inputとpins一致",
+  "stableSignature": "未署名・署名待ち",
+  "centralBundle": "未生成。最終core JARから再生成が必要",
+  "releaseAssets": [
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/artifacts/mcicon-guest-1.1.0-macos-aarch64.qcow2",
+      "bytes": 620224512,
+      "sha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+      "basename": "mcicon-guest-1.1.0-macos-aarch64.qcow2",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-macos-aarch64.qcow2"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/artifacts/mcicon-guest-1.1.0-windows-x86_64.tar.xz",
+      "bytes": 98146824,
+      "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5",
+      "basename": "mcicon-guest-1.1.0-windows-x86_64.tar.xz",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-windows-x86_64.tar.xz"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/artifacts/mcicon-helper-1.1.0-macos-aarch64.zip",
+      "bytes": 125853859,
+      "sha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde",
+      "basename": "mcicon-helper-1.1.0-macos-aarch64.zip",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-macos-aarch64.zip"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/artifacts/mcicon-helper-1.1.0-windows-x86_64.zip",
+      "bytes": 33863906,
+      "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8",
+      "basename": "mcicon-helper-1.1.0-windows-x86_64.zip",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-windows-x86_64.zip"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/artifacts/mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+      "bytes": 593385993,
+      "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+      "basename": "mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-renderer-1.1.0-linux-amd64.tar.gz"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/descriptors/macos-aarch64.json",
+      "bytes": 374519,
+      "sha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "basename": "macos-aarch64.json",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/macos-aarch64.json"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/descriptors/macos-aarch64.json.sig",
+      "bytes": 64,
+      "sha256": "3b867dbdcc833be57d2ec96388b1a63d9a339a17247c0280f315af6ba979a2ef",
+      "basename": "macos-aarch64.json.sig",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/macos-aarch64.json.sig"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/descriptors/windows-x86_64.json",
+      "bytes": 278044,
+      "sha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+      "basename": "windows-x86_64.json",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/windows-x86_64.json"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/descriptors/windows-x86_64.json.sig",
+      "bytes": 64,
+      "sha256": "aa30b8c398bcf155246b709b70bdb43048ed5f7467394667e660140bb1c32fdb",
+      "basename": "windows-x86_64.json.sig",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/windows-x86_64.json.sig"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/inventories/macos-aarch64/mcicon-renderer-1.1.0-linux-amd64.json",
+      "bytes": 458587,
+      "sha256": "6fa7c6b7cf59053fe44aae8bea5fe180d75a88ccd49cb065e4a3d765c2728408",
+      "basename": "mcicon-renderer-1.1.0-linux-amd64.json",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-renderer-1.1.0-linux-amd64.json"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/inventories/mcicon-guest-1.1.0-macos-aarch64.json",
+      "bytes": 419206,
+      "sha256": "7f439b243cd781198ede6b70d9ccaad8a11686a2a658bc3233081f307274e392",
+      "basename": "mcicon-guest-1.1.0-macos-aarch64.json",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-macos-aarch64.json"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/inventories/mcicon-guest-1.1.0-windows-x86_64.json",
+      "bytes": 162114,
+      "sha256": "f05a9ac3ce42db46c8bf7f6feaad5f2e0da01369e8affdfcaeedf5801bc2752b",
+      "basename": "mcicon-guest-1.1.0-windows-x86_64.json",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-windows-x86_64.json"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/inventories/mcicon-helper-1.1.0-macos-aarch64.json",
+      "bytes": 80921,
+      "sha256": "d5db2f6306d55b4149081a52c836c392a6753f62e4ba49e7db116168c1512c1d",
+      "basename": "mcicon-helper-1.1.0-macos-aarch64.json",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-macos-aarch64.json"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/inventories/mcicon-helper-1.1.0-windows-x86_64.json",
+      "bytes": 78623,
+      "sha256": "b1eb2eec77eef369884203bd034bf306f67fd1d7949d64b7fa640a61bf203f06",
+      "basename": "mcicon-helper-1.1.0-windows-x86_64.json",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-windows-x86_64.json"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/mcicon-operating.pub.der",
+      "bytes": 44,
+      "sha256": "8dc54c096f222fb1665e19446debec844e2c726d20cc91eab2a392f1e6902f5a",
+      "basename": "mcicon-operating.pub.der",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-operating.pub.der"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/mcicon-recovery.pub.der",
+      "bytes": 44,
+      "sha256": "0e468cc27d1fdad02bc90e2fb8de58a39152333c408a940f27f99df591dd9ccf",
+      "basename": "mcicon-recovery.pub.der",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-recovery.pub.der"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/trust-set.bin",
+      "bytes": 96,
+      "sha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+      "basename": "trust-set.bin",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/trust-set.bin"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/source-assets/mcicon-sources-1.1.0-part-01.tar",
+      "bytes": 1341122560,
+      "sha256": "6e2e101c9700ac5b09571f9fefd0386872f8f06392645355feedbe05e2546133",
+      "basename": "mcicon-sources-1.1.0-part-01.tar",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-01.tar"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/source-assets/mcicon-sources-1.1.0-part-02.tar",
+      "bytes": 1384468480,
+      "sha256": "cf984cad246b1572e04cf0ed013b61343772e698016dcad59f88885d28344f51",
+      "basename": "mcicon-sources-1.1.0-part-02.tar",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-02.tar"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/payloads/mcicon-tool-1.1.0-macos-aarch64.zip",
+      "bytes": 35983846,
+      "sha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+      "basename": "mcicon-tool-1.1.0-macos-aarch64.zip",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-tool-1.1.0-macos-aarch64.zip"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/payloads/mcicon-tool-1.1.0-windows-x86_64.zip",
+      "bytes": 37126358,
+      "sha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3",
+      "basename": "mcicon-tool-1.1.0-windows-x86_64.zip",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-tool-1.1.0-windows-x86_64.zip"
+    },
+    {
+      "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/payloads/stable.json",
+      "bytes": 16283,
+      "sha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20",
+      "basename": "stable.json",
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/stable.json"
+    }
+  ],
+  "pending": [
+    "Mac SSH復旧後の確定bytes転送と同梱Java・本番JAR確認",
+    "stable署名・64byte/public trust検証",
+    "署名後の両host Seed/ManagedPackageVerifier・package組立て",
+    "公開stableのsequence整合",
+    "tag/Release/Central公開判断・公開後consumer受入"
+  ],
+  "finalInputUnchanged": {
+    "files": 21,
+    "result": "全fileのsize/SHA-256がsnapshotと一致。指定descriptor SHAも一致"
+  },
+  "windowsRuntime": {
+    "host": "windows-x86_64",
+    "os": "Windows-11-10.0.26200-SP0",
+    "payloadSha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3",
+    "commands": [
+      {
+        "command": [
+          "H:\\MCIconGenerator\\worktrees\\milestone-release-payload-r3\\MCIconGenerator\\build\\r3\\slot-windows-x86_64\\java\\bin\\java.exe",
+          "-version"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\r\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\r\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode)\r\n"
+      },
+      {
+        "command": [
+          "H:\\MCIconGenerator\\worktrees\\milestone-release-payload-r3\\MCIconGenerator\\build\\r3\\slot-windows-x86_64\\java\\bin\\java.exe",
+          "-cp",
+          "H:\\MCIconGenerator\\worktrees\\milestone-release-payload-r3\\MCIconGenerator\\build\\r3\\probe;H:\\MCIconGenerator\\worktrees\\milestone-release-payload-r3\\MCIconGenerator\\build\\r3\\slot-windows-x86_64\\app\\lib\\*",
+          "io.github.rs0325.mcicon.internal.managed.R3Probe",
+          "H:\\MCIconGenerator\\worktrees\\milestone-release-payload-r3\\MCIconGenerator\\build\\r3\\slot-windows-x86_64\\app\\worker\\worker-agent.jar"
+        ],
+        "exitCode": 0,
+        "stdout": "descriptors/windows-x86_64.json: signature/pins/agent/adapters/inventories OK; changed bytes rejected\r\ndescriptors/macos-aarch64.json: signature/pins/agent/adapters/inventories OK; changed bytes rejected\r\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "H:\\MCIconGenerator\\worktrees\\milestone-release-payload-r3\\MCIconGenerator\\build\\r3\\slot-windows-x86_64\\java\\bin\\java.exe",
+          "-cp",
+          "H:\\MCIconGenerator\\worktrees\\milestone-release-payload-r3\\MCIconGenerator\\build\\r3\\slot-windows-x86_64\\app\\lib\\*",
+          "io.github.rs0325.mcicon.cli.Main",
+          "--help"
+        ],
+        "exitCode": 0,
+        "stdout": "Usage: mcicon [-hV] [--debug] [COMMAND]\r\nExport vanilla Minecraft Java textures and inventory icons.\r\n      --debug     Print exception causes to stderr on failure.\r\n  -h, --help      Show this help message and exit.\r\n  -V, --version   Print version information and exit.\r\nCommands:\r\n  versions  List official Java releases from 1.13 onward.\r\n  extract   Extract original PNG textures and animation metadata.\r\n  render    版のsupport状態に従いインベントリPNGを生成します。\r\n  list      Read item/block registries from the exact vanilla client.\r\n  doctor    管理環境または指定DockerのJava・Mesa・adapterを診断します。\r\n  cache     Inspect or verify cached input SHA-256 checksums.\r\n",
+        "stderr": ""
+      }
+    ],
+    "scope": "同梱Java/CLI helpと両host descriptorのJava署名・pin・inventory検証。bootstrap seed/package・実描画は対象外"
+  },
+  "macRuntime": {
+    "status": "未実施",
+    "cause": "登録先ryuman-sugimotomacbook-air:22が2回ともConnection timed out",
+    "transfer": "未実施。Mac側ディレクトリ作成・書込みも未実施",
+    "retryDirectory": "/Users/ryuman/tmp-mcicon-r3",
+    "constraints": "専用領域のみ。LIMA_HOMEもその配下。既存Lima/Homebrew/OS保護設定は変更しない"
+  },
+  "tests": {
+    "java": [
+      {
+        "name": "io.github.rs0325.mcicon.internal.managed.RuntimeDescriptorTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "io.github.rs0325.mcicon.internal.managed.RuntimeResourceGeneratorTest",
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "io.github.rs0325.mcicon.bootstrap.ManagedPackageVerifierTest",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "python": {
+      "command": "scripts/test-release-payloads.py",
+      "tests": 3,
+      "failures": 0,
+      "result": "sourceArchivesと再配布文書の欠落回帰を含む"
+    },
+    "production": "RuntimeResourceGenerator・本番JAR probe・OpenSSL・全payload entry照合・Windows同梱JRE確認成功"
+  },
+  "changes": [
+    "docs/release-candidate-1.1.md",
+    "scripts/prepare-release-payloads.py",
+    "scripts/test-release-payloads.py",
+    "qa/release-payload-2026-11-05.json",
+    "qa/release-payload-2026-11-05.json.sha256"
+  ],
+  "implementation": {
+    "change": "payloadへhelperのsourceArchivesと再配布文書を継承。JRE内文書はjava/へ再配置したpathをmetadataへ記載",
+    "unchanged": "公開API・schema・署名済みdescriptor・trust・最終core JAR",
+    "reason": "R1生成器はsourceArchivesを空にし、JREの外にあるMicrosoft原文等をpayloadから落としていた",
+    "initialUnadoptedOutputs": "build/r3/payloads-initial と seed-draft-initial。署名・公開に使用しない"
+  },
+  "cleanup": {
+    "docker": "未使用・起動なし",
+    "wsl": "未使用・変更なし",
+    "mac": "SSH接続失敗。remote process起動・書込みなし",
+    "processes": "ビルド・テスト・同梱Java・SSH試行は終了。継続プロセスなし",
+    "artifacts": "専用worktreeのbuild配下へ保全。署名待ちmanifest・payload・seed草稿を保持"
+  },
+  "macTransfer": {
+    "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/mac-transfer.tar",
+    "bytes": 80302080,
+    "sha256": "25f00395364af5d7e09b5a252770ec31aaad55f9863e338d6c36b7a6b54a8e38",
+    "status": "ローカル準備済み・未転送・未展開",
+    "contains": "確定core/JAR resources・Mac payload・署名前seed・bootstrap lib・既存packager・検証probe"
+  },
+  "seedDrafts": [
+    {
+      "host": "windows-x86_64",
+      "signed": false,
+      "files": [
+        {
+          "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/seed-draft/windows-x86_64/stable.json",
+          "bytes": 16283,
+          "sha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+        },
+        {
+          "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/seed-draft/windows-x86_64/tool.zip",
+          "bytes": 37126358,
+          "sha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3"
+        },
+        {
+          "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/seed-draft/windows-x86_64/trust-set.bin",
+          "bytes": 96,
+          "sha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283"
+        }
+      ]
+    },
+    {
+      "host": "macos-aarch64",
+      "signed": false,
+      "files": [
+        {
+          "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/seed-draft/macos-aarch64/stable.json",
+          "bytes": 16283,
+          "sha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+        },
+        {
+          "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/seed-draft/macos-aarch64/tool.zip",
+          "bytes": 35983846,
+          "sha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d"
+        },
+        {
+          "path": "H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/seed-draft/macos-aarch64/trust-set.bin",
+          "bytes": 96,
+          "sha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283"
+        }
+      ]
+    }
+  ],
+  "finalReview": {
+    "diffCheck": "成功",
+    "review": "source/noticeの欠落回帰・runtime resource重複・descriptor改変拒否・入力/JAR不変・署名未生成を確認",
+    "publicOperations": "commit/push/PR/merge/tag/Release/Central/署名の実行なし",
+    "domainKnowledge": "新規記録対象なし（今回の変更は実装・リリース組立て）"
+  },
+  "commandLogs": [
+    "20261104T214714Z-2351341adaaa4226ae495a0bf2b0e632.jsonl",
+    "20261104T215110Z-83330f646d7540edaae7d97938abaadb.jsonl",
+    "20261104T215417Z-b79fde63b92141d1a0a80e47cd8d3fc7.jsonl",
+    "20261104T215511Z-280a26aaae874f8f86fbf7b9a07be929.jsonl",
+    "20261104T215513Z-32e2e86830eb4132aa24af921ca9adf4.jsonl",
+    "20261104T215021Z-022c68196e034388a698cac79591494b.jsonl",
+    "20261104T215144Z-4f74d01d8f54419c986cfca744491b57.jsonl"
+  ],
+  "commandLogRoot": "C:/Users/ryuma/.codex/logs/commands"
+}

@@ -1,6 +1,6 @@
-# 1.1.0リリース候補の署名前組立て（R1・R2）
+# 1.1.0リリース候補の組立て（R1・R2・R3）
 
-最新の採用判定は末尾の「R2: 最終input採用の判定」を参照。現在もfalseで、最終署名対象は未確定。
+最新状態は末尾の「R3: 署名済みdescriptorからstable署名待ち」を参照。R2最終inputは採用済みでdescriptor署名を検証済み。stable manifestは未署名。R1・R2の記録は各時点の状態である。
 
 Refs #91〜#95（closeしない）。起点は2026-11-05 JSTのfetchで確認したorigin/main `e8e5d348cb23a92145fe0b8c09fb37c608fdceee`。worktreeは `H:/MCIconGenerator/worktrees/milestone-release-candidate-r1/MCIconGenerator`、branchは `feature/issue-97-release-candidate`。成果物はbuild/r1へ保全し、archive・署名前descriptorを本番値として収録しない。
 
@@ -258,3 +258,111 @@ Java関連35件、assembler4件のテストが成功。payload準備の既存3�
 前回R2のDocker監査image削除・既存image一覧一致・Docker停止の記録を保持。再開後はDocker/Mac/WSLを使わず、Docker engine pipeがないことを確認した。Macに作業ディレクトリを作らず、既存状態を変更していない（Macの前後実測は未実施）。自分が起動した処理はすべて終了。資材・source・ログ・試行1はbuild内に保全した。
 
 QAは [release-final-input-2026-11-05.json](../qa/release-final-input-2026-11-05.json) と [checksum](../qa/release-final-input-2026-11-05.json.sha256)。変更ファイル全一覧・各資材/source/descriptorのsize/SHA・未完了工程を収録。公開準備文面はUTF-8の `build/commit-message.txt`、`build/pr-title.txt`、`build/pr-body.md`。commit・push・PR・署名・Central・tag・Releaseは実施していない。残作業は上記2件のユーザー署名受領から始まる。
+
+## R3: 署名済みdescriptorからstable署名待ち
+
+2026-11-05 JST。Refs #91、Refs #92、Refs #93、Refs #94、Refs #95（closeしない）。fetch後の基準はPR #164を含む `origin/main d840045`。worktreeは `H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator`、branchは `feature/issue-97-release-payload`。公開操作は行っていない。
+
+### 署名と最終coreの検証
+
+R2の `build/r2/final-input` は読み取り専用で使用した。2件のdescriptorの指定size/SHA、各64byte署名が一致。96byte trust-set内の各公開DERをOpenSSLで試し、両descriptorとも回復鍵で成功、運用鍵で失敗した。回復鍵はユーザー指定の `.local/mcicon-recovery.pub.der` とも一致する。Javaの本番 `RuntimeResourceGenerator` とJAR probeでも両hostの署名・pins・agent・adapter・inventoryを検証した。probeは1byte改変descriptorを拒否した。
+
+次の記録対象コマンドで生成した（Windowsは `gradlew.bat`、各コマンドは指定の `run_logged.py --` 経由）。入力flagや署名bytesの変更はない。
+
+```sh
+./gradlew --offline --no-daemon -PreleaseVersion=1.1.0 -PmanagedRuntimeInputDir=H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input :core:jar :cli:installDist :bootstrap:installDist
+python scripts/prepare-release-payloads.py --runtime-input H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input --resources core/build/generated/resources/managedRuntime --cli-lib cli/build/install/mcicon/lib --worker worker/build/libs/worker-1.1.0-agent.jar --core core/build/libs/core-1.1.0.jar --sequence 1 --output build/r3/payloads
+```
+
+coreの全14 runtime resources（descriptor2・署名2・inventory6・trust・公開DER2・pins）を生成先とJARで元bytes照合した。pinsはinputと一致し、他resourceは入力元bytesと一致した。CLI distributionと両payloadも同じcore JAR全体を収録する。他のpayload JARによるruntime resource重複はない。全payload entryのsize/SHAとinventory、metadata文書path、source参照を照合した。
+
+生成器は既存実装・Python標準libraryを再利用した。R1実装の空 `sourceArchives` とJRE外文書の取り落としを修正し、署名済みhelperのsource archive参照2本、helper内の再配布文書をtool payloadへ引き継いだ。JRE内の文書pathは `java/`、JRE外の文書は `licenses/runtime-helper/` 配下へ対応させる。公開API・schema・descriptor・core JARの変更はない。初回の `payloads-initial` / `seed-draft-initial` は修正前の不採用証跡であり、署名・公開に使わない。
+
+| 確定file | bytes | SHA-256 |
+| --- | ---: | --- |
+| `core/build/libs/core-1.1.0.jar` | 427817 | `b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca` |
+| `worker/build/libs/worker-1.1.0-agent.jar` | 535302 | `91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf` |
+| `worker/build/libs/worker-1.1.0.jar` | 489342 | `5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec` |
+| `cli/build/libs/cli-1.1.0.jar` | 37317 | `8c03a2dd1932fdab8b506e85f3ff0458198fc738005cfdbf3cb75f2290d9d334` |
+| `bootstrap/build/libs/bootstrap-1.1.0.jar` | 91974 | `51bba7e2dd2f89ab762f96b9216a53fbb459fc0f7340412507ef6c8f2bcad1b5` |
+| `build/r3/payloads/mcicon-tool-1.1.0-windows-x86_64.zip` | 37126358 | `c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3` |
+| `build/r3/payloads/mcicon-tool-1.1.0-macos-aarch64.zip` | 35983846 | `c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d` |
+| `build/r3/payloads/stable.json` | 16283 | `26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20` |
+
+### 次にユーザーが署名する正確な対象
+
+- path: `H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/payloads/stable.json`
+- size: 16283 bytes
+- SHA-256: `26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20`
+- sequence: `1`。公開stableとの整合は主担当の後続確認待ち。sequence変更が必要ならmanifestを再確定してから署名する。
+
+署名端末にはこのfileを元bytesのまま置く。整形・改行変換・再生成をしない。以下はユーザー自身が署名端末で行う手順で、今回実行していない。秘密鍵pathは端末内の `ED25519_PRIVATE_KEY` に設定し、passphraseはOpenSSLの対話promptへ入力する。回復鍵またはtrust-set内の運用鍵を使用できる。PowerShellでは `$ED25519_PRIVATE_KEY` を `$env:ED25519_PRIVATE_KEY` とする。署名前に `openssl dgst -sha256` とsizeを上記へ照合する。
+
+```sh
+cd H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator
+openssl dgst -sha256 build/r3/payloads/stable.json
+openssl pkeyutl -sign -rawin -inkey "$ED25519_PRIVATE_KEY" -in build/r3/payloads/stable.json -out build/r3/payloads/stable.json.sig
+openssl pkeyutl -verify -rawin -pubin -keyform DER -inkey H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/mcicon-recovery.pub.der -in build/r3/payloads/stable.json -sigfile build/r3/payloads/stable.json.sig
+openssl pkeyutl -verify -rawin -pubin -keyform DER -inkey H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/mcicon-operating.pub.der -in build/r3/payloads/stable.json -sigfile build/r3/payloads/stable.json.sig
+wc -c build/r3/payloads/stable.json.sig
+```
+
+両鍵のいずれか一方で検証成功し、署名が64 bytesであることが受入条件。Windowsでのサイズ確認は `(Get-Item build/r3/payloads/stable.json.sig).Length`。Macで署名する場合は同じ元bytesを転送し、その端末の絶対pathへ引数を置き換える。署名だけを返し、manifestとpayloadを再生成しない。
+
+### seed/packageの準備と署名後の差分手順
+
+`build/r3/seed-draft/windows-x86_64` と `macos-aarch64` に、同一 `stable.json`、対応payloadを `tool.zip` としたfile、共通 `trust-set.bin` を準備した。`stable.json.sig` は存在せず、正式seedとして使用できない。署名後は同じ64byte署名を両directoryへ追加し、manifest/tool.zip/trustのsize/SHAがQAから変わっていないことを確認する。
+
+Windowsは次の正式検査を、今回と同じruntime入力と確定coreに対して行う。package出力やMac側でcoreを再buildして差し替えない。
+
+```sh
+./gradlew --offline --no-daemon -PreleaseVersion=1.1.0 -PmanagedRuntimeInputDir=H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input -PbootstrapSeedDir=H:/MCIconGenerator/worktrees/milestone-release-payload-r3/MCIconGenerator/build/r3/seed-draft/windows-x86_64 -PbootstrapTrustKey=H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input/trust-set.bin :bootstrap:verifyManagedRuntimePackage
+```
+
+MacはSSH接続を2回試したがport 22への `Connection timed out` で未接続。ディレクトリ作成・転送・実機検証は未実施。再開用の `build/r3/mac-transfer.tar`（80302080 bytes、SHA-256 `25f00395364af5d7e09b5a252770ec31aaad55f9863e338d6c36b7a6b54a8e38`）をローカルに準備した。確定core/resources・Mac payload・署名前seed・bootstrap lib・既存packager・検証probeを含む。接続復旧後、登録済みSSHとコマンド記録を使い `/Users/ryuman/tmp-mcicon-r3` にだけ転送・展開する。`/opt/homebrew/bin/python3.12 r3-runtime.py /Users/ryuman/tmp-mcicon-r3` で同梱JRE・両host署名/pin/inventory・CLI helpを確認する。
+
+stable署名をMacの `seed-draft/macos-aarch64/stable.json.sig` へ追加後、同梱JREの `java` とclasspath `bootstrap-lib/*` で `io.github.rs0325.mcicon.bootstrap.ManagedPackageVerifier resources seed-draft/macos-aarch64 seed-draft/macos-aarch64/trust-set.bin 1.1.0 core-1.1.0.jar` を実行する。Mac app-imageは同じbootstrap lib/seed/trustを既存 `bootstrap/scripts/package-bootstrap.py` へ明示して組み立てる。Windowsは確定native security readerとownerを指定して既存 `windowsAppImage` を使う。実画面・ユーザー介入を伴う受入は別途許可を得る。LIMA_HOMEを使う場合は専用directory配下とし、既存Lima/Homebrew・OS保護設定には触れない。
+
+**Central bundleは最終core JARから再生成が必要。** 今回はCentral bundleを生成していない。既存1.1.0 bundleは公開不可のまま。PGP署名・Central・tag・Releaseの公開判断は後続とする。
+
+### Release asset一覧案
+
+URLは各行のbasenameを `https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/` に付けたもの（QAにはfileごとの完全URLを収録、未公開・到達未検証）。source2本内のnoticeを含む。共有renderer inventoryのhost別resource複製は同bytesを確認し、Releaseには1本だけ並べる。`input.json` / `candidate-report.json` は内部検証資料のためassetに含めない。
+
+| basename | bytes | SHA-256 |
+| --- | ---: | --- |
+| `mcicon-guest-1.1.0-macos-aarch64.qcow2` | 620224512 | `1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55` |
+| `mcicon-guest-1.1.0-windows-x86_64.tar.xz` | 98146824 | `f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5` |
+| `mcicon-helper-1.1.0-macos-aarch64.zip` | 125853859 | `48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde` |
+| `mcicon-helper-1.1.0-windows-x86_64.zip` | 33863906 | `58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8` |
+| `mcicon-renderer-1.1.0-linux-amd64.tar.gz` | 593385993 | `dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4` |
+| `macos-aarch64.json` | 374519 | `2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101` |
+| `macos-aarch64.json.sig` | 64 | `3b867dbdcc833be57d2ec96388b1a63d9a339a17247c0280f315af6ba979a2ef` |
+| `windows-x86_64.json` | 278044 | `cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294` |
+| `windows-x86_64.json.sig` | 64 | `aa30b8c398bcf155246b709b70bdb43048ed5f7467394667e660140bb1c32fdb` |
+| `mcicon-renderer-1.1.0-linux-amd64.json` | 458587 | `6fa7c6b7cf59053fe44aae8bea5fe180d75a88ccd49cb065e4a3d765c2728408` |
+| `mcicon-guest-1.1.0-macos-aarch64.json` | 419206 | `7f439b243cd781198ede6b70d9ccaad8a11686a2a658bc3233081f307274e392` |
+| `mcicon-guest-1.1.0-windows-x86_64.json` | 162114 | `f05a9ac3ce42db46c8bf7f6feaad5f2e0da01369e8affdfcaeedf5801bc2752b` |
+| `mcicon-helper-1.1.0-macos-aarch64.json` | 80921 | `d5db2f6306d55b4149081a52c836c392a6753f62e4ba49e7db116168c1512c1d` |
+| `mcicon-helper-1.1.0-windows-x86_64.json` | 78623 | `b1eb2eec77eef369884203bd034bf306f67fd1d7949d64b7fa640a61bf203f06` |
+| `mcicon-operating.pub.der` | 44 | `8dc54c096f222fb1665e19446debec844e2c726d20cc91eab2a392f1e6902f5a` |
+| `mcicon-recovery.pub.der` | 44 | `0e468cc27d1fdad02bc90e2fb8de58a39152333c408a940f27f99df591dd9ccf` |
+| `trust-set.bin` | 96 | `8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283` |
+| `mcicon-sources-1.1.0-part-01.tar` | 1341122560 | `6e2e101c9700ac5b09571f9fefd0386872f8f06392645355feedbe05e2546133` |
+| `mcicon-sources-1.1.0-part-02.tar` | 1384468480 | `cf984cad246b1572e04cf0ed013b61343772e698016dcad59f88885d28344f51` |
+| `mcicon-tool-1.1.0-macos-aarch64.zip` | 35983846 | `c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d` |
+| `mcicon-tool-1.1.0-windows-x86_64.zip` | 37126358 | `c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3` |
+| `stable.json` | 16283 | `26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20` |
+| `stable.json.sig` | 64（予定） | 署名後に測定 |
+
+上記22件が準備済み、stable署名が23件目。installer/app-image等の追加配布物は署名後の包装・検証を終えてbasename/size/SHA/URLを追記する。source2本は最終SHAと照合済みで、旧unadopted archiveを混ぜていない。
+
+### 検証・後始末・残作業
+
+Java関連33件（skipなし）、payload回帰テスト3件が成功。本番JAR probeで両descriptorの署名・pin・agent・adapter・inventoryと改変拒否、全payload entry、Windows同梱Javaの起動・同probe・CLI helpが成功した。署名seed/package・Mac実機・公開URL consumerは未検証。
+
+`git diff --check` が成功。全入力fileのsize/SHA snapshotが再照合で一致し、署名済みfinal-inputへ書込みはしていない。Docker/WSLは未使用、Macの変更なし。起動したビルド・テスト・Java・SSH試行は終了し、継続プロセスなし。成果物と不採用初回出力はbuild内に保全した。
+
+変更ファイルは `scripts/prepare-release-payloads.py`、`scripts/test-release-payloads.py`、この文書、[QA JSON](../qa/release-payload-2026-11-05.json)、[checksum](../qa/release-payload-2026-11-05.json.sha256) の5件。UTF-8の `build/commit-message.txt` / `pr-title.txt` / `pr-body.md` を準備済み。commit・push・PR・署名・Central・tag・Releaseは行っていない。
+
+残作業はstable署名受領、公開stableのsequence整合、Mac接続復旧と転送/実機確認、署名後の両host package検証と組立て、最終追加asset、公開判断と公開後consumer受入。Refs #91〜#95はcloseしない。
