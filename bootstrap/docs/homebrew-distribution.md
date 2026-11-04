@@ -52,6 +52,6 @@ Homebrewはprefix/Cellar内のJava同梱bootstrapを更新する。bootstrapは�
 
 ## 検証と残る受入
 
-`python3 bootstrap/scripts/test-package-homebrew.py`でarchiveの実inventory/hash/mode、空白prefixとsymlink chainからの引数・stdio・exit継承、owner/link/上書き拒否、Formulaの明示URL/hashとRuby構文、stub上で15.7.6拒否・15.7.7/15.8.1通過を確認する。テスト内の`tarfile.extractall(filter=...)`を使うため、実行にはPython 3.12以降相当の対応環境が必要。このテスト内のJava/launcherは軽量fixtureであり、実Javaの受入ではない。
+`python3 bootstrap/scripts/test-package-homebrew.py`でarchiveの実inventory/hash/mode、空白prefixとsymlink chainからの引数・stdio・exit継承、owner/link/上書き拒否、Formulaの明示URL/hashとRuby構文、stub上で15.7.6拒否・15.7.7/15.8.1通過を確認する。テスト内の`tarfile.extractall(filter=...)`を使うため、実行にはPython 3.12以降相当の対応環境が必要。このテスト内のJava/launcherは軽量fixtureであり、実Javaの受入ではない。Python 3.12.16で4件すべて成功した。
 
 実Java同梱appは別途offlineで展開後のlauncherから起動して確認する。今回の生成・起動hostはmacOS 15.8.1、旧VM世代の15.7.7実測とは分けて扱う。既JDK生成appのMach-O deployment target 11.0とplistの最低版10.11はJDKの生成値であり、製品の対応範囲を拡大しない。署名後のappを書き換えない。JAVA_HOMEを外し、javaが存在しない専用PATHで起動できても、Java/Docker未導入の実ホスト受入の代用にしない。正式trust、Developer ID/notarization、実brew install/upgrade/uninstall、PATH反映・権限拒否・他配布経路との同時install、実helper/管理描画、正式package世代でのOS下限受入、winget・installerは未受入であり、#97全体の完成条件として残る。
