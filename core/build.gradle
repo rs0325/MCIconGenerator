@@ -103,3 +103,16 @@ tasks.named('processResources') {
         delete new File(destinationDir, 'META-INF/mcicon/runtime')
     }
 }
+
+def candidateInput = providers.gradleProperty('runtimeCandidateInputDir')
+tasks.register('verifyRuntimeCandidate', JavaExec) {
+    dependsOn 'compileJava', ':worker:agentJar'
+    classpath = files(sourceSets.main.output.classesDirs, configurations.compileClasspath)
+    mainClass = 'io.github.rs0325.mcicon.internal.managed.RuntimeCandidateVerifier'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    doFirst {
+        if (!candidateInput.isPresent()) throw new GradleException('runtimeCandidateInputDirが必要です')
+        args rootProject.file(candidateInput.get()), project.version.toString(),
+                project(':worker').tasks.named('agentJar').get().archiveFile.get().asFile, rootProject.projectDir
+    }
+}

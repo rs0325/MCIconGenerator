@@ -28,6 +28,14 @@ public record RuntimeDescriptor(String digest,String runtimeId,String toolVersio
         try {
             if(original.length>1024*1024||!FilesSupport.hash(original).equals(pin.descriptorSha256()))throw invalid("descriptorの固定hashが一致しません");
             trustKey.verify(original,signature);
+            return parse(original,pin);
+        } catch(McIconException failure) {throw failure;}
+        catch(Exception failure) {throw new McIconException("MANAGED_RUNTIME_INVALID","descriptorの署名を検証できません",1,failure);}
+    }
+    /** 署名前のbuild検査用。製品の信頼境界では必ずverifyを使う。 */
+    static RuntimeDescriptor parse(byte[] original,Pin pin) {
+        try {
+            if(original.length>1024*1024||!FilesSupport.hash(original).equals(pin.descriptorSha256()))throw invalid("descriptorの固定hashが一致しません");
             JsonNode root=read(original);
             fields(root,"schemaVersion","runtimeId","toolVersion","host","minimumOsVersion","helper","worker","rendering","artifacts");
             constant(root,"schemaVersion",1);
@@ -72,7 +80,7 @@ public record RuntimeDescriptor(String digest,String runtimeId,String toolVersio
             if(artifacts.stream().map(Artifact::role).distinct().count()!=artifacts.size())throw invalid("artifact roleが重複しています");
             return new RuntimeDescriptor(pin.descriptorSha256(),runtimeId,tool,host,minimum,helperId,executable,agent,adapters,imageArtifact,image,List.copyOf(java),Map.copyOf(environment),List.copyOf(artifacts));
         } catch(McIconException failure) {throw failure;}
-        catch(Exception failure) {throw new McIconException("MANAGED_RUNTIME_INVALID","descriptorの署名または形式を検証できません",1,failure);}
+        catch(Exception failure) {throw new McIconException("MANAGED_RUNTIME_INVALID","descriptorの形式を検証できません",1,failure);}
     }
     public Artifact artifact(String id) {return artifacts.stream().filter(a->a.id().equals(id)).findFirst().orElseThrow(()->invalid("artifact参照が見つかりません"));}
     public void verifyInventory(Artifact artifact,byte[] bytes) {if(!FilesSupport.hash(bytes).equals(artifact.inventorySha256()))throw invalid("inventoryのhashが一致しません");}
