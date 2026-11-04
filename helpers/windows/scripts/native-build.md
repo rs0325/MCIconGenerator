@@ -1,6 +1,6 @@
 # Windows nativeの事前build
 
-`build-native.py`はMac上の検査済LLVM-MinGWだけを明示指定し、PEとbuild.json/licenseを新しい出力directoryへ作る。取得、展開、署名設定変更、Windowsでのcompileは行わない。既存出力へ上書きしない。実行前に利用者が次を満たす。
+`build-native.py`は検査済LLVM-MinGWを明示指定し、PEとbuild.json/licenseを新しい出力directoryへ作る。取得、展開、署名設定変更は行わない。既存出力へ上書きしない。Macでは従来どおり、実行前に利用者が次を満たす。
 
 - [公式LLVM-MinGW 20261006](https://github.com/mstorsjo/llvm-mingw/releases/tag/20261006) の `llvm-mingw-20261006-ucrt-macos-universal.tar.xz` を固定する。124399776 bytes、SHA-256 `a7a19b11048e89372637d26279cdb7c430ed3cf8c1e224310421312bf986ebf6`。LLVM23.1.3、x86_64/UCRT。
 - 安全に展開した同一archiveの世代内にwrapper/clang-23/LLD/readobj/内部dylibが解決すること、arm64で実行可能なこと、otoolでsystemまたは同世代以外の依存が無いことを確認する。検査後のtoolchainを変更しない。
@@ -15,7 +15,19 @@ python3.12 helpers/windows/scripts/build-native.py --toolchain /absolute/verifie
 
 build.jsonは元source SHA、toolchain archiveとcompiler入力SHA、固定flags、PEのbytes/SHA/import、licenseのbytes/SHAを記録する。PEは32+ AMD64 console、importはKERNEL32/ADVAPI32/OLE32/UCRTに限定し、C++/unwind/pthread/GCC/MSVC runtime DLLや未知DLLを拒否する。packagerはbuild.json・PE・現在のsource・noticeを再照合する。build.jsonは由来の整合記録であり、署名された信頼根ではない。信頼済み配布descriptorの生成は別段階。
 
-Windows包装にはJDK21と検証済payloadに加えて `-PwindowsNativeDir` が必須となる。sourceをWindowsコンパイラへ渡す経路や旧MSVC fallbackは残さない。包装はWindows上で別途実行が必要で、MacのfixtureやPE静的検査だけでは実Windows動作を受け入れない。
+Windows包装にはJDK21と検証済payloadに加えて `-PwindowsNativeDir` が必須となる。包装時のcompileや旧MSVC fallbackはない。包装はWindows上で別途実行が必要で、MacのfixtureやPE静的検査だけでは実Windows動作を受け入れない。
+
+## Windowsホストでの事前build
+
+公式releaseの[`llvm-mingw-20261006-ucrt-x86_64.zip`](https://github.com/mstorsjo/llvm-mingw/releases/download/20261006/llvm-mingw-20261006-ucrt-x86_64.zip)だけを使う。190,836,485 bytes、SHA-256 `317492c456aa27ee607a5919f1d2d38dcdc1112516a24d0bf4b00d078f52d17a`、LLVM 23.1.3。公式release APIとrelease画面のdigestを照合し、取得fileをPython hashlibとPowerShell `Get-FileHash -Algorithm SHA256`で独立計算した。展開後の全fileも同ZIPと照合した。取得元・compiler情報・license/sourceの所在は[入力記録](../../../qa/windows-helper-source-inputs-2026-11-04.json)を参照する。
+
+```text
+python -X utf8 helpers/windows/scripts/build-native.py --toolchain H:/absolute/llvm-mingw-20261006-ucrt-x86_64 --archive H:/absolute/llvm-mingw-20261006-ucrt-x86_64.zip --source H:/absolute/repository/helpers/windows/src/main/native/windows-host.cpp --output H:/absolute/new-native-generation
+```
+
+Windowsでも同じtarget・compiler/linker flagsを使い、`--no-insert-timestamp`でPE timestampを0にする。SystemRootを引き継ぎ、PATHはSystem32、TMPは出力内に限定する。120秒でcompile待機を打ち切り、未終了の所有compilerと子孫だけをSystem32の`taskkill /PID <pid> /T /F`で回収し、残り10秒以内で待つ。回収失敗はunknownとして元例外とrawを残す。Macのprocess group回収は維持する。
+
+build.jsonはWindows版archive pinとcompiler/LLVM DLL・target library群のSHAを保存し、packagerはMac版またはWindows版の固定pinだけを受け付ける。既存schemaの`crossbuild-only-not-native-os-accepted`は維持し、WindowsホストでcompileできてもJob/WSL/OSの実動作受入を意味しない。E1の2回compile・最終包装結果は[候補記録](../../../docs/windows-helper-candidate-1.1.md)を参照する。
 
 ## 限定native QAの来歴
 

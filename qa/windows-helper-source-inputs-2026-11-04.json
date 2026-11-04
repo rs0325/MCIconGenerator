@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "toolchain": {
+    "releaseUrl": "https://github.com/mstorsjo/llvm-mingw/releases/tag/20261006",
+    "releaseApiUrl": "https://api.github.com/repos/mstorsjo/llvm-mingw/releases/tags/20261006",
+    "expandedAssetsUrl": "https://github.com/mstorsjo/llvm-mingw/releases/expanded_assets/20261006",
+    "asset": "llvm-mingw-20261006-ucrt-x86_64.zip",
+    "url": "https://github.com/mstorsjo/llvm-mingw/releases/download/20261006/llvm-mingw-20261006-ucrt-x86_64.zip",
+    "bytes": 190836485,
+    "sha256": "317492c456aa27ee607a5919f1d2d38dcdc1112516a24d0bf4b00d078f52d17a",
+    "digestChecks": [
+      "公式release API digest/sizeとのPython hashlib照合",
+      "公式release UI digestとの照合",
+      "PowerShell Get-FileHash SHA256独立計算との一致"
+    ],
+    "extractedFilesVerified": 9053,
+    "compilerVersion": "clang version 23.1.3 (https://github.com/llvm/llvm-project.git 0d261d1ca552c95a8f007e061c787ac7132fbcbc)\nTarget: x86_64-w64-windows-gnu\nThread model: posix\nInstalledDir: H:/MCIconGenerator/worktrees/milestone-windows-helper-e1/MCIconGenerator/build/e1/toolchain/llvm-mingw-20261006-ucrt-x86_64/bin\nConfiguration file: H:/MCIconGenerator/worktrees/milestone-windows-helper-e1/MCIconGenerator/build/e1/toolchain/llvm-mingw-20261006-ucrt-x86_64/bin/x86_64-w64-windows-gnu.cfg\n",
+    "license": "LICENSE.TXT / x86_64-w64-mingw32/share/mingw32/COPYING*",
+    "source": "archivesのllvm-mingw、llvm-project、mingw-w64参照。compilerと静的runtimeのみ製品へ影響し、toolchain archive自体は再配布しない"
+  },
+  "archives": {
+    "commons-codec": {
+      "version": "1.19.0",
+      "url": "https://archive.apache.org/dist/commons/codec/source/commons-codec-1.19.0-src.tar.gz",
+      "bytes": 465560,
+      "sha256": "ec8e16c8614550a076f3c06b52b6d4c8c9fce2c6da691376bdbd882f3db57449",
+      "bytesVerified": true,
+      "license": "Apache-2.0",
+      "officialSha512Matched": true,
+      "licenseDocuments": [
+        {
+          "path": "commons-codec-1.19.0-src/LICENSE.txt",
+          "bytes": 11359,
+          "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7"
+        },
+        {
+          "path": "commons-codec-1.19.0-src/NOTICE.txt",
+          "bytes": 175,
+          "sha256": "b64933ee1d36d14659156223a2604edadb60bffdd465d5368ff422d7689db5fb"
+        }
+      ],
+      "fileName": "commons-codec-1.19.0-src.tar.gz"
+    },
+    "commons-compress": {
+      "version": "1.28.0",
+      "url": "https://archive.apache.org/dist/commons/compress/source/commons-compress-1.28.0-src.tar.gz",
+      "bytes": 61394705,
+      "sha256": "5c870fa454221b24c81d10a28031a9183d55f2baab92c160ecc985e51a387662",
+      "bytesVerified": true,
+      "license": "Apache-2.0",
+      "officialSha512Matched": true,
+      "licenseDocuments": [
+        {
+          "path": "commons-compress-1.28.0-src/LICENSE.txt",
+          "bytes": 11358,
+          "sha256": "51b88fd3e9e24edcdce1dd145a4fca2dcd12911407f00b06dfa6ff600f9733c1"
+        },
+        {
+          "path": "commons-compress-1.28.0-src/NOTICE.txt",
+          "bytes": 178,
+          "sha256": "0d98967f0ab328af8d9d536aa9a5c684b5dd665657245f6ee6b5915affe811c0"
+        }
+      ],
+      "fileName": "commons-compress-1.28.0-src.tar.gz"
+    },
+    "commons-io": {
+      "version": "2.20.0",
+      "url": "https://archive.apache.org/dist/commons/io/source/commons-io-2.20.0-src.tar.gz",
+      "bytes": 700475,
+      "sha256": "301f655a687bc7cbc0c43b69fef807aba00e6c3bea4a4f7512c957faa379a33c",
+      "bytesVerified": true,
+      "license": "Apache-2.0",
+      "officialSha512Matched": true,
+      "licenseDocuments": [
+        {
+          "path": "commons-io-2.20.0-src/LICENSE.txt",
+          "bytes": 11360,
+          "sha256": "c1d1a38c99c48ccad170890ade6066e2e240bb6ce59861d4eb7f672eddd2a4c6"
+        },
+        {
+          "path": "commons-io-2.20.0-src/NOTICE.txt",
+          "bytes": 172,
+          "sha256": "b54b0db6c617273efff79ba193bb01b05eadcddfff55c24063b38b2acef714c3"
+        }
+      ],
+      "fileName": "commons-io-2.20.0-src.tar.gz"
+    },
+    "commons-lang3": {
+      "version": "3.18.0",
+      "url": "https://archive.apache.org/dist/commons/lang/source/commons-lang3-3.18.0-src.tar.gz",
+      "bytes": 1236581,
+      "sha256": "4a94ddeb6a5819c5d0aa5678d16cf97a672b06398b93a0e4f90594032ca991f7",
+      "bytesVerified": true,
+      "license": "Apache-2.0",
+      "officialSha512Matched": true,
+      "licenseDocuments": [
+        {
+          "path": "commons-lang3-3.18.0-src/LICENSE.txt",
+          "bytes": 11359,
+          "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7"
+        },
+        {
+          "path": "commons-lang3-3.18.0-src/NOTICE.txt",
+          "bytes": 174,
+          "sha256": "64bc8696af3f6c770521412b85d3a733fa44b2ef5b0f4bd739e0c4d02eca492a"
+        }
+      ],
+      "fileName": "commons-lang3-3.18.0-src.tar.gz"
+    },
+    "xz": {
+      "version": "1.10",
+      "url": "https://tukaani.org/xz/xz-java-1.10.zip",
+      "bytes": 179204,
+      "sha256": "c02a52da42f432fd5e9c8f30f8e0a9be775961d25740ec098b3f46b4d45f7fe5",
+      "bytesVerified": true,
+      "license": "0BSD",
+      "licenseDocuments": [
+        {
+          "path": "COPYING",
+          "bytes": 663,
+          "sha256": "1e77ef26cee5216d6531e49cbf2f6111a0270dc7b322fc65477063c5aff88766"
+        }
+      ],
+      "fileName": "xz-java-1.10.zip"
+    },
+    "llvm-project": {
+      "version": "llvmorg-23.1.3",
+      "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.3/llvm-project-23.1.3.src.tar.xz",
+      "bytes": 179220548,
+      "sha256": "c44186a7762ed28954be72e5ff6df9808e0779d4f1bf014ecc4e7e211d31ee34",
+      "bytesVerified": true,
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "officialReleaseDigestMatched": true,
+      "licenseDocuments": [
+        {
+          "path": "llvm-project-23.1.3.src/LICENSE.TXT",
+          "bytes": 15141,
+          "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+        },
+        {
+          "path": "llvm-project-23.1.3.src/clang/LICENSE.TXT",
+          "bytes": 15140,
+          "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47"
+        },
+        {
+          "path": "llvm-project-23.1.3.src/compiler-rt/LICENSE.TXT",
+          "bytes": 16708,
+          "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d"
+        },
+        {
+          "path": "llvm-project-23.1.3.src/libcxx/LICENSE.TXT",
+          "bytes": 16703,
+          "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+        },
+        {
+          "path": "llvm-project-23.1.3.src/libcxxabi/LICENSE.TXT",
+          "bytes": 16706,
+          "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+        },
+        {
+          "path": "llvm-project-23.1.3.src/libunwind/LICENSE.TXT",
+          "bytes": 16706,
+          "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d"
+        },
+        {
+          "path": "llvm-project-23.1.3.src/llvm/LICENSE.TXT",
+          "bytes": 15141,
+          "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+        }
+      ],
+      "fileName": "llvm-project-23.1.3.src.tar.xz"
+    },
+    "mingw-w64": {
+      "version": "a3d93999ef0521681d45e445c39964a7af0f593f",
+      "url": "https://api.github.com/repos/mingw-w64/mingw-w64/tarball/a3d93999ef0521681d45e445c39964a7af0f593f",
+      "bytes": 15805477,
+      "sha256": "0cae4b30ae06a3ec315918452b7eb5a151b662f2e96f95215aea576f28a3d53f",
+      "bytesVerified": true,
+      "license": "各COPYING参照",
+      "licenseDocuments": [
+        {
+          "path": "mingw-w64-mingw-w64-a3d9399/COPYING",
+          "bytes": 2326,
+          "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+        },
+        {
+          "path": "mingw-w64-mingw-w64-a3d9399/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+          "bytes": 12155,
+          "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f"
+        },
+        {
+          "path": "mingw-w64-mingw-w64-a3d9399/COPYING.MinGW-w64/COPYING.MinGW-w64.txt",
+          "bytes": 5905,
+          "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+        }
+      ],
+      "fileName": "mingw-w64-a3d93999ef0521681d45e445c39964a7af0f593f.tar.gz"
+    },
+    "llvm-mingw": {
+      "version": "20261006",
+      "url": "https://api.github.com/repos/mstorsjo/llvm-mingw/tarball/20261006",
+      "bytes": 71032,
+      "sha256": "854fa2ae5792e2580a8d59f776c74f4a7be68a40522bb713b06adbb41ba35fce",
+      "bytesVerified": true,
+      "license": "ISC",
+      "licenseDocuments": [
+        {
+          "path": "mstorsjo-llvm-mingw-1719710/LICENSE.txt",
+          "bytes": 1092,
+          "sha256": "8e5db0129069005be2a07be3297e198888fd72fad62a13a611504660c6b7e3c7"
+        }
+      ],
+      "fileName": "llvm-mingw-20261006.tar.gz"
+    }
+  },
+  "runtimeLicenses": [
+    {
+      "component": "compiler/LLVM/Clang",
+      "sourceArchive": "llvm-project",
+      "licensePath": "clang/LICENSE.TXT",
+      "license": "Apache-2.0 WITH LLVM-exception"
+    },
+    {
+      "component": "compiler-rt",
+      "sourceArchive": "llvm-project",
+      "licensePath": "compiler-rt/LICENSE.TXT",
+      "license": "Apache-2.0 WITH LLVM-exception"
+    },
+    {
+      "component": "libc++/libc++abi",
+      "sourceArchive": "llvm-project",
+      "licensePath": "libcxx/LICENSE.TXT + libcxxabi/LICENSE.TXT",
+      "license": "Apache-2.0 WITH LLVM-exception（本文の旧licenseも保持）"
+    },
+    {
+      "component": "libunwind",
+      "sourceArchive": "llvm-project",
+      "licensePath": "libunwind/LICENSE.TXT",
+      "license": "Apache-2.0 WITH LLVM-exception（本文の旧licenseも保持）"
+    },
+    {
+      "component": "MinGW CRT/headers/import libraries",
+      "sourceArchive": "mingw-w64",
+      "licensePath": "COPYING / COPYING.MinGW-w64/COPYING.MinGW-w64.txt / COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+      "license": "各fileの著作権・permissive licenseはCOPYINGを参照。Microsoft UCRT実装DLLを含めない"
+    }
+  ],
+  "microsoftRuntime": {
+    "legalReviewRequired": true,
+    "redistributionApproved": false,
+    "origin": "固定Temurin ZIP由来の49 DLL。OS提供DLLと分離",
+    "facts": [
+      "Visual C++ runtimeの配布にはVisual Studioの利用資格と適用license条項の確認が必要",
+      "UCRTのapp-local配布にはOS別制約があり、Windows 10/11ではsystem UCRTが優先される",
+      "Temurinへの同梱だけを本候補の再配布資格の根拠にしない"
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files?view=msvc-170",
+      "https://learn.microsoft.com/en-us/cpp/windows/universal-crt-deployment?view=msvc-170"
+    ],
+    "unresolved": [
+      "再配布資格と適用Microsoft licenseの法務判断",
+      "noticeとsource提供要否・配布形態の受入"
+    ]
+  }
+}

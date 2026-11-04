@@ -1,7 +1,7 @@
 """PE/manifestの実検査と、OS包装コマンドを隔離した包装入口を検査する。"""
 import importlib.util, json, pathlib, struct, tempfile, unittest
 from unittest.mock import patch
-from native_artifact import BUILD_FLAGS, LINK_FLAGS, LICENSE_PATHS, TOOLCHAIN_SHA256, digest, pe_imports, verify
+from native_artifact import BUILD_FLAGS, LINK_FLAGS, LICENSE_PATHS, TOOLCHAIN_SHA256, WINDOWS_TOOLCHAIN_SHA256, digest, pe_imports, verify
 
 spec = importlib.util.spec_from_file_location('packager', pathlib.Path(__file__).with_name('package-helper.py'))
 packager = importlib.util.module_from_spec(spec); spec.loader.exec_module(packager)
@@ -44,6 +44,12 @@ class NativeArtifactTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'artifact pin'): verify(self.native, self.source, self.build)
         self.native.write_bytes(image()); (self.root / self.manifest['notices'][0]['path']).write_text('changed')
         with self.assertRaisesRegex(RuntimeError, 'notice pin'): verify(self.native, self.source, self.build)
+
+    def test_windows_archive_pin_accepted_and_unknown_pin_rejected(self):
+        self.manifest['toolchainArchiveSha256'] = WINDOWS_TOOLCHAIN_SHA256; self.save()
+        verify(self.native, self.source, self.build)
+        self.manifest['toolchainArchiveSha256'] = '0' * 64; self.save()
+        with self.assertRaisesRegex(RuntimeError, 'toolchain/flags'): verify(self.native, self.source, self.build)
     def test_packaging_binds_native_source_manifest_notices_and_final_bytes(self):
         payload = self.root / 'payload'; payload.mkdir(); (payload / 'guestbridge.py').write_text('fixture')
         bridge = payload / 'guestbridge.py'; (payload / 'payload.json').write_text(json.dumps({'schemaVersion': 1, 'guestBridgeAbi': 1, 'files': [{'path': 'guestbridge.py', 'bytes': bridge.stat().st_size, 'sha256': digest(bridge)}], 'guestBase': {'bridgeSha256': digest(bridge)}}))
