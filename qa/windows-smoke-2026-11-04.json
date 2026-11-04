@@ -1,0 +1,785 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "refs": [
+    91,
+    95
+  ],
+  "issueClosed": false,
+  "baseCommit": "b3dcd07cd451e2a793c9a9eb5075f10c79a0beb5",
+  "branch": "feature/issue-95-windows-smoke",
+  "status": "limited-candidate-smoke-pass-with-network-unverified",
+  "scope": "候補rootfs/rendererとhelper ZIP内のnative PEによる非対話WSLスモーク。正式配布・本番署名・製品host-helper全体の受入ではない",
+  "environment": {
+    "preflight": {
+      "timeUtc": "2026-11-04T08:13:35.989295+00:00",
+      "commands": [
+        {
+          "argv": [
+            "C:/Windows/System32/wsl.exe",
+            "--list",
+            "--verbose"
+          ],
+          "exitCode": 0,
+          "stdout": "  NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2\r\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "C:/Windows/System32/wsl.exe",
+            "--status"
+          ],
+          "exitCode": 0,
+          "stdout": "既定のディストリビューション: MCIcon-82ec446b986db27cff993a27\r\n既定のバージョン: 2\r\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "C:/Windows/System32/wsl.exe",
+            "--version"
+          ],
+          "exitCode": 0,
+          "stdout": "WSL バージョン: 3.0.3.0\r\nカーネル バージョン: 6.18.54.1-1\r\nWSLg バージョン: 1.0.79\r\nMSRDC バージョン: 1.2.7391\r\nDirect3D バージョン: 1.611.1-81528511\r\nDXCore バージョン: 10.0.26100.1-240331-1435.ge-release\r\nWindows バージョン: 10.0.26200.9711\r\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "powershell",
+            "-NoProfile",
+            "-Command",
+            "Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json; Get-CimInstance Win32_ComputerSystem | Select-Object HypervisorPresent,TotalPhysicalMemory | ConvertTo-Json; Get-CimInstance Win32_Processor | Select-Object Name,VirtualizationFirmwareEnabled,SecondLevelAddressTranslationExtensions,VMMonitorModeExtensions | ConvertTo-Json; Get-Volume -DriveLetter H,C | Select-Object DriveLetter,Size,SizeRemaining | ConvertTo-Json"
+          ],
+          "exitCode": 0,
+          "stdout": "{\r\n    \"Caption\":  \"Microsoft Windows 11 Pro\",\r\n    \"Version\":  \"10.0.26200\",\r\n    \"BuildNumber\":  \"26200\",\r\n    \"TotalVisibleMemorySize\":  67031500,\r\n    \"FreePhysicalMemory\":  23397232\r\n}\r\n{\r\n    \"HypervisorPresent\":  true,\r\n    \"TotalPhysicalMemory\":  68640256000\r\n}\r\n{\r\n    \"Name\":  \"AMD Ryzen 7 5700X 8-Core Processor             \",\r\n    \"VirtualizationFirmwareEnabled\":  true,\r\n    \"SecondLevelAddressTranslationExtensions\":  false,\r\n    \"VMMonitorModeExtensions\":  false\r\n}\r\n[\r\n    {\r\n        \"DriveLetter\":  \"C\",\r\n        \"Size\":  998968913920,\r\n        \"SizeRemaining\":  296114196480\r\n    },\r\n    {\r\n        \"DriveLetter\":  \"H\",\r\n        \"Size\":  1000186310656,\r\n        \"SizeRemaining\":  624347561984\r\n    }\r\n]\r\n",
+          "stderr": ""
+        }
+      ]
+    },
+    "guestMemoryBytes": 33617231872,
+    "guestCpus": 16,
+    "hyperVCapabilitiesNote": "HypervisorPresent/VirtualizationFirmwareEnabled=true。稼働中hypervisor下のSLAT/VMMonitorModeのCIM falseを無効化と解釈せず、今回WSL2 import/guest起動も確認"
+  },
+  "inputs": [
+    {
+      "path": "H:\\MCIconGenerator\\worktrees\\milestone-windows-rootfs-c1\\MCIconGenerator\\build\\windows-rootfs\\fixed1\\rootfs.tar.xz",
+      "bytes": 98146824,
+      "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+    },
+    {
+      "path": "H:\\MCIconGenerator\\worktrees\\milestone-windows-helper-e1\\MCIconGenerator\\build\\e1\\renderer-1\\renderer.tar.gz",
+      "bytes": 593385993,
+      "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+    },
+    {
+      "path": "H:\\MCIconGenerator\\worktrees\\milestone-windows-helper-e1\\MCIconGenerator\\build\\e1\\final-1\\MCIconHelper.zip",
+      "bytes": 36029106,
+      "sha256": "efc2c38e735cf359ea751931ce7d2f746e8b082a758cd2f32ea885ad48257ab8"
+    }
+  ],
+  "guestPins": {
+    "format": "tar.xz",
+    "bytes": 98146824,
+    "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5",
+    "bridgeSha256": "508ea9fb5cb33babb98a74a71554419a9353f931c4f2bfccb16b6545f87e90ff",
+    "cpuProbeSha256": "b4fecfd8ca2d20f12e688a32473a123807ecce79fe8bcc0cb8aafa5ce79c2293",
+    "engines": {
+      "/usr/bin/docker": "7ed12b00293d64742419a6601ae97960a367a0ce97c88b06e3278cc0a409557b",
+      "/usr/bin/dockerd": "237b0603cc24496c74433aeb32d70a16931ae7e015f183b8f3c7c7db83c72a5f",
+      "/usr/bin/containerd": "98c9cd5187f7ab79faaaa77b22beb552176ce92c23714c1658f7f2e9e4a3a789",
+      "/usr/bin/runc": "bdce4d45b2dd217491db8a98c8484b161e225ce49c15ebc1ba42077fb7c07d50"
+    }
+  },
+  "checks": {
+    "c": {
+      "passed": true
+    },
+    "a": {
+      "passed": true,
+      "imported": true,
+      "registryAndDefaultVerified": true
+    },
+    "b": {
+      "passed": true,
+      "hello": {
+        "abi": 1,
+        "marker": {
+          "abi": 1,
+          "binding": {
+            "sid": "S-1-5-21-3020062788-2423296556-3861550556-1001",
+            "root": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e",
+            "hostId": "0960f7f0-d21c-456b-93f5-7d1cc05e8aed",
+            "descriptorSha256": "efc2c38e735cf359ea751931ce7d2f746e8b082a758cd2f32ea885ad48257ab8"
+          },
+          "generationOwner": "14ccbe8b-95ee-4bbf-b414-722098b43782"
+        },
+        "bridgeSha256": "508ea9fb5cb33babb98a74a71554419a9353f931c4f2bfccb16b6545f87e90ff",
+        "memoryBytes": 33617231872,
+        "cpus": 16,
+        "boot": "484ce47e-c360-44f1-b5ff-3bcc8b6001ea"
+      }
+    },
+    "d": {
+      "passed": true,
+      "proof": {
+        "abi": 1,
+        "ready": true,
+        "claim": {
+          "stop": null,
+          "identity": {
+            "jobId": "4137536c-314c-41a4-a893-e300e1fda056",
+            "ownerId": "d4c011a0-cc42-4748-83f0-0de015100b89",
+            "descriptorSha256": "efc2c38e735cf359ea751931ce7d2f746e8b082a758cd2f32ea885ad48257ab8"
+          },
+          "keeperAttempt": "a0b2bbfd-9611-4372-8104-285963a5971c"
+        },
+        "marker": {
+          "abi": 1,
+          "binding": {
+            "sid": "S-1-5-21-3020062788-2423296556-3861550556-1001",
+            "root": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e",
+            "hostId": "0960f7f0-d21c-456b-93f5-7d1cc05e8aed",
+            "descriptorSha256": "efc2c38e735cf359ea751931ce7d2f746e8b082a758cd2f32ea885ad48257ab8"
+          },
+          "generationOwner": "14ccbe8b-95ee-4bbf-b414-722098b43782"
+        },
+        "bridgeSha256": "508ea9fb5cb33babb98a74a71554419a9353f931c4f2bfccb16b6545f87e90ff",
+        "boot": "484ce47e-c360-44f1-b5ff-3bcc8b6001ea",
+        "daemon": {
+          "generation": "14ccbe8b-95ee-4bbf-b414-722098b43782",
+          "boot": "484ce47e-c360-44f1-b5ff-3bcc8b6001ea",
+          "pid": 67,
+          "started": "19346613"
+        },
+        "labelVerified": true
+      }
+    },
+    "e": {
+      "passed": true,
+      "loadPassed": true
+    },
+    "f": {
+      "passed": null,
+      "aptLogsBefore": {},
+      "aptLogsAfter": {},
+      "reason": "container network=none、daemon network無効。guest全体の通信遮断・offline製品経路は未確認"
+    },
+    "g": {
+      "passed": true
+    }
+  },
+  "registration": {
+    "guid": "f8c3e9d2-2665-4ea4-8094-643b85defc70",
+    "name": "MCIcon-e2e2e2835f5b1e1f5f481da5",
+    "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\distro",
+    "version": 2
+  },
+  "versions": {
+    "/usr/bin/python3": {
+      "exitCode": 0,
+      "stdout": "Python 3.12.3\n",
+      "stderr": ""
+    },
+    "/usr/bin/docker": {
+      "exitCode": 0,
+      "stdout": "Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2\n",
+      "stderr": ""
+    },
+    "/usr/bin/dockerd": {
+      "exitCode": 0,
+      "stdout": "Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2\n",
+      "stderr": ""
+    },
+    "/usr/bin/containerd": {
+      "exitCode": 0,
+      "stdout": "containerd github.com/containerd/containerd/v2 2.2.1 \n",
+      "stderr": ""
+    },
+    "/usr/bin/runc": {
+      "exitCode": 0,
+      "stdout": "runc version 1.3.4-0ubuntu1~24.04.1\nspec: 1.2.1\ngo: go1.24.4\nlibseccomp: 2.5.5\n",
+      "stderr": ""
+    }
+  },
+  "daemon": {
+    "ServerVersion": "29.1.3",
+    "Driver": "overlayfs",
+    "CgroupDriver": "cgroupfs",
+    "CgroupVersion": "2",
+    "NCPU": 16,
+    "MemTotal": 33617231872,
+    "DockerRootDir": "/var/lib/mcicon/docker",
+    "Warnings": null
+  },
+  "renderer": {
+    "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+    "os": "linux",
+    "architecture": "amd64",
+    "stdout": "name of display: :99\ndisplay: :99  screen: 0\ndirect rendering: Yes\nExtended renderer info (GLX_MESA_query_renderer):\n    Vendor: Mesa (0xffffffff)\n    Device: llvmpipe (LLVM 20.1.2, 128 bits) (0xffffffff)\n    Version: 25.2.8\n    Accelerated: no\n    Video memory: 32059MB\n    Unified memory: yes\n    Preferred profile: core (0x1)\n    Max core profile version: 4.5\n    Max compat profile version: 4.5\n    Max GLES1 profile version: 1.1\n    Max GLES[23] profile version: 3.2\nMemory info (GL_ATI_meminfo):\n    VBO free memory - total: 0 MB, largest block: 0 MB\n    VBO free aux. memory - total: 26709 MB, largest block: 26709 MB\n    Texture free memory - total: 0 MB, largest block: 0 MB\n    Texture free aux. memory - total: 26709 MB, largest block: 26709 MB\n    Renderbuffer free memory - total: 0 MB, largest block: 0 MB\n    Renderbuffer free aux. memory - total: 26709 MB, largest block: 26709 MB\nMemory info (GL_NVX_gpu_memory_info):\n    Dedicated video memory: 0 MB\n    Total available memory: 32059 MB\n    Currently available dedicated video memory: 0 MB\nOpenGL vendor string: Mesa\nOpenGL renderer string: llvmpipe (LLVM 20.1.2, 128 bits)\nOpenGL core profile version string: 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL core profile shading language version string: 4.50\nOpenGL core profile context flags: (none)\nOpenGL core profile profile mask: core profile\n\nOpenGL version string: 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL shading language version string: 4.50\nOpenGL context flags: (none)\nOpenGL profile mask: compatibility profile\n\nOpenGL ES profile version string: OpenGL ES 3.2 Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL ES profile shading language version string: OpenGL ES GLSL ES 3.20\n\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves clzero xsaveerptr arat umip vaes vpclmulqdq rdpid fsrm\n",
+    "stderr": "openjdk version \"1.8.0_504\"\nOpenJDK Runtime Environment (Temurin)(build 1.8.0_504-b01)\nOpenJDK 64-Bit Server VM (Temurin)(build 25.504-b01, mixed mode)\nopenjdk version \"17.0.20.1\" 2026-08-18\nOpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)\nOpenJDK 64-Bit Server VM Temurin-17.0.20.1+1 (build 17.0.20.1+1, mixed mode, sharing)\nopenjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\nopenjdk version \"25.0.4.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS, mixed mode, sharing)\nnativeJob phase=child-signalled childExit=0 active=3 queries=1\r\nnativeJob phase=drain-empty childExit=0 active=3,0 queries=2\r\n",
+    "realGuardExit": 0,
+    "cpuProbeExit": 0,
+    "javaVersionAllFourExit": 0,
+    "networkMode": "none",
+    "pullPolicy": "never",
+    "note": "set -euの単一script内でglxinfo/flags/probe/4 Javaが成功。SSE4.1専用の別CPU受入ではない"
+  },
+  "guestRelease": {
+    "closed": true,
+    "actors": 0,
+    "containers": 0,
+    "identity": {
+      "jobId": "4137536c-314c-41a4-a893-e300e1fda056",
+      "ownerId": "d4c011a0-cc42-4748-83f0-0de015100b89",
+      "descriptorSha256": "efc2c38e735cf359ea751931ce7d2f746e8b082a758cd2f32ea885ad48257ab8"
+    },
+    "keeper": {
+      "attempt": "a0b2bbfd-9611-4372-8104-285963a5971c",
+      "identity": {
+        "jobId": "4137536c-314c-41a4-a893-e300e1fda056",
+        "ownerId": "d4c011a0-cc42-4748-83f0-0de015100b89",
+        "descriptorSha256": "efc2c38e735cf359ea751931ce7d2f746e8b082a758cd2f32ea885ad48257ab8"
+      },
+      "group": "/sys/fs/cgroup/mcicon/14ccbe8b-95ee-4bbf-b414-722098b43782/keepers/4137536c-314c-41a4-a893-e300e1fda056",
+      "boot": "484ce47e-c360-44f1-b5ff-3bcc8b6001ea",
+      "pid": 63,
+      "started": "19346544"
+    }
+  },
+  "nativeCompletions": [
+    {
+      "file": "build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-09f75791-3b35-4e1b-a112-bd194c3f98c3.completion.json",
+      "schema": 1,
+      "client": {
+        "parent": 15880,
+        "parentStarted": 1793780574314,
+        "pid": 55736,
+        "started": 1793780605592,
+        "boot": "88994585-effc-11ee-bdd3-fe1315325ea3"
+      },
+      "phase": "drain-empty",
+      "childKnown": true,
+      "childExit": 0,
+      "plannedGuardExit": 0,
+      "jobEmpty": true,
+      "clientMatched": true
+    },
+    {
+      "file": "build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-63de680c-75ec-4223-98f2-97e76cebe5b1.completion.json",
+      "schema": 1,
+      "client": {
+        "parent": 15880,
+        "parentStarted": 1793780574314,
+        "pid": 4340,
+        "started": 1793780586387,
+        "boot": "88994585-effc-11ee-bdd3-fe1315325ea3"
+      },
+      "phase": "drain-empty",
+      "childKnown": true,
+      "childExit": 0,
+      "plannedGuardExit": 0,
+      "jobEmpty": true,
+      "clientMatched": true
+    },
+    {
+      "file": "build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-7e4c20da-4e81-4d63-b671-759585e85dc3.completion.json",
+      "schema": 1,
+      "client": {
+        "parent": 15880,
+        "parentStarted": 1793780574314,
+        "pid": 62196,
+        "started": 1793780583751,
+        "boot": "88994585-effc-11ee-bdd3-fe1315325ea3",
+        "clientPid": 17176,
+        "clientStarted": 1793780583770,
+        "corePid": 15880,
+        "coreStarted": 1793780574314
+      },
+      "phase": "drain-empty",
+      "childKnown": true,
+      "childExit": 0,
+      "plannedGuardExit": 0,
+      "jobEmpty": true,
+      "clientMatched": true
+    },
+    {
+      "file": "build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-82e0de99-1705-425f-ada9-10e612bb69f3.completion.json",
+      "schema": 1,
+      "client": {
+        "parent": 15880,
+        "parentStarted": 1793780574314,
+        "pid": 16068,
+        "started": 1793780607631,
+        "boot": "88994585-effc-11ee-bdd3-fe1315325ea3"
+      },
+      "phase": "drain-empty",
+      "childKnown": true,
+      "childExit": 0,
+      "plannedGuardExit": 0,
+      "jobEmpty": true,
+      "clientMatched": true
+    },
+    {
+      "file": "build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-c1c4208f-5d3f-4d0a-89ea-115b78fc3a2c.completion.json",
+      "schema": 1,
+      "client": {
+        "parent": 15880,
+        "parentStarted": 1793780574314,
+        "pid": 64440,
+        "started": 1793780610578,
+        "boot": "88994585-effc-11ee-bdd3-fe1315325ea3"
+      },
+      "phase": "drain-empty",
+      "childKnown": true,
+      "childExit": 0,
+      "plannedGuardExit": 0,
+      "jobEmpty": true,
+      "clientMatched": true
+    },
+    {
+      "file": "build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-ce0bb270-d24d-48ef-8351-dd333fe5d472.completion.json",
+      "schema": 1,
+      "client": {
+        "parent": 15880,
+        "parentStarted": 1793780574314,
+        "pid": 29100,
+        "started": 1793780584267,
+        "boot": "88994585-effc-11ee-bdd3-fe1315325ea3"
+      },
+      "phase": "command-empty",
+      "childKnown": true,
+      "childExit": 0,
+      "plannedGuardExit": 0,
+      "jobEmpty": true,
+      "clientMatched": true
+    }
+  ],
+  "cleanup": {
+    "successfulRun": {
+      "registrationAbsent": true,
+      "basePathAbsent": true,
+      "nativeJobs": [
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-c6888ce0-2349-4d12-8e37-069922f5ce7d",
+          "pid": 64664,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-5bd35b49-298f-4bc6-89c2-e4c8117e46d2",
+          "pid": 19472,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-048dea07-e441-4360-88fd-1a18f5ef83a2",
+          "pid": 56232,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-6ef5ea7c-a1fa-4a86-b57b-3bbb9b551623",
+          "pid": 2432,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-0eef7014-f22c-4a8b-ab87-f95e969a933e",
+          "pid": 62068,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-ce0bb270-d24d-48ef-8351-dd333fe5d472",
+          "pid": 29100,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-ea8b5f56-397e-49a1-a19b-aa97ef09384e",
+          "pid": 48048,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-63de680c-75ec-4223-98f2-97e76cebe5b1",
+          "pid": 4340,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-09f75791-3b35-4e1b-a112-bd194c3f98c3",
+          "pid": 55736,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-82e0de99-1705-425f-ada9-10e612bb69f3",
+          "pid": 16068,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-53d085b6-a2dd-426f-b498-bb30cdb381c7",
+          "pid": 63364,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-c1c4208f-5d3f-4d0a-89ea-115b78fc3a2c",
+          "pid": 64440,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-7e4c20da-4e81-4d63-b671-759585e85dc3",
+          "pid": 62196,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\native-3c8cd037-1d21-4be1-aef3-0fb86b7a2bd0",
+          "pid": 47216,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        }
+      ],
+      "existingWslUnchanged": true
+    },
+    "initialAttempt": {
+      "registrationAbsent": true,
+      "basePathAbsent": true,
+      "nativeJobs": [
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\native-166c9523-1744-4cec-be90-bc44bf6f6547",
+          "pid": 63644,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\native-5a953913-0c42-4138-8e2a-7c7a24d29bd0",
+          "pid": 62264,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\native-b33dd75c-578e-4655-bd77-daca1c2455e3",
+          "pid": 65128,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\native-4d3ac1c3-f983-4e06-a2d3-72aba71401f6",
+          "pid": 23292,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\native-a6368995-c78f-4091-8d5f-357d276c91cd",
+          "pid": 41640,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\native-a52ef119-ad2e-4429-a973-f9a77c67d466",
+          "pid": 44004,
+          "exitCode": 125,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\native-b679751e-1292-45ea-aca3-f7bc24669a31",
+          "pid": 20200,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        },
+        {
+          "prefix": "H:\\MCIconGenerator\\worktrees\\milestone-windows-smoke-e2\\MCIconGenerator\\build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\native-118e37c8-031c-4e5f-9528-d6a8c7cb17cf",
+          "pid": 16560,
+          "exitCode": 0,
+          "jobEmptyReceipt": true
+        }
+      ],
+      "existingWslUnchanged": true
+    },
+    "knownActorVerification": {
+      "timeUtc": "2026-11-04T08:24:43.863399+00:00",
+      "knownActors": [
+        {
+          "pid": 16560,
+          "expectedStarted": 1793780435771,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 63644,
+          "expectedStarted": 1793780429827,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 23292,
+          "expectedStarted": 1793780433591,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 62264,
+          "expectedStarted": 1793780432037,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 44004,
+          "expectedStarted": 1793780434404,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 41640,
+          "expectedStarted": 1793780433796,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 65128,
+          "expectedStarted": 1793780433235,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 20200,
+          "expectedStarted": 1793780434090,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 56232,
+          "expectedStarted": 1793780582868,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 55736,
+          "expectedStarted": 1793780605592,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 62068,
+          "expectedStarted": 1793780583455,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 47216,
+          "expectedStarted": 1793780611774,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 63364,
+          "expectedStarted": 1793780610062,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 19472,
+          "expectedStarted": 1793780581688,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 4340,
+          "expectedStarted": 1793780586387,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 2432,
+          "expectedStarted": 1793780583222,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 62196,
+          "expectedStarted": 1793780583751,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 16068,
+          "expectedStarted": 1793780607631,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 64440,
+          "expectedStarted": 1793780610578,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 64664,
+          "expectedStarted": 1793780579573,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 29100,
+          "expectedStarted": 1793780584267,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 48048,
+          "expectedStarted": 1793780585601,
+          "openError": 87,
+          "originalTerminated": true
+        },
+        {
+          "pid": 17176,
+          "expectedStarted": 1793780583770,
+          "openError": 87,
+          "originalTerminated": true
+        }
+      ],
+      "allKnownActorsTerminated": true,
+      "commands": [
+        {
+          "argv": [
+            "C:/Windows/System32/wsl.exe",
+            "--list",
+            "--verbose"
+          ],
+          "exitCode": 0,
+          "stdout": "  NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2\r\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "C:/Windows/System32/wsl.exe",
+            "--status"
+          ],
+          "exitCode": 0,
+          "stdout": "既定のディストリビューション: MCIcon-82ec446b986db27cff993a27\r\n既定のバージョン: 2\r\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "powershell",
+            "-NoProfile",
+            "-Command",
+            "Get-Process -Name 'Docker Desktop','com.docker.backend' -ErrorAction SilentlyContinue | Select-Object Id,ProcessName | ConvertTo-Json"
+          ],
+          "exitCode": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "initialListAndStatusUnchanged": true
+    },
+    "dockerDesktopStarted": false,
+    "dockerDesktopProcessesObserved": 0,
+    "dockerDesktopProcessQueryExit": 1,
+    "dockerDesktopProcessQueryNote": "Get-Processの該当名なしでexit 1、stdout/stderr空。query成功扱いにはしない",
+    "ownGuestImageAndDataRemovedWithDistro": true,
+    "sharedImagesOrCacheChanged": false,
+    "retained": "build/e2内のarchive tar、PE、所有記録、rawログ・QA証拠。distro BasePathは削除"
+  },
+  "priorAttempt": {
+    "run": "build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898",
+    "distro": "mcicon-e2-smoke-90b32f953af64d439d20164832cf7b29",
+    "error": [
+      "daemon-prepare: exit 125"
+    ],
+    "daemonGuestReadyObserved": true,
+    "nativeGuardExit": 125,
+    "cause": "通常execはdaemon spawn後に残るwslhost/conhostを回収して125。製品のexec-bridgeはkeeper本人を照合してcommand-emptyで回収完了できる",
+    "resolution": "専用prefixをMCIcon-e2e2e2+18hexへ合わせ、同じ候補PEのexec-keeper/exec-bridgeを使用。PE/source/WSL設定変更なし",
+    "unknownOrFailureOverwritten": false
+  },
+  "safety": {
+    "existingDistroChanges": false,
+    "defaultChanges": false,
+    "wslConfigOrUpdateOrShutdown": false,
+    "minecraftAcquiredOrExecuted": false,
+    "gameAssetsOrCredentialsAccessed": false,
+    "productionKeysAccessed": false,
+    "signingPerformed": false,
+    "ephemeralSigningKey": "署名経路を呼ばないため鍵生成自体なし。JVM一時鍵も不要",
+    "headless": true,
+    "publishPerformed": false,
+    "ownershipNote": "bindingのdescriptorSha256はQA用helper ZIP SHA。署名descriptor採用ではない。host owner/registry GUID/BasePath/defaultとguest markerを照合"
+  },
+  "unverified": [
+    "実Minecraft描画",
+    "全51版",
+    "未準備host setup",
+    "最小OS/WSL対応範囲とOS警告/SmartScreen",
+    "実reboot/boot差",
+    "guest全体のnetwork無通信とoffline製品経路",
+    "正式配布経路での導入と本番署名",
+    "Java host-helperの署名descriptor/leaseを通す製品全経路",
+    "ACK前死亡/partial import/同時release"
+  ],
+  "validation": {
+    "scriptSafetyTests": {
+      "tests": 4,
+      "passed": 4
+    },
+    "finalScriptSyntax": true,
+    "gitDiffCheck": true,
+    "completionProofsMatched": 6,
+    "allKnownActorsTerminated": true,
+    "note": "実機成功後はdocstring、native起動直後への記録移動、失敗チェックを非zero終了にする判定を修正。guest実行・正常回収の経路変更なし。最終script安全性4テスト・構文成功、実機は再実行していない",
+    "untrackedWhitespaceCheck": true,
+    "review": "公開API/製品sourceを変更せず、SHA・XZ上限・本人だけの削除・Job done/completion・失敗終了を重点確認。過去QAの成功を継承しない"
+  },
+  "artifacts": [
+    {
+      "path": "build\\e2\\preflight.json",
+      "bytes": 4901,
+      "sha256": "853bccbb59d7a21459dcedf4b438f286f139f22d1e060621c9ca189c93201905"
+    },
+    {
+      "path": "build\\e2\\postflight.json",
+      "bytes": 6445,
+      "sha256": "a98499c6d88247a62dc7b7487038db651e60ec8be38c74acae63f96587c4cb1a"
+    },
+    {
+      "path": "build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\result.json",
+      "bytes": 48566,
+      "sha256": "4f13927308377cb6a9bb433cb538b138831b0beb9e6e22735b7ed797139b142c"
+    },
+    {
+      "path": "build\\e2\\d0d9d4e6-a4b0-4fe9-b536-e81503a4343e\\commands.json",
+      "bytes": 101523,
+      "sha256": "c34072b427e5d1e5430407abd2ea9577525e08b4a8a14ade17c9902753667fd8"
+    },
+    {
+      "path": "build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\result.json",
+      "bytes": 31296,
+      "sha256": "59951347e12fc494bfca151d3f9d889e22db291bc5c53e75be97e84ce4046907"
+    },
+    {
+      "path": "build\\e2\\94e0e4f8-fafa-4db8-8c19-6f450703d898\\commands.json",
+      "bytes": 70956,
+      "sha256": "35ed8b4f638ace9857567df32914a8ec528f2ee64b572c2cc624c9811f438c0e"
+    },
+    {
+      "path": "helpers\\windows\\scripts\\smoke-candidate.py",
+      "bytes": 19854,
+      "sha256": "ab2ba165ecb051030b8ac45ae363098c8571192326440b2d558ee599a4e940f3"
+    },
+    {
+      "path": "helpers\\windows\\scripts\\test-smoke-candidate.py",
+      "bytes": 3391,
+      "sha256": "bed06a02527e9822357b0eb1b79b588cb6c6cb750be856633d146ba18a58609c"
+    }
+  ],
+  "commandAuditLogs": [
+    "C:/Users/ryuma/.codex/logs/commands/20261104T082024Z-6a3fd25dfd2f456eb44ee645ffde270f.jsonl",
+    "C:/Users/ryuma/.codex/logs/commands/20261104T082254Z-0186f30e50144e7b92c9ea9c08bc71c3.jsonl",
+    "C:/Users/ryuma/.codex/logs/commands/20261104T082443Z-fd8b9b1728884031a4c5d40ae93f9ed7.jsonl",
+    "C:/Users/ryuma/.codex/logs/commands/20261104T082835Z-375e5665858f4ba6aa3b8bf0ca032106.jsonl"
+  ]
+}
