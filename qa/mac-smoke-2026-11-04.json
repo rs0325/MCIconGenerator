@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "taskId": "milestone-mac-smoke-d2",
+  "repository": "rs0325/MCIconGenerator",
+  "branch": "feature/issue-94-mac-smoke",
+  "baseCommit": "92a69963c0e16907fa811dcb462110c168b5f2f9",
+  "relatedIssues": [
+    91,
+    94
+  ],
+  "status": "STOPPED_OS_PROMPT_NOT_ACCEPTED",
+  "scope": "Mac限定ヘッドレススモーク。正式配布・署名・Minecraft受入ではない。親Issueはcloseしない。",
+  "before": {
+    "os": {
+      "exit": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t15.8.1\nBuildVersion:\t\t24H32\n",
+      "stderr": ""
+    },
+    "arch": "arm64",
+    "memory": {
+      "exit": 0,
+      "stdout": "25769803776\n",
+      "stderr": ""
+    },
+    "vz": {
+      "exit": 0,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    "disk": {
+      "total": 494384795648,
+      "used": 348864720896,
+      "free": 145520074752
+    },
+    "rosettaPaths": {
+      "/Library/Apple/usr/share/rosetta": true,
+      "/Library/Apple/usr/libexec/oah/libRosettaRuntime": true
+    },
+    "limaExists": false,
+    "limaEntries": [],
+    "limactl": null,
+    "virtualizationProcesses": {
+      "exit": 0,
+      "stdout": " 1262 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent\n 1604 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent",
+      "stderr": ""
+    },
+    "workdirExists": false
+  },
+  "after": {
+    "os": {
+      "exit": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t15.8.1\nBuildVersion:\t\t24H32\n",
+      "stderr": ""
+    },
+    "arch": "arm64",
+    "memory": {
+      "exit": 0,
+      "stdout": "25769803776\n",
+      "stderr": ""
+    },
+    "vz": {
+      "exit": 0,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    "disk": {
+      "total": 494384795648,
+      "used": 348729868288,
+      "free": 145654927360
+    },
+    "rosettaPaths": {
+      "/Library/Apple/usr/share/rosetta": true,
+      "/Library/Apple/usr/libexec/oah/libRosettaRuntime": true
+    },
+    "limaExists": false,
+    "limaEntries": [],
+    "limactl": null,
+    "virtualizationProcesses": {
+      "exit": 0,
+      "stdout": " 1262 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent\n 1604 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent",
+      "stderr": ""
+    },
+    "workdirExists": false
+  },
+  "comparison": {
+    "os": true,
+    "arch": true,
+    "memory": true,
+    "vz": true,
+    "rosettaPaths": true,
+    "limaExists": true,
+    "limaEntries": true,
+    "limactl": true,
+    "virtualizationProcesses": true,
+    "workdirExists": true
+  },
+  "processFilterLimit": "最初のcomm部分一致のutmはInputMethodKit/TextInputMenuAgentにも一致した。両時点の同じ2行を保存。実際のLima/QEMU/VZ/Colima/Docker/UTMプロセスは観測なし。最終的にD2 pathを全command引数でも検索し残存0。",
+  "existingLimaList": "前後とも~/.lima不存在、PATHのlimactl無し。既存領域の生成を避けlistは実行せず、不存在を一覧相当の観測とした。",
+  "rosetta": "ホストの2path存在を確認。VZ API availabilityとguest内変換実行は未確認。導入操作なし。",
+  "inputs": [
+    {
+      "name": "base.img",
+      "bytes": 620224512,
+      "sha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55"
+    },
+    {
+      "name": "base.manifest",
+      "bytes": 21147,
+      "sha256": "be8373ae3b3be49905c1e9984196196cc9148c6437ec96a735e90428ee8b8ac6"
+    },
+    {
+      "name": "containerd_2.2.1-0ubuntu1~24.04.3_arm64.deb",
+      "bytes": 25160084,
+      "sha256": "e12495f100f025750ca91c07bab3a58c674afb1576fe55516608a8daa4d067bd"
+    },
+    {
+      "name": "docker.io_29.1.3-0ubuntu3~24.04.2_arm64.deb",
+      "bytes": 32026672,
+      "sha256": "fb0b4f8f4738d3d610b511f50808abd49376ee715a81364e7dbd8a2c60c580d6"
+    },
+    {
+      "name": "lima-source.tar.gz",
+      "bytes": 7887831,
+      "sha256": "d551efb52115ba006c1052d5c929e4d3afac363c78c9cfca6975af1f85c1426a"
+    },
+    {
+      "name": "lima.tar.gz",
+      "bytes": 38328082,
+      "sha256": "9e9eacce88f37e185c346bad73aa6136f738d8cdf8c3bb23cd42b071824bc66e"
+    },
+    {
+      "name": "runc_1.3.4-0ubuntu1~24.04.1_arm64.deb",
+      "bytes": 8578418,
+      "sha256": "725a27bbdd5f58d7059ed25d88f14f2d45f6a1ce089585eddc715e04d4a3f79f"
+    },
+    {
+      "name": "renderer.tar.gz",
+      "bytes": 593385993,
+      "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+    }
+  ],
+  "helperArchive": {
+    "bytes": 125853872,
+    "sha256": "2466ed0ea8447e735d7384faf2c4c98abb996158742c60fc4b9a38cbd9c2dca4"
+  },
+  "helperCandidate": {
+    "method": "D1保全transfer/maven/asm/deb-documentsを読み取り転送。最新origin/mainをgit archiveしD1手順のoffline installDist/test、payload、jlink/jpackage、packaging検証を1回実行。",
+    "fileCount": 196,
+    "unpackedBytes": 206610229,
+    "buildSeconds": 14.053,
+    "packageSeconds": 29.441,
+    "differencesFromD1": [
+      {
+        "path": "Contents/MacOS/MCIconHelper",
+        "before": {
+          "path": "Contents/MacOS/MCIconHelper",
+          "bytes": 178176,
+          "sha256": "4445fad52e197fcfdcc3509e9dcf22862153ff7a0dfedc1bc1f0a8254771c972",
+          "mode": "0o755"
+        },
+        "after": {
+          "path": "Contents/MacOS/MCIconHelper",
+          "bytes": 178176,
+          "sha256": "cd3836eff33fabcbff466f105ff193d132ee65396e56496a945ce6cc54323cbe",
+          "mode": "0o755"
+        }
+      },
+      {
+        "path": "Contents/_CodeSignature/CodeResources",
+        "before": {
+          "path": "Contents/_CodeSignature/CodeResources",
+          "bytes": 35134,
+          "sha256": "0b19e4a7c2de1f32153aff004660bd9fed3a3504f758806e9af9ea2cb696fc31",
+          "mode": "0o644"
+        },
+        "after": {
+          "path": "Contents/_CodeSignature/CodeResources",
+          "bytes": 35134,
+          "sha256": "49e97468cb54491bc3c8d123d068b6a319db2fff22da9b6da3b2dfeaf91fb166",
+          "mode": "0o644"
+        }
+      },
+      {
+        "path": "Contents/app/support/licenses/mcicon/LICENSE",
+        "before": {
+          "path": "Contents/app/support/licenses/mcicon/LICENSE",
+          "bytes": 1085,
+          "sha256": "e5d10a9495452177d62e2559ecfb08313997b937ce581192c84580a5c67219e9",
+          "mode": "0o644"
+        },
+        "after": {
+          "path": "Contents/app/support/licenses/mcicon/LICENSE",
+          "bytes": 1106,
+          "sha256": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691",
+          "mode": "0o644"
+        }
+      }
+    ],
+    "exactD1Bytes": false,
+    "differenceLimit": "D1に対してLICENSE本文/launcher/sealの3fileが異なる。今回archiveをD1の48ddab0f…候補そのものとは扱わない。全差分原因の確定は未実施。"
+  },
+  "rendererReproduction": {
+    "rawSha256": "6e63f160f2e3d15af3b088485739b21a076cf8672a9b02dc5600299d6daa1fe1",
+    "tarSha256": "b82f097689841b8272b493a2f3d4250f72861801aa0af3ccfef749698fff7785",
+    "tarGzSha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+    "bytes": 593385993,
+    "method": "E1保全docker-saveを既存normalizeと同一gzip設定で再包装。docker save自体は今回再実行していない"
+  },
+  "a": {
+    "status": "PARTIAL_STOPPED",
+    "observation": "移動後/ZIP再展開後の最終helper launcherはinvalid lease拒否のJSONまで到達。host-probe/process-guardはcompileのみで実行していない。同梱limactl --helpは20秒timeout。OSログに許可待ちprompt。"
+  },
+  "b": {
+    "status": "NOT_RUN",
+    "reason": "OS prompt停止条件。LIMA_HOMEもVMも未作成。"
+  },
+  "c": {
+    "status": "NOT_RUN",
+    "reason": "guest未起動。offline debのSHA/packaging照合のみ。"
+  },
+  "d": {
+    "status": "NOT_RUN",
+    "reason": "renderer再生成/固定SHA照合/転送まで。guestのdocker load、GLX、SSE4.1、Java8/17/21/25は未実行。"
+  },
+  "e": {
+    "status": "PASS_NO_VM_CREATED",
+    "observation": "証跡回収後に専用path削除。VM作成・停止・削除操作なし。既存状態一致、D2 pathを参照する残存command 0。"
+  },
+  "gate": {
+    "firstLimactlAttempt": "2026-11-04T17:38:54+09:00",
+    "timeoutSeconds": 20,
+    "osLog": {
+      "exit": 0,
+      "stdout": "Timestamp               Ty Process[PID:TID]\n2026-11-04 17:38:54.527 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/package-1/image/MCIconHelper.app/Contents/app/support/bin/limactl not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/package-1/image/MCIconHelper.app/Contents/app/support/bin/limactl, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:55.020 Df syspolicyd[690:3b4e0af] [com.apple.syspolicy.exec:default] GK evaluateScanResult: 3, PST: (path: d8451713d4ae0bd3), (team: JCDTMS22B4), (id: SigningServlet-5100274568309274513-unsigned_jpackageapplauncher), (bundle_id: io.github.rs0325.mcicon.helper.macos), 0, 0, 1, 0, 8, 4, 0\n2026-11-04 17:38:55.020 Df syspolicyd[690:3b4e0af] [com.apple.syspolicy.exec:default] Prompt shown (1, 0), waiting for response: PST: (path: d8451713d4ae0bd3), (team: JCDTMS22B4), (id: SigningServlet-5100274568309274513-unsigned_jpackageapplauncher), (bundle_id: io.github.rs0325.mcicon.helper.macos)\n2026-11-04 17:38:55.021 A  CoreServicesUIAgent[24595:3b4ca26] present code-evaluation prompt\n2026-11-04 17:38:56.252 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/MacOS/MCIconHelper not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/relocated%20with%20space/MCIconHelper.app/Contents/MacOS/MCIconHelper, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:56.804 Df syspolicyd[690:3b4e0be] [com.apple.syspolicy.exec:default] GK evaluateScanResult: 2, PST: (path: ceff2a3e5c78462), (team: (null)), (id: io.github.rs0325.mcicon.helper.macos), (bundle_id: io.github.rs0325.mcicon.helper.macos), 0, 0, 1, 0, 0, 0, 0\n2026-11-04 17:38:56.816 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjli.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/relocated%20with%20space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjli.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:56.819 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/server/libjvm.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/relocated%20with%20space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/server/libjvm.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:56.834 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjimage.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/relocated%20with%20space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjimage.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:56.836 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjava.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/relocated%20with%20space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjava.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:56.866 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnio.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/relocated%20with%20space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnio.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:56.866 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnet.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/relocated%20with%20space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnet.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:56.870 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libzip.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/relocated%20with%20space/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libzip.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:38:59.819 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/MacOS/MCIconHelper not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/MacOS/MCIconHelper, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:39:00.337 Df syspolicyd[690:3b4e384] [com.apple.syspolicy.exec:default] GK evaluateScanResult: 2, PST: (path: 2111aefb9bf2ce83), (team: (null)), (id: io.github.rs0325.mcicon.helper.macos), (bundle_id: io.github.rs0325.mcicon.helper.macos), 0, 0, 1, 0, 0, 0, 0\n2026-11-04 17:39:00.351 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjli.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjli.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:39:00.354 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/server/libjvm.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/server/libjvm.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:39:00.368 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjimage.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjimage.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:39:00.372 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjava.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjava.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:39:00.405 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnio.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnio.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:39:00.405 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnet.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnet.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n2026-11-04 17:39:00.409 Df amfid[26400:3b4734b] /Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libzip.dylib not valid: Error Domain=AppleMobileFileIntegrityError Code=-423 \"The file is adhoc signed or signed by an unknown certificate chain\" UserInfo={NSURL=file:///Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/runtime/Contents/Home/lib/libzip.dylib, NSLocalizedDescription=The file is adhoc signed or signed by an unknown certificate chain}\n",
+      "stderr": ""
+    },
+    "evidence": "17:38:55.020 syspolicyd: Prompt shown (1, 0), waiting for response。17:38:55.021 CoreServicesUIAgent: present code-evaluation prompt。",
+    "procedureError": "packagingを非同期実行中にlimactl --helpを開始した。最終tree完成前の起動と重なるため、最終候補がブロックされた証明ではない。",
+    "decision": "promptをログで確認した時点で追加候補起動を停止。OS許可操作・再試行なし。",
+    "quarantine": "観測時のlimactl xattr -lはexit0/空。quarantine追加・除去なし。",
+    "uiState": "GUI操作・目視・応答は行っていない。OS管理promptが終了したかは未確認で、既存OSプロセスを停止していない。"
+  },
+  "tests": {
+    "macos": [
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.CacheStateTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.CommandsTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.HostFactsTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "1"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.LeaseReferencesTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.MacRuntimeTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.OperationJournalTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.RebootRecoveryTest",
+        "tests": "13",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "total": 45,
+    "passed": 44,
+    "skipped": 1,
+    "failed": 0,
+    "skipReason": "実host-probe保存stdout未指定。",
+    "packaging": {
+      "status": "packaging-fixture-only-no-vm",
+      "records": [
+        {
+          "name": "relocated-TMP-only",
+          "argv": [
+            "/Users/ryuman/tmp-mcicon-d2/verify-1/relocated with space/MCIconHelper.app/Contents/MacOS/MCIconHelper",
+            "--protocol",
+            "1",
+            "--root",
+            "/Users/ryuman/tmp-mcicon-d2/verify-1/relocated-TMP-only-root",
+            "--lease",
+            "/Users/ryuman/tmp-mcicon-d2/verify-1/relocated-TMP-only-root/jobs/00000000-0000-0000-0000-000000000001/lease.json",
+            "preflight"
+          ],
+          "environment": {
+            "TMP": "/Users/ryuman/tmp-mcicon-d2/verify-1/relocated-TMP-only-tmp",
+            "TEMP": "/Users/ryuman/tmp-mcicon-d2/verify-1/relocated-TMP-only-tmp",
+            "TMPDIR": "/Users/ryuman/tmp-mcicon-d2/verify-1/relocated-TMP-only-tmp"
+          },
+          "exit": 1,
+          "stdoutSha256": "ef6cec059e6271bb7bf087c146898fc6806a2ec90c80ee974eafc4b4c314e802",
+          "scope": "invalid-lease-only-no-vm"
+        },
+        {
+          "name": "tree-tamper-rejected",
+          "path": "Contents/app/helper-common-1.1.0.jar"
+        },
+        {
+          "name": "tree-tamper-rejected",
+          "path": "Contents/runtime/Contents/Home/lib/modules"
+        },
+        {
+          "name": "tree-tamper-rejected",
+          "path": "Contents/app/MCIconHelper.cfg"
+        },
+        {
+          "name": "tree-link-rejected"
+        },
+        {
+          "name": "zip-owner-executable",
+          "argv": [
+            "/Users/ryuman/tmp-mcicon-d2/verify-1/roundtrip/MCIconHelper.app/Contents/MacOS/MCIconHelper",
+            "--protocol",
+            "1",
+            "--root",
+            "/Users/ryuman/tmp-mcicon-d2/verify-1/zip-owner-executable-root",
+            "--lease",
+            "/Users/ryuman/tmp-mcicon-d2/verify-1/zip-owner-executable-root/jobs/00000000-0000-0000-0000-000000000001/lease.json",
+            "preflight"
+          ],
+          "environment": {
+            "TMP": "/Users/ryuman/tmp-mcicon-d2/verify-1/zip-owner-executable-tmp",
+            "TEMP": "/Users/ryuman/tmp-mcicon-d2/verify-1/zip-owner-executable-tmp",
+            "TMPDIR": "/Users/ryuman/tmp-mcicon-d2/verify-1/zip-owner-executable-tmp"
+          },
+          "exit": 1,
+          "stdoutSha256": "ef6cec059e6271bb7bf087c146898fc6806a2ec90c80ee974eafc4b4c314e802",
+          "scope": "invalid-lease-only-no-vm"
+        }
+      ],
+      "archive": {
+        "bytes": 125853872,
+        "sha256": "2466ed0ea8447e735d7384faf2c4c98abb996158742c60fc4b9a38cbd9c2dca4"
+      },
+      "limits": [
+        "本scriptのtree改変拒否はcore RuntimeGeneration受入の代替ではない",
+        "実VM/daemon/Intel/OS下限/隔離属性/DeveloperID/notarizationは未受入"
+      ]
+    },
+    "rendererExportTests": {
+      "passed": 2,
+      "exit": 0
+    },
+    "diffCheck": "検証記録はbuild/d2/validation.jsonを参照。"
+  },
+  "cleanup": {
+    "workdirAbsent": true,
+    "ownedProcesses": [],
+    "vmCreated": false,
+    "vmStoppedOrDeleted": "VM未作成のため対象なし"
+  },
+  "finalProcesses": {
+    "ownedCommandLines": [],
+    "workdirAbsent": true
+  },
+  "notPerformed": [
+    "Minecraft取得/実行",
+    "sudo",
+    "Homebrew install/既存VM操作",
+    "OS/ネットワーク/キーチェーン設定変更",
+    "quarantine削除/Gatekeeper回避",
+    "鍵・認証探索",
+    "commit/push/PR/release/Issue close"
+  ],
+  "unverified": [
+    "最終候補の逐次初回起動とhost-probe/process-guard",
+    "VZ arm64 guest起動",
+    "offline deb導入/daemon",
+    "Rosetta guest内変換",
+    "amd64 renderer load/Xvfb/GLX/llvmpipe/SSE4.1/Java4系統",
+    "guest全体の無通信",
+    "実Minecraft描画",
+    "全51版",
+    "OS警告の正式配布経路",
+    "実reboot",
+    "Homebrew実install",
+    "正式署名なし配布の更新後起動"
+  ],
+  "remaining": "D2未受入。OS promptが発生したため現在の許可範囲では再試行しない。対話が不要な候補/許可経路と再実行方針をメインで確定し、build完了を待ってから別の新規専用領域で逐次実行する。OS警告の正式配布受入は別gate。",
+  "localEvidence": "build/d2/evidence.tar、evidence/、各SSH stdout/stderr、renderer/、runners/。認証情報を含むファイルは回収していない。",
+  "domainKnowledge": "新規・変更のドメイン知識なし。外部知識保存は更新しない。"
+}
