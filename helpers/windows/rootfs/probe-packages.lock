@@ -1,0 +1,8 @@
+binutils=2.42-4ubuntu2.10
+binutils-common:amd64=2.42-4ubuntu2.10
+binutils-x86-64-linux-gnu=2.42-4ubuntu2.10
+libbinutils:amd64=2.42-4ubuntu2.10
+libctf-nobfd0:amd64=2.42-4ubuntu2.10
+libctf0:amd64=2.42-4ubuntu2.10
+libgprofng0:amd64=2.42-4ubuntu2.10
+libsframe1:amd64=2.42-4ubuntu2.10
