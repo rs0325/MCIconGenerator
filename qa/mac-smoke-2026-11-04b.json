@@ -1,0 +1,629 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "taskId": "milestone-mac-smoke-d2b",
+  "repository": "rs0325/MCIconGenerator",
+  "branch": "feature/issue-94-mac-smoke-2",
+  "baseCommit": "17ab285537f5b4e943868f7433bd422f8fcdc9f8",
+  "relatedIssues": [
+    91,
+    94
+  ],
+  "status": "PASS_LIMITED_SMOKE",
+  "scope": "専用領域の候補資材スモークa〜eのみ。正式配布・Minecraft・製品全体の受入ではない。親Issueはcloseしない。",
+  "before": {
+    "os": {
+      "exit": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t15.8.1\nBuildVersion:\t\t24H32\n",
+      "stderr": ""
+    },
+    "arch": "arm64",
+    "memory": {
+      "exit": 0,
+      "stdout": "25769803776\n",
+      "stderr": ""
+    },
+    "vz": {
+      "exit": 0,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    "disk": {
+      "total": 494384795648,
+      "used": 350293143552,
+      "free": 144091652096
+    },
+    "rosettaPaths": {
+      "/Library/Apple/usr/share/rosetta": true,
+      "/Library/Apple/usr/libexec/oah/libRosettaRuntime": true
+    },
+    "limaExists": false,
+    "limaEntries": [],
+    "limactl": null,
+    "virtualizationProcesses": {
+      "exit": 0,
+      "stdout": " 1262 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent\n 1604 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent",
+      "stderr": ""
+    },
+    "workdirExists": false
+  },
+  "after": {
+    "os": {
+      "exit": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t15.8.1\nBuildVersion:\t\t24H32\n",
+      "stderr": ""
+    },
+    "arch": "arm64",
+    "memory": {
+      "exit": 0,
+      "stdout": "25769803776\n",
+      "stderr": ""
+    },
+    "vz": {
+      "exit": 0,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    "disk": {
+      "total": 494384795648,
+      "used": 350587371520,
+      "free": 143797424128
+    },
+    "rosettaPaths": {
+      "/Library/Apple/usr/share/rosetta": true,
+      "/Library/Apple/usr/libexec/oah/libRosettaRuntime": true
+    },
+    "limaExists": false,
+    "limaEntries": [],
+    "limactl": null,
+    "virtualizationProcesses": {
+      "exit": 0,
+      "stdout": " 1262 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent\n 1604 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent",
+      "stderr": ""
+    },
+    "workdirExists": false
+  },
+  "existingStateComparison": {
+    "keys": [
+      "limaExists",
+      "limaEntries",
+      "limactl",
+      "virtualizationProcesses",
+      "rosettaPaths"
+    ],
+    "unchanged": true,
+    "scope": "~/.limaの存在・一覧、PATHのlimactl、仮想化候補processのPID/実行file名、Rosetta既知pathの存在。既存領域の内容や認証情報は探索しない。",
+    "processFalsePositives": "utm部分一致のInputMethodKit/TextInputMenuAgentはVMではない。",
+    "diskFreeDeltaBytes": -294227968,
+    "diskNote": "空き容量は前後で変動した。同一と判定した対象にdisk量を含めない。"
+  },
+  "isolation": {
+    "macWorkdir": "/Users/ryuman/tmp-mcicon-d2b",
+    "limaHome": "/Users/ryuman/tmp-mcicon-d2b/l",
+    "homeTmpCaches": "専用領域内。既存JDK21とApple toolchainは読み取り利用。",
+    "sequential": true,
+    "hostSudoUsed": false,
+    "guiUsed": false,
+    "securityBypassUsed": false,
+    "remoteDownloadsPerformed": false,
+    "guestNetworkFullyAudited": false
+  },
+  "quarantineInvestigation": {
+    "status": "今回の経路でquarantine/provenance付与なし。前回の発生源は未特定。",
+    "stages": [
+      {
+        "name": "scp転送直後",
+        "operation": "D1保全済み公式入力・offline依存・git archiveをscp転送",
+        "xattrRecursiveOutput": "",
+        "quarantine": false,
+        "provenance": false
+      },
+      {
+        "name": "展開後",
+        "operation": "Python3.12 tarfile.extractall(filter=data)",
+        "xattrRecursiveOutput": "",
+        "quarantine": false,
+        "provenance": false
+      },
+      {
+        "name": "build/包装後・候補起動前",
+        "operation": "offline installDist/test → prepare-payload.py → package-helper.py",
+        "quarantine": false,
+        "provenance": false,
+        "attributes": [
+          {
+            "path": "package-1/image/MCIconHelper.app/Contents/app/support/offline/cpu-probe",
+            "name": "com.apple.cs.CodeDirectory",
+            "hex": "FADE0C020000009F00020100000000020000008B0000003000000002000000010000101F1401000000000000000000006370752D70726F62652D62383437633034653332366634666430393564333533366435633231633936306165313061656266003A75F6DB058529148E14DD7EA1B4729CC09EC9730000000000000000000000000000000000000000B847C04E326F4FD095D3536D5C21C960AE10AEBF"
+          },
+          {
+            "path": "package-1/image/MCIconHelper.app/Contents/app/support/offline/cpu-probe",
+            "name": "com.apple.cs.CodeRequirements",
+            "hex": "FADE0C010000000C00000000"
+          },
+          {
+            "path": "package-1/image/MCIconHelper.app/Contents/app/support/offline/cpu-probe",
+            "name": "com.apple.cs.CodeRequirements-1",
+            "hex": "FADE0C02000000C30002010000000002000000A30000003000000002000000010000101F2002000000000000000000006370752D70726F62652D6238343763303465333236663466643039356433353336643563323163393630616531306165626600987920904EAB650E75788C054AA0B0524E6A80BFC71AA32DF8D237A61743F9860000000000000000000000000000000000000000000000000000000000000000328293CCB19B77E6AB66891477036D9AF226C5A0C952FD8F2EFCC57ED80DFCE6"
+          },
+          {
+            "path": "package-1/image/MCIconHelper.app/Contents/app/support/offline/cpu-probe",
+            "name": "com.apple.cs.CodeSignature",
+            "hex": ""
+          }
+        ],
+        "note": "cpu-probe上のcom.apple.cs.* 4属性を包装工程後に初観測。署名呼出しごとの単独切り分けは未実施。"
+      },
+      {
+        "name": "移動・ZIP展開後",
+        "operation": "既存verify-packaging.py。Python zipfile展開とowner実行bit復元",
+        "xattrRecursiveOutput": "",
+        "quarantine": false,
+        "provenance": false
+      },
+      {
+        "name": "renderer-sha",
+        "bytes": 593385993,
+        "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "xattr": ""
+      }
+    ],
+    "previousUserObservation": "前回ユーザーがMac画面で「MCIconHelperは壊れているため開けません。ゴミ箱に入れる必要があります。ダウンロード日は不明」と確認しキャンセル済み。",
+    "previousCauseUnconfirmed": "当該appの属性実測がないため、quarantine起因・どの操作で付与されたか・前回limactlのsyspolicyd promptとの同一性は未確定。",
+    "notExercised": [
+      "ブラウザ経由取得",
+      "Mac curl取得",
+      "Finder/Archive Utility展開",
+      "正式配布URL/署名/公証経路"
+    ],
+    "recordingRecovery": "xattr -lrのbinary値をUTF-8文字列として読む処理が失敗。raw bytes・backslashreplace・xattr -pxに変更し、再取得して保全。属性削除・変更なし。"
+  },
+  "acceptance": {
+    "a": {
+      "status": "PASS_LIMITED",
+      "scope": "helperはinvalid lease拒否まで、probe/guard実行とlimactl help。正規leaseによるhelper管理VM一連操作ではない。",
+      "hostFacts": {
+        "arch": "aarch64",
+        "cpus": 10,
+        "osVersion": "15.8.1",
+        "physicalMemory": 25769803776,
+        "rosetta": "installed",
+        "uid": 501,
+        "vz": true
+      },
+      "records": [
+        {
+          "name": "helper",
+          "pid": 31211,
+          "start": "2026-11-04 19:46:09",
+          "argv": [
+            "/Users/ryuman/tmp-mcicon-d2b/package-1/image/MCIconHelper.app/Contents/MacOS/MCIconHelper",
+            "--protocol",
+            "1",
+            "--root",
+            "/Users/ryuman/tmp-mcicon-d2b/native-root",
+            "--lease",
+            "/Users/ryuman/tmp-mcicon-d2b/native-root/jobs/00000000-0000-0000-0000-000000000001/lease.json",
+            "preflight"
+          ],
+          "timeout": false,
+          "exit": 1,
+          "stderr": "",
+          "reaped": true,
+          "osLogExit": 0,
+          "promptLines": [],
+          "blocked": false
+        },
+        {
+          "name": "host-probe",
+          "pid": 31216,
+          "start": "2026-11-04 19:46:11",
+          "argv": [
+            "/Users/ryuman/tmp-mcicon-d2b/package-1/image/MCIconHelper.app/Contents/app/support/host-probe",
+            "--host-salt",
+            "00000000-0000-0000-0000-000000000001"
+          ],
+          "timeout": false,
+          "exit": 0,
+          "stderr": "",
+          "reaped": true,
+          "osLogExit": 0,
+          "promptLines": [],
+          "blocked": false
+        },
+        {
+          "name": "process-guard",
+          "pid": 31218,
+          "start": "2026-11-04 19:46:11",
+          "argv": [
+            "/Users/ryuman/tmp-mcicon-d2b/package-1/image/MCIconHelper.app/Contents/app/support/process-guard",
+            "--completion",
+            "/Users/ryuman/tmp-mcicon-d2b/guard-complete",
+            "--intent-sha",
+            "0000000000000000000000000000000000000000000000000000000000000000",
+            "--",
+            "/usr/bin/true"
+          ],
+          "timeout": false,
+          "exit": 0,
+          "stderr": "",
+          "reaped": true,
+          "osLogExit": 0,
+          "promptLines": [],
+          "blocked": false
+        },
+        {
+          "name": "limactl-help",
+          "pid": 31222,
+          "start": "2026-11-04 19:46:12",
+          "argv": [
+            "/Users/ryuman/tmp-mcicon-d2b/package-1/image/MCIconHelper.app/Contents/app/support/bin/limactl",
+            "--help"
+          ],
+          "timeout": false,
+          "exit": 0,
+          "stderr": "",
+          "reaped": true,
+          "osLogExit": 0,
+          "promptLines": [],
+          "blocked": false
+        }
+      ]
+    },
+    "b": {
+      "status": "PASS",
+      "vmType": "vz",
+      "arch": "aarch64",
+      "guest": {
+        "name": "guest",
+        "exit": 0,
+        "stdout": "aarch64\nPRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\ncontainerd\t2.2.1-0ubuntu1~24.04.3\ndocker.io\t29.1.3-0ubuntu3~24.04.2\nrunc\t1.3.4-0ubuntu1~24.04.1\nactive\nactive\nenabled\ninterpreter /mnt/lima-rosetta/rosetta\nflags: OCF\noffset 0\nmagic 7f454c4602010100000000000000000002003e00\nmask fffffffffffefe00fffffffffffffffffeffffff\n",
+        "stderr": ""
+      },
+      "cpus": 4,
+      "memoryBytes": 9663676416,
+      "diskBytes": 25769803776,
+      "baseSha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+      "start": {
+        "argv": [
+          "/Users/ryuman/tmp-mcicon-d2b/package-1/image/MCIconHelper.app/Contents/app/support/bin/limactl",
+          "start",
+          "--tty=false",
+          "--name=v",
+          "/Users/ryuman/tmp-mcicon-d2b/v.yaml"
+        ],
+        "pid": 31242,
+        "exit": 0,
+        "timeout": false,
+        "reaped": true,
+        "start": "2026-11-04 19:47:00",
+        "promptLines": []
+      },
+      "configurationYaml": "minimumLimaVersion: 2.2.1\nbase: []\nvmType: vz\narch: aarch64\ncpus: 4\nmemory: 9GiB\ndisk: 24GiB\nimages:\n- location: \"/Users/ryuman/tmp-mcicon-d2b/inputs/base.img\"\n  arch: aarch64\n  digest: sha256:1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55\nvmOpts:\n  vz:\n    rosetta:\n      enabled: true\n      binfmt: true\nmountType: virtiofs\nmounts:\n- location: \"/Users/ryuman/tmp-mcicon-d2b/package-1/image/MCIconHelper.app/Contents/app/support/offline\"\n  mountPoint: /mcicon/offline\n  writable: false\ncontainerd:\n  system: false\n  user: false\nssh:\n  loadDotSSHPubKeys: false\n  forwardAgent: false\n  forwardX11: false\npropagateProxyEnv: false\nupgradePackages: false\nprovision:\n- mode: dependency\n  skipDefaultDependencyResolution: true\n  script: |\n    #!/bin/sh\n    exit 0\n- mode: system\n  script: |\n    #!/bin/sh\n    set -eu\n    export DEBIAN_FRONTEND=noninteractive\n    dpkg -i /mcicon/offline/debs/runc.deb /mcicon/offline/debs/containerd.deb /mcicon/offline/debs/docker.io.deb\n    usermod -aG docker ryuman\n    systemctl enable --now containerd docker\n    dpkg-query -W runc containerd docker.io > /var/tmp/mcicon-d2b-packages\n    systemctl is-active containerd docker > /var/tmp/mcicon-d2b-daemons\n"
+    },
+    "c": {
+      "status": "PASS",
+      "source": "D1 pinとprepare-payload.pyで照合済みの3debのみ。guest system provisionでdpkg -iとdaemon起動。",
+      "packages": {
+        "runc": "1.3.4-0ubuntu1~24.04.1",
+        "containerd": "2.2.1-0ubuntu1~24.04.3",
+        "docker.io": "29.1.3-0ubuntu3~24.04.2"
+      },
+      "containerd": "active",
+      "docker": "active",
+      "permissionRecovery": {
+        "exit": 0,
+        "stdout": "docker:x:111:ryuman\nuid=501(ryuman) gid=1000(ryuman) groups=1000(ryuman),999(systemd-journal),111(docker)\n660 root docker\n29.1.3\n",
+        "stderr": ""
+      },
+      "note": "Docker socket 660 root:docker。guestユーザーへdocker groupを付与し、sg dockerで既存セッションへ適用。socket modeやhost権限は変更しない。"
+    },
+    "d": {
+      "status": "PASS",
+      "renderer": {
+        "rawSha256": "6e63f160f2e3d15af3b088485739b21a076cf8672a9b02dc5600299d6daa1fe1",
+        "tarSha256": "b82f097689841b8272b493a2f3d4250f72861801aa0af3ccfef749698fff7785",
+        "tarGzSha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "bytes": 593385993,
+        "method": "E1保全docker-saveを既存normalizeと同一gzip設定で再包装。docker save自体は今回再実行していない"
+      },
+      "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+      "platform": "linux/amd64",
+      "rosettaBinfmt": "enabled /mnt/lima-rosetta/rosetta flags OCF",
+      "records": [
+        {
+          "name": "guest-groups",
+          "exit": 0,
+          "stdout": "uid=501(ryuman) gid=111(docker) groups=111(docker),999(systemd-journal),1000(ryuman)\n",
+          "stderr": ""
+        },
+        {
+          "name": "load",
+          "exit": 0,
+          "stdout": "Loaded image ID: sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc\n",
+          "stderr": ""
+        },
+        {
+          "name": "inspect",
+          "exit": 0,
+          "stdout": "linux/amd64 sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc\n",
+          "stderr": ""
+        },
+        {
+          "name": "sse41",
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "name": "java-8",
+          "exit": 0,
+          "stdout": "",
+          "stderr": "openjdk version \"1.8.0_504\"\nOpenJDK Runtime Environment (Temurin)(build 1.8.0_504-b01)\nOpenJDK 64-Bit Server VM (Temurin)(build 25.504-b01, mixed mode)\n"
+        },
+        {
+          "name": "java-17",
+          "exit": 0,
+          "stdout": "",
+          "stderr": "openjdk version \"17.0.20.1\" 2026-08-18\nOpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)\nOpenJDK 64-Bit Server VM Temurin-17.0.20.1+1 (build 17.0.20.1+1, mixed mode, sharing)\n"
+        },
+        {
+          "name": "java-21",
+          "exit": 0,
+          "stdout": "",
+          "stderr": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n"
+        },
+        {
+          "name": "java-25",
+          "exit": 0,
+          "stdout": "",
+          "stderr": "openjdk version \"25.0.4.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS, mixed mode, sharing)\n"
+        },
+        {
+          "name": "glx-llvmpipe",
+          "exit": 0,
+          "stdout": "name of display: :88\ndisplay: :88  screen: 0\ndirect rendering: Yes\nExtended renderer info (GLX_MESA_query_renderer):\n    Vendor: Mesa (0xffffffff)\n    Device: llvmpipe (LLVM 20.1.2, 128 bits) (0xffffffff)\n    Version: 25.2.8\n    Accelerated: no\n    Video memory: 8916MB\n    Unified memory: yes\n    Preferred profile: core (0x1)\n    Max core profile version: 4.5\n    Max compat profile version: 4.5\n    Max GLES1 profile version: 1.1\n    Max GLES[23] profile version: 3.2\nMemory info (GL_ATI_meminfo):\n    VBO free memory - total: 0 MB, largest block: 0 MB\n    VBO free aux. memory - total: 8265 MB, largest block: 8265 MB\n    Texture free memory - total: 0 MB, largest block: 0 MB\n    Texture free aux. memory - total: 8265 MB, largest block: 8265 MB\n    Renderbuffer free memory - total: 0 MB, largest block: 0 MB\n    Renderbuffer free aux. memory - total: 8265 MB, largest block: 8265 MB\nMemory info (GL_NVX_gpu_memory_info):\n    Dedicated video memory: 0 MB\n    Total available memory: 8916 MB\n    Currently available dedicated video memory: 0 MB\nOpenGL vendor string: Mesa\nOpenGL renderer string: llvmpipe (LLVM 20.1.2, 128 bits)\nOpenGL core profile version string: 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL core profile shading language version string: 4.50\nOpenGL core profile context flags: (none)\nOpenGL core profile profile mask: core profile\n\nOpenGL version string: 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL shading language version string: 4.50\nOpenGL context flags: (none)\nOpenGL profile mask: compatibility profile\n\nOpenGL ES profile version string: OpenGL ES 3.2 Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL ES profile shading language version string: OpenGL ES GLSL ES 3.20\n\n",
+          "stderr": ""
+        },
+        {
+          "name": "containers-after",
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "containerPolicy": [
+        "--rm",
+        "--pull=never",
+        "--network none",
+        "--platform linux/amd64"
+      ],
+      "scope": "SSE4.1 CPUID、Java -version、Xvfb/GLX llvmpipe。Minecraft描画・Javaでの実jobは未実施。"
+    },
+    "e": {
+      "status": "PASS",
+      "vmOperations": [
+        {
+          "name": "stop",
+          "exit": 0,
+          "stdout": "",
+          "stderr": "time=\"2026-11-04T19:53:32+09:00\" level=info msg=\"Sending SIGINT to hostagent process 31478\"\ntime=\"2026-11-04T19:53:32+09:00\" level=info msg=\"Waiting for the host agent and the driver processes to shut down\"\ntime=\"2026-11-04T19:53:32+09:00\" level=info msg=\"[hostagent] Received SIGINT, shutting down the host agent\"\ntime=\"2026-11-04T19:53:32+09:00\" level=info msg=\"[hostagent] Shutting down the host agent\"\ntime=\"2026-11-04T19:53:32+09:00\" level=info msg=\"[hostagent] Shutting down VZ\"\ntime=\"2026-11-04T19:53:33+09:00\" level=info msg=\"[hostagent] [VZ] - vm state change: stopped\"\ntime=\"2026-11-04T19:53:33+09:00\" level=error msg=\"[hostagent] accept tcp 127.0.0.1:57556: use of closed network connection\"\ntime=\"2026-11-04T19:53:33+09:00\" level=info msg=\"Waiting for the instance to shut down\"\ntime=\"2026-11-04T19:53:33+09:00\" level=info msg=\"The instance v has shut down\"\n"
+        },
+        {
+          "name": "delete",
+          "exit": 0,
+          "stdout": "",
+          "stderr": "time=\"2026-11-04T19:53:33+09:00\" level=info msg=\"The vz driver process seems already stopped\"\ntime=\"2026-11-04T19:53:33+09:00\" level=info msg=\"The host agent process seems already stopped\"\ntime=\"2026-11-04T19:53:33+09:00\" level=info msg=\"Removing *.pid *.sock *.tmp under `/Users/ryuman/tmp-mcicon-d2b/l/v`\"\ntime=\"2026-11-04T19:53:33+09:00\" level=info msg=\"Removing `/Users/ryuman/tmp-mcicon-d2b/l/v/boot-session.tmp`\"\ntime=\"2026-11-04T19:53:33+09:00\" level=info msg=\"Deleted `v` (`/Users/ryuman/tmp-mcicon-d2b/l/v`)\"\n"
+        },
+        {
+          "name": "list-after",
+          "exit": 0,
+          "stdout": "",
+          "stderr": "time=\"2026-11-04T19:53:33+09:00\" level=warning msg=\"No instance found. Run `limactl create` to create an instance.\"\n"
+        }
+      ],
+      "cleanup": {
+        "workdirAbsent": true,
+        "ownedProcesses": [],
+        "vmDeleted": true
+      },
+      "ownedProcessesAfterVm": [],
+      "existingUnchanged": true
+    }
+  },
+  "failuresAndRecovery": [
+    "手順指定のH:/MCIconGeneratorはGit rootではなかった。実Git共通領域H:/MCIconGenerator/MCIconGeneratorを確認し、担当worktreeからfetchした。primary checkoutは変更なし。",
+    "ローカル補助コード作成時の引用符、import時のargv参照、Windows読取り時の既定cp932を修正。候補起動前の準備処理の失敗。",
+    "初期VMのguest一般ユーザーはDocker socket権限不足。provision編集後の再起動ではgroup設定が反映されず、guest /tmpのrendererも消失した。",
+    "初期VMを通常停止・削除し、初回system provisionにusermod -aG docker ryumanを含めて再生成、rendererを再コピーした。",
+    "再生成後も既存Limaセッションの補助groupは古いままだった。getent group docker/id ryumanで登録を確認し、sg dockerで接続成功後、load/全診断を完了した。"
+  ],
+  "osProtection": {
+    "blocked": false,
+    "nativePromptLines": [],
+    "vmPromptGate": {
+      "exit": 0,
+      "promptLines": []
+    },
+    "packagingPromptLines": [],
+    "note": "OSログ観測とprocess終了結果。GUI目視は実施していない。前回promptとの同一性は未確認。quarantine削除・spctl変更・許可操作なし。"
+  },
+  "helperCandidate": {
+    "files": 196,
+    "unpackedBytes": 206610229,
+    "archive": {
+      "bytes": 125853872,
+      "sha256": "2466ed0ea8447e735d7384faf2c4c98abb996158742c60fc4b9a38cbd9c2dca4"
+    },
+    "previousD2ZipBytesIdentical": true,
+    "d1FinalZipBytesIdentical": false,
+    "note": "D2 ZIPとSHA一致。D1最終ZIPとの差異は前回記録のまま。今回D1最終bytesの再受入とは扱わない。"
+  },
+  "tests": {
+    "macos": [
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.RebootRecoveryTest",
+        "tests": "13",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.CommandsTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.LeaseReferencesTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.HostFactsTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "1"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.MacRuntimeTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.CacheStateTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.OperationJournalTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "total": 45,
+    "passed": 44,
+    "skipped": 1,
+    "failed": 0,
+    "skipReason": "mcicon.macosProbeFacts未指定。実probe自体はaで別途実行成功。",
+    "packaging": {
+      "status": "packaging-fixture-only-no-vm",
+      "records": [
+        {
+          "name": "relocated-TMP-only",
+          "argv": [
+            "/Users/ryuman/tmp-mcicon-d2b/verify-1/relocated with space/MCIconHelper.app/Contents/MacOS/MCIconHelper",
+            "--protocol",
+            "1",
+            "--root",
+            "/Users/ryuman/tmp-mcicon-d2b/verify-1/relocated-TMP-only-root",
+            "--lease",
+            "/Users/ryuman/tmp-mcicon-d2b/verify-1/relocated-TMP-only-root/jobs/00000000-0000-0000-0000-000000000001/lease.json",
+            "preflight"
+          ],
+          "environment": {
+            "TMP": "/Users/ryuman/tmp-mcicon-d2b/verify-1/relocated-TMP-only-tmp",
+            "TEMP": "/Users/ryuman/tmp-mcicon-d2b/verify-1/relocated-TMP-only-tmp",
+            "TMPDIR": "/Users/ryuman/tmp-mcicon-d2b/verify-1/relocated-TMP-only-tmp"
+          },
+          "exit": 1,
+          "stdoutSha256": "ef6cec059e6271bb7bf087c146898fc6806a2ec90c80ee974eafc4b4c314e802",
+          "scope": "invalid-lease-only-no-vm"
+        },
+        {
+          "name": "tree-tamper-rejected",
+          "path": "Contents/app/helper-common-1.1.0.jar"
+        },
+        {
+          "name": "tree-tamper-rejected",
+          "path": "Contents/runtime/Contents/Home/lib/modules"
+        },
+        {
+          "name": "tree-tamper-rejected",
+          "path": "Contents/app/MCIconHelper.cfg"
+        },
+        {
+          "name": "tree-link-rejected"
+        },
+        {
+          "name": "zip-owner-executable",
+          "argv": [
+            "/Users/ryuman/tmp-mcicon-d2b/verify-1/roundtrip/MCIconHelper.app/Contents/MacOS/MCIconHelper",
+            "--protocol",
+            "1",
+            "--root",
+            "/Users/ryuman/tmp-mcicon-d2b/verify-1/zip-owner-executable-root",
+            "--lease",
+            "/Users/ryuman/tmp-mcicon-d2b/verify-1/zip-owner-executable-root/jobs/00000000-0000-0000-0000-000000000001/lease.json",
+            "preflight"
+          ],
+          "environment": {
+            "TMP": "/Users/ryuman/tmp-mcicon-d2b/verify-1/zip-owner-executable-tmp",
+            "TEMP": "/Users/ryuman/tmp-mcicon-d2b/verify-1/zip-owner-executable-tmp",
+            "TMPDIR": "/Users/ryuman/tmp-mcicon-d2b/verify-1/zip-owner-executable-tmp"
+          },
+          "exit": 1,
+          "stdoutSha256": "ef6cec059e6271bb7bf087c146898fc6806a2ec90c80ee974eafc4b4c314e802",
+          "scope": "invalid-lease-only-no-vm"
+        }
+      ],
+      "archive": {
+        "bytes": 125853872,
+        "sha256": "2466ed0ea8447e735d7384faf2c4c98abb996158742c60fc4b9a38cbd9c2dca4"
+      },
+      "limits": [
+        "本scriptのtree改変拒否はcore RuntimeGeneration受入の代替ではない",
+        "実VM/daemon/Intel/OS下限/隔離属性/DeveloperID/notarizationは未受入"
+      ]
+    },
+    "rendererExport": {
+      "passed": 2,
+      "failed": 0,
+      "command": "python docker/test-export-candidate.py"
+    },
+    "diffCheck": "PASS",
+    "qaChecksum": "PASS"
+  },
+  "localEvidence": {
+    "directory": "build/d2b/",
+    "archive": "build/d2b/evidence.tar",
+    "bytes": 126218240,
+    "sha256": "2073bbb1c10782548600854b175d396a4b943dc9760853d3c61597380e37e366",
+    "content": "stage別xattr raw/hex、native/OSログ、VM操作結果、renderer結果、helper manifest/ZIP、JUnit XML。鍵・認証・Lima内部データは含めない。",
+    "runners": "build/d2b/*.py。前回D1/D2 runnerを専用コピーで再利用。tracked実装は変更しない。"
+  },
+  "unverified": [
+    "実Minecraft描画",
+    "全51版",
+    "実host reboot",
+    "正式配布経路の隔離属性/初回警告",
+    "Developer ID署名/notarization",
+    "Intel Mac/他OS版",
+    "正規leaseからのhelper管理VM一連操作",
+    "guest全体の無通信",
+    "前回dialogの隔離属性発生源・limactl promptとの関係",
+    "D1 license/source閉包と正式inventory"
+  ],
+  "publication": {
+    "commit": false,
+    "push": false,
+    "pr": false,
+    "issueClose": false,
+    "preparedFiles": [
+      "build/commit-message.txt",
+      "build/pr-title.txt",
+      "build/pr-body.md"
+    ]
+  },
+  "domainKnowledge": "新規・変更のドメイン知識なし。外部知識保存は更新しない。"
+}
