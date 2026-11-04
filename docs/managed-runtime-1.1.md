@@ -6,7 +6,7 @@
 
 ## 先行固定する範囲
 
-#91の先行変更は共有API・worker artifact・descriptor schema・helper起動境界・CLI更新所有者だけを固定した。resolver/runtime managerの実装は#92/#93で行い、各OS helperやMaven Central/installerの公開とは区別する。#91の3ホスト実証と最終方式採用は未完了のまま継続する。
+#91の先行変更は共有API・worker artifact・descriptor schema・helper起動境界・CLI更新所有者だけを固定した。正式runtime構成は[構成仕様](managed-runtime-composition-1.1.md)に従う。resolver/runtime managerの実装は#92/#93で行い、各OS helperやMaven Central/installerの公開とは区別する。Linux x86_64および利用者がWSL内から直接実行する経路は実験的・未保証だが、正式Windowsアプリが専用WSL2を内部利用する構成は正式Windows経路の一部である。OS別の最終資材と受入は未完了。
 
 ## 利用者の完成条件
 
@@ -18,12 +18,12 @@
 
 | ホスト候補 | 専用実行環境 | 最低条件の候補 | 未確定の受入 |
 |---|---|---|---|
-| macOS arm64 | LimaのVZ arm64 guestとRosettaでLinux amd64を実行 | VZ自体はmacOS 13以上。製品の下限は署名・配布helper・実機試験後に確定 | 同梱helperの実行・再配布、Rosetta未準備時、画像、停止・回収 |
+| macOS arm64 | LimaのVZ arm64 guestとRosettaでLinux amd64を実行 | 正式検証基準・最小下限を15.8.1へ揃える方針。数値の生成物整合は別PR | 同梱helperの実行・再配布、Rosetta未準備時、画像、停止・回収 |
 | macOS x86_64 | VZのLinux amd64 guest | OS下限・対応CPUはIntel実機で確定 | 実機未確認。arm64の測定を流用しない |
 | Windows x86_64 | 専用WSL2 distribution内のLinux amd64 | WSL2・仮想化機能が必要。今回の観測版は最低対応版を示さない | 小規模の準備・画像・回収は2026-10-19に成功。製品helper、未準備時の承認・再起動、下限・配布条件は未受入 |
 | Linux x86_64 | 専用領域のrootless container runtime | user namespace・subuid/subgid・cgroup等の条件を検査 | distributionとkernelの下限、rootless制約、画像と回収 |
 
-最初の実証対象はmacOS arm64・Windows x86_64・Linux x86_64とする。他のOS/archは未検証であり、公表対応へ追加する際は別に実証する。新たな非対応範囲を確定したとは扱わず、黙って別rendererやホストJavaへ切り替えない。仮想化機能・Rosetta・WSL・rootless前提が不足する場合、必要操作と再開コマンドを表示する。無断の昇格、OS再起動、system daemon導入、既存VM/WSL設定変更は行わない。
+正式hostはWindows 11 x86_64とmacOS arm64。Linux x86_64および利用者がWSL内から製品を直接実行する経路は実験的・未保証とする。正式Windowsアプリ内では専用WSL2 distributionを使う。他のOS/archは未検証であり、公表対応へ追加する際は別に実証する。仮想化機能・Rosetta・WSL前提が不足する場合、必要操作と再開コマンドを表示する。無断の昇格、OS再起動、system daemon導入、既存VM/WSL設定変更は行わない。
 
 VZは同じCPU archのguestを実行するため、Apple Siliconでamd64 guestを指定しない。Rosettaはarm64 guest内のamd64実行に使用する。[Lima VZ](https://lima-vm.io/docs/config/vmtype/vz/)、[multi-arch](https://lima-vm.io/docs/config/multi-arch/)、[Docker rootless要件](https://docs.docker.com/engine/security/rootless/)を参照する。
 
@@ -196,7 +196,7 @@ Lima本体のApache-2.0 LICENSE/NOTICEと、同梱helper各componentの個別条
 
 2026-10-17にCentral Portalのnamespace `io.github.rs0325` がVerifiedであることを確認した。利用者がGPG Suiteで作成・送信した公開鍵のfingerprintは `B766BA473AF3178D42371A0F50562040DFAE0F27`。公開鍵の[取得先](https://keys.openpgp.org/vks/v1/by-fingerprint/B766BA473AF3178D42371A0F50562040DFAE0F27)はHTTP 200を確認したが、秘密鍵・passphrase・公開tokenは取得しておらず、token発行状態も未確認。Central用PGP鍵と自動更新descriptorの信頼鍵は別にする。
 
-Apple Developer IDとWindowsコード署名証明書は未準備。ローカルの未署名候補生成・検証と公開済みの状態を分ける。署名なしCLIの配布自体は候補となるが、Gatekeeper/SmartScreen等の警告なしで導入できるとは保証せず、installerごとの制約を公開前に示す。未署名配布を正式方針に確定したとは扱わず、更新descriptorの署名検証を省略しない。
+Apple Developer IDとWindowsコード署名証明書は使用しない。OS署名・notarizationなしで配布し、Gatekeeper/SmartScreen等の警告ゼロは保証しない。実配布経路の警告と必要操作を実測して案内する。unsigned Macで初回許可・更新後起動が成立しなければ正式gate未達とする。OS保護の一括無効化、quarantineの一括削除、実行policy緩和は製品に入れない。更新descriptorの署名検証は維持する。
 
 Centralは本人の公開tokenとartifact署名を利用できる状態の確認が残る。macOSのDeveloper ID/notarizationとWindows署名は本人のaccount・証明書・契約条件を確認してから公開手順へ進む。費用・署名方式・必要な本人操作を先に提示し、account登録・鍵作成・有料契約・公開を準備依頼から推定しない。秘密鍵・token・証明書秘密情報をrepositoryや検証ログへ保存しない。これらの未準備を理由に方式実証や未署名候補のローカル検証を省略しない。
 

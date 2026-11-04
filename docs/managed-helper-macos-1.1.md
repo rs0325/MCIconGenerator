@@ -2,9 +2,9 @@
 
 第1段はapp-image-v6、第2段はv7の当時sourceを限定受入した。host照合・reboot終了を加えたv9では、実再起動後の正常releasedからの欠落cache再構成と3PNG比較・通常closeを確認した。元active leaseの再起動終了・回復もanchor欠落のfresh分岐で実行し、この範囲の限定独立結果auditはPASS（追加指摘0）である。anchor現存の旧boot cold-startは未受入である。以下は実装の契約を記し、全OS・全版・製品配布受入の完了を意味しない。
 
-初期対応はApple Silicon・macOS 15.7.7以降を候補とし、実機確認済みのOSは15.7.7だけである。Intelと15.7.7未満は初版の正式対象に含めない。Lima 2.2.1/VZ、導入済みのVM用Rosetta、aarch64 Ubuntu guest、linux/amd64 rendererを使用する。Developer ID、notarization、隔離属性による初回起動は受入未完了。単体fixtureとpackagingは実VMの成功を意味しない。
+初期検討ではApple Silicon・macOS 15.7.7以降を候補とし、15.7.7の過去限定確認記録がある。正式検証基準と最小下限を15.8.1へ揃える方針を採用する。15.7.7保証は残さない。inventory生成器・Formula・fixture・descriptorの数値整合は別PRで行い、この文書変更は方針を記録する。Intelは初版対象に含めない。Lima 2.2.1/VZ、導入済みのVM用Rosetta、aarch64 Ubuntu guest、linux/amd64 rendererを使用する。Developer ID、notarization、隔離属性による初回起動は受入未完了。単体fixtureとpackagingは実VMの成功を意味しない。
 
-host判定は署名済みdescriptorの`minimumOsVersion`を比較する。最終Mac descriptorは`15.7.7`に設定し、native probeのcompile target `13.0`を対応下限と混同しない。`native-acceptance.py`のfixture descriptorも`15.7.7`を使用する。preflightでは、Rosettaの未導入・非対応・観測不明とVZの非対応・観測不明を異なるsetup-required診断で伝える。未導入時はApple公式の案内と利用規約を確認し、導入への明示同意を必要とする。製品での同意・公式導入・完了後の再確認導線は#97と接続して検証する。本helperは導入操作を実行せず、未知状態を導入済みとして継続しない。
+host判定は署名済みdescriptorの`minimumOsVersion`を比較する。現行descriptor・fixtureは`15.7.7`を使うが、これは採用した15.8.1下限方針と不整合であり、数値変更は別PRで行う。native probeのcompile target `13.0`を対応下限と混同しない。preflightでは、Rosettaの未導入・非対応・観測不明とVZの非対応・観測不明を異なるsetup-required診断で伝える。未導入時はApple公式の案内と利用規約を確認し、導入への明示同意を必要とする。製品での同意・公式導入・完了後の再確認導線は#97と接続して検証する。本helperは導入操作を実行せず、未知状態を導入済みとして継続しない。
 
 ## 配布と固定入力
 
