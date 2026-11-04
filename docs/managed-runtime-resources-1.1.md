@@ -15,6 +15,8 @@
 }
 ```
 
+公開DERも同梱する場合は、input直下へ `mcicon-operating.pub.der` と `mcicon-recovery.pub.der` を両方置く。生成器は2件がtrust-setの鍵集合と一致することを確認し、同名でruntime resourcesへ収録する。片方だけ、または信頼集合と不一致の場合は生成を拒否する。信頼の正本は従来どおり `trust-set.bin` である。
+
 SHA欄の説明文字列は入力値ではない。descriptorと64byteの隣接 `.sig`、[運用鍵・回復鍵の信頼集合](../bootstrap/docs/trust-set.md)、descriptorが参照する全inventoryを同directory内の相対pathへ置く。各artifactの実archiveは `artifacts/<id>.<format>` に置く。同じ入力集合で異なるbytesのartifactには異なるIDを使う。link、配置衝突、host重複を認めない。
 
 `finalBytesConfirmed` がfalse、署名・tool版・agent・adapter集合・host・Java major集合が不一致、inventory hashが不正、artifactの実size/SHAが不一致の場合は生成を拒否する。host helperは既 `RuntimeArchive` で展開を検証し、entryの存在・実行属性を確かめる。guest/renderer archiveは元bytesの検証だけを行い、hostへ展開しない。未発行URLや未採用candidateを通すためにflagを書き換えない。URLは既descriptorのHTTPS規則に従い、URLが到達可能であることまではローカル生成で証明しない。

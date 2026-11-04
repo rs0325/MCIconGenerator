@@ -19,6 +19,19 @@ class RuntimeResourceGeneratorTest {
         assertEquals(input.definition.path("runtimes"),RuntimeDescriptor.read(Files.readAllBytes(resources.resolve("pins.json"))).path("runtimes"));
         assertFalse(Files.exists(resources.resolve("artifacts")));assertFalse(Files.exists(resources.resolve("input.json")));
     }
+    @Test void embedsNamedPublicKeysOnlyWhenTheyMatchTrustSet() throws Exception {
+        Input input=new Input();byte[] operating=input.fixture.key.getPublic().getEncoded(),recovery=input.fixture.recovery.getPublic().getEncoded();
+        Files.write(input.dir.resolve("mcicon-operating.pub.der"),operating);Files.write(input.dir.resolve("mcicon-recovery.pub.der"),recovery);
+        Path resources=input.generate().resolve("META-INF/mcicon/runtime");
+        assertArrayEquals(operating,Files.readAllBytes(resources.resolve("mcicon-operating.pub.der")));
+        assertArrayEquals(recovery,Files.readAllBytes(resources.resolve("mcicon-recovery.pub.der")));
+    }
+    @Test void rejectsMissingOrMismatchedNamedPublicKey() throws Exception {
+        Input input=new Input();Files.write(input.dir.resolve("mcicon-operating.pub.der"),input.fixture.key.getPublic().getEncoded());
+        assertThrows(Exception.class,input::generate);assertFalse(Files.exists(input.output));
+        Files.write(input.dir.resolve("mcicon-recovery.pub.der"),new ManagedFixture().key.getPublic().getEncoded());
+        assertEquals("公開DERと信頼集合が不一致です",assertThrows(Exception.class,input::generate).getMessage());assertFalse(Files.exists(input.output));
+    }
     @Test void rejectsUnadoptedBytes() throws Exception {Input input=new Input();input.definition.put("finalBytesConfirmed",false);input.save();assertThrows(Exception.class,input::generate);assertFalse(Files.exists(input.output));}
     @Test void rejectsInvalidSignature() throws Exception {Input input=new Input();Files.write(input.dir.resolve("descriptor.json.sig"),new byte[64]);assertThrows(Exception.class,input::generate);}
     @Test void rejectsUntrustedKey() throws Exception {Input input=new Input();Files.write(input.dir.resolve("trust-set.bin"),new ManagedFixture().trustBytes);assertThrows(Exception.class,input::generate);}

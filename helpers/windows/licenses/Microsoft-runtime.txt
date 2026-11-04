@@ -1,0 +1,46 @@
+Microsoft runtime の利用・再配布条件（MCIconGenerator 1.1.0 Windows helper）
+
+この条件は同梱の Microsoft DLL 49件だけに適用します。MCIconGenerator の
+MIT License、および他の独立した第三者コンポーネントのライセンスは各正本に従います。
+DLL 一覧・ファイル版・SHA-256・署名元は同じディレクトリの inventory.json を参照してください。
+
+Microsoft DLL の利用・再配布には、本書と同梱の Microsoft 条項への合意が必要です。
+同意しない場合は DLL を利用・再配布しないでください。再配布者は、外部利用者と
+再配布先にも、Microsoft のコードを同等以上に保護する本条件への合意を求めてください。
+
+1. DLL は本アプリケーションの機能を実行するために、Windows 上でのみ使用します。
+   DLL 単独での配布、貸与・賃貸、改変は禁止します。再配布は主要機能を持つ本アプリの
+   一部として、元の DLL・著作権表示・商標表示・特許表示と本書・条項を保持して行います。
+2. 法令で認められる範囲を除き、技術的制限の回避、リバースエンジニアリング、逆コンパイル、
+   逆アセンブルを禁止します。違法・悪意ある・欺瞞的なプログラムに含めないでください。
+3. Microsoft による提供・推奨を示唆する名称・商標の使用は禁止します。
+   Microsoft DLL に、ソース開示や改変権の付与を要求するライセンスを適用しないでください。
+4. DLL は現状有姿で提供されます。Microsoft は明示の保証をせず、法令が認める限り、
+   商品性、特定目的適合性、非侵害の黙示保証を除外します。利用者が利用リスクを負います。
+   Microsoft と供給者への請求は、適用法が認める限り、直接損害5米ドルを上限とし、
+   間接損害、特別損害、付随損害、結果損害、逸失利益を除外します。
+   強行法規、消費者の権利、地域別の例外は同梱の原文どおり保持されます。
+5. 再配布者は、SDK 条項2.a.iiに従い、自己のプログラムの配布・使用に関する請求と
+   弁護士費用について Microsoft を補償・防御し、免責する義務を負います。
+   輸出先、利用者、用途に関する適用される輸出規制を遵守してください。
+
+配布者は有効な Microsoft SDK / Visual Studio の利用資格と条項に従い、上記の義務を
+負って配布します。利用者向け VC++ Runtime の条項だけを再配布許諾の根拠にしません。
+Copyright (c) 2026 MCIconGenerator contributors.
+MCIconGenerator は Microsoft の製品ではありません。
+
+適用条項と原文（取得日 2026-11-05）:
+- UCRT / APISet 46件: Windows SDK 10.0.26100.1742 の licenseUrl が指定する原文
+  windows-sdk-license.rtf。Microsoft.Windows.SDK.CPP の Redist/x64 実体と全件一致。
+  https://aka.ms/WinSDKLicenseURL
+  https://learn.microsoft.com/en-us/legal/windows-sdk/license
+  https://learn.microsoft.com/en-us/legal/windows-sdk/redist
+- VC++ 14.40.33810.0 の3件: Visual Studio 2022 の Distributable Code と Redist 一覧。
+  visual-studio-2022-community.docx（EULAID: VS_Comm_2022_ENU.1033）。
+  https://visualstudio.microsoft.com/license-terms/vs2022-ga-community/
+  https://learn.microsoft.com/en-us/visualstudio/releases/2022/redistribution
+- 利用者向け補足: visual-cpp-runtime-2015-2022.docx（EULA ID: Cpp_2015-2022_ENU.1033）。
+  https://visualstudio.microsoft.com/license-terms/vs2022-cruntime/
+
+DLL は改変せず、Microsoft のソース配布物として扱いません。
+これは配布上の技術的な条件整理であり、法的助言ではありません。

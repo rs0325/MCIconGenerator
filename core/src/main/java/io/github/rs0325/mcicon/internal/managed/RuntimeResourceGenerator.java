@@ -49,6 +49,13 @@ final class RuntimeResourceGenerator {
                 }
                 entries.add(entry.deepCopy());
             }
+            String operating="mcicon-operating.pub.der",recovery="mcicon-recovery.pub.der";
+            if(Files.exists(input.resolve(operating),LinkOption.NOFOLLOW_LINKS)||Files.exists(input.resolve(recovery),LinkOption.NOFOLLOW_LINKS)) {
+                byte[] operatingBytes=read(input,operating,44),recoveryBytes=read(input,recovery,44),first=operatingBytes,second=recoveryBytes;
+                if(Arrays.compareUnsigned(first,second)>0){byte[] swap=first;first=second;second=swap;}
+                if(!Arrays.equals(first,Arrays.copyOfRange(trustBytes,8,52))||!Arrays.equals(second,Arrays.copyOfRange(trustBytes,52,96)))throw RuntimeDescriptor.invalid("公開DERと信頼集合が不一致です");
+                add(resources,operating,operatingBytes);add(resources,recovery,recoveryBytes);
+            }
             add(resources,"pins.json",RuntimeDescriptor.JSON.writeValueAsBytes(pins));Files.createDirectory(output);
             for(var entry:resources.entrySet()){Path target=output.resolve(PREFIX+entry.getKey());Files.createDirectories(target.getParent());Files.write(target,entry.getValue(),StandardOpenOption.CREATE_NEW);}
         }catch(Exception failure){original=failure;throw failure;}
