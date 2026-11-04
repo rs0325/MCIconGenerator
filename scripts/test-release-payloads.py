@@ -61,9 +61,12 @@ class PayloadTest(unittest.TestCase):
                     info.create_system = 3
                     info.external_attr = 0o100755 << 16
                     archive.writestr(info, b'synthetic-java')
+                    archive.writestr('MCIconHelper/licenses/runtime.txt', b'synthetic-runtime-terms')
                 descriptor = payloads.candidate.encode({'host': {'os': os_name, 'arch': arch}, 'toolVersion': '1.1.0', 'worker': {'agentSha256': payloads.candidate.digest(worker)},
                     'artifacts': [{'id': host, 'role': 'host-helper', 'format': 'zip', 'bytes': helper.stat().st_size,
-                                   'sha256': payloads.candidate.digest(helper)}]})
+                                   'sha256': payloads.candidate.digest(helper),
+                                   'licenseFiles': ['MCIconHelper/licenses/runtime.txt'], 'noticeFiles': [],
+                                   'sourceArchives': [{'url': 'https://example.com/runtime-source.tar', 'sha256': 'a' * 64}]}]})
                 path = 'descriptors/' + host + '.json'
                 (runtime / path).write_bytes(descriptor)
                 (runtime / (path + '.sig')).write_bytes(b'x' * 64)
@@ -92,7 +95,11 @@ class PayloadTest(unittest.TestCase):
             for row in manifest['platforms']:
                 archive = args.output / Path(row['payload']['url']).name
                 self.assertEqual(payloads.candidate.digest(archive), row['payload']['sha256'])
+                self.assertEqual(row['payload']['sourceArchives'], [{'url': 'https://example.com/runtime-source.tar', 'sha256': 'a' * 64}])
                 with zipfile.ZipFile(archive) as jar:
+                    terms = 'licenses/runtime-helper/MCIconHelper/licenses/runtime.txt'
+                    self.assertEqual(jar.read(terms), b'synthetic-runtime-terms')
+                    self.assertIn(terms, row['payload']['licenseFiles'])
                     self.assertIn('app/worker/worker-agent.jar', jar.namelist())
                     java = next(n for n in jar.namelist() if n.startswith('java/bin/'))
                     self.assertTrue(jar.getinfo(java).external_attr >> 16 & 0o100)

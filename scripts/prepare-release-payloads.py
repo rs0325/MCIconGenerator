@@ -86,10 +86,10 @@ def prepare(args):
         archive = args.runtime_input / 'artifacts' / (helper['id'] + '.' + helper['format'])
         if archive.stat().st_size != helper['bytes'] or candidate.digest(archive) != helper['sha256']:
             raise ValueError('helper bytes不一致')
-        checked[host] = (entry, raw, signature, archive)
+        checked[host] = (entry, raw, signature, archive, helper)
     args.output.mkdir(parents=True)
     platforms = []
-    for host, (entry, raw, signature, archive) in checked.items():
+    for host, (entry, raw, signature, archive, helper_definition) in checked.items():
         files = {}
         for p in sorted(args.cli_lib.glob('*.jar')):
             if p.is_symlink():
@@ -107,7 +107,16 @@ def prepare(args):
                 files[p.relative_to(ROOT).as_posix()] = (p.read_bytes(), 0o100644)
         runtime_prefix = ('MCIconHelper/runtime/' if host.startswith('windows') else
                           'MCIconHelper.app/Contents/runtime/Contents/Home/')
+        documents = {'licenseFiles': ['LICENSE'], 'noticeFiles': ['THIRD_PARTY_NOTICES.md']}
         with zipfile.ZipFile(archive) as helper:
+            for field in documents:
+                for path in sorted(set(helper_definition[field])):
+                    if path.startswith(runtime_prefix):
+                        documents[field].append('java/' + path[len(runtime_prefix):])
+                    elif path.startswith(('MCIconHelper/', 'MCIconHelper.app/')):
+                        name = 'licenses/runtime-helper/' + path
+                        files[name] = (helper.read(path), 0o100644)
+                        documents[field].append(name)
             for item in helper.infolist():
                 if item.filename.startswith(runtime_prefix) and not item.is_dir():
                     name = 'java/' + item.filename[len(runtime_prefix):]
@@ -139,7 +148,8 @@ def prepare(args):
                                       'bytes': payload.stat().st_size, 'sha256': candidate.digest(payload),
                                       'unpackedBytes': sum(len(data) for data, _ in files.values()), 'format': 'zip',
                                       'inventoryPath': inventory_path, 'inventorySha256': hashlib.sha256(inventory).hexdigest(),
-                                      'licenseFiles': ['LICENSE'], 'noticeFiles': ['THIRD_PARTY_NOTICES.md'], 'sourceArchives': []}})
+                                      'licenseFiles': documents['licenseFiles'], 'noticeFiles': documents['noticeFiles'],
+                                      'sourceArchives': helper_definition['sourceArchives']}})
     candidate.save(args.output / 'stable.json', {'schemaVersion': 1, 'channel': 'stable', 'sequence': args.sequence,
                                                 'toolVersion': '1.1.0', 'minimumBootstrapProtocol': 4, 'platforms': platforms})
     print('payload/stable生成済み。stable署名・seed/packageのJava検証・配布gateは未完了です')
