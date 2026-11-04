@@ -15,11 +15,13 @@
 
 | 区分 | OS / architecture |
 |---|---|
-| 正式対応 | Windows 11 x64、macOS 15.7.7 / Apple Silicon (arm64) |
-| 実験的・未保証 | Linux x86_64、WSL |
+| 正式対応 | Windows 11 x64、macOS 15.8.1 / Apple Silicon (arm64) |
+| 実験的・未保証 | Linux x86_64、利用者によるWSL内からの直接実行 |
 | 対象外 | Windows arm64、Linux arm64 |
 
 この区分は1.1.0の製品受入完了を意味しません。受入状況は[台帳](../qa/acceptance-1.1.0.md)を参照してください。
+
+OS署名・notarizationは行わず、Gatekeeper/SmartScreen等の警告が出ないことは保証しません。実際の配布経路で警告と必要操作を確認し、案内を付けて配布します。unsigned Macで初回許可または更新後起動が成立しない場合は正式受入gate未達です。
 
 ## 移行と既存データ
 
