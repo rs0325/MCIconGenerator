@@ -36,4 +36,4 @@
 - installer、Homebrew、wingetの正式artifactを用いた導入・更新・アンインストール。
 - raw/offline経路、独立Gradle consumer、Central再取得と署名検証。
 - stable更新の本番trust/pin/URLと新規環境からの再取得確認。
-- 対応OS/下限、未署名配布の制約、必要な利用者操作。
+- 対応OS/下限、Maven Central・GitHub Releaseの公開状態、必要な利用者操作。OS署名・notarizationは行わない。

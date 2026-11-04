@@ -20,7 +20,7 @@ mcicon --bootstrap-pin 1.1.0@<payloadの64桁SHA256> --help
 
 署名済みmanifest/archiveと完全一致する既local slotだけを選択し、取得・pending消費・暗黙昇格・旧版fallbackをしない。指定版が無い/壊れている場合はその指定で診断失敗する。
 
-配布packageの`stableManifestUrl`は明示したHTTPS manifestとその`.sig`の取得先を指定する。未構成なら旧CLIを継続し未適用をstderrへ示す。packagerへ`--stable-manifest-url`、Gradle app-imageへ`-PbootstrapManifestUrl`で渡せるが、既定の製品URLを仮定しない。
+配布packageの`stableManifestUrl`はGitHub Release assetの`stable.json`と隣接する`stable.json.sig`を取得するHTTPS URLとして明示する。正式URLは未確定であり、未構成なら旧CLIを継続し未適用をstderrへ示す。packagerへ`--stable-manifest-url`、Gradle app-imageへ`-PbootstrapManifestUrl`で渡せるが、既定の製品URLを仮定しない。
 
 ## 有限background所有
 
