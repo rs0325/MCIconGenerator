@@ -1,0 +1,914 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "refs": [
+    91,
+    95
+  ],
+  "scope": "native/C1 bridge結合済み候補。正式inventory/source bundleではない",
+  "sourceCommit": "4a7c5d0575352928e6eda198300044a195d4a288",
+  "components": [
+    {
+      "id": "temurin-jre",
+      "sourceIdentityMatched": true,
+      "source": {
+        "home": "helper-runtime",
+        "version": "21.0.12.1+1",
+        "releaseTag": "jdk-21.0.12.1+1",
+        "releaseUrl": "https://github.com/adoptium/temurin21-binaries/releases/tag/jdk-21.0.12.1%2B1",
+        "sourceRepo": "https://github.com/adoptium/jdk21u",
+        "sourceTag": "jdk-21.0.12.1+1_adopt",
+        "sourceCommit": "1c417fbfc2f70ab03a565b0af0a5a3c6f5e15ad6",
+        "imageSource": ".:git:1c417fbfc2f7",
+        "imageSourceCommitMatchesTag": true,
+        "imageSourceHasLocalChangesMarker": false,
+        "buildSource": "git:e6ba7dec3d07654074559310376a3ae89da5f4ac",
+        "buildSourceRepo": "https://github.com/adoptium/temurin-build.git",
+        "sourceArchive": {
+          "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk-sources_21.0.12.1_1.tar.gz",
+          "bytes": 115126841,
+          "sha256": "573057d03584ae793fb7ec9a14c76d826d9187a53efeefd99da47403a5308234",
+          "bytesVerified": true
+        },
+        "metadata": [
+          {
+            "url": "https://api.github.com/repos/adoptium/temurin21-binaries/releases/tags/jdk-21.0.12.1%2B1",
+            "bytes": 538388,
+            "sha256": "66fa212440f61eeb5f3befb6ccb478891eafb4d3efbf4f6c74ec57baea1ae8bc"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/jdk21u/git/ref/tags/jdk-21.0.12.1%2B1_adopt",
+            "bytes": 375,
+            "sha256": "5da74280fbd5e71c86a9a6c8ff5f3ab0ed38082c24f889f931e930de9dee362b"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/jdk21u/git/tags/985779c716c4e8c5018cb3836badf9f1237b303f",
+            "bytes": 713,
+            "sha256": "a4e34c170e4402ca9793560740a405282d73de0e8d319422bbe59374ad754768"
+          }
+        ],
+        "binaryVerification": {
+          "archive": {
+            "name": "OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.zip",
+            "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.zip",
+            "bytes": 205073461,
+            "sha256": "sha256:f9d6e191ab098c0d416e7d588a24420a8621cd2f4720dab2459b8b7b2d2d8b4e"
+          },
+          "bytesVerified": true,
+          "comparedInstalledFiles": 94,
+          "differences": []
+        }
+      }
+    },
+    {
+      "id": "commons-codec",
+      "version": "1.19.0",
+      "binary": {
+        "path": "commons-codec-1.19.0.jar",
+        "bytes": 374716,
+        "sha256": "5c3881e4f556855e9c532927ee0c9dfde94cc66760d5805c031a59887070af5f"
+      },
+      "sourceIdentityMatched": true,
+      "source": {
+        "version": "1.19.0",
+        "sourceArchive": {
+          "version": "1.19.0",
+          "url": "https://archive.apache.org/dist/commons/codec/source/commons-codec-1.19.0-src.tar.gz",
+          "bytes": 465560,
+          "sha256": "ec8e16c8614550a076f3c06b52b6d4c8c9fce2c6da691376bdbd882f3db57449",
+          "bytesVerified": true,
+          "license": "Apache-2.0",
+          "officialSha512Matched": true,
+          "licenseDocuments": [
+            {
+              "path": "commons-codec-1.19.0-src/LICENSE.txt",
+              "bytes": 11359,
+              "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7"
+            },
+            {
+              "path": "commons-codec-1.19.0-src/NOTICE.txt",
+              "bytes": 175,
+              "sha256": "b64933ee1d36d14659156223a2604edadb60bffdd465d5368ff422d7689db5fb"
+            }
+          ],
+          "fileName": "commons-codec-1.19.0-src.tar.gz"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "id": "commons-compress",
+      "version": "1.28.0",
+      "binary": {
+        "path": "commons-compress-1.28.0.jar",
+        "bytes": 1117221,
+        "sha256": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca"
+      },
+      "sourceIdentityMatched": true,
+      "source": {
+        "version": "1.28.0",
+        "sourceArchive": {
+          "version": "1.28.0",
+          "url": "https://archive.apache.org/dist/commons/compress/source/commons-compress-1.28.0-src.tar.gz",
+          "bytes": 61394705,
+          "sha256": "5c870fa454221b24c81d10a28031a9183d55f2baab92c160ecc985e51a387662",
+          "bytesVerified": true,
+          "license": "Apache-2.0",
+          "officialSha512Matched": true,
+          "licenseDocuments": [
+            {
+              "path": "commons-compress-1.28.0-src/LICENSE.txt",
+              "bytes": 11358,
+              "sha256": "51b88fd3e9e24edcdce1dd145a4fca2dcd12911407f00b06dfa6ff600f9733c1"
+            },
+            {
+              "path": "commons-compress-1.28.0-src/NOTICE.txt",
+              "bytes": 178,
+              "sha256": "0d98967f0ab328af8d9d536aa9a5c684b5dd665657245f6ee6b5915affe811c0"
+            }
+          ],
+          "fileName": "commons-compress-1.28.0-src.tar.gz"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "id": "commons-io",
+      "version": "2.20.0",
+      "binary": {
+        "path": "commons-io-2.20.0.jar",
+        "bytes": 563971,
+        "sha256": "df90bba0fe3cb586b7f164e78fe8f8f4da3f2dd5c27fa645f888100ccc25dd72"
+      },
+      "sourceIdentityMatched": true,
+      "source": {
+        "version": "2.20.0",
+        "sourceArchive": {
+          "version": "2.20.0",
+          "url": "https://archive.apache.org/dist/commons/io/source/commons-io-2.20.0-src.tar.gz",
+          "bytes": 700475,
+          "sha256": "301f655a687bc7cbc0c43b69fef807aba00e6c3bea4a4f7512c957faa379a33c",
+          "bytesVerified": true,
+          "license": "Apache-2.0",
+          "officialSha512Matched": true,
+          "licenseDocuments": [
+            {
+              "path": "commons-io-2.20.0-src/LICENSE.txt",
+              "bytes": 11360,
+              "sha256": "c1d1a38c99c48ccad170890ade6066e2e240bb6ce59861d4eb7f672eddd2a4c6"
+            },
+            {
+              "path": "commons-io-2.20.0-src/NOTICE.txt",
+              "bytes": 172,
+              "sha256": "b54b0db6c617273efff79ba193bb01b05eadcddfff55c24063b38b2acef714c3"
+            }
+          ],
+          "fileName": "commons-io-2.20.0-src.tar.gz"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "id": "commons-lang3",
+      "version": "3.18.0",
+      "binary": {
+        "path": "commons-lang3-3.18.0.jar",
+        "bytes": 702952,
+        "sha256": "4eeeae8d20c078abb64b015ec158add383ac581571cddc45c68f0c9ae0230720"
+      },
+      "sourceIdentityMatched": true,
+      "source": {
+        "version": "3.18.0",
+        "sourceArchive": {
+          "version": "3.18.0",
+          "url": "https://archive.apache.org/dist/commons/lang/source/commons-lang3-3.18.0-src.tar.gz",
+          "bytes": 1236581,
+          "sha256": "4a94ddeb6a5819c5d0aa5678d16cf97a672b06398b93a0e4f90594032ca991f7",
+          "bytesVerified": true,
+          "license": "Apache-2.0",
+          "officialSha512Matched": true,
+          "licenseDocuments": [
+            {
+              "path": "commons-lang3-3.18.0-src/LICENSE.txt",
+              "bytes": 11359,
+              "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7"
+            },
+            {
+              "path": "commons-lang3-3.18.0-src/NOTICE.txt",
+              "bytes": 174,
+              "sha256": "64bc8696af3f6c770521412b85d3a733fa44b2ef5b0f4bd739e0c4d02eca492a"
+            }
+          ],
+          "fileName": "commons-lang3-3.18.0-src.tar.gz"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "id": "jackson-annotations",
+      "version": "2.22",
+      "binary": {
+        "path": "jackson-annotations-2.22.jar",
+        "bytes": 84211,
+        "sha256": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0"
+      },
+      "sourceIdentityMatched": true,
+      "source": {
+        "name": "jackson-annotations",
+        "version": "2.22",
+        "sourceArchive": {
+          "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22-sources.jar",
+          "bytes": 91807,
+          "sha256": "f5375c756ee3c585808f9937eb087d074743fd3f05f6aeff9b183cf19230c9f7",
+          "bytesVerified": true
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "id": "jackson-core",
+      "version": "2.22.3",
+      "binary": {
+        "path": "jackson-core-2.22.3.jar",
+        "bytes": 594776,
+        "sha256": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c"
+      },
+      "sourceIdentityMatched": true,
+      "source": {
+        "name": "jackson-core",
+        "version": "2.22.3",
+        "sourceArchive": {
+          "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.22.3/jackson-core-2.22.3-sources.jar",
+          "bytes": 504742,
+          "sha256": "547caff8197f49beccdcbab1b0178e1aba628aa3c4269302b0067f529101e0e4",
+          "bytesVerified": true
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "id": "jackson-databind",
+      "version": "2.22.3",
+      "binary": {
+        "path": "jackson-databind-2.22.3.jar",
+        "bytes": 1709604,
+        "sha256": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9"
+      },
+      "sourceIdentityMatched": true,
+      "source": {
+        "name": "jackson-databind",
+        "version": "2.22.3",
+        "sourceArchive": {
+          "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.22.3/jackson-databind-2.22.3-sources.jar",
+          "bytes": 1263833,
+          "sha256": "e6237bfb27df92e14edb4555ebb7b32f325b66d956e213644b720b65cb273fbb",
+          "bytesVerified": true
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "id": "xz",
+      "version": "1.10",
+      "binary": {
+        "path": "xz-1.10.jar",
+        "bytes": 168569,
+        "sha256": "95c63c1a55b22dd6453890a419cc1a640f790bbf7d8ae82db1e30aefefb08888"
+      },
+      "sourceIdentityMatched": true,
+      "source": {
+        "version": "1.10",
+        "sourceArchive": {
+          "version": "1.10",
+          "url": "https://tukaani.org/xz/xz-java-1.10.zip",
+          "bytes": 179204,
+          "sha256": "c02a52da42f432fd5e9c8f30f8e0a9be775961d25740ec098b3f46b4d45f7fe5",
+          "bytesVerified": true,
+          "license": "0BSD",
+          "licenseDocuments": [
+            {
+              "path": "COPYING",
+              "bytes": 663,
+              "sha256": "1e77ef26cee5216d6531e49cbf2f6111a0270dc7b322fc65477063c5aff88766"
+            }
+          ],
+          "fileName": "xz-java-1.10.zip"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "id": "helper-windows",
+      "sourceIdentityMatched": true,
+      "source": {
+        "commit": "4a7c5d0575352928e6eda198300044a195d4a288",
+        "license": "MIT",
+        "files": [
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/Commands.java",
+            "gitSha256": "63206799068f82824af31a4ee678cb7047ad52a1e5ccf8b14b38c2dec9b6b096",
+            "checkoutSha256": "28724154fb1634a34008e2e1246a06f9506c68505de17b2300bce05b1874d81d"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/DockerTransport.java",
+            "gitSha256": "d25186aa94bfa1a99a5c888b493ac11067d17398f57ec083ac274d7fc0dd6e67",
+            "checkoutSha256": "ab82daf38e6dcad0752a689ce5de5745503bfb8c018f3dce9e8cc05acd1bb897"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/GuestBudget.java",
+            "gitSha256": "3bb64866fca8cdf5d30fcb6822e063b32656440f7e5ce84647d06a725ce429fd",
+            "checkoutSha256": "3f7b4324a9bdcda2c3df9b7187b020ce5ffdff0f5f0a09a91601ca8d3ed24315"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/HostFacts.java",
+            "gitSha256": "55437d3533a52221333fe830281ae9c7b5fedcca82b6e6f45b796f9f86948374",
+            "checkoutSha256": "7404317c8d2c930342dcc72ca0966839dc167ebd6e48a4b4a564652d26ef16be"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/LeaseReferences.java",
+            "gitSha256": "68d0075f79e25ffa01216db061ef71b6bed4d9ec0c4db5c174496ba3d57dc677",
+            "checkoutSha256": "6f0cc3d0db374d6695d11a13e6de1b6181099c7303065371b25e832d0362a403"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/Main.java",
+            "gitSha256": "6e03fdf410c93d4d67624cb62ee1c4a62e161f628f46f37a0746b485145d305c",
+            "checkoutSha256": "de91e05d234b85012a81a461ecfbb70978c3f53ef255c5a1975988367a45ce4d"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/OperationJournal.java",
+            "gitSha256": "cee11aa53fee2aba072a4e3be4528b55420f0638bf7d5c76963b4a666261cb55",
+            "checkoutSha256": "089653098c322dd46e11a46ed9efc206d64d322ce36b133f4b534f2b9651eefe"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/Payload.java",
+            "gitSha256": "a3d4628e0aa8fa143df04e05d1b9cb4b748c82bae5776291fc112746b21349db",
+            "checkoutSha256": "247d743ec51a5ba495712abe0696c46cf4e778ae54fa93707e15b9ceb32a354f"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/WindowsFiles.java",
+            "gitSha256": "eda7940aa96076de7304e953949f67b887ea04be9e27081aa2d273d868fac920",
+            "checkoutSha256": "ab9420f87a3b77d7bc73d8e553f0bc10bacfe158e8e01e51f513aa4a0d945de1"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/WindowsKeeper.java",
+            "gitSha256": "2dfcb4ed3e3d8063375ddc6b024f245d297dcc6ee401c1a66e673c4c8453d5fb",
+            "checkoutSha256": "ab390ad270c471572154318235f8cf2e2465f55a840de12a69a11e6c005a0698"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/WindowsRuntime.java",
+            "gitSha256": "c33dd0d6aa7cd037e277dd4b5ac5fc24592cf091aed1e54203a6f123502b92c5",
+            "checkoutSha256": "51de923842624df31241236282ec0dc7c5ac18adf41ab5e06e30c09855a9b5b7"
+          },
+          {
+            "path": "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/WslDistribution.java",
+            "gitSha256": "2252445396bb802b9ada2379371a2e985b75d97a4f60fcf78a6e7fd4de4d52e4",
+            "checkoutSha256": "f463b4e80d5b937bdea67659d60873b38f008845430e1b13f472eb083df24f4c"
+          }
+        ]
+      }
+    },
+    {
+      "id": "helper-common",
+      "sourceIdentityMatched": true,
+      "source": {
+        "commit": "4a7c5d0575352928e6eda198300044a195d4a288",
+        "license": "MIT",
+        "files": [
+          {
+            "path": "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/DockerRequest.java",
+            "gitSha256": "b6351696c69f3d7c3ad2a601ae158649d38c65d1858f4b74445886dbef5cd862",
+            "checkoutSha256": "903cbbbc52ef83b8f26e6a1dd98c8d066e6a1b58bb3ddcb7f2d56d691b0d3487"
+          },
+          {
+            "path": "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/HelperProtocol.java",
+            "gitSha256": "8bac8fd85d0326e32a3eec953e9677a56922c0ea86ce1dd44c207990e46c712c",
+            "checkoutSha256": "89a0d7502beba689b26773c9d8b47481ae71bdff372a116218c85c88856f6bb7"
+          },
+          {
+            "path": "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/LeaseFile.java",
+            "gitSha256": "8d6c1346742c8a43025513382244c8a58852c957ef9ff29907ddf6cbd73a2fb5",
+            "checkoutSha256": "bda00aad7b623c92d528a1701e2384659c20392809ee7bf654b78c9e270b08c5"
+          },
+          {
+            "path": "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/ResourceRecords.java",
+            "gitSha256": "1fe95c8c0864e6bb22d3c57e63d9615af0880394574cb09f5090bf66b9259756",
+            "checkoutSha256": "4ebfbcf5986f1bac85c0dafd03e66c59e414923877d5d903791fabaaaa716f42"
+          },
+          {
+            "path": "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/Snapshot.java",
+            "gitSha256": "b211696e536dbd26ef2140580e3e56d8918d21e50f0eb839f372fc702ef873a4",
+            "checkoutSha256": "eaf0de4e350ba85cd0017c634bdc1c2108b87d770c803af7944c29001cb53495"
+          },
+          {
+            "path": "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/WorkerProxy.java",
+            "gitSha256": "c4115da6f1f9479ca4b330cbb6be1845f55ac12a3cfde5a597d1b24cd127b495",
+            "checkoutSha256": "c77610134fd0ae78525be7f4c2ee471ee900f3e1c1abaf92f5f4f38428a23158"
+          }
+        ]
+      }
+    },
+    {
+      "id": "guest-bridge",
+      "sourceIdentityMatched": true,
+      "source": {
+        "commit": "4a7c5d0575352928e6eda198300044a195d4a288",
+        "license": "MIT",
+        "files": [
+          {
+            "path": "helpers/windows/src/main/guest/guestbridge.py",
+            "gitSha256": "836633eadd20a57fd166838e983670a0b759ff455cfee78108dbef7fa798f79b",
+            "checkoutSha256": "508ea9fb5cb33babb98a74a71554419a9353f931c4f2bfccb16b6545f87e90ff"
+          }
+        ]
+      }
+    },
+    {
+      "id": "microsoft-runtime",
+      "sourceIdentityMatched": false,
+      "source": null,
+      "files": [
+        {
+          "path": "runtime/bin/api-ms-win-core-console-l1-1-0.dll",
+          "bytes": 22072,
+          "sha256": "88ace577a9c51061cb7d1a36babbbefa48212fadc838ffde98fdfff60de18386"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-console-l1-2-0.dll",
+          "bytes": 22056,
+          "sha256": "c062477ad3bfdc57b0cc402179637a214dab5045c8d644592c7decca7d18aa50"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-datetime-l1-1-0.dll",
+          "bytes": 22056,
+          "sha256": "1bd81dfd19204b44662510d9054852fb77c9f25c1088d647881c9b976cc16818"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-debug-l1-1-0.dll",
+          "bytes": 21944,
+          "sha256": "591358eb4d1531e9563ee0813e4301c552ce364c912ce684d16576eabf195dc3"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-errorhandling-l1-1-0.dll",
+          "bytes": 22096,
+          "sha256": "d56ce7b1cd76108ad6c137326ec694a14c99d48c3d7b0ace8c3ff4d9bcee3ce8"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-fibers-l1-1-0.dll",
+          "bytes": 22072,
+          "sha256": "91d249d7bc0e38ef6bcb17158b1fdc6dd8888dc086615c9b8b750b87e52a5fb3"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-fibers-l1-1-1.dll",
+          "bytes": 22072,
+          "sha256": "fc9d86cec621383eab636ebc87ddd3f5c19a3cb2a33d97be112c051d0b275429"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-file-l1-1-0.dll",
+          "bytes": 26152,
+          "sha256": "1ca895aba4e7435563a6b43e85eba67a0f8c74aa6a6a94d0fc48fa35535e2585"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-file-l1-2-0.dll",
+          "bytes": 22056,
+          "sha256": "4cadbc0c39da7c6722206fdcebd670abe5b8d261e7b041dd94f9397a89d1990d"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-file-l2-1-0.dll",
+          "bytes": 21960,
+          "sha256": "93c624b366ba16c643fc8933070a26f03b073ad0cf7f80173266d67536c61989"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-handle-l1-1-0.dll",
+          "bytes": 21944,
+          "sha256": "39095f59c41d76ec81bb2723d646fde4c148e7cc3402f4980d2ade95cb9c84f9"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-heap-l1-1-0.dll",
+          "bytes": 22072,
+          "sha256": "8f105771b236dbcb859de271f0a6822ce1cb79c36988dd42c9e3f6f55c5f7eb9"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-interlocked-l1-1-0.dll",
+          "bytes": 22072,
+          "sha256": "53b25e753ca785bf8b695d89dde5818a318890211dc992a89146f16658f0b606"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-kernel32-legacy-l1-1-1.dll",
+          "bytes": 22080,
+          "sha256": "a9b13a1cd1b8c19b0c6b4afcd5bb0dd29c0e2288231ac9e6db8510094ce68ba6"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-libraryloader-l1-1-0.dll",
+          "bytes": 22056,
+          "sha256": "7f39ba298b41e4963047341288cab36b6a241835ee11ba4ad70f44dacd40906c"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-localization-l1-2-0.dll",
+          "bytes": 22080,
+          "sha256": "6ee44dd0d8510dc024c9f7c79b1b9fa88c987b26b6beb6653ddd11751c34e5dc"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-memory-l1-1-0.dll",
+          "bytes": 22056,
+          "sha256": "0512a35316ec9180437f86696a84c5c06a7e4e82e050055a656e5bf9fca206f9"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-namedpipe-l1-1-0.dll",
+          "bytes": 22096,
+          "sha256": "c05f1fffe3b5a2738ea54ce9485cca026fb9635f982626fba1e1dcc531897273"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-processenvironment-l1-1-0.dll",
+          "bytes": 21968,
+          "sha256": "c4eca98c3c67b6395d5b005b00ac1eb0318b86b23aa71035a44c2b1602befba9"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-processthreads-l1-1-0.dll",
+          "bytes": 22096,
+          "sha256": "5ccb89e93d67bc3288d4e84649c5346e66e15e3d7cd65d989daf3f4cb584be9a"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-processthreads-l1-1-1.dll",
+          "bytes": 22072,
+          "sha256": "4ad565a8ba3ef0ea8ab87221ad11f83ee0bc844ce236607958406663b407333e"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-profile-l1-1-0.dll",
+          "bytes": 22080,
+          "sha256": "7809160932f44e59b021699f5bc68799eb7293ee1fa926d6fcca3c3445302e61"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-rtlsupport-l1-1-0.dll",
+          "bytes": 21960,
+          "sha256": "9dc1e91e71c7c054854bd1487cb4e6946d82c9f463430f1c4e8d1471005172b1"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-string-l1-1-0.dll",
+          "bytes": 22056,
+          "sha256": "60fc31d2a0c634412f529dba76af3b9bf991352877c6dae528186d3935704cfd"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-synch-l1-1-0.dll",
+          "bytes": 22056,
+          "sha256": "3a72b4f29f39a265d32ad12f0ce15dbf60129c840e10d84d427829ede45e78ad"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-synch-l1-2-0.dll",
+          "bytes": 22080,
+          "sha256": "efc1e4460984a73cf47a3def033af1c8f3b1dbc1a56cd27781d3aacf3e3330cb"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-sysinfo-l1-1-0.dll",
+          "bytes": 22072,
+          "sha256": "b203d862ddef1dd62bf623fc866c7f7a9c317c1c2ae30d1f52cb41f955b5698e"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-sysinfo-l1-2-0.dll",
+          "bytes": 22080,
+          "sha256": "2703635d835396afd0f138d7c73751afe7e33a24f4225d08c1690b0a371932c0"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-timezone-l1-1-0.dll",
+          "bytes": 22056,
+          "sha256": "33f4fddc181066fce06b2227bded813f95e94ed1f3d785e982c6b6b56c510c57"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-core-util-l1-1-0.dll",
+          "bytes": 21944,
+          "sha256": "6eda016742a6171205a387a14b3c0b331841567740376f56768f8c151724207d"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-conio-l1-1-0.dll",
+          "bytes": 22056,
+          "sha256": "b762061b688aae679afe788904d2c9970f74a7dac98f3b42463d08f25e483d3f"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-convert-l1-1-0.dll",
+          "bytes": 26056,
+          "sha256": "ebb2ae5535a64f65daeab8235585114fc9dd2cf1a49f5852d446250b998b6ae4"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-environment-l1-1-0.dll",
+          "bytes": 22080,
+          "sha256": "17d63275d00bdd8670422b95bd264c532998e0a1b041079e54fce4b6b7a55819"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-filesystem-l1-1-0.dll",
+          "bytes": 22056,
+          "sha256": "9a9e2a65a281644e368d0f272b95ba5f6b445d1c35910d06056c5ebeb77402db"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-heap-l1-1-0.dll",
+          "bytes": 22096,
+          "sha256": "bab9ac3ec83e380ae51e4295ef3bf2c738627812d3a49d1e713661abbc8dc57a"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-locale-l1-1-0.dll",
+          "bytes": 22080,
+          "sha256": "bd14c67ea28e21d6257ad780a37122c9b5773f69e693f5db6bffaee4d839526e"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-math-l1-1-0.dll",
+          "bytes": 30248,
+          "sha256": "606d66d82db562ea7979179d06486a0f94d079941d26b80a1e2c49d29959df6f"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-multibyte-l1-1-0.dll",
+          "bytes": 30248,
+          "sha256": "95f49efbe8107786733fa7c474025cf3fee0ac632f240367b296c736d06572aa"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-private-l1-1-0.dll",
+          "bytes": 75328,
+          "sha256": "1bc82bed6143d2bf1b6b08a7809f4a5e29317d6fddd338a7da3c0223522e4bbf"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-process-l1-1-0.dll",
+          "bytes": 22096,
+          "sha256": "f6156b1020380ec4f0e48577ebedaaef5fb1ab1f337d8b4e72e6a33a7567a9cc"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-runtime-l1-1-0.dll",
+          "bytes": 26152,
+          "sha256": "c5902934d026d7e15fbe9917d474f3322846a41a25e66f4b2b1f758801879f4b"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-stdio-l1-1-0.dll",
+          "bytes": 26168,
+          "sha256": "a9c5a153d8c0286f9b41a2b1c65854ad9e6471b8755b7de87bae4470e60bcab6"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-string-l1-1-0.dll",
+          "bytes": 26176,
+          "sha256": "25b8f83a7767211b11132775a0e27a45aa4ec8ab4e6572599f9c172ae3606b40"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-time-l1-1-0.dll",
+          "bytes": 22096,
+          "sha256": "7c7f6393f06de11750adb09cc5698ae55cd9fb27b2e51e207286feb1b5b2b156"
+        },
+        {
+          "path": "runtime/bin/api-ms-win-crt-utility-l1-1-0.dll",
+          "bytes": 21952,
+          "sha256": "d8ba5f17b9ffcbf3aeaf3fa1da226832d2fa90f81acce0cd669464e76ce434ac"
+        },
+        {
+          "path": "runtime/bin/msvcp140.dll",
+          "bytes": 575056,
+          "sha256": "a4c2229bdc2a2a630acdc095b4d86008e5c3e3bc7773174354f3da4f5beb9cde"
+        },
+        {
+          "path": "runtime/bin/ucrtbase.dll",
+          "bytes": 1361448,
+          "sha256": "2e5fb14b7bf8540278f3614a12f0226e56a7cc9e64b81cbd976c6fcf2f71cbfb"
+        },
+        {
+          "path": "runtime/bin/vcruntime140.dll",
+          "bytes": 119888,
+          "sha256": "02c6aa0e6e624411a9f19b0360a7865ab15908e26024510e5c38a9c08362c35a"
+        },
+        {
+          "path": "runtime/bin/vcruntime140_1.dll",
+          "bytes": 49640,
+          "sha256": "7dd9aa02e271c68ca6d5f18d651d23a15d7259715af43326578f7dde27f37637"
+        }
+      ],
+      "redistributed": true,
+      "legalReview": {
+        "legalReviewRequired": true,
+        "redistributionApproved": false,
+        "origin": "固定Temurin ZIP由来の49 DLL。OS提供DLLと分離",
+        "facts": [
+          "Visual C++ runtimeの配布にはVisual Studioの利用資格と適用license条項の確認が必要",
+          "UCRTのapp-local配布にはOS別制約があり、Windows 10/11ではsystem UCRTが優先される",
+          "Temurinへの同梱だけを本候補の再配布資格の根拠にしない"
+        ],
+        "references": [
+          "https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files?view=msvc-170",
+          "https://learn.microsoft.com/en-us/cpp/windows/universal-crt-deployment?view=msvc-170"
+        ],
+        "unresolved": [
+          "再配布資格と適用Microsoft licenseの法務判断",
+          "noticeとsource提供要否・配布形態の受入"
+        ]
+      },
+      "unresolved": "Temurin ZIP由来の同梱Microsoft DLL。再配布資格・適用license・notice/source提供要否は法務判断が必要。配布可能とは確定しない"
+    },
+    {
+      "id": "native-runtime",
+      "sourceIdentityMatched": true,
+      "source": {
+        "commit": "4a7c5d0575352928e6eda198300044a195d4a288",
+        "gitSha256": "9484e9341ef048c63247432723dc19cc9908e2ed075a02711327255dece55ea0",
+        "checkoutSha256": "a20f1b06d94802033699c48c4d7ac69d55e77a43bb4e83765b8b7fabdf252021",
+        "toolchain": {
+          "releaseUrl": "https://github.com/mstorsjo/llvm-mingw/releases/tag/20261006",
+          "releaseApiUrl": "https://api.github.com/repos/mstorsjo/llvm-mingw/releases/tags/20261006",
+          "expandedAssetsUrl": "https://github.com/mstorsjo/llvm-mingw/releases/expanded_assets/20261006",
+          "asset": "llvm-mingw-20261006-ucrt-x86_64.zip",
+          "url": "https://github.com/mstorsjo/llvm-mingw/releases/download/20261006/llvm-mingw-20261006-ucrt-x86_64.zip",
+          "bytes": 190836485,
+          "sha256": "317492c456aa27ee607a5919f1d2d38dcdc1112516a24d0bf4b00d078f52d17a",
+          "digestChecks": [
+            "公式release API digest/sizeとのPython hashlib照合",
+            "公式release UI digestとの照合",
+            "PowerShell Get-FileHash SHA256独立計算との一致"
+          ],
+          "extractedFilesVerified": 9053,
+          "compilerVersion": "clang version 23.1.3 (https://github.com/llvm/llvm-project.git 0d261d1ca552c95a8f007e061c787ac7132fbcbc)\nTarget: x86_64-w64-windows-gnu\nThread model: posix\nInstalledDir: H:/MCIconGenerator/worktrees/milestone-windows-helper-e1/MCIconGenerator/build/e1/toolchain/llvm-mingw-20261006-ucrt-x86_64/bin\nConfiguration file: H:/MCIconGenerator/worktrees/milestone-windows-helper-e1/MCIconGenerator/build/e1/toolchain/llvm-mingw-20261006-ucrt-x86_64/bin/x86_64-w64-windows-gnu.cfg\n",
+          "license": "LICENSE.TXT / x86_64-w64-mingw32/share/mingw32/COPYING*",
+          "source": "archivesのllvm-mingw、llvm-project、mingw-w64参照。compilerと静的runtimeのみ製品へ影響し、toolchain archive自体は再配布しない"
+        },
+        "upstream": {
+          "llvm-mingw": {
+            "version": "20261006",
+            "url": "https://api.github.com/repos/mstorsjo/llvm-mingw/tarball/20261006",
+            "bytes": 71032,
+            "sha256": "854fa2ae5792e2580a8d59f776c74f4a7be68a40522bb713b06adbb41ba35fce",
+            "bytesVerified": true,
+            "license": "ISC",
+            "licenseDocuments": [
+              {
+                "path": "mstorsjo-llvm-mingw-1719710/LICENSE.txt",
+                "bytes": 1092,
+                "sha256": "8e5db0129069005be2a07be3297e198888fd72fad62a13a611504660c6b7e3c7"
+              }
+            ],
+            "fileName": "llvm-mingw-20261006.tar.gz"
+          },
+          "llvm-project": {
+            "version": "llvmorg-23.1.3",
+            "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.3/llvm-project-23.1.3.src.tar.xz",
+            "bytes": 179220548,
+            "sha256": "c44186a7762ed28954be72e5ff6df9808e0779d4f1bf014ecc4e7e211d31ee34",
+            "bytesVerified": true,
+            "license": "Apache-2.0 WITH LLVM-exception",
+            "officialReleaseDigestMatched": true,
+            "licenseDocuments": [
+              {
+                "path": "llvm-project-23.1.3.src/LICENSE.TXT",
+                "bytes": 15141,
+                "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+              },
+              {
+                "path": "llvm-project-23.1.3.src/clang/LICENSE.TXT",
+                "bytes": 15140,
+                "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47"
+              },
+              {
+                "path": "llvm-project-23.1.3.src/compiler-rt/LICENSE.TXT",
+                "bytes": 16708,
+                "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d"
+              },
+              {
+                "path": "llvm-project-23.1.3.src/libcxx/LICENSE.TXT",
+                "bytes": 16703,
+                "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+              },
+              {
+                "path": "llvm-project-23.1.3.src/libcxxabi/LICENSE.TXT",
+                "bytes": 16706,
+                "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+              },
+              {
+                "path": "llvm-project-23.1.3.src/libunwind/LICENSE.TXT",
+                "bytes": 16706,
+                "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d"
+              },
+              {
+                "path": "llvm-project-23.1.3.src/llvm/LICENSE.TXT",
+                "bytes": 15141,
+                "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+              }
+            ],
+            "fileName": "llvm-project-23.1.3.src.tar.xz"
+          },
+          "mingw-w64": {
+            "version": "a3d93999ef0521681d45e445c39964a7af0f593f",
+            "url": "https://api.github.com/repos/mingw-w64/mingw-w64/tarball/a3d93999ef0521681d45e445c39964a7af0f593f",
+            "bytes": 15805477,
+            "sha256": "0cae4b30ae06a3ec315918452b7eb5a151b662f2e96f95215aea576f28a3d53f",
+            "bytesVerified": true,
+            "license": "各COPYING参照",
+            "licenseDocuments": [
+              {
+                "path": "mingw-w64-mingw-w64-a3d9399/COPYING",
+                "bytes": 2326,
+                "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+              },
+              {
+                "path": "mingw-w64-mingw-w64-a3d9399/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+                "bytes": 12155,
+                "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f"
+              },
+              {
+                "path": "mingw-w64-mingw-w64-a3d9399/COPYING.MinGW-w64/COPYING.MinGW-w64.txt",
+                "bytes": 5905,
+                "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+              }
+            ],
+            "fileName": "mingw-w64-a3d93999ef0521681d45e445c39964a7af0f593f.tar.gz"
+          }
+        },
+        "runtimeLicenses": [
+          {
+            "component": "compiler/LLVM/Clang",
+            "sourceArchive": "llvm-project",
+            "licensePath": "clang/LICENSE.TXT",
+            "license": "Apache-2.0 WITH LLVM-exception"
+          },
+          {
+            "component": "compiler-rt",
+            "sourceArchive": "llvm-project",
+            "licensePath": "compiler-rt/LICENSE.TXT",
+            "license": "Apache-2.0 WITH LLVM-exception"
+          },
+          {
+            "component": "libc++/libc++abi",
+            "sourceArchive": "llvm-project",
+            "licensePath": "libcxx/LICENSE.TXT + libcxxabi/LICENSE.TXT",
+            "license": "Apache-2.0 WITH LLVM-exception（本文の旧licenseも保持）"
+          },
+          {
+            "component": "libunwind",
+            "sourceArchive": "llvm-project",
+            "licensePath": "libunwind/LICENSE.TXT",
+            "license": "Apache-2.0 WITH LLVM-exception（本文の旧licenseも保持）"
+          },
+          {
+            "component": "MinGW CRT/headers/import libraries",
+            "sourceArchive": "mingw-w64",
+            "licensePath": "COPYING / COPYING.MinGW-w64/COPYING.MinGW-w64.txt / COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+            "license": "各fileの著作権・permissive licenseはCOPYINGを参照。Microsoft UCRT実装DLLを含めない"
+          }
+        ],
+        "notices": [
+          {
+            "path": "licenses/LICENSE.TXT",
+            "bytes": 15141,
+            "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING",
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt",
+            "bytes": 5905,
+            "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt",
+            "bytes": 12155,
+            "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f"
+          }
+        ],
+        "identityBasis": "公式release archiveのdigestと同版build recipeのsource参照を照合。toolchain自身のsource rebuild/bit一致は未検証"
+      },
+      "binary": {
+        "bytes": 1506816,
+        "sha256": "1112d86bd18633004759b4d327d9cd0e9e3772ecafb472b5cc731e50e39166d8",
+        "imports": [
+          "advapi32.dll",
+          "api-ms-win-crt-convert-l1-1-0.dll",
+          "api-ms-win-crt-environment-l1-1-0.dll",
+          "api-ms-win-crt-filesystem-l1-1-0.dll",
+          "api-ms-win-crt-heap-l1-1-0.dll",
+          "api-ms-win-crt-locale-l1-1-0.dll",
+          "api-ms-win-crt-math-l1-1-0.dll",
+          "api-ms-win-crt-multibyte-l1-1-0.dll",
+          "api-ms-win-crt-private-l1-1-0.dll",
+          "api-ms-win-crt-runtime-l1-1-0.dll",
+          "api-ms-win-crt-stdio-l1-1-0.dll",
+          "api-ms-win-crt-string-l1-1-0.dll",
+          "api-ms-win-crt-time-l1-1-0.dll",
+          "kernel32.dll",
+          "ole32.dll"
+        ]
+      },
+      "buildManifestSha256": "1da1eadc933ffe4e6a143258a792f6cb8672ad320ea7cc7f82af14c9246a61a6"
+    }
+  ],
+  "sourceInputs": {
+    "path": "windows-helper-source-inputs-2026-11-04.json",
+    "sha256": "114e310d28d524e69352792954dd65452ff21717d3466960774f4b1db005c3fe"
+  },
+  "publicSourceBundleReferencesConfirmed": false,
+  "osProvided": {
+    "redistributed": false,
+    "components": [
+      "同梱DLL以外のWindows system DLL",
+      "WSL OS機能/kernel"
+    ]
+  },
+  "reusedEvidence": [
+    "qa/renderer-sources-2026-11-04-b2b.json",
+    "qa/mac-helper-sources-2026-11-04.json"
+  ],
+  "summary": {
+    "components": 14,
+    "matched": 13,
+    "unmatched": 1
+  }
+}

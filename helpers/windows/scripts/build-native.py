@@ -1,6 +1,6 @@
 """検査済LLVM-MinGWからWindows x64 PEと包装用pinを生成する。取得/設定変更はしない。"""
 import argparse, json, os, pathlib, shutil, signal, subprocess, sys, time
-from native_artifact import BUILD_FLAGS, LINK_FLAGS, LICENSE_PATHS, TOOLCHAIN_SHA256, digest, pe_imports, require
+from native_artifact import BUILD_FLAGS, LINK_FLAGS, LICENSE_PATHS, TOOLCHAIN_SHA256, WINDOWS_TOOLCHAIN_SHA256, digest, pe_imports, require
 
 def run(args, cwd, env):
     process = None; original = None
@@ -19,6 +19,13 @@ def run(args, cwd, env):
                 try:
                     if process.returncode is not None:
                         report.update(collected=True, ownership='already-reaped-no-signal')
+                    elif sys.platform == 'win32':
+                        if process.poll() is None:
+                            report['ownership'] = 'unreaped-child-proven'
+                            subprocess.run([str(pathlib.Path(env['SystemRoot']) / 'System32/taskkill.exe'), '/PID', str(process.pid), '/T', '/F'], stdout=out, stderr=err, check=True, timeout=max(0, end - time.monotonic()))
+                            report['signalBeforeReap'] = True
+                        process.wait(timeout=max(0, end - time.monotonic()))
+                        report['collected'] = process.returncode is not None
                     else:
                         pid, status = os.waitpid(process.pid, os.WNOHANG)
                         if pid == process.pid:
@@ -52,12 +59,17 @@ def main():
     for name in ['toolchain', 'archive', 'source', 'output']: parser.add_argument('--' + name, type=pathlib.Path, required=True)
     args = parser.parse_args()
     for name in ['toolchain', 'archive', 'source', 'output']: setattr(args, name, getattr(args, name).resolve())
-    require(sys.platform == 'darwin', 'Mac専用buildです')
-    require(not args.output.exists(), '既存出力の上書き拒否'); require(digest(args.archive) == TOOLCHAIN_SHA256, 'toolchain archive pin不一致')
-    compiler = args.toolchain / 'bin/x86_64-w64-mingw32-clang++'
+    require(sys.platform in {'darwin', 'win32'}, 'MacまたはWindows専用buildです')
+    windows = sys.platform == 'win32'
+    archive_sha = WINDOWS_TOOLCHAIN_SHA256 if windows else TOOLCHAIN_SHA256
+    require(not args.output.exists(), '既存出力の上書き拒否'); require(digest(args.archive) == archive_sha, 'toolchain archive pin不一致')
+    compiler = args.toolchain / ('bin/x86_64-w64-mingw32-clang++.exe' if windows else 'bin/x86_64-w64-mingw32-clang++')
     require(compiler.resolve().is_relative_to(args.toolchain.resolve()) and compiler.is_file(), 'compiler path不一致')
     args.output.mkdir(parents=True); temporary = args.output / 'tmp'; temporary.mkdir()
     env = {'PATH': '/usr/bin:/bin', 'TMPDIR': str(temporary), 'TMP': str(temporary), 'TEMP': str(temporary)}
+    if windows:
+        env['SystemRoot'] = os.environ['SystemRoot']
+        env['PATH'] = str(pathlib.Path(env['SystemRoot']) / 'System32')
     if 'HOME' in os.environ: env['HOME'] = os.environ['HOME']
     source_sha = digest(args.source); native = args.output / 'windows-host.exe'
     run([compiler, *BUILD_FLAGS, args.source.resolve(), '-o', native.resolve(), *LINK_FLAGS], args.output, env)
@@ -67,7 +79,11 @@ def main():
         source = args.toolchain / relative; target = args.output / 'licenses' / relative
         target.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(source, target)
         notices.append({'path': target.relative_to(args.output).as_posix(), 'bytes': target.stat().st_size, 'sha256': digest(target)})
-    manifest = {'schemaVersion': 1, 'target': 'x86_64-w64-mingw32', 'toolchainArchiveSha256': TOOLCHAIN_SHA256, 'sourceSha256': source_sha, 'flags': BUILD_FLAGS + LINK_FLAGS, 'toolchainInputs': [{'path': name, 'sha256': digest((args.toolchain / name).resolve())} for name in ['bin/clang-target-wrapper.sh', 'bin/clang-23', 'bin/lld', 'bin/llvm-readobj', 'lib/libclang-cpp.23.1.dylib', 'lib/libLLVM.23.1.dylib']], 'artifact': {'bytes': native.stat().st_size, 'sha256': digest(native), 'imports': pe_imports(native)}, 'notices': notices, 'acceptance': 'crossbuild-only-not-native-os-accepted', 'signing': 'not-asserted'}
+    inputs = ['bin/clang-target-wrapper.sh', 'bin/clang-23', 'bin/lld', 'bin/llvm-readobj', 'lib/libclang-cpp.23.1.dylib', 'lib/libLLVM.23.1.dylib']
+    if windows:
+        inputs = ['bin/x86_64-w64-mingw32-clang++.exe', 'bin/clang-23.exe', 'bin/ld.lld.exe', 'bin/llvm-readobj.exe', 'bin/libLLVM-23.dll', 'bin/libclang-cpp.dll']
+        inputs += [p.relative_to(args.toolchain).as_posix() for directory in ['x86_64-w64-mingw32/lib', 'lib/clang/23/lib/windows'] for p in sorted((args.toolchain / directory).glob('*')) if p.is_file()]
+    manifest = {'schemaVersion': 1, 'target': 'x86_64-w64-mingw32', 'toolchainArchiveSha256': archive_sha, 'sourceSha256': source_sha, 'flags': BUILD_FLAGS + LINK_FLAGS, 'toolchainInputs': [{'path': name, 'sha256': digest((args.toolchain / name).resolve())} for name in inputs], 'artifact': {'bytes': native.stat().st_size, 'sha256': digest(native), 'imports': pe_imports(native)}, 'notices': notices, 'acceptance': 'crossbuild-only-not-native-os-accepted', 'signing': 'not-asserted'}
     (args.output / 'build.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 if __name__ == '__main__': main()

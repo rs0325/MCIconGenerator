@@ -19,12 +19,16 @@ class Child:
         return self.returncode
 
 class BuildRunTest(unittest.TestCase):
+    def setUp(self):
+        for target, name, value in [(build.sys, 'platform', 'darwin'), (build.signal, 'SIGKILL', 9), (build.os, 'WNOHANG', 1), (build.os, 'waitstatus_to_exitcode', lambda status: status)]:
+            patched = patch.object(target, name, value, create=True); patched.start(); self.addCleanup(patched.stop)
+
     def invoke(self, folder, child, probe=(0, 0), probe_error=None):
         def start(*args, **kwargs):
             kwargs['stdout'].write(b'partial compiler output'); kwargs['stdout'].flush()
             kwargs['stderr'].write(b'partial compiler diagnostic'); kwargs['stderr'].flush()
             return child
-        return patch.multiple(build.subprocess, Popen=Mock(side_effect=start)), patch.object(build.os, 'waitpid', side_effect=probe_error, return_value=probe), patch.object(build.os, 'killpg')
+        return patch.multiple(build.subprocess, Popen=Mock(side_effect=start)), patch.object(build.os, 'waitpid', side_effect=probe_error, return_value=probe, create=True), patch.object(build.os, 'killpg', create=True)
     def test_success_records_raw_and_exit_without_signal(self):
         with tempfile.TemporaryDirectory() as directory:
             folder = pathlib.Path(directory); child = Child(); spawn, probe, kill = self.invoke(folder, child)
@@ -60,5 +64,25 @@ class BuildRunTest(unittest.TestCase):
             folder = pathlib.Path(directory); failure = KeyboardInterrupt(); child = Child(failure); spawn, probe, kill = self.invoke(folder, child)
             with spawn, probe, kill, patch.object(pathlib.Path, 'write_text', side_effect=OSError('記録失敗')), self.assertRaises(KeyboardInterrupt) as caught: build.run(['compiler'], folder, {})
             self.assertIs(caught.exception, failure); self.assertTrue(failure.__notes__)
+
+    def test_windows_timeout_collects_owned_tree_and_preserves_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = pathlib.Path(directory); failure = subprocess.TimeoutExpired('compiler', 120); child = Child(failure)
+            child.poll = Mock(return_value=None)
+            spawn, probe, kill = self.invoke(folder, child)
+            with spawn, probe as waited, kill as signalled, patch.object(build.sys, 'platform', 'win32'), patch.object(build.subprocess, 'run') as taskkill, self.assertRaises(subprocess.TimeoutExpired) as caught:
+                build.run(['compiler'], folder, {'SystemRoot': 'C:/Windows'})
+            self.assertIs(caught.exception, failure); waited.assert_not_called(); signalled.assert_not_called()
+            self.assertEqual(taskkill.call_args.args[0][1:], ['/PID', '123', '/T', '/F'])
+            report = json.loads((folder / 'compile-process.json').read_text()); self.assertTrue(report['collected']); self.assertTrue(report['unknown'])
+
+    def test_windows_collection_failure_remains_unknown(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = pathlib.Path(directory); failure = KeyboardInterrupt(); child = Child(failure, cleanup_failure=True)
+            child.poll = Mock(return_value=None)
+            spawn, probe, kill = self.invoke(folder, child)
+            with spawn, probe, kill, patch.object(build.sys, 'platform', 'win32'), patch.object(build.subprocess, 'run', side_effect=OSError('回収失敗')), self.assertRaises(KeyboardInterrupt):
+                build.run(['compiler'], folder, {'SystemRoot': 'C:/Windows'})
+            report = json.loads((folder / 'compile-process.json').read_text()); self.assertFalse(report['collected']); self.assertIsNone(report['exit'])
 
 if __name__ == '__main__': unittest.main()

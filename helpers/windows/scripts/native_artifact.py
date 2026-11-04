@@ -2,6 +2,7 @@
 import hashlib, json, pathlib, re, struct
 
 TOOLCHAIN_SHA256 = 'a7a19b11048e89372637d26279cdb7c430ed3cf8c1e224310421312bf986ebf6'
+WINDOWS_TOOLCHAIN_SHA256 = '317492c456aa27ee607a5919f1d2d38dcdc1112516a24d0bf4b00d078f52d17a'
 BUILD_FLAGS = ['--no-default-config', '-rtlib=compiler-rt', '-unwindlib=libunwind', '-stdlib=libc++', '-fuse-ld=lld', '-std=c++17', '-O2', '-Wall', '-Wextra', '-Werror', '-static', '-municode']
 LINK_FLAGS = ['-ladvapi32', '-lole32', '-Wl,--no-insert-timestamp']
 LICENSE_PATHS = ['LICENSE.TXT', 'x86_64-w64-mingw32/share/mingw32/COPYING', 'x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt', 'x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt']
@@ -51,7 +52,7 @@ def verify(native, source, manifest_path):
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     require(manifest['schemaVersion'] == 1 and manifest['target'] == 'x86_64-w64-mingw32', 'native build schema/target不一致')
     require(manifest['sourceSha256'] == digest(source), 'native source pin不一致')
-    require(manifest['toolchainArchiveSha256'] == TOOLCHAIN_SHA256 and manifest['flags'] == BUILD_FLAGS + LINK_FLAGS, 'native toolchain/flags不一致')
+    require(manifest['toolchainArchiveSha256'] in {TOOLCHAIN_SHA256, WINDOWS_TOOLCHAIN_SHA256} and manifest['flags'] == BUILD_FLAGS + LINK_FLAGS, 'native toolchain/flags不一致')
     require(manifest['artifact'] == {'bytes': native.stat().st_size, 'sha256': digest(native), 'imports': pe_imports(native)}, 'native artifact pin不一致')
     require(manifest['acceptance'] == 'crossbuild-only-not-native-os-accepted', 'native未受入区分不一致')
     require(manifest_path.name == 'build.json', 'native build.json必須')
