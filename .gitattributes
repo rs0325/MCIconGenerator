@@ -3,3 +3,6 @@
 *.sh text eol=lf
 gradlew text eol=lf
 *.jar binary
+docker/Dockerfile text eol=lf
+docker/packages.lock text eol=lf
+qa/renderer-repro-2026-11-04-packages.tsv text eol=lf

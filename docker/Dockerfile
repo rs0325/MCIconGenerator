@@ -5,10 +5,14 @@ FROM eclipse-temurin:25-jdk-noble@sha256:589ff4cc3f71aab462e7048a47a0d10edf57fbc
 COPY --from=java8 /opt/java/openjdk /opt/java/java8
 COPY --from=java17 /opt/java/openjdk /opt/java/java17
 COPY --from=java21 /opt/java/openjdk /opt/java/java21
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    xvfb xauth libgl1 libgl1-mesa-dri mesa-utils libxrandr2 libxcursor1 \
-    libxi6 libxrender1 libxtst6 libxxf86vm1 libopenal1 python3 curl \
-    && rm -rf /var/lib/apt/lists/*
+ARG SOURCE_DATE_EPOCH=1793664000
+COPY docker/packages.lock /tmp/renderer-packages.lock
+RUN sed -i -E 's#http://(archive.ubuntu.com/ubuntu|security.ubuntu.com/ubuntu)/?#https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/#g' /etc/apt/sources.list.d/ubuntu.sources \
+    && apt-get update --error-on=any \
+    && PYTHONHASHSEED=0 apt-get install -y --no-install-recommends $(cat /tmp/renderer-packages.lock) \
+    && rm -rf /var/lib/apt/lists/* /tmp/renderer-packages.lock \
+        /var/log/apt/* /var/log/dpkg.log /var/log/alternatives.log \
+        /var/cache/ldconfig/aux-cache
 ENV LIBGL_ALWAYS_SOFTWARE=1
 ENV LP_NATIVE_VECTOR_WIDTH=128
 ENV GALLIUM_OVERRIDE_CPU_CAPS=sse4.1

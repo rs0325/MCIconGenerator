@@ -1,0 +1,414 @@
+{
+  "date": "2026-11-04",
+  "task": "milestone-renderer-b1",
+  "refs": [
+    91,
+    93
+  ],
+  "base_commit": "9ea39f0c7c9c6e31e045163299076344e6ea7863",
+  "final_runtime_adopted": false,
+  "environment": {
+    "client": "Docker 29.9.2 windows/amd64",
+    "server": "Docker Engine 29.9.2 linux/amd64",
+    "buildx": "0.38.1",
+    "buildkit": "v0.34.0",
+    "driver": "docker",
+    "disk_free_h_before_bytes": 636805296128
+  },
+  "build_options": {
+    "platform": "linux/amd64",
+    "no_cache": true,
+    "provenance": false,
+    "fixed_output": "type=docker,rewrite-timestamp=true",
+    "source_date_epoch": 1793664000
+  },
+  "snapshot": {
+    "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/",
+    "suites": [
+      "noble",
+      "noble-updates",
+      "noble-backports",
+      "noble-security"
+    ],
+    "signed_by": "/usr/share/keyrings/ubuntu-archive-keyring.gpg",
+    "signature_verification": true,
+    "added_package_count": 103
+  },
+  "java_base_images": [
+    "eclipse-temurin:8-jdk-noble@sha256:55cdca1740b7bcfc1dc207744bd280e1ff2b7829475185745e1b5d19c3e42f97",
+    "eclipse-temurin:17-jdk-noble@sha256:fb79620c3f6ee8f1c7530a8dc4fd49e3b410bcef037694ad4858a1553bac4170",
+    "eclipse-temurin:21-jdk-noble@sha256:b468c3fc688b14450571494f588bd939378e7fd542ed5a73f8efc13f17872a87",
+    "eclipse-temurin:25-jdk-noble@sha256:589ff4cc3f71aab462e7048a47a0d10edf57fbccde3fceea2281e610bf5880b4"
+  ],
+  "measurements": {
+    "baseline-1": {
+      "tag": "mcicon-renderer-repro:baseline-1",
+      "image_id": "sha256:d60fce0a677a38d0ce2c4b2d1bd8bc4b3e6d69d6e28986466eae371eb80004d7",
+      "image_bytes": 2056609175,
+      "build_seconds": 66.5,
+      "archive_bytes": 598801920,
+      "archive_sha256": "145d98d6a5dbd367f3ac04f438bf527aa8b5a3caf01166597a9a32e4ea81fd03",
+      "packages_sha256": "c9347178f5c1973a35af95b65aa01ddf2ed41e3f4e7ff850155e9fbbd8125ef2",
+      "files_sha256": "917c5339df4f0bfd5560a7c2a044c453f780423e93102dd6646563605edc3a8b",
+      "config_digest": "sha256:781882d25cf0a15a1b14209a2b3d2962f607217ce297a56d2b2944a02ce88ba1",
+      "id_archive_bytes": 598801920,
+      "id_archive_sha256": "7fe12db7e934449cc0ab2b39a5a71466740a97a191a2fe1ff8b1557e93b2a441"
+    },
+    "baseline-2": {
+      "tag": "mcicon-renderer-repro:baseline-2",
+      "image_id": "sha256:f3e7aa076c95a12b474a711033c7d73c16ba14c525dcf9eebb379c242c3ce381",
+      "image_bytes": 2056610019,
+      "build_seconds": 53.813,
+      "archive_bytes": 598802432,
+      "archive_sha256": "c66b34a52097f7732f1b9496202f6ca87be468ab49fd78f7ed632c126a6d2cdf",
+      "packages_sha256": "c9347178f5c1973a35af95b65aa01ddf2ed41e3f4e7ff850155e9fbbd8125ef2",
+      "files_sha256": "a4b336c3d67c732303a72160c3c47b970120ba0af09378a7ad4848812bdb5301",
+      "config_digest": "sha256:21280d5799af7aee16b77cf560b828ffb94c103ed0af262b94705d50826821d5",
+      "id_archive_bytes": 598802432,
+      "id_archive_sha256": "8ac42b4e681373fabad362b0b34dd93aea06528b79be4fe2ef377b6517f8f060"
+    },
+    "fixed-1": {
+      "tag": "mcicon-renderer-repro:fixed-1",
+      "image_id": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+      "image_bytes": 2056219398,
+      "build_seconds": 106.969,
+      "archive_bytes": 598764544,
+      "archive_sha256": "4200c7eaad4c5a082032ea1708020688094f6a79856a2f150103c7bbd69e6579",
+      "packages_sha256": "c9347178f5c1973a35af95b65aa01ddf2ed41e3f4e7ff850155e9fbbd8125ef2",
+      "files_sha256": "6c607001a9cf31cabaf6b7627f6258c4cd0c3f104d823b84e69dfb8eca29d74f",
+      "config_digest": "sha256:130ff7c7f504746fa447d312b72638c662b0a777bfb80fc4329cab5ac0974314",
+      "id_archive_bytes": 598764544,
+      "id_archive_sha256": "6e63f160f2e3d15af3b088485739b21a076cf8672a9b02dc5600299d6daa1fe1",
+      "inputs_sha256": {
+        "docker/Dockerfile": "a0a3576ade9a35bd830aa04f951bffc6ad51a71189f5cfaa3594633073d57d18",
+        "docker/entrypoint.sh": "f9e5bcd211856a62f7ac32b95c7bba142dbbabb991ccefcdf1a2b8c28d5f0b4b",
+        "docker/packages.lock": "8c8aa79be86580c0c1dad8cf349a802177d0e749adfe8d228fdf652c8374cc7b"
+      }
+    },
+    "fixed-2": {
+      "tag": "mcicon-renderer-repro:fixed-2",
+      "image_id": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+      "image_bytes": 2056219398,
+      "build_seconds": 93.234,
+      "archive_bytes": 598764544,
+      "archive_sha256": "8a6208d9b97311ec9c956ae514896adfc0dd9bfac973d39a6f91820834712a79",
+      "config_digest": "sha256:130ff7c7f504746fa447d312b72638c662b0a777bfb80fc4329cab5ac0974314",
+      "id_archive_bytes": 598764544,
+      "id_archive_sha256": "6e63f160f2e3d15af3b088485739b21a076cf8672a9b02dc5600299d6daa1fe1",
+      "inputs_sha256": {
+        "docker/Dockerfile": "a0a3576ade9a35bd830aa04f951bffc6ad51a71189f5cfaa3594633073d57d18",
+        "docker/entrypoint.sh": "f9e5bcd211856a62f7ac32b95c7bba142dbbabb991ccefcdf1a2b8c28d5f0b4b",
+        "docker/packages.lock": "8c8aa79be86580c0c1dad8cf349a802177d0e749adfe8d228fdf652c8374cc7b"
+      },
+      "packages_sha256": "c9347178f5c1973a35af95b65aa01ddf2ed41e3f4e7ff850155e9fbbd8125ef2",
+      "files_sha256": "1eb164b44254d309d7d40bfbdec70fef275f4080a38a2d2aee8081c72c23e7fa"
+    }
+  },
+  "comparison_baseline": {
+    "equal": {
+      "image_id": false,
+      "config_digest": false,
+      "archive_sha256": false,
+      "id_archive_sha256": false,
+      "packages_sha256": true,
+      "files_sha256": false
+    },
+    "changed_files": 1066,
+    "content_differences": [
+      {
+        "path": "var/cache/ldconfig/aux-cache",
+        "changes": {
+          "mtime": [
+            1793768791,
+            1793768908
+          ],
+          "sha256": [
+            "bd2c34db95ab8c7a8294467d6e32e699186c7686e48346816eea98a888bc2d25",
+            "0c3a65b8d0030a8784ab570aff351d5ad676462afecbcbe76b4ec24387b20486"
+          ]
+        }
+      },
+      {
+        "path": "var/log/apt/history.log",
+        "changes": {
+          "mtime": [
+            1793768791,
+            1793768908
+          ],
+          "sha256": [
+            "98b6329ce0895d2d5c772779132a862aac99ea5e4715fe9874445bc25b45853f",
+            "8842fbb5fc7283e5c82e0a4f55367ee52b77db84916f35cb0c13c948ae9e99ae"
+          ]
+        }
+      },
+      {
+        "path": "var/log/apt/term.log",
+        "changes": {
+          "mtime": [
+            1793768791,
+            1793768908
+          ],
+          "sha256": [
+            "e4e9ee7eae3d6c9c6a2f395c1d7d26994c16d3997304012ddde540b5ce78cc9c",
+            "82d16a4caac8b7e081e0c3bdd729bc470b888f39fa52e356a66101a07235a334"
+          ]
+        }
+      },
+      {
+        "path": "var/log/dpkg.log",
+        "changes": {
+          "mtime": [
+            1793768791,
+            1793768908
+          ],
+          "sha256": [
+            "e84ddcbeb7fc3abe2c5888e6152764c64e9d601217f1d06f832016e6995ad6b2",
+            "e2330a3794be8491410ef539fd9783126a10d1432840766f8447daefe27adfb8"
+          ]
+        }
+      }
+    ],
+    "mtime_only_files": 1062
+  },
+  "comparison_fixed": {
+    "left": "fixed-1",
+    "right": "fixed-2",
+    "equal": {
+      "image_id": true,
+      "config_digest": true,
+      "archive_sha256": false,
+      "id_archive_sha256": true,
+      "packages_sha256": true,
+      "files_sha256": false
+    },
+    "file_differences": [
+      {
+        "path": ".dockerenv",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "dev",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "dev/console",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "dev/pts",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "dev/shm",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "etc",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "etc/hostname",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "etc/hosts",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "etc/mtab",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      },
+      {
+        "path": "etc/resolv.conf",
+        "changes": {
+          "mtime": [
+            1793769080,
+            1793769254
+          ]
+        }
+      }
+    ]
+  },
+  "fixed_tag_archive_member_differences": [
+    {
+      "path": "index.json",
+      "changes": {
+        "sha256": [
+          "dbacde63e98317181ab5a840aed289bb146649ba02c1f6cdc95ffe16c7eb27e0",
+          "aa1ee73cf08b4831d12453c27b716dfbf8cba3a9a87a55e1b4c877d4f81a91bc"
+        ]
+      }
+    },
+    {
+      "path": "manifest.json",
+      "changes": {
+        "sha256": [
+          "2be7dac2a423e218755907c04120c4d71c320bb94bb27a3961aad9ba3a8965cf",
+          "a2e7dd864de67ab838caece32a462e524b2d6ae39e8f7a5a5a7d5043ffaa01e0"
+        ]
+      }
+    }
+  ],
+  "packages": {
+    "path": "qa/renderer-repro-2026-11-04-packages.tsv",
+    "count": 220,
+    "sha256": "c9347178f5c1973a35af95b65aa01ddf2ed41e3f4e7ff850155e9fbbd8125ef2"
+  },
+  "file_manifests": {
+    "baseline-1": {
+      "path": "build/renderer-repro/baseline-1/files.jsonl",
+      "sha256": "917c5339df4f0bfd5560a7c2a044c453f780423e93102dd6646563605edc3a8b",
+      "bytes": 2219182
+    },
+    "baseline-2": {
+      "path": "build/renderer-repro/baseline-2/files.jsonl",
+      "sha256": "a4b336c3d67c732303a72160c3c47b970120ba0af09378a7ad4848812bdb5301",
+      "bytes": 2219182
+    },
+    "fixed-1": {
+      "path": "build/renderer-repro/fixed-1/files.jsonl",
+      "sha256": "6c607001a9cf31cabaf6b7627f6258c4cd0c3f104d823b84e69dfb8eca29d74f",
+      "bytes": 2217939
+    },
+    "fixed-2": {
+      "path": "build/renderer-repro/fixed-2/files.jsonl",
+      "sha256": "1eb164b44254d309d7d40bfbdec70fef275f4080a38a2d2aee8081c72c23e7fa",
+      "bytes": 2217939
+    }
+  },
+  "java": [
+    {
+      "path": "/opt/java/java8/bin/java",
+      "version": "1.8.0_504-b01",
+      "sha256": "1a081a2c18367e5d966d716a6091d5fe2eec26b19e471980d0d8fd550174e21c"
+    },
+    {
+      "path": "/opt/java/java17/bin/java",
+      "version": "17.0.20.1+1",
+      "sha256": "f5aed21d3a0b0f4b05d3a3f9fe71263916d5bc0d47b53aa52a3340b90f0b4805"
+    },
+    {
+      "path": "/opt/java/java21/bin/java",
+      "version": "21.0.12.1+1-LTS",
+      "sha256": "2a207f5e7d075afa01d97f8048389a64432a44c4a5af0f5e77d6e286ec5f401d"
+    },
+    {
+      "path": "/opt/java/openjdk/bin/java",
+      "version": "25.0.4.1+1-LTS",
+      "sha256": "7380ce48ed5013735d2c8414db54adb8f981e7933ff594bd36f3baccddaafba3"
+    }
+  ],
+  "smoke": {
+    "runs": [
+      "fixed-1",
+      "fixed-2"
+    ],
+    "entrypoint": "/usr/local/bin/mcicon-display",
+    "network": "none",
+    "renderer": "llvmpipe (LLVM 20.1.2, 128 bits)",
+    "mesa": "25.2.8-0ubuntu0.24.04.4",
+    "cpu_feature": "sse4_1",
+    "gallium_override_cpu_caps": "sse4.1",
+    "default_java": "/opt/java/openjdk/bin/java",
+    "raw_outputs": {
+      "fixed-1": "name of display: :99\ndisplay: :99  screen: 0\ndirect rendering: Yes\nExtended renderer info (GLX_MESA_query_renderer):\n    Vendor: Mesa (0xffffffff)\n    Device: llvmpipe (LLVM 20.1.2, 128 bits) (0xffffffff)\n    Version: 25.2.8\n    Accelerated: no\n    Video memory: 32059MB\n    Unified memory: yes\n    Preferred profile: core (0x1)\n    Max core profile version: 4.5\n    Max compat profile version: 4.5\n    Max GLES1 profile version: 1.1\n    Max GLES[23] profile version: 3.2\nMemory info (GL_ATI_meminfo):\n    VBO free memory - total: 30 MB, largest block: 30 MB\n    VBO free aux. memory - total: 27431 MB, largest block: 27431 MB\n    Texture free memory - total: 30 MB, largest block: 30 MB\n    Texture free aux. memory - total: 27431 MB, largest block: 27431 MB\n    Renderbuffer free memory - total: 30 MB, largest block: 30 MB\n    Renderbuffer free aux. memory - total: 27431 MB, largest block: 27431 MB\nMemory info (GL_NVX_gpu_memory_info):\n    Dedicated video memory: 4293101696 MB\n    Total available memory: 4293133755 MB\n    Currently available dedicated video memory: 30 MB\nOpenGL vendor string: Mesa\nOpenGL renderer string: llvmpipe (LLVM 20.1.2, 128 bits)\nOpenGL core profile version string: 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL core profile shading language version string: 4.50\nOpenGL core profile context flags: (none)\nOpenGL core profile profile mask: core profile\n\nOpenGL version string: 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL shading language version string: 4.50\nOpenGL context flags: (none)\nOpenGL profile mask: compatibility profile\n\nOpenGL ES profile version string: OpenGL ES 3.2 Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL ES profile shading language version string: OpenGL ES GLSL ES 3.20\n\nCPU=sse4.1; vector=128; OpenAL=null\n/opt/java/java8/bin/java\nopenjdk version \"1.8.0_504\"\nOpenJDK Runtime Environment (Temurin)(build 1.8.0_504-b01)\nOpenJDK 64-Bit Server VM (Temurin)(build 25.504-b01, mixed mode)\n1a081a2c18367e5d966d716a6091d5fe2eec26b19e471980d0d8fd550174e21c  /opt/java/java8/bin/java\n/opt/java/java17/bin/java\nopenjdk version \"17.0.20.1\" 2026-08-18\nOpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)\nOpenJDK 64-Bit Server VM Temurin-17.0.20.1+1 (build 17.0.20.1+1, mixed mode, sharing)\nf5aed21d3a0b0f4b05d3a3f9fe71263916d5bc0d47b53aa52a3340b90f0b4805  /opt/java/java17/bin/java\n/opt/java/java21/bin/java\nopenjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n2a207f5e7d075afa01d97f8048389a64432a44c4a5af0f5e77d6e286ec5f401d  /opt/java/java21/bin/java\n/opt/java/openjdk/bin/java\nopenjdk version \"25.0.4.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS, mixed mode, sharing)\n7380ce48ed5013735d2c8414db54adb8f981e7933ff594bd36f3baccddaafba3  /opt/java/openjdk/bin/java\n",
+      "fixed-2": "name of display: :99\ndisplay: :99  screen: 0\ndirect rendering: Yes\nExtended renderer info (GLX_MESA_query_renderer):\n    Vendor: Mesa (0xffffffff)\n    Device: llvmpipe (LLVM 20.1.2, 128 bits) (0xffffffff)\n    Version: 25.2.8\n    Accelerated: no\n    Video memory: 32059MB\n    Unified memory: yes\n    Preferred profile: core (0x1)\n    Max core profile version: 4.5\n    Max compat profile version: 4.5\n    Max GLES1 profile version: 1.1\n    Max GLES[23] profile version: 3.2\nMemory info (GL_ATI_meminfo):\n    VBO free memory - total: 30 MB, largest block: 30 MB\n    VBO free aux. memory - total: 26849 MB, largest block: 26849 MB\n    Texture free memory - total: 30 MB, largest block: 30 MB\n    Texture free aux. memory - total: 26849 MB, largest block: 26849 MB\n    Renderbuffer free memory - total: 30 MB, largest block: 30 MB\n    Renderbuffer free aux. memory - total: 26849 MB, largest block: 26849 MB\nMemory info (GL_NVX_gpu_memory_info):\n    Dedicated video memory: 15315 MB\n    Total available memory: 47375 MB\n    Currently available dedicated video memory: 30 MB\nOpenGL vendor string: Mesa\nOpenGL renderer string: llvmpipe (LLVM 20.1.2, 128 bits)\nOpenGL core profile version string: 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL core profile shading language version string: 4.50\nOpenGL core profile context flags: (none)\nOpenGL core profile profile mask: core profile\n\nOpenGL version string: 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL shading language version string: 4.50\nOpenGL context flags: (none)\nOpenGL profile mask: compatibility profile\n\nOpenGL ES profile version string: OpenGL ES 3.2 Mesa 25.2.8-0ubuntu0.24.04.4\nOpenGL ES profile shading language version string: OpenGL ES GLSL ES 3.20\n\nCPU=sse4.1; vector=128; OpenAL=null\n/opt/java/java8/bin/java\nopenjdk version \"1.8.0_504\"\nOpenJDK Runtime Environment (Temurin)(build 1.8.0_504-b01)\nOpenJDK 64-Bit Server VM (Temurin)(build 25.504-b01, mixed mode)\n1a081a2c18367e5d966d716a6091d5fe2eec26b19e471980d0d8fd550174e21c  /opt/java/java8/bin/java\n/opt/java/java17/bin/java\nopenjdk version \"17.0.20.1\" 2026-08-18\nOpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)\nOpenJDK 64-Bit Server VM Temurin-17.0.20.1+1 (build 17.0.20.1+1, mixed mode, sharing)\nf5aed21d3a0b0f4b05d3a3f9fe71263916d5bc0d47b53aa52a3340b90f0b4805  /opt/java/java17/bin/java\n/opt/java/java21/bin/java\nopenjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n2a207f5e7d075afa01d97f8048389a64432a44c4a5af0f5e77d6e286ec5f401d  /opt/java/java21/bin/java\n/opt/java/openjdk/bin/java\nopenjdk version \"25.0.4.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS, mixed mode, sharing)\n7380ce48ed5013735d2c8414db54adb8f981e7933ff594bd36f3baccddaafba3  /opt/java/openjdk/bin/java\n"
+    }
+  },
+  "asset_path_audit": {
+    "entries": 10797,
+    "regular_files": 7916,
+    "workspace_children": [],
+    "non_jdk_jars": [],
+    "png_paths": [
+      "usr/share/pixmaps/debian-logo.png",
+      "usr/share/pixmaps/ubuntu-logo-text-dark.png",
+      "usr/share/pixmaps/ubuntu-logo-text.png"
+    ],
+    "credential_paths_detected": [],
+    "method": "展開一覧のpathを照合。作業端末の鍵・認証情報は探索していない。COPY入力はJDK、package lock、entrypointのみ。"
+  },
+  "c498": {
+    "record": "qa/validation-2026-10-19-linux-rootless-proof.json",
+    "image_id": "sha256:c498eda74b68a67acb8709951f36b294dcef9025acc480238e7742bf2b9601cf",
+    "archive_sha256": "1dcf9b4363583ed6c9cf5847aaf5648aaaf80a084f978b075d1b4fe483ed2e70",
+    "same_image_or_config": false,
+    "same_archive": false,
+    "scope": "旧記録値との比較。旧archiveは取得・展開していない。"
+  },
+  "limitations": [
+    "同じWindows端末・Engine・BuildKitでの2回比較。別host/BuildKit版は未検証。",
+    "docker export一覧はコンテナ生成10pathのmtimeが異なる。",
+    "別tagのsaveにはtagメタデータ差がある。",
+    "Minecraft描画、最終tar.gz、license/source提供、正式採用は未実施。"
+  ],
+  "local_artifacts": "build/renderer-repro/ にログ・全一覧・inspect・比較を保持。image.tarはhash取得後削除。",
+  "measurement_script_sha256": "3a7b261d7795c0df946daf66c2cda716a03218a25e967f9d08aaf7353f2b517e",
+  "checks": {
+    "script_help": true,
+    "final_archive_helper": true,
+    "final_smoke_helper": true,
+    "line_endings_lf": true,
+    "git_diff_check": true
+  },
+  "cleanup": {
+    "retained_image": "mcicon-renderer-repro:fixed-1",
+    "removed_tags": [
+      "mcicon-renderer-repro:baseline-1",
+      "mcicon-renderer-repro:baseline-2",
+      "mcicon-renderer-repro:fixed-2"
+    ],
+    "removed_probe_image": "sha256:cb3e34fb31d38a838786b9d7ef46b66a7377675a5bc2e577d3a1ad82f3929913",
+    "removed_private_cache_records": 29,
+    "protected_other_cache_records": 25,
+    "temporary_tar_files": 0,
+    "remaining_containers": 0,
+    "disk_after": "TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE\nImages          13        0         6.459GB   2.893GB (44%)\nContainers      0         0         0B        0B\nLocal Volumes   0         0         0B        0B\nBuild Cache     25        0         4.144GB   8.192kB\n",
+    "docker_desktop": "停止コマンド成功。Desktop/backend process数0を確認。停止後のstatus APIは応答なし。"
+  }
+}
