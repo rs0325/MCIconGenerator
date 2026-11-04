@@ -1,0 +1,21 @@
+Package: sample-source
+Binary: libsample1,
+ sample-tools
+Version: 1:2.0-1
+Directory: pool/main/s/sample-source
+Standards-Version: 4.7.0
+Format: 3.0 (quilt)
+Checksums-Sha256:
+ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 10 sample-source_2.0-1.dsc
+ bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb 12 sample-source_2.0.orig.tar.xz
+ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 14 sample-source_2.0-1.debian.tar.xz
+
+Package: native
+Binary: native
+Version: 3.0
+Directory: pool/main/n/native
+Standards-Version: 4.6.2
+Format: 3.0 (native)
+Checksums-Sha256:
+ dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd 10 native_3.0.dsc
+ eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee 12 native_3.0.tar.gz
