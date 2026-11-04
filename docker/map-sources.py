@@ -52,7 +52,7 @@ def source_identity(package):
     return match[1], match[2] or package['version']
 
 
-def source_record(fields):
+def source_record(fields, base_url=SNAPSHOT):
     files = []
     for line in fields['Checksums-Sha256'].splitlines():
         if not line.strip():
@@ -61,7 +61,7 @@ def source_record(fields):
         if not re.fullmatch('[0-9a-f]{64}', sha) or int(size) <= 0:
             raise ValueError('Sourcesのchecksum/sizeが不正です')
         files.append({'name': name, 'bytes': int(size), 'sha256': sha,
-                      'url': SNAPSHOT + urllib.parse.quote(fields['Directory'] + '/' + name, safe='/+~.-_')})
+                      'url': base_url + urllib.parse.quote((fields['Directory'] + '/' + name).lstrip('/'), safe='/+~.-_')})
     dsc = [f for f in files if f['name'].endswith('.dsc')]
     archives = [f for f in files if re.search(r'\.tar\.(?:gz|xz|bz2|lzma|zst)$', f['name'])]
     if len(dsc) != 1 or not archives:
@@ -176,16 +176,56 @@ def generate(evidence_path, inventory_path, cache, offline=False, metadata_path=
                         'copyrightMissing': [p['package'] for p in packages if p['copyright'] is None]}}
 
 
+def supplement(table_path, metadata_path):
+    """既存表の入力証拠を保持し、未一致版だけを補足.dscで解決する。"""
+    raw = table_path.read_bytes().replace(b'\r\n', b'\n')
+    table = json.loads(raw)
+    metadata_raw = metadata_path.read_bytes()
+    metadata = json.loads(metadata_raw)
+    wanted = {(p['sourcePackage'], p['sourceVersion'])
+              for p in table['packages'] if p['sourceId'] is None}
+    sources = {(s['package'], s['version']): s for s in table['sources']}
+    for source in metadata['sources']:
+        key = source['package'], source['version']
+        if key not in wanted or key in sources:
+            raise ValueError('補足sourceの対象が不正または既存表と重複しています')
+        sources[key] = {'id': '@'.join(key), **source}
+    packages = match_packages(table['packages'], sources)
+    for package in packages:
+        if package['sourceId']:
+            package.pop('availableSourceVersions', None)
+    table.update(packages=packages, sources=[sources[k] for k in sorted(sources)],
+                 baselineTableSha256=digest(raw), supplementalMetadataSha256=digest(metadata_raw),
+                 javaReleases=metadata['java'], unresolvedMetadata=metadata['unresolved'])
+    table['summary'].update(
+        matched=sum(p['sourceId'] is not None for p in packages),
+        unmatched=sum(p['sourceId'] is None for p in packages), sourcePackages=len(sources),
+        matchedFromIndexes=sum(bool(sources[(p['sourcePackage'], p['sourceVersion'])]['indexes'])
+                               for p in packages if p['sourceId']),
+        matchedFromDsc=sum(not sources[(p['sourcePackage'], p['sourceVersion'])]['indexes']
+                           for p in packages if p['sourceId']))
+    return table
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--evidence', type=Path, required=True)
-    parser.add_argument('--packages', type=Path, required=True)
-    parser.add_argument('--cache', type=Path, required=True)
+    inputs = parser.add_mutually_exclusive_group(required=True)
+    inputs.add_argument('--evidence', type=Path)
+    inputs.add_argument('--baseline', type=Path)
+    parser.add_argument('--packages', type=Path)
+    parser.add_argument('--cache', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--metadata', type=Path)
     args = parser.parse_args()
-    result = generate(args.evidence, args.packages, args.cache, args.offline, args.metadata)
+    if args.baseline:
+        if not args.metadata or args.evidence or args.packages or args.cache:
+            parser.error('--baselineには--metadataだけを指定します')
+        result = supplement(args.baseline, args.metadata)
+    else:
+        if not args.packages or not args.cache:
+            parser.error('--evidenceには--packagesと--cacheが必要です')
+        result = generate(args.evidence, args.packages, args.cache, args.offline, args.metadata)
     raw = encode(result)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(raw)

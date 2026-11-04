@@ -15,9 +15,11 @@ mapping = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mapping)
 
 
-def fetch(url, cache):
+def fetch(url, cache, offline=False):
     local = cache / (hashlib.sha256(url.encode()).hexdigest() + '.metadata')
     if not local.exists():
+        if offline:
+            raise FileNotFoundError(local)
         request = urllib.request.Request(url, headers={'User-Agent': 'MCIconGenerator-source-audit/1.1'})
         with urllib.request.urlopen(request, timeout=120) as response:
             local.write_bytes(response.read())
@@ -33,45 +35,59 @@ def dsc_fields(raw):
     return next(mapping.paragraphs(text))
 
 
+def collect_locations(table, cache, locations, offline=False):
+    """設定された.dsc候補を順に検証し、archive本体を取得せず対応を返す。"""
+    sources = []
+    unresolved = []
+    missing = sorted({(p['sourcePackage'], p['sourceVersion'])
+                      for p in table['packages'] if p['sourceId'] is None})
+    for name, version in missing:
+        attempts = []
+        for url in locations.get(name + '@' + version, []):
+            try:
+                raw, pin = fetch(url, cache, offline)
+            except urllib.error.HTTPError as error:
+                attempts.append({'url': url, 'httpStatus': error.code})
+                continue
+            fields = dsc_fields(raw)
+            if fields['Source'] != name or fields['Version'] != version:
+                raise ValueError('取得した.dscのsource名/版が一致しません')
+            filename = urllib.parse.unquote(url.rsplit('/', 1)[1])
+            fields['Package'] = name
+            fields['Directory'] = ''
+            fields['Checksums-Sha256'] += '\n' + pin['sha256'] + ' ' + str(pin['bytes']) + ' ' + filename
+            source = mapping.source_record(fields, url.rsplit('/', 1)[0] + '/')
+            source['directory'] = None
+            source['indexes'] = []
+            source['retrievalAttempts'] = attempts + [{'url': url, 'httpStatus': 200}]
+            source['dscRetrieved'] = pin
+            source['dscSignatureVerified'] = False
+            sources.append(source)
+            break
+        else:
+            unresolved.append({'package': name, 'version': version, 'attempts': attempts})
+    return {'sources': sources, 'unresolved': unresolved,
+            'java': table['javaReleases'], 'dscChecks': table['dscChecks']}
+
+
 def collect(table, cache):
     cache.mkdir(parents=True, exist_ok=True)
     directories = {}
     for local in sorted((cache.parent / 'indexes').glob('*-Sources.gz')):
         for fields in mapping.paragraphs(gzip.decompress(local.read_bytes()).decode('utf-8')):
             directories[fields['Package']] = fields['Directory']
-    supplemental = []
-    unresolved = []
+    locations = {}
     missing = sorted({(p['sourcePackage'], p['sourceVersion'])
                       for p in table['packages'] if p['sourceId'] is None})
     for name, version in missing:
-        directory = directories[name]
         filename = name + '_' + version.split(':')[-1] + '.dsc'
-        url = mapping.SNAPSHOT + urllib.parse.quote(directory + '/' + filename, safe='/+~.-_')
-        attempts = []
-        for base in (mapping.SNAPSHOT, 'https://archive.ubuntu.com/ubuntu/'):
-            url = base + urllib.parse.quote(directory + '/' + filename, safe='/+~.-_')
-            try:
-                raw, pin = fetch(url, cache)
-                break
-            except urllib.error.HTTPError as error:
-                attempts.append({'url': url, 'httpStatus': error.code})
-        else:
-            unresolved.append({'package': name, 'version': version, 'attempts': attempts})
-            continue
-        fields = dsc_fields(raw)
-        if fields['Source'] != name or fields['Version'] != version:
-            raise ValueError('取得した.dscのsource名/版が一致しません')
-        fields['Package'] = fields['Source']
-        fields['Directory'] = directory
-        fields['Checksums-Sha256'] += '\n' + pin['sha256'] + ' ' + str(pin['bytes']) + ' ' + filename
-        source = mapping.source_record(fields)
-        for file in source['files']:
-            file['url'] = file['url'].replace(mapping.SNAPSHOT, base)
-        source['indexes'] = []
-        source['retrievalAttempts'] = attempts
-        source['dscRetrieved'] = pin
-        source['dscSignatureVerified'] = False
-        supplemental.append(source)
+        relative = urllib.parse.quote(directories[name] + '/' + filename, safe='/+~.-_')
+        locations[name + '@' + version] = [base + relative for base in
+                                         (mapping.SNAPSHOT, 'https://archive.ubuntu.com/ubuntu/')]
+    result = collect_locations(table, cache, locations)
+    supplemental, unresolved = result['sources'], result['unresolved']
+    for source in supplemental:
+        source['directory'] = directories[source['package']]
     dsc_checks = []
     for source in table['sources']:
         if source['package'] not in ('mesa', 'llvm-toolchain-20', 'base-files'):
@@ -130,8 +146,17 @@ def main():
     parser.add_argument('--table', type=Path, required=True)
     parser.add_argument('--cache', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--source-locations', type=Path)
+    parser.add_argument('--offline', action='store_true')
     args = parser.parse_args()
-    result = collect(json.loads(args.table.read_bytes()), args.cache)
+    if args.source_locations:
+        args.cache.mkdir(parents=True, exist_ok=True)
+        result = collect_locations(json.loads(args.table.read_bytes()), args.cache,
+                                   json.loads(args.source_locations.read_bytes()), args.offline)
+    else:
+        if args.offline:
+            parser.error('--offlineには--source-locationsが必要です')
+        result = collect(json.loads(args.table.read_bytes()), args.cache)
     args.output.write_bytes(mapping.encode(result))
     print(json.dumps({'supplementalSources': len(result['sources']), 'unresolved': result['unresolved'],
                       'java': [{k: j[k] for k in ('home', 'releaseTag', 'imageSourceCommitMatchesTag')}

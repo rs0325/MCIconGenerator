@@ -1,0 +1,1321 @@
+{
+  "sources": [
+    {
+      "package": "audit",
+      "version": "1:3.1.2-2.1build1.1",
+      "binaryNames": [
+        "auditd",
+        "libauparse0t64",
+        "libauparse-dev",
+        "libaudit1",
+        "libaudit-common",
+        "libaudit-dev",
+        "python3-audit",
+        "golang-redhat-audit-dev",
+        "audispd-plugins"
+      ],
+      "directory": null,
+      "standardsVersion": "4.6.2",
+      "format": "3.0 (quilt)",
+      "homepage": "https://people.redhat.com/sgrubb/audit/",
+      "dsc": {
+        "name": "audit_3.1.2-2.1build1.1.dsc",
+        "bytes": 2848,
+        "sha256": "3df86dee4b6d645173901fad492776add35f82c4e7c58cd8a4f82931a2588324",
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2-2.1build1.1.dsc"
+      },
+      "sourceArchives": [
+        {
+          "name": "audit_3.1.2.orig.tar.gz",
+          "bytes": 1219860,
+          "sha256": "c0b1792d1f0a88c6f1828710509cbb987059fc68712c97669ca90eae103d287d",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2.orig.tar.gz"
+        },
+        {
+          "name": "audit_3.1.2-2.1build1.1.debian.tar.xz",
+          "bytes": 18860,
+          "sha256": "ed9d8bb3ff1194b6c8943c7768596383f995b1d45dbc57b8f5ca5868a7b22558",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2-2.1build1.1.debian.tar.xz"
+        }
+      ],
+      "files": [
+        {
+          "name": "audit_3.1.2.orig.tar.gz",
+          "bytes": 1219860,
+          "sha256": "c0b1792d1f0a88c6f1828710509cbb987059fc68712c97669ca90eae103d287d",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2.orig.tar.gz"
+        },
+        {
+          "name": "audit_3.1.2-2.1build1.1.debian.tar.xz",
+          "bytes": 18860,
+          "sha256": "ed9d8bb3ff1194b6c8943c7768596383f995b1d45dbc57b8f5ca5868a7b22558",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2-2.1build1.1.debian.tar.xz"
+        },
+        {
+          "name": "audit_3.1.2-2.1build1.1.dsc",
+          "bytes": 2848,
+          "sha256": "3df86dee4b6d645173901fad492776add35f82c4e7c58cd8a4f82931a2588324",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2-2.1build1.1.dsc"
+        }
+      ],
+      "debianCopyrightInSource": "未確認（source archive本体は未取得）",
+      "indexes": [],
+      "retrievalAttempts": [
+        {
+          "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/a/audit/audit_3.1.2-2.1build1.1.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/a/audit/audit_3.1.2-2.1build1.1.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2-2.1build1.1.dsc",
+          "httpStatus": 200
+        }
+      ],
+      "dscRetrieved": {
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2-2.1build1.1.dsc",
+        "bytes": 2848,
+        "sha256": "3df86dee4b6d645173901fad492776add35f82c4e7c58cd8a4f82931a2588324"
+      },
+      "dscSignatureVerified": false,
+      "publicationHistory": {
+        "metadata": [
+          {
+            "url": "https://launchpad.net/ubuntu/+source/audit/1:3.1.2-2.1build1.1",
+            "httpStatus": 200,
+            "bytes": 21979,
+            "sha256": "4de6328c4dfa9ca9e6f14b18d273a8a14f8264978e1ff6b5a8039abfaaf58b04"
+          },
+          {
+            "url": "https://launchpad.net/ubuntu/+source/audit/1:3.1.2-2.1build1.1/+publishinghistory",
+            "httpStatus": 200,
+            "bytes": 15956,
+            "sha256": "35670fe927cd6be9e8d3e8d6f13497dddd82b1c50c0687eb3311507d7abbe084"
+          }
+        ],
+        "rows": [
+          "2026-09-23 19:10:27 UTC Superseded Noble updates main libs 1:3.1.2-2.1build1.1",
+          "Created on 2024-11-14 by Andreas Hasenack Removed from disk on 2026-09-25 . Removal requested on 2026-09-24 . Superseded on 2026-09-23 by audit - 1:3.1.2-2.1ubuntu0.1 Published on 2024-11-14",
+          "2026-09-25 00:10:42 UTC Deleted Noble proposed main libs 1:3.1.2-2.1build1.1",
+          "Removed from disk on 2026-09-25 . Removal requested on 2024-11-17 . Deleted on 2024-11-17 by Colin Watson moved to -updates Published on 2024-10-15"
+        ],
+        "snapshotAbsenceReason": "固定snapshot以前に新版へ置換され、poolから削除済み（公開履歴のRemoved from disk）"
+      }
+    },
+    {
+      "package": "ca-certificates",
+      "version": "20260601~24.04.1",
+      "binaryNames": [
+        "ca-certificates",
+        "ca-certificates-udeb"
+      ],
+      "directory": null,
+      "standardsVersion": "4.6.2",
+      "format": "3.0 (native)",
+      "homepage": null,
+      "dsc": {
+        "name": "ca-certificates_20260601~24.04.1.dsc",
+        "bytes": 1769,
+        "sha256": "42292e01982f1a0aaed5ab540bc771322864bf92798ca3099a1e582ced440116",
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ca-certificates/20260601~24.04.1/ca-certificates_20260601~24.04.1.dsc"
+      },
+      "sourceArchives": [
+        {
+          "name": "ca-certificates_20260601~24.04.1.tar.xz",
+          "bytes": 266460,
+          "sha256": "fd3a351ad98f5b714915d4a7c82ae258a174b48f7d5391713c7f3445067143eb",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ca-certificates/20260601~24.04.1/ca-certificates_20260601~24.04.1.tar.xz"
+        }
+      ],
+      "files": [
+        {
+          "name": "ca-certificates_20260601~24.04.1.tar.xz",
+          "bytes": 266460,
+          "sha256": "fd3a351ad98f5b714915d4a7c82ae258a174b48f7d5391713c7f3445067143eb",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ca-certificates/20260601~24.04.1/ca-certificates_20260601~24.04.1.tar.xz"
+        },
+        {
+          "name": "ca-certificates_20260601~24.04.1.dsc",
+          "bytes": 1769,
+          "sha256": "42292e01982f1a0aaed5ab540bc771322864bf92798ca3099a1e582ced440116",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ca-certificates/20260601~24.04.1/ca-certificates_20260601~24.04.1.dsc"
+        }
+      ],
+      "debianCopyrightInSource": "未確認（source archive本体は未取得）",
+      "indexes": [],
+      "retrievalAttempts": [
+        {
+          "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/c/ca-certificates/ca-certificates_20260601~24.04.1.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20260601~24.04.1.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ca-certificates/20260601~24.04.1/ca-certificates_20260601~24.04.1.dsc",
+          "httpStatus": 200
+        }
+      ],
+      "dscRetrieved": {
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ca-certificates/20260601~24.04.1/ca-certificates_20260601~24.04.1.dsc",
+        "bytes": 1769,
+        "sha256": "42292e01982f1a0aaed5ab540bc771322864bf92798ca3099a1e582ced440116"
+      },
+      "dscSignatureVerified": false,
+      "publicationHistory": {
+        "metadata": [
+          {
+            "url": "https://launchpad.net/ubuntu/+source/ca-certificates/20260601~24.04.1",
+            "httpStatus": 200,
+            "bytes": 18162,
+            "sha256": "42c5d7d38fbe13f8422ebdaed213af14497e8da9194cf1aae5e32ef8b3686788"
+          },
+          {
+            "url": "https://launchpad.net/ubuntu/+source/ca-certificates/20260601~24.04.1/+publishinghistory",
+            "httpStatus": 200,
+            "bytes": 16893,
+            "sha256": "d60f8cfefd970fae40b744bce0452eb0f2e5e40151c35e59d23d2042346a4ce2"
+          }
+        ],
+        "rows": [
+          "2026-10-21 07:00:54 UTC Superseded Noble updates main misc 20260601~24.04.1",
+          "Removed from disk on 2026-10-22 . Removal requested on 2026-10-22 . Superseded on 2026-10-21 by ca-certificates - 20260816ubuntu0.24.04.1 Published on 2026-06-16 Copied from Primary Archive for Ubuntu by Ubuntu Archive Robot Originally uploaded to ubuntu noble in PPA for Ubuntu Security Proposed",
+          "2026-10-20 15:55:31 UTC Superseded Noble security main misc 20260601~24.04.1",
+          "Removed from disk on 2026-10-22 . Removal requested on 2026-10-21 . Superseded on 2026-10-20 by ca-certificates - 20260816ubuntu0.24.04.1 Published on 2026-06-16 Copied from ubuntu noble in PPA for Ubuntu Security Proposed by Marc Deslauriers"
+        ],
+        "snapshotAbsenceReason": "固定snapshot以前に新版へ置換され、poolから削除済み（公開履歴のRemoved from disk）"
+      }
+    },
+    {
+      "package": "freetype",
+      "version": "2.13.2+dfsg-1ubuntu0.1",
+      "binaryNames": [
+        "libfreetype6",
+        "libfreetype-dev",
+        "freetype2-demos",
+        "freetype2-doc",
+        "libfreetype6-udeb"
+      ],
+      "directory": null,
+      "standardsVersion": "4.6.2",
+      "format": "3.0 (quilt)",
+      "homepage": "https://freetype.org",
+      "dsc": {
+        "name": "freetype_2.13.2+dfsg-1ubuntu0.1.dsc",
+        "bytes": 3606,
+        "sha256": "05368dead2fd8739fb2aa3a11e6ffd4376039b57536cc1c5cdadceb75496f385",
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg-1ubuntu0.1.dsc"
+      },
+      "sourceArchives": [
+        {
+          "name": "freetype_2.13.2+dfsg.orig-ft2demos.tar.xz",
+          "bytes": 341140,
+          "sha256": "99ee2ed8b98bcfad17bc57c2d9699d764f20fe29ad304c69b8eb28834ca3b48e",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2demos.tar.xz"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg.orig-ft2docs.tar.xz",
+          "bytes": 2173920,
+          "sha256": "685c25e1035a5076e5097186b3143b9c06878f3f9087d0a81e4d8538d5d15424",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2docs.tar.xz"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg.orig.tar.xz",
+          "bytes": 2220368,
+          "sha256": "48c78a4194adfcd15a4d089f3206dab8454c311f5577f3ef7eaef95f777f86e6",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig.tar.xz"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg-1ubuntu0.1.debian.tar.xz",
+          "bytes": 44692,
+          "sha256": "41371d9748c0e6f407c44c52c7fe5fbd4fbc2276a168ae528404731ae2e95b31",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg-1ubuntu0.1.debian.tar.xz"
+        }
+      ],
+      "files": [
+        {
+          "name": "freetype_2.13.2+dfsg.orig-ft2demos.tar.xz",
+          "bytes": 341140,
+          "sha256": "99ee2ed8b98bcfad17bc57c2d9699d764f20fe29ad304c69b8eb28834ca3b48e",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2demos.tar.xz"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg.orig-ft2demos.tar.xz.asc",
+          "bytes": 833,
+          "sha256": "e58ba462f7bdcdc5899f777d33453c1ce6f6e46b080047580f45c9fd9f2dc08c",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2demos.tar.xz.asc"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg.orig-ft2docs.tar.xz",
+          "bytes": 2173920,
+          "sha256": "685c25e1035a5076e5097186b3143b9c06878f3f9087d0a81e4d8538d5d15424",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2docs.tar.xz"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg.orig-ft2docs.tar.xz.asc",
+          "bytes": 833,
+          "sha256": "d7e17c8a3bce50181530ebe06346f506cbfc92ecc5ca7cc395c7dbb24a71a5c0",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2docs.tar.xz.asc"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg.orig.tar.xz",
+          "bytes": 2220368,
+          "sha256": "48c78a4194adfcd15a4d089f3206dab8454c311f5577f3ef7eaef95f777f86e6",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig.tar.xz"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg-1ubuntu0.1.debian.tar.xz",
+          "bytes": 44692,
+          "sha256": "41371d9748c0e6f407c44c52c7fe5fbd4fbc2276a168ae528404731ae2e95b31",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg-1ubuntu0.1.debian.tar.xz"
+        },
+        {
+          "name": "freetype_2.13.2+dfsg-1ubuntu0.1.dsc",
+          "bytes": 3606,
+          "sha256": "05368dead2fd8739fb2aa3a11e6ffd4376039b57536cc1c5cdadceb75496f385",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg-1ubuntu0.1.dsc"
+        }
+      ],
+      "debianCopyrightInSource": "未確認（source archive本体は未取得）",
+      "indexes": [],
+      "retrievalAttempts": [
+        {
+          "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/f/freetype/freetype_2.13.2+dfsg-1ubuntu0.1.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/freetype/freetype_2.13.2+dfsg-1ubuntu0.1.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg-1ubuntu0.1.dsc",
+          "httpStatus": 200
+        }
+      ],
+      "dscRetrieved": {
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg-1ubuntu0.1.dsc",
+        "bytes": 3606,
+        "sha256": "05368dead2fd8739fb2aa3a11e6ffd4376039b57536cc1c5cdadceb75496f385"
+      },
+      "dscSignatureVerified": false,
+      "publicationHistory": {
+        "metadata": [
+          {
+            "url": "https://launchpad.net/ubuntu/+source/freetype/2.13.2+dfsg-1ubuntu0.1",
+            "httpStatus": 200,
+            "bytes": 22692,
+            "sha256": "d919703e638deff1c085a4e24cfb0f9f6e763abee3942b3e2ec7f432a2b8fe3e"
+          },
+          {
+            "url": "https://launchpad.net/ubuntu/+source/freetype/2.13.2+dfsg-1ubuntu0.1/+publishinghistory",
+            "httpStatus": 200,
+            "bytes": 16822,
+            "sha256": "0df04c6e4e16960ca54d98b04cdc3fd2b226cf222caedadc845c867e4b0bd418"
+          }
+        ],
+        "rows": [
+          "2026-10-06 15:37:49 UTC Superseded Noble updates main libs 2.13.2+dfsg-1ubuntu0.1",
+          "Removed from disk on 2026-10-07 . Removal requested on 2026-10-07 . Superseded on 2026-10-06 by freetype - 2.13.2+dfsg-1ubuntu0.2 Published on 2026-03-12 Copied from Primary Archive for Ubuntu by Ubuntu Archive Robot Originally uploaded to ubuntu noble in PPA for Ubuntu Security Proposed",
+          "2026-10-06 12:38:07 UTC Superseded Noble security main libs 2.13.2+dfsg-1ubuntu0.1",
+          "Removed from disk on 2026-10-07 . Removal requested on 2026-10-07 . Superseded on 2026-10-06 by freetype - 2.13.2+dfsg-1ubuntu0.2 Published on 2026-03-12 Copied from ubuntu noble in PPA for Ubuntu Security Proposed by Bruce Cable"
+        ],
+        "snapshotAbsenceReason": "固定snapshot以前に新版へ置換され、poolから削除済み（公開履歴のRemoved from disk）"
+      }
+    },
+    {
+      "package": "libpng1.6",
+      "version": "1.6.43-5ubuntu0.6",
+      "binaryNames": [
+        "libpng16-16t64",
+        "libpng-dev",
+        "libpng-tools",
+        "libpng16-16-udeb"
+      ],
+      "directory": null,
+      "standardsVersion": "4.6.2",
+      "format": "3.0 (quilt)",
+      "homepage": "http://libpng.org/pub/png/libpng.html",
+      "dsc": {
+        "name": "libpng1.6_1.6.43-5ubuntu0.6.dsc",
+        "bytes": 2384,
+        "sha256": "b5c3539ad4f9289480671a5a89aad2d9ad60c5eae79255460f1e929be1e272ad",
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43-5ubuntu0.6.dsc"
+      },
+      "sourceArchives": [
+        {
+          "name": "libpng1.6_1.6.43.orig.tar.gz",
+          "bytes": 1554715,
+          "sha256": "fecc95b46cf05e8e3fc8a414750e0ba5aad00d89e9fdf175e94ff041caf1a03a",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43.orig.tar.gz"
+        },
+        {
+          "name": "libpng1.6_1.6.43-5ubuntu0.6.debian.tar.xz",
+          "bytes": 50432,
+          "sha256": "2410934848547a4c826e102b54e2abdf005fa4e0fbc4aa1e9fe3200638cd9328",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43-5ubuntu0.6.debian.tar.xz"
+        }
+      ],
+      "files": [
+        {
+          "name": "libpng1.6_1.6.43.orig.tar.gz",
+          "bytes": 1554715,
+          "sha256": "fecc95b46cf05e8e3fc8a414750e0ba5aad00d89e9fdf175e94ff041caf1a03a",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43.orig.tar.gz"
+        },
+        {
+          "name": "libpng1.6_1.6.43-5ubuntu0.6.debian.tar.xz",
+          "bytes": 50432,
+          "sha256": "2410934848547a4c826e102b54e2abdf005fa4e0fbc4aa1e9fe3200638cd9328",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43-5ubuntu0.6.debian.tar.xz"
+        },
+        {
+          "name": "libpng1.6_1.6.43-5ubuntu0.6.dsc",
+          "bytes": 2384,
+          "sha256": "b5c3539ad4f9289480671a5a89aad2d9ad60c5eae79255460f1e929be1e272ad",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43-5ubuntu0.6.dsc"
+        }
+      ],
+      "debianCopyrightInSource": "未確認（source archive本体は未取得）",
+      "indexes": [],
+      "retrievalAttempts": [
+        {
+          "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/libp/libpng1.6/libpng1.6_1.6.43-5ubuntu0.6.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/libp/libpng1.6/libpng1.6_1.6.43-5ubuntu0.6.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43-5ubuntu0.6.dsc",
+          "httpStatus": 200
+        }
+      ],
+      "dscRetrieved": {
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43-5ubuntu0.6.dsc",
+        "bytes": 2384,
+        "sha256": "b5c3539ad4f9289480671a5a89aad2d9ad60c5eae79255460f1e929be1e272ad"
+      },
+      "dscSignatureVerified": false,
+      "publicationHistory": {
+        "metadata": [
+          {
+            "url": "https://launchpad.net/ubuntu/+source/libpng1.6/1.6.43-5ubuntu0.6",
+            "httpStatus": 200,
+            "bytes": 20182,
+            "sha256": "8f7c271ec94a560b39293c2a74d5d776116f64599a976f60dd0f11e51289ac16"
+          },
+          {
+            "url": "https://launchpad.net/ubuntu/+source/libpng1.6/1.6.43-5ubuntu0.6/+publishinghistory",
+            "httpStatus": 200,
+            "bytes": 16778,
+            "sha256": "e74e6264a1a1d18a3b6f9cce089c725e031ec41703f7d1f5d2f4c436ada06d3c"
+          }
+        ],
+        "rows": [
+          "2026-10-08 04:15:23 UTC Superseded Noble updates main misc 1.6.43-5ubuntu0.6",
+          "Removed from disk on 2026-10-09 . Removal requested on 2026-10-09 . Superseded on 2026-10-08 by libpng1.6 - 1.6.43-5ubuntu0.7 Published on 2026-05-07 Copied from Primary Archive for Ubuntu by Ubuntu Archive Robot Originally uploaded to ubuntu noble in PPA for Ubuntu Security Proposed",
+          "2026-10-07 18:49:57 UTC Superseded Noble security main misc 1.6.43-5ubuntu0.6",
+          "Removed from disk on 2026-10-09 . Removal requested on 2026-10-08 . Superseded on 2026-10-07 by libpng1.6 - 1.6.43-5ubuntu0.7 Published on 2026-05-07 Copied from ubuntu noble in PPA for Ubuntu Security Proposed by Marc Deslauriers"
+        ],
+        "snapshotAbsenceReason": "固定snapshot以前に新版へ置換され、poolから削除済み（公開履歴のRemoved from disk）"
+      }
+    },
+    {
+      "package": "systemd",
+      "version": "255.4-1ubuntu8.17",
+      "binaryNames": [
+        "systemd",
+        "systemd-sysv",
+        "systemd-container",
+        "systemd-journal-remote",
+        "systemd-coredump",
+        "systemd-timesyncd",
+        "systemd-tests",
+        "libpam-systemd",
+        "libnss-myhostname",
+        "libnss-mymachines",
+        "libnss-resolve",
+        "libnss-systemd",
+        "libsystemd0",
+        "libsystemd-dev",
+        "libsystemd-shared",
+        "udev",
+        "libudev1",
+        "libudev-dev",
+        "udev-udeb",
+        "libudev1-udeb",
+        "systemd-standalone-sysusers",
+        "systemd-standalone-tmpfiles",
+        "systemd-oomd",
+        "systemd-userdbd",
+        "systemd-homed",
+        "systemd-boot",
+        "systemd-boot-efi",
+        "systemd-ukify",
+        "systemd-resolved",
+        "systemd-dev"
+      ],
+      "directory": null,
+      "standardsVersion": "4.6.2",
+      "format": "3.0 (quilt)",
+      "homepage": "https://www.freedesktop.org/wiki/Software/systemd",
+      "dsc": {
+        "name": "systemd_255.4-1ubuntu8.17.dsc",
+        "bytes": 7324,
+        "sha256": "8e5f4e5a7b7ee457214be1efd1ea1d380186c38b146d8c98af5da0f625d3c396",
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4-1ubuntu8.17.dsc"
+      },
+      "sourceArchives": [
+        {
+          "name": "systemd_255.4.orig.tar.gz",
+          "bytes": 14952427,
+          "sha256": "96e75bd08c57ad401677456fb88ef54a9f05bb1695693013bc6ecce839640fd5",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4.orig.tar.gz"
+        },
+        {
+          "name": "systemd_255.4-1ubuntu8.17.debian.tar.xz",
+          "bytes": 272596,
+          "sha256": "4695ff34f83b1f7e6e02bf3cfac2e2a44ac76b6cfc5a38c0081bac6919d547bb",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4-1ubuntu8.17.debian.tar.xz"
+        }
+      ],
+      "files": [
+        {
+          "name": "systemd_255.4.orig.tar.gz",
+          "bytes": 14952427,
+          "sha256": "96e75bd08c57ad401677456fb88ef54a9f05bb1695693013bc6ecce839640fd5",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4.orig.tar.gz"
+        },
+        {
+          "name": "systemd_255.4-1ubuntu8.17.debian.tar.xz",
+          "bytes": 272596,
+          "sha256": "4695ff34f83b1f7e6e02bf3cfac2e2a44ac76b6cfc5a38c0081bac6919d547bb",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4-1ubuntu8.17.debian.tar.xz"
+        },
+        {
+          "name": "systemd_255.4-1ubuntu8.17.dsc",
+          "bytes": 7324,
+          "sha256": "8e5f4e5a7b7ee457214be1efd1ea1d380186c38b146d8c98af5da0f625d3c396",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4-1ubuntu8.17.dsc"
+        }
+      ],
+      "debianCopyrightInSource": "未確認（source archive本体は未取得）",
+      "indexes": [],
+      "retrievalAttempts": [
+        {
+          "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/s/systemd/systemd_255.4-1ubuntu8.17.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/s/systemd/systemd_255.4-1ubuntu8.17.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://security.ubuntu.com/ubuntu/pool/main/s/systemd/systemd_255.4-1ubuntu8.17.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4-1ubuntu8.17.dsc",
+          "httpStatus": 200
+        }
+      ],
+      "dscRetrieved": {
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4-1ubuntu8.17.dsc",
+        "bytes": 7324,
+        "sha256": "8e5f4e5a7b7ee457214be1efd1ea1d380186c38b146d8c98af5da0f625d3c396"
+      },
+      "dscSignatureVerified": false,
+      "publicationHistory": {
+        "metadata": [
+          {
+            "url": "https://launchpad.net/ubuntu/+source/systemd/255.4-1ubuntu8.17",
+            "httpStatus": 200,
+            "bytes": 37693,
+            "sha256": "a281dff9546e09a2bc0c1b7f9728c041b8560fa818e45a1ca54f0603a24cd6e3"
+          },
+          {
+            "url": "https://launchpad.net/ubuntu/+source/systemd/255.4-1ubuntu8.17/+publishinghistory",
+            "httpStatus": 200,
+            "bytes": 16653,
+            "sha256": "a4acb35c954ddc0fd2ed07fbe035b8ee3fe7f3dc38348cd0213b2dd697c926d3"
+          }
+        ],
+        "rows": [
+          "2026-10-21 07:00:54 UTC Superseded Noble updates main admin 255.4-1ubuntu8.17",
+          "Removed from disk on 2026-10-22 . Removal requested on 2026-10-22 . Superseded on 2026-10-21 by systemd - 255.4-1ubuntu8.18 Published on 2026-08-10 Copied from Primary Archive for Ubuntu by Ubuntu Archive Robot Originally uploaded to ubuntu noble in Private PPA for Ubuntu Security Team Collaboration",
+          "2026-10-14 11:30:23 UTC Superseded Noble security main admin 255.4-1ubuntu8.17",
+          "Removed from disk on 2026-10-22 . Removal requested on 2026-10-15 . Superseded on 2026-10-14 by systemd - 255.4-1ubuntu8.18 Published on 2026-08-10 Copied from ubuntu noble in Private PPA for Ubuntu Security Team Collaboration by Hlib Korzhynskyy"
+        ],
+        "snapshotAbsenceReason": "固定snapshot以前に新版へ置換され、poolから削除済み（公開履歴のRemoved from disk）"
+      }
+    },
+    {
+      "package": "tzdata",
+      "version": "2026c-0ubuntu0.24.04.1",
+      "binaryNames": [
+        "tzdata",
+        "tzdata-icu",
+        "tzdata-legacy"
+      ],
+      "directory": null,
+      "standardsVersion": "4.6.2",
+      "format": "3.0 (quilt)",
+      "homepage": "https://www.iana.org/time-zones",
+      "dsc": {
+        "name": "tzdata_2026c-0ubuntu0.24.04.1.dsc",
+        "bytes": 2728,
+        "sha256": "386a8e5151de2497bb7df0470632e78c47bf3d455faec0b244e4afc6d8e1b1a2",
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c-0ubuntu0.24.04.1.dsc"
+      },
+      "sourceArchives": [
+        {
+          "name": "tzdata_2026c.orig.tar.gz",
+          "bytes": 475694,
+          "sha256": "e4a178a4477f3d0ea77cc31828ff72aa38feff8d61aa13e7e99e142e9d902be4",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c.orig.tar.gz"
+        },
+        {
+          "name": "tzdata_2026c-0ubuntu0.24.04.1.debian.tar.xz",
+          "bytes": 188348,
+          "sha256": "a684e31c7c6e747a9aed337006ac53845c545f6e9129e73062d7c43774a36f63",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c-0ubuntu0.24.04.1.debian.tar.xz"
+        }
+      ],
+      "files": [
+        {
+          "name": "tzdata_2026c.orig.tar.gz",
+          "bytes": 475694,
+          "sha256": "e4a178a4477f3d0ea77cc31828ff72aa38feff8d61aa13e7e99e142e9d902be4",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c.orig.tar.gz"
+        },
+        {
+          "name": "tzdata_2026c.orig.tar.gz.asc",
+          "bytes": 833,
+          "sha256": "26cd02e034eed682aa911d224bca3247ff15914df317e3bb0b1a01dc557b46fe",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c.orig.tar.gz.asc"
+        },
+        {
+          "name": "tzdata_2026c-0ubuntu0.24.04.1.debian.tar.xz",
+          "bytes": 188348,
+          "sha256": "a684e31c7c6e747a9aed337006ac53845c545f6e9129e73062d7c43774a36f63",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c-0ubuntu0.24.04.1.debian.tar.xz"
+        },
+        {
+          "name": "tzdata_2026c-0ubuntu0.24.04.1.dsc",
+          "bytes": 2728,
+          "sha256": "386a8e5151de2497bb7df0470632e78c47bf3d455faec0b244e4afc6d8e1b1a2",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c-0ubuntu0.24.04.1.dsc"
+        }
+      ],
+      "debianCopyrightInSource": "未確認（source archive本体は未取得）",
+      "indexes": [],
+      "retrievalAttempts": [
+        {
+          "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/t/tzdata/tzdata_2026c-0ubuntu0.24.04.1.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2026c-0ubuntu0.24.04.1.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c-0ubuntu0.24.04.1.dsc",
+          "httpStatus": 200
+        }
+      ],
+      "dscRetrieved": {
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c-0ubuntu0.24.04.1.dsc",
+        "bytes": 2728,
+        "sha256": "386a8e5151de2497bb7df0470632e78c47bf3d455faec0b244e4afc6d8e1b1a2"
+      },
+      "dscSignatureVerified": false,
+      "publicationHistory": {
+        "metadata": [
+          {
+            "url": "https://launchpad.net/ubuntu/+source/tzdata/2026c-0ubuntu0.24.04.1",
+            "httpStatus": 200,
+            "bytes": 18281,
+            "sha256": "854434a0733aed701c4d6d1128a002e0bd4fae42c0b3638333e2092264b9ddf1"
+          },
+          {
+            "url": "https://launchpad.net/ubuntu/+source/tzdata/2026c-0ubuntu0.24.04.1/+publishinghistory",
+            "httpStatus": 200,
+            "bytes": 17436,
+            "sha256": "8e052b0c11cbce4b56757477f29f3a37938494367322e825e11401e61cb2d7dd"
+          }
+        ],
+        "rows": [
+          "2026-10-19 17:40:36 UTC Superseded Noble security main libs 2026c-0ubuntu0.24.04.1",
+          "Created on 2026-07-31 by Nick Rosbrook Removed from disk on 2026-10-20 . Removal requested on 2026-10-20 . Superseded on 2026-10-19 by tzdata - 2026e-0ubuntu0.24.04.1 Published on 2026-07-31",
+          "2026-10-14 14:33:30 UTC Superseded Noble updates main libs 2026c-0ubuntu0.24.04.1",
+          "Created on 2026-07-29 by Nick Rosbrook Removed from disk on 2026-10-20 . Removal requested on 2026-10-15 . Superseded on 2026-10-14 by tzdata - 2026e-0ubuntu0.24.04.1 Published on 2026-07-29",
+          "2026-10-20 18:10:18 UTC Deleted Noble proposed main libs 2026c-0ubuntu0.24.04.1",
+          "Removed from disk on 2026-10-20 . Removal requested on 2026-08-03 . Deleted on 2026-08-03 by Timo Aaltonen moved to -updates Published on 2026-07-17"
+        ],
+        "snapshotAbsenceReason": "固定snapshot以前に新版へ置換され、poolから削除済み（公開履歴のRemoved from disk）"
+      }
+    },
+    {
+      "package": "xz-utils",
+      "version": "5.6.1+really5.4.5-1ubuntu0.3",
+      "binaryNames": [
+        "liblzma5",
+        "liblzma5-udeb",
+        "xz-utils",
+        "xzdec",
+        "liblzma-dev",
+        "liblzma-doc"
+      ],
+      "directory": null,
+      "standardsVersion": "4.6.2",
+      "format": "3.0 (quilt)",
+      "homepage": "https://tukaani.org/xz/",
+      "dsc": {
+        "name": "xz-utils_5.6.1+really5.4.5-1ubuntu0.3.dsc",
+        "bytes": 2505,
+        "sha256": "34c2be772533a5c31e881bc620cedaf9be3d315feb677f00e12c136c299d126a",
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.dsc"
+      },
+      "sourceArchives": [
+        {
+          "name": "xz-utils_5.6.1+really5.4.5.orig.tar.xz",
+          "bytes": 1680520,
+          "sha256": "da9dec6c12cf2ecf269c31ab65b5de18e8e52b96f35d5bcd08c12b43e6878803",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5.orig.tar.xz"
+        },
+        {
+          "name": "xz-utils_5.6.1+really5.4.5-1ubuntu0.3.debian.tar.xz",
+          "bytes": 31672,
+          "sha256": "03f321901f6e1c56235cd7ae6a6784c104b1b1060ca3afa5a5806e345ee72e01",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.debian.tar.xz"
+        }
+      ],
+      "files": [
+        {
+          "name": "xz-utils_5.6.1+really5.4.5.orig.tar.xz",
+          "bytes": 1680520,
+          "sha256": "da9dec6c12cf2ecf269c31ab65b5de18e8e52b96f35d5bcd08c12b43e6878803",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5.orig.tar.xz"
+        },
+        {
+          "name": "xz-utils_5.6.1+really5.4.5-1ubuntu0.3.debian.tar.xz",
+          "bytes": 31672,
+          "sha256": "03f321901f6e1c56235cd7ae6a6784c104b1b1060ca3afa5a5806e345ee72e01",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.debian.tar.xz"
+        },
+        {
+          "name": "xz-utils_5.6.1+really5.4.5-1ubuntu0.3.dsc",
+          "bytes": 2505,
+          "sha256": "34c2be772533a5c31e881bc620cedaf9be3d315feb677f00e12c136c299d126a",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.dsc"
+        }
+      ],
+      "debianCopyrightInSource": "未確認（source archive本体は未取得）",
+      "indexes": [],
+      "retrievalAttempts": [
+        {
+          "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/x/xz-utils/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/x/xz-utils/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.dsc",
+          "httpStatus": 200
+        }
+      ],
+      "dscRetrieved": {
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.dsc",
+        "bytes": 2505,
+        "sha256": "34c2be772533a5c31e881bc620cedaf9be3d315feb677f00e12c136c299d126a"
+      },
+      "dscSignatureVerified": false,
+      "publicationHistory": {
+        "metadata": [
+          {
+            "url": "https://launchpad.net/ubuntu/+source/xz-utils/5.6.1+really5.4.5-1ubuntu0.3",
+            "httpStatus": 200,
+            "bytes": 22380,
+            "sha256": "daaef37b2921b12047bcc2c38efcc49e76d875dca8b4b735b68331495dc95856"
+          },
+          {
+            "url": "https://launchpad.net/ubuntu/+source/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/+publishinghistory",
+            "httpStatus": 200,
+            "bytes": 16905,
+            "sha256": "51eb322f2113985069bbb7ed3e2592767bf8c1c78237aebf814d3bcbb9bdb8a0"
+          }
+        ],
+        "rows": [
+          "2026-10-21 07:00:54 UTC Superseded Noble updates main utils 5.6.1+really5.4.5-1ubuntu0.3",
+          "Removed from disk on 2026-10-22 . Removal requested on 2026-10-22 . Superseded on 2026-10-21 by xz-utils - 5.6.1+really5.4.5-1ubuntu0.4 Published on 2026-06-02 Copied from Primary Archive for Ubuntu by Ubuntu Archive Robot Originally uploaded to ubuntu noble in PPA for Ubuntu Security Proposed",
+          "2026-10-20 15:55:31 UTC Superseded Noble security main utils 5.6.1+really5.4.5-1ubuntu0.3",
+          "Removed from disk on 2026-10-22 . Removal requested on 2026-10-21 . Superseded on 2026-10-20 by xz-utils - 5.6.1+really5.4.5-1ubuntu0.4 Published on 2026-06-02 Copied from ubuntu noble in PPA for Ubuntu Security Proposed by Ian Constantin"
+        ],
+        "snapshotAbsenceReason": "固定snapshot以前に新版へ置換され、poolから削除済み（公開履歴のRemoved from disk）"
+      }
+    },
+    {
+      "package": "zlib",
+      "version": "1:1.3.dfsg-3.1ubuntu2.2",
+      "binaryNames": [
+        "zlib1g",
+        "zlib1g-dev",
+        "zlib1g-udeb",
+        "lib64z1",
+        "lib64z1-dev",
+        "lib32z1",
+        "lib32z1-dev",
+        "libn32z1",
+        "libn32z1-dev",
+        "libx32z1",
+        "libx32z1-dev",
+        "minizip",
+        "libminizip1t64",
+        "libminizip-dev"
+      ],
+      "directory": null,
+      "standardsVersion": "4.6.1",
+      "format": "3.0 (quilt)",
+      "homepage": "http://zlib.net/",
+      "dsc": {
+        "name": "zlib_1.3.dfsg-3.1ubuntu2.2.dsc",
+        "bytes": 2987,
+        "sha256": "56a7cd029863cbddafce831e4e63cccfa84017f93617929cb7c02f80bb5a122a",
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg-3.1ubuntu2.2.dsc"
+      },
+      "sourceArchives": [
+        {
+          "name": "zlib_1.3.dfsg.orig.tar.xz",
+          "bytes": 1128572,
+          "sha256": "5eea0322c1c21c75cad3b607ac1c43ff5c71e014b8ac4a34300b5e2b80d02e70",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg.orig.tar.xz"
+        },
+        {
+          "name": "zlib_1.3.dfsg-3.1ubuntu2.2.debian.tar.xz",
+          "bytes": 61316,
+          "sha256": "de1c2d532ecb7caf99ccb905fb03c37fe0c8117fbdc79d05be4474b71e6398c2",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg-3.1ubuntu2.2.debian.tar.xz"
+        }
+      ],
+      "files": [
+        {
+          "name": "zlib_1.3.dfsg.orig.tar.xz",
+          "bytes": 1128572,
+          "sha256": "5eea0322c1c21c75cad3b607ac1c43ff5c71e014b8ac4a34300b5e2b80d02e70",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg.orig.tar.xz"
+        },
+        {
+          "name": "zlib_1.3.dfsg-3.1ubuntu2.2.debian.tar.xz",
+          "bytes": 61316,
+          "sha256": "de1c2d532ecb7caf99ccb905fb03c37fe0c8117fbdc79d05be4474b71e6398c2",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg-3.1ubuntu2.2.debian.tar.xz"
+        },
+        {
+          "name": "zlib_1.3.dfsg-3.1ubuntu2.2.dsc",
+          "bytes": 2987,
+          "sha256": "56a7cd029863cbddafce831e4e63cccfa84017f93617929cb7c02f80bb5a122a",
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg-3.1ubuntu2.2.dsc"
+        }
+      ],
+      "debianCopyrightInSource": "未確認（source archive本体は未取得）",
+      "indexes": [],
+      "retrievalAttempts": [
+        {
+          "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/z/zlib/zlib_1.3.dfsg-3.1ubuntu2.2.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/z/zlib/zlib_1.3.dfsg-3.1ubuntu2.2.dsc",
+          "httpStatus": 404
+        },
+        {
+          "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg-3.1ubuntu2.2.dsc",
+          "httpStatus": 200
+        }
+      ],
+      "dscRetrieved": {
+        "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg-3.1ubuntu2.2.dsc",
+        "bytes": 2987,
+        "sha256": "56a7cd029863cbddafce831e4e63cccfa84017f93617929cb7c02f80bb5a122a"
+      },
+      "dscSignatureVerified": false,
+      "publicationHistory": {
+        "metadata": [
+          {
+            "url": "https://launchpad.net/ubuntu/+source/zlib/1:1.3.dfsg-3.1ubuntu2.2",
+            "httpStatus": 200,
+            "bytes": 23254,
+            "sha256": "246ca81b82dccc0cfb62eff884b05a5748fa43b28e009bea40915dbe3cec17f7"
+          },
+          {
+            "url": "https://launchpad.net/ubuntu/+source/zlib/1:1.3.dfsg-3.1ubuntu2.2/+publishinghistory",
+            "httpStatus": 200,
+            "bytes": 16650,
+            "sha256": "1494c8b6fbe677e6c796acfac4bcfab78567974d93730a56b6fd3a2b5a7d011b"
+          }
+        ],
+        "rows": [
+          "2026-10-22 20:03:43 UTC Superseded Noble updates main libs 1:1.3.dfsg-3.1ubuntu2.2",
+          "Removed from disk on 2026-10-24 . Removal requested on 2026-10-23 . Superseded on 2026-10-22 by zlib - 1:1.3.dfsg-3.1ubuntu2.3 Published on 2026-08-31 Copied from Primary Archive for Ubuntu by Ubuntu Archive Robot Originally uploaded to ubuntu noble in Private PPA for Ubuntu Security Team",
+          "2026-10-22 18:51:22 UTC Superseded Noble security main libs 1:1.3.dfsg-3.1ubuntu2.2",
+          "Removed from disk on 2026-10-24 . Removal requested on 2026-10-23 . Superseded on 2026-10-22 by zlib - 1:1.3.dfsg-3.1ubuntu2.3 Published on 2026-08-31 Copied from ubuntu noble in Private PPA for Ubuntu Security Team by Chrisa Oikonomou"
+        ],
+        "snapshotAbsenceReason": "固定snapshot以前に新版へ置換され、poolから削除済み（公開履歴のRemoved from disk）"
+      }
+    }
+  ],
+  "unresolved": [],
+  "java": [
+    {
+      "home": "/opt/java/java17",
+      "version": "17.0.20.1+1",
+      "releaseTag": "jdk-17.0.20.1+1",
+      "releaseUrl": "https://github.com/adoptium/temurin17-binaries/releases/tag/jdk-17.0.20.1%2B1",
+      "sourceRepo": "https://github.com/adoptium/jdk17u",
+      "sourceTag": "jdk-17.0.20.1+1_adopt",
+      "sourceCommit": "79597447bd94ff9f8216e2e3a573d5261ee49f2e",
+      "imageSource": ".:git:79597447bd94",
+      "imageSourceCommitMatchesTag": true,
+      "imageSourceHasLocalChangesMarker": false,
+      "buildSource": "git:e6ba7dec3d07654074559310376a3ae89da5f4ac",
+      "buildSourceRepo": "https://github.com/adoptium/temurin-build.git",
+      "sourceArchive": {
+        "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.20.1%2B1/OpenJDK17U-jdk-sources_17.0.20.1_1.tar.gz",
+        "bytes": 109272338,
+        "sha256": "21e2a065d244ab048e737f21af5d1fc74daaeb6707de36477ead8db1dca71214",
+        "bytesVerified": false
+      },
+      "metadata": [
+        {
+          "url": "https://api.github.com/repos/adoptium/temurin17-binaries/releases/tags/jdk-17.0.20.1%2B1",
+          "bytes": 484762,
+          "sha256": "3de15d39cfaefebb4cb95fc7243c976dfcfc9f48803c3ce0ef6aa9accb49f4a7"
+        },
+        {
+          "url": "https://api.github.com/repos/adoptium/jdk17u/git/ref/tags/jdk-17.0.20.1%2B1_adopt",
+          "bytes": 383,
+          "sha256": "17270ad9716a1d814d47122efd3f1985e57fb3ac9598a9c71621ccf6f5eb9f57"
+        },
+        {
+          "url": "https://api.github.com/repos/adoptium/jdk17u/git/tags/1fd26e1193de2457cacacd95ff48c43890d92b98",
+          "bytes": 712,
+          "sha256": "54d0a1395efb526178a1ba32088853a3b75f8bba59d7f179cc4aaf1d232136b0"
+        }
+      ]
+    },
+    {
+      "home": "/opt/java/java21",
+      "version": "21.0.12.1+1",
+      "releaseTag": "jdk-21.0.12.1+1",
+      "releaseUrl": "https://github.com/adoptium/temurin21-binaries/releases/tag/jdk-21.0.12.1%2B1",
+      "sourceRepo": "https://github.com/adoptium/jdk21u",
+      "sourceTag": "jdk-21.0.12.1+1_adopt",
+      "sourceCommit": "1c417fbfc2f70ab03a565b0af0a5a3c6f5e15ad6",
+      "imageSource": ".:git:1c417fbfc2f7",
+      "imageSourceCommitMatchesTag": true,
+      "imageSourceHasLocalChangesMarker": false,
+      "buildSource": "git:e6ba7dec3d07654074559310376a3ae89da5f4ac",
+      "buildSourceRepo": "https://github.com/adoptium/temurin-build.git",
+      "sourceArchive": {
+        "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk-sources_21.0.12.1_1.tar.gz",
+        "bytes": 115126841,
+        "sha256": "573057d03584ae793fb7ec9a14c76d826d9187a53efeefd99da47403a5308234",
+        "bytesVerified": false
+      },
+      "metadata": [
+        {
+          "url": "https://api.github.com/repos/adoptium/temurin21-binaries/releases/tags/jdk-21.0.12.1%2B1",
+          "bytes": 538388,
+          "sha256": "66fa212440f61eeb5f3befb6ccb478891eafb4d3efbf4f6c74ec57baea1ae8bc"
+        },
+        {
+          "url": "https://api.github.com/repos/adoptium/jdk21u/git/ref/tags/jdk-21.0.12.1%2B1_adopt",
+          "bytes": 375,
+          "sha256": "5da74280fbd5e71c86a9a6c8ff5f3ab0ed38082c24f889f931e930de9dee362b"
+        },
+        {
+          "url": "https://api.github.com/repos/adoptium/jdk21u/git/tags/985779c716c4e8c5018cb3836badf9f1237b303f",
+          "bytes": 713,
+          "sha256": "a4e34c170e4402ca9793560740a405282d73de0e8d319422bbe59374ad754768"
+        }
+      ]
+    },
+    {
+      "home": "/opt/java/java8",
+      "version": "8.0.504+1",
+      "releaseTag": "jdk8u504-b01",
+      "releaseUrl": "https://github.com/adoptium/temurin8-binaries/releases/tag/jdk8u504-b01",
+      "sourceRepo": "https://github.com/adoptium/jdk8u",
+      "sourceTag": "jdk8u504-b01_adopt",
+      "sourceCommit": "1358e1b273e29392787e6feb32732304befaf1da",
+      "imageSource": ".:git:1358e1b273e2+",
+      "imageSourceCommitMatchesTag": true,
+      "imageSourceHasLocalChangesMarker": true,
+      "buildSource": "git:e6ba7dec3d07654074559310376a3ae89da5f4ac",
+      "buildSourceRepo": "https://github.com/adoptium/temurin-build.git",
+      "sourceArchive": {
+        "url": "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u504-b01/OpenJDK8U-jdk-sources_8u504b01.tar.gz",
+        "bytes": 94314011,
+        "sha256": "86cd14f299616dddca13268cc2fa794eb4d28fc732dedaad8c5b8a3078e5d3c9",
+        "bytesVerified": false
+      },
+      "metadata": [
+        {
+          "url": "https://api.github.com/repos/adoptium/temurin8-binaries/releases/tags/jdk8u504-b01",
+          "bytes": 240441,
+          "sha256": "5679b9508b380f1f7477f8c9bebf4ab213f8b198c576c90642b305c3b24e449d"
+        },
+        {
+          "url": "https://api.github.com/repos/adoptium/jdk8u/git/ref/tags/jdk8u504-b01_adopt",
+          "bytes": 363,
+          "sha256": "a4921a45b7b1a258afa2f4784b2d5b75cab42d24d8d480891242d83baabfd72d"
+        },
+        {
+          "url": "https://api.github.com/repos/adoptium/jdk8u/git/tags/1cfd9194a46a321da5c23734ea6a166a30af9518",
+          "bytes": 691,
+          "sha256": "4f6b209f63d11359455bef99c7e12e6cc63bbc0ccf545ce92a0fdbe484eb260b"
+        }
+      ],
+      "localChangesInvestigation": {
+        "status": "未確定（マーカーの条件と対応tag/archiveは確定、実際の全変更差分は未確定）",
+        "markerMeaning": "make/SourceRevision.gmkはgit status --porcelainが空でなければ+を付ける。未追跡ファイルも含み、追跡sourceへのpatch有無はマーカーだけでは決まらない。",
+        "explicitExternalPatches": "対象linux/x64 release metadataのBUILD_CONFIG[PATCHES]は空文字列",
+        "archiveCreation": "対象BUILD_SOURCEのsbin/build.shはsource作業treeから.gitを一時退避してarchive化し、その後configure/makeを実行する。tagの自動archiveとは区別する。",
+        "remaining": "当時の全git status/git diffとarchive実bytesは未確認。.hgtip生成はマーカーを説明するが、他の変更が無いことや全変更のarchive包含は未確定。",
+        "sourceArchiveChecksumMatchesReleaseMetadata": true,
+        "archiveBytesVerified": false,
+        "releaseBuild": {
+          "scmRef": "jdk8u504-b01_adopt",
+          "buildRef": "https://github.com/adoptium/temurin-build/commit/e6ba7dec3d07654074559310376a3ae89da5f4ac",
+          "openjdk_source": "https://github.com/adoptium/jdk8u/commit/1358e1b273e29392787e6feb32732304befaf1da",
+          "makejdk_any_platform_args": " --clean-git-repo --jdk-boot-dir /usr/lib/jvm/java-1.7.0-openjdk.x86_64 --configure-args \" --disable-ccache\" --target-file-name OpenJDK8U-jdk_x64_linux_hotspot_8u504b01.tar.gz --release --clean-libs --tag jdk8u504-b01_adopt --create-source-archive --create-sbom --enable-sbom-strace --use-jep319-certs --create-debug-image --create-jre-image --build-variant temurin jdk8u\n"
+        },
+        "selectedBuildConfig": [
+          "BUILD_CONFIG[CLEAN_GIT_REPO]=\"true\"",
+          "BUILD_CONFIG[CREATE_SOURCE_ARCHIVE]=\"true\"",
+          "BUILD_CONFIG[PATCHES]=\"\"",
+          "BUILD_CONFIG[TAG]=\"jdk8u504-b01_adopt\"",
+          "BUILD_CONFIG[USE_JEP319_CERTS]=\"true\""
+        ],
+        "metadata": [
+          {
+            "url": "https://api.github.com/repos/adoptium/temurin-build/contents/sbin/build.sh?ref=e6ba7dec3d07654074559310376a3ae89da5f4ac",
+            "httpStatus": 200,
+            "bytes": 184687,
+            "sha256": "e5a2c91f67e0bc6445c74c605327f2cf6be46296a9785ddf4f26d83c766a12ce"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/jdk8u/contents/jdk/make/Images.gmk?ref=jdk8u504-b01_adopt",
+            "httpStatus": 200,
+            "bytes": 40752,
+            "sha256": "1fb87429b9e3ecee3f4c25f6e4e652ff9b5de71ce8ae102fb57668590e91f2da"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/jdk8u/contents/make/SourceRevision.gmk?ref=jdk8u504-b01_adopt",
+            "httpStatus": 200,
+            "bytes": 9025,
+            "sha256": "3c1eb73908d76b19b2ba15bcd0b8156c32c52f0a26e3657e554559f34c604245"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/temurin-build/contents/sbin/prepareWorkspace.sh?ref=e6ba7dec3d07654074559310376a3ae89da5f4ac",
+            "httpStatus": 200,
+            "bytes": 61701,
+            "sha256": "fea401607f895df36b27ffb1596e7014990b3fc12928ea50b60ac9735039437b"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/jdk8u/contents/.gitignore?ref=jdk8u504-b01_adopt",
+            "httpStatus": 200,
+            "bytes": 1102,
+            "sha256": "ae05c1fd56725292aeaad5d3420ce1dfaacaeeacb45b3dd1a58d205079ef8c2d"
+          },
+          {
+            "url": "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u504-b01/OpenJDK8U-jdk_x64_linux_hotspot_8u504b01.tar.gz.json",
+            "httpStatus": 200,
+            "bytes": 21368,
+            "sha256": "149e0cc3574f266b5fdd2211bf29d054fdcffb01c2db4d6eb0f6e22fc4ba0931"
+          },
+          {
+            "url": "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u504-b01/OpenJDK8U-jdk-sources_8u504b01.tar.gz.json",
+            "httpStatus": 200,
+            "bytes": 21372,
+            "sha256": "38022d1409844b82ac0ddd46c7d4a71cfccbebd6b5890d4c71a82ac7889e9868"
+          },
+          {
+            "url": "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u504-b01/OpenJDK8U-jdk-sources_8u504b01.tar.gz.sha256.txt",
+            "httpStatus": 200,
+            "bytes": 104,
+            "sha256": "d61fd1b06c11c52d0606f5d9730b47cef02345b376ac8dfb3a9c62ea97dd9f8a"
+          },
+          {
+            "url": "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u504-b01/OpenJDK8U-sbom_x64_linux_hotspot_8u504b01.json",
+            "httpStatus": 200,
+            "bytes": 84043,
+            "sha256": "e9bdde93fc2a59312d659683e4bed437fdae6b598b6b7b2000a784c9b4ccb0ed"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/temurin-build/contents/sbin/common/common.sh?ref=e6ba7dec3d07654074559310376a3ae89da5f4ac",
+            "httpStatus": 200,
+            "bytes": 18079,
+            "sha256": "324a07199648a3fde7c0624368902b8032e967197c5a0e5b03c970f249ad2b8c"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/jdk8u/contents/.hgtip?ref=jdk8u504-b01_adopt",
+            "httpStatus": 404
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/jdk8u/git/ref/tags/jdk8u504-b01_adopt",
+            "httpStatus": 200,
+            "bytes": 363,
+            "sha256": "a4921a45b7b1a258afa2f4784b2d5b75cab42d24d8d480891242d83baabfd72d"
+          },
+          {
+            "url": "https://api.github.com/repos/adoptium/jdk8u/git/tags/1cfd9194a46a321da5c23734ea6a166a30af9518",
+            "httpStatus": 200,
+            "bytes": 691,
+            "sha256": "4f6b209f63d11359455bef99c7e12e6cc63bbc0ccf545ce92a0fdbe484eb260b"
+          }
+        ],
+        "generatedFile": {
+          "path": ".hgtip",
+          "contents": "OpenJDK: <git rev-parse --short HEAD>",
+          "creation": "prepareWorkspace.shのcheckoutAndCloneOpenJDKGitRepoはgit clean後にcreateSourceTagFileを呼び、JDK8ではsource rootへ.hgtipを書く。",
+          "trackedInSourceTag": false,
+          "ignoredByTagGitignore": false,
+          "interpretation": "公式ビルド処理から、未追跡.hgtipだけでも+の条件が成立すると判断できる。これが当時の唯一の変更だったとは確定しない。",
+          "archiveInclusion": "createSourceArchiveは前処理後のtreeをcreateOpenJDKArchiveへ渡す。common.shのtarは.hgtipを除外しないため、コード上は収録される。archive実bytesは未確認。"
+        },
+        "exactLocalDiffConfirmed": false,
+        "sourceTagAndReleaseArchiveConfirmed": true
+      }
+    },
+    {
+      "home": "/opt/java/openjdk",
+      "version": "25.0.4.1+1",
+      "releaseTag": "jdk-25.0.4.1+1",
+      "releaseUrl": "https://github.com/adoptium/temurin25-binaries/releases/tag/jdk-25.0.4.1%2B1",
+      "sourceRepo": "https://github.com/adoptium/jdk25u",
+      "sourceTag": "jdk-25.0.4.1+1_adopt",
+      "sourceCommit": "520406d871955300957ef01e406ac2acd0f9b75c",
+      "imageSource": ".:git:520406d87195",
+      "imageSourceCommitMatchesTag": true,
+      "imageSourceHasLocalChangesMarker": false,
+      "buildSource": "git:e6ba7dec3d07654074559310376a3ae89da5f4ac",
+      "buildSourceRepo": "https://github.com/adoptium/temurin-build.git",
+      "sourceArchive": {
+        "url": "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.4.1%2B1/OpenJDK25U-jdk-sources_25.0.4.1_1.tar.gz",
+        "bytes": 120577922,
+        "sha256": "cb9e50d2eb3de72ffd28466d7c511b4039b4bc4bd8f0d276d1e4cf81e30fdf09",
+        "bytesVerified": false
+      },
+      "metadata": [
+        {
+          "url": "https://api.github.com/repos/adoptium/temurin25-binaries/releases/tags/jdk-25.0.4.1%2B1",
+          "bytes": 559732,
+          "sha256": "507ee057a12a0effcb440df70ba27b1c15e33e16780aab90c72bf0509e86e3ac"
+        },
+        {
+          "url": "https://api.github.com/repos/adoptium/jdk25u/git/ref/tags/jdk-25.0.4.1%2B1_adopt",
+          "bytes": 372,
+          "sha256": "b3ec45a3e67cc45c21a0ab6b6afe25134fa3e86a4a71164562c9304572a78820"
+        },
+        {
+          "url": "https://api.github.com/repos/adoptium/jdk25u/git/tags/c2e3d3f0b935fce5197d9fc6bbfb0b39a510b66f",
+          "bytes": 710,
+          "sha256": "d63de6b269c374a60d6d093ee28941ec9a2ca5c11a9e5b1349173cd8ad301adb"
+        }
+      ]
+    }
+  ],
+  "dscChecks": [
+    {
+      "sourceId": "base-files@13ubuntu10.5",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/b/base-files/base-files_13ubuntu10.5.dsc",
+      "bytes": 1625,
+      "sha256": "326996812284298ceb029ae175af1bc55480c977f652469775983b53ae005d9a",
+      "matchesIndex": true,
+      "signatureVerified": false
+    },
+    {
+      "sourceId": "llvm-toolchain-20@1:20.1.2-0ubuntu1~24.04.3",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/universe/l/llvm-toolchain-20/llvm-toolchain-20_20.1.2-0ubuntu1~24.04.3.dsc",
+      "bytes": 8624,
+      "sha256": "cd0ec8d11b7df50d7845dbcc54146bdf76cf86f699a16c37c428bcf0e1d6b712",
+      "matchesIndex": true,
+      "signatureVerified": false
+    },
+    {
+      "sourceId": "mesa@25.2.8-0ubuntu0.24.04.4",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261103T000000Z/pool/main/m/mesa/mesa_25.2.8-0ubuntu0.24.04.4.dsc",
+      "bytes": 5358,
+      "sha256": "8703280401d59a28abc6503461e1cb167bffcd967c7cf8309f00749d125f406f",
+      "matchesIndex": true,
+      "signatureVerified": false
+    }
+  ],
+  "archiveUrlChecks": [
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2.orig.tar.gz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/752455766/audit_3.1.2.orig.tar.gz",
+      "bytes": 1219860
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/audit/1:3.1.2-2.1build1.1/audit_3.1.2-2.1build1.1.debian.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/752455767/audit_3.1.2-2.1build1.1.debian.tar.xz",
+      "bytes": 18860
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ca-certificates/20260601~24.04.1/ca-certificates_20260601~24.04.1.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/865194221/ca-certificates_20260601~24.04.1.tar.xz",
+      "bytes": 266460
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2demos.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/850953124/freetype_2.13.2+dfsg.orig-ft2demos.tar.xz",
+      "bytes": 341140
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2demos.tar.xz.asc",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/850953125/freetype_2.13.2+dfsg.orig-ft2demos.tar.xz.asc",
+      "bytes": 833
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2docs.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/850953126/freetype_2.13.2+dfsg.orig-ft2docs.tar.xz",
+      "bytes": 2173920
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig-ft2docs.tar.xz.asc",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/850953127/freetype_2.13.2+dfsg.orig-ft2docs.tar.xz.asc",
+      "bytes": 833
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg.orig.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/850953128/freetype_2.13.2+dfsg.orig.tar.xz",
+      "bytes": 2220368
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/freetype/2.13.2+dfsg-1ubuntu0.1/freetype_2.13.2+dfsg-1ubuntu0.1.debian.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/850953129/freetype_2.13.2+dfsg-1ubuntu0.1.debian.tar.xz",
+      "bytes": 44692
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43.orig.tar.gz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/859941026/libpng1.6_1.6.43.orig.tar.gz",
+      "bytes": 1554715
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libpng1.6/1.6.43-5ubuntu0.6/libpng1.6_1.6.43-5ubuntu0.6.debian.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/859941027/libpng1.6_1.6.43-5ubuntu0.6.debian.tar.xz",
+      "bytes": 50432
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4.orig.tar.gz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/871325179/systemd_255.4.orig.tar.gz",
+      "bytes": 14952427
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/255.4-1ubuntu8.17/systemd_255.4-1ubuntu8.17.debian.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/871325181/systemd_255.4-1ubuntu8.17.debian.tar.xz",
+      "bytes": 272596
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c.orig.tar.gz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/869309037/tzdata_2026c.orig.tar.gz",
+      "bytes": 475694
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c.orig.tar.gz.asc",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/869309038/tzdata_2026c.orig.tar.gz.asc",
+      "bytes": 833
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/tzdata/2026c-0ubuntu0.24.04.1/tzdata_2026c-0ubuntu0.24.04.1.debian.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/869309039/tzdata_2026c-0ubuntu0.24.04.1.debian.tar.xz",
+      "bytes": 188348
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5.orig.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/863383818/xz-utils_5.6.1+really5.4.5.orig.tar.xz",
+      "bytes": 1680520
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/xz-utils/5.6.1+really5.4.5-1ubuntu0.3/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.debian.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/863383819/xz-utils_5.6.1+really5.4.5-1ubuntu0.3.debian.tar.xz",
+      "bytes": 31672
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg.orig.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/874813691/zlib_1.3.dfsg.orig.tar.xz",
+      "bytes": 1128572
+    },
+    {
+      "url": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/zlib/1:1.3.dfsg-3.1ubuntu2.2/zlib_1.3.dfsg-3.1ubuntu2.2.debian.tar.xz",
+      "httpStatus": 200,
+      "method": "HEAD",
+      "finalUrl": "https://launchpadlibrarian.net/874813693/zlib_1.3.dfsg-3.1ubuntu2.2.debian.tar.xz",
+      "bytes": 61316
+    }
+  ],
+  "exploratoryAttempts": [
+    {
+      "url": "https://security.ubuntu.com/ubuntu/pool/main/s/systemd/systemd_255.4-1ubuntu8.17.dsc",
+      "httpStatus": 404
+    },
+    {
+      "url": "https://api.github.com/repos/adoptium/temurin-build/contents/sbin/common/build.sh?ref=e6ba7dec3d07654074559310376a3ae89da5f4ac",
+      "httpStatus": 404
+    },
+    {
+      "url": "https://api.github.com/repos/adoptium/temurin-build/contents/sbin/common/configure.sh?ref=e6ba7dec3d07654074559310376a3ae89da5f4ac",
+      "httpStatus": 404
+    },
+    {
+      "url": "https://api.github.com/repos/adoptium/jdk8u/contents/.hgtip?ref=jdk8u504-b01_adopt",
+      "httpStatus": 404
+    }
+  ]
+}
