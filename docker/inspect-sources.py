@@ -44,7 +44,7 @@ for block in Path('/var/lib/dpkg/status').read_text().split('\n\n'):
                      'sourceField': fields.get('Source'),
                      'copyright': record(copyright) if copyright.is_file() else None})
 java = []
-for home in sorted(Path('/opt/java').iterdir()):
+for home in sorted(Path('/opt/java').iterdir()) if Path('/opt/java').is_dir() else []:
     if not home.is_dir():
         continue
     release = home / 'release'
@@ -65,7 +65,7 @@ print(json.dumps({'packages': sorted(packages, key=lambda p: p['package']), 'jav
     'assetSearch': {'pattern': pattern, 'excludedMounts': ['/proc', '/sys', '/dev'],
                     'fileCount': len(paths), 'matches': [p for p in paths if re.search(pattern, p)],
                     'jarsOutsideJdk': [p for p in paths if p.endswith('.jar') and not p.startswith('/opt/java/')],
-                    'workspaceEntries': sorted(os.listdir('/workspace'))},
+                    'workspaceEntries': sorted(os.listdir('/workspace')) if Path('/workspace').is_dir() else []},
     'commonLicenses': [record(p) for p in sorted(Path('/usr/share/common-licenses').iterdir()) if p.is_file()],
     'fileList': sorted(paths)}, ensure_ascii=False))
 '''
@@ -74,12 +74,13 @@ print(json.dumps({'packages': sorted(packages, key=lambda p: p['package']), 'jav
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--image', default=IMAGE_ID)
+    parser.add_argument('--expected-image', default=IMAGE_ID, help='照合する固定image ID')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     actual = subprocess.check_output(
         ['docker', 'image', 'inspect', args.image, '--format', '{{.Id}}'], text=True).strip()
-    if actual != IMAGE_ID:
-        raise ValueError('B1の固定image IDと一致しません')
+    if actual != args.expected_image:
+        raise ValueError('固定image IDと一致しません')
     raw = subprocess.check_output(
         ['docker', 'run', '--rm', '--network', 'none', '--read-only',
          '--entrypoint', 'python3', actual, '-c', PROBE])

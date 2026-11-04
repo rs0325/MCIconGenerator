@@ -91,7 +91,7 @@ def match_packages(packages, sources):
     return result
 
 
-def generate(evidence_path, inventory_path, cache, offline=False, metadata_path=None):
+def generate(evidence_path, inventory_path, cache, offline=False, metadata_path=None, refs=(91, 93)):
     evidence_raw = evidence_path.read_bytes()
     evidence = json.loads(evidence_raw)
     inventory_raw = inventory_path.read_bytes()
@@ -101,7 +101,7 @@ def generate(evidence_path, inventory_path, cache, offline=False, metadata_path=
         inventory[name.split(':', 1)[0]] = version
     installed = {p['package']: p['version'] for p in evidence['packages']}
     if inventory != installed:
-        raise ValueError('image内の全package名/版がB1の220件一覧と一致しません')
+        raise ValueError('image内の全package名/版が指定inventoryと一致しません')
     wanted = {source_identity(p) for p in evidence['packages']}
     sources = {}
     available_versions = {name: set() for name, _ in wanted}
@@ -149,7 +149,7 @@ def generate(evidence_path, inventory_path, cache, offline=False, metadata_path=
     for package in packages:
         if package['sourceId'] is None:
             package['availableSourceVersions'] = sorted(available_versions[package['sourcePackage']])
-    return {'schemaVersion': 1, 'date': '2026-11-04', 'refs': [91, 93],
+    return {'schemaVersion': 1, 'date': '2026-11-04', 'refs': list(refs),
             'imageId': evidence['imageId'], 'snapshot': SNAPSHOT,
             'evidenceSha256': digest(evidence_raw), 'binaryInventorySha256': digest(inventory_raw),
             'indexSignatureVerified': False,
@@ -216,6 +216,7 @@ def main():
     parser.add_argument('--cache', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--offline', action='store_true')
+    parser.add_argument('--refs', nargs='+', type=int, default=[91, 93])
     parser.add_argument('--metadata', type=Path)
     args = parser.parse_args()
     if args.baseline:
@@ -225,7 +226,7 @@ def main():
     else:
         if not args.packages or not args.cache:
             parser.error('--evidenceには--packagesと--cacheが必要です')
-        result = generate(args.evidence, args.packages, args.cache, args.offline, args.metadata)
+        result = generate(args.evidence, args.packages, args.cache, args.offline, args.metadata, args.refs)
     raw = encode(result)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(raw)
