@@ -79,6 +79,37 @@ class CandidateTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.assemble(plan)
 
+    def test_final_adoption_requires_closure_and_propagates_without_signing(self):
+        import json
+        plan = copy.deepcopy(self.plan)
+        plan['finalBytesConfirmed'] = True
+        with self.assertRaisesRegex(ValueError, '閉包'):
+            self.assemble(plan)
+        self.assertFalse((self.root / 'output').exists())
+        plan['unresolved'] = []
+        for row in plan['artifacts']:
+            row['contents']['licenseClosureConfirmed'] = True
+            row['noticeFiles'] = ['NOTICE']
+            row['sourceArchives'] = [{'url': 'https://example.com/sources.tar', 'sha256': '1' * 64}]
+        for field in ('licenseClosureConfirmed', 'noticeFiles', 'sourceArchives'):
+            with self.subTest(field=field):
+                incomplete = copy.deepcopy(plan)
+                row = incomplete['artifacts'][0]
+                if field == 'licenseClosureConfirmed':
+                    row['contents'][field] = False
+                else:
+                    row[field] = []
+                with self.assertRaisesRegex(ValueError, '閉包'):
+                    self.assemble(incomplete)
+                self.assertFalse((self.root / 'output').exists())
+        report = self.assemble(plan)
+        self.assertTrue(report['finalBytesConfirmed'])
+        self.assertTrue(json.loads((self.root / 'output/input.json').read_bytes())['finalBytesConfirmed'])
+        for row in report['artifacts']:
+            inventory = self.root / 'output' / row['inventory']['path']
+            self.assertTrue(json.loads(inventory.read_bytes())['finalBytesConfirmed'])
+        self.assertFalse(list((self.root / 'output').rglob('*.sig')))
+
 
 if __name__ == '__main__':
     unittest.main()

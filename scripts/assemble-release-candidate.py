@@ -42,13 +42,20 @@ def adapter_digest(root):
 
 
 def assemble(plan, output, root=ROOT):
-    """2回の再生成と既存QA pinを照合し、採用前のdescriptor/inventoryだけを出力する。"""
+    """2回の再生成とQA pinを照合し、署名前のdescriptor/inventoryを出力する。"""
     if output.exists():
         raise ValueError('既存出力は上書きしません')
     if plan['version'] != '1.1.0' or plan['tag'] != 'v1.1.0':
         raise ValueError('1.1.0/v1.1.0の候補だけを扱います')
     expected = {('host-helper', h) for h in HOSTS} | {('guest-base', h) for h in HOSTS} | {('renderer-image', 'linux-amd64')}
     rows = plan['artifacts']
+    confirmed = plan.get('finalBytesConfirmed', False)
+    if type(confirmed) is not bool:
+        raise ValueError('最終bytes採用flagはbooleanが必要です')
+    if confirmed and (plan['unresolved'] or any(
+            row['contents'].get('licenseClosureConfirmed') is not True
+            or not row['sourceArchives'] or not row['noticeFiles'] for row in rows)):
+        raise ValueError('最終bytes採用には未解決事項なし・全資材のlicense/notice/source閉包が必要です')
     if len(rows) != 5 or {(r['role'], r['host']) for r in rows} != expected:
         raise ValueError('2hostのhelper/guestと共有rendererの5資材が必要です')
     checked = []
@@ -90,7 +97,7 @@ def assemble(plan, output, root=ROOT):
             path = root / value
             evidence.append({'path': value, 'bytes': path.stat().st_size, 'sha256': digest(path)})
         inventory_path = 'inventories/' + row['id'] + '.json'
-        inventory = {'schemaVersion': 1, 'finalBytesConfirmed': False, 'artifactId': row['id'],
+        inventory = {'schemaVersion': 1, 'finalBytesConfirmed': confirmed, 'artifactId': row['id'],
                      'role': row['role'], 'artifact': {'url': base + name, **runs[0]},
                      'reproduction': {'runs': runs, 'baseline': row['baseline'], 'matched': True},
                      'evidence': evidence, 'unresolved': plan['unresolved'], 'contents': row['contents']}
@@ -128,8 +135,8 @@ def assemble(plan, output, root=ROOT):
         entries.append({'host': descriptor['host'], 'descriptorPath': path,
                         'descriptorSha256': report['sha256'], 'trustKeyPath': 'trust-set.bin'})
         sign.append(report)
-    save(output / 'input.json', {'schemaVersion': 1, 'finalBytesConfirmed': False, 'runtimes': entries})
-    report = {'schemaVersion': 1, 'finalBytesConfirmed': False, 'signatureVerified': False,
+    save(output / 'input.json', {'schemaVersion': 1, 'finalBytesConfirmed': confirmed, 'runtimes': entries})
+    report = {'schemaVersion': 1, 'finalBytesConfirmed': confirmed, 'signatureVerified': False,
               'artifacts': reports, 'inventoryResourcePaths': inventory_resources, 'signingTargets': sign, 'unresolved': plan['unresolved']}
     save(output / 'candidate-report.json', report)
     return report
@@ -141,7 +148,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     report = assemble(json.loads(args.plan.read_bytes()), args.output)
-    print(json.dumps({'finalBytesConfirmed': False, 'artifacts': len(report['artifacts']),
+    print(json.dumps({'finalBytesConfirmed': report['finalBytesConfirmed'], 'artifacts': len(report['artifacts']),
                       'signingTargets': report['signingTargets']}, ensure_ascii=False))
 
 
