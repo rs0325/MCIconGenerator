@@ -17,7 +17,7 @@ TREE=F/'helper-tree';TREE.mkdir();(TREE/'Contents').mkdir()
 body={'Contents/helper.jar':b'synthetic-jar','Contents/LICENSE':b'synthetic license\n','Contents/NOTICE':b'synthetic notice\n'}
 for name,raw in body.items():(TREE/name).write_bytes(raw)
 def hashed(raw):return hashlib.sha256(raw).hexdigest()
-manifest={'schemaVersion':1,'finalBytesConfirmed':True,'host':{'os':'macos','arch':'aarch64'},'minimumOsVersion':'15.7.7',
+manifest={'schemaVersion':1,'finalBytesConfirmed':True,'host':{'os':'macos','arch':'aarch64'},'minimumOsVersion':'15.8.1',
     'sourceCommit':'a'*40,'archivePrefix':'MCIconHelper.app',
     'artifact':{'id':'macos-aarch64-helper','role':'host-helper','format':'zip','version':'1.1.0','bytes':123,'sha256':'b'*64,'unpackedBytes':321},
     'files':[{'path':name,'bytes':len(raw),'sha256':hashed(raw),'mode':'0o644'} for name,raw in body.items()]}

@@ -1,6 +1,6 @@
 # Homebrew向けJava同梱archive候補
 
-#97のHomebrew向け配布候補をローカルで生成する。候補はApple Silicon・macOS 15.7.7以降向けのJava同梱app、prefixから相対位置で起動する`bin/mcicon`、file inventory、明示URL/hashから生成するFormulaを対象とする。候補のOS条件は製品受入や公開済み配布を意味しない。v1.1.0の正式対応方針はWindows 11 x64とmacOS 15.8.1 / Apple Silicon (arm64)。Linux x86_64と利用者によるWSL内からの直接実行は実験的・未保証であり、Windows arm64とLinux arm64は対象外である。15.7.7以上の保証は残さず、生成器・Formula・fixture・descriptorの数値整合は別PRで行う。正式Windowsアプリ内部の専用WSL2利用はWindows正式経路に含む。tap公開先・本番trust・署名アカウントは入力から推測しない。
+#97のHomebrew向け配布候補をローカルで生成する。候補はApple Silicon・macOS 15.8.1以降向けのJava同梱app、prefixから相対位置で起動する`bin/mcicon`、file inventory、明示URL/hashから生成するFormulaを対象とする。候補のOS条件は製品受入や公開済み配布を意味しない。v1.1.0の正式対応方針はWindows 11 x64とmacOS 15.8.1 / Apple Silicon (arm64)。Linux x86_64と利用者によるWSL内からの直接実行は実験的・未保証であり、Windows arm64とLinux arm64は対象外である。正式Windowsアプリ内部の専用WSL2利用はWindows正式経路に含む。tap公開先・本番trust・署名アカウントは入力から推測しない。
 
 ## 生成入力
 
@@ -40,7 +40,7 @@ python3 bootstrap/scripts/package-homebrew.py formula \
 ruby -c /absolute/candidates/mcicon-bootstrap.rb
 ```
 
-上のURLは未公開fixtureの説明用であり、正式配布URLではない。SHA-256不一致、非HTTPS、URL内認証情報・fragment、既存出力は拒否する。初版FormulaはApple SiliconとmacOS Sequoiaを宣言し、現行のinstall条件は15.7.7未満を拒否する。これは15.8.1へ統一する方針との数値不整合であり、Formula・fixtureの変更は別PRで行う。IntelとLinuxは対象に含めない。Formulaの構成は[Homebrew Formula Cookbook](https://docs.brew.sh/Formula-Cookbook)の`libexec`配置と`bin.install`に従う。候補生成や`ruby -c`はbrew監査・tap審査の成功ではない。
+上のURLは未公開fixtureの説明用であり、正式配布URLではない。SHA-256不一致、非HTTPS、URL内認証情報・fragment、既存出力は拒否する。初版FormulaはApple SiliconとmacOS Sequoiaを宣言し、現行のinstall条件は15.8.1未満を拒否する。IntelとLinuxは対象に含めない。Formulaの構成は[Homebrew Formula Cookbook](https://docs.brew.sh/Formula-Cookbook)の`libexec`配置と`bin.install`に従う。候補生成や`ruby -c`はbrew監査・tap審査の成功ではない。
 
 ## 配置、所有者、修復、uninstall
 
@@ -52,6 +52,6 @@ Homebrewはprefix/Cellar内のJava同梱bootstrapを更新する。bootstrapは�
 
 ## 検証と残る受入
 
-`python3 bootstrap/scripts/test-package-homebrew.py`でarchiveの実inventory/hash/mode、空白prefixとsymlink chainからの引数・stdio・exit継承、owner/link/上書き拒否、Formulaの明示URL/hashとRuby構文、stub上で15.7.6拒否・15.7.7/15.8.1通過を確認する。テスト内の`tarfile.extractall(filter=...)`を使うため、実行にはPython 3.12以降相当の対応環境が必要。このテスト内のJava/launcherは軽量fixtureであり、実Javaの受入ではない。Python 3.12.16で4件すべて成功した。
+`python3 bootstrap/scripts/test-package-homebrew.py`でarchiveの実inventory/hash/mode、空白prefixとsymlink chainからの引数・stdio・exit継承、owner/link/上書き拒否、Formulaの明示URL/hashとRuby構文、stub上で15.8.0拒否・15.8.1通過を確認する。テスト内の`tarfile.extractall(filter=...)`を使うため、実行にはPython 3.12以降相当の対応環境が必要。このテスト内のJava/launcherは軽量fixtureであり、実Javaの受入ではない。Python 3.12.16で4件すべて成功した。
 
 実Java同梱appは別途offlineで展開後のlauncherから起動して確認する。今回の生成・起動hostはmacOS 15.8.1、旧VM世代の15.7.7実測とは分けて扱う。既JDK生成appのMach-O deployment target 11.0とplistの最低版10.11はJDKの生成値であり、製品の対応範囲を拡大しない。署名後のappを書き換えない。JAVA_HOMEを外し、javaが存在しない専用PATHで起動できても、Java/Docker未導入の実ホスト受入の代用にしない。正式trust、Developer ID/notarization、実brew install/upgrade/uninstall、PATH反映・権限拒否・他配布経路との同時install、実helper/管理描画、正式package世代でのOS下限受入、winget・installerは未受入であり、#97全体の完成条件として残る。

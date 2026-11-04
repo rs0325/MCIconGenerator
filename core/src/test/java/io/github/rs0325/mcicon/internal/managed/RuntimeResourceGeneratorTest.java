@@ -50,7 +50,7 @@ class RuntimeResourceGeneratorTest {
         final ManagedFixture fixture=new ManagedFixture();final ObjectNode definition=RuntimeDescriptor.JSON.createObjectNode();
         Input() throws Exception {
             Files.write(agent,new byte[]{1});Files.createDirectory(adapters.resolve("adapters"));Files.writeString(adapters.resolve("adapters/legacy-mappings.json"),"{}");Files.writeString(adapters.resolve("adapters/releases.json"),"{}");
-            ((ObjectNode)fixture.json.get("host")).put("os","macos").put("arch","aarch64");fixture.json.put("minimumOsVersion","15.7.7");
+ ((ObjectNode)fixture.json.get("host")).put("os","macos").put("arch","aarch64");fixture.json.put("minimumOsVersion","15.8.1");
             String adapterHash;try(var loader=new java.net.URLClassLoader(new java.net.URL[]{adapters.toUri().toURL()},null)){adapterHash=ManagedRuntime.adapterDigest(loader);}
             ((ObjectNode)fixture.json.get("worker")).put("agentSha256",FilesSupport.hash(new byte[]{1})).put("adapterSetSha256",adapterHash);
             ArrayNode java=((ObjectNode)fixture.json.get("rendering")).putArray("javaExecutables");for(int major:List.of(8,17,21,25))java.addObject().put("major",major).put("executable","/opt/java/java"+major+"/bin/java").put("sha256",ManagedFixture.HASH);

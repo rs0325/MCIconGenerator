@@ -101,7 +101,7 @@ rescue => error
   puts error.message
 end
 '''
-        for version, expected in [('15.7.6', 'macOS 15.7.7以降が必要です'), ('15.7.7', 'install-started'), ('15.8.1', 'install-started')]:
+        for version, expected in [('15.8.0', 'macOS 15.8.1以降が必要です'), ('15.8.1', 'install-started')]:
             result = subprocess.run(['ruby', '-e', checking, str(output)], env={**os.environ, 'QA_MACOS_VERSION': version}, capture_output=True, text=True, timeout=10)
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertEqual(expected, result.stdout.strip())

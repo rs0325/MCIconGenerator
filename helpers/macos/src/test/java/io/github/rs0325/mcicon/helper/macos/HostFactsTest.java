@@ -44,15 +44,15 @@ class HostFactsTest {
     }
     @Test void 承認したdescriptor下限の直前を拒否し下限以上を比較する() throws Exception {
         ObjectNode descriptor=supportedDescriptor(),value=supportedFacts();
-        value.put("osVersion","15.7.6");assertEquals("この描画環境にはmacOS 15.7.7以降が必要です",assertThrows(IOException.class,()->HostFacts.parse(value,descriptor)).getMessage());
-        for(String version:List.of("15.7.7","15.8","16.0")) {
+ value.put("osVersion","15.8.0");assertEquals("この描画環境にはmacOS 15.8.1以降が必要です",assertThrows(IOException.class,()->HostFacts.parse(value,descriptor)).getMessage());
+ for(String version:List.of("15.8.1","15.9","16.0")) {
             value.put("osVersion",version);assertEquals(version,HostFacts.parse(value,descriptor).osVersion());
         }
     }
     private static ObjectNode supportedDescriptor() {
-        ObjectNode descriptor=MacFiles.JSON.createObjectNode().put("minimumOsVersion","15.7.7");descriptor.putObject("host").put("os","macos").put("arch","aarch64");return descriptor;
+ ObjectNode descriptor=MacFiles.JSON.createObjectNode().put("minimumOsVersion","15.8.1");descriptor.putObject("host").put("os","macos").put("arch","aarch64");return descriptor;
     }
     private static ObjectNode supportedFacts() {
-        return MacFiles.JSON.createObjectNode().put("arch","aarch64").put("vz",true).put("rosetta","installed").put("osVersion","15.7.7").put("uid",501).put("physicalMemory",16L*1024*1024*1024).put("cpus",8).put("bootSessionId","00000000-0000-0000-0000-000000000001").put("hostBindingSha256","a".repeat(64));
+ return MacFiles.JSON.createObjectNode().put("arch","aarch64").put("vz",true).put("rosetta","installed").put("osVersion","15.8.1").put("uid",501).put("physicalMemory",16L*1024*1024*1024).put("cpus",8).put("bootSessionId","00000000-0000-0000-0000-000000000001").put("hostBindingSha256","a".repeat(64));
     }
 }

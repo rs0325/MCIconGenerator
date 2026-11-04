@@ -12,7 +12,7 @@ Mac・Windowsの生成器は`bootstrap-package.json`に`bootstrapProtocol: 4`を
 
 stable manifestはchannel/sequence/toolVersion/minimumBootstrapProtocolとplatform別tool-payload ZIPのsize/hash/unpackedBytes、inventory/runtime descriptorの参照を閉じる。manifest署名、対象host、ZIP実bytes、展開上限、entryの重複/外向きpath/link、inventoryとdescriptorのhash、必要なJava/CLI/core/worker/licenseを初期設置前に確認する。descriptorの全runtime契約と実helper受入は既coreの責務であり、この初期設置の成功では代用しない。
 
-user rootはMacの`~/Library/Application Support/MCIconBootstrap`、Windowsの`%LOCALAPPDATA%/MCIconBootstrap`、Linuxの`$XDG_DATA_HOME/mcicon-bootstrap`（未指定は`~/.local/share/mcicon-bootstrap`）を候補とする。このpath候補は製品の対応OSを示さない。v1.1.0の正式対応はWindows 11 x64とmacOS 15.7.7 / Apple Silicon (arm64)、Linux x86_64とWSLは実験的・未保証、Windows arm64とLinux arm64は対象外である。Mac以外のpackage実受入は未実施である。
+user rootはMacの`~/Library/Application Support/MCIconBootstrap`、Windowsの`%LOCALAPPDATA%/MCIconBootstrap`、Linuxの`$XDG_DATA_HOME/mcicon-bootstrap`（未指定は`~/.local/share/mcicon-bootstrap`）を候補とする。このpath候補は製品の対応OSを示さない。v1.1.0の正式対応はWindows 11 x64とmacOS 15.8.1 / Apple Silicon (arm64)、Linux x86_64とWSLは実験的・未保証、Windows arm64とLinux arm64は対象外である。Mac以外のpackage実受入は未実施である。
 
 Windowsでは任意の`MCICON_DATA_HOME`を指定すると、その配下`bootstrap`をuser rootにする。通常drive付き絶対pathだけを受理し、不正指定は`BOOTSTRAP_INVALID`/終了2となり旧既定先へfallbackしない。旧領域の探索・移行は行わない。CLI/trialと更新準備子には正規化envとroot配下`tmp`を`java.io.tmpdir`・`TMP`・`TEMP`へ渡す。tmpにも既存owner/ACL/親gateを適用する。最初のbootstrap JVMのtempは対象外。[利用方法と全保証範囲](../../docs/usage.md#Windowsのデータ保存先)を参照。
 
