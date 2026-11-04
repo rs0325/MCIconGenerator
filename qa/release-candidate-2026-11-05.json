@@ -1,0 +1,516 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-05",
+  "task": "milestone-release-candidate-r1",
+  "refs": [
+    91,
+    92,
+    93,
+    94,
+    95
+  ],
+  "baseCommit": "e8e5d348cb23a92145fe0b8c09fb37c608fdceee",
+  "branch": "feature/issue-97-release-candidate",
+  "artifactBytesConfirmed": true,
+  "finalBytesConfirmed": false,
+  "signedOrPublished": false,
+  "archiveOrDescriptorBytesCommitted": false,
+  "environment": {
+    "windows": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "zlib": "1.3.2"
+  },
+  "artifacts": [
+    {
+      "basename": "mcicon-helper-1.1.0-windows-x86_64.zip",
+      "bytes": 36029106,
+      "id": "mcicon-helper-1.1.0-windows-x86_64",
+      "inventory": {
+        "bytes": 47276,
+        "path": "inventories/mcicon-helper-1.1.0-windows-x86_64.json",
+        "sha256": "220e98916d9e1771bc2c5770877a1bded5667a46caca22dfcdc0ac09c3aa593d"
+      },
+      "reproduction": "PASS-2-runs-and-baseline",
+      "sha256": "efc2c38e735cf359ea751931ce7d2f746e8b082a758cd2f32ea885ad48257ab8",
+      "path": "build/r1/candidate-v2/artifacts/mcicon-helper-1.1.0-windows-x86_64.zip"
+    },
+    {
+      "basename": "mcicon-helper-1.1.0-macos-aarch64.zip",
+      "bytes": 125853859,
+      "id": "mcicon-helper-1.1.0-macos-aarch64",
+      "inventory": {
+        "bytes": 49867,
+        "path": "inventories/mcicon-helper-1.1.0-macos-aarch64.json",
+        "sha256": "cb2111c49279b23a272d8b7763704a99c0cdde93c9bbbcef46b86dce6f3fb04b"
+      },
+      "reproduction": "PASS-2-runs-and-baseline",
+      "sha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde",
+      "path": "build/r1/candidate-v2/artifacts/mcicon-helper-1.1.0-macos-aarch64.zip"
+    },
+    {
+      "basename": "mcicon-guest-1.1.0-windows-x86_64.tar.xz",
+      "bytes": 98146824,
+      "id": "mcicon-guest-1.1.0-windows-x86_64",
+      "inventory": {
+        "bytes": 123374,
+        "path": "inventories/mcicon-guest-1.1.0-windows-x86_64.json",
+        "sha256": "d3ca5c824b1bf09c8bb7130c3b541cc56aa24c9d04b52ee83c7dca5c14678577"
+      },
+      "reproduction": "PASS-2-runs-and-baseline",
+      "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5",
+      "path": "build/r1/candidate-v2/artifacts/mcicon-guest-1.1.0-windows-x86_64.tar.xz"
+    },
+    {
+      "basename": "mcicon-guest-1.1.0-macos-aarch64.qcow2",
+      "bytes": 620224512,
+      "id": "mcicon-guest-1.1.0-macos-aarch64",
+      "inventory": {
+        "bytes": 247251,
+        "path": "inventories/mcicon-guest-1.1.0-macos-aarch64.json",
+        "sha256": "4bbc21c08f1dfcee247fa17fc7ad48421d7aedd70d25f4f4d92ee5398e8deaf2"
+      },
+      "reproduction": "PASS-2-runs-and-baseline",
+      "sha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+      "path": "build/r1/candidate-v2/artifacts/mcicon-guest-1.1.0-macos-aarch64.qcow2"
+    },
+    {
+      "basename": "mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+      "bytes": 593385993,
+      "id": "mcicon-renderer-1.1.0-linux-amd64",
+      "inventory": {
+        "bytes": 204739,
+        "path": "inventories/mcicon-renderer-1.1.0-linux-amd64.json",
+        "sha256": "67f0735969d5be1e218f2b17bb2dd7273796f2645e18b2036f7d36600a0af34c"
+      },
+      "reproduction": "PASS-2-runs-and-baseline",
+      "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+      "path": "build/r1/candidate-v2/artifacts/mcicon-renderer-1.1.0-linux-amd64.tar.gz"
+    }
+  ],
+  "signingTargets": [
+    {
+      "bytes": 120459,
+      "path": "build/r1/candidate-v2/descriptors/windows-x86_64.json",
+      "sha256": "1ebde182cbdecb0cd3004d56ee41d071cd7d5128a63f77384ce5b5b85cbed32c"
+    },
+    {
+      "bytes": 466787,
+      "path": "build/r1/candidate-v2/descriptors/macos-aarch64.json",
+      "sha256": "864b89f6da5a5ec52b628492a0d4eba090656888104d85b483304b335969d826"
+    }
+  ],
+  "inventoryResourcePaths": [
+    "inventories/mcicon-helper-1.1.0-windows-x86_64.json",
+    "inventories/mcicon-guest-1.1.0-windows-x86_64.json",
+    "inventories/windows-x86_64/mcicon-renderer-1.1.0-linux-amd64.json",
+    "inventories/mcicon-helper-1.1.0-macos-aarch64.json",
+    "inventories/mcicon-guest-1.1.0-macos-aarch64.json",
+    "inventories/macos-aarch64/mcicon-renderer-1.1.0-linux-amd64.json"
+  ],
+  "worker": {
+    "adapterSetSha256": "a2b152ebaeec52b1bb67f7ba27d9b178ebec28c9579e87fd4e450efef3501e97",
+    "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+    "protocolVersion": 1,
+    "toolVersion": "1.1.0"
+  },
+  "rootfsRuns": [
+    {
+      "image_id": "sha256:bfffeb2e814314ab496753cc7723749860d90253025822977d5ab4757f13e8d9",
+      "build_seconds": 409.937,
+      "export_measure_seconds": 156.906,
+      "inputs_sha256": {
+        "helpers/windows/rootfs/Dockerfile": "6dbaebcb0166b57912fd69bead86f160fd9830265fc1132f4ba4eff61aad3a74",
+        "helpers/windows/rootfs/packages.lock": "c7438f89684f797c93ace3527f0240c15ec765ca3a3c77157c5a18660824d5d4",
+        "helpers/windows/rootfs/probe-packages.lock": "97ac23b59c4cab8c861bfb487ddf65b2883ff496f45226eb43e3e620c48c8e42",
+        "helpers/windows/rootfs/build.py": "8164beea547ba36e77acd12c87cf24a58771d574f49e7917069a7f0586a08193",
+        "LICENSE": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691",
+        "helpers/windows/src/main/guest/guestbridge.py": "508ea9fb5cb33babb98a74a71554419a9353f931c4f2bfccb16b6545f87e90ff",
+        "helpers/macos/src/main/native/cpu-probe.S": "d109f1f2e0c3a5bda7c3ef4bf47d162b79045b95eec4f2228d22607c45334b87"
+      },
+      "docker_export_sha256": "4e7303d4c2f6b1a8c33f74261b1bd5d833a4b80df5aadecef4fa46cdac8c3fa6",
+      "tar_sha256": "c3b5269dd0bb26a551167bc36554fc90df5f9fc62504b981c9528259e1599bad",
+      "tar_xz_sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5",
+      "tar_xz_bytes": 98146824,
+      "tar_bytes": 403507200,
+      "xz": {
+        "preset": 6,
+        "check": "CRC64",
+        "decoder_limit_bytes": 67108864,
+        "decoder_memory_bytes": 8454200,
+        "bounded_decode_matches_tar": true,
+        "robot": "name\t/measure/rootfs.tar.xz\nfile\t1\t1\t98146824\t403507200\t0.243\tCRC64\t0\nstream\t1\t1\t0\t0\t98146824\t403507200\t0.243\tCRC64\t0\nblock\t1\t1\t1\t12\t0\t98146784\t403507200\t0.243\tCRC64\ta9b25c35b210fbec\t12\t--\t98146763\t8454200\t--lzma2=dict=8MiB\nsummary\t8454200\tno\t50000002\ntotals\t1\t1\t98146824\t403507200\t0.243\tCRC64\t0\t1\t8454200\tno\t50000002\n"
+      }
+    },
+    {
+      "image_id": "sha256:bfffeb2e814314ab496753cc7723749860d90253025822977d5ab4757f13e8d9",
+      "build_seconds": 399.297,
+      "export_measure_seconds": 214.0,
+      "inputs_sha256": {
+        "helpers/windows/rootfs/Dockerfile": "6dbaebcb0166b57912fd69bead86f160fd9830265fc1132f4ba4eff61aad3a74",
+        "helpers/windows/rootfs/packages.lock": "c7438f89684f797c93ace3527f0240c15ec765ca3a3c77157c5a18660824d5d4",
+        "helpers/windows/rootfs/probe-packages.lock": "97ac23b59c4cab8c861bfb487ddf65b2883ff496f45226eb43e3e620c48c8e42",
+        "helpers/windows/rootfs/build.py": "8164beea547ba36e77acd12c87cf24a58771d574f49e7917069a7f0586a08193",
+        "LICENSE": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691",
+        "helpers/windows/src/main/guest/guestbridge.py": "508ea9fb5cb33babb98a74a71554419a9353f931c4f2bfccb16b6545f87e90ff",
+        "helpers/macos/src/main/native/cpu-probe.S": "d109f1f2e0c3a5bda7c3ef4bf47d162b79045b95eec4f2228d22607c45334b87"
+      },
+      "docker_export_sha256": "26e4ececefe073a13d9c1f41cfb3171bc66f5ae5e0da5cef3cfaad11bcfb8999",
+      "tar_sha256": "c3b5269dd0bb26a551167bc36554fc90df5f9fc62504b981c9528259e1599bad",
+      "tar_xz_sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5",
+      "tar_xz_bytes": 98146824,
+      "tar_bytes": 403507200,
+      "xz": {
+        "preset": 6,
+        "check": "CRC64",
+        "decoder_limit_bytes": 67108864,
+        "decoder_memory_bytes": 8454200,
+        "bounded_decode_matches_tar": true,
+        "robot": "name\t/measure/rootfs.tar.xz\nfile\t1\t1\t98146824\t403507200\t0.243\tCRC64\t0\nstream\t1\t1\t0\t0\t98146824\t403507200\t0.243\tCRC64\t0\nblock\t1\t1\t1\t12\t0\t98146784\t403507200\t0.243\tCRC64\ta9b25c35b210fbec\t12\t--\t98146763\t8454200\t--lzma2=dict=8MiB\nsummary\t8454200\tno\t50000002\ntotals\t1\t1\t98146824\t403507200\t0.243\tCRC64\t0\t1\t8454200\tno\t50000002\n"
+      }
+    }
+  ],
+  "rendererBuildRuns": [
+    {
+      "image_id": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+      "image_bytes": 2056219398,
+      "build_seconds": 742.968,
+      "id_archive_bytes": 598764544,
+      "id_archive_sha256": "6e63f160f2e3d15af3b088485739b21a076cf8672a9b02dc5600299d6daa1fe1",
+      "inputs_sha256": {
+        "docker/Dockerfile": "a0a3576ade9a35bd830aa04f951bffc6ad51a71189f5cfaa3594633073d57d18",
+        "docker/entrypoint.sh": "f9e5bcd211856a62f7ac32b95c7bba142dbbabb991ccefcdf1a2b8c28d5f0b4b",
+        "docker/packages.lock": "8c8aa79be86580c0c1dad8cf349a802177d0e749adfe8d228fdf652c8374cc7b"
+      }
+    },
+    {
+      "image_id": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+      "image_bytes": 2056219398,
+      "build_seconds": 529.125,
+      "id_archive_bytes": 598764544,
+      "id_archive_sha256": "6e63f160f2e3d15af3b088485739b21a076cf8672a9b02dc5600299d6daa1fe1",
+      "inputs_sha256": {
+        "docker/Dockerfile": "a0a3576ade9a35bd830aa04f951bffc6ad51a71189f5cfaa3594633073d57d18",
+        "docker/entrypoint.sh": "f9e5bcd211856a62f7ac32b95c7bba142dbbabb991ccefcdf1a2b8c28d5f0b4b",
+        "docker/packages.lock": "8c8aa79be86580c0c1dad8cf349a802177d0e749adfe8d228fdf652c8374cc7b"
+      }
+    }
+  ],
+  "rendererArchiveRuns": [
+    {
+      "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+      "platform": "linux/amd64",
+      "imageBytes": 2056219398,
+      "rawSave": {
+        "bytes": 598764544,
+        "sha256": "6e63f160f2e3d15af3b088485739b21a076cf8672a9b02dc5600299d6daa1fe1"
+      },
+      "tar": {
+        "bytes": 598773760,
+        "sha256": "b82f097689841b8272b493a2f3d4250f72861801aa0af3ccfef749698fff7785"
+      },
+      "tarGz": {
+        "bytes": 593385993,
+        "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+      },
+      "members": 19,
+      "memberContentPreserved": true,
+      "config": "blobs/sha256/130ff7c7f504746fa447d312b72638c662b0a777bfb80fc4329cab5ac0974314",
+      "seconds": 42.781,
+      "normalization": {
+        "epoch": 1793664000,
+        "uid": 0,
+        "gid": 0,
+        "ownerNames": "",
+        "order": "path",
+        "gzipMtime": 0,
+        "gzipFilename": "",
+        "gzipLevel": 6
+      }
+    },
+    {
+      "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+      "platform": "linux/amd64",
+      "imageBytes": 2056219398,
+      "rawSave": {
+        "bytes": 598764544,
+        "sha256": "6e63f160f2e3d15af3b088485739b21a076cf8672a9b02dc5600299d6daa1fe1"
+      },
+      "tar": {
+        "bytes": 598773760,
+        "sha256": "b82f097689841b8272b493a2f3d4250f72861801aa0af3ccfef749698fff7785"
+      },
+      "tarGz": {
+        "bytes": 593385993,
+        "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+      },
+      "members": 19,
+      "memberContentPreserved": true,
+      "config": "blobs/sha256/130ff7c7f504746fa447d312b72638c662b0a777bfb80fc4329cab5ac0974314",
+      "seconds": 39.968,
+      "normalization": {
+        "epoch": 1793664000,
+        "uid": 0,
+        "gid": 0,
+        "ownerNames": "",
+        "order": "path",
+        "gzipMtime": 0,
+        "gzipFilename": "",
+        "gzipLevel": 6
+      }
+    }
+  ],
+  "windowsHelperRuns": [
+    {
+      "files": 230,
+      "packagingSha256": "b9d85fd8d7c377510b72e8e7c215ce410acaaf2d8a37d3ad130724e6657bae91",
+      "nativeBuildSha256": "1da1eadc933ffe4e6a143258a792f6cb8672ad320ea7cc7f82af14c9246a61a6",
+      "nativeProcess": {
+        "collected": true,
+        "unknown": false,
+        "exit": 0
+      }
+    },
+    {
+      "files": 230,
+      "packagingSha256": "b9d85fd8d7c377510b72e8e7c215ce410acaaf2d8a37d3ad130724e6657bae91",
+      "nativeBuildSha256": "1da1eadc933ffe4e6a143258a792f6cb8672ad320ea7cc7f82af14c9246a61a6",
+      "nativeProcess": {
+        "collected": true,
+        "unknown": false,
+        "exit": 0
+      }
+    }
+  ],
+  "macHelperRuns": [
+    {
+      "round": 3,
+      "buildSeconds": 11.7,
+      "payloadSeconds": 0.309,
+      "packageSeconds": 31.336,
+      "verifySeconds": 4.853,
+      "unpackedBytes": 206610208,
+      "archive": {
+        "bytes": 125853859,
+        "sha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde"
+      }
+    },
+    {
+      "round": 4,
+      "buildSeconds": 12.356,
+      "payloadSeconds": 0.311,
+      "packageSeconds": 30.564,
+      "verifySeconds": 4.802,
+      "unpackedBytes": 206610208,
+      "archive": {
+        "bytes": 125853859,
+        "sha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde"
+      }
+    }
+  ],
+  "macGuestAcquisition": "公式固定URLから無改変qcow2を独立2回取得。sourceからのOS再buildではない",
+  "verification": {
+    "javaTests": [
+      {
+        "name": "io.github.rs0325.mcicon.internal.managed.RuntimeArchiveTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.internal.managed.RuntimeCandidateVerifierTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.internal.managed.RuntimeDescriptorTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.internal.managed.RuntimeResourceGeneratorTest",
+        "tests": "17",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.internal.managed.RuntimeStoreTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "macHelperTests": [
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.RebootRecoveryTest",
+        "tests": "13",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.CommandsTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.LeaseReferencesTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.HostFactsTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "1"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.MacRuntimeTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.CacheStateTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "io.github.rs0325.mcicon.helper.macos.OperationJournalTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "pythonTests": {
+      "scripts/test-release-candidate.py": 3,
+      "scripts/test-release-payloads.py": 3,
+      "helpers/windows/rootfs/test-build.py": 2,
+      "docker/test-export-candidate.py": 2
+    },
+    "actualUnsignedJavaValidation": "PASS build/r1/candidate-v2",
+    "initialSharedInventoryCollisionRejected": true,
+    "negativeChecks": {
+      "archive": {
+        "exit": 1,
+        "expectedRejection": true
+      },
+      "inventory": {
+        "exit": 1,
+        "expectedRejection": true
+      },
+      "productionResources": {
+        "exit": 1,
+        "expectedUnadoptedRejection": true,
+        "resourcesNotGenerated": true
+      }
+    },
+    "productionSignatureVerified": false,
+    "gitDiffCheck": "PASS",
+    "macHelperSkips": [
+      {
+        "class": "io.github.rs0325.mcicon.helper.macos.HostFactsTest",
+        "test": "実probeの保存stdoutを現契約で解析する()",
+        "message": "org.opentest4j.TestAbortedException: Assumption failed: 実probeの保存stdoutが指定された場合だけ実行する"
+      }
+    ]
+  },
+  "corrections": [
+    "rootfs lockfileのCRLF混入をGit元bytesと一致するLFへ修正",
+    "Mac LICENSEのCRLF混入を元bytesへ補正しrun3/4で既存ZIPに一致",
+    "共有renderer inventoryをhost別resource pathへ複製して本番配置衝突を解消"
+  ],
+  "supersededCandidate": "build/r1/candidate（共有inventory resource path衝突。署名対象外）",
+  "cleanup": {
+    "mac": {
+      "dedicatedDirectoryAbsent": true,
+      "dedicatedProcessesRemaining": [],
+      "vmStarted": false,
+      "existingLimaModified": false
+    },
+    "wslDirectCommandsUsed": false,
+    "sharedCachePruned": false,
+    "taskTagsBefore": [
+      {
+        "tags": [
+          "mcicon-windows-rootfs-c1:r1-fixed-1",
+          "mcicon-windows-rootfs-c1:r1-fixed-2"
+        ],
+        "id": "sha256:bfffeb2e814314ab496753cc7723749860d90253025822977d5ab4757f13e8d9"
+      },
+      {
+        "tags": [
+          "mcicon-windows-rootfs-c1:r1-fixed-1",
+          "mcicon-windows-rootfs-c1:r1-fixed-2"
+        ],
+        "id": "sha256:bfffeb2e814314ab496753cc7723749860d90253025822977d5ab4757f13e8d9"
+      },
+      {
+        "tags": [
+          "mcicon-renderer-repro:fixed-1",
+          "mcicon-renderer-repro:r1-1",
+          "mcicon-renderer-repro:r1-2"
+        ],
+        "id": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc"
+      },
+      {
+        "tags": [
+          "mcicon-renderer-repro:fixed-1",
+          "mcicon-renderer-repro:r1-1",
+          "mcicon-renderer-repro:r1-2"
+        ],
+        "id": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc"
+      }
+    ],
+    "containersAtEnd": "",
+    "taskTagsRemoved": true,
+    "sharedRendererPreserved": true,
+    "dockerDesktopProcessesRemaining": 0,
+    "dockerEnginePipePresent": false,
+    "dockerStopped": true
+  },
+  "sourceScriptsSha256": {
+    "scripts/assemble-release-candidate.py": "e7e346892348d77ade74454b9f8f3339255b9098c951272fbd66a256a0382c35",
+    "scripts/prepare-release-payloads.py": "47ab6c0f070210165cf26d4fb9810c9730ad6a79d2056c9bf57fc579060cc4c6",
+    "scripts/test-release-candidate.py": "be39f2dbdb3280d08ee878f27206de0a1b069c0334c11e553508b119e6330ec1",
+    "scripts/test-release-payloads.py": "4cb88b53dd27aff37fd32e8f525956393ab214ab68793cd950210943d2ac3e85",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeCandidateVerifier.java": "bec1d88dcbbfce8997427be57165bd53c2cf7b247480a06ede34eefa9894a925",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeDescriptor.java": "e0c6ba87588e638fe7f7cc059f72915047d75717285476c0cf65251a5b465dcf"
+  },
+  "unresolved": [
+    "本番公開trust-set未指定・descriptor未署名。署名前候補であり最終採用は未確定",
+    "source archive本体の取得検証・component別source/notice bundleの閉包と配布形態は未完了",
+    "Microsoft runtimeの再配布条件とUbuntu改変版の商標・再配布条件の法務判断は未完了",
+    "Mac qcow2内license本文・正式配布経路のOS警告・未準備host setup・実reboot・正規leaseからの製品一連受入は未完了",
+    "Windows下限は確認済み10.0.26200へ限定。旧Windows 11版の受入は未実施"
+  ],
+  "changedFiles": [
+    ".gitattributes",
+    "core/build.gradle",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeDescriptor.java",
+    "core/src/main/java/io/github/rs0325/mcicon/internal/managed/RuntimeCandidateVerifier.java",
+    "core/src/test/java/io/github/rs0325/mcicon/internal/managed/RuntimeCandidateVerifierTest.java",
+    "scripts/assemble-release-candidate.py",
+    "scripts/prepare-release-payloads.py",
+    "scripts/test-release-candidate.py",
+    "scripts/test-release-payloads.py",
+    "docs/release-candidate-1.1.md",
+    "qa/release-candidate-2026-11-05.json",
+    "qa/release-candidate-2026-11-05.json.sha256"
+  ]
+}
