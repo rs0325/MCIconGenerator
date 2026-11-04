@@ -37,8 +37,10 @@ try:
 finally:link.unlink()
 archive=a.output/'helper.zip'
 with zipfile.ZipFile(archive,'x',compression=zipfile.ZIP_DEFLATED,compresslevel=3) as output:
- for name in sorted(directories):output.write(a.image/name,'MCIconHelper.app/'+name+'/')
- for name in sorted(expected):output.write(a.image/name,'MCIconHelper.app/'+name)
+ for name in sorted(directories)+sorted(expected):
+  file=a.image/name;directory=file.is_dir();entry=zipfile.ZipInfo('MCIconHelper.app/'+name+('/' if directory else ''),date_time=(1980,1,1,0,0,0));entry.create_system=3;entry.external_attr=(file.stat().st_mode&0xffff)<<16
+  if directory:entry.external_attr|=0x10
+  output.writestr(entry,b'' if directory else file.read_bytes(),compress_type=zipfile.ZIP_STORED if directory else zipfile.ZIP_DEFLATED,compresslevel=3)
 roundtrip=a.output/'roundtrip';roundtrip.mkdir()
 with zipfile.ZipFile(archive) as source:
  for entry in source.infolist():
