@@ -93,7 +93,7 @@ def generate(tree, manifest_path, component_path, publication_path):
     publication, _ = load(publication_path)
     if type(manifest['schemaVersion']) is not int or manifest['schemaVersion'] != 1 or manifest['finalBytesConfirmed'] is not True:
         invalid('最終bytesのfile manifestが必要です')
-    if manifest['host'] != {'os': 'macos', 'arch': 'aarch64'} or manifest['minimumOsVersion'] != '15.7.7':
+    if manifest['host'] != {'os': 'macos', 'arch': 'aarch64'} or manifest['minimumOsVersion'] != '15.8.1':
         invalid('承認済みMac対応範囲と一致しません')
     if not re.fullmatch('[0-9a-f]{40}', text(manifest['sourceCommit'])):
         invalid('source commitが不正です')

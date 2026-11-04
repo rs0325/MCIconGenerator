@@ -62,7 +62,7 @@ def archive(image, output):
             bundle.add(file, arcname=root + '/' + relative, recursive=False)
             if file.is_file():
                 records.append({'path': relative, 'bytes': file.stat().st_size, 'sha256': hashlib.sha256(file.read_bytes()).hexdigest(), 'mode': format(stat.S_IMODE(file.stat().st_mode), 'o')})
-    evidence = {'status': 'local-homebrew-candidate-not-installed-or-published', 'minimumMacOS': '15.7.7', 'package': package, 'archive': output.name,
+    evidence = {'status': 'local-homebrew-candidate-not-installed-or-published', 'minimumMacOS': '15.8.1', 'package': package, 'archive': output.name,
                 'bytes': output.stat().st_size, 'sha256': hashlib.sha256(output.read_bytes()).hexdigest(), 'files': records}
     with audit.open('x') as stream:
         stream.write(json.dumps(evidence, ensure_ascii=False, indent=2) + '\n')
@@ -98,7 +98,7 @@ def formula(bundle, url, sha256, output):
 
   def install
     macos_version = IO.popen(["/usr/bin/sw_vers", "-productVersion"], &:read).strip
-    odie "macOS 15.7.7以降が必要です" if Version.new(macos_version) < Version.new("15.7.7")
+    odie "macOS 15.8.1以降が必要です" if Version.new(macos_version) < Version.new("15.8.1")
     libexec.install "libexec/MCIconBootstrap.app"
     bin.install "bin/mcicon"
   end
