@@ -1,0 +1,3408 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "refs": [
+    91,
+    94
+  ],
+  "sourceCommit": "f209a927143e0e0d25874de3ee9815da5ff87352",
+  "scope": "同じMac/同じ固定入力でのoffline候補測定。正式配布・VM受入ではない",
+  "environment": {
+    "jdkRelease": "IMPLEMENTOR=\"Eclipse Adoptium\"\nIMPLEMENTOR_VERSION=\"Temurin-21.0.13+9\"\nJAVA_RUNTIME_VERSION=\"21.0.13+9-LTS\"\nJAVA_VERSION=\"21.0.13\"\nJAVA_VERSION_DATE=\"2026-10-20\"\nLIBC=\"default\"\nMODULES=\"java.base java.compiler java.datatransfer java.xml java.prefs java.desktop java.instrument java.logging java.management java.security.sasl java.naming java.rmi java.management.rmi java.net.http java.scripting java.security.jgss java.transaction.xa java.sql java.sql.rowset java.xml.crypto java.se java.smartcardio jdk.accessibility jdk.internal.jvmstat jdk.attach jdk.charsets jdk.internal.opt jdk.zipfs jdk.compiler jdk.crypto.ec jdk.crypto.cryptoki jdk.dynalink jdk.internal.ed jdk.editpad jdk.hotspot.agent jdk.httpserver jdk.incubator.vector jdk.internal.le jdk.internal.vm.ci jdk.internal.vm.compiler jdk.internal.vm.compiler.management jdk.jartool jdk.javadoc jdk.jcmd jdk.management jdk.management.agent jdk.jconsole jdk.jdeps jdk.jdwp.agent jdk.jdi jdk.jfr jdk.jlink jdk.jpackage jdk.jshell jdk.jsobject jdk.jstatd jdk.localedata jdk.management.jfr jdk.naming.dns jdk.naming.rmi jdk.net jdk.nio.mapmode jdk.random jdk.sctp jdk.security.auth jdk.security.jgss jdk.unsupported jdk.unsupported.desktop jdk.xml.dom\"\nOS_ARCH=\"aarch64\"\nOS_NAME=\"Darwin\"\nSOURCE=\".:git:2ab10ca20c19\"\nBUILD_SOURCE=\"git:1cf43d7a3e77886bfea7d550a902e151a87d724d\"\nBUILD_SOURCE_REPO=\"https://github.com/adoptium/temurin-build.git\"\nSOURCE_REPO=\"https://github.com/adoptium/jdk21u.git\"\nFULL_VERSION=\"21.0.13+9-LTS\"\nSEMANTIC_VERSION=\"21.0.13+9\"\nBUILD_INFO=\"OS: macOS Version: 14.1 23B74\"\nJVM_VARIANT=\"Hotspot\"\nJVM_VERSION=\"21.0.13+9-LTS\"\nIMAGE_TYPE=\"JDK\"\n",
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t15.8.1\nBuildVersion:\t\t24H32\n",
+    "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin24.6.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+    "swift": "Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)\nTarget: arm64-apple-macosx15.0\n",
+    "base": {
+      "bytes": 620224512,
+      "sha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55"
+    },
+    "sourceCommit": "f209a927143e0e0d25874de3ee9815da5ff87352"
+  },
+  "downloads": [
+    {
+      "name": "lima.tar.gz",
+      "url": "https://github.com/lima-vm/lima/releases/download/v2.2.1/lima-2.2.1-Darwin-arm64.tar.gz",
+      "expectedSha256": "9e9eacce88f37e185c346bad73aa6136f738d8cdf8c3bb23cd42b071824bc66e",
+      "headStatus": 200,
+      "contentLength": "38328082",
+      "bytes": 38328082,
+      "sha256": "9e9eacce88f37e185c346bad73aa6136f738d8cdf8c3bb23cd42b071824bc66e",
+      "verified": true,
+      "seconds": 2.75
+    },
+    {
+      "name": "lima-source.tar.gz",
+      "url": "https://github.com/lima-vm/lima/archive/refs/tags/v2.2.1.tar.gz",
+      "expectedSha256": "d551efb52115ba006c1052d5c929e4d3afac363c78c9cfca6975af1f85c1426a",
+      "headStatus": 200,
+      "contentLength": "7887831",
+      "bytes": 7887831,
+      "sha256": "d551efb52115ba006c1052d5c929e4d3afac363c78c9cfca6975af1f85c1426a",
+      "verified": true,
+      "seconds": 1.313
+    },
+    {
+      "name": "base.img",
+      "url": "https://cloud-images.ubuntu.com/releases/noble/release-20260926/ubuntu-24.04-server-cloudimg-arm64.img",
+      "expectedSha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+      "headStatus": 200,
+      "contentLength": "620224512",
+      "bytes": 620224512,
+      "sha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+      "verified": true,
+      "seconds": 33.125
+    },
+    {
+      "name": "base.manifest",
+      "url": "https://cloud-images.ubuntu.com/releases/noble/release-20260926/ubuntu-24.04-server-cloudimg-arm64.manifest",
+      "expectedSha256": "be8373ae3b3be49905c1e9984196196cc9148c6437ec96a735e90428ee8b8ac6",
+      "headStatus": 200,
+      "contentLength": "21147",
+      "bytes": 21147,
+      "sha256": "be8373ae3b3be49905c1e9984196196cc9148c6437ec96a735e90428ee8b8ac6",
+      "verified": true,
+      "seconds": 2.0
+    },
+    {
+      "name": "runc_1.3.4-0ubuntu1~24.04.1_arm64.deb",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261017T000000Z/pool/main/r/runc-app/runc_1.3.4-0ubuntu1~24.04.1_arm64.deb",
+      "expectedSha256": "725a27bbdd5f58d7059ed25d88f14f2d45f6a1ce089585eddc715e04d4a3f79f",
+      "headStatus": 200,
+      "contentLength": "8578418",
+      "bytes": 8578418,
+      "sha256": "725a27bbdd5f58d7059ed25d88f14f2d45f6a1ce089585eddc715e04d4a3f79f",
+      "verified": true,
+      "seconds": 5.984
+    },
+    {
+      "name": "containerd_2.2.1-0ubuntu1~24.04.3_arm64.deb",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261017T000000Z/pool/main/c/containerd-app/containerd_2.2.1-0ubuntu1~24.04.3_arm64.deb",
+      "expectedSha256": "e12495f100f025750ca91c07bab3a58c674afb1576fe55516608a8daa4d067bd",
+      "headStatus": 200,
+      "contentLength": "25160084",
+      "bytes": 25160084,
+      "sha256": "e12495f100f025750ca91c07bab3a58c674afb1576fe55516608a8daa4d067bd",
+      "verified": true,
+      "seconds": 13.125
+    },
+    {
+      "name": "docker.io_29.1.3-0ubuntu3~24.04.2_arm64.deb",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261017T000000Z/pool/universe/d/docker.io-app/docker.io_29.1.3-0ubuntu3~24.04.2_arm64.deb",
+      "expectedSha256": "fb0b4f8f4738d3d610b511f50808abd49376ee715a81364e7dbd8a2c60c580d6",
+      "headStatus": 200,
+      "contentLength": "32026672",
+      "bytes": 32026672,
+      "sha256": "fb0b4f8f4738d3d610b511f50808abd49376ee715a81364e7dbd8a2c60c580d6",
+      "verified": true,
+      "seconds": 11.063
+    },
+    {
+      "name": "jdk.tar.gz",
+      "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.13_9.tar.gz",
+      "headStatus": 200,
+      "bytes": 199754598,
+      "sha256": "bf036b35b071bfb2f54f2c0af8ee8d88afa95ee6eb3dce02c0f94cfc2524d04a",
+      "verified": true,
+      "seconds": 7.531,
+      "pinOrigin": "D1で照合したAdoptium公式release metadata"
+    },
+    {
+      "name": "jdk-source.tar.gz",
+      "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk-sources_21.0.13_9.tar.gz",
+      "headStatus": 200,
+      "bytes": 115231532,
+      "sha256": "b5232c9980d8a0f0459676c084c41c6e2c771ed9e785890b03c6a438406ad1ca",
+      "verified": true,
+      "seconds": 6.625,
+      "pinOrigin": "D1で照合したAdoptium公式release metadata"
+    }
+  ],
+  "downloadTotalBytes": 1047212876,
+  "jdkOfficialComparison": {
+    "regularFiles": 459,
+    "allBytesMatched": true,
+    "officialManifestSha256": "d5c3cecc74fc11d5ad1816362a2955895aba7dc631e4261ce75456571e50baa8",
+    "installedManifestSha256": "63c2dfaf7f844b6808f3643870735fdd7af75fa56f58acb2cb48022abe7b3784"
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "buildSeconds": 11.772,
+      "debUnpackSeconds": null,
+      "payloadSeconds": 0.286,
+      "packageSeconds": 29.54,
+      "verifySeconds": 4.698,
+      "unpackedBytes": 206610208,
+      "archive": {
+        "bytes": 125853859,
+        "sha256": "fc4973b19809177bf4fea9bb0c22aab4777ab5ab26b2900acbf1db2c8758863c"
+      },
+      "symlinks": []
+    },
+    {
+      "round": 2,
+      "buildSeconds": 11.822,
+      "debUnpackSeconds": null,
+      "payloadSeconds": 0.288,
+      "packageSeconds": 28.969,
+      "verifySeconds": 4.679,
+      "unpackedBytes": 206610208,
+      "archive": {
+        "bytes": 125853859,
+        "sha256": "08f134929900eb2c0bfc5d6c65eaeaefbec5e21b87f76d35a4f727c8f63de37a"
+      },
+      "symlinks": []
+    }
+  ],
+  "fileManifest": [
+    {
+      "path": "Contents/Info.plist",
+      "bytes": 1383,
+      "sha256": "5138218b3c7e8c290810595d178bcc394ba2d998e383e2fc5b69c708e20a0687",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/MacOS/MCIconHelper",
+      "bytes": 178176,
+      "sha256": "4445fad52e197fcfdcc3509e9dcf22862153ff7a0dfedc1bc1f0a8254771c972",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/PkgInfo",
+      "bytes": 8,
+      "sha256": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/Resources/MCIconHelper.icns",
+      "bytes": 378371,
+      "sha256": "d54efb9969c36e52177b7314f51afaf3865da48ff3f98fff1def9fb5831f456d",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/_CodeSignature/CodeResources",
+      "bytes": 35134,
+      "sha256": "0b19e4a7c2de1f32153aff004660bd9fed3a3504f758806e9af9ea2cb696fc31",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/.jpackage.xml",
+      "bytes": 297,
+      "sha256": "4f9f3b6bb59bf38a707dcddcd6952dcd1777372b6ef301f497e9316843f93ba4",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/MCIconHelper.cfg",
+      "bytes": 365,
+      "sha256": "759ab172a430e25a6ce9a3745cf3dfdbc6e909ddba32c6b3dd773b6db6b3e0b5",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/helper-common-1.1.0.jar",
+      "bytes": 43072,
+      "sha256": "433f89e19f21eb51ee25f0084365c53a3d9f4f535ae621eb0b57b828f93b7bca",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/helper-macos-1.1.0.jar",
+      "bytes": 82827,
+      "sha256": "3346feaaed5a2061c30f472fe4e756c8dd953dfc27198be5699f7b74c73c2664",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/jackson-annotations-2.22.jar",
+      "bytes": 84211,
+      "sha256": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/jackson-core-2.22.3.jar",
+      "bytes": 594776,
+      "sha256": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/jackson-databind-2.22.3.jar",
+      "bytes": 1709604,
+      "sha256": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/NOTICE.json",
+      "bytes": 1639,
+      "sha256": "fab780ada643d667fc6d217711f9440f319968df5bb995844ed2a5f508f22d92",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/bin/limactl",
+      "bytes": 32685200,
+      "sha256": "6d32fb0f880c0ea750434f2ac855a3f2129126752a301ce4d88adbd2fa599e1e",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/app/support/host-probe",
+      "bytes": 112672,
+      "sha256": "dbfb80126f9421e7a1832d2e4e24b46e05dff445309c9c9aaae56d916f1981e7",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/NOTICE",
+      "bytes": 738,
+      "sha256": "612b14bc77c944ce229cbba0d14919162cfea8ed802cbf06a8e865e032d03201",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-LICENSE",
+      "bytes": 3228,
+      "sha256": "59067508e44346bf93dc9c5e4d673a67ecd77988c2020bb5e0f8667eb199f396",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-ThirdParty-LICENSE",
+      "bytes": 4578,
+      "sha256": "dbc36f9422a40d58d1a214080583667cfd37d61c2fae1657d981edda2a60727f",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/NOTICE",
+      "bytes": 1616,
+      "sha256": "e6aef1c0f4cf5b0f802c16b31fce309b3c3737450b93c40d6291bf6540aae3d1",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/Schubfach-LICENSE",
+      "bytes": 1064,
+      "sha256": "12d39a6615219d73202300715e365bec2b958f858d1e837c8f2dace57f905969",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/NOTICE",
+      "bytes": 738,
+      "sha256": "612b14bc77c944ce229cbba0d14919162cfea8ed802cbf06a8e865e032d03201",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/licenses/mcicon/LICENSE",
+      "bytes": 1085,
+      "sha256": "e5d10a9495452177d62e2559ecfb08313997b937ce581192c84580a5c67219e9",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/offline/cpu-probe",
+      "bytes": 4127,
+      "sha256": "328293ccb19b77e6ab66891477036d9af226c5a0c952fd8f2efcc57ed80dfce6",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/app/support/offline/debs/containerd.deb",
+      "bytes": 25160084,
+      "sha256": "e12495f100f025750ca91c07bab3a58c674afb1576fe55516608a8daa4d067bd",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/offline/debs/docker.io.deb",
+      "bytes": 32026672,
+      "sha256": "fb0b4f8f4738d3d610b511f50808abd49376ee715a81364e7dbd8a2c60c580d6",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/offline/debs/runc.deb",
+      "bytes": 8578418,
+      "sha256": "725a27bbdd5f58d7059ed25d88f14f2d45f6a1ce089585eddc715e04d4a3f79f",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/payload.json",
+      "bytes": 3649,
+      "sha256": "3d12d76694d917dd4a4ee06fa76f131479c3409076e4ed25a6bc0955983e30c2",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/process-guard",
+      "bytes": 53008,
+      "sha256": "e89445d1d1ca30ca4cd5750b087d8158b7a6f3e63fb816195a603125f2c63f5d",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/app/support/share/doc/lima/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/share/doc/lima/NOTICE",
+      "bytes": 963,
+      "sha256": "a7e0caed1395c49dfa6ce7dc8aa6362e4daa8369917f56fbe80084c1ae8c765c",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/share/doc/lima/VERSION",
+      "bytes": 7,
+      "sha256": "51a76904570dfd01d966325f09cddf7ecc5f7608a65d6f4bf11d135bbb88ba0d",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/share/doc/ubuntu/containerd/copyright",
+      "bytes": 55702,
+      "sha256": "68592c95770d75949ec612178bcbc7bc8a57a6eccd6cfd3bb5990219c716a863",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/share/doc/ubuntu/docker.io/copyright",
+      "bytes": 47578,
+      "sha256": "e0f85dd2076ae0024c669dd5c399a0f6bde6be8dc6015dcdffd4cc24b503e64e",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/share/doc/ubuntu/runc/copyright",
+      "bytes": 8887,
+      "sha256": "4b28f3745ae2a9eb2d332058d10b0b08cf3802d8347be90cc0faf8c811939ca6",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/share/lima/lima-guestagent.Linux-aarch64.gz",
+      "bytes": 7421099,
+      "sha256": "ed41b146a0aa9fb5e75d4b42d7af40c9ffb2cafadf4d8685762599e1960a72d7",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/app/support/sources/lima-v2.2.1.tar.gz",
+      "bytes": 7887831,
+      "sha256": "d551efb52115ba006c1052d5c929e4d3afac363c78c9cfca6975af1f85c1426a",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/bin/java",
+      "bytes": 68656,
+      "sha256": "e80c3ddeef93bf2abcc4595e1102e0ef6b66edc824dbc517322ac8b8c3a1eac7",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/bin/jrunscript",
+      "bytes": 68688,
+      "sha256": "a797d5d3d0c6fadde573a92b5709b38092e039e31b42974cdb5ea8650f92bb31",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/bin/keytool",
+      "bytes": 68688,
+      "sha256": "b76558141850c59ad43eafab83368fbeba1e76928fb9470549eebfc2d37974c2",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/bin/rmiregistry",
+      "bytes": 68688,
+      "sha256": "203c5762f3e548bbf7ffef7a1ddf125b331e7b35c7a3e5dd0c7af21b5e7a142c",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/jaxp.properties",
+      "bytes": 7302,
+      "sha256": "7d95c49465d0c836d608d02856d3b097934dfb5dc4bd2279affaf337d045b708",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/logging.properties",
+      "bytes": 2732,
+      "sha256": "b62d2733ab99556b108a1951d894c5a8d76b1ac7a00c02c388f9eb9be046c56f",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/net.properties",
+      "bytes": 7441,
+      "sha256": "2e070ed1d97052f0ce8771ed2ef74a38d7c260a45fde7a3682c8844e5fdf58a4",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/security/java.policy",
+      "bytes": 2294,
+      "sha256": "d51bcab7ed301caeff3779a5e777e6019864cecee5e2abc102ef991b0de77af2",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/security/java.security",
+      "bytes": 72050,
+      "sha256": "a7975ff49305cdf5082be1498fc1b736e3ad69e8717357294f76106c0c772bdb",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/security/policy/README.txt",
+      "bytes": 2390,
+      "sha256": "6da0747334b0fea7592fd92614b2bbc8b126535e129b1fee483774d914e98eb5",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/security/policy/limited/default_US_export.policy",
+      "bytes": 146,
+      "sha256": "758b930a526fc670ab7537f8c26321527050a31f5f42149a2dda623c56a0a1a9",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/security/policy/limited/default_local.policy",
+      "bytes": 647,
+      "sha256": "2b2627548e61316150d47ffc3e6cad465ca05b3cccd4785eb7d21aa7baa0f441",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/security/policy/limited/exempt_local.policy",
+      "bytes": 566,
+      "sha256": "8c3d7648abcd95a272ce12db870082937f4d7f6878d730d83cb7fbb31eb8b2c9",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/security/policy/unlimited/default_US_export.policy",
+      "bytes": 146,
+      "sha256": "758b930a526fc670ab7537f8c26321527050a31f5f42149a2dda623c56a0a1a9",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/security/policy/unlimited/default_local.policy",
+      "bytes": 193,
+      "sha256": "8d8a318e6d90dfd7e26612d2b6385aa704f686ca6134c551f8928418d92b851a",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/conf/sound.properties",
+      "bytes": 1210,
+      "sha256": "299c2360b6155eb28990ec49cd21753f97e43442fe8fab03e04f3e213df43a66",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/aes.md",
+      "bytes": 1444,
+      "sha256": "45c6d4da48325edfbff3dcf71c704e504c057904435ed23c6d57046d551eb69d",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/asm.md",
+      "bytes": 1582,
+      "sha256": "683be15695bd248272d60f5b7fbe5e126a935ea6bf231a624a9aa164733e1d1d",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/c-libutl.md",
+      "bytes": 1556,
+      "sha256": "bef40679922d6fdfb7e4ddb223ad6722300f6054ba737bbf6188d60fcec517f9",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/cldr.md",
+      "bytes": 9601,
+      "sha256": "19515e14a240e022640e95b61b5095127fa9690755950b4a2b0a02e783e08163",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/icu.md",
+      "bytes": 30197,
+      "sha256": "1bf28459c6e0af9f3429f4f8becd1668d6544055f8df240277456bc4b3d8a752",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/public_suffix.md",
+      "bytes": 17783,
+      "sha256": "861de1e4992a7d28f1de25c73cd50d26a94779ebd749c0643fecfa56442c3429",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/siphash.md",
+      "bytes": 8256,
+      "sha256": "5a792b5a74ad2a5f3d6a7ad8b7a841116e58a772c18bc6e392320a365b222c76",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/unicode.md",
+      "bytes": 9078,
+      "sha256": "6f72f10d166b2c2e8a395e03e734c5afc852b59aeca73ced124f6b9c96268d53",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.base/zlib.md",
+      "bytes": 1010,
+      "sha256": "c9c70c36a1f0325e8788771906202d42ba6ab4205caca44ec0f665707e83226b",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.compiler/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.compiler/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.compiler/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.datatransfer/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.datatransfer/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/colorimaging.md",
+      "bytes": 167,
+      "sha256": "04d61e3e8e71dd452ebe52008af5378d9f6640d14578aeb515dc5375973b0189",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/freetype.md",
+      "bytes": 30465,
+      "sha256": "553e804baecb7de7129d77c7259a6b70037d1893f1c600b41b35201695fb7758",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/giflib.md",
+      "bytes": 1689,
+      "sha256": "206aab89ec75968e48a6a1ed6df7d8b9bfb7aea12cbe4c9345d93e5d97460a25",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/harfbuzz.md",
+      "bytes": 3629,
+      "sha256": "5ec7cba7f8e7fc3a089213140aab6fa1b3bd5bf8a91bf8bddb3b8d315fc5f7d0",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/jpeg.md",
+      "bytes": 3474,
+      "sha256": "c1dfb9719a71ad9f861f8728550542d681e25c8ef40e6393606e6e2a0c1d653a",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/lcms.md",
+      "bytes": 2654,
+      "sha256": "843f9f6fa9c3f8109fcf4d5fe74caf7f2ae8e9bcd92238e4aff2d428c932b24b",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/libpng.md",
+      "bytes": 7519,
+      "sha256": "f73afb394792f3aeecd959e89487603677a430e56b44eba596d8b572accfd540",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/mesa3d.md",
+      "bytes": 5732,
+      "sha256": "63f4e6f75caebbccb95d903fb43e46ac7111b3624d0a34f146b276d7d9e7b152",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/pipewire.md",
+      "bytes": 1479,
+      "sha256": "56a8fb1652c70ac204d13bb52ca4d678162e7d21a97d10209c2a633de8082de0",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.desktop/xwd.md",
+      "bytes": 1348,
+      "sha256": "1d4ffa93c87f35084b02a7aa90a21084b4019db4fe1003c2e5ce775b4a384f59",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.instrument/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.instrument/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.instrument/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.logging/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.logging/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.logging/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.management/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.management/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.management/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.management.rmi/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.management.rmi/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.naming/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.naming/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.naming/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.net.http/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.net.http/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.net.http/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.prefs/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.prefs/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.prefs/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.rmi/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.rmi/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.rmi/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.scripting/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.scripting/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.scripting/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.se/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.se/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.se/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.security.jgss/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.security.jgss/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.security.sasl/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.security.sasl/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.sql/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.sql/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.sql/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.sql.rowset/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.sql.rowset/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.transaction.xa/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.transaction.xa/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml/bcel.md",
+      "bytes": 11196,
+      "sha256": "cd578186ad93de46cca29ec8ace2b11f9da751987f3f140e6095c528596cc8c1",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml/dom.md",
+      "bytes": 3761,
+      "sha256": "6686e8877667584a3a7c07344baadca1a03e29f677162d87c3c0811e990d1148",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml/jcup.md",
+      "bytes": 1448,
+      "sha256": "8d5dcfdf50455a3c34c753a98f21e953248af200415a9084e3f102cb6c43b8bf",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml/xalan.md",
+      "bytes": 13477,
+      "sha256": "c27eb875da4be683d4d7422be986e5e30f636ede31958ff1d39f9cd6109e7a00",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml/xerces.md",
+      "bytes": 11848,
+      "sha256": "4a6bf6b367193ee68681cb2d9fed30ffc5d62dd2d477bd62e0271707d71b3244",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml.crypto/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml.crypto/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/java.xml.crypto/santuario.md",
+      "bytes": 11505,
+      "sha256": "d08690d25f660f145c73365d260ed522cd0aace8a0e1396706551b7a1ae8c9a3",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO",
+      "bytes": 2114,
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION",
+      "bytes": 1514,
+      "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/LICENSE",
+      "bytes": 19274,
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/classlist",
+      "bytes": 77202,
+      "sha256": "01b9c997aa616618b9cd713dda43b66fbcf5f25976cfe12240415d0641db801a",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/fontconfig.bfc",
+      "bytes": 2922,
+      "sha256": "5409952a218126c5c11cf0e4963665711aeeab50f5648264d70866fca705a950",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/fontconfig.properties.src",
+      "bytes": 8931,
+      "sha256": "c8d20a4a39240665252306bdd3dbc8d71e1e246c8cd8c7985b32e4101658a148",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/jrt-fs.jar",
+      "bytes": 110123,
+      "sha256": "b3b49dbb3ce6e67eec8a5f9ca7a44667161af1dff0f31afc8c8143681d126ffa",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/jspawnhelper",
+      "bytes": 70096,
+      "sha256": "312b078166700ec50b579b7bc829ab566aa4d8ea493a7bf02b840331cc068483",
+      "mode": "0o755"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/jvm.cfg",
+      "bytes": 29,
+      "sha256": "aa9efb969444c1484e29adecab55a122458090616e766b2f1230ef05bc3867e0",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libawt.dylib",
+      "bytes": 549904,
+      "sha256": "39eb44028636d96f45bf901f1fdeb428ac8ae0ec266881eee10e1036214701e8",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libawt_lwawt.dylib",
+      "bytes": 1189632,
+      "sha256": "5624e9ce65a01beeec5d1a56c537619d881619a876df198915be1c8a3cf47cbf",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libfontmanager.dylib",
+      "bytes": 1118720,
+      "sha256": "b6e388ccb8e0ed7a7b0a71746968c129a41d4c5a7a5dbcb119bb968beb084099",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libfreetype.dylib",
+      "bytes": 643984,
+      "sha256": "1a6925c29c0ed768b5fa6a608b00815cde846996be04b31ebbbab28a84bd83fc",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libinstrument.dylib",
+      "bytes": 90496,
+      "sha256": "bcec7ad70eb039dc7983130d2b6d63e5435d8a6dbabcdead1f6c06df6cfdf100",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libj2gss.dylib",
+      "bytes": 91072,
+      "sha256": "f00f91a241f2379e7c9945fdb8b29e01239ed0e6617dd6855a80aa09ccfdef31",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjava.dylib",
+      "bytes": 186912,
+      "sha256": "0b8d8a20a8a49c5d1a80c9978eefa5ccc14a85cf9d7d3f9067e3f38a0b78a0d3",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjavajpeg.dylib",
+      "bytes": 246608,
+      "sha256": "d71529ac82e6a1767a0306eb0412d5bae151154c48782bf26af4420ccce00ff6",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjawt.dylib",
+      "bytes": 51968,
+      "sha256": "ac30c1d9db0062cadbf96dba215e8e6d6fb505f80074b10cf79a6e6088ef7edb",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjimage.dylib",
+      "bytes": 74528,
+      "sha256": "578bccf66c05b8ec26b4822dfe68e1408c4bfbb62c009eb58cedc5624a1b79f4",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjli.dylib",
+      "bytes": 129680,
+      "sha256": "fb06efad003363957d08c107ed06ee43352e078d96e68d9965a6f21e3ba1ac3a",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjsig.dylib",
+      "bytes": 69440,
+      "sha256": "77a56c546b9bb020a9e99a6a099a55ccf253769392acbf471d1ad36e743f582c",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjsound.dylib",
+      "bytes": 133744,
+      "sha256": "519e295ac0f97309a47c66a019fe78c96ff04975be54f4fc97886cd83e2ce020",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/liblcms.dylib",
+      "bytes": 298128,
+      "sha256": "ffa276baa94f512b9ed68f42d8e4be19e176b0ee0e1a1380d75ba31c060657b0",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libmanagement.dylib",
+      "bytes": 75328,
+      "sha256": "9004391b14e1b273ded3f7912c83a16f72545db1b00145d25472f912c290dd2b",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libmlib_image.dylib",
+      "bytes": 488752,
+      "sha256": "a7096ed4bdfb844e8bf66023b57d49d275325d7f01d33f205815997a6a2f6987",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libnet.dylib",
+      "bytes": 112816,
+      "sha256": "65c4eae231aca763c75b0d51cdee4c4558f7ab926a4bfe0be09c2ae2b10887b4",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libnio.dylib",
+      "bytes": 125456,
+      "sha256": "ad4b79e692a28fd6cf0672cd2d2f6f290dba263e38111299a29b1fa7512e9d41",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosx.dylib",
+      "bytes": 73248,
+      "sha256": "fe9e9245324174582ad2413d141d522710f893d38fcdd44e399756d087049720",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosxapp.dylib",
+      "bytes": 188112,
+      "sha256": "d5a05e057d7e5950219fbe2a1a0ef9963503b0a781107f904183facd6c5eae1e",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosxkrb5.dylib",
+      "bytes": 73024,
+      "sha256": "ba6cafa4acc852b3edd937629868f4ae7274de256c99aa4b07a9b3d7aaebc9ff",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosxsecurity.dylib",
+      "bytes": 73584,
+      "sha256": "6b61a772273249e482a90a476f019169c5610660cbe571f23aa93a78288332b4",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosxui.dylib",
+      "bytes": 98160,
+      "sha256": "2c2f868307ce67e00eca0e83b06c83057014b383c786c875f1a094dbefcb4a6f",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libprefs.dylib",
+      "bytes": 73104,
+      "sha256": "90893d5acce4aa80c2c3b9cdca992a38ec4b4d462c78b382c0d86357503af1ee",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/librmi.dylib",
+      "bytes": 68176,
+      "sha256": "018ca31b0dc6b508434a7101d665a14a3ed6a8adf31992b213eff75f29aa7adc",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libsplashscreen.dylib",
+      "bytes": 240800,
+      "sha256": "9ed6566f3d12512fa756565740751de90e02b87c4efc9f8b0b4f636d5fa4ddd3",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libsyslookup.dylib",
+      "bytes": 34880,
+      "sha256": "647507959f9b9d33a879cb7a0def009cc4acc7f55846c58c82b7dc403493e2f4",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libverify.dylib",
+      "bytes": 105344,
+      "sha256": "c3d863dabbd708173c62309dc19a3cbd792e954357ce906efc6d91a735c24d01",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libzip.dylib",
+      "bytes": 125008,
+      "sha256": "9e8278661058017486d89fbe8f706cc06f79ad5b947c95b5d0182cab243ec55a",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/modules",
+      "bytes": 62054169,
+      "sha256": "05700771bccb66ed51469ca71d5981a33ffe40b7ba6537385db2c46756e2f953",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/psfont.properties.ja",
+      "bytes": 3793,
+      "sha256": "5a4bd51b969bf187ff86d94f4a71fdfbfa602762975fa3c73d264b4575f7c78f",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/psfontj2d.properties",
+      "bytes": 11390,
+      "sha256": "780c565d5af3ee6f68b887b75c041cdf46a0592f67012f12eeb691283e92630a",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/security/blocked.certs",
+      "bytes": 2488,
+      "sha256": "96572f243f31c2ef81a6e627542e596f6a9295cff3c7ae095c1b595cb1457ded",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/security/cacerts",
+      "bytes": 154503,
+      "sha256": "628b436e6698c364c5498a32c5bff91806bea7a9b501f75e2289ddc60b4ca7ef",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/security/default.policy",
+      "bytes": 10742,
+      "sha256": "9b77a722ab832082b8f9312f72da1528989a3ca1b9fa4f9bf32767dfd5ebe099",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/security/public_suffix_list.dat",
+      "bytes": 227396,
+      "sha256": "16b42002aa6f83a7763c4cdbd399ecf738460377d447e362884495545afd60a3",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/server/libjsig.dylib",
+      "bytes": 69440,
+      "sha256": "77a56c546b9bb020a9e99a6a099a55ccf253769392acbf471d1ad36e743f582c",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/server/libjvm.dylib",
+      "bytes": 18277136,
+      "sha256": "f692d88f95e46abd8d1e1d292be298bcb41e1f8ca4805de312d53222ee3939f6",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/shaders.metallib",
+      "bytes": 156397,
+      "sha256": "7a2758084a5dbe418dc9f4360276234dc02a415ca1371b40202de50ad89ef9b7",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/tzdb.dat",
+      "bytes": 103876,
+      "sha256": "a02e3a23d67255782b11ab81070902235ab564080f0f65ffe2a989cdaa86fe89",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/release",
+      "bytes": 344,
+      "sha256": "7e8a78c9d3c556bb1d55ddb5b7d028c16289f13c5382250302ef9b0b452766fd",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/Info.plist",
+      "bytes": 890,
+      "sha256": "55b2bc79c0ab03f9327231ae3c9ff80a979b88c37e461a6a2359b9bd2c0f074f",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/MacOS/libjli.dylib",
+      "bytes": 129728,
+      "sha256": "728c1c9b63e22b7943df6c98a4b46a25b4480a539c07dad62f268e47c4672377",
+      "mode": "0o644"
+    },
+    {
+      "path": "Contents/runtime/Contents/_CodeSignature/CodeResources",
+      "bytes": 26187,
+      "sha256": "cd1bd308b623c6a745a3777636f9031481777895f0881f66227496dbb596e93e",
+      "mode": "0o644"
+    }
+  ],
+  "fileTreeSha256": "ad0260629378bb03782bd9918bc0ac29ebb4659537d9f6946379ab667b310903",
+  "comparison": {
+    "files": 196,
+    "fileBytesAndModesEqual": true,
+    "payloadAndAdHocSealEqual": true,
+    "changedFiles": [],
+    "originalZipContentEqual": true,
+    "originalZipShaEqual": false,
+    "zipTimestampDifferences": 260,
+    "fixedZipBytesEqual": true,
+    "fixedZip": {
+      "bytes": 125853859,
+      "sha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde"
+    },
+    "fixedTimestamp": "1980-01-01T00:00:00",
+    "compression": "files=deflate level3; directories=stored",
+    "zipMetadataExceptTimestampEqual": true
+  },
+  "native": [
+    {
+      "path": "Contents/MacOS/MCIconHelper",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/MacOS/MCIconHelper\nIdentifier=io.github.rs0325.mcicon.helper.macos\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=1469 flags=0x2(adhoc) hashes=39+3 location=embedded\nSignature=adhoc\nInfo.plist entries=16\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=192\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/app/support/bin/limactl",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 26.0",
+        "      sdk 26.5",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/app/support/bin/limactl\nIdentifier=limactl-55554944d0ea9108d39b3844a87c6fdea5965f70\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=64041 flags=0x2(adhoc) hashes=1990+7 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>com.apple.security.network.client</key><true/><key>com.apple.security.network.server</key><true/><key>com.apple.security.virtualization</key><true/></dict></plist>\n"
+    },
+    {
+      "path": "Contents/app/support/host-probe",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 13.0",
+        "      sdk 26.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/app/support/host-probe\nIdentifier=host-probe-5555494461c44bed6462364b8f81b57c2f907d6b\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=940 flags=0x2(adhoc) hashes=23+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/app/support/process-guard",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 15.0",
+        "      sdk 26.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/app/support/process-guard\nIdentifier=process-guard-55554944656178c9b9da32d2b7a1d409746dc4b1\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=495 flags=0x2(adhoc) hashes=9+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/bin/java",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/bin/java\nIdentifier=net.java.openjdk.java\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=590 flags=0x2(adhoc) hashes=13+2 location=embedded\nSignature=adhoc\nInfo.plist entries=5\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/bin/jrunscript",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/bin/jrunscript\nIdentifier=net.java.openjdk.jrunscript\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=596 flags=0x2(adhoc) hashes=13+2 location=embedded\nSignature=adhoc\nInfo.plist entries=5\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/bin/keytool",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/bin/keytool\nIdentifier=net.java.openjdk.keytool\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=593 flags=0x2(adhoc) hashes=13+2 location=embedded\nSignature=adhoc\nInfo.plist entries=5\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/bin/rmiregistry",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/bin/rmiregistry\nIdentifier=net.java.openjdk.rmiregistry\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=597 flags=0x2(adhoc) hashes=13+2 location=embedded\nSignature=adhoc\nInfo.plist entries=5\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/jspawnhelper",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/jspawnhelper\nIdentifier=jspawnhelper-55554944fdaa2e2c1609382b87a232e1ddb81091\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=622 flags=0x2(adhoc) hashes=13+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libawt.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libawt.dylib\nIdentifier=libawt-55554944b09e5e576dff331d90bbf8e8d63f13ee\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=4328 flags=0x2(adhoc) hashes=129+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libawt_lwawt.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libawt_lwawt.dylib\nIdentifier=libawt_lwawt-555549444a907cd3a0543fef89e7b5907a49921f\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=9294 flags=0x2(adhoc) hashes=284+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libfontmanager.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libfontmanager.dylib\nIdentifier=libfontmanager-55554944b2842734253637f49b5940ccfa9f7737\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=8752 flags=0x2(adhoc) hashes=267+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libfreetype.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libfreetype.dylib\nIdentifier=libfreetype-5555494457237781409935c0bec572e6a8c083b7\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=5069 flags=0x2(adhoc) hashes=152+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libinstrument.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libinstrument.dylib\nIdentifier=libinstrument-55554944e9fbfe0b1ade3899816d2ae31f15bbb4\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=783 flags=0x2(adhoc) hashes=18+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libj2gss.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libj2gss.dylib\nIdentifier=libj2gss-555549449207245b99bb366fa95f735eb53e894c\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=778 flags=0x2(adhoc) hashes=18+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjava.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjava.dylib\nIdentifier=libjava-55554944e6da06d0cf0a30faaed52a50b1ef44ac\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=1513 flags=0x2(adhoc) hashes=41+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjavajpeg.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjavajpeg.dylib\nIdentifier=libjavajpeg-55554944aa97451ec6363aee9609f1dcaa7f003c\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=1997 flags=0x2(adhoc) hashes=56+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjawt.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjawt.dylib\nIdentifier=libjawt-555549443cf15f8e50ba3320aa71965b2b431c40\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=489 flags=0x2(adhoc) hashes=9+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjimage.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjimage.dylib\nIdentifier=libjimage-5555494486a88c33cb1034fcb3eb70d8b013caee\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=651 flags=0x2(adhoc) hashes=14+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjli.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjli.dylib\nIdentifier=libjli-55554944d19f0cc2648c30cd82f3c2cf2cfa9988\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=1064 flags=0x2(adhoc) hashes=27+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjsig.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjsig.dylib\nIdentifier=libjsig-555549445bc8b1c9e3b13bd69c4e0fe504222141\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=617 flags=0x2(adhoc) hashes=13+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libjsound.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libjsound.dylib\nIdentifier=libjsound-55554944c4e3a80251013ecdb558bbb4bfc1948c\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=1099 flags=0x2(adhoc) hashes=28+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/liblcms.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/liblcms.dylib\nIdentifier=liblcms-55554944e3808b3d235c3f44b36a5789ed5833dd\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=2377 flags=0x2(adhoc) hashes=68+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libmanagement.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libmanagement.dylib\nIdentifier=libmanagement-5555494452429ec1406a39ac8a3efa0f3a0edfdc\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=655 flags=0x2(adhoc) hashes=14+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libmlib_image.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libmlib_image.dylib\nIdentifier=libmlib_image-555549444c8ba04d827e3c71bd9f4a949fa5d26b\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=3855 flags=0x2(adhoc) hashes=114+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libnet.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnet.dylib\nIdentifier=libnet-55554944239a90c989f23296b8064c2771ea11f2\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=936 flags=0x2(adhoc) hashes=23+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libnio.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libnio.dylib\nIdentifier=libnio-5555494430409ab0794432a5a3a93d59e368ef9d\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=1032 flags=0x2(adhoc) hashes=26+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosx.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libosx.dylib\nIdentifier=libosx-55554944847360a707833e6d96df1a653d63ed3b\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=648 flags=0x2(adhoc) hashes=14+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosxapp.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libosxapp.dylib\nIdentifier=libosxapp-555549445b6ec42a22583b759fd799659ddf296e\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=1547 flags=0x2(adhoc) hashes=42+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosxkrb5.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libosxkrb5.dylib\nIdentifier=libosxkrb5-555549445bbd13b55f1a3cd0bcd3e7c24c234e61\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=652 flags=0x2(adhoc) hashes=14+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosxsecurity.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libosxsecurity.dylib\nIdentifier=libosxsecurity-55554944c53cb335b79a3860b2a4933c1a6f9d6e\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=656 flags=0x2(adhoc) hashes=14+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libosxui.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libosxui.dylib\nIdentifier=libosxui-55554944cd9f9e64002b3ec487b0c793ac6092e9\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=842 flags=0x2(adhoc) hashes=20+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libprefs.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libprefs.dylib\nIdentifier=libprefs-55554944505bf08bc4a2378fbafb7d58cd3b2682\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=650 flags=0x2(adhoc) hashes=14+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/librmi.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/librmi.dylib\nIdentifier=librmi-55554944f9ef86e631993ff0aba5f3feb1f93f49\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=616 flags=0x2(adhoc) hashes=13+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libsplashscreen.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libsplashscreen.dylib\nIdentifier=libsplashscreen-55554944976b9f07098837e78323aed23588913f\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=1937 flags=0x2(adhoc) hashes=54+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libsyslookup.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libsyslookup.dylib\nIdentifier=libsyslookup-55554944b2b661a31b0e32fd88da2f3a530af26a\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=366 flags=0x2(adhoc) hashes=5+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libverify.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libverify.dylib\nIdentifier=libverify-55554944111a2e59bae43bdc8da7682b0925173b\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=907 flags=0x2(adhoc) hashes=22+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/libzip.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/libzip.dylib\nIdentifier=libzip-55554944afd9b64dce3e384591a9d22beef568b9\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=1032 flags=0x2(adhoc) hashes=26+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/server/libjsig.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/server/libjsig.dylib\nIdentifier=libjsig-555549445bc8b1c9e3b13bd69c4e0fe504222141\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=617 flags=0x2(adhoc) hashes=13+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/Home/lib/server/libjvm.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/Home/lib/server/libjvm.dylib\nIdentifier=libjvm-555549448fd32657cf7e3b509d3bfc4e0a28e804\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=141768 flags=0x2(adhoc) hashes=4424+2 location=embedded\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    },
+    {
+      "path": "Contents/runtime/Contents/MacOS/libjli.dylib",
+      "deployment": [
+        "      cmd LC_BUILD_VERSION",
+        "  cmdsize 32",
+        " platform 1",
+        "    minos 11.0",
+        "      sdk 14.2",
+        "   ntools 1"
+      ],
+      "codesignExit": 0,
+      "codesign": "Executable=MCIconHelper.app/Contents/runtime/Contents/MacOS/libjli.dylib\nIdentifier=com.oracle.java.io.github.rs0325.mcicon.helper.macos\nFormat=bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=1101 flags=0x2(adhoc) hashes=27+3 location=embedded\nSignature=adhoc\nInfo.plist entries=9\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=154\nInternal requirements count=0 size=12\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n",
+      "entitlements": ""
+    }
+  ],
+  "plist": {
+    "LSMinimumSystemVersion": "10.11",
+    "CFBundleDevelopmentRegion": "English",
+    "CFBundleAllowMixedLocalizations": true,
+    "CFBundleExecutable": "MCIconHelper",
+    "CFBundleIconFile": "MCIconHelper.icns",
+    "CFBundleIdentifier": "io.github.rs0325.mcicon.helper.macos",
+    "CFBundleInfoDictionaryVersion": "6.0",
+    "CFBundleName": "MCIconHelper",
+    "CFBundlePackageType": "APPL",
+    "CFBundleShortVersionString": "1.1.0",
+    "CFBundleSignature": "????",
+    "LSApplicationCategoryType": "public.app-category.utilities",
+    "CFBundleVersion": "1.1.0",
+    "NSHumanReadableCopyright": "Copyright (C) 2026",
+    "NSHighResolutionCapable": "true",
+    "NSMicrophoneUsageDescription": "The application MCIconHelper is requesting access to the microphone."
+  },
+  "symlinks": [],
+  "runtimeLegalLinksMaterialized": 63,
+  "payloadSigning": {
+    "method": "restore official limactl signature; outer app ad-hoc only, no deep signing/no entitlement change",
+    "originalManifestSha256": "3d12d76694d917dd4a4ee06fa76f131479c3409076e4ed25a6bc0955983e30c2",
+    "changedFiles": [
+      {
+        "path": "bin/limactl",
+        "jpackageBytes": 32875568,
+        "jpackageSha256": "c19f041237fa84717d74c1a66a1297bba680444e60db9d48a48dfe73f0ec30ad",
+        "restoredOfficialBytes": 32685200,
+        "restoredOfficialSha256": "6d32fb0f880c0ea750434f2ac855a3f2129126752a301ce4d88adbd2fa599e1e"
+      }
+    ],
+    "finalManifestAllFilesVerified": true,
+    "officialInnerEntitlements": {
+      "com.apple.security.network.client": true,
+      "com.apple.security.network.server": true,
+      "com.apple.security.virtualization": true
+    }
+  },
+  "inventory": {
+    "componentCount": 9,
+    "attributedFiles": 196,
+    "unattributedFiles": [],
+    "documentBodiesVerified": {
+      "Contents/app/support/share/doc/ubuntu/containerd/copyright": {
+        "bytes": 55702,
+        "sha256": "68592c95770d75949ec612178bcbc7bc8a57a6eccd6cfd3bb5990219c716a863"
+      },
+      "Contents/app/support/share/doc/ubuntu/docker.io/copyright": {
+        "bytes": 47578,
+        "sha256": "e0f85dd2076ae0024c669dd5c399a0f6bde6be8dc6015dcdffd4cc24b503e64e"
+      },
+      "Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/LICENSE": {
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/NOTICE": {
+        "bytes": 738,
+        "sha256": "612b14bc77c944ce229cbba0d14919162cfea8ed802cbf06a8e865e032d03201"
+      },
+      "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-LICENSE": {
+        "bytes": 3228,
+        "sha256": "59067508e44346bf93dc9c5e4d673a67ecd77988c2020bb5e0f8667eb199f396"
+      },
+      "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-ThirdParty-LICENSE": {
+        "bytes": 4578,
+        "sha256": "dbc36f9422a40d58d1a214080583667cfd37d61c2fae1657d981edda2a60727f"
+      },
+      "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/LICENSE": {
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/NOTICE": {
+        "bytes": 1616,
+        "sha256": "e6aef1c0f4cf5b0f802c16b31fce309b3c3737450b93c40d6291bf6540aae3d1"
+      },
+      "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/Schubfach-LICENSE": {
+        "bytes": 1064,
+        "sha256": "12d39a6615219d73202300715e365bec2b958f858d1e837c8f2dace57f905969"
+      },
+      "Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/LICENSE": {
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/NOTICE": {
+        "bytes": 738,
+        "sha256": "612b14bc77c944ce229cbba0d14919162cfea8ed802cbf06a8e865e032d03201"
+      },
+      "Contents/app/support/share/doc/lima/LICENSE": {
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/app/support/share/doc/lima/NOTICE": {
+        "bytes": 963,
+        "sha256": "a7e0caed1395c49dfa6ce7dc8aa6362e4daa8369917f56fbe80084c1ae8c765c"
+      },
+      "Contents/app/support/licenses/mcicon/LICENSE": {
+        "bytes": 1085,
+        "sha256": "e5d10a9495452177d62e2559ecfb08313997b937ce581192c84580a5c67219e9"
+      },
+      "Contents/app/support/share/doc/ubuntu/runc/copyright": {
+        "bytes": 8887,
+        "sha256": "4b28f3745ae2a9eb2d332058d10b0b08cf3802d8347be90cc0faf8c811939ca6"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/aes.md": {
+        "bytes": 1444,
+        "sha256": "45c6d4da48325edfbff3dcf71c704e504c057904435ed23c6d57046d551eb69d"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/asm.md": {
+        "bytes": 1582,
+        "sha256": "683be15695bd248272d60f5b7fbe5e126a935ea6bf231a624a9aa164733e1d1d"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/c-libutl.md": {
+        "bytes": 1556,
+        "sha256": "bef40679922d6fdfb7e4ddb223ad6722300f6054ba737bbf6188d60fcec517f9"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/cldr.md": {
+        "bytes": 9601,
+        "sha256": "19515e14a240e022640e95b61b5095127fa9690755950b4a2b0a02e783e08163"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/icu.md": {
+        "bytes": 30197,
+        "sha256": "1bf28459c6e0af9f3429f4f8becd1668d6544055f8df240277456bc4b3d8a752"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/public_suffix.md": {
+        "bytes": 17783,
+        "sha256": "861de1e4992a7d28f1de25c73cd50d26a94779ebd749c0643fecfa56442c3429"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/siphash.md": {
+        "bytes": 8256,
+        "sha256": "5a792b5a74ad2a5f3d6a7ad8b7a841116e58a772c18bc6e392320a365b222c76"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/unicode.md": {
+        "bytes": 9078,
+        "sha256": "6f72f10d166b2c2e8a395e03e734c5afc852b59aeca73ced124f6b9c96268d53"
+      },
+      "Contents/runtime/Contents/Home/legal/java.base/zlib.md": {
+        "bytes": 1010,
+        "sha256": "c9c70c36a1f0325e8788771906202d42ba6ab4205caca44ec0f665707e83226b"
+      },
+      "Contents/runtime/Contents/Home/legal/java.compiler/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.compiler/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.compiler/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.datatransfer/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.datatransfer/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/colorimaging.md": {
+        "bytes": 167,
+        "sha256": "04d61e3e8e71dd452ebe52008af5378d9f6640d14578aeb515dc5375973b0189"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/freetype.md": {
+        "bytes": 30465,
+        "sha256": "553e804baecb7de7129d77c7259a6b70037d1893f1c600b41b35201695fb7758"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/giflib.md": {
+        "bytes": 1689,
+        "sha256": "206aab89ec75968e48a6a1ed6df7d8b9bfb7aea12cbe4c9345d93e5d97460a25"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/harfbuzz.md": {
+        "bytes": 3629,
+        "sha256": "5ec7cba7f8e7fc3a089213140aab6fa1b3bd5bf8a91bf8bddb3b8d315fc5f7d0"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/jpeg.md": {
+        "bytes": 3474,
+        "sha256": "c1dfb9719a71ad9f861f8728550542d681e25c8ef40e6393606e6e2a0c1d653a"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/lcms.md": {
+        "bytes": 2654,
+        "sha256": "843f9f6fa9c3f8109fcf4d5fe74caf7f2ae8e9bcd92238e4aff2d428c932b24b"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/libpng.md": {
+        "bytes": 7519,
+        "sha256": "f73afb394792f3aeecd959e89487603677a430e56b44eba596d8b572accfd540"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/mesa3d.md": {
+        "bytes": 5732,
+        "sha256": "63f4e6f75caebbccb95d903fb43e46ac7111b3624d0a34f146b276d7d9e7b152"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/pipewire.md": {
+        "bytes": 1479,
+        "sha256": "56a8fb1652c70ac204d13bb52ca4d678162e7d21a97d10209c2a633de8082de0"
+      },
+      "Contents/runtime/Contents/Home/legal/java.desktop/xwd.md": {
+        "bytes": 1348,
+        "sha256": "1d4ffa93c87f35084b02a7aa90a21084b4019db4fe1003c2e5ce775b4a384f59"
+      },
+      "Contents/runtime/Contents/Home/legal/java.instrument/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.instrument/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.instrument/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.logging/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.logging/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.logging/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.management/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.management/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.management/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.management.rmi/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.management.rmi/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.naming/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.naming/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.naming/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.net.http/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.net.http/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.net.http/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.prefs/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.prefs/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.prefs/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.rmi/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.rmi/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.rmi/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.scripting/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.scripting/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.scripting/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.se/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.se/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.se/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.security.jgss/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.security.jgss/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.security.sasl/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.security.sasl/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.sql/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.sql/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.sql/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.sql.rowset/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.sql.rowset/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.transaction.xa/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.transaction.xa/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml/bcel.md": {
+        "bytes": 11196,
+        "sha256": "cd578186ad93de46cca29ec8ace2b11f9da751987f3f140e6095c528596cc8c1"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml/dom.md": {
+        "bytes": 3761,
+        "sha256": "6686e8877667584a3a7c07344baadca1a03e29f677162d87c3c0811e990d1148"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml/jcup.md": {
+        "bytes": 1448,
+        "sha256": "8d5dcfdf50455a3c34c753a98f21e953248af200415a9084e3f102cb6c43b8bf"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml/xalan.md": {
+        "bytes": 13477,
+        "sha256": "c27eb875da4be683d4d7422be986e5e30f636ede31958ff1d39f9cd6109e7a00"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml/xerces.md": {
+        "bytes": 11848,
+        "sha256": "4a6bf6b367193ee68681cb2d9fed30ffc5d62dd2d477bd62e0271707d71b3244"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml.crypto/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml.crypto/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      "Contents/runtime/Contents/Home/legal/java.xml.crypto/santuario.md": {
+        "bytes": 11505,
+        "sha256": "d08690d25f660f145c73365d260ed522cd0aace8a0e1396706551b7a1ae8c9a3"
+      },
+      "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO": {
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION": {
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/LICENSE": {
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      }
+    },
+    "components": [
+      {
+        "id": "containerd",
+        "version": "2.2.1-0ubuntu1~24.04.3",
+        "files": [
+          "Contents/app/support/offline/debs/containerd.deb",
+          "Contents/app/support/share/doc/ubuntu/containerd/copyright"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/app/support/share/doc/ubuntu/containerd/copyright"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      },
+      {
+        "id": "docker.io",
+        "version": "29.1.3-0ubuntu3~24.04.2",
+        "files": [
+          "Contents/app/support/offline/debs/docker.io.deb",
+          "Contents/app/support/share/doc/ubuntu/docker.io/copyright"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/app/support/share/doc/ubuntu/docker.io/copyright"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      },
+      {
+        "id": "jackson-annotations",
+        "version": "2.22",
+        "files": [
+          "Contents/app/jackson-annotations-2.22.jar",
+          "Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/NOTICE"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/NOTICE"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      },
+      {
+        "id": "jackson-core",
+        "version": "2.22.3",
+        "files": [
+          "Contents/app/jackson-core-2.22.3.jar",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-ThirdParty-LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/NOTICE",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/Schubfach-LICENSE"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-ThirdParty-LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/NOTICE",
+          "Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/Schubfach-LICENSE"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      },
+      {
+        "id": "jackson-databind",
+        "version": "2.22.3",
+        "files": [
+          "Contents/app/jackson-databind-2.22.3.jar",
+          "Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/NOTICE"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/LICENSE",
+          "Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/NOTICE"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      },
+      {
+        "id": "lima",
+        "version": "2.2.1",
+        "files": [
+          "Contents/app/support/bin/limactl",
+          "Contents/app/support/share/doc/lima/LICENSE",
+          "Contents/app/support/share/doc/lima/NOTICE",
+          "Contents/app/support/share/doc/lima/VERSION",
+          "Contents/app/support/share/lima/lima-guestagent.Linux-aarch64.gz",
+          "Contents/app/support/sources/lima-v2.2.1.tar.gz"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/app/support/share/doc/lima/LICENSE",
+          "Contents/app/support/share/doc/lima/NOTICE"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      },
+      {
+        "id": "mcicon",
+        "version": "1.1.0",
+        "files": [
+          "Contents/Info.plist",
+          "Contents/PkgInfo",
+          "Contents/_CodeSignature/CodeResources",
+          "Contents/app/.jpackage.xml",
+          "Contents/app/MCIconHelper.cfg",
+          "Contents/app/helper-common-1.1.0.jar",
+          "Contents/app/helper-macos-1.1.0.jar",
+          "Contents/app/support/NOTICE.json",
+          "Contents/app/support/host-probe",
+          "Contents/app/support/licenses/mcicon/LICENSE",
+          "Contents/app/support/offline/cpu-probe",
+          "Contents/app/support/payload.json",
+          "Contents/app/support/process-guard"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/app/support/licenses/mcicon/LICENSE"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      },
+      {
+        "id": "runc",
+        "version": "1.3.4-0ubuntu1~24.04.1",
+        "files": [
+          "Contents/app/support/offline/debs/runc.deb",
+          "Contents/app/support/share/doc/ubuntu/runc/copyright"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/app/support/share/doc/ubuntu/runc/copyright"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      },
+      {
+        "id": "temurin",
+        "version": "21.0.13+9",
+        "files": [
+          "Contents/MacOS/MCIconHelper",
+          "Contents/Resources/MCIconHelper.icns",
+          "Contents/runtime/Contents/Home/bin/java",
+          "Contents/runtime/Contents/Home/bin/jrunscript",
+          "Contents/runtime/Contents/Home/bin/keytool",
+          "Contents/runtime/Contents/Home/bin/rmiregistry",
+          "Contents/runtime/Contents/Home/conf/jaxp.properties",
+          "Contents/runtime/Contents/Home/conf/logging.properties",
+          "Contents/runtime/Contents/Home/conf/net.properties",
+          "Contents/runtime/Contents/Home/conf/security/java.policy",
+          "Contents/runtime/Contents/Home/conf/security/java.security",
+          "Contents/runtime/Contents/Home/conf/security/policy/README.txt",
+          "Contents/runtime/Contents/Home/conf/security/policy/limited/default_US_export.policy",
+          "Contents/runtime/Contents/Home/conf/security/policy/limited/default_local.policy",
+          "Contents/runtime/Contents/Home/conf/security/policy/limited/exempt_local.policy",
+          "Contents/runtime/Contents/Home/conf/security/policy/unlimited/default_US_export.policy",
+          "Contents/runtime/Contents/Home/conf/security/policy/unlimited/default_local.policy",
+          "Contents/runtime/Contents/Home/conf/sound.properties",
+          "Contents/runtime/Contents/Home/legal/java.base/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.base/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.base/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.base/aes.md",
+          "Contents/runtime/Contents/Home/legal/java.base/asm.md",
+          "Contents/runtime/Contents/Home/legal/java.base/c-libutl.md",
+          "Contents/runtime/Contents/Home/legal/java.base/cldr.md",
+          "Contents/runtime/Contents/Home/legal/java.base/icu.md",
+          "Contents/runtime/Contents/Home/legal/java.base/public_suffix.md",
+          "Contents/runtime/Contents/Home/legal/java.base/siphash.md",
+          "Contents/runtime/Contents/Home/legal/java.base/unicode.md",
+          "Contents/runtime/Contents/Home/legal/java.base/zlib.md",
+          "Contents/runtime/Contents/Home/legal/java.compiler/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.compiler/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.compiler/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.datatransfer/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.datatransfer/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.desktop/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.desktop/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.desktop/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.desktop/colorimaging.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/freetype.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/giflib.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/harfbuzz.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/jpeg.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/lcms.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/libpng.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/mesa3d.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/pipewire.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/xwd.md",
+          "Contents/runtime/Contents/Home/legal/java.instrument/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.instrument/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.instrument/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.logging/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.logging/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.logging/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.management/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.management/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.management/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.management.rmi/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.management.rmi/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.naming/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.naming/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.naming/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.net.http/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.net.http/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.net.http/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.prefs/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.prefs/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.prefs/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.rmi/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.rmi/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.rmi/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.scripting/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.scripting/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.scripting/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.se/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.se/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.se/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.security.jgss/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.security.jgss/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.security.sasl/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.security.sasl/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.sql/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.sql/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.sql/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.sql.rowset/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.sql.rowset/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.transaction.xa/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.transaction.xa/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.xml/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.xml/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.xml/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.xml/bcel.md",
+          "Contents/runtime/Contents/Home/legal/java.xml/dom.md",
+          "Contents/runtime/Contents/Home/legal/java.xml/jcup.md",
+          "Contents/runtime/Contents/Home/legal/java.xml/xalan.md",
+          "Contents/runtime/Contents/Home/legal/java.xml/xerces.md",
+          "Contents/runtime/Contents/Home/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.xml.crypto/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.xml.crypto/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.xml.crypto/santuario.md",
+          "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/LICENSE",
+          "Contents/runtime/Contents/Home/lib/classlist",
+          "Contents/runtime/Contents/Home/lib/fontconfig.bfc",
+          "Contents/runtime/Contents/Home/lib/fontconfig.properties.src",
+          "Contents/runtime/Contents/Home/lib/jrt-fs.jar",
+          "Contents/runtime/Contents/Home/lib/jspawnhelper",
+          "Contents/runtime/Contents/Home/lib/jvm.cfg",
+          "Contents/runtime/Contents/Home/lib/libawt.dylib",
+          "Contents/runtime/Contents/Home/lib/libawt_lwawt.dylib",
+          "Contents/runtime/Contents/Home/lib/libfontmanager.dylib",
+          "Contents/runtime/Contents/Home/lib/libfreetype.dylib",
+          "Contents/runtime/Contents/Home/lib/libinstrument.dylib",
+          "Contents/runtime/Contents/Home/lib/libj2gss.dylib",
+          "Contents/runtime/Contents/Home/lib/libjava.dylib",
+          "Contents/runtime/Contents/Home/lib/libjavajpeg.dylib",
+          "Contents/runtime/Contents/Home/lib/libjawt.dylib",
+          "Contents/runtime/Contents/Home/lib/libjimage.dylib",
+          "Contents/runtime/Contents/Home/lib/libjli.dylib",
+          "Contents/runtime/Contents/Home/lib/libjsig.dylib",
+          "Contents/runtime/Contents/Home/lib/libjsound.dylib",
+          "Contents/runtime/Contents/Home/lib/liblcms.dylib",
+          "Contents/runtime/Contents/Home/lib/libmanagement.dylib",
+          "Contents/runtime/Contents/Home/lib/libmlib_image.dylib",
+          "Contents/runtime/Contents/Home/lib/libnet.dylib",
+          "Contents/runtime/Contents/Home/lib/libnio.dylib",
+          "Contents/runtime/Contents/Home/lib/libosx.dylib",
+          "Contents/runtime/Contents/Home/lib/libosxapp.dylib",
+          "Contents/runtime/Contents/Home/lib/libosxkrb5.dylib",
+          "Contents/runtime/Contents/Home/lib/libosxsecurity.dylib",
+          "Contents/runtime/Contents/Home/lib/libosxui.dylib",
+          "Contents/runtime/Contents/Home/lib/libprefs.dylib",
+          "Contents/runtime/Contents/Home/lib/librmi.dylib",
+          "Contents/runtime/Contents/Home/lib/libsplashscreen.dylib",
+          "Contents/runtime/Contents/Home/lib/libsyslookup.dylib",
+          "Contents/runtime/Contents/Home/lib/libverify.dylib",
+          "Contents/runtime/Contents/Home/lib/libzip.dylib",
+          "Contents/runtime/Contents/Home/lib/modules",
+          "Contents/runtime/Contents/Home/lib/psfont.properties.ja",
+          "Contents/runtime/Contents/Home/lib/psfontj2d.properties",
+          "Contents/runtime/Contents/Home/lib/security/blocked.certs",
+          "Contents/runtime/Contents/Home/lib/security/cacerts",
+          "Contents/runtime/Contents/Home/lib/security/default.policy",
+          "Contents/runtime/Contents/Home/lib/security/public_suffix_list.dat",
+          "Contents/runtime/Contents/Home/lib/server/libjsig.dylib",
+          "Contents/runtime/Contents/Home/lib/server/libjvm.dylib",
+          "Contents/runtime/Contents/Home/lib/shaders.metallib",
+          "Contents/runtime/Contents/Home/lib/tzdb.dat",
+          "Contents/runtime/Contents/Home/release",
+          "Contents/runtime/Contents/Info.plist",
+          "Contents/runtime/Contents/MacOS/libjli.dylib",
+          "Contents/runtime/Contents/_CodeSignature/CodeResources"
+        ],
+        "licenseAndNoticeFiles": [
+          "Contents/runtime/Contents/Home/legal/java.base/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.base/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.base/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.base/aes.md",
+          "Contents/runtime/Contents/Home/legal/java.base/asm.md",
+          "Contents/runtime/Contents/Home/legal/java.base/c-libutl.md",
+          "Contents/runtime/Contents/Home/legal/java.base/cldr.md",
+          "Contents/runtime/Contents/Home/legal/java.base/icu.md",
+          "Contents/runtime/Contents/Home/legal/java.base/public_suffix.md",
+          "Contents/runtime/Contents/Home/legal/java.base/siphash.md",
+          "Contents/runtime/Contents/Home/legal/java.base/unicode.md",
+          "Contents/runtime/Contents/Home/legal/java.base/zlib.md",
+          "Contents/runtime/Contents/Home/legal/java.compiler/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.compiler/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.compiler/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.datatransfer/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.datatransfer/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.desktop/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.desktop/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.desktop/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.desktop/colorimaging.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/freetype.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/giflib.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/harfbuzz.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/jpeg.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/lcms.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/libpng.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/mesa3d.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/pipewire.md",
+          "Contents/runtime/Contents/Home/legal/java.desktop/xwd.md",
+          "Contents/runtime/Contents/Home/legal/java.instrument/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.instrument/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.instrument/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.logging/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.logging/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.logging/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.management/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.management/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.management/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.management.rmi/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.management.rmi/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.naming/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.naming/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.naming/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.net.http/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.net.http/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.net.http/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.prefs/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.prefs/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.prefs/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.rmi/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.rmi/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.rmi/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.scripting/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.scripting/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.scripting/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.se/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.se/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.se/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.security.jgss/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.security.jgss/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.security.sasl/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.security.sasl/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.sql/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.sql/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.sql/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.sql.rowset/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.sql.rowset/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.transaction.xa/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.transaction.xa/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.xml/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.xml/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.xml/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.xml/bcel.md",
+          "Contents/runtime/Contents/Home/legal/java.xml/dom.md",
+          "Contents/runtime/Contents/Home/legal/java.xml/jcup.md",
+          "Contents/runtime/Contents/Home/legal/java.xml/xalan.md",
+          "Contents/runtime/Contents/Home/legal/java.xml/xerces.md",
+          "Contents/runtime/Contents/Home/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/java.xml.crypto/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/java.xml.crypto/LICENSE",
+          "Contents/runtime/Contents/Home/legal/java.xml.crypto/santuario.md",
+          "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO",
+          "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION",
+          "Contents/runtime/Contents/Home/legal/jdk.crypto.ec/LICENSE"
+        ],
+        "sourceEvidence": "qa/mac-helper-sources-2026-11-04.json",
+        "publishedSourceBundle": null
+      }
+    ],
+    "fixture": {
+      "conditions": 45,
+      "fixtureUrlsOnly": true,
+      "realProductionArtifactGenerated": false,
+      "results": [
+        {
+          "inventoryBytes": 2273,
+          "name": "normal-cli-and-existing-artifact-schema",
+          "status": "PASS"
+        },
+        {
+          "name": "existing-output-unchanged",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "unissued-artifact-url",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "unissued-source-url",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "absent-license-path",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "absent-notice-path",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "uncovered-binary-file",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "absent-external-notice",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "external-notice-hash",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "actual-document-hash",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "candidate-not-final",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "unsafe-file-path",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "archive-prefix-combined-path-limit",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "compile-target-not-support-minimum",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "source-manifest-pin",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "file-manifest-pin",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "license-link",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "inventory-utf8-over-four-mib",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-uppercase-scheme",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-mixed-scheme",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-underscore-host",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-edge-hyphen-host",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-empty-host-label",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-numeric-tld",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-invalid-port",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-authority-suffix",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-path-brackets",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-query-outside-asset-form",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-ipv6-outside-asset-form",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-port-outside-asset-form",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-unicode-outside-asset-form",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-space",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-tab",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-newline",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-control",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-invalid-escape",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-incomplete-escape",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-empty-fragment",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-illegal-character",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "source-url-empty-fragment",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "name": "url-valid-escaped-asset-path",
+          "status": "PASS"
+        },
+        {
+          "name": "zero-file-and-source-member",
+          "status": "PASS"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "negative-file-size",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "negative-source-member-size",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "zero-archive-size",
+          "status": "PASS-expected-rejection"
+        }
+      ],
+      "sourceBodiesOrJreRehashed": false,
+      "sourceScriptSha256": "bee00be8e59f54ff3ccc6944c03c2536ebf6b2556f06b86a67852228f61e5e5a",
+      "status": "PASS",
+      "vmNetworkOrSigningUsed": false
+    },
+    "secondFixture": {
+      "conditions": 45,
+      "fixtureUrlsOnly": true,
+      "realProductionArtifactGenerated": false,
+      "results": [
+        {
+          "inventoryBytes": 2273,
+          "name": "normal-cli-and-existing-artifact-schema",
+          "status": "PASS"
+        },
+        {
+          "name": "existing-output-unchanged",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "unissued-artifact-url",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "unissued-source-url",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "absent-license-path",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "absent-notice-path",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "uncovered-binary-file",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "absent-external-notice",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "external-notice-hash",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "actual-document-hash",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "candidate-not-final",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "unsafe-file-path",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "archive-prefix-combined-path-limit",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "compile-target-not-support-minimum",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "source-manifest-pin",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "file-manifest-pin",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "license-link",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "inventory-utf8-over-four-mib",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-uppercase-scheme",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-mixed-scheme",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-underscore-host",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-edge-hyphen-host",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-empty-host-label",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-numeric-tld",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-invalid-port",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-authority-suffix",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-path-brackets",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-query-outside-asset-form",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-ipv6-outside-asset-form",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-port-outside-asset-form",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-unicode-outside-asset-form",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-space",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-tab",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-newline",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-control",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-invalid-escape",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-incomplete-escape",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-empty-fragment",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "url-illegal-character",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "source-url-empty-fragment",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "name": "url-valid-escaped-asset-path",
+          "status": "PASS"
+        },
+        {
+          "name": "zero-file-and-source-member",
+          "status": "PASS"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "negative-file-size",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "negative-source-member-size",
+          "status": "PASS-expected-rejection"
+        },
+        {
+          "errorType": "ValueError",
+          "name": "zero-archive-size",
+          "status": "PASS-expected-rejection"
+        }
+      ],
+      "sourceBodiesOrJreRehashed": false,
+      "sourceScriptSha256": "bee00be8e59f54ff3ccc6944c03c2536ebf6b2556f06b86a67852228f61e5e5a",
+      "status": "PASS",
+      "vmNetworkOrSigningUsed": false
+    },
+    "syntheticInventoryBytesEqual": true,
+    "candidateGeneration": [
+      {
+        "round": 1,
+        "expectedRejection": "最終bytesのfile manifestが必要です",
+        "productionInventoryGenerated": false
+      },
+      {
+        "round": 2,
+        "expectedRejection": "最終bytesのfile manifestが必要です",
+        "productionInventoryGenerated": false
+      }
+    ],
+    "productionInventoryGenerated": false,
+    "licenseAndSourceClosureComplete": false,
+    "unresolved": [
+      "正式公開URL・source/notice bundleのmanifest/本文/pin未確定",
+      "Lima Go依存と標準ライブラリのlicense/source閉包",
+      "deb copyright参照先のfull licenseを含むbundleの結合",
+      "guest内copyright/kernelを含む全file文書監査"
+    ]
+  },
+  "tests": {
+    "macJavaTests": {
+      "tests": 45,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "runs": 2
+    },
+    "packagingRounds": 2,
+    "fixedPackagingRounds": 2,
+    "windowsMacTests": "45件中37失敗・1skip（POSIX権限/プロセス差）。Macで再実行成功。",
+    "coreRuntimeArchive": {
+      "codesignDeepStrictExit": 0,
+      "ownerExecutableBitsVerified": true,
+      "unpackedBytes": 206610208,
+      "allFileBytesVerified": true,
+      "fileCount": 196,
+      "status": "PASS-core-RuntimeArchive-only-no-vm",
+      "vmOrKeyOrGuest": false,
+      "entryExit": 1
+    },
+    "sourceIntegration": {
+      "status": "PASS",
+      "pythonSyntax": 2,
+      "sourceOfflineBytesEqual": true,
+      "packages": 666,
+      "sourcePackages": 436,
+      "sourceReferencesValid": true,
+      "componentFilesUniqueAndComplete": 196,
+      "qaHashPinsVerified": true,
+      "diffCheck": true
+    },
+    "reusedSourceUnitTests": {
+      "tests": 12,
+      "failures": 0
+    }
+  },
+  "osProvided": {
+    "RosettaRedistributed": false,
+    "AppleFrameworksRedistributed": false,
+    "nativeDynamicLinks": "package-1/image/MCIconHelper.app/Contents/app/support/host-probe:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 4201.0.0)\n\t/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 4201.0.0)\n\t/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit (compatibility version 1.0.0, current version 275.0.0)\n\t/System/Library/Frameworks/Virtualization.framework/Versions/A/Virtualization (compatibility version 1.0.0, current version 259.3.3)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0, weak)\n\t/usr/lib/swift/libswiftCoreImage.dylib (compatibility version 1.0.0, current version 2.2.0, weak)\n\t/usr/lib/swift/libswiftDarwin.dylib (compatibility version 1.0.0, current version 347.40.2)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 56.0.0, weak)\n\t/usr/lib/swift/libswiftIOKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftMetal.dylib (compatibility version 1.0.0, current version 370.64.2, weak)\n\t/usr/lib/swift/libswiftOSLog.dylib (compatibility version 1.0.0, current version 10.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 951.1.0, weak)\n\t/usr/lib/swift/libswiftQuartzCore.dylib (compatibility version 1.0.0, current version 5.0.0, weak)\n\t/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (compatibility version 1.0.0, current version 877.2.4, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 105.0.14, weak)\n\t/usr/lib/swift/libswiftos.dylib (compatibility version 1.0.0, current version 1076.40.2, weak)\n\t/usr/lib/swift/libswiftsimd.dylib (compatibility version 1.0.0, current version 23.0.0, weak)\npackage-1/image/MCIconHelper.app/Contents/app/support/process-guard:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n"
+  },
+  "unverified": [
+    "Lima/VZ実VM起動",
+    "Rosetta導入・同意・変換実行",
+    "macOS15.8.1正式候補の製品受入",
+    "未署名配布物の初回許可・quarantine/Gatekeeper",
+    "管理描画",
+    "異なるhost/toolchainでの再現性"
+  ],
+  "cleanup": {
+    "macTemporaryDirectory": "/Users/ryuman/tmp-mcicon-d1",
+    "macTemporaryDirectoryRemoved": true,
+    "absenceConfirmed": true,
+    "taskProcessesRemaining": 0,
+    "dockerUsed": false
+  },
+  "publicOperations": {
+    "commit": false,
+    "push": false,
+    "pr": false,
+    "release": false
+  },
+  "inputPinStatus": {
+    "repositoryPinned": [
+      "Lima binary/source",
+      "Ubuntu base/manifest SHA and version",
+      "offline 3deb SHA and version",
+      "Java dependency versions",
+      "Gradle 9.8.1 distribution SHA",
+      "native source commit"
+    ],
+    "resolvedByThisMeasurement": [
+      "Ubuntu cloud image/manifestの公式URL",
+      "Temurin 21.0.13+9 binary/source URL・SHAと実JDK全459file一致"
+    ],
+    "notPortableToolchainPins": [
+      "Apple clang 17.0.0/Swift6.2.3/SDK26.2は実測環境の記録。取得URL・SDK全bytesは固定していない"
+    ],
+    "formalPublicationUnresolved": [
+      "正式asset URL",
+      "source/notice bundle bytesと公開参照"
+    ]
+  },
+  "sourceScriptSha256": "6b9c436a37468702853ada9589a99161a4576bbedd4da4bdf86e095dd0f58390",
+  "packagingScriptSha256": "88bca6df73c82aa96996c37cfc190097b4fd3fcac90e22373ac5c43f8efafda1",
+  "debMetadataUnpackMeasurement": {
+    "platform": "Windows Python3.12.14 + zstandard0.25.0",
+    "scope": "固定3debの再読取・decompress・tar metadata走査。全fileのdisk展開やoffline dpkgは行わない",
+    "packages": [
+      {
+        "filename": "containerd_2.2.1-0ubuntu1~24.04.3_arm64.deb",
+        "downloadBytes": 25160084,
+        "dataTarExpandedBytes": 98672640,
+        "dataTarFileBytes": 98630942,
+        "dataTarRegularFiles": 35,
+        "seconds": 0.157
+      },
+      {
+        "filename": "docker.io_29.1.3-0ubuntu3~24.04.2_arm64.deb",
+        "downloadBytes": 32026672,
+        "dataTarExpandedBytes": 130938880,
+        "dataTarFileBytes": 130756625,
+        "dataTarRegularFiles": 210,
+        "seconds": 0.25
+      },
+      {
+        "filename": "runc_1.3.4-0ubuntu1~24.04.1_arm64.deb",
+        "downloadBytes": 8578418,
+        "dataTarExpandedBytes": 35573760,
+        "dataTarFileBytes": 35540217,
+        "dataTarRegularFiles": 27,
+        "seconds": 0.062
+      }
+    ]
+  },
+  "payloadPreparation": [
+    {
+      "files": 13,
+      "bytes": 113885438,
+      "status": "local-preparation-only-no-vm"
+    },
+    {
+      "files": 13,
+      "bytes": 113885438,
+      "status": "local-preparation-only-no-vm"
+    }
+  ]
+}
