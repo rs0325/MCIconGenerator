@@ -9,4 +9,4 @@ qa/renderer-repro-2026-11-04-packages.tsv text eol=lf
 qa/renderer-source*.json text eol=lf
 helpers/windows/rootfs/packages.lock text eol=lf
 helpers/windows/rootfs/probe-packages.lock text eol=lf
-qa/release-candidate-*.json text eol=lf
+qa/*.json text eol=lf
