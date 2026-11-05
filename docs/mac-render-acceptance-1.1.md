@@ -88,7 +88,7 @@ Minecraft取得はHTTPSのMojang公式manifest / piston-data / libraries / resou
 | 1.13.1 | PASS (2/2) | 8 / 一致 | 一致 |
 | 1.13 | PASS (2/2) | 8 / 一致 | 一致 |
 
-Windows参照は前担当がF1担当worktreeの未コミット成果から読み取り固定したもの。比較元JSON SHA-256は `e8020a73a2751b381a90fd163c066283ac2b55c6a1cfd1e37647eb80268b7ff7`。他担当の変更は取り込んでいない。51/51版でSHA-256が一致した事実を記録する。他OS・別hardware全般の一致を保証する結果ではない。
+Windows参照は前担当がF1担当worktreeの未コミット成果から読み取り固定したもの。比較元JSON（当時のCRLF版）のSHA-256は `e8020a73a2751b381a90fd163c066283ac2b55c6a1cfd1e37647eb80268b7ff7`。Git管理のLF版は `1811f8a1f3d2a172f96ca6d315ca22c18427e5f4df213dcfd3d341a8c7dffb8b` で、現在の `qa/windows-render-acceptance-2026-11-04.json.sha256` はLF版を対象とする。他担当の変更は取り込んでいない。51/51版でSHA-256が一致した事実を記録する。他OS・別hardware全般の一致を保証する結果ではない。
 
 ## 隔離属性と途中失敗
 
