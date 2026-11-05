@@ -1,6 +1,6 @@
 # 1.1.0リリース候補の組立て（R1・R2・R3）
 
-最新状態は「署名後の実施結果（R4）」を参照。stable署名、両host seed/packageと包装archiveの検証は完了。公開・実reboot・未準備host・OS警告・公開後consumerは未検証。R1〜R3の記録は各時点の状態である。
+最新状態は「公開後consumer検証（P1・2026-11-05）」を参照。公開Centralの空cache consumerと両hostのRelease取得・署名検証は完了。CLI/bootstrapの管理準備全体・実managed受入・実reboot・未準備host・OS警告は未検証。R1〜R4の記録は各時点の状態である。
 
 Refs #91〜#95（closeしない）。起点は2026-11-05 JSTのfetchで確認したorigin/main `e8e5d348cb23a92145fe0b8c09fb37c608fdceee`。worktreeは `H:/MCIconGenerator/worktrees/milestone-release-candidate-r1/MCIconGenerator`、branchは `feature/issue-97-release-candidate`。成果物はbuild/r1へ保全し、archive・署名前descriptorを本番値として収録しない。
 
@@ -413,3 +413,21 @@ Java関連33件（skipなし）、payload回帰テスト3件が成功。本番JA
 変更ファイルは `scripts/prepare-release-payloads.py`、`scripts/test-release-payloads.py`、この文書、[QA JSON](../qa/release-payload-2026-11-05.json)、[checksum](../qa/release-payload-2026-11-05.json.sha256) の5件。UTF-8の `build/commit-message.txt` / `pr-title.txt` / `pr-body.md` を準備済み。commit・push・PR・署名・Central・tag・Releaseは行っていない。
 
 残作業はstable署名受領、公開stableのsequence整合、Mac接続復旧と転送/実機確認、署名後の両host package検証と組立て、最終追加asset、公開判断と公開後consumer受入。Refs #91〜#95はcloseしない。
+
+## 公開後consumer検証（P1・2026-11-05）
+
+GitHub Release `v1.1.0` とCentral `io.github.rs0325.mcicon:mcicon-core/worker:1.1.0` を公開URLから再取得した。測定起点は `origin/main e876e52`、担当branchは `feature/issue-92-post-publish`。結果とfile別size/SHA-256は [QA JSON](../qa/post-publish-2026-11-05.json) と [LF blob基準checksum](../qa/post-publish-2026-11-05.json.sha256) に記録した。前節までの未公開・未実施の記述は各測定時点の記録である。
+
+- Central: Java 21.0.12.1+1 / Gradle 9.8.1で、module/POMの経路ごとに新しい空Gradle cacheを作成し、`mavenCentral()` だけで独立consumerのcompile/runが成功した。raw抽出のbytes保持、worker推移依存・展開hash、既存API署名を確認した。両経路のcore/worker JARは公開前候補と一致した。
+- Centralのbinary・POM・module・sources・javadocと各.asc、合計20fileは保全済み `build/c1/mcicon-central-1.1.0.zip` 内の全bytesと一致した。Windows native gpgv 2.5.24と返却ZIP内の明示公開鍵だけで10署名すべてを検証し、fingerprint `B766BA473AF3178D42371A0F50562040DFAE0F27` を確認した。
+- Windows Release: latest/downloadのstableと署名、v1.1.0の96-byte trust-setを新規取得した。公開coreのTrustSetでstable署名を検証し、Release trust-setとcore同梱bytesの一致を確認した。descriptorと署名はcore内resourceとも一致し、RuntimeDescriptor.verifyで固定hash・署名・worker・adapter・Java majorの互換pinを検証した。空runtime cacheから公開coreのRuntimeStore.obtainでhelper・guest・rendererを取得し、署名済みdescriptorのsize/SHA-256と一致した。tool payloadもstableのsize/SHAと一致し、内部core/worker・descriptor/署名・trust・inventory hashの一致を確認した。
+- Mac Release: 登録済みMacから `/Users/ryuman/tmp-mcicon-p1` のみへ新規取得した。stable/trustはWindows取得bytesと一致し、descriptorは公開coreのMac pinと一致した。OpenSSLでstable・descriptorのEd25519署名を検証し、helper・guest・renderer・tool payloadのsize/SHA-256もすべて一致した。両hostの署名はtrust-setの第2鍵（0始まりindex 1）で受理された。
+- 反証: 公開coreは改変stable bytes、改変descriptor署名、不正descriptor pinを3件とも拒否した。
+
+既存 `scripts/verify-maven-consumer.py` は未公開runtimeの `MANAGED_RUNTIME_INVALID` を期待するため、公開後の正常な `OFFLINE_CACHE_MISS` で失敗した。build内の一時コピーで期待エラー1か所だけを変更し、さらに新しい空cacheで両経路を検証した。追跡対象のscript・製品コードは変更していない。初回のcp932ログdecode失敗はPython `-X utf8` で解消した。Git付属MSYS gpgvのWindows絶対path拒否はnative gpgvへの切替で解消し、署名不一致はなかった。
+
+取得量はCentral成果物/署名1,490,537 bytes、Gradle artifact/metadata 26,307,349 bytes（初回2試行を含む）、Windows Release 762,817,632 bytes、Mac Release 1,375,839,236 bytes、計2,166,454,754 bytes。既存Gradle distributionを使用したためGradle本体の再取得はない。この集計は保存した応答本文の合計で、checksum照会・HTTP/TLSヘッダー・Git通信は含まない。
+
+Mac一時directoryの削除を別SSHで再確認した。Windowsの取得物・runtime/bootstrap/worker cache・全consumer一時cacheも、ログとhash証跡をbuild/p1/evidenceへ保全してから削除した。Java harnessと一時consumerをbuild/p1に残し、継続プロセスはない。公開準備文面はUTF-8（BOMなし）のbuild/commit-message.txt、build/pr-title.txt、build/pr-body.mdに保存した。
+
+未実施: CLI/bootstrapからの管理runtime準備全体、bootstrap slot作成・更新、WSL import・VM/helper起動、実managed doctor/render、実reboot・未準備host・OS警告・installer等の受入、source/notice等を含む全25 Release assetの再取得。導入前停止オプションがないため公開coreの取得APIまでを直接検証し、ホスト実導入・システム設定変更は行っていない。実managed consumerと実機受入は残作業であり、今回のdownload成功を機能全体の受入完了として扱わない。commit/push/PR・Release/Central変更・Issue操作は行っていない。

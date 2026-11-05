@@ -1,0 +1,600 @@
+{
+  "task": "P1 公開後consumer検証（空cache）",
+  "date": "2026-11-05",
+  "baseCommit": "e876e520ac96005d1a6f6a1f3e04a8e753ebc7d1",
+  "branch": "feature/issue-92-post-publish",
+  "releaseTag": "v1.1.0",
+  "scope": "公開CentralとReleaseの取得・署名・hash検証。ホストへの導入なし。",
+  "environment": {
+    "windowsJava": "OpenJDK Temurin 21.0.12.1+1-LTS（java -versionで確認）",
+    "gradle": "9.8.1（既存distributionを使用し、依存cacheは経路ごとに新規作成）",
+    "gpgv": "C:/Program Files/GnuPG/bin/gpgv.exe",
+    "commandLogging": "run_logged.py / Macはssh_logged.pyも使用",
+    "executionPermissions": "require_escalated",
+    "worktree": "H:\\MCIconGenerator\\worktrees\\milestone-post-publish-p1\\MCIconGenerator",
+    "gpgvVersion": "GnuPG 2.5.24 / libgcrypt 1.12.4"
+  },
+  "central": {
+    "repository": "https://repo.maven.apache.org/maven2/",
+    "candidateBundleSha256": "dfa73ac3b26d12bd2432d7de919cfc0093aaace1e67b6f91b94a95aacfecaedc",
+    "results": [
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0-javadoc.jar",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0-javadoc.jar",
+        "bytes": 310708,
+        "sha256": "3c245d7a59c4f5ce3005e06b618b8c59c4d19e04de633949cd5516719a34bdc7",
+        "candidateSha256": "3c245d7a59c4f5ce3005e06b618b8c59c4d19e04de633949cd5516719a34bdc7",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0-javadoc.jar.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0-javadoc.jar.asc",
+        "bytes": 265,
+        "sha256": "806f27a2590c66cc1df9ddb92ffef52e16cbe8c51d95fd37abfffc92c9995c4b",
+        "candidateSha256": "806f27a2590c66cc1df9ddb92ffef52e16cbe8c51d95fd37abfffc92c9995c4b",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0-sources.jar",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0-sources.jar",
+        "bytes": 81962,
+        "sha256": "4e4211436bd94b263120e52c7ee59cb3da300f4fe99d0f078227f4755860b0e8",
+        "candidateSha256": "4e4211436bd94b263120e52c7ee59cb3da300f4fe99d0f078227f4755860b0e8",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0-sources.jar.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0-sources.jar.asc",
+        "bytes": 265,
+        "sha256": "10c1ea8300dbdbc4a883a3b38b98702cd2b779a3a0c4c63c5f91923ac6382d50",
+        "candidateSha256": "10c1ea8300dbdbc4a883a3b38b98702cd2b779a3a0c4c63c5f91923ac6382d50",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.jar",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.jar",
+        "bytes": 427817,
+        "sha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+        "candidateSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.jar.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.jar.asc",
+        "bytes": 265,
+        "sha256": "1fbb2ed7e44bf3435bbcb60161ad691776256415316438894b439e895f032751",
+        "candidateSha256": "1fbb2ed7e44bf3435bbcb60161ad691776256415316438894b439e895f032751",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.module",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.module",
+        "bytes": 4393,
+        "sha256": "acd51d1de752d2db737f644ab483944e8a9dc0edb99cda085746f9668649643a",
+        "candidateSha256": "acd51d1de752d2db737f644ab483944e8a9dc0edb99cda085746f9668649643a",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.module.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.module.asc",
+        "bytes": 265,
+        "sha256": "a988490ffb0ac88887e84cc0dbffed3939addb193d2896df1095639ebaac584b",
+        "candidateSha256": "a988490ffb0ac88887e84cc0dbffed3939addb193d2896df1095639ebaac584b",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.pom",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.pom",
+        "bytes": 2365,
+        "sha256": "69100333017394343a564ce7c9aa81de30a192b813f41dfe41cd28be43f41f04",
+        "candidateSha256": "69100333017394343a564ce7c9aa81de30a192b813f41dfe41cd28be43f41f04",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.pom.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.pom.asc",
+        "bytes": 265,
+        "sha256": "ae69cb2d90e5632cec8c043bf12432f8f26ccc009577cdfb0e9f5c3d825385fa",
+        "candidateSha256": "ae69cb2d90e5632cec8c043bf12432f8f26ccc009577cdfb0e9f5c3d825385fa",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0-javadoc.jar",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0-javadoc.jar",
+        "bytes": 134522,
+        "sha256": "5bd61053d44a41452f5e0017e90b30a35a674931d6f6f579098f626751d85cbc",
+        "candidateSha256": "5bd61053d44a41452f5e0017e90b30a35a674931d6f6f579098f626751d85cbc",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0-javadoc.jar.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0-javadoc.jar.asc",
+        "bytes": 265,
+        "sha256": "68d0633a90c705be7630161edb9d2b0ff15db922b226eb77e3d9b48e8af2c14c",
+        "candidateSha256": "68d0633a90c705be7630161edb9d2b0ff15db922b226eb77e3d9b48e8af2c14c",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0-sources.jar",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0-sources.jar",
+        "bytes": 31730,
+        "sha256": "3931d24d514b8338a2170ccbe2197e721ccc10a41a68912403d24379a31f4a79",
+        "candidateSha256": "3931d24d514b8338a2170ccbe2197e721ccc10a41a68912403d24379a31f4a79",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0-sources.jar.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0-sources.jar.asc",
+        "bytes": 265,
+        "sha256": "7fdf13c4408c06e08bd73d4d9aed12572d3c055365583513c94310d634ab6da7",
+        "candidateSha256": "7fdf13c4408c06e08bd73d4d9aed12572d3c055365583513c94310d634ab6da7",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.jar",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.jar",
+        "bytes": 489342,
+        "sha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+        "candidateSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.jar.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.jar.asc",
+        "bytes": 265,
+        "sha256": "6d42e1b6c4d13f8001e1398865d1b236b22ef7fd16266e4bd793d8b01b6b5559",
+        "candidateSha256": "6d42e1b6c4d13f8001e1398865d1b236b22ef7fd16266e4bd793d8b01b6b5559",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.module",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.module",
+        "bytes": 3501,
+        "sha256": "8bfe84bb8ba8efef92b641f9f48cd670705731911539499c66184c636034b6e1",
+        "candidateSha256": "8bfe84bb8ba8efef92b641f9f48cd670705731911539499c66184c636034b6e1",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.module.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.module.asc",
+        "bytes": 265,
+        "sha256": "18eecf3bdd70e7ba1f9cd6fd90700604f510ad5bcc08b086986f7ad44e328fe0",
+        "candidateSha256": "18eecf3bdd70e7ba1f9cd6fd90700604f510ad5bcc08b086986f7ad44e328fe0",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.pom",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.pom",
+        "bytes": 1547,
+        "sha256": "a3a21c2a9f22c6ccbd2edf77730ad3665b6ed3c17943f5a0405aaf75c16ff6de",
+        "candidateSha256": "a3a21c2a9f22c6ccbd2edf77730ad3665b6ed3c17943f5a0405aaf75c16ff6de",
+        "bytesMatch": true
+      },
+      {
+        "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.pom.asc",
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.pom.asc",
+        "bytes": 265,
+        "sha256": "c6590ea3a2e7719618357947b4311cb05bd6aa741e3fb02835bd65ef1a743efd",
+        "candidateSha256": "c6590ea3a2e7719618357947b4311cb05bd6aa741e3fb02835bd65ef1a743efd",
+        "bytesMatch": true,
+        "gpgvExitCode": 0,
+        "validFingerprint": true
+      }
+    ],
+    "downloadBytes": 1490537,
+    "passed": true,
+    "gpgv": "C:/Program Files/GnuPG/bin/gpgv.exe",
+    "initialGpgvFailure": "Git MSYS gpgv rejected native Windows keyring path; no signature mismatch"
+  },
+  "consumer": {
+    "version": "1.1.0",
+    "source": "mavenCentral",
+    "candidateBundle": "H:\\MCIconGenerator\\worktrees\\milestone-central-c1\\MCIconGenerator\\build\\c1\\mcicon-central-1.1.0.zip",
+    "workspace": "H:\\MCIconGenerator\\worktrees\\milestone-post-publish-p1\\MCIconGenerator\\build\\p1\\central-consumer-published\\consumer-abgqndsm",
+    "initialGradleCacheEmpty": true,
+    "results": [
+      {
+        "metadata": "module",
+        "artifactComparisons": [
+          {
+            "artifact": "mcicon-core-1.1.0.jar",
+            "candidateSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+            "resolvedSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+            "passed": true
+          },
+          {
+            "artifact": "mcicon-worker-1.1.0.jar",
+            "candidateSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+            "resolvedSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "gradleExitCode": 0,
+        "failureStage": "実行前",
+        "managedApiMarkers": {
+          "doctor": "未実施"
+        }
+      },
+      {
+        "metadata": "pom",
+        "artifactComparisons": [
+          {
+            "artifact": "mcicon-core-1.1.0.jar",
+            "candidateSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+            "resolvedSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+            "passed": true
+          },
+          {
+            "artifact": "mcicon-worker-1.1.0.jar",
+            "candidateSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+            "resolvedSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "gradleExitCode": 0,
+        "failureStage": "実行前",
+        "managedApiMarkers": {
+          "doctor": "未実施"
+        }
+      }
+    ],
+    "managedRuntimeMissing": [],
+    "managedApi": "未実施: --managed-runtime 未指定",
+    "passed": true
+  },
+  "gradleCaches": [
+    {
+      "path": "central-consumer\\consumer-ze0iomxf\\module-gradle-home",
+      "fileCount": 35,
+      "bytes": 6584596,
+      "initiallyEmpty": true
+    },
+    {
+      "path": "central-consumer-published\\consumer-abgqndsm\\module-gradle-home",
+      "fileCount": 35,
+      "bytes": 6584596,
+      "initiallyEmpty": true
+    },
+    {
+      "path": "central-consumer-published\\consumer-abgqndsm\\pom-gradle-home",
+      "fileCount": 28,
+      "bytes": 6553561,
+      "initiallyEmpty": true
+    },
+    {
+      "path": "central-consumer-utf8\\consumer-odshw1ro\\module-gradle-home",
+      "fileCount": 35,
+      "bytes": 6584596,
+      "initiallyEmpty": true
+    }
+  ],
+  "windowsRelease": {
+    "assets": [
+      {
+        "name": "windows-x86_64.json",
+        "bytes": 278044,
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/windows-x86_64.json",
+        "sha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294"
+      },
+      {
+        "name": "windows-x86_64.json.sig",
+        "bytes": 64,
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/windows-x86_64.json.sig",
+        "sha256": "aa30b8c398bcf155246b709b70bdb43048ed5f7467394667e660140bb1c32fdb"
+      },
+      {
+        "bytes": 33863906,
+        "expectedBytes": 33863906,
+        "expectedSha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8",
+        "name": "mcicon-helper-1.1.0-windows-x86_64.zip",
+        "passed": true,
+        "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-windows-x86_64.zip"
+      },
+      {
+        "bytes": 98146824,
+        "expectedBytes": 98146824,
+        "expectedSha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5",
+        "name": "mcicon-guest-1.1.0-windows-x86_64.tar.xz",
+        "passed": true,
+        "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-windows-x86_64.tar.xz"
+      },
+      {
+        "bytes": 593385993,
+        "expectedBytes": 593385993,
+        "expectedSha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "name": "mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+        "passed": true,
+        "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-renderer-1.1.0-linux-amd64.tar.gz"
+      },
+      {
+        "name": "mcicon-tool-1.1.0-windows-x86_64.zip",
+        "bytes": 37126358,
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-tool-1.1.0-windows-x86_64.zip",
+        "sha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3"
+      }
+    ],
+    "cliBootstrapManagedExecution": "未実施: 導入前の取得・検証境界まで",
+    "descriptorSignatureAndBundledPinVerified": true,
+    "hostInstallPerformed": false,
+    "initialBootstrapCacheEmpty": true,
+    "initialRuntimeCacheEmpty": true,
+    "metadata": [
+      {
+        "name": "stable.json",
+        "bytes": 16283,
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json",
+        "sha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+      },
+      {
+        "name": "stable.json.sig",
+        "bytes": 64,
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json.sig",
+        "sha256": "0a7a5c0a60db6095fa8469d73487792378991aa4607725385fa0411c0603ad63"
+      },
+      {
+        "name": "trust-set.bin",
+        "bytes": 96,
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/trust-set.bin",
+        "sha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283"
+      }
+    ],
+    "passed": true,
+    "runtimeStoreObtainPassed": true,
+    "stableAcceptedKeyIndices": [
+      1
+    ],
+    "stableSignatureVerified": true,
+    "trustMatchesPublishedCore": true
+  },
+  "windowsToolPayloadChecks": [
+    {
+      "path": "app/lib/core-1.1.0.jar",
+      "bytes": 427817,
+      "sha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+      "expectedSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+      "passed": true
+    },
+    {
+      "path": "app/lib/worker-1.1.0.jar",
+      "bytes": 489342,
+      "sha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+      "expectedSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+      "passed": true
+    },
+    {
+      "path": "descriptors/windows-x86_64.json",
+      "bytes": 278044,
+      "sha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+      "expectedSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+      "passed": true
+    },
+    {
+      "path": "descriptors/windows-x86_64.json.sig",
+      "bytes": 64,
+      "sha256": "aa30b8c398bcf155246b709b70bdb43048ed5f7467394667e660140bb1c32fdb",
+      "expectedSha256": "aa30b8c398bcf155246b709b70bdb43048ed5f7467394667e660140bb1c32fdb",
+      "passed": true
+    },
+    {
+      "path": "trust-set.bin",
+      "bytes": 96,
+      "sha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+      "expectedSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+      "passed": true
+    },
+    {
+      "path": "inventories/tool-windows-x86_64.json",
+      "bytes": 42445,
+      "sha256": "2ee0547b06dc36911d4fa40ccff3294ea99e9953693399048149c026c61eae15",
+      "expectedSha256": "2ee0547b06dc36911d4fa40ccff3294ea99e9953693399048149c026c61eae15",
+      "passed": true
+    }
+  ],
+  "macRelease": {
+    "assets": [
+      {
+        "bytes": 16283,
+        "name": "stable.json",
+        "sha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json"
+      },
+      {
+        "bytes": 64,
+        "name": "stable.json.sig",
+        "sha256": "0a7a5c0a60db6095fa8469d73487792378991aa4607725385fa0411c0603ad63",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json.sig"
+      },
+      {
+        "bytes": 96,
+        "name": "trust-set.bin",
+        "sha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/trust-set.bin"
+      },
+      {
+        "bytes": 374519,
+        "name": "macos-aarch64.json",
+        "sha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/macos-aarch64.json"
+      },
+      {
+        "bytes": 64,
+        "name": "macos-aarch64.json.sig",
+        "sha256": "3b867dbdcc833be57d2ec96388b1a63d9a339a17247c0280f315af6ba979a2ef",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/macos-aarch64.json.sig"
+      },
+      {
+        "bytes": 125853859,
+        "expectedBytes": 125853859,
+        "expectedSha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde",
+        "name": "mcicon-helper-1.1.0-macos-aarch64.zip",
+        "passed": true,
+        "sha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-macos-aarch64.zip"
+      },
+      {
+        "bytes": 620224512,
+        "expectedBytes": 620224512,
+        "expectedSha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+        "name": "mcicon-guest-1.1.0-macos-aarch64.qcow2",
+        "passed": true,
+        "sha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-macos-aarch64.qcow2"
+      },
+      {
+        "bytes": 593385993,
+        "expectedBytes": 593385993,
+        "expectedSha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "name": "mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+        "passed": true,
+        "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-renderer-1.1.0-linux-amd64.tar.gz"
+      },
+      {
+        "bytes": 35983846,
+        "expectedBytes": 35983846,
+        "expectedSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+        "name": "mcicon-tool-1.1.0-macos-aarch64.zip",
+        "passed": true,
+        "sha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-tool-1.1.0-macos-aarch64.zip"
+      }
+    ],
+    "cleanupCompleted": true,
+    "descriptorAcceptedKeyIndices": [
+      1
+    ],
+    "downloadBytes": 1375839236,
+    "host": "macos-aarch64",
+    "hostInstallPerformed": false,
+    "initialCacheEmpty": true,
+    "passed": true,
+    "stableAcceptedKeyIndices": [
+      1
+    ]
+  },
+  "tamperRejection": {
+    "stableBytesTamperRejected": true,
+    "descriptorSignatureTamperRejected": true,
+    "descriptorPinTamperRejected": true
+  },
+  "downloads": {
+    "centralArtifactsAndSignaturesBytes": 1490537,
+    "gradleCachedArtifactAndMetadataBytesIncludingFailedAttempts": 26307349,
+    "windowsReleaseBytes": 762817632,
+    "macReleaseBytes": 1375839236,
+    "gradleDistributionsDownloaded": 0,
+    "note": "保存した応答本文・artifact/metadataの合計。Gradle checksum照会、HTTP/TLSヘッダー、Git通信は集計外。初回2試行のcache取得分も含む。",
+    "measuredTotalBytes": 2166454754
+  },
+  "deviations": [
+    {
+      "problem": "最初のconsumerはWindows既定cp932によるログdecodeで中断",
+      "resolution": "Python -X utf8で、新しい空cacheから再試行。"
+    },
+    {
+      "problem": "既存consumerは未公開runtimeのMANAGED_RUNTIME_INVALIDを期待し、公開版の正常なOFFLINE_CACHE_MISSを失敗扱いした。",
+      "resolution": "build/p1/verify-published-consumer.pyで期待エラー文字列1か所だけ置換し、module/POMそれぞれ新規空cacheから成功。製品コード・追跡対象scriptは変更なし。"
+    },
+    {
+      "problem": "Git付属MSYS gpgvはWindows絶対pathのkeyringを不正URLとして拒否",
+      "resolution": "Windows native GnuPG gpgvで同じ取得物・明示公開鍵のみを使い10署名とも成功。署名不一致ではない。"
+    },
+    {
+      "problem": "指定された新worktreeが未作成で、初回のcwd指定が無効だった。",
+      "resolution": "git fetch origin後、指定ブランチ/worktreeをorigin/main e876e52から作成した。元worktreeのcheckout・成果物は変更なし。"
+    },
+    {
+      "problem": "一時検証スクリプトの準備コマンドでWindows引用符変換によりSyntaxError。",
+      "resolution": "Pythonへbase64で渡して解消。失敗した準備コマンドもrun_logged.pyで記録済み。"
+    }
+  ],
+  "notVerified": [
+    "CLI/bootstrapの管理runtime準備全体。導入前停止オプションがなく、公開coreのRuntimeStore.obtainまでを直接実行した。bootstrap-emptyは空のままで、bootstrap slot作成・更新処理は未実行。",
+    "WSL import、VM起動、helper起動、実managed doctor/render、実reboot、未準備hostでの受入。",
+    "OS署名・SmartScreen/Gatekeeper・installer・winget/Homebrew・PATH/uninstall。",
+    "source/notice archiveやinstallerを含む全25 Release assetの再取得。検証対象は各hostのstable・trust・descriptor・runtime3点・tool payload。"
+  ],
+  "remainingWork": "主担当による成果確認と公開判断。実managed consumer・実機受入と対象外assetの検証は別作業。",
+  "publicationPerformed": false,
+  "domainKnowledgeChanged": false,
+  "consumerReportNote": "既存reportのfailureStage=実行前は正常終了時にも出る値。成功はgradleExitCode=0、CONSUMER_OK、2経路のartifact比較で判定。managedApi/markersは正常な実managed doctor/render未実施を表す。公開版のoffline空cache拒否のみ実行。",
+  "cleanup": {
+    "windowsDownloadedArtifactsAndTemporaryCachesRemoved": true,
+    "removedPathsRelativeToBuildP1": [
+      "central-bytes",
+      "central-consumer",
+      "central-consumer-utf8",
+      "central-consumer-published",
+      "release",
+      "runtime-empty",
+      "worker-empty",
+      "bootstrap-empty"
+    ],
+    "macTemporaryDirectoryRemoved": true,
+    "macCleanupIndependentlyConfirmed": true,
+    "preserved": "build/p1/evidenceのreport/log、Java harness、consumer一時修正版と集約QA。自動command logはC:/Users/ryuma/.codex/logs/commands/。",
+    "backgroundTasksRemaining": []
+  },
+  "validation": {
+    "centralModuleAndPomConsumerPassed": true,
+    "centralBytesMatchCount": 20,
+    "centralGpgvValidCount": 10,
+    "windowsReleaseDownloadAndVerificationPassed": true,
+    "macReleaseDownloadAndVerificationPassed": true,
+    "tamperRejectionPassedCount": 3,
+    "gitDiffCheck": "成功（20261105T083052Z-2651220163c1460ea9946e1444e58589.jsonl）",
+    "fullProjectBuild": "未実施（製品コード変更なし。独立consumerは両経路でcompile/run成功）",
+    "qaLfBlobAndChecksum": "成功（UTF-8 BOMなし・LF、git hash-objectのfilter前後一致、SHA-256一致）",
+    "consumerTemporaryChange": "元scriptとの差は期待エラー1文字列の置換のみと照合済み"
+  },
+  "commandsEvidence": {
+    "centralConsumerSuccess": "20261105T082234Z-d911f825dbcd494a9ec6cd33251d91a2.jsonl",
+    "centralBytes": "20261105T082136Z-7aeafe340f1741409dd8587394f4f8b7.jsonl",
+    "gpgvSuccess": "20261105T082220Z-6c8e6bf657da4601ac57080dfc9601d8.jsonl",
+    "windowsRelease": "20261105T082357Z-150f4138a63a4e89b23532c0a067468e.jsonl",
+    "macRelease": "20261105T082447Z-45f6eb726756464b92dedc3cee7b77fc.jsonl",
+    "macCleanupConfirmation": "20261105T082820Z-523f4248f8f041e09d86b6eda1f8f6bf.jsonl",
+    "tamperRejection": "20261105T082655Z-bc64bd50403f49fc8c6d2789669536c6.jsonl"
+  },
+  "evidenceSources": [
+    {
+      "path": "scripts/verify-maven-consumer.py",
+      "sha256": "d4cc396f703194966e39dfe88b171405ec7097803769f275e6ca67172bde2ac3"
+    },
+    {
+      "path": "build/p1/verify-published-consumer.py",
+      "sha256": "c7570fa6fa3fa00180a065acd1f8fd3b57d6014e400d8f942219e53aae3c9be0"
+    },
+    {
+      "path": "build/p1/VerifyRelease.java",
+      "sha256": "7a58725d6767dd47656ddddade572ec62f52f76d844ccf5feae8b59e0d493cb0"
+    },
+    {
+      "path": "build/p1/RejectTamper.java",
+      "sha256": "d9b71c0a709bb09f41bd5ee0d69312d04bf27a3b532aa596af4ff4c5d12f3507"
+    }
+  ]
+}
