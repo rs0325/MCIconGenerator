@@ -69,3 +69,19 @@ python3 scripts/audit-central-bundle.py \
 本人が管理する公開鍵だけを指定した `gpgv` で全署名を検証し、fingerprintを確認する。秘密鍵やtokenはbuild出力・consumer fixtureにも入れない。実際の署名、Central Portalへのupload・検証・公開はそれぞれ許可範囲を確認する。
 
 Portalでは[USER_MANAGEDの検証](https://central.sonatype.org/publish/publish-portal-api/)と公開を分ける。`VALIDATED` は未公開であり、公開操作を実行したとは報告しない。公開後はCentralのみの空cache consumer、再取得bytes照合、管理API結合受入まで確認して#92の完成を判定する。GitHub Actions、release/tag作成、OS署名はこの準備に含めない。
+
+## 最終coreからの署名前再生成（C1、2026-11-05）
+
+旧1.1.0 bundleは公開対象外。origin/main a4756f38e0db0b9c31a984dbbcf90a37b8d16332 から、既存prepareCentralCandidateへ -PreleaseVersion=1.1.0 と -PmanagedRuntimeInputDir=H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input を渡し、JDK 21.0.12 / Gradle 9.8.1で再生成した。追加依存・公開API・データ形式の変更はない。
+
+coreは427817 bytes、SHA-256 b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca。R3確定JAR・両host payload内coreと全bytes一致し、450-byte pinsと公開trust-setも一致。workerは同版1.1.0で、内包agentもR3と一致した。
+
+候補 build/c1/mcicon-central-1.1.0-candidate.zip は1457960 bytes、SHA-256 aab7a6a3dc60a52b425b50d8942e4237371dc7ab7c8c6f098f2a189ea230ff3e。core/workerのbinary・sources・javadoc・POM・module各5件と4種checksum、計50fileを含み、署名なし監査はfailures 0で成功。PGP署名対象は10件。
+
+Mac転送用単一zipは build/c1/mcicon-central-1.1.0-signing-kit.zip（1470775 bytes、SHA-256 652dc82606c018c8417fc99bb95b35c448adb018f0c340c1838d69714b47f7bf）。ユーザー本人の署名手順と全file一覧は build/c1/SIGN-ON-MAC.md、測定記録は [QA JSON](../qa/central-bundle-candidate-2026-11-05.json) と [LF blob基準checksum](../qa/central-bundle-candidate-2026-11-05.json.sha256)。登録済みSSHへの転送は行っていない。
+
+C2（2026-11-05）で、ユーザーがMacで署名・gpgv検証済みの返却ZIP（build/c1/returned/mcicon-central-1.1.0-signatures.zip、5737 bytes、SHA-256 2d48e13213c2b07167204832063e389d30de3a78f470824b50a186108b7d1e12）を照合した。entryは.asc 10件と公開鍵1件のみで、絶対path・..・重複はない。元50fileを置換せず配置し、WindowsのGnuPG 2.5.24 gpgvと返却公開鍵だけで署名10/10を再検証し、fingerprint B766BA473AF3178D42371A0F50562040DFAE0F27を確認した。Mac側の実行成功はユーザー報告、Windows側は本タスクの実測である。
+
+署名済み最終ZIPは build/c1/mcicon-central-1.1.0.zip、1472738 bytes、SHA-256 dfa73ac3b26d12bd2432d7de919cfc0093aaace1e67b6f91b94a95aacfecaedc。元50fileに.asc 10件と署名checksum 40件を加えた100fileで、元50fileの全bytesおよび上記core SHA-256は不変。prepareCentralBundleの再publishは行っていない。scripts/audit-central-bundle.pyを --require-signatures 付きで実行し、failures 0・passed true（build/c1/audit-signed-final.json）。この監査の署名file構成検査と、別途成功したgpgvの暗号学的署名検証を区別して記録した。
+
+PGP署名・gpgv検証・署名済み再結合・署名必須監査は成功。Central upload・Central検証・公開・公開後consumerは未実施であり、ローカル監査成功をCentral受理・公開成功とは扱わない。commit・push・PR作成・tag・releaseも未実施。
