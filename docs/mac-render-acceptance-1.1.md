@@ -136,6 +136,8 @@ bootstrapは67,505,927 bytes（取得5.167秒）、管理artifact3件は1,339,46
 
 ## 初回取得取消し後の回復修正（2026-11-06、Refs #94）
 
+後段のE2E記録にある初回取得取消し後の再開失敗は、修正前の公開v1.1.0で観測した事象である。未着手leaseの回復は以下の修正で直し、自動テストで確認した。公開CLIからの取消し・再開・描画はまだ実証していないため、**次の配布候補で実機再検証が必要**である。
+
 公開v1.1.0の追加E2Eでは、初回runtime取得中にCLIがexit 130で終了した後、resources空のactive leaseと取得途中fileが残り、同じコマンドの再実行が未作成のVM登録JSON読み取りでexit 1となった。既存の描画成功記録から、この初回取得取消しの成功を推定しない。元の証拠はタスク `milestone-e2e2-macos` の `qa/e2e-cancel-resume-macos-2026-11-06.json` に保全されている。
 
 原因はhelperの未着手releaseが旧coreの生存を必須にしていたこと。resources空・生成intent不在でも、旧core終了後には登録照合を必要とする通常releaseへ進んでいた。修正はこの生存必須条件だけを除き、所有照合とjob/lifecycle排他、durable tombstone、資源・生成痕跡の拒否を維持する。共有core・guest・保存形式は変更しない。登録のみの中断や未知のVM状態は従来どおり保持・診断する。
@@ -145,3 +147,28 @@ Macの専用領域 `/Users/ryuman/tmp-mcicon-fix-cancel-resume-20261106` で、�
 公開CLIの既存経路は同梱trust/署名済みdescriptorとhelper SHAを固定する。ClassLoader/Transportを差し替える内部fixtureはあるが、公開CLIから修正helperだけを指定するテスト設定はない。署名済み公開runtimeを差し替えずに修正helperを使う公開CLI E2Eは実施できず、**次の配布候補で再検証が必要**。空の専用rootで初回取得中の取消し→同一コマンド再開→PNG生成→released/resources空→専用資源回収まで確認する。
 
 配布にはhelperの再ビルド・app-image再包装と署名整合性確認、artifact/inventoryのsize・SHA更新、descriptor/pinの再生成・配布署名、新版の発行が必要。既存v1.1.0の署名・helperを上書きしない。core回復は同一descriptor世代を対象とするため、この修正だけで新版から旧v1.1.0の残存leaseを回復できるとは保証しない。旧rootのlease・登録・anchorを手動削除する一般的な回復手順は提供せず、証拠を保全して世代別の対応を確認する。
+## 公開物の取消し・中断後再開・残存データ（2026-11-06）
+
+Refs #94。[追加E2E QA](../qa/e2e-cancel-resume-macos-2026-11-06.json)と[LF基準checksum](../qa/e2e-cancel-resume-macos-2026-11-06.json.sha256)に実測を保持する。公開v1.1.0だけを使用し製品コードは変更していない。起点はfetch後のorigin/main 71972cf、branchはfeature/issue-94-e2e-cancel-resume。**初回準備中断後の同一home再開はFAILであり、#94全体を受入成功とはしない。**
+
+| 項目 | 結果 | 実測 |
+| --- | --- | --- |
+| 空状態のruntime取得中にCLIへSIGINT | 中断を観測 | 12.047秒、exit 130。helper取得済み、guest part 2,339,235 bytes、resources空のactive lease。9 lock再取得可、VM/anchorなし |
+| 直後に同一コマンド再実行 | FAIL | 3.372秒、exit 1。IO_FAILED / MACOS_RUNTIME_FAILED: 所有記録を安全に読めません: descriptor digest.json。旧lease回復で停止しPNGなし |
+| 破損part検出・再取得 | PASS（別home） | 134.069秒、exit 0。中断partの先頭反転・宣言sizeまでsparse拡張したfixtureを検証済みhelperと別homeへコピー。誤ったpartを採用せず正しいguest取得・stone描画成功 |
+| 36 ID描画中のSIGINTと同一コマンド再開 | PASS（再開） | 最初のPNG公開後に中断、40.944秒、exit 130、終了時PNG 2枚。再開46.451秒、exit 0、36枚。旧leaseをreleasedへ回復しVM Stopped |
+| コンテナ観測用の追加中断・再開 | 部分確認 | 中断40.186秒、exit 130。再開45.164秒、exit 0、36枚。lease containers空・guest worker関連processなし。Docker DB一覧は取得できず |
+| archiveのpackage限定手動除去 | 保持契約の限定確認 | raw抽出exit 0。除去後もtool/runtime/cache/設定/lease/log/Stopped VM登録/PNG/raw保持。path・size・mtime集約と出力全file SHA一致 |
+| QA回収と前後比較 | PASS | VM通常delete・空一覧後に今回anchor回収。証跡転送SHA照合後に専用root削除。既存path・候補process・既存anchor一覧/uid/birth一致 |
+
+初回取得中断の元rootはそのまま保全した。再開失敗は旧lease回復の診断で、破損part検査へ進んでいない。取得順とhelper実装から、Mac所有登録を作る前に残ったleaseのreleaseで登録JSONを要求して止まると推定する。別home成功を元root再開成功へ読み替えず、製品修正は行っていない。短い自然なpartのHTTP Range再開完了も未確認。
+
+破損fixtureはQA専用cacheへの注入で、公開物自体は改変しない。コピーhelperのsize/mtimeNs/SHAは不変。描画中断・再開でも管理artifact3件とbootstrap archive/tool/manifest合計197fileの集合・size/mtimeNs/SHAが不変だった。全通信監査ではない。別home初回と2回の描画再開で1.21.4 stone 64×64はすべて既存Mac受入SHA-256 b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de と一致。
+
+描画中断直後はactive leaseのmacos ready資源とRunning VM/hostagentが残り、確認lockは再取得できた。再実行は旧leaseと新jobをreleased/resources空へ回復した。観測したTMPDIR配下に通常fileはなく、描画側runtime download.partもなかった。出力/worker stagingを含む全一時fileの中断瞬間の完全一覧は未取得。guest sg dockerはgroup認証に失敗し、所有照合した転送socketへの読取GETも切断された。製品helperのDocker経路はguest内sudoを使うが、QA直接sudo・group変更は行わず、Docker DB上の停止済みcontainer一覧は未検証とする。
+
+[利用ガイド](usage.md)・[初期bootstrap契約](../bootstrap/docs/initial-bootstrap.md)・[Homebrew配布契約](../bootstrap/docs/homebrew-distribution.md)はnonpurgeでprogram所有物だけ除去しuser dataを保持する。公開archiveの具体的uninstall/purgeコマンドや完全削除手順は確認できなかったため、手動package除去はこの所有境界の確認に限定し、実Homebrew/installer uninstallとは扱わない。除去後は両homeのbootstrap/runtime、約214 MBの入力cache、設定・lease・log、専用VM登録/anchor、生成PNG 73枚、元stone raw（157 bytes、SHA-256 33ac70ba8cb701087642a12c5fd29c1ba3006dc4730e9b014ed3a19ce7cdda7b）を保持し、確認範囲で保持契約との差異はなかった。除去前後の通常file metadataと出力hashをQAへ記録した。
+
+Macは新規 /Users/ryuman/tmp-mcicon-e2e2-cancel-resume 配下へ隔離し、明示許可されたhelper用 /private/tmp/mcicon-501-c31e684851b548941a80 を使用した。既存13個のmcicon一時pathは保持。登録/owner/VM identity・uid・作成時刻・machine/config hashを照合して今回VM/anchorだけ回収した。証跡862,239 bytesの転送SHA-256 0946dab82cb0ccd34dc16fad3fc2cb18c3ec61a0e7de1d57dc8d610be8c026ba を照合後に専用rootも削除。元rootのactive lease/partはQA回収で除去したもので、製品回復成功ではない。
+
+「再起動後再開」はCLI/準備process中断後の再実行だけで、OS rebootは行っていない。host sudo・OS設定変更・既存Lima/Docker/Homebrew操作、commit/push/PR/Issue操作なし。比較は列挙pathの存在・候補process・一時path所有metadataに限り、OS全体や既存data全fileの不変を保証しない。製品ビルドは変更対象外。LF/checksum・Git正規化blob整合とgit diff --checkは成功した。公開準備文面・再現スクリプト・詳細証跡はbuild配下へ保全した。
