@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""空のGradle cacheを持つ独立consumerで固定依存、raw、worker展開を検証する。"""
+"""空のGradle cacheを持つ独立consumerで正式固定依存、raw、workerとruntime resourceを検証する。"""
 import argparse
 import hashlib
 import json
@@ -269,10 +269,23 @@ public class Consumer {
                 var diagnostic=generator.doctorManaged("1.13",managed).join();
                 System.out.println("MCICON_MANAGED:"+args[2]+":DOCTOR_END");
                 if(!diagnostic.healthy())throw new AssertionError("正式managed runtimeのdoctorに失敗: "+diagnostic);
-            } else {
-                try {generator.doctorManaged("1.13",managed).join();throw new AssertionError("未発行runtimeを成功扱いしました");}
-                catch(java.util.concurrent.CompletionException failure) {
-                    if(!(failure.getCause() instanceof McIconException cause)||!cause.code().equals("MANAGED_RUNTIME_INVALID"))throw failure;
+            }
+        }
+        var loader=MCIconGenerator.class.getClassLoader();
+        String prefix="META-INF/mcicon/runtime/";
+        var json=new com.fasterxml.jackson.databind.ObjectMapper();
+        try(var stream=loader.getResourceAsStream(prefix+"pins.json")) {
+            if(stream==null)throw new AssertionError("正式coreのruntime pinsがありません");
+            var pins=json.readTree(stream);
+            if(pins.path("schemaVersion").asInt()!=1||pins.path("runtimes").size()!=2)throw new AssertionError("runtime pinsが不正です");
+            for(var pin:pins.path("runtimes")) {
+                String path=pin.path("descriptorPath").asText();
+                try(var descriptor=loader.getResourceAsStream(prefix+path);
+                    var signature=loader.getResourceAsStream(prefix+path+".sig");
+                    var trust=loader.getResourceAsStream(prefix+pin.path("trustKeyPath").asText())) {
+                    if(descriptor==null||signature==null||trust==null)throw new AssertionError("正式runtime resourceが不足しています");
+                    if(!hash(descriptor.readAllBytes(),"SHA-256").equals(pin.path("descriptorSha256").asText())||
+                            signature.readAllBytes().length!=64||trust.readAllBytes().length!=96)throw new AssertionError("正式runtime resourceのpin/size不一致");
                 }
             }
         }

@@ -10,6 +10,7 @@ def run(args): subprocess.run([str(value) for value in args], check=True, timeou
 def main():
     parser = argparse.ArgumentParser()
     for name in ['jdk', 'input', 'payload', 'native', 'native-source', 'native-build', 'output']: parser.add_argument('--' + name, type=pathlib.Path, required=True)
+    parser.add_argument('--app-version', required=True)
     args = parser.parse_args(); require(sys.platform == 'win32', 'Windows上で生成してください'); require(not args.output.exists(), '既存出力の上書き拒否')
     native_build = verify(args.native, args.native_source, args.native_build)
     manifest = json.loads((args.payload / 'payload.json').read_text(encoding='utf-8'))
@@ -46,7 +47,7 @@ def main():
     jars = list(inputs.glob('helper-windows-*.jar')); require(len(jars) == 1, 'helper JARが一意ではありません')
     runtime = work / 'runtime'
     run([args.jdk / 'bin/jlink.exe', '--add-modules', 'java.se,jdk.crypto.ec', '--strip-debug', '--no-header-files', '--no-man-pages', '--output', runtime])
-    run([args.jdk / 'bin/jpackage.exe', '--type', 'app-image', '--name', 'MCIconHelper', '--input', inputs, '--main-jar', jars[0].name, '--main-class', 'io.github.rs0325.mcicon.helper.windows.Main', '--runtime-image', runtime, '--dest', args.output / 'image'])
+    run([args.jdk / 'bin/jpackage.exe', '--type', 'app-image', '--name', 'MCIconHelper', '--app-version', args.app_version, '--input', inputs, '--main-jar', jars[0].name, '--main-class', 'io.github.rs0325.mcicon.helper.windows.Main', '--runtime-image', runtime, '--dest', args.output / 'image'])
     image = args.output / 'image/MCIconHelper'; files = []
     for path in sorted(image.rglob('*')):
         require(not path.is_symlink(), 'app-image link拒否')

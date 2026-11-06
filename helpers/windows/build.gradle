@@ -11,6 +11,7 @@ tasks.register('appImage', Exec) {
         if (!project.hasProperty('windowsNativeDir')) throw new GradleException('-PwindowsNativeDirで事前build PE/build.json/licenseを指定してください')
         def nativeDir = file(project.property('windowsNativeDir'))
         commandLine 'python', file('scripts/package-helper.py'), '--jdk', launcher.get().metadata.installationPath.asFile,
+                '--app-version', project.version.toString(),
                 '--input', layout.buildDirectory.dir('install/helper-windows/lib').get().asFile,
                 '--payload', project.property('windowsPayloadDir'), '--native', new File(nativeDir, 'windows-host.exe'),
                 '--native-build', new File(nativeDir, 'build.json'), '--native-source', file('src/main/native/windows-host.cpp'),

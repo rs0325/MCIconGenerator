@@ -102,7 +102,7 @@ gradlew --offline --no-daemon -PreleaseVersion=1.1.0 -PmanagedRuntimeInputDir=bu
 3. 現coreのJAR全体とruntime resourcesを固定し、tool payload2件とstable.jsonを次のツールで生成する。host別JREは同じfinal-inputのhelper ZIP内から採る。Windowsで生成したJava artifact/adapter bytesを他hostで再buildして入れ替えない。Mac包装へはこの確定JAR/resources/seedを転送する。改行により同梱LICENSEやagent hashが変わり得るためである。
 
 ```text
-python scripts/prepare-release-payloads.py --runtime-input build/r1/final-input --cli-lib cli/build/install/mcicon/lib --worker worker/build/libs/worker-1.1.0-agent.jar --core core/build/libs/core-1.1.0.jar --resources core/build/generated/resources/managedRuntime --sequence 1 --output build/r1/payloads
+python scripts/prepare-release-payloads.py --version 1.1.0 --tag v1.1.0 --runtime-input build/r1/final-input --cli-lib cli/build/install/mcicon/lib --worker worker/build/libs/worker-1.1.0-agent.jar --core core/build/libs/core-1.1.0.jar --resources core/build/generated/resources/managedRuntime --sequence 1 --output build/r1/payloads
 ```
 
 初回sequenceは1とする。既存公開stableのsequenceとの整合は公開直前に主担当が再確認し、将来版は単調増加させる。packageに渡すstableManifestUrlは `https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json` とする。immutableなruntime/payload URLは `releases/download/v1.1.0/<asset>` のまま。latest asset URLの仕様は[GitHub公式文書](https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases)に基づく。Releaseをlatestとして公開する判断はユーザーに残す。
@@ -244,7 +244,7 @@ wc -c build/r2/final-input/descriptors/*.json.sig
 5. 両descriptorと64byte署名、公開DER・共通96byte trustのbytesを照合し、runtime入力とbootstrap seed/packageのtrustを一致させる。公開trust3ファイルをRelease候補へ置く。
 6. `-PreleaseVersion=1.1.0 -PmanagedRuntimeInputDir=build/r2/final-input` で `:core:jar :cli:installDist :bootstrap:installDist` を実行し、core JAR内のdescriptor・署名・inventory・pins・trust・DERが入力と一致することを検証する。
 7. 現core/workerからCentral bundleをローカルで準備・監査する。PGP署名とCentral公開は別の実行許可を確認し、旧bundleを流用しない。
-8. `scripts/prepare-release-payloads.py --runtime-input build/r2/final-input --resources core/build/generated/resources/managedRuntime --sequence 1 --output build/r2/payloads` に現CLI lib・worker・coreの引数を付けて実行し、payload2件とstable manifestの最終bytes/hashを確定する。
+8. `scripts/prepare-release-payloads.py --version 1.1.0 --tag v1.1.0 --runtime-input build/r2/final-input --resources core/build/generated/resources/managedRuntime --sequence 1 --output build/r2/payloads` に現CLI lib・worker・coreの引数を付けて実行し、payload2件とstable manifestの最終bytes/hashを確定する。
 9. **payload確定後**にユーザーがstable manifestを署名し、同じ公開DERで64byte署名を検証する。
 10. seed/packageのJava検証でcore・payload・manifest・descriptor・署名・trustを照合。source2本、notice、inventory、公開trust3ファイルを含む最終asset一覧を確定する。tag/Release公開は別の明示許可後。
 11. 公開後にfresh cacheで正式URL再取得・署名検証・consumer受入を行う。正式経路のOS警告・実reboot・lease受入は後続gateとして完了を確認する。
@@ -273,7 +273,7 @@ R2の `build/r2/final-input` は読み取り専用で使用した。2件のdescr
 
 ```sh
 ./gradlew --offline --no-daemon -PreleaseVersion=1.1.0 -PmanagedRuntimeInputDir=H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input :core:jar :cli:installDist :bootstrap:installDist
-python scripts/prepare-release-payloads.py --runtime-input H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input --resources core/build/generated/resources/managedRuntime --cli-lib cli/build/install/mcicon/lib --worker worker/build/libs/worker-1.1.0-agent.jar --core core/build/libs/core-1.1.0.jar --sequence 1 --output build/r3/payloads
+python scripts/prepare-release-payloads.py --version 1.1.0 --tag v1.1.0 --runtime-input H:/MCIconGenerator/worktrees/milestone-release-final-r2/MCIconGenerator/build/r2/final-input --resources core/build/generated/resources/managedRuntime --cli-lib cli/build/install/mcicon/lib --worker worker/build/libs/worker-1.1.0-agent.jar --core core/build/libs/core-1.1.0.jar --sequence 1 --output build/r3/payloads
 ```
 
 coreの全14 runtime resources（descriptor2・署名2・inventory6・trust・公開DER2・pins）を生成先とJARで元bytes照合した。pinsはinputと一致し、他resourceは入力元bytesと一致した。CLI distributionと両payloadも同じcore JAR全体を収録する。他のpayload JARによるruntime resource重複はない。全payload entryのsize/SHAとinventory、metadata文書path、source参照を照合した。

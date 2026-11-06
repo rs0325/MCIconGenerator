@@ -37,6 +37,11 @@ class PayloadTest(unittest.TestCase):
                 payloads.core_resources(core, root / 'resources')
 
     def test_two_host_payload_layout_and_hashes(self):
+        for version in ('1.1.0', '1.1.1'):
+            with self.subTest(version=version):
+                self.check_payloads(version)
+
+    def check_payloads(self, version):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             resources = root / 'resources'
@@ -62,7 +67,7 @@ class PayloadTest(unittest.TestCase):
                     info.external_attr = 0o100755 << 16
                     archive.writestr(info, b'synthetic-java')
                     archive.writestr('MCIconHelper/licenses/runtime.txt', b'synthetic-runtime-terms')
-                descriptor = payloads.candidate.encode({'host': {'os': os_name, 'arch': arch}, 'toolVersion': '1.1.0', 'worker': {'agentSha256': payloads.candidate.digest(worker)},
+                descriptor = payloads.candidate.encode({'host': {'os': os_name, 'arch': arch}, 'toolVersion': version, 'worker': {'toolVersion': version, 'agentSha256': payloads.candidate.digest(worker)},
                     'artifacts': [{'id': host, 'role': 'host-helper', 'format': 'zip', 'bytes': helper.stat().st_size,
                                    'sha256': payloads.candidate.digest(helper),
                                    'licenseFiles': ['MCIconHelper/licenses/runtime.txt'], 'noticeFiles': [],
@@ -82,17 +87,20 @@ class PayloadTest(unittest.TestCase):
                 for p in prefix.rglob('*'):
                     if p.is_file():
                         jar.write(p, p.relative_to(resources).as_posix())
-            shutil.copyfile(core, cli / 'core-1.1.0.jar')
+            shutil.copyfile(core, cli / ('core-' + version + '.jar'))
             for name in ('cli', 'worker'):
-                (cli / (name + '-1.1.0.jar')).write_bytes(b'synthetic-jar')
+                (cli / (name + '-' + version + '.jar')).write_bytes(b'synthetic-jar')
             args = SimpleNamespace(runtime_input=runtime, output=root / 'out', resources=resources, core=core,
-                                   cli_lib=cli, worker=worker, sequence=1, openssl='openssl')
+                                   cli_lib=cli, worker=worker, version=version, tag='v' + version, sequence=2, openssl='openssl')
             with patch.object(payloads.trust_set, 'read', return_value=trust), patch.object(payloads, 'verify_signature') as verify:
                 payloads.prepare(args)
                 self.assertEqual(verify.call_count, 2)
             manifest = json.loads((args.output / 'stable.json').read_bytes())
             self.assertEqual(manifest['minimumBootstrapProtocol'], 4)
+            self.assertEqual(manifest['toolVersion'], version)
+            self.assertEqual(manifest['sequence'], 2)
             for row in manifest['platforms']:
+                self.assertIn('/v' + version + '/mcicon-tool-' + version + '-', row['payload']['url'])
                 archive = args.output / Path(row['payload']['url']).name
                 self.assertEqual(payloads.candidate.digest(archive), row['payload']['sha256'])
                 self.assertEqual(row['payload']['sourceArchives'], [{'url': 'https://example.com/runtime-source.tar', 'sha256': 'a' * 64}])
@@ -100,6 +108,8 @@ class PayloadTest(unittest.TestCase):
                     terms = 'licenses/runtime-helper/MCIconHelper/licenses/runtime.txt'
                     self.assertEqual(jar.read(terms), b'synthetic-runtime-terms')
                     self.assertIn(terms, row['payload']['licenseFiles'])
+                    for name in ('cli', 'core', 'worker'):
+                        self.assertIn('app/lib/' + name + '-' + version + '.jar', jar.namelist())
                     self.assertIn('app/worker/worker-agent.jar', jar.namelist())
                     java = next(n for n in jar.namelist() if n.startswith('java/bin/'))
                     self.assertTrue(jar.getinfo(java).external_attr >> 16 & 0o100)
