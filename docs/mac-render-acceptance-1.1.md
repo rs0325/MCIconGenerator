@@ -107,3 +107,29 @@ helperテストは45件中44成功・1skip、failure/error 0。skipは実probe�
 開始・終了とも既存 `~/.lima` 不存在、PATHのlimactlなし。仮想化候補processのPID/実行file名とRosetta既知pathの存在が一致し、専用pathを含む残存processはなかった。InputMethodKit/TextInputMenuAgentの部分一致2件はVMではない。ディスク空き容量は変動し、同一性判定には含めない。
 
 未検証は実host reboot、OS警告の正式配布経路、未準備host setup、正規leaseからの製品helper管理VM一連操作、Intel Mac・他macOS版。正式配布経路の隔離属性・警告や前回ダイアログの原因は未確定のままで、このローカル構築経路の成功から推定しない。
+
+## 公開物の空環境E2E（2026-11-05、11-06再実行）
+
+公開v1.1.0のMac bootstrapと管理artifactだけを使い、新規領域から署名seed設置・専用VZ VM自動準備・代表3版のstone描画・再利用・offline描画・回収が成功した。[E2E QA](../qa/e2e-macos-2026-11-05.json)と[LF基準checksum](../qa/e2e-macos-2026-11-05.json.sha256)に測定値を保持する。製品コード・API・保存形式は変更していない。
+
+前回はhelperの固定`/private/tmp`領域が指定範囲外のため106.991秒で停止した（exit 143、PNGなし）。その実行と回収の証跡はQAの`previousAttempt`に保持する。再実行ではユーザーが固定一時領域の使用を実行中に限り明示許可した。前回領域とVMは回収済みで配布fileも不存在だったため、`/Users/ryuman/tmp-mcicon-e2e-resume`を新規作成して公開物を取得した。同じSHAの既存fileを重複取得していない。
+
+| 実行 | 版 | 秒 | 結果・Mac/Windows既存PNG SHA |
+| --- | --- | ---: | --- |
+| 初回（管理artifact取得・VM準備を含む） | 1.21.4 | 161.731 | exit 0・一致 |
+| 管理環境再利用 | 1.21.4 | 43.427 | exit 0・一致 |
+| 既存版offline描画 | 1.21.4 | 42.348 | exit 0・一致 |
+| 追加代表版 | 1.13 | 67.515 | exit 0・一致 |
+| 追加代表版 | 26.3 | 53.372 | exit 0・一致 |
+
+5枚とも有効RGBA PNG・64×64・可視2744pixelで、既存Mac/Windows受入の版別SHA-256と一致した。1.21.4は`b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de`。既存`audit-export.py`のPNG監査を再利用し、PNG本体やMinecraft資産は保存していない。
+
+再利用・offlineでは同じVMのgenerationOwnerとmachine IDを確認した。配布archive・toolと既存入力のsize/SHAは不変。online再利用時は版一覧metadataとchecksumのmtimeだけ更新され、offlineはそれらも不変だった。各起動で新規作成されるworkerログ等は入力比較から除外した。通信全体や物理切断を測った結果ではない。
+
+bootstrapは67,505,927 bytes（取得5.167秒）、管理artifact3件は1,339,464,364 bytesでdescriptorのsize/SHAに一致し、今回の計上対象は1,406,970,291 bytes。Minecraft資産・metadata・署名・HTTP/TLS overheadを含む全通信量ではない。Central core/workerの取得・seed同梱JARとの照合は前回の検証結果を再利用し、今回は新規seedの同梱JARがその同一SHAであることを確認した。Centralからの再取得はない。
+
+描画前の`--bootstrap-auto-update false`が成功し、設定は最後までfalse。online managed描画にも`UPDATE_PREPARING`はなく、取得したreceiptに更新準備はなかった。Mac curl/Python展開後のbootstrap/helper属性と実行期間のsyspolicydログに保護promptは観測せず、OS保護・属性・GUIを操作していない。GUI目視・ブラウザ/Finder経路は未検証。
+
+5描画すべてのleaseは通常終了でreleased、resourcesは空。通常release後の専用VMがStoppedであることを確認し、登録・owner marker・VM identity・作成時刻・uid・machine/config hashを照合して同梱Limaの通常deleteを実行した。空一覧・関連processなしを確認して今回のanchorだけを削除し、測定JSON回収後に専用領域も削除した。列挙した既存標準pathの存在、仮想化候補PID/実行file、起動前からの`/private/tmp/mcicon-*`一覧・uid・作成時刻は前後一致した。OS全体の不変を保証する比較ではない。
+
+未検証は全51版・全登録アイテム、実host reboot、未準備host setup、Intel Mac/他macOS、ブラウザ/Finder経路とGUI目視、物理network切断・packet監査、更新取得・適用。commit・push・PR・Issue操作は行っていない。公開準備文面のみbuild配下で更新した。

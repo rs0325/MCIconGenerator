@@ -1,0 +1,1655 @@
+{
+  "schemaVersion": 1,
+  "taskId": "milestone-e2e-macos",
+  "host": "macos",
+  "date": "2026-11-05",
+  "resumedDate": "2026-11-06",
+  "refs": [
+    "#94",
+    "#95",
+    "#98",
+    "#99"
+  ],
+  "baseCommit": "d33583fcae09b513e18352dc238bf30533fc41b3",
+  "branch": "feature/e2e-macos",
+  "worktree": "H:\\MCIconGenerator\\worktrees\\milestone-e2e-macos\\MCIconGenerator",
+  "status": "成功（公開物の代表3版・再利用・offline・所有物回収）",
+  "acceptancePassed": true,
+  "scope": {
+    "version": "1.1.0",
+    "sources": "GitHub Release v1.1.0の公開bootstrap・管理artifactのみ。Central JAR取得結果は前回証跡を再利用し、同梱JARの同一SHAを再照合。ローカル候補・repo build出力は不使用",
+    "minecraftVersions": [
+      "1.21.4",
+      "1.13",
+      "26.3"
+    ],
+    "id": "minecraft:stone",
+    "kind": "block",
+    "size": 64,
+    "renderCount": 5
+  },
+  "environment": {
+    "os": "macOS-15.8.1-arm64-arm-64bit",
+    "python": "/opt/homebrew/bin/python3.12",
+    "before": {
+      "paths": {
+        "/Users/ryuman/.lima": false,
+        "/Users/ryuman/Library/Application Support/MCIconBootstrap": false,
+        "/Users/ryuman/Library/Application Support/MCIconGenerator": false,
+        "/Library/Apple/usr/share/rosetta": true,
+        "/Library/Apple/usr/libexec/oah/libRosettaRuntime": true
+      },
+      "virtualization": [
+        " 1262 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent",
+        " 1604 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent"
+      ],
+      "anchors": [
+        {
+          "path": "/private/tmp/mcicon-verify-135-main",
+          "uid": 501,
+          "birth": 1793600979.6526654
+        },
+        {
+          "path": "/private/tmp/mcicon-verify-130",
+          "uid": 501,
+          "birth": 1793551841.3631163
+        },
+        {
+          "path": "/private/tmp/mcicon-copy-dist.err",
+          "uid": 501,
+          "birth": 1793716339.0497963
+        },
+        {
+          "path": "/private/tmp/mcicon-copy.out",
+          "uid": 501,
+          "birth": 1793716302.4268985
+        },
+        {
+          "path": "/private/tmp/mcicon-copy.err",
+          "uid": 501,
+          "birth": 1793716302.4270375
+        },
+        {
+          "path": "/private/tmp/mcicon-h-root-api-comparison-20261028-v1",
+          "uid": 501,
+          "birth": 1793172495.7794428
+        },
+        {
+          "path": "/private/tmp/mcicon-copy-dist.out",
+          "uid": 501,
+          "birth": 1793716339.0496519
+        },
+        {
+          "path": "/private/tmp/mcicon-launcher.out",
+          "uid": 501,
+          "birth": 1793716301.2401195
+        },
+        {
+          "path": "/private/tmp/mcicon-verify-135",
+          "uid": 501,
+          "birth": 1793600925.056077
+        },
+        {
+          "path": "/private/tmp/mcicon-verify-132",
+          "uid": 501,
+          "birth": 1793530381.8828452
+        },
+        {
+          "path": "/private/tmp/mcicon-dist.err",
+          "uid": 501,
+          "birth": 1793716338.212815
+        },
+        {
+          "path": "/private/tmp/mcicon-dist.out",
+          "uid": 501,
+          "birth": 1793716338.2127085
+        },
+        {
+          "path": "/private/tmp/mcicon-launcher.err",
+          "uid": 501,
+          "birth": 1793716301.2403855
+        }
+      ],
+      "os": "macOS-15.8.1-arm64-arm-64bit"
+    }
+  },
+  "isolation": {
+    "root": "/Users/ryuman/tmp-mcicon-e2e-resume",
+    "environment": {
+      "HOME": "/Users/ryuman/tmp-mcicon-e2e-resume/home",
+      "TMPDIR": "/Users/ryuman/tmp-mcicon-e2e-resume/tmp/",
+      "TMP": "/Users/ryuman/tmp-mcicon-e2e-resume/tmp",
+      "TEMP": "/Users/ryuman/tmp-mcicon-e2e-resume/tmp",
+      "LIMA_HOME": "/Users/ryuman/tmp-mcicon-e2e-resume/lima",
+      "JAVA_TOOL_OPTIONS": "-Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true"
+    },
+    "satisfied": true,
+    "actualAnchor": "/private/tmp/mcicon-501-7921f566023d6f480a3b",
+    "permission": "このE2E実行中のみ/private/tmp/mcicon-<uid>-<token>の作成・使用をユーザーが明示許可。既存mcicon-*は変更せず、今回作成分のみ所有確認後に回収",
+    "priorE2eRootsAtStart": []
+  },
+  "acquisition": {
+    "bootstrap": {
+      "bytes": 67505927,
+      "sha256": "7cbf377d7ed65319d653ad4ab748bc7c1b74b248cd397e6aeb09c65b310a821c",
+      "seconds": 5.1669539590366185,
+      "reason": "前回領域は回収済みでファイル不存在のため再取得"
+    },
+    "runtimeArtifacts": [
+      {
+        "id": "mcicon-helper-1.1.0-macos-aarch64",
+        "role": "host-helper",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-macos-aarch64.zip",
+        "bytes": 125853859,
+        "sha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde",
+        "actualBytes": 125853859,
+        "actualSha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde",
+        "matchesDescriptor": true
+      },
+      {
+        "id": "mcicon-guest-1.1.0-macos-aarch64",
+        "role": "guest-base",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-macos-aarch64.qcow2",
+        "bytes": 620224512,
+        "sha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+        "actualBytes": 620224512,
+        "actualSha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+        "matchesDescriptor": true
+      },
+      {
+        "id": "mcicon-renderer-1.1.0-linux-amd64",
+        "role": "renderer-image",
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+        "bytes": 593385993,
+        "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "actualBytes": 593385993,
+        "actualSha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "matchesDescriptor": true
+      }
+    ],
+    "runtimeArtifactBytes": 1339464364,
+    "central": [
+      {
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.jar",
+        "exit": 0,
+        "stdout": "200 427817 0.158530",
+        "elapsedSeconds": 0.18056845804676414,
+        "bytes": 427817,
+        "sha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+        "seedJarSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+        "matchesSeed": true,
+        "seedJarPath": "home/Library/Application Support/MCIconBootstrap/tools/1.1.0/c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d/app/lib/core-1.1.0.jar",
+        "resumeSeedJarSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+        "retrievalScope": "Centralからの取得は前回の検証結果を再利用。今回は同じSHAのseed同梱JARを再照合し、Centralからは再取得しない"
+      },
+      {
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.jar",
+        "exit": 0,
+        "stdout": "200 489342 0.116671",
+        "elapsedSeconds": 0.1333892080001533,
+        "bytes": 489342,
+        "sha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+        "seedJarSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+        "matchesSeed": true,
+        "seedJarPath": "home/Library/Application Support/MCIconBootstrap/tools/1.1.0/c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d/app/lib/worker-1.1.0.jar",
+        "resumeSeedJarSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+        "retrievalScope": "Centralからの取得は前回の検証結果を再利用。今回は同じSHAのseed同梱JARを再照合し、Centralからは再取得しない"
+      }
+    ],
+    "countedPublicArtifactBytesThisRun": 1406970291,
+    "priorCountedPublicArtifactBytes": 1407887450,
+    "byteCountScope": "今回のbootstrapと管理artifact3件の実file bytes合計。Minecraft資産・metadata・署名・HTTP/TLS overheadを含む全通信量ではない。前回領域は回収済みでファイル不存在だったため新規取得。同じSHAの存在するファイルは再取得していない",
+    "minecraft": "製品が公式manifest等の正規経路で取得。1.21.4/1.13/26.3の描画完了。Minecraft資産は専用領域ごと回収"
+  },
+  "checks": [
+    {
+      "id": 1,
+      "name": "空cacheから初回管理描画",
+      "status": "成功",
+      "details": "公開bootstrap署名seed初期設置、管理artifact size/SHA照合、VZ専用VM自動準備、1.21.4の64x64 stone描画がexit 0。追加1.13/26.3もexit 0"
+    },
+    {
+      "id": 2,
+      "name": "2回目以降の再利用・再取得なし",
+      "status": "成功（保存fileの観測範囲）",
+      "details": "同一VM generationOwner/machineIdを再利用。tool/配布archive・既存入力のsize/SHA不変。onlineでは版一覧metadata2fileのmtimeのみ更新。全通信を監査した結果ではない",
+      "comparison": {
+        "beforeFiles": 715,
+        "afterFiles": 715,
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "path": "cache/metadata/version_manifest_v2.json",
+            "fields": [
+              "mtimeNs"
+            ]
+          },
+          {
+            "path": "cache/metadata/version_manifest_v2.json.sha256",
+            "fields": [
+              "mtimeNs"
+            ]
+          }
+        ],
+        "allHashesAndSizesUnchanged": true,
+        "runtimeAndToolsUnchanged": true
+      }
+    },
+    {
+      "id": 3,
+      "name": "offlineで既存版を継続",
+      "status": "成功",
+      "details": "render --offlineで1.21.4をexit 0、同じPNG。直前からの既存入力・tool/配布archiveのSHA/size/mtime不変。OS network設定は変更せず、物理的な切断・packet監査は未実施",
+      "comparison": {
+        "beforeFiles": 715,
+        "afterFiles": 715,
+        "added": [],
+        "removed": [],
+        "changed": [],
+        "allHashesAndSizesUnchanged": true,
+        "runtimeAndToolsUnchanged": true
+      }
+    },
+    {
+      "id": 4,
+      "name": "自動更新無効設定",
+      "status": "成功",
+      "details": "描画前に--bootstrap-auto-update falseを実行、config autoUpdate false。全online managed renderでUPDATE_PREPARINGなし、取得したreceiptにupdate-preparationなし"
+    },
+    {
+      "id": 5,
+      "name": "所有物の回収・削除",
+      "status": "成功",
+      "details": "5描画の全lease released/resources空。通常release後のVM StoppedをLimaで確認し、同梱Lima deleteで今回VMのみ削除。空一覧・所有processなしを確認し、anchorと専用領域を削除。既存path/process/anchor一覧は前後一致"
+    },
+    {
+      "id": 6,
+      "name": "署名なし配布の初回OS警告・ブロック",
+      "status": "指定取得経路で観測なし",
+      "details": "Mac curl取得・Python tarfile展開でbootstrap/helperが起動。取得したxattrとsyspolicydログに保護promptなし。GUI目視・ブラウザ/Finder経路は未検証。属性削除・OS保護変更なし"
+    }
+  ],
+  "execution": {
+    "steps": [
+      {
+        "name": "initial-version",
+        "args": [
+          "--version"
+        ],
+        "exit": 0,
+        "seconds": 3.5079471670323983,
+        "stdout": "MCIconGenerator 1.1.0\n",
+        "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nBootstrap 1.1.0 (owner: archive)\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\n"
+      },
+      {
+        "name": "disable-auto-update",
+        "args": [
+          "--bootstrap-auto-update",
+          "false"
+        ],
+        "exit": 0,
+        "seconds": 0.208002166938968,
+        "stdout": "",
+        "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\n"
+      },
+      {
+        "name": "first",
+        "args": [
+          "--debug",
+          "render",
+          "--version",
+          "1.21.4",
+          "--kind",
+          "block",
+          "--id",
+          "minecraft:stone",
+          "--size",
+          "64",
+          "--out",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/out/first",
+          "--cache",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/cache",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 161.73113058297895,
+        "stdout": "{\n  \"version\" : \"1.21.4\",\n  \"mode\" : \"icons\",\n  \"manifest\" : \"/Users/ryuman/tmp-mcicon-e2e-resume/out/first/java/1.21.4/icons/manifest.json\",\n  \"complete\" : true,\n  \"succeeded\" : 1,\n  \"failed\" : 0,\n  \"entries\" : [ {\n    \"id\" : \"minecraft:stone\",\n    \"kind\" : \"block\",\n    \"status\" : \"success\",\n    \"path\" : \"assets/minecraft/textures/block/stone.png\",\n    \"sha256\" : \"b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de\",\n    \"sourceSha256\" : null,\n    \"auxiliary\" : { },\n    \"code\" : null,\n    \"message\" : null\n  } ]\n}\n",
+        "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nprepare 1.21.4 0/1\nstartup-ready 1.21.4 0/1\nrender minecraft:stone 1/1\n"
+      },
+      {
+        "name": "reuse",
+        "args": [
+          "--debug",
+          "render",
+          "--version",
+          "1.21.4",
+          "--kind",
+          "block",
+          "--id",
+          "minecraft:stone",
+          "--size",
+          "64",
+          "--out",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/out/reuse",
+          "--cache",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/cache",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 43.42748291697353,
+        "stdout": "{\n  \"version\" : \"1.21.4\",\n  \"mode\" : \"icons\",\n  \"manifest\" : \"/Users/ryuman/tmp-mcicon-e2e-resume/out/reuse/java/1.21.4/icons/manifest.json\",\n  \"complete\" : true,\n  \"succeeded\" : 1,\n  \"failed\" : 0,\n  \"entries\" : [ {\n    \"id\" : \"minecraft:stone\",\n    \"kind\" : \"block\",\n    \"status\" : \"success\",\n    \"path\" : \"assets/minecraft/textures/block/stone.png\",\n    \"sha256\" : \"b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de\",\n    \"sourceSha256\" : null,\n    \"auxiliary\" : { },\n    \"code\" : null,\n    \"message\" : null\n  } ]\n}\n",
+        "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nprepare 1.21.4 0/1\nstartup-ready 1.21.4 0/1\nrender minecraft:stone 1/1\n"
+      },
+      {
+        "name": "offline",
+        "args": [
+          "--debug",
+          "render",
+          "--version",
+          "1.21.4",
+          "--kind",
+          "block",
+          "--id",
+          "minecraft:stone",
+          "--size",
+          "64",
+          "--out",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/out/offline",
+          "--cache",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/cache",
+          "--json",
+          "--offline"
+        ],
+        "exit": 0,
+        "seconds": 42.34839145897422,
+        "stdout": "{\n  \"version\" : \"1.21.4\",\n  \"mode\" : \"icons\",\n  \"manifest\" : \"/Users/ryuman/tmp-mcicon-e2e-resume/out/offline/java/1.21.4/icons/manifest.json\",\n  \"complete\" : true,\n  \"succeeded\" : 1,\n  \"failed\" : 0,\n  \"entries\" : [ {\n    \"id\" : \"minecraft:stone\",\n    \"kind\" : \"block\",\n    \"status\" : \"success\",\n    \"path\" : \"assets/minecraft/textures/block/stone.png\",\n    \"sha256\" : \"b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de\",\n    \"sourceSha256\" : null,\n    \"auxiliary\" : { },\n    \"code\" : null,\n    \"message\" : null\n  } ]\n}\n",
+        "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nprepare 1.21.4 0/1\nstartup-ready 1.21.4 0/1\nrender minecraft:stone 1/1\n"
+      },
+      {
+        "name": "1.13",
+        "args": [
+          "--debug",
+          "render",
+          "--version",
+          "1.13",
+          "--kind",
+          "block",
+          "--id",
+          "minecraft:stone",
+          "--size",
+          "64",
+          "--out",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/out/1.13",
+          "--cache",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/cache",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 67.51520208304282,
+        "stdout": "{\n  \"version\" : \"1.13\",\n  \"mode\" : \"icons\",\n  \"manifest\" : \"/Users/ryuman/tmp-mcicon-e2e-resume/out/1.13/java/1.13/icons/manifest.json\",\n  \"complete\" : true,\n  \"succeeded\" : 1,\n  \"failed\" : 0,\n  \"entries\" : [ {\n    \"id\" : \"minecraft:stone\",\n    \"kind\" : \"block\",\n    \"status\" : \"success\",\n    \"path\" : \"assets/minecraft/textures/block/stone.png\",\n    \"sha256\" : \"b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7\",\n    \"sourceSha256\" : null,\n    \"auxiliary\" : { },\n    \"code\" : null,\n    \"message\" : null\n  } ]\n}\n",
+        "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nprepare 1.13 0/1\nstartup-ready 1.13 0/1\nrender minecraft:stone 1/1\n"
+      },
+      {
+        "name": "26.3",
+        "args": [
+          "--debug",
+          "render",
+          "--version",
+          "26.3",
+          "--kind",
+          "block",
+          "--id",
+          "minecraft:stone",
+          "--size",
+          "64",
+          "--out",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/out/26.3",
+          "--cache",
+          "/Users/ryuman/tmp-mcicon-e2e-resume/cache",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 53.37165145797189,
+        "stdout": "{\n  \"version\" : \"26.3\",\n  \"mode\" : \"icons\",\n  \"manifest\" : \"/Users/ryuman/tmp-mcicon-e2e-resume/out/26.3/java/26.3/icons/manifest.json\",\n  \"complete\" : true,\n  \"succeeded\" : 1,\n  \"failed\" : 0,\n  \"entries\" : [ {\n    \"id\" : \"minecraft:stone\",\n    \"kind\" : \"block\",\n    \"status\" : \"success\",\n    \"path\" : \"assets/minecraft/textures/block/stone.png\",\n    \"sha256\" : \"1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39\",\n    \"sourceSha256\" : null,\n    \"auxiliary\" : { },\n    \"code\" : null,\n    \"message\" : null\n  } ]\n}\n",
+        "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e-resume/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e-resume/tmp -Djava.awt.headless=true\nprepare 26.3 0/1\nstartup-ready 26.3 0/1\nrender minecraft:stone 1/1\n"
+      }
+    ],
+    "config": {
+      "schemaVersion": 1,
+      "autoUpdate": false
+    },
+    "receiptKinds": [
+      {
+        "kind": "command",
+        "state": "finished",
+        "exitCode": 0
+      },
+      {
+        "kind": "command",
+        "state": "finished",
+        "exitCode": 0
+      },
+      {
+        "kind": "command",
+        "state": "finished",
+        "exitCode": 0
+      },
+      {
+        "kind": "command",
+        "state": "finished",
+        "exitCode": 0
+      },
+      {
+        "kind": "command",
+        "state": "finished",
+        "exitCode": 0
+      },
+      {
+        "kind": "command",
+        "state": "finished",
+        "exitCode": 0
+      }
+    ],
+    "sameGenerationOwner": "3f7681ed-79b7-4e3b-8a8b-eb4cb38453cb",
+    "sameMachineIdSha256": "cea0991fdd6e30fe154c4077590e01d0128a9aaa78b856b77010b3c73904f25b",
+    "vmMemoryMiB": 7168,
+    "leases": [
+      {
+        "schemaVersion": 1,
+        "jobId": "d197ad33-85ed-41d0-8bf6-7389c60a119a",
+        "ownerId": "bfaf2442-14e4-4ff6-b954-433db849ed94",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 76307,
+        "processStartedAt": "2026-11-06T01:09:03.965Z",
+        "createdAt": "2026-11-06T01:09:05.653308Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:24:04.502163Z"
+        },
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "schemaVersion": 1,
+        "jobId": "62ef088c-e5a7-4159-bbc0-c49560fdcb3c",
+        "ownerId": "88e4fd8d-d5c0-4709-91d3-d5b92621be56",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 75820,
+        "processStartedAt": "2026-11-06T01:08:20.839Z",
+        "createdAt": "2026-11-06T01:08:22.271858Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:23:21.131208Z"
+        },
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "schemaVersion": 1,
+        "jobId": "0c805ea7-6f55-4505-b925-3f40a4da9822",
+        "ownerId": "4f7d3987-5c98-41da-b7d9-2a2443fb20cc",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 74814,
+        "processStartedAt": "2026-11-06T01:04:32.751Z",
+        "createdAt": "2026-11-06T01:04:41.695654Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:19:33.370025Z"
+        },
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "schemaVersion": 1,
+        "jobId": "5adc7352-cd64-4ad0-ab6a-cefa8caeefac",
+        "ownerId": "dc2f9e33-8e94-40ba-af36-3aaf23387538",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 76974,
+        "processStartedAt": "2026-11-06T01:10:11.571Z",
+        "createdAt": "2026-11-06T01:10:13.254994Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:25:12.116103Z"
+        },
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "schemaVersion": 1,
+        "jobId": "8a8eb8d2-9823-45a1-bc99-c34c5d01e287",
+        "ownerId": "431a93d6-7c7a-4970-ab99-8553b45b7ca8",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 75340,
+        "processStartedAt": "2026-11-06T01:07:36.640Z",
+        "createdAt": "2026-11-06T01:07:38.334591Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:22:37.195263Z"
+        },
+        "state": "released",
+        "resources": {}
+      }
+    ],
+    "manifests": {
+      "out/reuse/java/1.21.4/icons/manifest.json": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "complete": true,
+        "counts": {
+          "failed": 0,
+          "noItemForm": 76,
+          "succeeded": 1
+        },
+        "settings": {
+          "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "context": "canonical-v1",
+          "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+          "javaMajor": 21,
+          "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+          "javaVersion": "21.0.12.1",
+          "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+          "metadataSha256": "b6f4dbe69e0f481bbaf8526ff456b06afa0a07a32c4c8bf2715d7755198522d5",
+          "profile": "gui-1.21.4",
+          "size": 64
+        },
+        "entries": [
+          {
+            "id": "minecraft:stone",
+            "kind": "block",
+            "status": "success",
+            "path": "assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "sourceSha256": null,
+            "auxiliary": {},
+            "code": null,
+            "message": null
+          }
+        ]
+      },
+      "out/first/java/1.21.4/icons/manifest.json": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "complete": true,
+        "counts": {
+          "failed": 0,
+          "noItemForm": 76,
+          "succeeded": 1
+        },
+        "settings": {
+          "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "context": "canonical-v1",
+          "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+          "javaMajor": 21,
+          "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+          "javaVersion": "21.0.12.1",
+          "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+          "metadataSha256": "b6f4dbe69e0f481bbaf8526ff456b06afa0a07a32c4c8bf2715d7755198522d5",
+          "profile": "gui-1.21.4",
+          "size": 64
+        },
+        "entries": [
+          {
+            "id": "minecraft:stone",
+            "kind": "block",
+            "status": "success",
+            "path": "assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "sourceSha256": null,
+            "auxiliary": {},
+            "code": null,
+            "message": null
+          }
+        ]
+      },
+      "out/1.13/java/1.13/icons/manifest.json": {
+        "version": "1.13",
+        "mode": "icons",
+        "complete": true,
+        "counts": {
+          "failed": 0,
+          "noItemForm": 46,
+          "succeeded": 1
+        },
+        "settings": {
+          "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "context": "canonical-v1",
+          "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+          "javaMajor": 8,
+          "javaSelectionSha256": "7808b733786ca895a3fdafbf97cba0335ed9521d9499af2bfaacd7f6ee1a9b17",
+          "javaVersion": "1.8.0_504",
+          "mappingsSha256": "7e15791525814102ee9733b178f79fd672ce6072f666a99b58c741a4c8035881",
+          "metadataSha256": "1116fb9184b9f49922759dbc7fd0b6022c4cc4e87096a25be128939cd9764eaa",
+          "profile": "legacy-1.13",
+          "size": 64
+        },
+        "entries": [
+          {
+            "id": "minecraft:stone",
+            "kind": "block",
+            "status": "success",
+            "path": "assets/minecraft/textures/block/stone.png",
+            "sha256": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+            "sourceSha256": null,
+            "auxiliary": {},
+            "code": null,
+            "message": null
+          }
+        ]
+      },
+      "out/26.3/java/26.3/icons/manifest.json": {
+        "version": "26.3",
+        "mode": "icons",
+        "complete": true,
+        "counts": {
+          "failed": 0,
+          "noItemForm": 78,
+          "succeeded": 1
+        },
+        "settings": {
+          "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "context": "canonical-v1",
+          "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+          "javaMajor": 25,
+          "javaSelectionSha256": "df20268082e19d184f8b1d5e78d60dfed03b615cae7905790e88dd2558636c2f",
+          "javaVersion": "25.0.4.1",
+          "mappingsSha256": "named",
+          "metadataSha256": "ccd69400e508add415045ffa67cd4ffced8a4c53b6a1d166548bd5c85caa6211",
+          "profile": "gui-26.3",
+          "size": 64
+        },
+        "entries": [
+          {
+            "id": "minecraft:stone",
+            "kind": "block",
+            "status": "success",
+            "path": "assets/minecraft/textures/block/stone.png",
+            "sha256": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+            "sourceSha256": null,
+            "auxiliary": {},
+            "code": null,
+            "message": null
+          }
+        ]
+      },
+      "out/offline/java/1.21.4/icons/manifest.json": {
+        "version": "1.21.4",
+        "mode": "icons",
+        "complete": true,
+        "counts": {
+          "failed": 0,
+          "noItemForm": 76,
+          "succeeded": 1
+        },
+        "settings": {
+          "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "context": "canonical-v1",
+          "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+          "javaMajor": 21,
+          "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+          "javaVersion": "21.0.12.1",
+          "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+          "metadataSha256": "b6f4dbe69e0f481bbaf8526ff456b06afa0a07a32c4c8bf2715d7755198522d5",
+          "profile": "gui-1.21.4",
+          "size": 64
+        },
+        "entries": [
+          {
+            "id": "minecraft:stone",
+            "kind": "block",
+            "status": "success",
+            "path": "assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "sourceSha256": null,
+            "auxiliary": {},
+            "code": null,
+            "message": null
+          }
+        ]
+      }
+    },
+    "javaSelectionMatches": {
+      "1.13": true,
+      "1.21.4": true,
+      "26.3": true
+    }
+  },
+  "pixels": {
+    "status": "成功",
+    "baselines": [
+      {
+        "path": "qa/mac-render-acceptance-2026-11-04.json",
+        "lfBlobSha256": "290794f72d295d024b2694bfaba6e4ec457ee903778b109c3dd6625f6441f2b7"
+      },
+      {
+        "path": "qa/windows-render-acceptance-2026-11-04.json",
+        "lfBlobSha256": "1811f8a1f3d2a172f96ca6d315ca22c18427e5f4df213dcfd3d341a8c7dffb8b"
+      }
+    ],
+    "validation": "既存scripts/audit-export.py rgba_pngでCRC・RGBA8・64x64・可視画素を検証。全5枚のPNG SHA-256がMac/Windows既存受入と一致",
+    "pngCount": 5,
+    "matches": true,
+    "renders": [
+      {
+        "path": "out/reuse/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+        "version": "1.21.4",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "pngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "macExpected": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "windowsExpected": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "matchesMac": true,
+        "matchesWindows": true
+      },
+      {
+        "path": "out/first/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+        "version": "1.21.4",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "pngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "macExpected": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "windowsExpected": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "matchesMac": true,
+        "matchesWindows": true
+      },
+      {
+        "path": "out/1.13/java/1.13/icons/assets/minecraft/textures/block/stone.png",
+        "version": "1.13",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "pngSha256": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+        "macExpected": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+        "windowsExpected": "b32386991255ae7271020073f91009d5795a05830a340d68ebd05a6a341e46a7",
+        "matchesMac": true,
+        "matchesWindows": true
+      },
+      {
+        "path": "out/26.3/java/26.3/icons/assets/minecraft/textures/block/stone.png",
+        "version": "26.3",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "pngSha256": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+        "macExpected": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+        "windowsExpected": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+        "matchesMac": true,
+        "matchesWindows": true
+      },
+      {
+        "path": "out/offline/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+        "version": "1.21.4",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "pngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "macExpected": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "windowsExpected": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "matchesMac": true,
+        "matchesWindows": true
+      }
+    ]
+  },
+  "reuse": {
+    "online": {
+      "beforeFiles": 715,
+      "afterFiles": 715,
+      "added": [],
+      "removed": [],
+      "changed": [
+        {
+          "path": "cache/metadata/version_manifest_v2.json",
+          "fields": [
+            "mtimeNs"
+          ]
+        },
+        {
+          "path": "cache/metadata/version_manifest_v2.json.sha256",
+          "fields": [
+            "mtimeNs"
+          ]
+        }
+      ],
+      "allHashesAndSizesUnchanged": true,
+      "runtimeAndToolsUnchanged": true
+    },
+    "offline": {
+      "beforeFiles": 715,
+      "afterFiles": 715,
+      "added": [],
+      "removed": [],
+      "changed": [],
+      "allHashesAndSizesUnchanged": true,
+      "runtimeAndToolsUnchanged": true
+    },
+    "excludedFromInputComparison": "cache/worker-*（各起動で新規生成するworkerログ・agent.json・game/options.txt）。更新後のsnapshot全体はbuild証跡に保存"
+  },
+  "cleanup": {
+    "ownership": {
+      "registration": {
+        "schemaVersion": 2,
+        "hostBindingSha256": "4e7690afc505d6f512a2cac9aacd755e58250b02df66ff896cc64d85d59bafa3",
+        "bootSessionId": "6fcc3a75-5f1c-42d2-b724-6324c94e2408",
+        "root": "/Users/ryuman/tmp-mcicon-e2e-resume/home/Library/Application Support/MCIconGenerator",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "uid": 501,
+        "cachePath": "/private/tmp/mcicon-501-7921f566023d6f480a3b",
+        "instance": "v",
+        "generationOwner": "3f7681ed-79b7-4e3b-8a8b-eb4cb38453cb"
+      },
+      "vmIdentityMatches": true,
+      "uid": 501,
+      "birth": 1793927164.7454062,
+      "notInBeforeSnapshot": true,
+      "machineAndConfigurationHashesMatch": true,
+      "hostAgent": {
+        "pid": 77001,
+        "processStartedAt": "2026-11-06T01:10:14.836Z",
+        "bootSessionId": "6fcc3a75-5f1c-42d2-b724-6324c94e2408"
+      },
+      "leaseProcessesMatchBootstrapReceipts": true
+    },
+    "leasesBeforeRemoval": [
+      {
+        "schemaVersion": 1,
+        "jobId": "d197ad33-85ed-41d0-8bf6-7389c60a119a",
+        "ownerId": "bfaf2442-14e4-4ff6-b954-433db849ed94",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 76307,
+        "processStartedAt": "2026-11-06T01:09:03.965Z",
+        "createdAt": "2026-11-06T01:09:05.653308Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:24:04.502163Z"
+        },
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "schemaVersion": 1,
+        "jobId": "62ef088c-e5a7-4159-bbc0-c49560fdcb3c",
+        "ownerId": "88e4fd8d-d5c0-4709-91d3-d5b92621be56",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 75820,
+        "processStartedAt": "2026-11-06T01:08:20.839Z",
+        "createdAt": "2026-11-06T01:08:22.271858Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:23:21.131208Z"
+        },
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "schemaVersion": 1,
+        "jobId": "0c805ea7-6f55-4505-b925-3f40a4da9822",
+        "ownerId": "4f7d3987-5c98-41da-b7d9-2a2443fb20cc",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 74814,
+        "processStartedAt": "2026-11-06T01:04:32.751Z",
+        "createdAt": "2026-11-06T01:04:41.695654Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:19:33.370025Z"
+        },
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "schemaVersion": 1,
+        "jobId": "5adc7352-cd64-4ad0-ab6a-cefa8caeefac",
+        "ownerId": "dc2f9e33-8e94-40ba-af36-3aaf23387538",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 76974,
+        "processStartedAt": "2026-11-06T01:10:11.571Z",
+        "createdAt": "2026-11-06T01:10:13.254994Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:25:12.116103Z"
+        },
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "schemaVersion": 1,
+        "jobId": "8a8eb8d2-9823-45a1-bc99-c34c5d01e287",
+        "ownerId": "431a93d6-7c7a-4970-ab99-8553b45b7ca8",
+        "toolVersion": "1.1.0",
+        "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "runtimeId": "mcicon-1.1.0-macos-aarch64",
+        "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "hostId": "87d186e8-5158-47e1-8236-f58c2ba92f0b",
+        "pid": 75340,
+        "processStartedAt": "2026-11-06T01:07:36.640Z",
+        "createdAt": "2026-11-06T01:07:38.334591Z",
+        "requirements": {
+          "containerMemoryMiB": 3072,
+          "heapMemoryMiB": 2048,
+          "cpus": 4,
+          "preparationDeadline": "2026-11-06T01:22:37.195263Z"
+        },
+        "state": "released",
+        "resources": {}
+      }
+    ],
+    "commands": [
+      {
+        "args": [
+          "list",
+          "--json"
+        ],
+        "exit": 0,
+        "stdout": "{\"name\":\"v\",\"hostname\":\"lima-v\",\"status\":\"Stopped\",\"dir\":\"/private/tmp/mcicon-501-7921f566023d6f480a3b/l/v\",\"vmType\":\"vz\",\"arch\":\"aarch64\",\"cpus\":4,\"memory\":7516192768,\"disk\":25769803776,\"sshLocalPort\":52515,\"sshConfigFile\":\"/private/tmp/mcicon-501-7921f566023d6f480a3b/l/v/ssh.config\",\"config\":{\"minimumLimaVersion\":\"2.2.1\",\"vmType\":\"vz\",\"vmOpts\":{\"vz\":{\"rosetta\":{\"binfmt\":true,\"enabled\":true}}},\"os\":\"Linux\",\"arch\":\"aarch64\",\"images\":[{\"location\":\"/Users/ryuman/tmp-mcicon-e2e-resume/home/Library/Application Support/MCIconGenerator/runtimes/mcicon-1.1.0-macos-aarch64/2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101/mcicon-guest-1.1.0-macos-aarch64.qcow2\",\"arch\":\"aarch64\",\"digest\":\"sha256:1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55\"}],\"cpus\":4,\"memory\":\"7168MiB\",\"disk\":\"24GiB\",\"mounts\":[{\"location\":\"/Users/ryuman/tmp-mcicon-e2e-resume/home/Library/Application Support/MCIconGenerator/macos-staging/2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101\",\"mountPoint\":\"/mcicon/jobs\",\"writable\":true,\"sshfs\":{\"cache\":true,\"followSymlinks\":false,\"sftpDriver\":\"\"},\"9p\":{\"securityModel\":\"none\",\"protocolVersion\":\"9p2000.L\",\"msize\":\"128KiB\",\"cache\":\"mmap\"}},{\"location\":\"/Users/ryuman/tmp-mcicon-e2e-resume/home/Library/Application Support/MCIconGenerator/helpers/macos-aarch64/48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde/MCIconHelper.app/Contents/app/support/offline\",\"mountPoint\":\"/mcicon/offline\",\"writable\":false,\"sshfs\":{\"cache\":true,\"followSymlinks\":false,\"sftpDriver\":\"\"},\"9p\":{\"securityModel\":\"none\",\"protocolVersion\":\"9p2000.L\",\"msize\":\"128KiB\",\"cache\":\"fscache\"}},{\"location\":\"/Users/ryuman/tmp-mcicon-e2e-resume/home/Library/Application Support/MCIconGenerator/runtimes/mcicon-1.1.0-macos-aarch64/2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101\",\"mountPoint\":\"/mcicon/runtime\",\"writable\":false,\"sshfs\":{\"cache\":true,\"followSymlinks\":false,\"sftpDriver\":\"\"},\"9p\":{\"securityModel\":\"none\",\"protocolVersion\":\"9p2000.L\",\"msize\":\"128KiB\",\"cache\":\"fscache\"}}],\"mountType\":\"virtiofs\",\"mountInotify\":false,\"ssh\":{\"localPort\":0,\"loadDotSSHPubKeys\":false,\"forwardAgent\":false,\"forwardX11\":false,\"forwardX11Trusted\":false},\"firmware\":{\"legacyBIOS\":false},\"audio\":{\"device\":\"\",\"interface\":\"\"},\"video\":{\"display\":\"none\"},\"provision\":[{\"mode\":\"dependency\",\"skipDefaultDependencyResolution\":true,\"script\":\"#!/bin/sh\\nexit 0\\n\"},{\"mode\":\"system\",\"script\":\"#!/bin/sh\\nset -eu\\nexport DEBIAN_FRONTEND=noninteractive\\nmkdir -p /etc/docker\\ncat > /etc/docker/daemon.json <<'MCICON_DAEMON'\\n{\\\"labels\\\":[\\\"io.github.rs0325.mcicon.generation=3f7681ed-79b7-4e3b-8a8b-eb4cb38453cb\\\"]}\\nMCICON_DAEMON\\ncat > /var/lib/mcicon-owner.json <<'MCICON_OWNER'\\n{\\\"schemaVersion\\\":1,\\\"generationOwner\\\":\\\"3f7681ed-79b7-4e3b-8a8b-eb4cb38453cb\\\",\\\"descriptorSha256\\\":\\\"2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101\\\"}\\nMCICON_OWNER\\ndpkg -i /mcicon/offline/debs/runc.deb /mcicon/offline/debs/containerd.deb /mcicon/offline/debs/docker.io.deb\\nsystemctl enable --now containerd docker\\n\"}],\"upgradePackages\":false,\"containerd\":{\"system\":false,\"user\":false,\"archives\":[{\"location\":\"https://github.com/containerd/nerdctl/releases/download/v2.4.1/nerdctl-full-2.4.1-linux-amd64.tar.gz\",\"arch\":\"x86_64\",\"digest\":\"sha256:ff018f11ac2f1354bf7b3aaaca6e0b52d81139c746a89134744d0b7be3a0e62f\"},{\"location\":\"https://github.com/containerd/nerdctl/releases/download/v2.4.1/nerdctl-full-2.4.1-linux-arm64.tar.gz\",\"arch\":\"aarch64\",\"digest\":\"sha256:2deffe14625f93866f90a8f265d0f59d6fa476c7dc54b98adb327b1b4613efd4\"}]},\"guestInstallPrefix\":\"/usr/local\",\"probes\":[{\"mode\":\"readiness\",\"description\":\"user probe 1/1\",\"script\":\"#!/bin/sh\\nset -eu\\nsudo docker info >/dev/null\\n\"}],\"portForwards\":[{\"guestIPMustBeZero\":false,\"guestIP\":\"127.0.0.1\",\"guestPortRange\":[1,65535],\"guestSocket\":\"/var/run/docker.sock\",\"hostIP\":\"127.0.0.1\",\"hostPortRange\":[0,0],\"hostSocket\":\"/private/tmp/mcicon-501-7921f566023d6f480a3b/l/v/sock/docker.sock\",\"proto\":\"any\"}],\"hostResolver\":{\"enabled\":true,\"ipv6\":false},\"propagateProxyEnv\":false,\"caCerts\":{\"removeDefaults\":false},\"plain\":false,\"timezone\":\"Asia/Tokyo\",\"nestedVirtualization\":false,\"user\":{\"name\":\"ryuman\",\"comment\":\"ryuman_sugimoto\",\"home\":\"/home/ryuman.guest\",\"shell\":\"/bin/bash\",\"uid\":501,\"passwordlessSudo\":true},\"tpm\":false},\"sshAddress\":\"127.0.0.1\",\"protected\":false,\"limaVersion\":\"v2.2.1\",\"HostOS\":\"darwin\",\"HostArch\":\"aarch64\",\"LimaHome\":\"/private/tmp/mcicon-501-7921f566023d6f480a3b/l\",\"IdentityFile\":\"/private/tmp/mcicon-501-7921f566023d6f480a3b/l/_config/user\"}\n",
+        "stderr": "",
+        "seconds": 0.02530154201667756
+      },
+      {
+        "args": [
+          "delete",
+          "v"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": "time=\"2026-11-06T10:12:12+09:00\" level=info msg=\"The vz driver process seems already stopped\"\ntime=\"2026-11-06T10:12:12+09:00\" level=info msg=\"The host agent process seems already stopped\"\ntime=\"2026-11-06T10:12:12+09:00\" level=info msg=\"Removing *.pid *.sock *.tmp under `/private/tmp/mcicon-501-7921f566023d6f480a3b/l/v`\"\ntime=\"2026-11-06T10:12:12+09:00\" level=info msg=\"Removing `/private/tmp/mcicon-501-7921f566023d6f480a3b/l/v/boot-session.tmp`\"\ntime=\"2026-11-06T10:12:12+09:00\" level=info msg=\"Deleted `v` (`/private/tmp/mcicon-501-7921f566023d6f480a3b/l/v`)\"\n",
+        "seconds": 0.08558045898098499
+      },
+      {
+        "args": [
+          "list",
+          "--json"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": "time=\"2026-11-06T10:12:12+09:00\" level=warning msg=\"No instance found. Run `limactl create` to create an instance.\"\n",
+        "seconds": 0.013585833017714322
+      }
+    ],
+    "normalReleaseStoppedVm": true,
+    "ownedProcessesBeforeRemoval": [],
+    "anchorRemoved": true,
+    "remainingAnchors": [
+      {
+        "path": "/private/tmp/mcicon-verify-135-main",
+        "uid": 501,
+        "birth": 1793600979.6526654
+      },
+      {
+        "path": "/private/tmp/mcicon-verify-130",
+        "uid": 501,
+        "birth": 1793551841.3631163
+      },
+      {
+        "path": "/private/tmp/mcicon-copy-dist.err",
+        "uid": 501,
+        "birth": 1793716339.0497963
+      },
+      {
+        "path": "/private/tmp/mcicon-copy.out",
+        "uid": 501,
+        "birth": 1793716302.4268985
+      },
+      {
+        "path": "/private/tmp/mcicon-copy.err",
+        "uid": 501,
+        "birth": 1793716302.4270375
+      },
+      {
+        "path": "/private/tmp/mcicon-h-root-api-comparison-20261028-v1",
+        "uid": 501,
+        "birth": 1793172495.7794428
+      },
+      {
+        "path": "/private/tmp/mcicon-copy-dist.out",
+        "uid": 501,
+        "birth": 1793716339.0496519
+      },
+      {
+        "path": "/private/tmp/mcicon-launcher.out",
+        "uid": 501,
+        "birth": 1793716301.2401195
+      },
+      {
+        "path": "/private/tmp/mcicon-verify-135",
+        "uid": 501,
+        "birth": 1793600925.056077
+      },
+      {
+        "path": "/private/tmp/mcicon-verify-132",
+        "uid": 501,
+        "birth": 1793530381.8828452
+      },
+      {
+        "path": "/private/tmp/mcicon-dist.err",
+        "uid": 501,
+        "birth": 1793716338.212815
+      },
+      {
+        "path": "/private/tmp/mcicon-dist.out",
+        "uid": 501,
+        "birth": 1793716338.2127085
+      },
+      {
+        "path": "/private/tmp/mcicon-launcher.err",
+        "uid": 501,
+        "birth": 1793716301.2403855
+      }
+    ],
+    "existingAnchorsUnchanged": true,
+    "after": {
+      "paths": {
+        "/Users/ryuman/.lima": false,
+        "/Users/ryuman/Library/Application Support/MCIconBootstrap": false,
+        "/Users/ryuman/Library/Application Support/MCIconGenerator": false,
+        "/Library/Apple/usr/share/rosetta": true,
+        "/Library/Apple/usr/libexec/oah/libRosettaRuntime": true
+      },
+      "virtualization": [
+        " 1262 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent",
+        " 1604 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent"
+      ],
+      "anchors": [
+        {
+          "path": "/private/tmp/mcicon-verify-135-main",
+          "uid": 501,
+          "birth": 1793600979.6526654
+        },
+        {
+          "path": "/private/tmp/mcicon-verify-130",
+          "uid": 501,
+          "birth": 1793551841.3631163
+        },
+        {
+          "path": "/private/tmp/mcicon-copy-dist.err",
+          "uid": 501,
+          "birth": 1793716339.0497963
+        },
+        {
+          "path": "/private/tmp/mcicon-copy.out",
+          "uid": 501,
+          "birth": 1793716302.4268985
+        },
+        {
+          "path": "/private/tmp/mcicon-copy.err",
+          "uid": 501,
+          "birth": 1793716302.4270375
+        },
+        {
+          "path": "/private/tmp/mcicon-h-root-api-comparison-20261028-v1",
+          "uid": 501,
+          "birth": 1793172495.7794428
+        },
+        {
+          "path": "/private/tmp/mcicon-copy-dist.out",
+          "uid": 501,
+          "birth": 1793716339.0496519
+        },
+        {
+          "path": "/private/tmp/mcicon-launcher.out",
+          "uid": 501,
+          "birth": 1793716301.2401195
+        },
+        {
+          "path": "/private/tmp/mcicon-verify-135",
+          "uid": 501,
+          "birth": 1793600925.056077
+        },
+        {
+          "path": "/private/tmp/mcicon-verify-132",
+          "uid": 501,
+          "birth": 1793530381.8828452
+        },
+        {
+          "path": "/private/tmp/mcicon-dist.err",
+          "uid": 501,
+          "birth": 1793716338.212815
+        },
+        {
+          "path": "/private/tmp/mcicon-dist.out",
+          "uid": 501,
+          "birth": 1793716338.2127085
+        },
+        {
+          "path": "/private/tmp/mcicon-launcher.err",
+          "uid": 501,
+          "birth": 1793716301.2403855
+        }
+      ]
+    },
+    "pathStatesUnchanged": true,
+    "virtualizationProcessesUnchanged": true,
+    "dedicatedRootRemoved": true,
+    "root": "/Users/ryuman/tmp-mcicon-e2e-resume",
+    "evidenceSha256BeforeRemoval": "433acda59ff6fbb9ddddfd5dcb9e3c4c15f52eaeddc1f8a0ee1efe45fb980463"
+  },
+  "osWarnings": {
+    "bootstrapXattrBefore": "",
+    "bootstrapXattrAfter": "",
+    "helperAttributes": [
+      {
+        "path": "home/Library/Application Support/MCIconGenerator/helpers/macos-aarch64/48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde/MCIconHelper.app",
+        "stdout": ""
+      }
+    ],
+    "promptLines": [],
+    "osLogExit": 0,
+    "observed": "Mac curl/Python展開/正規bootstrap-helper起動ではブロック・promptなし。GUI目視は未実施"
+  },
+  "unverified": [
+    "全51版・全登録アイテム",
+    "実host reboot・未準備host setup・Intel Mac・他macOS",
+    "ブラウザ/Finder取得経路・GUI目視・Developer ID/notarization",
+    "物理的network切断・packet単位の無通信確認",
+    "自動更新の取得・適用（今回は無効設定）"
+  ],
+  "failures": [],
+  "previousAttempt": {
+    "schemaVersion": 1,
+    "taskId": "milestone-e2e-macos",
+    "host": "macos",
+    "date": "2026-11-05",
+    "refs": [
+      "#94",
+      "#95",
+      "#98",
+      "#99"
+    ],
+    "baseCommit": "d33583fcae09b513e18352dc238bf30533fc41b3",
+    "branch": "feature/e2e-macos",
+    "worktree": "H:\\MCIconGenerator\\worktrees\\milestone-e2e-macos\\MCIconGenerator",
+    "status": "未検証（管理helperの固定一時領域が指定範囲外のため停止）",
+    "acceptancePassed": false,
+    "scope": {
+      "version": "1.1.0",
+      "sources": "GitHub Release v1.1.0とMaven Central 1.1.0のみ。リポジトリbuild出力・ローカル候補は未使用",
+      "minecraftVersion": "1.21.4",
+      "id": "minecraft:stone",
+      "kind": "block",
+      "size": 64,
+      "otherVersions": "1.13系・26.3は隔離制約を確認したため未着手"
+    },
+    "environment": {
+      "os": "macOS-15.8.1-arm64-arm-64bit",
+      "arch": "arm64",
+      "python": "/opt/homebrew/bin/python3.12",
+      "before": {
+        "paths": {
+          "/Users/ryuman/.lima": false,
+          "/Users/ryuman/Library/Application Support/MCIconBootstrap": false,
+          "/Users/ryuman/Library/Application Support/MCIconGenerator": false,
+          "/Library/Apple/usr/share/rosetta": true,
+          "/Library/Apple/usr/libexec/oah/libRosettaRuntime": true
+        },
+        "virtualization": [
+          " 1262 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent",
+          " 1604 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent"
+        ],
+        "os": "macOS-15.8.1-arm64-arm-64bit",
+        "arch": "arm64",
+        "freeBytes": 145281732608
+      }
+    },
+    "isolation": {
+      "root": "/Users/ryuman/tmp-mcicon-e2e",
+      "environment": {
+        "HOME": "/Users/ryuman/tmp-mcicon-e2e/home",
+        "TMPDIR": "/Users/ryuman/tmp-mcicon-e2e/tmp/",
+        "TMP": "/Users/ryuman/tmp-mcicon-e2e/tmp",
+        "TEMP": "/Users/ryuman/tmp-mcicon-e2e/tmp",
+        "LIMA_HOME": "/Users/ryuman/tmp-mcicon-e2e/lima",
+        "JAVA_TOOL_OPTIONS": "-Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true"
+      },
+      "cache": "/Users/ryuman/tmp-mcicon-e2e/cache",
+      "satisfied": false,
+      "cause": "Mac helperのCacheStateは環境のLIMA_HOMEを使わず/private/tmp/mcicon-<uid>-<token>を生成する。起動前の実装確認不足で、停止時には専用VMが作成済みだった",
+      "implementation": [
+        "helpers/macos/src/main/java/io/github/rs0325/mcicon/helper/macos/CacheState.java",
+        "helpers/macos/src/main/java/io/github/rs0325/mcicon/helper/macos/MacRuntime.java"
+      ],
+      "actualAnchor": "/private/tmp/mcicon-501-19e7914bb2e42013b9ec",
+      "actualLimaHome": "/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l",
+      "restartCondition": "公開物が専用配下へ隔離可能になること、または固定一時領域の利用範囲が明示されること。再実行には新規空領域を使う"
+    },
+    "acquisition": {
+      "bootstrap": {
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-bootstrap-1.1.0-macos-aarch64.tar.gz",
+        "transport": "Macの/usr/bin/curl -fL",
+        "bytes": 67505927,
+        "sha256": "7cbf377d7ed65319d653ad4ab748bc7c1b74b248cd397e6aeb09c65b310a821c",
+        "elapsedSeconds": null,
+        "timingNote": "取得後の属性計測がPythonの未提供APIで失敗し、curl所要時間は未回収。属性はxattrコマンドで再測定"
+      },
+      "runtimeArtifacts": [
+        {
+          "id": "mcicon-helper-1.1.0-macos-aarch64",
+          "role": "host-helper",
+          "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-macos-aarch64.zip",
+          "bytes": 125853859,
+          "sha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde",
+          "actualBytes": 125853859,
+          "actualSha256": "48ddab0fa68844a269e4ac0982cbffbfa2d67806207efdeb187c0900d05efbde",
+          "matchesDescriptor": true
+        },
+        {
+          "id": "mcicon-guest-1.1.0-macos-aarch64",
+          "role": "guest-base",
+          "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-macos-aarch64.qcow2",
+          "bytes": 620224512,
+          "sha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+          "actualBytes": 620224512,
+          "actualSha256": "1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55",
+          "matchesDescriptor": true
+        },
+        {
+          "id": "mcicon-renderer-1.1.0-linux-amd64",
+          "role": "renderer-image",
+          "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+          "bytes": 593385993,
+          "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+          "actualBytes": 593385993,
+          "actualSha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+          "matchesDescriptor": true
+        }
+      ],
+      "runtimeArtifactBytes": 1339464364,
+      "central": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.jar",
+          "exit": 0,
+          "stdout": "200 427817 0.158530",
+          "elapsedSeconds": 0.18056845804676414,
+          "bytes": 427817,
+          "sha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+          "seedJarSha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+          "matchesSeed": true,
+          "seedJarPath": "home/Library/Application Support/MCIconBootstrap/tools/1.1.0/c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d/app/lib/core-1.1.0.jar"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.jar",
+          "exit": 0,
+          "stdout": "200 489342 0.116671",
+          "elapsedSeconds": 0.1333892080001533,
+          "bytes": 489342,
+          "sha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+          "seedJarSha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+          "matchesSeed": true,
+          "seedJarPath": "home/Library/Application Support/MCIconBootstrap/tools/1.1.0/c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d/app/lib/worker-1.1.0.jar"
+        }
+      ],
+      "countedPublicArtifactBytes": 1407887450,
+      "byteCountScope": "bootstrap・管理artifact 3件・Central JAR 2件の実file bytes合計。署名/manifest/更新確認/Minecraft metadata/通信overheadを含む全通信量ではない。Mac上の展開済み複製は加算しない",
+      "minecraft": "製品が版manifestを正規経路で取得した。対象版の資産準備完了は未確認"
+    },
+    "checks": [
+      {
+        "id": 1,
+        "name": "空cacheから初回管理描画",
+        "status": "中断・未検証",
+        "details": "署名seed初期設置と版表示は成功。管理artifact 3件の実size/SHA-256はdescriptorに一致。世代設置とVZ専用VMのready記録まで到達。指定外固定cacheの判明によりCLIへSIGTERMを送りexit 143。PNGなし"
+      },
+      {
+        "id": 2,
+        "name": "2回目以降の再利用・再取得なし",
+        "status": "部分確認",
+        "details": "--version再実行exit 0。tools/archives/manifests全通常fileのpath・size・mtimeNs・SHA-256は不変。通信全体は監査していない。管理描画の再利用は未検証"
+      },
+      {
+        "id": 3,
+        "name": "offlineで既存版を継続",
+        "status": "部分確認",
+        "details": "versions --offlineはexit 0で51版を返した。OSのnetwork設定は変更していない。既存版のoffline描画継続は未検証"
+      },
+      {
+        "id": 4,
+        "name": "自動更新無効設定",
+        "status": "成功",
+        "details": "--bootstrap-auto-update falseはexit 0。config.jsonはschemaVersion 1 / autoUpdate false。以後のonline managed起動で更新準備を抑止する実測は未検証"
+      },
+      {
+        "id": 5,
+        "name": "所有物の回収・削除",
+        "status": "回収成功・製品releaseは未検証",
+        "details": "SIGTERM後もleaseはactive/readyでVMがRunningだった。登録/owner marker/vm identity/leaseを照合し、同梱Limaの通常stop/deleteで今回VMだけ回収。空一覧・関連processなしを確認して専用anchorと作業領域を削除"
+      },
+      {
+        "id": 6,
+        "name": "署名なし配布の初回OS警告・ブロック",
+        "status": "指定取得経路で観測なし",
+        "details": "Mac curl取得・Python tarfile展開後と起動後のbootstrap/helperのxattr出力は空。正式bootstrapとhelperは起動し、syspolicydログにprompt記録なし。GUI目視・ブラウザ/Finder経路・別OS/hostは未検証。OS保護設定・属性を変更していない"
+      }
+    ],
+    "execution": {
+      "initialVersion": {
+        "exit": 0,
+        "stdout": "MCIconGenerator 1.1.0\n",
+        "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\nBootstrap 1.1.0 (owner: archive)\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\n",
+        "elapsedSeconds": 3.245124249951914
+      },
+      "firstRender": {
+        "exit": 143,
+        "elapsedSeconds": 106.99054158304352,
+        "args": [
+          "/Users/ryuman/tmp-mcicon-e2e/package/MCIconBootstrap.app/Contents/MacOS/MCIconBootstrap",
+          "--debug",
+          "render",
+          "--version",
+          "1.21.4",
+          "--kind",
+          "block",
+          "--id",
+          "minecraft:stone",
+          "--size",
+          "64",
+          "--out",
+          "/Users/ryuman/tmp-mcicon-e2e/out/first",
+          "--cache",
+          "/Users/ryuman/tmp-mcicon-e2e/cache",
+          "--json"
+        ]
+      },
+      "firstRenderStderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\nUPDATE_PREPARING: 裏で準備し、次の適格な起動から適用します\nprepare 1.21.4 0/1\n",
+      "independent": [
+        {
+          "name": "reuse-version",
+          "args": [
+            "--version"
+          ],
+          "exit": 0,
+          "stdout": "MCIconGenerator 1.1.0\n",
+          "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\nBootstrap 1.1.0 (owner: archive)\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\n",
+          "elapsedSeconds": 0.9349627919727936
+        },
+        {
+          "name": "disable-auto-update",
+          "args": [
+            "--bootstrap-auto-update",
+            "false"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\n",
+          "elapsedSeconds": 0.1492995829321444
+        },
+        {
+          "name": "offline-versions",
+          "args": [
+            "versions",
+            "--offline",
+            "--cache",
+            "/Users/ryuman/tmp-mcicon-e2e/cache",
+            "--json"
+          ],
+          "exit": 0,
+          "stdout": "omitted; 51-version JSON stored only during execution",
+          "stderr": "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\nPicked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\n",
+          "elapsedSeconds": 1.4968458329094574,
+          "returnedVersions": 51
+        }
+      ],
+      "config": {
+        "schemaVersion": 1,
+        "autoUpdate": false
+      },
+      "toolFilesUnchanged": true,
+      "activeSlot": {
+        "toolVersion": "1.1.0",
+        "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+        "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+      },
+      "vmMemoryMiB": 7168,
+      "managedJob": {
+        "id": "381562de-6cbc-4279-bbb8-6cb147c9f778",
+        "stateAfterTerm": "active",
+        "resourcesAfterTerm": {
+          "macos": {
+            "phase": "ready",
+            "generationOwner": "5bdd54dd-5d9e-4654-ae0a-ce61b5c79a25",
+            "instanceDir": "/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l/v",
+            "machineIdSha256": "91dc6f1de061cdc391364cfe304ac1206664d53ec618b7a1b997bddb9ac1de76",
+            "forwardConfigSha256": "12a46d74c42a4e43fd23f3697a84e7792abd5f85bda5d4a738a05e703b029890",
+            "guestOwnerMarkerSha256": "4a99fb4de93643847e8446a26aece999f88d13b2ad80e8c6e435abd414b94b7b",
+            "containers": [],
+            "hostAgent": {
+              "pid": 58636,
+              "processStartedAt": "2026-11-05T08:51:10.285Z",
+              "bootSessionId": "6fcc3a75-5f1c-42d2-b724-6324c94e2408"
+            },
+            "dockerSocket": {
+              "path": "/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l/v/sock/docker.sock",
+              "dev": 16777229,
+              "ino": 34272516,
+              "uid": 501
+            }
+          }
+        }
+      },
+      "backgroundUpdate": {
+        "result": "未適用",
+        "details": "準備receiptはfinished/exit 1。UPDATE_NOT_APPLIED: 旧sequence/同版以下の暗黙更新を拒否しました。更新成功の証拠ではない",
+        "logs": [
+          "Picked up JAVA_TOOL_OPTIONS: -Duser.home=/Users/ryuman/tmp-mcicon-e2e/home -Djava.io.tmpdir=/Users/ryuman/tmp-mcicon-e2e/tmp -Djava.awt.headless=true\nUPDATE_NOT_APPLIED: 旧sequence/同版以下の暗黙更新を拒否しました\n"
+        ]
+      }
+    },
+    "pixels": {
+      "status": "未検証",
+      "baseline": "qa/mac-render-acceptance-2026-11-04.json",
+      "baselineLfBlobSha256": "290794f72d295d024b2694bfaba6e4ec457ee903778b109c3dd6625f6441f2b7",
+      "version": "1.21.4",
+      "expectedPngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+      "actualPngSha256": null,
+      "matches": null,
+      "pngCount": 0
+    },
+    "osProtection": {
+      "bootstrapXattrs": "",
+      "helperXattrs": "",
+      "syspolicydLog": "Timestamp               Ty Process[PID:TID]\n2026-11-05 17:49:28.048 Df syspolicyd[690:421ef89] [com.apple.syspolicy.exec:default] GK evaluateScanResult: 2, PST: (path: 62dd6778a63ae903), (team: (null)), (id: io.github.rs0325.mcicon.bootstrap), (bundle_id: io.github.rs0325.mcicon.bootstrap), 0, 0, 1, 0, 0, 0, 0\n2026-11-05 17:50:03.827 Df syspolicyd[690:421ef8c] [com.apple.syspolicy.exec:default] GK evaluateScanResult: 2, PST: (path: 918e571175fa8069), (team: (null)), (id: io.github.rs0325.mcicon.helper.macos), (bundle_id: io.github.rs0325.mcicon.helper.macos), 0, 0, 1, 0, 0, 0, 0\n",
+      "guiObserved": false,
+      "guiOperations": false,
+      "protectionBypass": false
+    },
+    "cleanup": {
+      "commands": [
+        {
+          "args": [
+            "list",
+            "--json"
+          ],
+          "exit": 0,
+          "elapsedSeconds": 0.025224167038686574,
+          "instances": [
+            {
+              "name": "v",
+              "status": "Running",
+              "dir": "/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l/v",
+              "vmType": "vz",
+              "arch": "aarch64",
+              "cpus": 4,
+              "memory": 7516192768,
+              "disk": 25769803776
+            }
+          ]
+        },
+        {
+          "args": [
+            "stop",
+            "v"
+          ],
+          "exit": 0,
+          "elapsedSeconds": 1.0505025410093367,
+          "stdout": "",
+          "stderr": "time=\"2026-11-05T17:52:23+09:00\" level=info msg=\"Sending SIGINT to hostagent process 58636\"\ntime=\"2026-11-05T17:52:23+09:00\" level=info msg=\"Waiting for the host agent and the driver processes to shut down\"\ntime=\"2026-11-05T17:52:23+09:00\" level=info msg=\"[hostagent] Received SIGINT, shutting down the host agent\"\ntime=\"2026-11-05T17:52:23+09:00\" level=info msg=\"[hostagent] Shutting down the host agent\"\ntime=\"2026-11-05T17:52:23+09:00\" level=info msg=\"[hostagent] Stopping forwarding `/var/run/docker.sock` (guest) to `/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l/v/sock/docker.sock` (host)\"\ntime=\"2026-11-05T17:52:23+09:00\" level=info msg=\"[hostagent] Shutting down VZ\"\ntime=\"2026-11-05T17:52:23+09:00\" level=info msg=\"[hostagent] [VZ] - vm state change: stopped\"\ntime=\"2026-11-05T17:52:23+09:00\" level=error msg=\"[hostagent] accept tcp 127.0.0.1:49381: use of closed network connection\"\ntime=\"2026-11-05T17:52:23+09:00\" level=info msg=\"Waiting for the instance to shut down\"\ntime=\"2026-11-05T17:52:24+09:00\" level=info msg=\"The instance v has shut down\"\n"
+        },
+        {
+          "args": [
+            "list",
+            "--json"
+          ],
+          "exit": 0,
+          "elapsedSeconds": 0.044019625056535006,
+          "instances": [
+            {
+              "name": "v",
+              "status": "Stopped",
+              "dir": "/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l/v",
+              "vmType": "vz",
+              "arch": "aarch64",
+              "cpus": 4,
+              "memory": 7516192768,
+              "disk": 25769803776
+            }
+          ]
+        },
+        {
+          "args": [
+            "delete",
+            "v"
+          ],
+          "exit": 0,
+          "elapsedSeconds": 0.06373670895118266,
+          "stdout": "",
+          "stderr": "time=\"2026-11-05T17:52:24+09:00\" level=info msg=\"The vz driver process seems already stopped\"\ntime=\"2026-11-05T17:52:24+09:00\" level=info msg=\"The host agent process seems already stopped\"\ntime=\"2026-11-05T17:52:24+09:00\" level=info msg=\"Removing *.pid *.sock *.tmp under `/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l/v`\"\ntime=\"2026-11-05T17:52:24+09:00\" level=info msg=\"Removing `/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l/v/boot-session.tmp`\"\ntime=\"2026-11-05T17:52:24+09:00\" level=info msg=\"Deleted `v` (`/private/tmp/mcicon-501-19e7914bb2e42013b9ec/l/v`)\"\n"
+        },
+        {
+          "args": [
+            "list",
+            "--json"
+          ],
+          "exit": 0,
+          "elapsedSeconds": 0.014928000047802925,
+          "instances": []
+        }
+      ],
+      "generationOwner": "5bdd54dd-5d9e-4654-ae0a-ce61b5c79a25",
+      "ownershipProof": "管理rootの登録、anchor owner.json、vm.json.identityは一致。leaseのgenerationOwnerとinstanceDirも一致",
+      "after": {
+        "paths": {
+          "/Users/ryuman/.lima": false,
+          "/Users/ryuman/Library/Application Support/MCIconBootstrap": false,
+          "/Users/ryuman/Library/Application Support/MCIconGenerator": false,
+          "/Library/Apple/usr/share/rosetta": true,
+          "/Library/Apple/usr/libexec/oah/libRosettaRuntime": true
+        },
+        "virtualization": [
+          " 1262 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent",
+          " 1604 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent"
+        ],
+        "freeBytes": 145122144256
+      },
+      "pathStatesUnchanged": true,
+      "virtualizationProcessesUnchanged": true,
+      "ownedProcessesBeforeRemoval": [],
+      "dedicatedRootRemoved": true,
+      "productAnchorRemoved": true,
+      "limitations": [
+        "既存状態の同一性は列挙したパスの存在と仮想化候補PID/実行fileに限定する。OS全体の不変・未読取は証明しない",
+        "固定/private/tmp anchorは起動前の直接snapshotなし。今回の登録・owner markerで所有を確認した",
+        "disk空き容量は変動しており同一性の判定から除外した"
+      ]
+    },
+    "unverified": [
+      "代表描画とPNG一致",
+      "管理環境の2回目再利用・再取得なし",
+      "offlineでの既存版描画",
+      "自動更新無効化後のonline managed描画",
+      "通常終了時の製品releaseによる回収",
+      "1.13系・26.3の描画",
+      "Centralを独立依存解決したconsumerによる描画。取得JARとseed JARのhash一致のみ確認",
+      "GUI目視とブラウザ/Finder取得経路のOS警告"
+    ],
+    "publication": {
+      "commit": false,
+      "push": false,
+      "prCreated": false,
+      "releaseOrCentralWrite": false,
+      "issueOperations": false
+    }
+  },
+  "evidence": {
+    "resume": "build/e2e-macos-resume-evidence.json",
+    "resumeSha256": "433acda59ff6fbb9ddddfd5dcb9e3c4c15f52eaeddc1f8a0ee1efe45fb980463",
+    "cleanup": "build/e2e-macos-resume-cleanup.json",
+    "cleanupSha256": "6c946d9c257d2b7a97b4b60d17c182e46005913ab26bbfb1adb40ab0ac55d5ee",
+    "contents": "JSON測定値・公開物hash・lease/receipt・選別manifestのみ。Minecraft資産・PNG・JAR・VM内部・鍵は保管しない"
+  },
+  "validation": {
+    "pngAuditPassed": true,
+    "allFiveRenderExitsZero": true,
+    "runtimeArtifactHashesMatch": true,
+    "existingStateUnchanged": true,
+    "gitDiffCheck": "成功",
+    "leaseProcessIdentityMatchesBootstrapReceipt": true,
+    "allReceiptsFinishedCommandsExitZero": true,
+    "javaSelectionPassed": true
+  },
+  "publication": {
+    "commit": false,
+    "push": false,
+    "pr": false,
+    "issueOperations": false,
+    "reason": "ユーザー指示で禁止",
+    "prepared": [
+      "build/commit-message.txt",
+      "build/pr-title.txt",
+      "build/pr-body.md"
+    ]
+  }
+}
