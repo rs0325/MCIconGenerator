@@ -1,6 +1,6 @@
 # Windows managed helper（Issue #95）
 
-Java 21の自己完結app-imageと同梱native Job入口から、検証済みprepared rootfsの専用WSL 2だけを利用する。hostのJava/Python/Docker Desktop/PATHに依存しない。ビルド用Python/LLVM-MinGW/JDKとguest内Pythonは別の依存であり、利用時のhost導入・apt・OS機能有効化・昇格・再起動は行わない。現時点では本番descriptor/trust/rootfsを発行していない。
+Java 21の自己完結app-imageと同梱native Job入口から、検証済みprepared rootfsの専用WSL 2だけを利用する。hostのJava/Python/Docker Desktop/PATHに依存しない。ビルド用Python/LLVM-MinGW/JDKとguest内Pythonは別の依存であり、利用時のhost導入・apt・OS機能有効化・昇格・再起動は行わない。公開v1.1.0で判明した中断後の回復失敗に対する修正候補と検証範囲は下記に記載する。
 
 ## 所有と回復
 
@@ -18,9 +18,23 @@ guestの`init`/`hello`はowner・bridge/engine pinの照合後、同じlifecycle
 
 停止receiptの`lastStop.boot`はhost bootであり、guest kernel bootとは別である。通常keep/helloはreceiptを消費しない。prepareはjob journal→generation lockを取得し、fresh ownerとready keeperを照合して`daemon-prepare`意図を保存する。ownerの`restartClaim`は`stop`（停止ID/host boot、初回はnull）、job/owner/descriptorの`identity`、`keeperAttempt`を固定する。他attemptの未確定claimはlock解放やhelper死亡だけでは奪わない。
 
-専用`daemon-prepare`はlifecycle→job fence lock内でmarker/pin、稼働keeper本人とattempt、開いたfenceを確認する。guestの`daemon-prepare.json`へpendingをspawn前に保存し、daemonのgeneration/guest boot/PID/startとDocker labelを確認したready証明を保存してACKする。同じclaimの再要求は保存済みready本人の照合だけを許し、pendingや失効本人から再spawnしない。新しい停止IDはhostで肯定した新停止の証明を前提とする。初回生成・guest boot変更もこの専用操作内に限り許可し、一般要求の`restartAllowed`は常にfalse、通常/recovery releaseもdaemonを生成しない。
+専用`daemon-prepare`はlifecycle→job fence lock内でmarker/pin、稼働keeper本人とattempt、開いたfenceを確認する。guestの`daemon-prepare.json`へpendingをspawn前に保存し、daemonのgeneration/guest boot/PID/startとDocker labelを確認したready証明を保存してACKする。同じclaimの再要求は保存済みready本人の照合だけを許し、pendingや失効本人から再spawnしない。新しい停止IDはhostで肯定した新停止の証明を前提とする。初回生成・guest boot変更も専用準備操作内に限り許可し、一般要求のrestartAllowedは常にfalse、通常releaseと停止証明のない回復releaseはdaemonを生成しない。
 
 hostはACKのmarker/pin/claimとdaemon本人の証明、およびbridgeのstate/done/completionと実終了値を照合し、owner全体の比較付き更新でreceipt/claimを除去して`preparedDaemon`へ証明を保存する。その後journalをsettledにし、ownerを再読込してload→CPU probeへ進む。消費後・settled前の中断は同じ保存証明とguestの本人照合でのみ再確定する。load/CPU失敗でreceiptは復活しない。host/guestの保存を跨ぐ原子的トランザクションではなく、曖昧なspawn/ACK/保存はpending/unknownとして保持する。
+
+### worker中断後の回復（2026-11-06修正候補）
+
+実worker起動後にWSL lifetime clientが失われると、専用distroのdaemonが消失しても共有kernelのboot IDは変わらない場合がある。旧経路はcontainer清算時に既存daemonを要求し、停止receiptがないためDAEMON_RESTART_DENIEDで回復できなかった。
+
+回復keeper開始前にlease資源と専用distroの所有を照合し、他leaseの停止禁止・unknownがない場合だけ旧native Jobの終端を確認して専用distroを停止する。稼働一覧からの不在とhost boot/SID/GUID/BasePathの再照合後に新しい停止receiptを保存する。他leaseが専用distroを使用中の場合は停止せず、既存の稼働daemonによる清算を維持する。
+
+停止証明付きkeep-recoverは、keeperのcgroupを作る前に既存の厳格なdelegation初期化を行い、keeper記録に停止receiptを結び付ける。閉じたfence向けのdaemon-recoverは、そのreceipt・元job/owner/descriptor・稼働keeper本人とattemptを照合してからdaemonを準備する。停止済みの旧actor記録を清算し、通常のrelease-recoverで完全container IDと所有labelを再照合して回収する。container未作成ならdaemonを起動しない。pending create、部分import、Job終端不明、所有不一致は引き続き記録を保持して拒否する。
+
+hostは`daemon-recover`にも`daemon-prepare`と同じstate/done/completion・実終了値・子0終端の照合を要求する。空の回復が成功した場合はowner全体を比較して自分の`restartClaim`だけを解除し、停止receiptは保持する。preflight後に停止を挟んで別CLIのkeeperが開始しても、そのkeeperを止めずに次のprepareがreceiptを取得できる。比較不一致や終端不明ではclaimを解除しない。
+
+再現用自動テストを修正前に失敗させ、専用使い捨てWSLでも同bootの拒否を再現した。修正候補guestでは回復・旧container不存在・次jobの実行まで確認した。これは実workerのCLI JVMを中断して同じrenderコマンドからPNGを得る公開物E2Eではない。公開CLIには候補helper/rootfsの無署名差替え経路がなく、**次の配布候補で取消し→再開の再検証が必要**。実機試験の登録・稼働一覧・default・設定は前後一致し、専用distroと起動プロセスを回収した。[受入範囲と未解決事項](qa/cancel-resume-2026-11-06.json)を参照。
+
+配布にはhelper JAR/app-image、guestbridgeを含むrootfs、hash/pinを反映したdescriptorと同梱runtime資源の再ビルド・再署名・新版が必要になる。native PEのsourceは変更していない。旧公開descriptorのleaseは新descriptorによる回復対象から除外されるため、本修正だけで既存の旧世代leaseが救済されるとは扱わない。利用者は失敗時のlease・owner・ログを保全し、旧世代の清算は所有確認を伴う別途の対応対象とする。
 
 writerFailureではwriterがnativeを破棄せず、監督側が元期限内で自然終端と有限回収を行う。bridgeもkeeperと同形式のcompletionを保存する（bridgeのclientはnative state）。job tmpの`native-<UUID>.diagnostic.json`へ入力失敗種別、実native exit、照合済みcompletion、肯定Job0、回収・unknown、stdout/stderr総bytes・適用上限・超過とstderr切断をatomic保存する。stdoutはサイズだけを調べ、通常1MiB・fetch 64MiBの適用上限を記録する。共通の`outputLimitExceeded`はどちらかの超過でtrueになる。stderrは先頭/末尾各8192 bytesの有限読取りから固定guest reasonとnative accounting行だけを抽出し、任意文字列を出さない。固定reasonは末尾から消えても先頭側から別項目へ残す。保存失敗時は一時出力を保持し、保存/cleanup失敗を元失敗に併記する。helperの単一制御JSONにも同じ要約を載せる。
 

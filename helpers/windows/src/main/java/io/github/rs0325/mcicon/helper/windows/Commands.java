@@ -42,7 +42,7 @@ final class Commands {
             int exit=waitFor(process,runBudget(maximum));
             if(writer!=null)join(writer,left(Duration.ofMillis(500)));
             if(writerFailure.get()!=null)throw writerFailure.get();
-            if(request!=null&&WindowsFiles.JSON.readTree(request).path("operation").asText().equals("daemon-prepare")) {
+            if(request!=null&&Set.of("daemon-prepare","daemon-recover").contains(WindowsFiles.JSON.readTree(request).path("operation").asText())) {
                 Receipt receipt=observed(prefix,process,started);JsonNode proof=WindowsKeeper.completion(prefix,receipt.value(),exit);
                 if(!receipt.done()||exit!=0||!proof.path("childKnown").asBoolean()||proof.path("childExit").asLong()!=0||!Set.of("drain-empty","command-empty").contains(proof.path("phase").asText()))throw new IOException("daemon準備native終端が未確認です");
             }

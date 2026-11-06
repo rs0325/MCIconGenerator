@@ -150,6 +150,8 @@ def daemon(owner, restart_allowed, allow_start=True):
 
 def prepare_daemon(request, owner):
     claim = request['claim']; attempt = claim['keeperAttempt']; stop = claim['stop']
+    recovery = request.get('operation') == 'daemon-recover'
+    reject(not recovery or stop is not None, 'DAEMON_RESTART_DENIED', '回復daemonには停止receiptが必要です')
     reject(claim['identity'] == identity(request) and str(uuid.UUID(attempt)) == attempt, 'OWNERSHIP_MISMATCH', '準備claim所有不一致')
     if stop is not None:
         reject(str(uuid.UUID(stop['id'])) == stop['id'] and str(uuid.UUID(stop['boot'])) == stop['boot'], 'OWNERSHIP_MISMATCH', '停止receipt不正')
@@ -157,7 +159,12 @@ def prepare_daemon(request, owner):
     with (path / 'fence.lock').open('a+b') as fence:
         fcntl.flock(fence, fcntl.LOCK_EX)
         record = read(path / 'fence.json'); keeper = record.get('keeper', {})
-        reject(not record['closed'] and record['identity'] == identity(request) and keeper.get('attempt') == attempt and keeper.get('identity') == identity(request) and keeper.get('boot') == BOOT.read_text().strip() and process_start(keeper.get('pid', 0)) == keeper.get('started') and keeper.get('started') is not None, 'OWNERSHIP_MISMATCH', '準備keeper/fence不一致')
+        reject(record['closed'] == recovery and record['identity'] == identity(request) and keeper.get('attempt') == attempt and keeper.get('identity') == identity(request) and keeper.get('boot') == BOOT.read_text().strip() and process_start(keeper.get('pid', 0)) == keeper.get('started') and keeper.get('started') is not None, 'OWNERSHIP_MISMATCH', '準備keeper/fence不一致')
+        if recovery:
+            reject(keeper.get('stop') == stop, 'OWNERSHIP_MISMATCH', '回復keeperの停止receipt不一致')
+            require('pendingCreate' not in record, 'daemon create終端不明のためintentを保持')
+            if not record['containers']:
+                return {'abi': 1, 'marker': owner, 'bridgeSha256': request['bridgeSha256'], 'boot': BOOT.read_text().strip(), 'empty': True}
         saved = ROOT / 'daemon-prepare.json'
         previous = read(saved) if saved.exists() else None
         if previous is not None:
@@ -222,6 +229,7 @@ def keep(request, owner, recovery):
         require(group.resolve() == group and (group / 'cgroup.kill').is_file(), 'keeper cgroup2不明')
         current = {'attempt': attempt, 'identity': identity(request), 'group': str(group), 'boot': BOOT.read_text().strip(), 'pid': os.getpid(), 'started': process_start(os.getpid())}
         require(current['started'] is not None, 'keeper開始identity不明')
+        if recovery and request.get('stop') is not None: current['stop'] = request['stop']
         with (path / ('keeper-' + attempt + '.json')).open('x') as saved:
             json.dump(current, saved, ensure_ascii=False, separators=(',', ':')); saved.flush(); os.fsync(saved.fileno())
         record['keeper'] = current; write(record_path, record)
@@ -247,7 +255,10 @@ def main(request):
             require(memory >= request['memoryBytes'] and os.cpu_count() >= 4, 'guest資源不足')
             output({'abi': 1, 'marker': owner, 'bridgeSha256': request['bridgeSha256'], 'memoryBytes': memory, 'cpus': os.cpu_count(), 'boot': BOOT.read_text().strip()}); return
         if operation in ['keep-init', 'keep', 'keep-recover']:
-            if operation != 'keep-recover': ensure_delegation()
+            stop = request.get('stop')
+            if operation == 'keep-recover' and stop is not None:
+                reject(str(uuid.UUID(stop['id'])) == stop['id'] and str(uuid.UUID(stop['boot'])) == stop['boot'], 'OWNERSHIP_MISMATCH', '回復停止receipt不正')
+            if operation != 'keep-recover' or stop is not None: ensure_delegation()
             else:
                 descriptor = os.open(CGROUP.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
                 try: cgroup_view(descriptor)
@@ -258,8 +269,17 @@ def main(request):
             output({'abi': 1, 'identity': identity(request), 'marker': owner, 'bridgeSha256': request['bridgeSha256'], 'boot': BOOT.read_text().strip(), 'memoryBytes': memory, 'cpus': os.cpu_count(), 'keeper': keeper})
             fcntl.flock(lifecycle, fcntl.LOCK_UN)
             return wait_keeper(request)
-        if operation == 'daemon-prepare':
-            try: output(prepare_daemon(request, owner)); return
+        if operation in ['daemon-prepare', 'daemon-recover']:
+            try:
+                proof = prepare_daemon(request, owner)
+                if operation == 'daemon-recover':
+                    path = job_directory(request)
+                    with (path / 'fence.lock').open('a+b') as fence:
+                        fcntl.flock(fence, fcntl.LOCK_EX)
+                        record = read(path / 'fence.json')
+                        require(record['closed'] and record['identity'] == identity(request), '回復fence所有不一致')
+                        record['actors'] = []; write(path / 'fence.json', record)
+                output(proof); return
             except BridgeFailure: raise
             except Exception as failure: raise BridgeFailure('DAEMON_PREPARATION_UNKNOWN', 'daemon準備未確定') from failure
         if operation not in ['release', 'release-recover']: daemon(owner, False, False)

@@ -51,6 +51,10 @@ final class WslDistribution {
         ObjectNode current=owner();if(!current.equals(owner)||!current.has("restartClaim")||!current.path("restartClaim").equals(proof.path("claim"))||!marker(current).equals(proof.path("marker"))||!proof.path("ready").isBoolean()||!proof.path("ready").asBoolean()||!HostFacts.uuid(proof.path("boot").asText())||!proof.path("daemon").path("generation").equals(current.path("generationOwner"))||!proof.path("daemon").path("boot").equals(proof.path("boot"))||!proof.path("daemon").path("pid").isIntegralNumber()||proof.path("daemon").path("pid").asLong()<1||!proof.path("daemon").path("started").asText().matches("[0-9]+")||!proof.path("labelVerified").isBoolean()||!proof.path("labelVerified").asBoolean())throw new IOException("daemon準備証明/claimが一致しません");
         current.set("preparedDaemon",proof);current.remove(List.of("lastStop","restartClaim"));WindowsFiles.write(anchor.resolve("owner.json"),current);return owner();
     }
+    ObjectNode releaseClaim(ObjectNode owner) throws IOException {
+        ObjectNode current=owner();if(!current.equals(owner)||!owner.has("restartClaim"))throw new IOException("解除するdaemon準備claimが一致しません");
+        current.remove("restartClaim");WindowsFiles.write(anchor.resolve("owner.json"),current);return current;
+    }
     void stopped(ObjectNode owner,String boot) throws IOException {ObjectNode current=owner();if(!current.equals(owner))throw new IOException("停止時の所有が変化しました");current.remove(List.of("restartClaim","preparedDaemon"));current.putObject("lastStop").put("boot",boot).put("id",UUID.randomUUID().toString());WindowsFiles.write(anchor.resolve("owner.json"),current);}
     static boolean sameBase(String registered,Path expected) {String value=registered.startsWith("\\\\?\\")?registered.substring(4):registered;return value.replace('/', '\\').equalsIgnoreCase(expected.toString().replace('/', '\\'));}
     ObjectNode resource(ObjectNode owner,String phase,String job) {

@@ -66,7 +66,7 @@ class KeeperTest(unittest.TestCase):
             return 0
         with patch.object(bridge, 'PROC', proc), patch.object(bridge, 'OWNER', bridge.ROOT / 'owner.json'), patch.object(bridge, 'ensure_delegation') as delegation, patch.object(bridge, 'cgroup_view'), patch.object(bridge, 'process_start', side_effect=lambda pid: None if previous_dead and pid == 123 else '200' if previous_dead else '100'), patch.object(bridge.os, 'getpid', return_value=124 if previous_dead else 123), patch.object(pathlib.Path, 'mkdir', mkdir), patch.object(bridge, 'wait_keeper', side_effect=waited):
             value = self.call()
-            self.assertEqual(delegation.call_count, 0 if operation == 'keep-recover' else 1)
+            self.assertEqual(delegation.call_count, 0 if operation == 'keep-recover' and 'stop' not in self.request else 1)
         return value
     def test_first_init_registers_keeper_before_ack_and_waits_without_locks(self):
         value = self.run_keeper('keep-init')
@@ -103,6 +103,14 @@ class KeeperTest(unittest.TestCase):
         (pathlib.Path(previous['group']) / 'cgroup.procs').write_text('')
         self.run_keeper('keep-recover', previous_dead=True)
         self.request['operation'] = 'release-recover'
+    def test_confirmed_stop_supplies_delegation_before_recovery_keeper_creation(self):
+        self.request['stop']={'id':str(uuid.uuid4()),'boot':str(uuid.uuid4())}
+        self.run_keeper('keep-recover')
+        self.assertTrue(bridge.read(self.path / 'fence.json')['closed'])
+    def test_invalid_recovery_stop_never_supplies_delegation(self):
+        self.request['stop']={'id':'invalid','boot':str(uuid.uuid4())}
+        with self.assertRaises(ValueError): self.run_keeper('keep-recover')
+        self.assertFalse((self.path / 'fence.json').exists())
     def test_init_ack_core_death_recovery_release_does_not_start_daemon(self):
         self.recover_after_init()
         with patch.object(bridge, 'daemon', side_effect=REAL_DAEMON), patch.object(bridge.subprocess, 'Popen') as spawn, patch.object(bridge, 'docker') as docker:
@@ -127,6 +135,32 @@ class KeeperTest(unittest.TestCase):
         with patch.object(bridge, 'daemon', side_effect=REAL_DAEMON), patch.object(bridge, 'process_start', return_value='300'), patch.object(bridge, 'docker', side_effect=docker), patch.object(bridge.subprocess, 'Popen') as spawn:
             self.assertEqual(self.call()['containers'],0); spawn.assert_not_called()
         self.assertTrue(removed)
+    def test_confirmed_stop_recovery_clears_old_actors_and_reclaims_full_id(self):
+        self.recover_after_init()
+        keeper = bridge.read(self.path / 'fence.json')['keeper']
+        record = bridge.read(self.path / 'fence.json')
+        record.update(actors=[{'boot':'fixture-boot','cgroup':'missing-after-stop'}], containers=[{'id':'a'*64}])
+        bridge.write(self.path / 'fence.json',record)
+        keeper['stop']={'id':str(uuid.uuid4()),'boot':str(uuid.uuid4())}; record['keeper']=keeper; bridge.write(self.path / 'fence.json',record)
+        self.request.update(operation='daemon-recover', claim={'identity':bridge.identity(self.request), 'keeperAttempt':keeper['attempt'], 'stop':keeper['stop']})
+        daemon = {'generation':self.request['marker']['generationOwner'], 'boot':'fixture-boot','pid':777,'started':'300'}
+        with patch.object(bridge,'process_start',return_value=keeper['started']), patch.object(bridge,'daemon',return_value=daemon) as prepare:
+            self.assertTrue(self.call()['ready']); prepare.assert_called_once_with(self.request['marker'],True)
+        self.assertEqual(bridge.read(self.path / 'fence.json')['actors'],[])
+        self.request['operation'] = 'release-recover'
+        with patch.object(bridge,'owned',return_value=None):
+            self.assertEqual(self.call()['containers'],0)
+    def test_recovery_stop_does_not_clear_pending_create_or_foreign_fence(self):
+        self.recover_after_init()
+        keeper = bridge.read(self.path / 'fence.json')['keeper']
+        record = bridge.read(self.path / 'fence.json'); record['pendingCreate']='uncertain'
+        bridge.write(self.path / 'fence.json',record)
+        keeper['stop']={'id':str(uuid.uuid4()),'boot':str(uuid.uuid4())}; record['keeper']=keeper; bridge.write(self.path / 'fence.json',record)
+        self.request.update(operation='daemon-recover', claim={'identity':bridge.identity(self.request), 'keeperAttempt':keeper['attempt'], 'stop':keeper['stop']})
+        with patch.object(bridge,'process_start',return_value=keeper['started']), patch.object(bridge,'daemon') as daemon:
+            with self.assertRaisesRegex(RuntimeError,'未確定'): self.call()
+            daemon.assert_not_called()
+        self.assertEqual(bridge.read(self.path / 'fence.json'),record)
     def test_recovery_missing_or_stale_daemon_and_pending_create_never_spawn(self):
         self.recover_after_init(); record = bridge.read(self.path / 'fence.json'); record['containers'] = [{'id':'a'*64}]; bridge.write(self.path / 'fence.json',record)
         for old_boot in [None, 'old-boot', 'fixture-boot']:

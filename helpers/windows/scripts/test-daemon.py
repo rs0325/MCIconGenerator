@@ -17,7 +17,7 @@ class DaemonTest(unittest.TestCase):
         self.request = {'jobId': str(uuid.uuid4()), 'ownerId': str(uuid.uuid4()), 'descriptorSha256': 'a'*64, 'bridgeSha256': 'b'*64}
         self.request['claim'] = {'identity': bridge.identity(self.request), 'keeperAttempt': self.attempt, 'stop': {'id': str(uuid.uuid4()), 'boot': str(uuid.uuid4())}}
         self.path = bridge.job_directory(self.request)
-        self.fence = {'identity': bridge.identity(self.request), 'closed': False, 'keeper': {'identity': bridge.identity(self.request), 'attempt': self.attempt, 'boot': bridge.BOOT.read_text(), 'pid': 100, 'started': '10'}}
+        self.fence = {'identity': bridge.identity(self.request), 'closed': False, 'containers': [{'id': 'a'*64}], 'keeper': {'identity': bridge.identity(self.request), 'attempt': self.attempt, 'boot': bridge.BOOT.read_text(), 'pid': 100, 'started': '10'}}
         bridge.write(self.path / 'fence.json', self.fence)
         self.label = 'io.github.rs0325.mcicon.generation=' + self.owner['generationOwner']
         self.live = {100: '10', 200: '20'}
@@ -32,6 +32,36 @@ class DaemonTest(unittest.TestCase):
     def old(self, boot=None, started='19'):
         bridge.write(self.root / 'daemon.json', {'generation': self.owner['generationOwner'], 'boot': boot or bridge.BOOT.read_text(), 'pid':200, 'started':started})
     def prepare(self): return bridge.prepare_daemon(self.request, self.owner)
+    def test_recovery_closed_fence_uses_confirmed_stop_once(self):
+        self.fence['closed'] = True; self.fence['keeper']['stop'] = self.request['claim']['stop']; bridge.write(self.path / 'fence.json', self.fence)
+        self.request['operation'] = 'daemon-recover'; self.old()
+        proof = self.prepare()
+        self.assertTrue(proof['ready']); self.assertEqual(self.spawn.call_count, 1)
+        self.assertEqual(self.prepare(), proof); self.assertEqual(self.spawn.call_count, 1)
+        self.live.pop(200)
+        with self.assertRaises(RuntimeError): self.prepare()
+        self.assertEqual(self.spawn.call_count, 1)
+    def test_recovery_requires_closed_fence_and_stop_receipt(self):
+        self.request['operation'] = 'daemon-recover'; self.old()
+        with self.assertRaises(RuntimeError): self.prepare()
+        self.fence['closed'] = True; self.fence['keeper']['stop'] = self.request['claim']['stop']; bridge.write(self.path / 'fence.json', self.fence)
+        self.request['claim']['stop'] = None
+        with self.assertRaises(RuntimeError): self.prepare()
+        self.spawn.assert_not_called()
+    def test_recovery_before_container_creation_never_starts_daemon(self):
+        self.request['operation'] = 'daemon-recover'
+        self.fence.update(closed=True, containers=[], actors=[]); self.fence['keeper']['stop'] = self.request['claim']['stop']
+        bridge.write(self.path / 'fence.json', self.fence)
+        self.assertTrue(self.prepare()['empty']); self.spawn.assert_not_called()
+        self.fence['pendingCreate'] = 'uncertain'; bridge.write(self.path / 'fence.json', self.fence)
+        with self.assertRaisesRegex(RuntimeError, 'create終端不明'): self.prepare()
+        self.spawn.assert_not_called()
+    def test_recovery_cannot_use_a_different_keeper_stop(self):
+        self.request['operation']='daemon-recover'; self.fence['closed']=True
+        self.fence['keeper']['stop']={'id':str(uuid.uuid4()),'boot':str(uuid.uuid4())}
+        bridge.write(self.path / 'fence.json',self.fence)
+        with self.assertRaisesRegex(RuntimeError,'停止receipt不一致'): self.prepare()
+        self.spawn.assert_not_called()
     def test_same_boot_expired_pid_receipt_ack_retry_and_disappearance(self):
         self.old(); proof = self.prepare(); self.assertTrue(proof['labelVerified']); self.assertEqual(self.spawn.call_count, 1)
         self.assertEqual(self.prepare(), proof); self.assertEqual(self.spawn.call_count, 1)

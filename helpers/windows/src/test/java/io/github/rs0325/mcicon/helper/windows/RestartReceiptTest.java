@@ -54,6 +54,13 @@ class RestartReceiptTest {
         }
         try(OperationJournal journal=OperationJournal.acquire(job,lease,Duration.ofSeconds(1))) {assertFalse(journal.pending());assertEquals(evidence,journal.state().path("evidence"));}
     }
+    @Test void 空回復の解除は本人claimだけを除き停止receiptと別claimを保持する() throws Exception {
+        ObjectNode claimed=distribution.claimStop(distribution.owner(),identity(),attempt,host.boot());
+        ObjectNode released=distribution.releaseClaim(claimed);assertFalse(released.has("restartClaim"));assertEquals(claimed.path("lastStop"),released.path("lastStop"));assertFalse(released.has("preparedDaemon"));
+        assertThrows(IOException.class,()->distribution.releaseClaim(released));
+        ObjectNode peer=distribution.claimStop(released,identity().put("ownerId",UUID.randomUUID().toString()),UUID.randomUUID().toString(),host.boot());
+        assertThrows(IOException.class,()->distribution.releaseClaim(claimed));assertEquals(peer,distribution.owner());
+    }
     @Test void 世代lock解放と別プロセス終了だけではclaimを奪えない() throws Exception {
         String executable=Path.of(System.getProperty("java.home"),"bin","java.exe").toString();if(!Files.exists(Path.of(executable)))executable=Path.of(System.getProperty("java.home"),"bin","java").toString();
         List<String> paths=new ArrayList<>();for(Class<?> type:List.of(RestartReceiptTest.class,WindowsFiles.class,com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class))paths.add(Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()).toString());
