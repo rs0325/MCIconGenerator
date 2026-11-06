@@ -112,3 +112,23 @@ Refs #94 #95 #98 #99。上記F1とは別に、公開済みv1.1.0のWindows boots
 - 未署名（Authenticode NotSigned）の公開launcherは今回の非対話経路で起動でき、警告・ブロックを観測しなかった。ただしPython取得・展開ではZone.Identifierが付いていない。**ブラウザ取得/MOTW付き初回・GUIのOS警告は未検証**。属性削除、OS保護・既存distro・Docker・システム設定の変更、reboot、機能有効化は行っていない。
 
 未検証は上記OS警告、WSL未導入host、実reboot、全51版・全アイテム、新版への自動更新/rollback、installer/winget。今回の機能成功で受入全体を完了扱いにしない。製品コード・API・保存形式は変更せず、commit・push・PR・Release/Central変更・Issue操作も行っていない。
+
+## 公開v1.1.0の取消し・中断後再開・残存データ（2026-11-06）
+
+Refs #95。origin/main 71972cf、branch feature/issue-95-e2e-cancel-resume。公開Windows bootstrap ZIPだけから実測した。正本は [追加E2E QA](../qa/e2e-cancel-resume-windows-2026-11-06.json) と [LF blob checksum](../qa/e2e-cancel-resume-windows-2026-11-06.json.sha256)。製品コードは変更していない。
+
+| 項目 | 結果 |
+| --- | --- |
+| 初回準備中断→同一コマンド再実行 | 中断exit 1、再実行exit 0。取得済みhelperはsize/hash/mtime不変。guest部分取得を完成させ旧leaseをreleasedへ回復。 |
+| 代表PNG | 1.21.4 minecraft:stone、64×64。SHA-256 b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de、既存基準と一致。 |
+| 破損part | 同一sizeのhelper artifact.part先頭1byte反転を検出・再取得。正規hashへ復元しpart消失。他artifactは不変。 |
+| 実worker稼働中のCLI単独終了→再実行 | 終了直前にDocker State=runningと完全IDを確認。中断exit 1、再実行exit 1。release-recoverがDAEMON_RESTART_DENIEDを返し再開PNG未生成。 |
+| 追加の起動途中取消し | intent時のCLIツリー全体終了ではkeeper ACK不一致、created時のCLI単独終了ではDAEMON_RESTART_DENIED。最終running試行と区別。 |
+| programのみ手動削除 | 非VHDXデータfileのsize/hash/mtime・設定・ログ・cache・登録distro・生成PNG・元rawを保持。VHDXはpath保持を確認し全内容不変とは扱わない。 |
+| 後始末 | 今回の専用distroだけをGUID/BasePath照合後に回収。既存40登録・既定・一覧/status/稼働状態・.wslconfig hash・既定製品pathは前後一致。 |
+
+**実worker中断後の再開は不合格**。helperの拒否理由まで確認したが根本原因は未確定で、コード修正やIssue変更は行っていない。中断後はactive lease、専用distro、running表記のbootstrap receipt、lock fileが残った。初回準備の空stagingも残存した。lock file残存だけをOS lock保持とは判断しない。失敗状態を保全し、別rootへ移る前に当該distroを回収した。後続rootへは公開物由来のdownloads/cacheだけを再利用した。
+
+公開タグv1.1.0の利用ガイドは起点mainと同一で、docs/usage.md:138の通常uninstallのデータ保持方針と手動program削除の結果は整合した。一方、**公開ZIP向けuninstallコマンド・全データ削除手順は未記載**。ZIP展開directoryを手動削除した試験であり、正式MSI/winget uninstallerや製品purgeの成功とは扱わない。自動回復失敗を手動回収で成功へ書き換えない。
+
+MCICON_DATA_HOMEとTMP/TEMPを専用領域へ隔離した。専用3root・temp・配布ZIP・VHDXを除去し、証拠ログ・hash・試験用生成PNGと元rawはbuild/e2e/に保持した。再取得なしの確認は保存fileのsize/hash/mtimeに基づき、全HTTP通信監査ではない。未検証は中断後の成功PNG（再開失敗）、Ctrl+Cシグナル経路、短い破損partのRange継続、正式installer/winget uninstall・製品purge。OS reboot・OS設定変更・既存distro/Docker変更、commit・push・PR・Issue変更は行っていない。
