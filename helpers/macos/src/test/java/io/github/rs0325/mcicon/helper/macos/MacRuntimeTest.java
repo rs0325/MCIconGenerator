@@ -25,10 +25,42 @@ class MacRuntimeTest {
         var job=fixture.job(false);assertTrue(MacRuntime.releaseUnstarted(job.command(),job.lease(),System.nanoTime()));assertTrue(job.lease().read().path("resources").isEmpty());assertFalse(Files.exists(fixture.cache().anchor()));assertFalse(Files.exists(fixture.root.resolve("macos")));
         try(var journal=OperationJournal.acquire(job.command().lease().getParent().resolve("tmp"),job.lease().read(),Duration.ofSeconds(1))){assertTrue(journal.released());assertThrows(java.io.IOException.class,()->journal.begin("create"));}
     }
-    @Test void deadと生成痕跡は未着手cleanupへ流さない() throws Exception {
-        var dead=fixture.job(true);assertFalse(MacRuntime.releaseUnstarted(dead.command(),dead.lease(),System.nanoTime()));
+    @Test void 初回取得中断後のdead未着手leaseを閉じて次jobを初回登録できる() throws Exception {
+        var dead=fixture.job(true);String launcher=System.getProperty("jpackage.app-path");
+        try {
+            System.setProperty("jpackage.app-path",fixture.executable.toString());
+            assertEquals(0,Main.run(new String[]{"--protocol","1","--root",fixture.root.toString(),"--lease",dead.command().lease().toString(),"release"}));
+        }finally {if(launcher==null)System.clearProperty("jpackage.app-path");else System.setProperty("jpackage.app-path",launcher);}
+        assertTrue(MacRuntime.releaseUnstarted(dead.command(),dead.lease(),System.nanoTime()));
+        ObjectNode value=dead.lease().read();value.put("state","released");MacFiles.write(dead.command().lease(),value);
+        assertTrue(value.path("resources").isEmpty());assertTrue(fixture.cache().firstUse());
+        var next=fixture.job(false);CacheState cache=fixture.cache();
+        try(var operation=OperationJournal.acquire(next.command().lease().getParent().resolve("tmp"),next.lease().read(),Duration.ofSeconds(1));var lifecycle=cache.lock(Duration.ofSeconds(1))) {
+            var scan=LeaseReferences.inspect(next.command(),fixture.executable,fixture.digest);assertTrue(scan.pristine());assertFalse(scan.unknown());cache.register(scan,operation);cache.verify();
+        }
+    }
+    @Test void 生成痕跡は未着手cleanupへ流さない() throws Exception {
         var pending=fixture.job(false);try(var journal=OperationJournal.acquire(pending.command().lease().getParent().resolve("tmp"),pending.lease().read(),Duration.ofSeconds(1))){journal.begin("prepare");}
         assertFalse(MacRuntime.releaseUnstarted(pending.command(),pending.lease(),System.nanoTime()));assertFalse(Files.exists(fixture.cache().anchor()));
+    }
+    @Test void dead未着手の回収は既存世代と別jobを変更しない() throws Exception {
+        var other=fixture.job(false);CacheState cache=fixture.cache();
+        try(var operation=OperationJournal.acquire(other.command().lease().getParent().resolve("tmp"),other.lease().read(),Duration.ofSeconds(1));var lifecycle=cache.lock(Duration.ofSeconds(1))) {
+            cache.register(LeaseReferences.inspect(other.command(),fixture.executable,fixture.digest),operation);
+        }
+        Path registration=fixture.root.resolve("macos").resolve(fixture.digest+".json");byte[] registered=Files.readAllBytes(registration),marker=Files.readAllBytes(cache.anchor().resolve("owner.json")),otherLease=Files.readAllBytes(other.command().lease());
+        var dead=fixture.job(true);assertTrue(MacRuntime.releaseUnstarted(dead.command(),dead.lease(),System.nanoTime()));
+        cache.verify();assertArrayEquals(registered,Files.readAllBytes(registration));assertArrayEquals(marker,Files.readAllBytes(cache.anchor().resolve("owner.json")));assertArrayEquals(otherLease,Files.readAllBytes(other.command().lease()));
+    }
+    @Test void deadの資源と途中journalを未着手扱いしない() throws Exception {
+        var resources=fixture.job(true);ObjectNode value=resources.lease().read();value.withObject("resources").putObject("macos").put("phase","starting").put("generationOwner",UUID.randomUUID().toString()).put("instanceDir",fixture.cache().instance().toString()).putArray("containers");MacFiles.write(resources.command().lease(),value);
+        byte[] before=Files.readAllBytes(resources.command().lease());assertFalse(MacRuntime.releaseUnstarted(resources.command(),resources.lease(),System.nanoTime()));assertArrayEquals(before,Files.readAllBytes(resources.command().lease()));
+        var pending=fixture.job(true);Path tmp=pending.command().lease().getParent().resolve("tmp");
+        try(var journal=OperationJournal.acquire(tmp,pending.lease().read(),Duration.ofSeconds(1))){journal.begin("prepare");}
+        assertFalse(MacRuntime.releaseUnstarted(pending.command(),pending.lease(),System.nanoTime()));
+        var partial=fixture.job(true);Path operations=partial.command().lease().getParent().resolve("tmp/macos-operations");Files.createDirectory(operations);Files.createDirectory(operations.resolve(UUID.randomUUID().toString()));
+        assertFalse(MacRuntime.releaseUnstarted(partial.command(),partial.lease(),System.nanoTime()));
+        assertFalse(Files.exists(fixture.cache().anchor()));
     }
     @Test void 同時live未着手jobはlifecycle内で真初回だけ登録できる() throws Exception {
         var first=fixture.job(false);var second=fixture.job(false);CacheState cache=fixture.cache();
