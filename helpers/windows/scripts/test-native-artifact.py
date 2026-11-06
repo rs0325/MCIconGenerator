@@ -60,9 +60,10 @@ class NativeArtifactTest(unittest.TestCase):
             if 'jpackage.exe' in str(args[0]):
                 import shutil
                 shutil.copytree(output / 'staging/input', output / 'image/MCIconHelper/app')
-        argv = ['package-helper.py', '--jdk', str(self.root), '--input', str(jars), '--payload', str(payload), '--native', str(self.native), '--native-source', str(self.source), '--native-build', str(self.build), '--output', str(output)]
+        argv = ['package-helper.py', '--app-version', '1.1.1', '--jdk', str(self.root), '--input', str(jars), '--payload', str(payload), '--native', str(self.native), '--native-source', str(self.source), '--native-build', str(self.build), '--output', str(output)]
         with patch('sys.argv', argv), patch.object(packager.sys, 'platform', 'win32'), patch.object(packager, 'run', fake_run): packager.main()
         self.assertEqual(len(calls), 2); self.assertTrue(calls[0][0].endswith('jlink.exe')); self.assertTrue(calls[1][0].endswith('jpackage.exe'))
+        self.assertEqual(calls[1][calls[1].index('--app-version') + 1], '1.1.1')
         result = json.loads((output / 'packaging.json').read_text()); self.assertEqual(result['nativeBuild']['manifestSha256'], digest(self.build)); self.assertEqual(result['nativeBuild']['sourceSha256'], digest(self.source))
         support = output / 'image/MCIconHelper/app/support'; self.assertEqual(digest(support / 'windows-host.exe'), digest(self.native))
         verify(support / 'windows-host.exe', self.source, support / 'native-build/build.json')
@@ -85,7 +86,7 @@ class NativeArtifactTest(unittest.TestCase):
                     if relative != missing:
                         path = docs / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(b'notice')
                 output = self.root / 'not-created'
-                argv = ['package-helper.py', '--jdk', str(self.root), '--input', str(self.root), '--payload', str(payload), '--native', str(self.native), '--native-source', str(self.source), '--native-build', str(self.build), '--output', str(output)]
+                argv = ['package-helper.py', '--app-version', '1.1.1', '--jdk', str(self.root), '--input', str(self.root), '--payload', str(payload), '--native', str(self.native), '--native-source', str(self.source), '--native-build', str(self.build), '--output', str(output)]
                 with patch('sys.argv', argv), patch.object(packager.sys, 'platform', 'win32'), patch.object(packager, 'PROJECT_ROOT', docs), patch.object(packager, 'run') as run:
                     with self.assertRaisesRegex(RuntimeError, 'project notice不足'): packager.main()
                 run.assert_not_called(); self.assertFalse(output.exists())

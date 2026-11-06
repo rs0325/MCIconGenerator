@@ -59,7 +59,7 @@ class CandidateTest(unittest.TestCase):
     def test_rejects_baseline_and_second_run_mismatch_before_output(self):
         plan = copy.deepcopy(self.plan)
         plan['artifacts'][0]['baseline']['sha256'] = '0' * 64
-        with self.assertRaisesRegex(ValueError, 'QA pin'):
+        with self.assertRaisesRegex(ValueError, '採用baseline'):
             self.assemble(plan)
         self.assertFalse((self.root / 'output').exists())
         plan = copy.deepcopy(self.plan)
@@ -78,6 +78,49 @@ class CandidateTest(unittest.TestCase):
         plan['artifacts'][1]['id'] = plan['artifacts'][0]['id']
         with self.assertRaises(ValueError):
             self.assemble(plan)
+
+    def test_patch_version_reuses_original_basename_and_per_artifact_url(self):
+        import json
+        plan = copy.deepcopy(self.plan)
+        plan.update(version='1.1.1', tag='v1.1.1')
+        for row in plan['artifacts']:
+            if row['role'] == 'host-helper' or row['host'] == 'windows-x86_64':
+                row['id'] = row['id'].replace('1.1.0', '1.1.1')
+                changed = self.root / row['id']
+                changed.write_bytes(b'new-1.1.1-baseline')
+                row['runs'] = [str(changed), str(changed)]
+                row['baseline'] = {'bytes': changed.stat().st_size, 'sha256': candidate.digest(changed)}
+            else:
+                fmt = 'qcow2' if row['role'] == 'guest-base' else 'tar.gz'
+                row['basename'] = row['id'] + '.' + fmt
+        renderer = plan['artifacts'][-1]
+        renderer['url'] = 'https://example.com/reused/' + renderer['basename']
+        report = self.assemble(plan)
+        for target in report['signingTargets']:
+            descriptor = json.loads((self.root / 'output' / target['path']).read_bytes())
+            self.assertEqual(descriptor['toolVersion'], '1.1.1')
+            self.assertEqual(descriptor['worker']['toolVersion'], '1.1.1')
+            self.assertTrue(descriptor['runtimeId'].startswith('mcicon-1.1.1-'))
+            for artifact in descriptor['artifacts']:
+                inventory = self.root / 'output' / artifact['inventoryPath']
+                self.assertEqual(candidate.digest(inventory), artifact['inventorySha256'])
+                self.assertEqual(json.loads(inventory.read_bytes())['artifact']['url'], artifact['url'])
+                self.assertEqual(artifact['url'], renderer['url'] if artifact['role'] == 'renderer-image'
+                                 else 'https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.1/' + artifact['id'] + '.' + artifact['format'])
+        self.assertTrue((self.root / 'output/artifacts' / renderer['basename']).is_file())
+
+    def test_rejects_invalid_release_and_insecure_artifact_url_before_output(self):
+        for field, value in [('version', '../1.1.1'), ('tag', '../v1.1.1')]:
+            plan = copy.deepcopy(self.plan)
+            plan[field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.assemble(plan)
+            self.assertFalse((self.root / 'output').exists())
+        plan = copy.deepcopy(self.plan)
+        plan['artifacts'][0]['url'] = 'http://example.com/helper.zip'
+        with self.assertRaisesRegex(ValueError, 'HTTPS'):
+            self.assemble(plan)
+        self.assertFalse((self.root / 'output').exists())
 
     def test_final_adoption_requires_closure_and_propagates_without_signing(self):
         import json

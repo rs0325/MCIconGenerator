@@ -1,4 +1,4 @@
-"""署名前の1.1.0候補を実archiveから組み立てる。秘密鍵・署名・ネットワークは使用しない。"""
+"""署名前の配布候補を実archiveから組み立てる。秘密鍵・署名・ネットワークは使用しない。"""
 
 import argparse
 import hashlib
@@ -41,12 +41,21 @@ def adapter_digest(root):
     return hashlib.sha256(data).hexdigest()
 
 
+def release_base(version, tag):
+    """版と単一要素のtagを検査し、固定ReleaseのURL prefixを返す。通信は行わない。"""
+    if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?', version):
+        raise ValueError('版はmajor.minor.patchまたはプレリリース形式が必要です')
+    if not re.fullmatch(r'[0-9A-Za-z][0-9A-Za-z._-]*', tag):
+        raise ValueError('tagはRelease URLの単一要素で指定してください')
+    return 'https://github.com/rs0325/MCIconGenerator/releases/download/' + tag + '/'
+
+
 def assemble(plan, output, root=ROOT):
-    """2回の再生成とQA pinを照合し、署名前のdescriptor/inventoryを出力する。"""
+    """2回の出力と採用baselineを照合し、署名前のdescriptor/inventoryを出力する。"""
     if output.exists():
         raise ValueError('既存出力は上書きしません')
-    if plan['version'] != '1.1.0' or plan['tag'] != 'v1.1.0':
-        raise ValueError('1.1.0/v1.1.0の候補だけを扱います')
+    version = plan['version']
+    base = release_base(version, plan['tag'])
     expected = {('host-helper', h) for h in HOSTS} | {('guest-base', h) for h in HOSTS} | {('renderer-image', 'linux-amd64')}
     rows = plan['artifacts']
     confirmed = plan.get('finalBytesConfirmed', False)
@@ -66,9 +75,12 @@ def assemble(plan, output, root=ROOT):
             raise ValueError('artifact IDが不正または重複しています')
         ids.add(identifier)
         fmt = {'host-helper': 'zip', 'renderer-image': 'tar.gz'}.get(row['role'], 'tar.xz' if row['host'] == 'windows-x86_64' else 'qcow2')
-        name = 'mcicon-' + {'host-helper': 'helper', 'guest-base': 'guest', 'renderer-image': 'renderer'}[row['role']] + '-1.1.0-' + row['host'] + '.' + fmt
+        name = row.get('basename') or 'mcicon-' + {'host-helper': 'helper', 'guest-base': 'guest', 'renderer-image': 'renderer'}[row['role']] + '-' + version + '-' + row['host'] + '.' + fmt
         if identifier + '.' + fmt != name:
             raise ValueError('artifact IDがRelease basenameと一致しません')
+        url = row.get('url', base + name)
+        if not url.startswith('https://'):
+            raise ValueError('artifact URLはHTTPSが必要です')
         runs = []
         for value in row['runs']:
             path = Path(value)
@@ -76,17 +88,16 @@ def assemble(plan, output, root=ROOT):
                 raise ValueError('実archiveの通常fileが必要です')
             runs.append({'bytes': path.stat().st_size, 'sha256': digest(path)})
         if len(runs) != 2 or runs[0] != runs[1] or runs[0] != row['baseline']:
-            raise ValueError('再生成2回または既存QA pinと一致しません: ' + identifier)
+            raise ValueError('再生成2回または採用baselineと一致しません: ' + identifier)
         if type(row['unpackedBytes']) is not int or row['unpackedBytes'] < runs[0]['bytes']:
             raise ValueError('展開size予算が不正です')
         if not row['licenseFiles']:
             raise ValueError('license参照が必要です')
-        checked.append((row, fmt, name, runs))
+        checked.append((row, fmt, name, url, runs))
     output.mkdir(parents=True)
     artifacts = {}
     reports = []
-    base = 'https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/'
-    for row, fmt, name, runs in checked:
+    for row, fmt, name, url, runs in checked:
         archive = output / 'artifacts' / name
         archive.parent.mkdir(exist_ok=True)
         shutil.copyfile(row['runs'][0], archive)
@@ -98,11 +109,11 @@ def assemble(plan, output, root=ROOT):
             evidence.append({'path': value, 'bytes': path.stat().st_size, 'sha256': digest(path)})
         inventory_path = 'inventories/' + row['id'] + '.json'
         inventory = {'schemaVersion': 1, 'finalBytesConfirmed': confirmed, 'artifactId': row['id'],
-                     'role': row['role'], 'artifact': {'url': base + name, **runs[0]},
+                     'role': row['role'], 'artifact': {'url': url, **runs[0]},
                      'reproduction': {'runs': runs, 'baseline': row['baseline'], 'matched': True},
                      'evidence': evidence, 'unresolved': plan['unresolved'], 'contents': row['contents']}
         inventory_report = save(output / inventory_path, inventory)
-        artifact = {'id': row['id'], 'role': row['role'], 'url': base + name, **runs[0],
+        artifact = {'id': row['id'], 'role': row['role'], 'url': url, **runs[0],
                     'unpackedBytes': row['unpackedBytes'], 'format': fmt,
                     'inventoryPath': inventory_path, 'inventorySha256': inventory_report['sha256'],
                     'licenseFiles': row['licenseFiles'], 'noticeFiles': row['noticeFiles'],
@@ -110,7 +121,7 @@ def assemble(plan, output, root=ROOT):
         artifacts[(row['role'], row['host'])] = artifact
         reports.append({'id': row['id'], 'basename': name, **runs[0], 'reproduction': 'PASS-2-runs-and-baseline',
                         'inventory': {**inventory_report, 'path': inventory_path}})
-    worker = {'toolVersion': '1.1.0', 'protocolVersion': 1, 'agentSha256': digest(Path(plan['agent'])),
+    worker = {'toolVersion': version, 'protocolVersion': 1, 'agentSha256': digest(Path(plan['agent'])),
               'adapterSetSha256': adapter_digest(root)}
     entries = []
     sign = []
@@ -124,7 +135,7 @@ def assemble(plan, output, root=ROOT):
         shutil.copyfile(output / renderer['inventoryPath'], target)
         host_renderer = {**renderer, 'inventoryPath': renderer_path}
         inventory_resources.extend(a['inventoryPath'] for a in (helper, artifacts[('guest-base', name)], host_renderer))
-        descriptor = {'schemaVersion': 1, 'runtimeId': 'mcicon-1.1.0-' + name, 'toolVersion': '1.1.0',
+        descriptor = {'schemaVersion': 1, 'runtimeId': 'mcicon-' + version + '-' + name, 'toolVersion': version,
                       'host': {'os': os_name, 'arch': arch}, 'minimumOsVersion': minimum,
                       'helper': {'protocolVersion': 1, 'artifactId': helper['id'], 'executable': executable},
                       'worker': worker,
