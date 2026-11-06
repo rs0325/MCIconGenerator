@@ -114,3 +114,25 @@ Windows版toolchain固定、現sourceのnative 2回compile、PE/import/notice検
 **WSL import、実guest起動、現Job回収の実機、未準備host setup、OS警告/SmartScreen、全51版は未検証で、承認後または後続gateである。** WSL有効化、distro操作、Minecraft、鍵・認証探索、commit/push/PR/releaseは行っていない。
 
 前担当はrenderer測定で起動したDocker Desktopを停止済みで、今回E1bではDockerを起動していない。image・cache・containerも作成していない。自分のcompile・包装・検証processは終了し、常駐processは残していない。B1の既存imageを保持し、取得archive・展開toolchain・生成候補・失敗ログは`build/e1/`へ保全した。commit/push/PR作成は行わず、準備文面を`build/commit-message.txt`、`build/pr-title.txt`、`build/pr-body.md`へUTF-8で保存した。
+
+## 1.1.1 段階C（2026-11-06）
+
+起点c7b507a（#176）、固定JDK21.0.12.1+1・LLVM-MinGW20261006/LLVM23.1.3・
+Python3.12.14/zlib1.3.2を再照合し、Java/native・jlink/jpackageを独立2run生成した。
+両runへ --app-version 1.1.1 を渡し、launcherの表示版・jpackage.app-versionも1.1.1と確認した。
+全230fileのtree・全ZIP entryのsize/SHAとZIP bytesが一致した。
+
+- helper ZIP: **36,030,238 bytes**、SHA-256 **56e894dd37c3a1bac34cf737fce8d5c0c820829a7a7d6ad9e963bc69dbaa2b8e**
+- payload内bridge・rootfs内bridge・guestBase.bridgeSha256: **754447a88923b11799ba3510bfc924d0071729958ba7971cb1d23fbc6977e179**
+- E1の再配布文書102件を本文hash込みで保持。project文書8件・native通知4件も原本と照合。
+- helper-windows: 55件中34成功・21skip、helper-common: 33成功。POSIX固定host bindのtest fixtureを実行OSの絶対pathへ修正した。
+- 固定Pythonの包装/native/daemon/rootfs試験28件、Linux guestbridge/daemon/rootfs試験は全成功。件数・境界はQAを参照。
+
+[段階C QA](../qa/windows-helper-candidate-1.1.1-2026-11-06.json)とLF blob基準sidecarが正本。
+成果物・詳細logは専用worktreeの build/111-c/ に保全した。
+Desktopは元の停止状態へ復元し、ユーザーWSL39件の登録・稼働状態の前後一致を確認した。
+共有builder cacheは削除せず、今回の生成imageタグだけ回収した。
+Docker内部のdocker-desktopは起動時にGUIDが再登録されたが、名前・保存先・版・停止状態は同じ。
+ユーザーdistroのGUID/保存先/版は全39件不変で、既存distroへの操作は行っていない。
+正式inventory/source対応・署名descriptor結合はD、製品WSL受入は後続工程であり、
+旧1.1.0や21skipを今回の実機成功へ読み替えない。commit/push/PR/Issue操作は未実施。

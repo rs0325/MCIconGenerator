@@ -95,3 +95,21 @@ Sources索引の独立署名検証、source archive本体の取得・bytes検証
 起動したDocker Desktopは通常停止し、Desktop/backend process不在とengine pipe消失で確認した。停止後の`docker desktop status`は非zeroとなったため、そのコマンドだけを停止確認の根拠にしていない。`build/windows-rootfs/`のarchive・全file一覧・package一覧・source文書・失敗log・環境記録を保持する。image削除後の再採取には、未使用の測定名で再buildが必要になる。
 
 commit・push・PR・release、WSL import・distro操作、Windows機能変更、Minecraft実行は行っていない。
+
+## 1.1.1 段階C（2026-11-06）
+
+起点c7b507aのguestbridgeを収録し、上記Ubuntu digest・snapshot・両lockと
+SOURCE_DATE_EPOCH=1793664000を維持して --no-cache で独立2run生成した。
+Python3.12.14の同じlzma条件で圧縮し、XZ64MiB制限付きdecode・tar照合も成功した。
+
+- rootfs tar.xz: **98,147,132 bytes**、SHA-256 **b9be53fe3bae9c468ae72e8ad0e24bf698090a93c7248b18b4fbe52b95d9c54c**
+- 非圧縮tar: **403,507,200 bytes**、SHA-256 **f42ba303958a7259621bf70670a83440fcae3df4afd46c932907afb4cf73e8e6**
+- 2runの圧縮bytes・正規化tar・file一覧・package一覧は一致。正規化後差分0件。
+- bridge実収録bytesのSHA-256: **754447a88923b11799ba3510bfc924d0071729958ba7971cb1d23fbc6977e179**。helper payloadとguestBase pinも一致。
+- docker/dockerd/containerd/runc・cpu-probe pinはC1から不変。実tar.xz内本文と全pinを照合した。
+
+詳細は[段階C QA](../qa/windows-helper-candidate-1.1.1-2026-11-06.json)。
+raw Docker exportのmetadata差は別記録し、配布tarの一致と区別する。
+Docker Desktop停止・ユーザーWSL39件の登録/稼働状態の一致を確認済み。
+Docker内部distroの起動時再登録によるGUID差はQAに明記した。名前・保存先・版・停止状態は同じ。
+WSL import・製品daemon/cgroup・offline受入は今回実施せず、後続工程へ渡す。
