@@ -1,0 +1,1725 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-06",
+  "refs": [
+    95,
+    99
+  ],
+  "stage": "1.1.1 C",
+  "status": "reproducible-candidates-verified-pending-stage-D",
+  "sourceCommit": "c7b507ac920ed360a62866c0fe7a26e43740c55c",
+  "branch": "feature/issue-99-windows-helper-111",
+  "worktree": "H:\\MCIconGenerator\\worktrees\\milestone-111-c\\MCIconGenerator",
+  "owner": "段階C complex_worker（本セッション）",
+  "toolVersion": "1.1.1",
+  "sourceDateEpoch": 1793664000,
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "zlib": "1.3.2",
+    "jdk": {
+      "archive": "H:\\MCIconGenerator\\worktrees\\milestone-windows-helper-e1\\MCIconGenerator\\build\\e1\\inputs\\OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.zip",
+      "bytes": 205073461,
+      "sha256": "f9d6e191ab098c0d416e7d588a24420a8621cd2f4720dab2459b8b7b2d2d8b4e",
+      "verifiedFiles": 490
+    },
+    "toolchain": {
+      "archive": "H:\\MCIconGenerator\\worktrees\\milestone-windows-helper-e1\\MCIconGenerator\\build\\e1\\toolchain\\llvm-mingw-20261006-ucrt-x86_64.zip",
+      "bytes": 190836485,
+      "sha256": "317492c456aa27ee607a5919f1d2d38dcdc1112516a24d0bf4b00d078f52d17a",
+      "verifiedFiles": 9053
+    },
+    "javaVersion": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\r\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\r\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\r\n",
+    "compilerVersion": "clang version 23.1.3 (https://github.com/llvm/llvm-project.git 0d261d1ca552c95a8f007e061c787ac7132fbcbc)\nTarget: x86_64-w64-windows-gnu\nThread model: posix\nInstalledDir: H:/MCIconGenerator/worktrees/milestone-windows-helper-e1/MCIconGenerator/build/e1/toolchain/llvm-mingw-20261006-ucrt-x86_64/bin\nConfiguration file: H:/MCIconGenerator/worktrees/milestone-windows-helper-e1/MCIconGenerator/build/e1/toolchain/llvm-mingw-20261006-ucrt-x86_64/bin/x86_64-w64-windows-gnu.cfg\n",
+    "pythonBinaryInputs": [
+      {
+        "path": "C:\\Users\\ryuma\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "bytes": 107312,
+        "sha256": "f8b45d63047da9d9adf09892e4cc4317b859e86a93a478cc9616bc69d3b176e5"
+      },
+      {
+        "path": "C:\\Users\\ryuma\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python312.dll",
+        "bytes": 6985520,
+        "sha256": "0ca3acbf9ce7165a4e3779fa9ddececa652af781b22c2bd2ba377d0d6b4c9c01"
+      },
+      {
+        "path": "C:\\Users\\ryuma\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\DLLs\\_lzma.pyd",
+        "bytes": 168240,
+        "sha256": "a168fc517c3c150fc4fb95ce75aa3366fb58170d5c29556b1c04bcf890d4b3a1"
+      },
+      {
+        "path": "C:\\Users\\ryuma\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\Lib\\lzma.py",
+        "bytes": 13277,
+        "sha256": "58fb9d2fdc8a8af7b25e218f17ea3b51bdfa53bdf40f440ab33c605974ca5c2e"
+      }
+    ],
+    "compressionModuleOrigins": {
+      "zlib": "built-in",
+      "_lzma": "C:\\Users\\ryuma\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\DLLs\\_lzma.pyd",
+      "lzma": "C:\\Users\\ryuma\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\Lib\\lzma.py"
+    }
+  },
+  "dockerVersion": {
+    "Client": {
+      "Version": "29.9.2",
+      "ApiVersion": "1.56",
+      "DefaultAPIVersion": "1.56",
+      "GitCommit": "a82e528",
+      "GoVersion": "go1.26.10",
+      "Os": "windows",
+      "Arch": "amd64",
+      "BuildTime": "Tue Oct 20 19:44:07 2026",
+      "Context": "desktop-linux"
+    },
+    "Server": {
+      "Platform": {
+        "Name": "Docker Desktop 4.96.3 (244472)"
+      },
+      "Version": "29.9.2",
+      "ApiVersion": "1.56",
+      "MinAPIVersion": "1.40",
+      "Os": "linux",
+      "Arch": "amd64",
+      "Components": [
+        {
+          "Name": "Engine",
+          "Version": "29.9.2",
+          "Details": {
+            "ApiVersion": "1.56",
+            "Arch": "amd64",
+            "BuildTime": "Tue Oct 20 18:45:02 2026",
+            "Experimental": "false",
+            "GitCommit": "0367cbe",
+            "GoVersion": "go1.26.10",
+            "KernelVersion": "6.18.54.1-microsoft-standard-WSL2",
+            "MinAPIVersion": "1.40",
+            "Module": "github.com/moby/moby/v2",
+            "ModuleVersion": "v2.0.0+unknown",
+            "Os": "linux"
+          }
+        },
+        {
+          "Name": "containerd",
+          "Version": "v2.4.2",
+          "Details": {
+            "GitCommit": "b7a25261e029d68978bbf290df0a62fc819b3c51"
+          }
+        },
+        {
+          "Name": "runc",
+          "Version": "1.5.2",
+          "Details": {
+            "GitCommit": "v1.5.2-0-g29dd3dc2"
+          }
+        },
+        {
+          "Name": "docker-init",
+          "Version": "0.19.0",
+          "Details": {
+            "GitCommit": "de40ad0"
+          }
+        }
+      ],
+      "GitCommit": "0367cbe",
+      "GoVersion": "go1.26.10",
+      "KernelVersion": "6.18.54.1-microsoft-standard-WSL2",
+      "BuildTime": "2026-10-20T18:45:02.000000000+00:00"
+    }
+  },
+  "buildxVersion": "github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5",
+  "helperRuns": [
+    {
+      "archive": "build/111-c/helper-1/mcicon-helper-1.1.1-windows-x86_64.zip",
+      "bytes": 36030238,
+      "sha256": "56e894dd37c3a1bac34cf737fce8d5c0c820829a7a7d6ad9e963bc69dbaa2b8e",
+      "files": 230,
+      "unpackedFileBytes": 93466569,
+      "manifestSha256": "23ac07327c481e381f3294b17dc2034c75291f8faf1cf75f13bb771755a43db5",
+      "version": {
+        "FileVersion": "1.1.1",
+        "ProductVersion": "1.1.1"
+      },
+      "native": {
+        "toolchainArchiveSha256": "317492c456aa27ee607a5919f1d2d38dcdc1112516a24d0bf4b00d078f52d17a",
+        "sourceSha256": "a20f1b06d94802033699c48c4d7ac69d55e77a43bb4e83765b8b7fabdf252021",
+        "flags": [
+          "--no-default-config",
+          "-rtlib=compiler-rt",
+          "-unwindlib=libunwind",
+          "-stdlib=libc++",
+          "-fuse-ld=lld",
+          "-std=c++17",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-static",
+          "-municode",
+          "-ladvapi32",
+          "-lole32",
+          "-Wl,--no-insert-timestamp"
+        ],
+        "artifact": {
+          "bytes": 1506816,
+          "sha256": "1112d86bd18633004759b4d327d9cd0e9e3772ecafb472b5cc731e50e39166d8",
+          "imports": [
+            "advapi32.dll",
+            "api-ms-win-crt-convert-l1-1-0.dll",
+            "api-ms-win-crt-environment-l1-1-0.dll",
+            "api-ms-win-crt-filesystem-l1-1-0.dll",
+            "api-ms-win-crt-heap-l1-1-0.dll",
+            "api-ms-win-crt-locale-l1-1-0.dll",
+            "api-ms-win-crt-math-l1-1-0.dll",
+            "api-ms-win-crt-multibyte-l1-1-0.dll",
+            "api-ms-win-crt-private-l1-1-0.dll",
+            "api-ms-win-crt-runtime-l1-1-0.dll",
+            "api-ms-win-crt-stdio-l1-1-0.dll",
+            "api-ms-win-crt-string-l1-1-0.dll",
+            "api-ms-win-crt-time-l1-1-0.dll",
+            "kernel32.dll",
+            "ole32.dll"
+          ]
+        },
+        "notices": [
+          {
+            "path": "licenses/LICENSE.TXT",
+            "bytes": 15141,
+            "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING",
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt",
+            "bytes": 5905,
+            "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt",
+            "bytes": 12155,
+            "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f"
+          }
+        ]
+      },
+      "toolchainInputCount": 1003
+    },
+    {
+      "archive": "build/111-c/helper-2/mcicon-helper-1.1.1-windows-x86_64.zip",
+      "bytes": 36030238,
+      "sha256": "56e894dd37c3a1bac34cf737fce8d5c0c820829a7a7d6ad9e963bc69dbaa2b8e",
+      "files": 230,
+      "unpackedFileBytes": 93466569,
+      "manifestSha256": "23ac07327c481e381f3294b17dc2034c75291f8faf1cf75f13bb771755a43db5",
+      "version": {
+        "FileVersion": "1.1.1",
+        "ProductVersion": "1.1.1"
+      },
+      "native": {
+        "toolchainArchiveSha256": "317492c456aa27ee607a5919f1d2d38dcdc1112516a24d0bf4b00d078f52d17a",
+        "sourceSha256": "a20f1b06d94802033699c48c4d7ac69d55e77a43bb4e83765b8b7fabdf252021",
+        "flags": [
+          "--no-default-config",
+          "-rtlib=compiler-rt",
+          "-unwindlib=libunwind",
+          "-stdlib=libc++",
+          "-fuse-ld=lld",
+          "-std=c++17",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-static",
+          "-municode",
+          "-ladvapi32",
+          "-lole32",
+          "-Wl,--no-insert-timestamp"
+        ],
+        "artifact": {
+          "bytes": 1506816,
+          "sha256": "1112d86bd18633004759b4d327d9cd0e9e3772ecafb472b5cc731e50e39166d8",
+          "imports": [
+            "advapi32.dll",
+            "api-ms-win-crt-convert-l1-1-0.dll",
+            "api-ms-win-crt-environment-l1-1-0.dll",
+            "api-ms-win-crt-filesystem-l1-1-0.dll",
+            "api-ms-win-crt-heap-l1-1-0.dll",
+            "api-ms-win-crt-locale-l1-1-0.dll",
+            "api-ms-win-crt-math-l1-1-0.dll",
+            "api-ms-win-crt-multibyte-l1-1-0.dll",
+            "api-ms-win-crt-private-l1-1-0.dll",
+            "api-ms-win-crt-runtime-l1-1-0.dll",
+            "api-ms-win-crt-stdio-l1-1-0.dll",
+            "api-ms-win-crt-string-l1-1-0.dll",
+            "api-ms-win-crt-time-l1-1-0.dll",
+            "kernel32.dll",
+            "ole32.dll"
+          ]
+        },
+        "notices": [
+          {
+            "path": "licenses/LICENSE.TXT",
+            "bytes": 15141,
+            "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING",
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt",
+            "bytes": 5905,
+            "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+          },
+          {
+            "path": "licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt",
+            "bytes": 12155,
+            "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f"
+          }
+        ]
+      },
+      "toolchainInputCount": 1003
+    }
+  ],
+  "helperZipBytesEqual": true,
+  "helperTreeEqual": true,
+  "rootfsRuns": [
+    {
+      "tag": "mcicon-windows-rootfs-c1:run111-a",
+      "image_id": "sha256:f656828c82b49d4663ac9108dbb097a0882a05229cbb427ecb2609541fcb0105",
+      "image_bytes": 557471577,
+      "build_seconds": 533.422,
+      "export_measure_seconds": 214.797,
+      "inputs_sha256": {
+        "helpers/windows/rootfs/Dockerfile": "6dbaebcb0166b57912fd69bead86f160fd9830265fc1132f4ba4eff61aad3a74",
+        "helpers/windows/rootfs/packages.lock": "c7438f89684f797c93ace3527f0240c15ec765ca3a3c77157c5a18660824d5d4",
+        "helpers/windows/rootfs/probe-packages.lock": "97ac23b59c4cab8c861bfb487ddf65b2883ff496f45226eb43e3e620c48c8e42",
+        "helpers/windows/rootfs/build.py": "8164beea547ba36e77acd12c87cf24a58771d574f49e7917069a7f0586a08193",
+        "LICENSE": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691",
+        "helpers/windows/src/main/guest/guestbridge.py": "754447a88923b11799ba3510bfc924d0071729958ba7971cb1d23fbc6977e179",
+        "helpers/macos/src/main/native/cpu-probe.S": "d109f1f2e0c3a5bda7c3ef4bf47d162b79045b95eec4f2228d22607c45334b87"
+      },
+      "source_date_epoch": 1793664000,
+      "docker_export_sha256": "16f9ca6c02bf08422130b96d09d0bbea9be6f5715a1e7625bcdc26d56fbef6da",
+      "tar_sha256": "f42ba303958a7259621bf70670a83440fcae3df4afd46c932907afb4cf73e8e6",
+      "tar_bytes": 403507200,
+      "tar_xz_sha256": "b9be53fe3bae9c468ae72e8ad0e24bf698090a93c7248b18b4fbe52b95d9c54c",
+      "tar_xz_bytes": 98147132,
+      "expanded_regular_bytes": 398954693,
+      "files_sha256": "ecba3352d2afcef2bd29780e3e46076b7eb9b338dab4cbc39ffccfbeeaef582f",
+      "packages_sha256": "27bc0a6fad1e542da5f9eb74c7ed8a055a6e6f6c0a11c006c4f7dbae2e6b3c88",
+      "members": 6275,
+      "xz": {
+        "preset": 6,
+        "check": "CRC64",
+        "decoder_limit_bytes": 67108864,
+        "decoder_memory_bytes": 8454200,
+        "bounded_decode_matches_tar": true,
+        "robot": "name\t/measure/rootfs.tar.xz\nfile\t1\t1\t98147132\t403507200\t0.243\tCRC64\t0\nstream\t1\t1\t0\t0\t98147132\t403507200\t0.243\tCRC64\t0\nblock\t1\t1\t1\t12\t0\t98147092\t403507200\t0.243\tCRC64\tec7879c4334bb794\t12\t--\t98147070\t8454200\t--lzma2=dict=8MiB\nsummary\t8454200\tno\t50000002\ntotals\t1\t1\t98147132\t403507200\t0.243\tCRC64\t0\t1\t8454200\tno\t50000002\n"
+      },
+      "inventory": {
+        "schemaVersion": 1,
+        "guestBridgeAbi": 1,
+        "projectLicense": {
+          "path": "/usr/share/doc/mcicon/copyright",
+          "license": "MIT",
+          "sha256": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691"
+        },
+        "guestBase": {
+          "format": "tar.xz",
+          "bytes": 98147132,
+          "sha256": "b9be53fe3bae9c468ae72e8ad0e24bf698090a93c7248b18b4fbe52b95d9c54c",
+          "bridgeSha256": "754447a88923b11799ba3510bfc924d0071729958ba7971cb1d23fbc6977e179",
+          "cpuProbeSha256": "b4fecfd8ca2d20f12e688a32473a123807ecce79fe8bcc0cb8aafa5ce79c2293",
+          "engines": {
+            "/usr/bin/docker": "7ed12b00293d64742419a6601ae97960a367a0ce97c88b06e3278cc0a409557b",
+            "/usr/bin/dockerd": "237b0603cc24496c74433aeb32d70a16931ae7e015f183b8f3c7c7db83c72a5f",
+            "/usr/bin/containerd": "98c9cd5187f7ab79faaaa77b22beb552176ce92c23714c1658f7f2e9e4a3a789",
+            "/usr/bin/runc": "bdce4d45b2dd217491db8a98c8484b161e225ce49c15ebc1ba42077fb7c07d50"
+          }
+        }
+      }
+    },
+    {
+      "tag": "mcicon-windows-rootfs-c1:run111-b",
+      "image_id": "sha256:f656828c82b49d4663ac9108dbb097a0882a05229cbb427ecb2609541fcb0105",
+      "image_bytes": 557471577,
+      "build_seconds": 383.266,
+      "export_measure_seconds": 205.375,
+      "inputs_sha256": {
+        "helpers/windows/rootfs/Dockerfile": "6dbaebcb0166b57912fd69bead86f160fd9830265fc1132f4ba4eff61aad3a74",
+        "helpers/windows/rootfs/packages.lock": "c7438f89684f797c93ace3527f0240c15ec765ca3a3c77157c5a18660824d5d4",
+        "helpers/windows/rootfs/probe-packages.lock": "97ac23b59c4cab8c861bfb487ddf65b2883ff496f45226eb43e3e620c48c8e42",
+        "helpers/windows/rootfs/build.py": "8164beea547ba36e77acd12c87cf24a58771d574f49e7917069a7f0586a08193",
+        "LICENSE": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691",
+        "helpers/windows/src/main/guest/guestbridge.py": "754447a88923b11799ba3510bfc924d0071729958ba7971cb1d23fbc6977e179",
+        "helpers/macos/src/main/native/cpu-probe.S": "d109f1f2e0c3a5bda7c3ef4bf47d162b79045b95eec4f2228d22607c45334b87"
+      },
+      "source_date_epoch": 1793664000,
+      "docker_export_sha256": "d47088c12025848297bf1780afc6c68bc4300b969227731e0024c5cd2e406413",
+      "tar_sha256": "f42ba303958a7259621bf70670a83440fcae3df4afd46c932907afb4cf73e8e6",
+      "tar_bytes": 403507200,
+      "tar_xz_sha256": "b9be53fe3bae9c468ae72e8ad0e24bf698090a93c7248b18b4fbe52b95d9c54c",
+      "tar_xz_bytes": 98147132,
+      "expanded_regular_bytes": 398954693,
+      "files_sha256": "ecba3352d2afcef2bd29780e3e46076b7eb9b338dab4cbc39ffccfbeeaef582f",
+      "packages_sha256": "27bc0a6fad1e542da5f9eb74c7ed8a055a6e6f6c0a11c006c4f7dbae2e6b3c88",
+      "members": 6275,
+      "xz": {
+        "preset": 6,
+        "check": "CRC64",
+        "decoder_limit_bytes": 67108864,
+        "decoder_memory_bytes": 8454200,
+        "bounded_decode_matches_tar": true,
+        "robot": "name\t/measure/rootfs.tar.xz\nfile\t1\t1\t98147132\t403507200\t0.243\tCRC64\t0\nstream\t1\t1\t0\t0\t98147132\t403507200\t0.243\tCRC64\t0\nblock\t1\t1\t1\t12\t0\t98147092\t403507200\t0.243\tCRC64\tec7879c4334bb794\t12\t--\t98147070\t8454200\t--lzma2=dict=8MiB\nsummary\t8454200\tno\t50000002\ntotals\t1\t1\t98147132\t403507200\t0.243\tCRC64\t0\t1\t8454200\tno\t50000002\n"
+      },
+      "inventory": {
+        "schemaVersion": 1,
+        "guestBridgeAbi": 1,
+        "projectLicense": {
+          "path": "/usr/share/doc/mcicon/copyright",
+          "license": "MIT",
+          "sha256": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691"
+        },
+        "guestBase": {
+          "format": "tar.xz",
+          "bytes": 98147132,
+          "sha256": "b9be53fe3bae9c468ae72e8ad0e24bf698090a93c7248b18b4fbe52b95d9c54c",
+          "bridgeSha256": "754447a88923b11799ba3510bfc924d0071729958ba7971cb1d23fbc6977e179",
+          "cpuProbeSha256": "b4fecfd8ca2d20f12e688a32473a123807ecce79fe8bcc0cb8aafa5ce79c2293",
+          "engines": {
+            "/usr/bin/docker": "7ed12b00293d64742419a6601ae97960a367a0ce97c88b06e3278cc0a409557b",
+            "/usr/bin/dockerd": "237b0603cc24496c74433aeb32d70a16931ae7e015f183b8f3c7c7db83c72a5f",
+            "/usr/bin/containerd": "98c9cd5187f7ab79faaaa77b22beb552176ce92c23714c1658f7f2e9e4a3a789",
+            "/usr/bin/runc": "bdce4d45b2dd217491db8a98c8484b161e225ce49c15ebc1ba42077fb7c07d50"
+          }
+        }
+      }
+    }
+  ],
+  "rootfsArchiveBytesEqual": true,
+  "rootfsComparison": {
+    "schemaVersion": 1,
+    "equal": {
+      "inputs_sha256": true,
+      "image_id": true,
+      "docker_export_sha256": false,
+      "tar_sha256": true,
+      "tar_xz_sha256": true,
+      "files_sha256": true,
+      "packages_sha256": true
+    },
+    "raw_export_differences": [
+      {
+        "path": ".dockerenv",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "dev",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "dev/console",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "dev/pts",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "dev/shm",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "etc",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "etc/hostname",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "etc/hosts",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "etc/mtab",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      },
+      {
+        "path": "etc/resolv.conf",
+        "changes": {
+          "mtime": [
+            1793958199,
+            1793958799
+          ]
+        }
+      }
+    ],
+    "normalized_differences": [],
+    "difference_classes": {
+      "raw": {
+        "docker_transport": [
+          ".dockerenv",
+          "etc/hostname",
+          "etc/hosts",
+          "etc/resolv.conf"
+        ],
+        "metadata_only": [
+          "dev",
+          "dev/console",
+          "dev/pts",
+          "dev/shm",
+          "etc",
+          "etc/mtab"
+        ],
+        "content_or_structure": []
+      },
+      "normalized": {
+        "docker_transport": [],
+        "metadata_only": [],
+        "content_or_structure": []
+      }
+    },
+    "unverified": [
+      "WSL import",
+      "実guest起動",
+      "offline製品経路",
+      "cgroup/容量能力",
+      "Docker engine実起動"
+    ],
+    "normalization": {
+      "mtime": 1793664000,
+      "owner": "数値uid/gid保持、uname/gnameを空にする",
+      "order": "path昇順",
+      "removed": [
+        ".dockerenv"
+      ],
+      "transport_files": {
+        "etc/hostname": "mcicon-guest\n",
+        "etc/hosts": "127.0.0.1 localhost\n::1 localhost ip6-localhost ip6-loopback\n",
+        "etc/resolv.conf": ""
+      }
+    }
+  },
+  "bridgeAndPins": {
+    "pins": {
+      "guestBase": {
+        "format": "tar.xz",
+        "bytes": 98147132,
+        "sha256": "b9be53fe3bae9c468ae72e8ad0e24bf698090a93c7248b18b4fbe52b95d9c54c",
+        "bridgeSha256": "754447a88923b11799ba3510bfc924d0071729958ba7971cb1d23fbc6977e179",
+        "cpuProbeSha256": "b4fecfd8ca2d20f12e688a32473a123807ecce79fe8bcc0cb8aafa5ce79c2293",
+        "engines": {
+          "/usr/bin/docker": "7ed12b00293d64742419a6601ae97960a367a0ce97c88b06e3278cc0a409557b",
+          "/usr/bin/dockerd": "237b0603cc24496c74433aeb32d70a16931ae7e015f183b8f3c7c7db83c72a5f",
+          "/usr/bin/containerd": "98c9cd5187f7ab79faaaa77b22beb552176ce92c23714c1658f7f2e9e4a3a789",
+          "/usr/bin/runc": "bdce4d45b2dd217491db8a98c8484b161e225ce49c15ebc1ba42077fb7c07d50"
+        }
+      },
+      "projectLicense": {
+        "path": "/usr/share/doc/mcicon/copyright",
+        "license": "MIT",
+        "sha256": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691"
+      }
+    },
+    "lineEndings": {
+      "helpers/windows/src/main/guest/guestbridge.py": {
+        "checkoutBytes": 27880,
+        "checkoutSha256": "754447a88923b11799ba3510bfc924d0071729958ba7971cb1d23fbc6977e179",
+        "gitBlobLfSha256": "8a72b5faa2fd21e300e34af3f419ddfe0e0808afb8e1da8cda6f66014413e31d",
+        "crlf": 388,
+        "lf": 388,
+        "normalizedEqual": true,
+        "bytesEqual": false,
+        "lfOnly": 0
+      },
+      "helpers/windows/src/main/native/windows-host.cpp": {
+        "checkoutBytes": 22780,
+        "checkoutSha256": "a20f1b06d94802033699c48c4d7ac69d55e77a43bb4e83765b8b7fabdf252021",
+        "gitBlobLfSha256": "9484e9341ef048c63247432723dc19cc9908e2ed075a02711327255dece55ea0",
+        "crlf": 166,
+        "lf": 166,
+        "normalizedEqual": true,
+        "bytesEqual": false,
+        "lfOnly": 0
+      },
+      "helpers/windows/rootfs/Dockerfile": {
+        "checkoutBytes": 2019,
+        "checkoutSha256": "6dbaebcb0166b57912fd69bead86f160fd9830265fc1132f4ba4eff61aad3a74",
+        "gitBlobLfSha256": "78d6d542279ee674a3207e716f81a8a799f1c1c9073ac3846ef59a504b0b582f",
+        "crlf": 25,
+        "lf": 25,
+        "normalizedEqual": true,
+        "bytesEqual": false,
+        "lfOnly": 0
+      },
+      "helpers/windows/rootfs/packages.lock": {
+        "checkoutBytes": 1006,
+        "checkoutSha256": "c7438f89684f797c93ace3527f0240c15ec765ca3a3c77157c5a18660824d5d4",
+        "gitBlobLfSha256": "c7438f89684f797c93ace3527f0240c15ec765ca3a3c77157c5a18660824d5d4",
+        "crlf": 0,
+        "lf": 31,
+        "normalizedEqual": true,
+        "bytesEqual": true,
+        "lfOnly": 31
+      },
+      "helpers/windows/rootfs/probe-packages.lock": {
+        "checkoutBytes": 280,
+        "checkoutSha256": "97ac23b59c4cab8c861bfb487ddf65b2883ff496f45226eb43e3e620c48c8e42",
+        "gitBlobLfSha256": "97ac23b59c4cab8c861bfb487ddf65b2883ff496f45226eb43e3e620c48c8e42",
+        "crlf": 0,
+        "lf": 8,
+        "normalizedEqual": true,
+        "bytesEqual": true,
+        "lfOnly": 8
+      }
+    },
+    "unchangedDependencyJars": [
+      {
+        "path": "commons-codec-1.19.0.jar",
+        "bytes": 374716,
+        "sha256": "5c3881e4f556855e9c532927ee0c9dfde94cc66760d5805c031a59887070af5f"
+      },
+      {
+        "path": "commons-compress-1.28.0.jar",
+        "bytes": 1117221,
+        "sha256": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca"
+      },
+      {
+        "path": "commons-io-2.20.0.jar",
+        "bytes": 563971,
+        "sha256": "df90bba0fe3cb586b7f164e78fe8f8f4da3f2dd5c27fa645f888100ccc25dd72"
+      },
+      {
+        "path": "commons-lang3-3.18.0.jar",
+        "bytes": 702952,
+        "sha256": "4eeeae8d20c078abb64b015ec158add383ac581571cddc45c68f0c9ae0230720"
+      },
+      {
+        "path": "jackson-annotations-2.22.jar",
+        "bytes": 84211,
+        "sha256": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0"
+      },
+      {
+        "path": "jackson-core-2.22.3.jar",
+        "bytes": 594776,
+        "sha256": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c"
+      },
+      {
+        "path": "jackson-databind-2.22.3.jar",
+        "bytes": 1709604,
+        "sha256": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9"
+      },
+      {
+        "path": "xz-1.10.jar",
+        "bytes": 168569,
+        "sha256": "95c63c1a55b22dd6453890a419cc1a640f790bbf7d8ae82db1e30aefefb08888"
+      }
+    ],
+    "nativeEqual": true,
+    "packageListSameAsC1": true,
+    "nativeSameAsE1": true,
+    "nativeManifestSha256": "1da1eadc933ffe4e6a143258a792f6cb8672ad320ea7cc7f82af14c9246a61a6",
+    "gradleTests": {
+      "windows": {
+        "tests": 55,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 21,
+        "passed": 34
+      },
+      "common": {
+        "tests": 33,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 33
+      }
+    }
+  },
+  "redistributionDocuments": {
+    "unchangedFromE1": 102,
+    "files": [
+      {
+        "path": "app/support/licenses/mcicon/LICENSE",
+        "bytes": 1106,
+        "sha256": "0adfee8b9490b28392f16dbbaf93345d0caf2c3fc3f314c9700549e8a8dc9691"
+      },
+      {
+        "path": "app/support/licenses/mcicon/licenses/Apache-2.0.txt",
+        "bytes": 11560,
+        "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5"
+      },
+      {
+        "path": "app/support/licenses/mcicon/licenses/Commons-Codec.txt",
+        "bytes": 11745,
+        "sha256": "38b2d13d7b547efcaa78a6f447a041a8a88b302a76bb771b72cd76d2b82afa29"
+      },
+      {
+        "path": "app/support/licenses/mcicon/licenses/Commons-Compress.txt",
+        "bytes": 11746,
+        "sha256": "ad086a2a58a3d5a5d356221150231429386afbc794b5298ae80eed4cb10c2f2d"
+      },
+      {
+        "path": "app/support/licenses/mcicon/licenses/Commons-IO.txt",
+        "bytes": 11744,
+        "sha256": "d08e9ff829f157fa145b44678d3e8a0acabf0358171ba1f8a61ef6ca4b3c4f7d"
+      },
+      {
+        "path": "app/support/licenses/mcicon/licenses/Commons-Lang.txt",
+        "bytes": 11744,
+        "sha256": "714effbc85cc8162f4cda09d8c32979a8785f009e876b5a2b952650f27f54ee4"
+      },
+      {
+        "path": "app/support/licenses/mcicon/licenses/XZ-for-Java.txt",
+        "bytes": 676,
+        "sha256": "2840cad8366d048dae6e711cc238771c113cfcae3b4ca1257397162859f4c416"
+      },
+      {
+        "path": "app/support/licenses/mcicon/THIRD_PARTY_NOTICES.md",
+        "bytes": 2621,
+        "sha256": "24d505e22ad897bf066fc2127d4e58db560c97d231826a5fdd5b9caa4ca200be"
+      },
+      {
+        "path": "app/support/native-build/licenses/LICENSE.TXT",
+        "bytes": 15141,
+        "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+      },
+      {
+        "path": "app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING",
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      {
+        "path": "app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt",
+        "bytes": 12155,
+        "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f"
+      },
+      {
+        "path": "app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt",
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      {
+        "path": "runtime/legal/java.base/ADDITIONAL_LICENSE_INFO",
+        "bytes": 2114,
+        "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916"
+      },
+      {
+        "path": "runtime/legal/java.base/aes.md",
+        "bytes": 1444,
+        "sha256": "45c6d4da48325edfbff3dcf71c704e504c057904435ed23c6d57046d551eb69d"
+      },
+      {
+        "path": "runtime/legal/java.base/asm.md",
+        "bytes": 1582,
+        "sha256": "683be15695bd248272d60f5b7fbe5e126a935ea6bf231a624a9aa164733e1d1d"
+      },
+      {
+        "path": "runtime/legal/java.base/ASSEMBLY_EXCEPTION",
+        "bytes": 1514,
+        "sha256": "75292f03bf23d3db7c985aecc191029b93883200721ed23ed34a2e601463df33"
+      },
+      {
+        "path": "runtime/legal/java.base/c-libutl.md",
+        "bytes": 1556,
+        "sha256": "bef40679922d6fdfb7e4ddb223ad6722300f6054ba737bbf6188d60fcec517f9"
+      },
+      {
+        "path": "runtime/legal/java.base/cldr.md",
+        "bytes": 9601,
+        "sha256": "19515e14a240e022640e95b61b5095127fa9690755950b4a2b0a02e783e08163"
+      },
+      {
+        "path": "runtime/legal/java.base/icu.md",
+        "bytes": 30197,
+        "sha256": "1bf28459c6e0af9f3429f4f8becd1668d6544055f8df240277456bc4b3d8a752"
+      },
+      {
+        "path": "runtime/legal/java.base/LICENSE",
+        "bytes": 19274,
+        "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+      },
+      {
+        "path": "runtime/legal/java.base/public_suffix.md",
+        "bytes": 17783,
+        "sha256": "861de1e4992a7d28f1de25c73cd50d26a94779ebd749c0643fecfa56442c3429"
+      },
+      {
+        "path": "runtime/legal/java.base/siphash.md",
+        "bytes": 8256,
+        "sha256": "5a792b5a74ad2a5f3d6a7ad8b7a841116e58a772c18bc6e392320a365b222c76"
+      },
+      {
+        "path": "runtime/legal/java.base/unicode.md",
+        "bytes": 9078,
+        "sha256": "6f72f10d166b2c2e8a395e03e734c5afc852b59aeca73ced124f6b9c96268d53"
+      },
+      {
+        "path": "runtime/legal/java.base/wepoll.md",
+        "bytes": 1454,
+        "sha256": "3ac2992770080453b98c42afa807ba4b2c1738ef756b92a55c645f55e7df48f0"
+      },
+      {
+        "path": "runtime/legal/java.base/zlib.md",
+        "bytes": 1010,
+        "sha256": "c9c70c36a1f0325e8788771906202d42ba6ab4205caca44ec0f665707e83226b"
+      },
+      {
+        "path": "runtime/legal/java.compiler/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.compiler/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.compiler/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.datatransfer/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.datatransfer/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.desktop/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.desktop/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.desktop/colorimaging.md",
+        "bytes": 167,
+        "sha256": "04d61e3e8e71dd452ebe52008af5378d9f6640d14578aeb515dc5375973b0189"
+      },
+      {
+        "path": "runtime/legal/java.desktop/freetype.md",
+        "bytes": 30465,
+        "sha256": "553e804baecb7de7129d77c7259a6b70037d1893f1c600b41b35201695fb7758"
+      },
+      {
+        "path": "runtime/legal/java.desktop/giflib.md",
+        "bytes": 1689,
+        "sha256": "206aab89ec75968e48a6a1ed6df7d8b9bfb7aea12cbe4c9345d93e5d97460a25"
+      },
+      {
+        "path": "runtime/legal/java.desktop/harfbuzz.md",
+        "bytes": 3629,
+        "sha256": "5ec7cba7f8e7fc3a089213140aab6fa1b3bd5bf8a91bf8bddb3b8d315fc5f7d0"
+      },
+      {
+        "path": "runtime/legal/java.desktop/jpeg.md",
+        "bytes": 3474,
+        "sha256": "c1dfb9719a71ad9f861f8728550542d681e25c8ef40e6393606e6e2a0c1d653a"
+      },
+      {
+        "path": "runtime/legal/java.desktop/lcms.md",
+        "bytes": 2654,
+        "sha256": "843f9f6fa9c3f8109fcf4d5fe74caf7f2ae8e9bcd92238e4aff2d428c932b24b"
+      },
+      {
+        "path": "runtime/legal/java.desktop/libpng.md",
+        "bytes": 7519,
+        "sha256": "f73afb394792f3aeecd959e89487603677a430e56b44eba596d8b572accfd540"
+      },
+      {
+        "path": "runtime/legal/java.desktop/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.desktop/mesa3d.md",
+        "bytes": 5732,
+        "sha256": "63f4e6f75caebbccb95d903fb43e46ac7111b3624d0a34f146b276d7d9e7b152"
+      },
+      {
+        "path": "runtime/legal/java.instrument/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.instrument/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.instrument/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.logging/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.logging/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.logging/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.management/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.management/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.management/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.management.rmi/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.management.rmi/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.naming/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.naming/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.naming/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.net.http/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.net.http/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.net.http/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.prefs/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.prefs/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.prefs/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.rmi/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.rmi/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.rmi/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.scripting/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.scripting/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.scripting/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.se/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.se/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.se/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.security.jgss/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.security.jgss/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.security.sasl/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.security.sasl/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.sql/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.sql/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.sql/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.sql.rowset/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.sql.rowset/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.transaction.xa/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.transaction.xa/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.xml/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.xml/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.xml/bcel.md",
+        "bytes": 11196,
+        "sha256": "cd578186ad93de46cca29ec8ace2b11f9da751987f3f140e6095c528596cc8c1"
+      },
+      {
+        "path": "runtime/legal/java.xml/dom.md",
+        "bytes": 3761,
+        "sha256": "6686e8877667584a3a7c07344baadca1a03e29f677162d87c3c0811e990d1148"
+      },
+      {
+        "path": "runtime/legal/java.xml/jcup.md",
+        "bytes": 1448,
+        "sha256": "8d5dcfdf50455a3c34c753a98f21e953248af200415a9084e3f102cb6c43b8bf"
+      },
+      {
+        "path": "runtime/legal/java.xml/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.xml/xalan.md",
+        "bytes": 13477,
+        "sha256": "c27eb875da4be683d4d7422be986e5e30f636ede31958ff1d39f9cd6109e7a00"
+      },
+      {
+        "path": "runtime/legal/java.xml/xerces.md",
+        "bytes": 11848,
+        "sha256": "4a6bf6b367193ee68681cb2d9fed30ffc5d62dd2d477bd62e0271707d71b3244"
+      },
+      {
+        "path": "runtime/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/java.xml.crypto/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/java.xml.crypto/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      },
+      {
+        "path": "runtime/legal/java.xml.crypto/santuario.md",
+        "bytes": 11505,
+        "sha256": "d08690d25f660f145c73365d260ed522cd0aace8a0e1396706551b7a1ae8c9a3"
+      },
+      {
+        "path": "runtime/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO",
+        "bytes": 49,
+        "sha256": "ebf9777bd307ed789ceabf282a9aca168c391c7f48e15a60939352efb3ea33f9"
+      },
+      {
+        "path": "runtime/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION",
+        "bytes": 44,
+        "sha256": "b998cda101e5a1ebcfb5ff9cddd76ed43a2f2169676592d428b7c0d780665f2a"
+      },
+      {
+        "path": "runtime/legal/jdk.crypto.ec/LICENSE",
+        "bytes": 33,
+        "sha256": "86e0516b888276a492b19f9a84f5a866ed36925fae1510b3a94a0b6213e69192"
+      }
+    ],
+    "projectNoticesVerified": true,
+    "nativeNoticesVerified": true
+  },
+  "tests": {
+    "gradle": {
+      "windows": {
+        "tests": 55,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 21,
+        "passed": 34
+      },
+      "common": {
+        "tests": 33,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 33
+      }
+    },
+    "python": {
+      "test-native-artifact-windows": {
+        "tests": 5,
+        "exit": 0,
+        "log": "build/111-c/test-native-artifact-windows.log",
+        "sha256": "2424617c5eb6dd0ce8b0ad0731c842afd6272cf893b2fe49b09159a6be159564"
+      },
+      "test-build-native-windows": {
+        "tests": 8,
+        "exit": 0,
+        "log": "build/111-c/test-build-native-windows.log",
+        "sha256": "d708d49939de6e5082f946d02054c376f253629a794b8cd569ecbf23869acc03"
+      },
+      "test-daemon-windows": {
+        "tests": 13,
+        "exit": 0,
+        "log": "build/111-c/test-daemon-windows.log",
+        "sha256": "2ac8b0b1798d57f6da8b4d2fe38128f3680e2cfaeba9d089264979906a88906b"
+      },
+      "test-build-windows": {
+        "tests": 2,
+        "exit": 0,
+        "log": "build/111-c/test-build-windows.log",
+        "sha256": "f3419ccdd65e7cf76f79f32ec8986b74b4d1c2497f99c4192f958efb3c377d2f"
+      },
+      "test-guestbridge-linux": {
+        "tests": 27,
+        "exit": 0,
+        "log": "build/111-c/test-guestbridge-linux.log",
+        "sha256": "cd35d883a175d938cb09a68c3bdee892d01c55b18085ae5e9848cc22115c0790"
+      },
+      "test-daemon-linux": {
+        "tests": 13,
+        "exit": 0,
+        "log": "build/111-c/test-daemon-linux.log",
+        "sha256": "fb33a9e41757112851f0481f3a0e36adb8fd286e00b488d80bd4496b92fd3f8d"
+      },
+      "test-build-linux": {
+        "tests": 2,
+        "exit": 0,
+        "log": "build/111-c/test-build-linux.log",
+        "sha256": "f2f7f20b09268ff1a5a9edf399b32bb047568b9780fc65a6c38dee4a6be91892"
+      }
+    }
+  },
+  "dockerRestoration": {
+    "distros": [
+      {
+        "guid": "{064cd034-e011-4c35-bc86-41a9f2d157d7}",
+        "DistributionName": "MCIcon-82ec446b986db27cff993a27",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v10\\execution\\runtime\\windows\\82ec446b986db27cff993a27d675c889d5868198816543fbbc3d8ab657a7991e\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{077c8a19-d2d7-4c7e-837e-72cdd1d75086}",
+        "DistributionName": "MCIcon-9333825c39c0df5f8d3ab095",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v12\\execution\\runtime\\windows\\9333825c39c0df5f8d3ab095ce78c7f279a23808268fbf1939d8aa73f1cff3c6\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{113e82a5-8576-4da4-a26f-52ea99771b32}",
+        "DistributionName": "MCIcon-Issue95-Builder-V14",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v19\\execution\\wsl\\MCIcon-Issue95-Builder-V14",
+        "Version": 2
+      },
+      {
+        "guid": "{185b9688-8c62-4e3b-8d76-d33219cb0217}",
+        "DistributionName": "MCIcon-9922213e9d5e232bf90db2d7",
+        "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v9\\run-001\\data\\v7-shared\\runtime\\windows\\9922213e9d5e232bf90db2d76a9b03ead0e5340f081e77e4bdd38304a27e499b\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{251ca84f-9435-468e-955a-674ac1f5fee0}",
+        "DistributionName": "MCIcon-Issue95-Builder-V9",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v14\\execution\\wsl\\MCIcon-Issue95-Builder-V9",
+        "Version": 2
+      },
+      {
+        "guid": "{29d66d8e-2e84-4277-a4d3-d97d02996f68}",
+        "DistributionName": "MCIcon-Issue95-Builder-V12",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v17\\execution\\wsl\\MCIcon-Issue95-Builder-V12",
+        "Version": 2
+      },
+      {
+        "guid": "{324df4f0-a387-4f7f-8c0d-7f2fb394b448}",
+        "DistributionName": "MCIcon-6b7e078236b9d00319f34e40",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v6\\execution\\runtime\\windows\\6b7e078236b9d00319f34e4066fe021c0a3e9e25102e149edaac0aa7808248d4\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{39a3df50-3c2a-4f58-94ca-f191df00e9f9}",
+        "DistributionName": "MCIcon-5ba0815df4293859842d2fbc",
+        "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v11\\run-001\\data\\v7-shared\\runtime\\windows\\5ba0815df4293859842d2fbca0bea186a568388be81eec08b97c7b7c77a3efc6\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{3a5ed283-9081-49df-9336-770b9bb1ee1f}",
+        "DistributionName": "docker-desktop",
+        "BasePath": "\\\\?\\C:\\Users\\ryuma\\AppData\\Local\\Docker\\wsl\\main",
+        "Version": 2
+      },
+      {
+        "guid": "{3b3159bd-19d4-494c-b993-0fb5ce31ddfc}",
+        "DistributionName": "MCIcon-Issue95-Builder-V18",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v23\\execution\\wsl\\MCIcon-Issue95-Builder-V18",
+        "Version": 2
+      },
+      {
+        "guid": "{3eff1d21-6cb6-4d57-82aa-c732b8239045}",
+        "DistributionName": "MCIcon-Issue95-Builder-V5",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v10\\execution\\wsl\\MCIcon-Issue95-Builder-V5",
+        "Version": 2
+      },
+      {
+        "guid": "{46e05d44-6388-480d-9dca-f9b61335d4c2}",
+        "DistributionName": "MCIcon-Issue95-Builder-V6",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v11\\execution\\wsl\\MCIcon-Issue95-Builder-V6",
+        "Version": 2
+      },
+      {
+        "guid": "{558be4d0-cc18-4ae8-a8a9-534479c4fc93}",
+        "DistributionName": "MCIcon-Issue95-Builder-V11",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v16\\execution\\wsl\\MCIcon-Issue95-Builder-V11",
+        "Version": 2
+      },
+      {
+        "guid": "{70891763-840d-4d65-9d9a-b21488fc1772}",
+        "DistributionName": "MCIcon-Issue95-Builder-V7",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v12\\execution\\wsl\\MCIcon-Issue95-Builder-V7",
+        "Version": 2
+      },
+      {
+        "guid": "{8314adf2-7a23-4a72-99be-0869baeadb56}",
+        "DistributionName": "MCIcon-Issue95-Builder-V17",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v22\\execution\\wsl\\MCIcon-Issue95-Builder-V17",
+        "Version": 2
+      },
+      {
+        "guid": "{8c80dd3f-8c3a-4017-8f1c-6ecd97c5f6cf}",
+        "DistributionName": "MCIcon-9862bd8335a9aac8f8f1844f",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v15\\execution\\runtime\\windows\\9862bd8335a9aac8f8f1844fa5194f04defd3af53d2769b21037992a237a7a15\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{8d9eb482-68de-4c4b-b9cd-691524ea6c41}",
+        "DistributionName": "MCIcon-6717dc3f92906fd38d19c3dc",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v4\\execution\\runtime\\windows\\6717dc3f92906fd38d19c3dc5e0eab689321191628c360edaa3ddbf5b18fc74a\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{8f7a348e-ab75-432b-b2e3-da7fa521ea81}",
+        "DistributionName": "MCIcon-aa038dd224dc38f9939cf22d",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v17\\execution\\runtime\\windows\\aa038dd224dc38f9939cf22d1bb11d7780792e00edf868fcaa6d3c2eff11fe85\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{92353240-335d-4bae-bcde-e6dfd20a4851}",
+        "DistributionName": "MCIcon-a5124a2a2ee645c086f33d07",
+        "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\a5124a2a2ee645c086f33d0701395208f6d2d40871b001f8a44de333af986a5e\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{96352485-9336-4648-a2a4-9f2d8d96f3d0}",
+        "DistributionName": "MCIcon-Issue95-Builder-V16",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v21\\execution\\wsl\\MCIcon-Issue95-Builder-V16",
+        "Version": 2
+      },
+      {
+        "guid": "{9ae51412-9d23-49f5-824f-45c085d5fda6}",
+        "DistributionName": "MCIcon-Issue95-Builder-V13",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v18\\execution\\wsl\\MCIcon-Issue95-Builder-V13",
+        "Version": 2
+      },
+      {
+        "guid": "{9e0a73f1-e23a-4d5b-b8e1-d4f91bb71f2a}",
+        "DistributionName": "MCIcon-2c9dc6b88d5831cb3a818c68",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v11\\execution\\runtime\\windows\\2c9dc6b88d5831cb3a818c683bb26aaeb8e53726211521c158065302010553e0\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{a20424d3-489d-4839-92e7-27f43dcdbabf}",
+        "DistributionName": "MCIcon-f87fc4aebed84984c9e250f6",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-h-c18-v3\\execution-v1\\runtime\\windows\\f87fc4aebed84984c9e250f6c9cfae1d114df685f8781767525c87fb7296ebae\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{a823b519-6483-42f8-a2df-bf49e19e5c22}",
+        "DistributionName": "MCIcon-Issue95-Builder-V8",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v13\\execution\\wsl\\MCIcon-Issue95-Builder-V8",
+        "Version": 2
+      },
+      {
+        "guid": "{a9285574-2e26-4dbb-8f93-d524f2ae090f}",
+        "DistributionName": "MCIcon-d8a4dfb01684287672a8eba8",
+        "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\d8a4dfb01684287672a8eba87bddc2d0bd887d2ca36e03731831e18ac4a39139\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{b383c507-977f-4181-b801-26f8ce5c282d}",
+        "DistributionName": "Ubuntu-24.04",
+        "BasePath": "H:\\WSL\\colorstats",
+        "Version": 2
+      },
+      {
+        "guid": "{b70783eb-11fe-4f3c-9403-d39cc1b78519}",
+        "DistributionName": "MCIcon-Issue95-Builder-V4",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v9\\execution\\wsl\\MCIcon-Issue95-Builder-V4",
+        "Version": 2
+      },
+      {
+        "guid": "{c065f811-314d-4ce9-8b86-667709b4c700}",
+        "DistributionName": "MCIcon-128c33dcea15a8ea6487eac4",
+        "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v10\\run-001\\data\\v7-shared\\runtime\\windows\\128c33dcea15a8ea6487eac44e6f16e33361939901380c71b7d1e3da34703bce\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{cc9905db-38e5-4092-bc92-6779714317b0}",
+        "DistributionName": "MCIcon-Issue95-Builder-V15",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v20\\execution\\wsl\\MCIcon-Issue95-Builder-V15",
+        "Version": 2
+      },
+      {
+        "guid": "{d4561e5c-093d-45bf-9c68-96f73e15ebd7}",
+        "DistributionName": "MCIcon-b28910c0585341f944637b75",
+        "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\b28910c0585341f944637b75f3a17aa832341dab179332dea7a8e0e2ba0c1697\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{de20cb1d-d465-40c0-8b5b-7e52934b3212}",
+        "DistributionName": "MCIcon-Issue95-Builder-V3",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v8\\execution\\wsl\\MCIcon-Issue95-Builder-V3",
+        "Version": 2
+      },
+      {
+        "guid": "{e3ed6870-c0d8-4ca2-8b88-108be81baebb}",
+        "DistributionName": "MCIcon-Issue91-V1",
+        "BasePath": "H:\\MCIconGenerator\\issue-91-managed-contract\\resume-encoding-v1\\wsl\\MCIcon-Issue91-V1",
+        "Version": 2
+      },
+      {
+        "guid": "{e5297f5f-fca4-40ce-84d3-2d3352431a19}",
+        "DistributionName": "MCIcon-5ef94cacfdb4b618ae4d791a",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v13\\execution\\runtime\\windows\\5ef94cacfdb4b618ae4d791ac1c4bd3b6e34bfb6dc0cfcbe557311d7fa512b5a\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{e581e759-ecd7-4999-9246-ac7b889de6ba}",
+        "DistributionName": "MCIcon-987cb1cb668708b0d7fff9b6",
+        "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v7\\run-002\\data\\v7-shared\\runtime\\windows\\987cb1cb668708b0d7fff9b620f3fd42febdee04b19eb34df1b118a0207b0346\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{e99312fa-3a3c-41d9-ba62-a63bd21a3d61}",
+        "DistributionName": "MCIcon-0e44596ba5e39d6030376249",
+        "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\0e44596ba5e39d60303762491418a9756957001b3aac66c878ee844077cc1754\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{e9a61512-b3a9-41a8-aedc-33c1d2118873}",
+        "DistributionName": "MCIcon-833fcb60d85b240e66f84eff",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v9\\execution\\runtime\\windows\\833fcb60d85b240e66f84eff163c8bd463f40ef40157046c23ea353611fad923\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{ed068c71-7535-4dca-9530-918058651f19}",
+        "DistributionName": "MCIcon-Issue95-ImportQA-V11",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\import-qa-v11\\execution\\wsl\\MCIcon-Issue95-ImportQA-V11",
+        "Version": 2
+      },
+      {
+        "guid": "{ef807971-d897-4bbb-96cb-25f9b75c4400}",
+        "DistributionName": "MCIcon-fa14990d78f8adb210b6936d",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v16\\execution\\runtime\\windows\\fa14990d78f8adb210b6936d11de38a365576d83e209b371ecdcc870c407d17b\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{f58f58d2-05cd-45c6-94d9-102def7478e8}",
+        "DistributionName": "MCIcon-3c769605f0eb59fd27565bed",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v7\\execution\\runtime\\windows\\3c769605f0eb59fd27565bed48accdb48b57f032c22325abf2184287ffdbf91d\\distro",
+        "Version": 2
+      },
+      {
+        "guid": "{f8cffce3-4776-41a2-89f9-961946f63569}",
+        "DistributionName": "MCIcon-Issue95-Builder-V10",
+        "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v15\\execution\\wsl\\MCIcon-Issue95-Builder-V10",
+        "Version": 2
+      }
+    ],
+    "wsl": {
+      "exit": 0,
+      "output": "  NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2\r\n"
+    },
+    "dockerProcesses": {
+      "exit": 0,
+      "output": ""
+    },
+    "dockerEngine": {
+      "exit": 1,
+      "output": "null\nfailed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+    },
+    "registryEqual": false,
+    "wslRawEqual": false,
+    "wslStateEqual": true,
+    "userRegistryEqual": true,
+    "dockerBackendRegistration": {
+      "before": [
+        {
+          "guid": "{a86a23dd-a7b1-4af4-8955-82dee3d91eca}",
+          "DistributionName": "docker-desktop",
+          "BasePath": "\\\\?\\C:\\Users\\ryuma\\AppData\\Local\\Docker\\wsl\\main",
+          "Version": 2
+        }
+      ],
+      "after": [
+        {
+          "guid": "{3a5ed283-9081-49df-9336-770b9bb1ee1f}",
+          "DistributionName": "docker-desktop",
+          "BasePath": "\\\\?\\C:\\Users\\ryuma\\AppData\\Local\\Docker\\wsl\\main",
+          "Version": 2
+        }
+      ]
+    },
+    "dockerStopped": true,
+    "ownImageTagsRemoved": true,
+    "existingDistroOperations": [],
+    "sharedBuilderCache": "所有を分離できないためpruneせず保全"
+  },
+  "evidence": {
+    "build/111-c/after.py": {
+      "bytes": 2569,
+      "sha256": "6f0fcabe97bdb78c51954b9c495862df63a06c422ee1636cb71b605421021b96"
+    },
+    "build/111-c/audit.py": {
+      "bytes": 4403,
+      "sha256": "e0062a50fad09effffa95737969e3cefb9977939206f45ad378a150bb2d8e351"
+    },
+    "build/111-c/before.py": {
+      "bytes": 1594,
+      "sha256": "e50b830f16b9cd72d57d5329413d44dadf271d78663a7586987d38db3077d816"
+    },
+    "build/111-c/cleanup.py": {
+      "bytes": 1321,
+      "sha256": "23ebcf01898216a2d975d9a15c12867c2af5e073edd5590fc2524f456adb7845"
+    },
+    "build/111-c/finish-package.py": {
+      "bytes": 1497,
+      "sha256": "6f55f06ef1f2713cefdf2a1bc8fb9d6dfcf9f58276a4d4d4c0124bc233ec5f4c"
+    },
+    "build/111-c/helper-runs.py": {
+      "bytes": 3032,
+      "sha256": "9b954d4a9f63eada03b645d070d63501162949f00593d2b84babbf78b4fdd355"
+    },
+    "build/111-c/package-runs.py": {
+      "bytes": 4918,
+      "sha256": "c96a3bd1fb0ae03de59b242fc613eca30b736cf6937fae8504cc0592feede81c"
+    },
+    "build/111-c/rootfs-runs.py": {
+      "bytes": 1956,
+      "sha256": "9823456e161b163c90dac2e1dda6ee938db038c306dd24116771bc73a08c45cf"
+    },
+    "build/111-c/after-initial.json": {
+      "bytes": 15412,
+      "sha256": "02a7b21ce450a3040edc0f6ba42375bab6e05182cb065882dea2c255efc27ee6"
+    },
+    "build/111-c/after.json": {
+      "bytes": 16012,
+      "sha256": "312eb6f5701946f03ff79e5b6adb19f34bdefcb5a2ea9ce812329e2ccfe714ed"
+    },
+    "build/111-c/audit.json": {
+      "bytes": 4649,
+      "sha256": "f542c94ebbdd922137d12c1a60a6ced5faba59501d994c4ba418c382419192ab"
+    },
+    "build/111-c/before.json": {
+      "bytes": 15284,
+      "sha256": "f82fa3d873bf37bd11d3484d4de9204ad99c0e5d35c0819f5d9b6ad9262b7a2e"
+    },
+    "build/111-c/cleanup-images.json": {
+      "bytes": 5773,
+      "sha256": "9ea62225abdabf55d14c8d5b71bdb19635ea7814c1bb35beddc07483f10b6dae"
+    },
+    "build/111-c/cleanup.json": {
+      "bytes": 5857,
+      "sha256": "bc088368013d33b1e6627cdf5a4affbd66762c2f63b847df04dfa3ef8377a6d7"
+    },
+    "build/111-c/docker-version.json": {
+      "bytes": 1148,
+      "sha256": "e179156f105c459739b28fb09d53523323472491e8a3521453a5f242704ea6e1"
+    },
+    "build/111-c/helper-result.json": {
+      "bytes": 373713,
+      "sha256": "0c1f2d7182f29750c7363847d48838bc0f67cdb9f912fd2ef721b5e660a86f3e"
+    },
+    "build/111-c/inputs.json": {
+      "bytes": 2779,
+      "sha256": "0c8cd154182134283902fc666688f0f9e3b064806e21b4e59f6dc1c3be3bf301"
+    },
+    "build/111-c/linux-tests.json": {
+      "bytes": 90,
+      "sha256": "52e6a3db794850022a635f1b8c0d1fea3745542a0218dd3cfeaa8341ead537a2"
+    },
+    "build/111-c/rootfs-compare.json": {
+      "bytes": 15528,
+      "sha256": "a578195c5f3de057e644de74811f940b2642f049863f38527d99179391b52dd9"
+    },
+    "build/111-c/windows-python-tests.json": {
+      "bytes": 135,
+      "sha256": "b7a48d6411edfc3d0d1247cec8f408448f8001966b1f580e0b610dffb19bef8f"
+    },
+    "build/111-c/helper-tests.log": {
+      "bytes": 1566,
+      "sha256": "7483b1a6dd9f3bbb33347c20d05bd4e8af63afa6cf38897c9f9feb4ce119ef7c"
+    },
+    "build/111-c/java-1.log": {
+      "bytes": 1348,
+      "sha256": "204a20a47519d9e974661a23bd08fa13948f9280ced9059e5e2f8f5ca9889162"
+    },
+    "build/111-c/java-2.log": {
+      "bytes": 1348,
+      "sha256": "cf604d344e8121b255ec18b9bd0bdac314c4ac3e5a6bba0a3f9522dc88832508"
+    },
+    "build/111-c/native-1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build/111-c/native-2.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build/111-c/package-1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build/111-c/package-2.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build/111-c/rootfs-compare.log": {
+      "bytes": 227,
+      "sha256": "8d0cfd9933895d76299bc5824be40036fc7e46985d7cda374f1d4255acf2309f"
+    },
+    "build/111-c/run111-a.log": {
+      "bytes": 4753,
+      "sha256": "87ee0f4aeed8dbb555edb4dca526afb4642ed4f790cfd5d1ad4a777755f63307"
+    },
+    "build/111-c/run111-b.log": {
+      "bytes": 4753,
+      "sha256": "cfed0dc4e1106d05ac3d733c81d9f371b3f43d3edbbf429d29837089a507b399"
+    },
+    "build/111-c/test-build-linux.log": {
+      "bytes": 100,
+      "sha256": "f2f7f20b09268ff1a5a9edf399b32bb047568b9780fc65a6c38dee4a6be91892"
+    },
+    "build/111-c/test-build-native-windows.log": {
+      "bytes": 111,
+      "sha256": "d708d49939de6e5082f946d02054c376f253629a794b8cd569ecbf23869acc03"
+    },
+    "build/111-c/test-build-windows.log": {
+      "bytes": 105,
+      "sha256": "f3419ccdd65e7cf76f79f32ec8986b74b4d1c2497f99c4192f958efb3c377d2f"
+    },
+    "build/111-c/test-daemon-linux.log": {
+      "bytes": 112,
+      "sha256": "fb33a9e41757112851f0481f3a0e36adb8fd286e00b488d80bd4496b92fd3f8d"
+    },
+    "build/111-c/test-daemon-windows.log": {
+      "bytes": 117,
+      "sha256": "2ac8b0b1798d57f6da8b4d2fe38128f3680e2cfaeba9d089264979906a88906b"
+    },
+    "build/111-c/test-guestbridge-linux.log": {
+      "bytes": 126,
+      "sha256": "cd35d883a175d938cb09a68c3bdee892d01c55b18085ae5e9848cc22115c0790"
+    },
+    "build/111-c/test-native-artifact-windows.log": {
+      "bytes": 108,
+      "sha256": "2424617c5eb6dd0ce8b0ad0731c842afd6272cf893b2fe49b09159a6be159564"
+    },
+    "build/111-c/buildx-before.txt": {
+      "bytes": 459,
+      "sha256": "8d25beb68aa6df4646bdc9887292be4ada334060c3c4c728fd8800d1eff0a38e"
+    },
+    "build/111-c/buildx-version.txt": {
+      "bytes": 74,
+      "sha256": "d9cf3efe6fd516633e6deaa14313c3c8f4871ad6afb520815fee9ef161901bdc"
+    }
+  },
+  "unverified": [
+    "正式inventory・source対応・署名descriptorへの統合（段階D）",
+    "専用WSLでのimport・実guest/daemon起動・製品offline/cgroup/回収の実機受入（後続工程）",
+    "helper-windowsの21skipはnative/WSL実機受入として数えない"
+  ],
+  "publication": {
+    "commit": false,
+    "push": false,
+    "pr": false,
+    "issueOperation": false
+  },
+  "notes": [
+    "rootfs生成器のcompare出力にある旧固定date/refsは今回QAへ転記しない。測定日は本QAのdateが正本。",
+    "Git blob LFとcheckout CRLFを区別し、pinにはアーカイブに実収録されたbytesを採用。",
+    "source/依存条件は既存1.1.0 QAおよび確定済み1.1.1契約を再利用。追加依存・toolchain更新なし。",
+    "Windows共通テストのPOSIX固定host bindのみ実行OSの正規絶対pathへ変更。製品コード・公開契約に変更なし。",
+    "Docker内部docker-desktopはDesktop起動時に同名/同BasePath/同VersionでGUIDを再登録。停止状態へ復元し、ユーザーdistro39件の登録と全distroの稼働状態は一致。GUIDを書き戻す操作は行わない。",
+    "包装後集計のWindows path区切りによるIndexErrorは集計だけを修正し再開。成功済み2runのZIPを再生成せず比較を完了。"
+  ]
+}
