@@ -88,3 +88,15 @@ QAの候補帰属監査は9componentで全196fileを覆い、106文書本文のs
 **Lima/VZでの実VM起動、Rosettaの導入・同意・変換実行、OS下限15.8.1での正式候補受入、未署名配布物の初回許可、管理描画は未検証。承認後に実行する別単位である。** 同じ15.8.1上での非VM packaging成功を製品受入へ拡張しない。実更新/uninstall/cold-start、正式trust/resource/package接続も既存gateを維持する。
 
 正式候補採用には、Apple toolchainの再生成条件、上記license/source閉包と正式公開先、最終inventoryを確定する必要がある。#91/#94はRefsのまま維持し、commit・push・PR・release・Issue closeは行っていない。
+
+## 1.1.1 段階B（2026-11-06）
+
+起点はmain `c7b507ac920ed360a62866c0fe7a26e43740c55c`（#176）。[段階A契約](release-candidate-1.1.1.md)に従い、専用Mac領域で同じ固定JDK21.0.13+9/Python3.12.16/Apple toolchainを使った独立2runを実施した。全613ソースのGit blob生bytesを転送し、各runのsource/HOME/TMP/Gradle cache/payload/出力を分離した。初回のWindows archive改行変換を検出・非採用とし、LF blob基準で再実行した。
+
+全196file・展開後206,610,147 bytes、file/directory mode、ZIP bytesが一致した。ZIPは両方 **125,853,796 bytes**、SHA-256 **`6b6b3b5937a4ece6afaff5ff0bb72df102f4874bb37f68d8eda31f023617d3cc`**。外側appのCFBundleShortVersionString/CFBundleVersionは両方1.1.1、codesign deep/strictと移動・ZIP再展開検証が成功した。各runのhelper-macosは48件中47成功・任意probe fixture 1skip、helper-commonは33件すべて成功。inventory合成45条件も各run成功した。
+
+v1.1.0公開qcow2を新規取得し620,224,512 bytes・SHA `1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55`を照合した。再buildではない。旧source2本は保全済み本体を再hashし、MANIFESTの第三者source1,580件・旧notice pathを保持する対応を確認した。既存license/notice106本文は同bytesであり、9componentで全fileを帰属させた。JDK launcher/libjliの差は再署名領域だけで、その外側bytesは旧正式ZIPと一致した。新helperのプロジェクトsourceは上記起点に対応し、旧第三者bundleが新プロジェクトsourceを含むとは扱わない。
+
+測定・全file/mode・source/notice対応・Dへの引継ぎは[QA](../qa/mac-helper-candidate-1.1.1-2026-11-06.json)と[LF blob基準checksum](../qa/mac-helper-candidate-1.1.1-2026-11-06.json.sha256)に記録した。ZIP2本・qcow2・生ログは担当worktreeの`build/111-b/`へ回収済み。Mac専用`/Users/ryuman/tmp-mcicon-111`は削除し、不存在・所有process残存なしを確認した。既存Lima/Homebrew・OS設定は変更せず、VMも起動していない。
+
+段階Bの再現ビルド完了と正式inventoryの採用を分け、`finalBytesConfirmed=false`を維持する。5資材全体のsource/notice閉包・最終公開commit/tag・inventoryはDで確定する。署名descriptor/core/payload接続・実VM生成回収・51版受入・更新E2Eは後続gateであり、D1/D2bや今回の包装成功から受入済みとはしない。commit/push/PR/Issue操作は行っていない。
