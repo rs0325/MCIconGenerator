@@ -1,0 +1,1593 @@
+{
+  "schemaVersion": 1,
+  "taskId": "milestone-e2e-windows",
+  "host": "windows",
+  "date": "2026-11-05",
+  "refs": [
+    "#94",
+    "#95",
+    "#98",
+    "#99"
+  ],
+  "baseCommit": "d33583fcae09b513e18352dc238bf30533fc41b3",
+  "branch": "feature/issue-95-e2e-windows",
+  "status": "導入・管理描画・回収は合格。ブラウザ取得時のOS警告は未検証",
+  "acceptancePassed": false,
+  "scope": {
+    "productVersion": "1.1.0",
+    "publicArtifactsOnly": true,
+    "localProductBuildUsed": false,
+    "initialDataRootAbsent": true,
+    "initialHelpSeconds": 46.031,
+    "initialRuntimeAndInputCachesAbsent": true,
+    "dataRoot": "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\data",
+    "temporaryRoot": "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\tmp",
+    "versions": [
+      "1.14.4",
+      "1.21.4",
+      "26.3"
+    ],
+    "item": "minecraft:stone",
+    "size": 64,
+    "existingWslHost": true,
+    "cleanOsHost": false
+  },
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "host": "windows",
+    "os": {
+      "Caption": "Microsoft Windows 11 Pro",
+      "Version": "10.0.26200",
+      "BuildNumber": "26200",
+      "OSArchitecture": "64 ビット",
+      "TotalVisibleMemorySize": 67031500
+    },
+    "wslVersion": {
+      "exit": 0,
+      "stdout": "WSL バージョン: 3.0.3.0\r\nカーネル バージョン: 6.18.54.1-1\r\nWSLg バージョン: 1.0.79\r\nMSRDC バージョン: 1.2.7391\r\nDirect3D バージョン: 1.611.1-81528511\r\nDXCore バージョン: 10.0.26100.1-240331-1435.ge-release\r\nWindows バージョン: 10.0.26200.9711"
+    },
+    "authenticode": {
+      "Status": 2,
+      "statusText": "NotSigned"
+    },
+    "zoneIdentifiers": {
+      "build\\e2e\\bootstrap.zip": null,
+      "build\\e2e\\package\\mcicon.exe": null
+    }
+  },
+  "acquisition": {
+    "bootstrap": {
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-bootstrap-1.1.0-windows-x86_64.zip",
+      "bytes": 70496160,
+      "sha256": "2fd5ed53283d77372519368051f67a6bec6be50d32dcc4a61ece13be11e90bfe",
+      "seconds": 4.985
+    },
+    "central": [
+      {
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-core/1.1.0/mcicon-core-1.1.0.jar",
+        "bytes": 427817,
+        "sha256": "b3ea6fccb3a0571ee88cda3d94a2faac71dbe9dfd64e990eb7b0967838e81bca",
+        "seconds": 0.218,
+        "bootstrapSlotPath": "build\\e2e\\data\\bootstrap\\tools\\1.1.0\\c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3\\app\\lib\\core-1.1.0.jar",
+        "bootstrapBytesEqual": true
+      },
+      {
+        "url": "https://repo.maven.apache.org/maven2/io/github/rs0325/mcicon/mcicon-worker/1.1.0/mcicon-worker-1.1.0.jar",
+        "bytes": 489342,
+        "sha256": "5b1272933b53ef9b5617b473e46d8fdf9c7288e0c0e6e618ffa31140e80105ec",
+        "seconds": 0.11,
+        "bootstrapSlotPath": "build\\e2e\\data\\bootstrap\\tools\\1.1.0\\c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3\\app\\lib\\worker-1.1.0.jar",
+        "bootstrapBytesEqual": true
+      }
+    ],
+    "runtime": [
+      {
+        "path": "build\\e2e\\data\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+        "bytes": 33863906,
+        "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8",
+        "mtimeNs": 1793868785899546400,
+        "descriptor": [
+          {
+            "id": "mcicon-helper-1.1.0-windows-x86_64",
+            "role": "host-helper",
+            "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-helper-1.1.0-windows-x86_64.zip",
+            "bytes": 33863906,
+            "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+          }
+        ]
+      },
+      {
+        "path": "build\\e2e\\data\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+        "bytes": 593385993,
+        "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4",
+        "mtimeNs": 1793868823467003200,
+        "descriptor": [
+          {
+            "id": "mcicon-renderer-1.1.0-linux-amd64",
+            "role": "renderer-image",
+            "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+            "bytes": 593385993,
+            "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+          }
+        ]
+      },
+      {
+        "path": "build\\e2e\\data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+        "bytes": 98146824,
+        "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5",
+        "mtimeNs": 1793868799362517200,
+        "descriptor": [
+          {
+            "id": "mcicon-guest-1.1.0-windows-x86_64",
+            "role": "guest-base",
+            "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-guest-1.1.0-windows-x86_64.tar.xz",
+            "bytes": 98146824,
+            "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+          }
+        ]
+      }
+    ],
+    "minecraft": {
+      "files": 640,
+      "bytes": 461408504,
+      "inventory": "build/e2e/minecraft-acquisition.json"
+    },
+    "savedResponseBodyBytesLowerBound": 1258218546,
+    "excluded": "HTTP/TLS overhead, Git, repeated version-manifest refreshes and background update-manifest requests"
+  },
+  "renders": [
+    {
+      "name": "render-cold",
+      "version": "1.21.4",
+      "args": [
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:/MCIconGenerator/worktrees/milestone-e2e-windows/MCIconGenerator/build/e2e/out-cold",
+        "--json"
+      ],
+      "exitCode": 0,
+      "seconds": 236.266,
+      "complete": true,
+      "counts": {
+        "failed": 0,
+        "noItemForm": 76,
+        "succeeded": 1
+      },
+      "png": {
+        "bytes": 1468,
+        "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "expectedSha256": {
+          "windows": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "mac": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+        },
+        "matchesWindows": true,
+        "matchesMac": true
+      },
+      "settings": {
+        "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "context": "canonical-v1",
+        "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "javaMajor": 21,
+        "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+        "javaVersion": "21.0.12.1",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "b6f4dbe69e0f481bbaf8526ff456b06afa0a07a32c4c8bf2715d7755198522d5",
+        "profile": "gui-1.21.4",
+        "size": 64
+      },
+      "environment": {
+        "arch": "amd64",
+        "backend": "docker",
+        "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "os": "linux"
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "stderr": "UPDATE_PREPARING: 裏で準備し、次の適格な起動から適用します\r\nprepare 1.21.4 0/1\r\nstartup-ready 1.21.4 0/1\r\nrender minecraft:stone 1/1\r\n",
+      "passed": true
+    },
+    {
+      "name": "render-reuse",
+      "version": "1.21.4",
+      "args": [
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:/MCIconGenerator/worktrees/milestone-e2e-windows/MCIconGenerator/build/e2e/out-reuse",
+        "--json"
+      ],
+      "exitCode": 0,
+      "seconds": 147.094,
+      "complete": true,
+      "counts": {
+        "failed": 0,
+        "noItemForm": 76,
+        "succeeded": 1
+      },
+      "png": {
+        "bytes": 1468,
+        "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "expectedSha256": {
+          "windows": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "mac": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+        },
+        "matchesWindows": true,
+        "matchesMac": true
+      },
+      "settings": {
+        "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "context": "canonical-v1",
+        "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "javaMajor": 21,
+        "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+        "javaVersion": "21.0.12.1",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "b6f4dbe69e0f481bbaf8526ff456b06afa0a07a32c4c8bf2715d7755198522d5",
+        "profile": "gui-1.21.4",
+        "size": 64
+      },
+      "environment": {
+        "arch": "amd64",
+        "backend": "docker",
+        "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "os": "linux"
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "stderr": "prepare 1.21.4 0/1\nstartup-ready 1.21.4 0/1\nrender minecraft:stone 1/1\n",
+      "passed": true
+    },
+    {
+      "name": "render-offline",
+      "version": "1.21.4",
+      "args": [
+        "--debug",
+        "render",
+        "--offline",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\out-offline",
+        "--json"
+      ],
+      "exitCode": 0,
+      "seconds": 135.39,
+      "complete": true,
+      "counts": {
+        "failed": 0,
+        "noItemForm": 76,
+        "succeeded": 1
+      },
+      "png": {
+        "bytes": 1468,
+        "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "expectedSha256": {
+          "windows": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "mac": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+        },
+        "matchesWindows": true,
+        "matchesMac": true
+      },
+      "settings": {
+        "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "context": "canonical-v1",
+        "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "javaMajor": 21,
+        "javaSelectionSha256": "78edc576b2acb2dd68ad1f2948bdb37ed3b51bfda3394c314e0123ae2dfcf11d",
+        "javaVersion": "21.0.12.1",
+        "mappingsSha256": "48b502ccc5e855b49da8aa9c0c0d7c565bec54c9f5da3a3664528aff7b9fdf23",
+        "metadataSha256": "b6f4dbe69e0f481bbaf8526ff456b06afa0a07a32c4c8bf2715d7755198522d5",
+        "profile": "gui-1.21.4",
+        "size": 64
+      },
+      "environment": {
+        "arch": "amd64",
+        "backend": "docker",
+        "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "os": "linux"
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "stderr": "Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=62542 -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=62542\nPicked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=62542 -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=62542\nprepare 1.21.4 0/1\nstartup-ready 1.21.4 0/1\nrender minecraft:stone 1/1\n",
+      "passed": true
+    },
+    {
+      "name": "render-old",
+      "version": "1.14.4",
+      "args": [
+        "--debug",
+        "render",
+        "--version",
+        "1.14.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:/MCIconGenerator/worktrees/milestone-e2e-windows/MCIconGenerator/build/e2e/out-old",
+        "--json"
+      ],
+      "exitCode": 0,
+      "seconds": 172.406,
+      "complete": true,
+      "counts": {
+        "failed": 0,
+        "noItemForm": 43,
+        "succeeded": 1
+      },
+      "png": {
+        "bytes": 1289,
+        "sha256": "65e554abf13a39887115af84f8a890c67e7114f1b0703bc9eb2d9012903eb372",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "expectedSha256": {
+          "windows": "65e554abf13a39887115af84f8a890c67e7114f1b0703bc9eb2d9012903eb372",
+          "mac": "65e554abf13a39887115af84f8a890c67e7114f1b0703bc9eb2d9012903eb372"
+        },
+        "matchesWindows": true,
+        "matchesMac": true
+      },
+      "settings": {
+        "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "context": "canonical-v1",
+        "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "javaMajor": 8,
+        "javaSelectionSha256": "7808b733786ca895a3fdafbf97cba0335ed9521d9499af2bfaacd7f6ee1a9b17",
+        "javaVersion": "1.8.0_504",
+        "mappingsSha256": "2dd53a5e70ba493cf6e33c0fc52bbdf4c57f9429c7a13842565aa825fd44d910",
+        "metadataSha256": "7239a8a156a64f38292f3120736e57aa2b9bc32087240b402804d1912cacec4c",
+        "profile": "gui-fixed",
+        "size": 64
+      },
+      "environment": {
+        "arch": "amd64",
+        "backend": "docker",
+        "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "os": "linux"
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "stderr": "prepare 1.14.4 0/1\nstartup-ready 1.14.4 0/1\nrender minecraft:stone 1/1\n",
+      "passed": true
+    },
+    {
+      "name": "render-latest",
+      "version": "26.3",
+      "args": [
+        "--debug",
+        "render",
+        "--version",
+        "26.3",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:/MCIconGenerator/worktrees/milestone-e2e-windows/MCIconGenerator/build/e2e/out-latest",
+        "--json"
+      ],
+      "exitCode": 0,
+      "seconds": 137.125,
+      "complete": true,
+      "counts": {
+        "failed": 0,
+        "noItemForm": 78,
+        "succeeded": 1
+      },
+      "png": {
+        "bytes": 1470,
+        "sha256": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+        "width": 64,
+        "height": 64,
+        "visiblePixels": 2744,
+        "expectedSha256": {
+          "windows": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39",
+          "mac": "1c2f50d29210fd373b20ad2da04e503d5f4071f8f375f1ec47d32bc8f0288b39"
+        },
+        "matchesWindows": true,
+        "matchesMac": true
+      },
+      "settings": {
+        "agentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "context": "canonical-v1",
+        "dockerImageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "javaMajor": 25,
+        "javaSelectionSha256": "df20268082e19d184f8b1d5e78d60dfed03b615cae7905790e88dd2558636c2f",
+        "javaVersion": "25.0.4.1",
+        "mappingsSha256": "named",
+        "metadataSha256": "ccd69400e508add415045ffa67cd4ffced8a4c53b6a1d166548bd5c85caa6211",
+        "profile": "gui-26.3",
+        "size": 64
+      },
+      "environment": {
+        "arch": "amd64",
+        "backend": "docker",
+        "imageId": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+        "os": "linux"
+      },
+      "renderer": "llvmpipe (LLVM 20.1.2, 128 bits) / 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "stderr": "prepare 26.3 0/1\nstartup-ready 26.3 0/1\nrender minecraft:stone 1/1\n",
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "id": 1,
+      "name": "空cacheからの管理環境自動準備・代表描画",
+      "status": "合格",
+      "detail": "公開bootstrapの署名seed設置、runtime署名・hash照合、世代設置、専用WSL import・Docker準備を経て3版で描画成功。全PNGが既存Windows/Mac受入SHA-256と一致"
+    },
+    {
+      "id": 2,
+      "name": "再利用",
+      "status": "合格（管理資材・ゲーム資産）",
+      "evidence": {
+        "checkedFiles": 783,
+        "checkedBytes": 938435948,
+        "changed": [
+          {
+            "path": "data\\cache\\metadata\\version_manifest_v2.json",
+            "sameBytes": true,
+            "oldMtimeNs": 1793868776577952400,
+            "newMtimeNs": 1793869086963044400
+          },
+          {
+            "path": "data\\cache\\metadata\\version_manifest_v2.json.sha256",
+            "sameBytes": true,
+            "oldMtimeNs": 1793868776594024000,
+            "newMtimeNs": 1793869086989156800
+          }
+        ],
+        "missing": [],
+        "new": [
+          "data\\cache\\worker-18106055328539231296\\agent.json",
+          "data\\cache\\worker-18106055328539231296\\worker.log",
+          "data\\cache\\worker-18106055328539231296\\game\\options.txt"
+        ]
+      },
+      "detail": "runtime download・ゲーム資産のmtime/size不変。公式版一覧とchecksumだけ同bytesで更新。全HTTP通信なしという意味ではない"
+    },
+    {
+      "id": 3,
+      "name": "offlineで既存版継続",
+      "status": "合格（プロセス限定）",
+      "network": {
+        "mode": "process-only rejecting HTTP/HTTPS proxy plus product --offline",
+        "port": 62542,
+        "attempts": [],
+        "listenerStopped": true,
+        "physicalNetworkDisabled": false
+      },
+      "detail": "--offlineとJVM用HTTP/HTTPS拒否proxyで1.21.4を描画。物理ネットワーク切断・host/guest全通信のpacket監査は未実施"
+    },
+    {
+      "id": 4,
+      "name": "自動更新無効",
+      "status": "合格",
+      "command": {
+        "args": [
+          "--bootstrap-auto-update",
+          "false"
+        ],
+        "exit": 0,
+        "seconds": 0.813,
+        "stdout": "",
+        "stderr": ""
+      },
+      "config": {
+        "schemaVersion": 1,
+        "autoUpdate": false
+      },
+      "detail": "設定コマンド終了0。以後preparation receipt増加なし。初回既定有効時のworkerは同版・旧sequenceのため未適用、exit 1でfinishedを確認"
+    },
+    {
+      "id": 5,
+      "name": "製品所有物回収・削除",
+      "status": "合格",
+      "cleanup": {
+        "passed": true,
+        "distribution": "MCIcon-cdcd7ce552f0be140a57eae5",
+        "guid": "f2f7cb8b-75f6-45f1-91fa-2017dfe6ff05",
+        "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+        "productRelease": "all leases released with empty resources before unregister",
+        "unregisterExitCode": 0,
+        "existingStateExactlyEqual": true,
+        "basePathAbsent": true,
+        "ownProcessesBeforeDelete": [],
+        "removed": [
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\data",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\package",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\central",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\tmp",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\bootstrap.zip",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\out-cold",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\out-latest",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\out-offline",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\out-old",
+          "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\out-reuse"
+        ],
+        "remainingProcesses": [],
+        "scope": "only task-created paths and product-owned new distribution"
+      }
+    },
+    {
+      "id": 6,
+      "name": "未署名配布のOS警告・ブロック",
+      "status": "限定観測／ブラウザ経路未検証",
+      "detail": "Python urllib取得・zipfile展開のZIP/launcherにZone.Identifierなし。Authenticode NotSigned。非対話初回help・実描画で警告・ブロックを観測せず。GUI目視・ブラウザ取得・MOTW付き初回は未実施。属性削除・OS保護回避なし"
+    }
+  ],
+  "stateComparison": {
+    "before": {
+      "list": {
+        "exit": 0,
+        "stdout": "NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2",
+        "stderr": ""
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "既定のディストリビューション: MCIcon-82ec446b986db27cff993a27\r\n既定のバージョン: 2",
+        "stderr": ""
+      },
+      "running": {
+        "exit": 0,
+        "stdout": "Ubuntu-24.04",
+        "stderr": ""
+      },
+      "defaultDistribution": "{064cd034-e011-4c35-bc86-41a9f2d157d7}",
+      "distributions": {
+        "{064cd034-e011-4c35-bc86-41a9f2d157d7}": {
+          "DistributionName": "MCIcon-82ec446b986db27cff993a27",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v10\\execution\\runtime\\windows\\82ec446b986db27cff993a27d675c889d5868198816543fbbc3d8ab657a7991e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{077c8a19-d2d7-4c7e-837e-72cdd1d75086}": {
+          "DistributionName": "MCIcon-9333825c39c0df5f8d3ab095",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v12\\execution\\runtime\\windows\\9333825c39c0df5f8d3ab095ce78c7f279a23808268fbf1939d8aa73f1cff3c6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{113e82a5-8576-4da4-a26f-52ea99771b32}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V14",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v19\\execution\\wsl\\MCIcon-Issue95-Builder-V14",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{185b9688-8c62-4e3b-8d76-d33219cb0217}": {
+          "DistributionName": "MCIcon-9922213e9d5e232bf90db2d7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v9\\run-001\\data\\v7-shared\\runtime\\windows\\9922213e9d5e232bf90db2d76a9b03ead0e5340f081e77e4bdd38304a27e499b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{251ca84f-9435-468e-955a-674ac1f5fee0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V9",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v14\\execution\\wsl\\MCIcon-Issue95-Builder-V9",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{29d66d8e-2e84-4277-a4d3-d97d02996f68}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V12",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v17\\execution\\wsl\\MCIcon-Issue95-Builder-V12",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{324df4f0-a387-4f7f-8c0d-7f2fb394b448}": {
+          "DistributionName": "MCIcon-6b7e078236b9d00319f34e40",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v6\\execution\\runtime\\windows\\6b7e078236b9d00319f34e4066fe021c0a3e9e25102e149edaac0aa7808248d4\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{39a3df50-3c2a-4f58-94ca-f191df00e9f9}": {
+          "DistributionName": "MCIcon-5ba0815df4293859842d2fbc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v11\\run-001\\data\\v7-shared\\runtime\\windows\\5ba0815df4293859842d2fbca0bea186a568388be81eec08b97c7b7c77a3efc6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3b3159bd-19d4-494c-b993-0fb5ce31ddfc}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V18",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v23\\execution\\wsl\\MCIcon-Issue95-Builder-V18",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3eff1d21-6cb6-4d57-82aa-c732b8239045}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V5",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v10\\execution\\wsl\\MCIcon-Issue95-Builder-V5",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{46e05d44-6388-480d-9dca-f9b61335d4c2}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v11\\execution\\wsl\\MCIcon-Issue95-Builder-V6",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{558be4d0-cc18-4ae8-a8a9-534479c4fc93}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v16\\execution\\wsl\\MCIcon-Issue95-Builder-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{70891763-840d-4d65-9d9a-b21488fc1772}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v12\\execution\\wsl\\MCIcon-Issue95-Builder-V7",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8314adf2-7a23-4a72-99be-0869baeadb56}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V17",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v22\\execution\\wsl\\MCIcon-Issue95-Builder-V17",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8c80dd3f-8c3a-4017-8f1c-6ecd97c5f6cf}": {
+          "DistributionName": "MCIcon-9862bd8335a9aac8f8f1844f",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v15\\execution\\runtime\\windows\\9862bd8335a9aac8f8f1844fa5194f04defd3af53d2769b21037992a237a7a15\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8d9eb482-68de-4c4b-b9cd-691524ea6c41}": {
+          "DistributionName": "MCIcon-6717dc3f92906fd38d19c3dc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v4\\execution\\runtime\\windows\\6717dc3f92906fd38d19c3dc5e0eab689321191628c360edaa3ddbf5b18fc74a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8f7a348e-ab75-432b-b2e3-da7fa521ea81}": {
+          "DistributionName": "MCIcon-aa038dd224dc38f9939cf22d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v17\\execution\\runtime\\windows\\aa038dd224dc38f9939cf22d1bb11d7780792e00edf868fcaa6d3c2eff11fe85\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{92353240-335d-4bae-bcde-e6dfd20a4851}": {
+          "DistributionName": "MCIcon-a5124a2a2ee645c086f33d07",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\a5124a2a2ee645c086f33d0701395208f6d2d40871b001f8a44de333af986a5e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{96352485-9336-4648-a2a4-9f2d8d96f3d0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V16",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v21\\execution\\wsl\\MCIcon-Issue95-Builder-V16",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9ae51412-9d23-49f5-824f-45c085d5fda6}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V13",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v18\\execution\\wsl\\MCIcon-Issue95-Builder-V13",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9e0a73f1-e23a-4d5b-b8e1-d4f91bb71f2a}": {
+          "DistributionName": "MCIcon-2c9dc6b88d5831cb3a818c68",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v11\\execution\\runtime\\windows\\2c9dc6b88d5831cb3a818c683bb26aaeb8e53726211521c158065302010553e0\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a20424d3-489d-4839-92e7-27f43dcdbabf}": {
+          "DistributionName": "MCIcon-f87fc4aebed84984c9e250f6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-h-c18-v3\\execution-v1\\runtime\\windows\\f87fc4aebed84984c9e250f6c9cfae1d114df685f8781767525c87fb7296ebae\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a823b519-6483-42f8-a2df-bf49e19e5c22}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v13\\execution\\wsl\\MCIcon-Issue95-Builder-V8",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a86a23dd-a7b1-4af4-8955-82dee3d91eca}": {
+          "DistributionName": "docker-desktop",
+          "Version": 2,
+          "BasePath": "\\\\?\\C:\\Users\\ryuma\\AppData\\Local\\Docker\\wsl\\main",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a9285574-2e26-4dbb-8f93-d524f2ae090f}": {
+          "DistributionName": "MCIcon-d8a4dfb01684287672a8eba8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\d8a4dfb01684287672a8eba87bddc2d0bd887d2ca36e03731831e18ac4a39139\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b383c507-977f-4181-b801-26f8ce5c282d}": {
+          "DistributionName": "Ubuntu-24.04",
+          "Version": 2,
+          "BasePath": "H:\\WSL\\colorstats",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b70783eb-11fe-4f3c-9403-d39cc1b78519}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v9\\execution\\wsl\\MCIcon-Issue95-Builder-V4",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{c065f811-314d-4ce9-8b86-667709b4c700}": {
+          "DistributionName": "MCIcon-128c33dcea15a8ea6487eac4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v10\\run-001\\data\\v7-shared\\runtime\\windows\\128c33dcea15a8ea6487eac44e6f16e33361939901380c71b7d1e3da34703bce\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{cc9905db-38e5-4092-bc92-6779714317b0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V15",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v20\\execution\\wsl\\MCIcon-Issue95-Builder-V15",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{d4561e5c-093d-45bf-9c68-96f73e15ebd7}": {
+          "DistributionName": "MCIcon-b28910c0585341f944637b75",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\b28910c0585341f944637b75f3a17aa832341dab179332dea7a8e0e2ba0c1697\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{de20cb1d-d465-40c0-8b5b-7e52934b3212}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V3",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v8\\execution\\wsl\\MCIcon-Issue95-Builder-V3",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e3ed6870-c0d8-4ca2-8b88-108be81baebb}": {
+          "DistributionName": "MCIcon-Issue91-V1",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-91-managed-contract\\resume-encoding-v1\\wsl\\MCIcon-Issue91-V1",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e5297f5f-fca4-40ce-84d3-2d3352431a19}": {
+          "DistributionName": "MCIcon-5ef94cacfdb4b618ae4d791a",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v13\\execution\\runtime\\windows\\5ef94cacfdb4b618ae4d791ac1c4bd3b6e34bfb6dc0cfcbe557311d7fa512b5a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e581e759-ecd7-4999-9246-ac7b889de6ba}": {
+          "DistributionName": "MCIcon-987cb1cb668708b0d7fff9b6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v7\\run-002\\data\\v7-shared\\runtime\\windows\\987cb1cb668708b0d7fff9b620f3fd42febdee04b19eb34df1b118a0207b0346\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e99312fa-3a3c-41d9-ba62-a63bd21a3d61}": {
+          "DistributionName": "MCIcon-0e44596ba5e39d6030376249",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\0e44596ba5e39d60303762491418a9756957001b3aac66c878ee844077cc1754\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e9a61512-b3a9-41a8-aedc-33c1d2118873}": {
+          "DistributionName": "MCIcon-833fcb60d85b240e66f84eff",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v9\\execution\\runtime\\windows\\833fcb60d85b240e66f84eff163c8bd463f40ef40157046c23ea353611fad923\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ed068c71-7535-4dca-9530-918058651f19}": {
+          "DistributionName": "MCIcon-Issue95-ImportQA-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\import-qa-v11\\execution\\wsl\\MCIcon-Issue95-ImportQA-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ef807971-d897-4bbb-96cb-25f9b75c4400}": {
+          "DistributionName": "MCIcon-fa14990d78f8adb210b6936d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v16\\execution\\runtime\\windows\\fa14990d78f8adb210b6936d11de38a365576d83e209b371ecdcc870c407d17b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f58f58d2-05cd-45c6-94d9-102def7478e8}": {
+          "DistributionName": "MCIcon-3c769605f0eb59fd27565bed",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v7\\execution\\runtime\\windows\\3c769605f0eb59fd27565bed48accdb48b57f032c22325abf2184287ffdbf91d\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f8cffce3-4776-41a2-89f9-961946f63569}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V10",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v15\\execution\\wsl\\MCIcon-Issue95-Builder-V10",
+          "Flags": 15,
+          "DefaultUid": 0
+        }
+      },
+      "legacyPaths": {
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconBootstrap": false,
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconGenerator": false
+      }
+    },
+    "productCreated": {
+      "list": {
+        "exit": 0,
+        "stdout": "NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-cdcd7ce552f0be140a57eae5    Running         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2",
+        "stderr": ""
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "既定のディストリビューション: MCIcon-82ec446b986db27cff993a27\r\n既定のバージョン: 2",
+        "stderr": ""
+      },
+      "running": {
+        "exit": 0,
+        "stdout": "Ubuntu-24.04\r\nMCIcon-cdcd7ce552f0be140a57eae5",
+        "stderr": ""
+      },
+      "defaultDistribution": "{064cd034-e011-4c35-bc86-41a9f2d157d7}",
+      "distributions": {
+        "{064cd034-e011-4c35-bc86-41a9f2d157d7}": {
+          "DistributionName": "MCIcon-82ec446b986db27cff993a27",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v10\\execution\\runtime\\windows\\82ec446b986db27cff993a27d675c889d5868198816543fbbc3d8ab657a7991e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{077c8a19-d2d7-4c7e-837e-72cdd1d75086}": {
+          "DistributionName": "MCIcon-9333825c39c0df5f8d3ab095",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v12\\execution\\runtime\\windows\\9333825c39c0df5f8d3ab095ce78c7f279a23808268fbf1939d8aa73f1cff3c6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{113e82a5-8576-4da4-a26f-52ea99771b32}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V14",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v19\\execution\\wsl\\MCIcon-Issue95-Builder-V14",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{185b9688-8c62-4e3b-8d76-d33219cb0217}": {
+          "DistributionName": "MCIcon-9922213e9d5e232bf90db2d7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v9\\run-001\\data\\v7-shared\\runtime\\windows\\9922213e9d5e232bf90db2d76a9b03ead0e5340f081e77e4bdd38304a27e499b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{251ca84f-9435-468e-955a-674ac1f5fee0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V9",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v14\\execution\\wsl\\MCIcon-Issue95-Builder-V9",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{29d66d8e-2e84-4277-a4d3-d97d02996f68}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V12",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v17\\execution\\wsl\\MCIcon-Issue95-Builder-V12",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{324df4f0-a387-4f7f-8c0d-7f2fb394b448}": {
+          "DistributionName": "MCIcon-6b7e078236b9d00319f34e40",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v6\\execution\\runtime\\windows\\6b7e078236b9d00319f34e4066fe021c0a3e9e25102e149edaac0aa7808248d4\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{39a3df50-3c2a-4f58-94ca-f191df00e9f9}": {
+          "DistributionName": "MCIcon-5ba0815df4293859842d2fbc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v11\\run-001\\data\\v7-shared\\runtime\\windows\\5ba0815df4293859842d2fbca0bea186a568388be81eec08b97c7b7c77a3efc6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3b3159bd-19d4-494c-b993-0fb5ce31ddfc}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V18",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v23\\execution\\wsl\\MCIcon-Issue95-Builder-V18",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3eff1d21-6cb6-4d57-82aa-c732b8239045}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V5",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v10\\execution\\wsl\\MCIcon-Issue95-Builder-V5",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{46e05d44-6388-480d-9dca-f9b61335d4c2}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v11\\execution\\wsl\\MCIcon-Issue95-Builder-V6",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{558be4d0-cc18-4ae8-a8a9-534479c4fc93}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v16\\execution\\wsl\\MCIcon-Issue95-Builder-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{70891763-840d-4d65-9d9a-b21488fc1772}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v12\\execution\\wsl\\MCIcon-Issue95-Builder-V7",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8314adf2-7a23-4a72-99be-0869baeadb56}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V17",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v22\\execution\\wsl\\MCIcon-Issue95-Builder-V17",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8c80dd3f-8c3a-4017-8f1c-6ecd97c5f6cf}": {
+          "DistributionName": "MCIcon-9862bd8335a9aac8f8f1844f",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v15\\execution\\runtime\\windows\\9862bd8335a9aac8f8f1844fa5194f04defd3af53d2769b21037992a237a7a15\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8d9eb482-68de-4c4b-b9cd-691524ea6c41}": {
+          "DistributionName": "MCIcon-6717dc3f92906fd38d19c3dc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v4\\execution\\runtime\\windows\\6717dc3f92906fd38d19c3dc5e0eab689321191628c360edaa3ddbf5b18fc74a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8f7a348e-ab75-432b-b2e3-da7fa521ea81}": {
+          "DistributionName": "MCIcon-aa038dd224dc38f9939cf22d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v17\\execution\\runtime\\windows\\aa038dd224dc38f9939cf22d1bb11d7780792e00edf868fcaa6d3c2eff11fe85\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{92353240-335d-4bae-bcde-e6dfd20a4851}": {
+          "DistributionName": "MCIcon-a5124a2a2ee645c086f33d07",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\a5124a2a2ee645c086f33d0701395208f6d2d40871b001f8a44de333af986a5e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{96352485-9336-4648-a2a4-9f2d8d96f3d0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V16",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v21\\execution\\wsl\\MCIcon-Issue95-Builder-V16",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9ae51412-9d23-49f5-824f-45c085d5fda6}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V13",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v18\\execution\\wsl\\MCIcon-Issue95-Builder-V13",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9e0a73f1-e23a-4d5b-b8e1-d4f91bb71f2a}": {
+          "DistributionName": "MCIcon-2c9dc6b88d5831cb3a818c68",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v11\\execution\\runtime\\windows\\2c9dc6b88d5831cb3a818c683bb26aaeb8e53726211521c158065302010553e0\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a20424d3-489d-4839-92e7-27f43dcdbabf}": {
+          "DistributionName": "MCIcon-f87fc4aebed84984c9e250f6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-h-c18-v3\\execution-v1\\runtime\\windows\\f87fc4aebed84984c9e250f6c9cfae1d114df685f8781767525c87fb7296ebae\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a823b519-6483-42f8-a2df-bf49e19e5c22}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v13\\execution\\wsl\\MCIcon-Issue95-Builder-V8",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a86a23dd-a7b1-4af4-8955-82dee3d91eca}": {
+          "DistributionName": "docker-desktop",
+          "Version": 2,
+          "BasePath": "\\\\?\\C:\\Users\\ryuma\\AppData\\Local\\Docker\\wsl\\main",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a9285574-2e26-4dbb-8f93-d524f2ae090f}": {
+          "DistributionName": "MCIcon-d8a4dfb01684287672a8eba8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\d8a4dfb01684287672a8eba87bddc2d0bd887d2ca36e03731831e18ac4a39139\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b383c507-977f-4181-b801-26f8ce5c282d}": {
+          "DistributionName": "Ubuntu-24.04",
+          "Version": 2,
+          "BasePath": "H:\\WSL\\colorstats",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b70783eb-11fe-4f3c-9403-d39cc1b78519}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v9\\execution\\wsl\\MCIcon-Issue95-Builder-V4",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{c065f811-314d-4ce9-8b86-667709b4c700}": {
+          "DistributionName": "MCIcon-128c33dcea15a8ea6487eac4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v10\\run-001\\data\\v7-shared\\runtime\\windows\\128c33dcea15a8ea6487eac44e6f16e33361939901380c71b7d1e3da34703bce\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{cc9905db-38e5-4092-bc92-6779714317b0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V15",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v20\\execution\\wsl\\MCIcon-Issue95-Builder-V15",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{d4561e5c-093d-45bf-9c68-96f73e15ebd7}": {
+          "DistributionName": "MCIcon-b28910c0585341f944637b75",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\b28910c0585341f944637b75f3a17aa832341dab179332dea7a8e0e2ba0c1697\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{de20cb1d-d465-40c0-8b5b-7e52934b3212}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V3",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v8\\execution\\wsl\\MCIcon-Issue95-Builder-V3",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e3ed6870-c0d8-4ca2-8b88-108be81baebb}": {
+          "DistributionName": "MCIcon-Issue91-V1",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-91-managed-contract\\resume-encoding-v1\\wsl\\MCIcon-Issue91-V1",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e5297f5f-fca4-40ce-84d3-2d3352431a19}": {
+          "DistributionName": "MCIcon-5ef94cacfdb4b618ae4d791a",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v13\\execution\\runtime\\windows\\5ef94cacfdb4b618ae4d791ac1c4bd3b6e34bfb6dc0cfcbe557311d7fa512b5a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e581e759-ecd7-4999-9246-ac7b889de6ba}": {
+          "DistributionName": "MCIcon-987cb1cb668708b0d7fff9b6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v7\\run-002\\data\\v7-shared\\runtime\\windows\\987cb1cb668708b0d7fff9b620f3fd42febdee04b19eb34df1b118a0207b0346\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e99312fa-3a3c-41d9-ba62-a63bd21a3d61}": {
+          "DistributionName": "MCIcon-0e44596ba5e39d6030376249",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\0e44596ba5e39d60303762491418a9756957001b3aac66c878ee844077cc1754\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e9a61512-b3a9-41a8-aedc-33c1d2118873}": {
+          "DistributionName": "MCIcon-833fcb60d85b240e66f84eff",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v9\\execution\\runtime\\windows\\833fcb60d85b240e66f84eff163c8bd463f40ef40157046c23ea353611fad923\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ed068c71-7535-4dca-9530-918058651f19}": {
+          "DistributionName": "MCIcon-Issue95-ImportQA-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\import-qa-v11\\execution\\wsl\\MCIcon-Issue95-ImportQA-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ef807971-d897-4bbb-96cb-25f9b75c4400}": {
+          "DistributionName": "MCIcon-fa14990d78f8adb210b6936d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v16\\execution\\runtime\\windows\\fa14990d78f8adb210b6936d11de38a365576d83e209b371ecdcc870c407d17b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f2f7cb8b-75f6-45f1-91fa-2017dfe6ff05}": {
+          "DistributionName": "MCIcon-cdcd7ce552f0be140a57eae5",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e-windows\\MCIconGenerator\\build\\e2e\\data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f58f58d2-05cd-45c6-94d9-102def7478e8}": {
+          "DistributionName": "MCIcon-3c769605f0eb59fd27565bed",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v7\\execution\\runtime\\windows\\3c769605f0eb59fd27565bed48accdb48b57f032c22325abf2184287ffdbf91d\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f8cffce3-4776-41a2-89f9-961946f63569}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V10",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v15\\execution\\wsl\\MCIcon-Issue95-Builder-V10",
+          "Flags": 15,
+          "DefaultUid": 0
+        }
+      },
+      "legacyPaths": {
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconBootstrap": false,
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconGenerator": false
+      }
+    },
+    "after": {
+      "list": {
+        "exit": 0,
+        "stdout": "NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2",
+        "stderr": ""
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "既定のディストリビューション: MCIcon-82ec446b986db27cff993a27\r\n既定のバージョン: 2",
+        "stderr": ""
+      },
+      "running": {
+        "exit": 0,
+        "stdout": "Ubuntu-24.04",
+        "stderr": ""
+      },
+      "defaultDistribution": "{064cd034-e011-4c35-bc86-41a9f2d157d7}",
+      "distributions": {
+        "{064cd034-e011-4c35-bc86-41a9f2d157d7}": {
+          "DistributionName": "MCIcon-82ec446b986db27cff993a27",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v10\\execution\\runtime\\windows\\82ec446b986db27cff993a27d675c889d5868198816543fbbc3d8ab657a7991e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{077c8a19-d2d7-4c7e-837e-72cdd1d75086}": {
+          "DistributionName": "MCIcon-9333825c39c0df5f8d3ab095",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v12\\execution\\runtime\\windows\\9333825c39c0df5f8d3ab095ce78c7f279a23808268fbf1939d8aa73f1cff3c6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{113e82a5-8576-4da4-a26f-52ea99771b32}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V14",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v19\\execution\\wsl\\MCIcon-Issue95-Builder-V14",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{185b9688-8c62-4e3b-8d76-d33219cb0217}": {
+          "DistributionName": "MCIcon-9922213e9d5e232bf90db2d7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v9\\run-001\\data\\v7-shared\\runtime\\windows\\9922213e9d5e232bf90db2d76a9b03ead0e5340f081e77e4bdd38304a27e499b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{251ca84f-9435-468e-955a-674ac1f5fee0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V9",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v14\\execution\\wsl\\MCIcon-Issue95-Builder-V9",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{29d66d8e-2e84-4277-a4d3-d97d02996f68}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V12",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v17\\execution\\wsl\\MCIcon-Issue95-Builder-V12",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{324df4f0-a387-4f7f-8c0d-7f2fb394b448}": {
+          "DistributionName": "MCIcon-6b7e078236b9d00319f34e40",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v6\\execution\\runtime\\windows\\6b7e078236b9d00319f34e4066fe021c0a3e9e25102e149edaac0aa7808248d4\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{39a3df50-3c2a-4f58-94ca-f191df00e9f9}": {
+          "DistributionName": "MCIcon-5ba0815df4293859842d2fbc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v11\\run-001\\data\\v7-shared\\runtime\\windows\\5ba0815df4293859842d2fbca0bea186a568388be81eec08b97c7b7c77a3efc6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3b3159bd-19d4-494c-b993-0fb5ce31ddfc}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V18",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v23\\execution\\wsl\\MCIcon-Issue95-Builder-V18",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3eff1d21-6cb6-4d57-82aa-c732b8239045}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V5",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v10\\execution\\wsl\\MCIcon-Issue95-Builder-V5",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{46e05d44-6388-480d-9dca-f9b61335d4c2}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v11\\execution\\wsl\\MCIcon-Issue95-Builder-V6",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{558be4d0-cc18-4ae8-a8a9-534479c4fc93}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v16\\execution\\wsl\\MCIcon-Issue95-Builder-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{70891763-840d-4d65-9d9a-b21488fc1772}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v12\\execution\\wsl\\MCIcon-Issue95-Builder-V7",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8314adf2-7a23-4a72-99be-0869baeadb56}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V17",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v22\\execution\\wsl\\MCIcon-Issue95-Builder-V17",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8c80dd3f-8c3a-4017-8f1c-6ecd97c5f6cf}": {
+          "DistributionName": "MCIcon-9862bd8335a9aac8f8f1844f",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v15\\execution\\runtime\\windows\\9862bd8335a9aac8f8f1844fa5194f04defd3af53d2769b21037992a237a7a15\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8d9eb482-68de-4c4b-b9cd-691524ea6c41}": {
+          "DistributionName": "MCIcon-6717dc3f92906fd38d19c3dc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v4\\execution\\runtime\\windows\\6717dc3f92906fd38d19c3dc5e0eab689321191628c360edaa3ddbf5b18fc74a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8f7a348e-ab75-432b-b2e3-da7fa521ea81}": {
+          "DistributionName": "MCIcon-aa038dd224dc38f9939cf22d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v17\\execution\\runtime\\windows\\aa038dd224dc38f9939cf22d1bb11d7780792e00edf868fcaa6d3c2eff11fe85\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{92353240-335d-4bae-bcde-e6dfd20a4851}": {
+          "DistributionName": "MCIcon-a5124a2a2ee645c086f33d07",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\a5124a2a2ee645c086f33d0701395208f6d2d40871b001f8a44de333af986a5e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{96352485-9336-4648-a2a4-9f2d8d96f3d0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V16",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v21\\execution\\wsl\\MCIcon-Issue95-Builder-V16",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9ae51412-9d23-49f5-824f-45c085d5fda6}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V13",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v18\\execution\\wsl\\MCIcon-Issue95-Builder-V13",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9e0a73f1-e23a-4d5b-b8e1-d4f91bb71f2a}": {
+          "DistributionName": "MCIcon-2c9dc6b88d5831cb3a818c68",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v11\\execution\\runtime\\windows\\2c9dc6b88d5831cb3a818c683bb26aaeb8e53726211521c158065302010553e0\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a20424d3-489d-4839-92e7-27f43dcdbabf}": {
+          "DistributionName": "MCIcon-f87fc4aebed84984c9e250f6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-h-c18-v3\\execution-v1\\runtime\\windows\\f87fc4aebed84984c9e250f6c9cfae1d114df685f8781767525c87fb7296ebae\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a823b519-6483-42f8-a2df-bf49e19e5c22}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v13\\execution\\wsl\\MCIcon-Issue95-Builder-V8",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a86a23dd-a7b1-4af4-8955-82dee3d91eca}": {
+          "DistributionName": "docker-desktop",
+          "Version": 2,
+          "BasePath": "\\\\?\\C:\\Users\\ryuma\\AppData\\Local\\Docker\\wsl\\main",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a9285574-2e26-4dbb-8f93-d524f2ae090f}": {
+          "DistributionName": "MCIcon-d8a4dfb01684287672a8eba8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\d8a4dfb01684287672a8eba87bddc2d0bd887d2ca36e03731831e18ac4a39139\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b383c507-977f-4181-b801-26f8ce5c282d}": {
+          "DistributionName": "Ubuntu-24.04",
+          "Version": 2,
+          "BasePath": "H:\\WSL\\colorstats",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b70783eb-11fe-4f3c-9403-d39cc1b78519}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v9\\execution\\wsl\\MCIcon-Issue95-Builder-V4",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{c065f811-314d-4ce9-8b86-667709b4c700}": {
+          "DistributionName": "MCIcon-128c33dcea15a8ea6487eac4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v10\\run-001\\data\\v7-shared\\runtime\\windows\\128c33dcea15a8ea6487eac44e6f16e33361939901380c71b7d1e3da34703bce\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{cc9905db-38e5-4092-bc92-6779714317b0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V15",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v20\\execution\\wsl\\MCIcon-Issue95-Builder-V15",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{d4561e5c-093d-45bf-9c68-96f73e15ebd7}": {
+          "DistributionName": "MCIcon-b28910c0585341f944637b75",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\b28910c0585341f944637b75f3a17aa832341dab179332dea7a8e0e2ba0c1697\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{de20cb1d-d465-40c0-8b5b-7e52934b3212}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V3",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v8\\execution\\wsl\\MCIcon-Issue95-Builder-V3",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e3ed6870-c0d8-4ca2-8b88-108be81baebb}": {
+          "DistributionName": "MCIcon-Issue91-V1",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-91-managed-contract\\resume-encoding-v1\\wsl\\MCIcon-Issue91-V1",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e5297f5f-fca4-40ce-84d3-2d3352431a19}": {
+          "DistributionName": "MCIcon-5ef94cacfdb4b618ae4d791a",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v13\\execution\\runtime\\windows\\5ef94cacfdb4b618ae4d791ac1c4bd3b6e34bfb6dc0cfcbe557311d7fa512b5a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e581e759-ecd7-4999-9246-ac7b889de6ba}": {
+          "DistributionName": "MCIcon-987cb1cb668708b0d7fff9b6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v7\\run-002\\data\\v7-shared\\runtime\\windows\\987cb1cb668708b0d7fff9b620f3fd42febdee04b19eb34df1b118a0207b0346\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e99312fa-3a3c-41d9-ba62-a63bd21a3d61}": {
+          "DistributionName": "MCIcon-0e44596ba5e39d6030376249",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\0e44596ba5e39d60303762491418a9756957001b3aac66c878ee844077cc1754\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e9a61512-b3a9-41a8-aedc-33c1d2118873}": {
+          "DistributionName": "MCIcon-833fcb60d85b240e66f84eff",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v9\\execution\\runtime\\windows\\833fcb60d85b240e66f84eff163c8bd463f40ef40157046c23ea353611fad923\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ed068c71-7535-4dca-9530-918058651f19}": {
+          "DistributionName": "MCIcon-Issue95-ImportQA-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\import-qa-v11\\execution\\wsl\\MCIcon-Issue95-ImportQA-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ef807971-d897-4bbb-96cb-25f9b75c4400}": {
+          "DistributionName": "MCIcon-fa14990d78f8adb210b6936d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v16\\execution\\runtime\\windows\\fa14990d78f8adb210b6936d11de38a365576d83e209b371ecdcc870c407d17b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f58f58d2-05cd-45c6-94d9-102def7478e8}": {
+          "DistributionName": "MCIcon-3c769605f0eb59fd27565bed",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v7\\execution\\runtime\\windows\\3c769605f0eb59fd27565bed48accdb48b57f032c22325abf2184287ffdbf91d\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f8cffce3-4776-41a2-89f9-961946f63569}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V10",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v15\\execution\\wsl\\MCIcon-Issue95-Builder-V10",
+          "Flags": 15,
+          "DefaultUid": 0
+        }
+      },
+      "legacyPaths": {
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconBootstrap": false,
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconGenerator": false
+      }
+    },
+    "exactMatch": true
+  },
+  "recovery": {
+    "allJobsReleased": true,
+    "allReceiptsFinished": true,
+    "jobs": [
+      {
+        "jobId": "3b5ec5a5-de9f-4761-8a20-40d378e533bd",
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "jobId": "73b32af3-8964-46cf-8e65-5a5ce4937f5a",
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "jobId": "ad4fad68-ab59-4409-a886-a81e5f821eb4",
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "jobId": "d0077c16-a95c-41ea-81a8-4b433c94bdd1",
+        "state": "released",
+        "resources": {}
+      },
+      {
+        "jobId": "fcea9734-1fda-40f8-b4e0-752806b8083b",
+        "state": "released",
+        "resources": {}
+      }
+    ],
+    "preparations": [
+      {
+        "schemaVersion": 1,
+        "kind": "preparation",
+        "invocationId": "1edeb4da-b023-483a-b9a5-aefa9ca96c3a",
+        "state": "finished",
+        "issuedAt": "2026-11-05T08:52:53.429883900Z",
+        "expiresAt": "2026-11-05T08:57:53.429883900Z",
+        "result": "未適用",
+        "slot": {
+          "toolVersion": "1.1.0",
+          "payloadSha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3",
+          "runtimeDescriptorSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+          "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+        },
+        "bootstrap": {
+          "pid": 55524,
+          "startedAt": "2026-11-05T08:51:28.267Z"
+        },
+        "child": {
+          "pid": 69024,
+          "startedAt": "2026-11-05T08:52:54.713Z"
+        },
+        "exitCode": 1,
+        "packagePin": {
+          "java": "82051fdab26319d77d20cc0065045d05ec00b3e3d05f44935d7c06b96b621d55",
+          "metadata": "331a23120a780a4df52bd618e317672c7aa495da9a20c8bb539da8fe7d644799",
+          "jars": {
+            "bootstrap-1.1.0.jar": "51bba7e2dd2f89ab762f96b9216a53fbb459fc0f7340412507ef6c8f2bcad1b5",
+            "commons-codec-1.19.0.jar": "5c3881e4f556855e9c532927ee0c9dfde94cc66760d5805c031a59887070af5f",
+            "commons-compress-1.28.0.jar": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca",
+            "commons-io-2.20.0.jar": "df90bba0fe3cb586b7f164e78fe8f8f4da3f2dd5c27fa645f888100ccc25dd72",
+            "commons-lang3-3.18.0.jar": "4eeeae8d20c078abb64b015ec158add383ac581571cddc45c68f0c9ae0230720",
+            "jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+            "jackson-core-2.22.3.jar": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+            "jackson-databind-2.22.3.jar": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9"
+          }
+        },
+        "receiptKey": "windows-file-id-v1:2503028341075529897:1f010900000005000000000000000000"
+      }
+    ]
+  },
+  "validation": {
+    "pngCrcAndRgbaDecoded": true,
+    "pngMatchesBothHostBaselines": true,
+    "centralCoreWorkerEqualBootstrapSlot": true,
+    "gitDiffCheck": "最終確認コマンドを参照",
+    "qaChecksum": "LF blob基準、UTF-8 BOMなし"
+  },
+  "unverified": [
+    "MOTW付きブラウザ取得・GUIでのOS警告",
+    "WSL未導入host、OS機能有効化、実reboot",
+    "全51版・全アイテム",
+    "物理ネットワーク切断と全通信packet監査",
+    "新version自動更新、rollback、purgeコマンド、installer/winget経路"
+  ],
+  "harnessIssues": [
+    {
+      "cause": "WindowsのUTF-8/cp932とWSLのUTF-16LEが混在",
+      "resolution": "出力別にdecodeを修正。元bytes保全"
+    },
+    {
+      "cause": "初回のレジストリ区切り誤り",
+      "resolution": "backslashのLxssキーで製品準備前に40登録・既定を取得し直した"
+    },
+    {
+      "cause": "PowerShell引用による一時script作成・診断filter失敗",
+      "resolution": "PythonコードをUTF-8 hex引数で記録付き実行へ変更。誤診断プロセス終了確認。製品処理の失敗ではない"
+    },
+    {
+      "cause": "起動中receiptの共有lockによる読取拒否",
+      "resolution": "lockを回避せず、製品終了後に全receiptのfinishedを確認"
+    }
+  ],
+  "evidence": {
+    "directory": "build/e2e",
+    "fileInventory": "build/e2e/evidence-files.json",
+    "commands": "C:/Users/ryuma/.codex/logs/commands/",
+    "productAssetsPngAndVhdxRemoved": true
+  },
+  "publication": {
+    "commit": false,
+    "push": false,
+    "pullRequest": false,
+    "releaseCentralOrIssueOperations": false
+  }
+}

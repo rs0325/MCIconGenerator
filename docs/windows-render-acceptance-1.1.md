@@ -99,3 +99,16 @@ Windows 11 Pro 10.0.26200.9711、Ryzen 7 5700X、RAM 68,640,256,000 bytes、Pyth
 WSL一覧・status・既存登録/既定の前後一致: **True**。専用登録不存在: **True**。BasePath不存在: **True**。runner資産・PNG削除: **True**。追加のmappings・metadata・展開用tarも67ファイル回収し、`build/f1/` 内にjar・PNG・VHDXは残っていない。hostのDocker Desktop/backend/dockerd/containerdも観測されなかった。独立観測器と受入runnerの終了を確認した。daemon用WSL clientのexit 1は専用distro unregisterに伴う切断であり、描画exitとは区別する。既存distro・既定・`.wslconfig`・WSL設定は変更せず、shutdown/update/機能有効化/rebootは行っていない。
 
 未検証: 未準備host setup、OS警告、実reboot、offline製品経路、正式配布経路、Mac、全登録アイテム。commit・push・PR・release・Issue closeは行っていない。
+
+## 公開物だけによる空cache E2E（2026-11-05）
+
+Refs #94 #95 #98 #99。上記F1とは別に、公開済みv1.1.0のWindows bootstrap ZIPとMaven Central 1.1.0だけを新規取得し、製品bootstrapから管理環境を自動準備した。基準は origin/main d33583f、branchは feature/issue-95-e2e-windows。実測正本は [E2E QA](../qa/e2e-windows-2026-11-05.json) と [LF blob基準checksum](../qa/e2e-windows-2026-11-05.json.sha256)。
+
+- MCICON_DATA_HOMEとTMP/TEMPを新規専用領域へ隔離した。署名seed・slot設置、runtime取得・署名/hash検証、世代設置、製品専用WSL・Docker準備を経て、1.14.4 / 1.21.4 / 26.3のminecraft:stone（64×64）を描画した。初回・再利用・offlineを含む5/5回が終了0で、PNGのCRC・RGBA・可視pixelを確認し、全PNG SHA-256が既存Windows/Mac受入と一致した。
+- 所要時間: render-cold 236.266秒、render-reuse 147.094秒、render-offline 135.39秒、render-old 172.406秒、render-latest 137.125秒。初回help/署名slot設置は46.031秒。取得本文の保存量下限は **1,258,218,546 bytes**。HTTP/TLS、Git、公式版一覧の再取得、背景更新manifest等はこの下限に含まない。
+- 2回目は管理runtime・ゲーム資産を再利用した。公式版一覧だけは同じ内容で再取得された。--bootstrap-auto-update falseは終了0で設定を保存し、以後の更新準備worker増加なし。初回の背景準備は同版・旧sequenceとして未適用（exit 1）で終端した。
+- --offlineとプロセス限定のHTTP/HTTPS拒否proxyで既存1.21.4を継続でき、proxyへの取得試行は0件。物理ネットワーク切断や全通信監査の代わりとは扱わない。
+- 製品が作成した専用distroは MCIcon-cdcd7ce552f0be140a57eae5。全leaseのreleased・資源空と本人プロセス不存在を確認し、所有記録・GUID・BasePath一致後に当該登録だけをunregisterした。既存40登録・既定・WSL一覧/status/稼働状態と既定保存先不存在は前後で完全一致。専用取得物・cache・PNG・VHDX・tempを削除し、ログ・hash・所有証拠だけをbuild/e2eに保全した。
+- 未署名（Authenticode NotSigned）の公開launcherは今回の非対話経路で起動でき、警告・ブロックを観測しなかった。ただしPython取得・展開ではZone.Identifierが付いていない。**ブラウザ取得/MOTW付き初回・GUIのOS警告は未検証**。属性削除、OS保護・既存distro・Docker・システム設定の変更、reboot、機能有効化は行っていない。
+
+未検証は上記OS警告、WSL未導入host、実reboot、全51版・全アイテム、新版への自動更新/rollback、installer/winget。今回の機能成功で受入全体を完了扱いにしない。製品コード・API・保存形式は変更せず、commit・push・PR・Release/Central変更・Issue操作も行っていない。
