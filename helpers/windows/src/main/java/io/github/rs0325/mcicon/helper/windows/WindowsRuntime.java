@@ -81,7 +81,20 @@ final class WindowsRuntime {
     }
     ObjectNode keeperOwner(OperationJournal journal,boolean recovery) throws IOException {
         LeaseFile.Artifact base=lease.verifiedArtifact("guest-base");payload.base(base);HostFacts before=facts();
-        if(recovery)return distribution.verify(before);
+        if(recovery) {
+            ObjectNode owner=distribution.verify(before);if(!lease.read().path("resources").isEmpty())verifyResource(lease.read().path("resources").path("windows"),owner);LeaseReferences.Scan others=references();
+            if(others.unknown())throw new IOException("他leaseが不明なため回復用停止を拒否しました");
+            if(others.stopAllowed()) {
+                commands.reap(before.boot(),lease.read().path("resources").path("windows").path("transports"));
+                HostFacts fresh=facts();if(!fresh.boot().equals(before.boot())||!fresh.sid().equals(before.sid())||!distribution.verify(fresh).equals(owner))throw new IOException("回復用停止前の所有が変化しました");
+                Commands.Result running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"),commands.left(Duration.ofSeconds(2)));Commands.zero(running,"回復用WSL停止前照合");Set<String> names=runningNames(running.stdout()),registered=new HashSet<>();for(var row:fresh.distributions())registered.add(row.name());if(!registered.containsAll(names))throw new IOException("WSL稼働一覧の登録が不明です");
+                if(names.contains(distribution.name))Commands.zero(commands.capture(List.of(wsl.toString(),"--terminate",distribution.name),commands.left(Duration.ofSeconds(3))),"回復用専用WSL停止");
+                running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"),commands.left(Duration.ofSeconds(2)));Commands.zero(running,"回復用WSL停止照合");names=runningNames(running.stdout());
+                HostFacts after=facts();registered.clear();for(var row:after.distributions())registered.add(row.name());if(!after.boot().equals(fresh.boot())||!after.sid().equals(fresh.sid())||!registered.containsAll(names)||names.contains(distribution.name)||!distribution.verify(after).equals(owner))throw new IOException("回復用専用WSL停止が未確認です");
+                distribution.stopped(owner,after.boot());owner=distribution.owner();
+            }
+            return owner;
+        }
         journal.settledRequired();if(!lease.read().path("resources").isEmpty())throw new IOException("keeper開始前の資源が空ではありません");
         ObjectNode owner;
         if(distribution.exists()){owner=distribution.verify(before);journal.begin("keeper-start",before.boot());}
@@ -117,6 +130,7 @@ final class WindowsRuntime {
             ObjectNode current=lease.read();if(current.path("resources").isEmpty()&&journal.unstarted()){journal.release();return;}
             ObjectNode owner=distribution.verify(facts());verifyResource(current.path("resources").path("windows"),owner);
             commands.reap(facts().boot(),current.path("resources").path("windows").path("transports"),keeperPrefix(keeper.value()));
+            if(recovery&&owner.has("lastStop"))owner=recoverDaemon(owner,keeper.value());
             JsonNode proof=bridge(recovery?"release-recover":"release",owner,null,null);if(!proof.path("closed").asBoolean()||proof.path("actors").asInt(-1)!=0||proof.path("containers").asInt(-1)!=0||!proof.path("identity").equals(identity())||!proof.path("keeper").equals(keeper.value().path("guest").path("keeper")))throw new IOException("guest fence終端証明が一致しません");
             keeper.workProof(proof);LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseが不明なため回収完了を確定しません");
             keeper.closeIntent(others.stopAllowed());keeper.endClient(commands);
@@ -132,6 +146,15 @@ final class WindowsRuntime {
             keeper.finish(commands);
             commands.left(Duration.ofSeconds(2));if(!journal.released()){journal.recovered(proof);journal.release();}commands.left(Duration.ofSeconds(2));lease.replaceResources((ObjectNode)current.path("resources"),WindowsFiles.JSON.createObjectNode());commands.left(Duration.ofSeconds(2));
         }
+    }
+    ObjectNode recoverDaemon(ObjectNode owner,JsonNode keeper) throws IOException {
+        owner=distribution.claimStop(owner,identity(),keeper.path("attempt").asText(),facts().boot());
+        JsonNode prepared=call(request("daemon-recover",owner).set("claim",owner.path("restartClaim")),null);verifyHello(prepared,owner);
+        if(prepared.path("empty").asBoolean()) {
+            if(prepared.has("daemon")||prepared.path("ready").asBoolean())throw new IOException("空の回復準備証明が矛盾しています");
+            return distribution.releaseClaim(owner);
+        }
+        return distribution.consumeStop(owner,prepared);
     }
     static Set<String> runningNames(byte[] bytes) throws IOException {
         boolean nul=false;for(byte value:bytes)if(value==0)nul=true;String text;if(bytes.length>=2&&(bytes[0]==(byte)0xff&&bytes[1]==(byte)0xfe))text=StandardCharsets.UTF_16LE.newDecoder().decode(java.nio.ByteBuffer.wrap(bytes,2,bytes.length-2)).toString();else if(nul)text=StandardCharsets.UTF_16LE.newDecoder().decode(java.nio.ByteBuffer.wrap(bytes)).toString();else text=StandardCharsets.UTF_8.newDecoder().decode(java.nio.ByteBuffer.wrap(bytes)).toString();

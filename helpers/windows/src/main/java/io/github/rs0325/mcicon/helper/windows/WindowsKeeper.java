@@ -72,6 +72,7 @@ final class WindowsKeeper {
             record=WindowsFiles.JSON.createObjectNode().put("state","starting").put("attempt",controller.attempt()).put("boot",host.boot()).put("controllerPid",controller.pid()).put("controllerStarted",controller.started()).put("recovery",controller.recovery());
             record.set("identity",runtime.identity());save();
             ObjectNode request=runtime.request(controller.recovery()?"keep-recover":owner.path("needsInit").asBoolean()?"keep-init":"keep",owner).put("keeperAttempt",controller.attempt());owner.remove("needsInit");
+            if(controller.recovery()&&owner.has("lastStop"))request.set("stop",owner.path("lastStop"));
             child=runtime.commands.keep(runtime.guest(),controller.pid(),controller.started());record.put("prefix",child.prefix().toString());save();
             CompletableFuture<Void> writing=new CompletableFuture<>();Thread.ofVirtual().start(()->{try{OutputStream writer=child.process().getOutputStream();writer.write(WindowsFiles.JSON.writeValueAsBytes(request));writer.write('\n');writer.flush();writing.complete(null);}catch(Throwable error){writing.completeExceptionally(error);}});
             CompletableFuture<JsonNode> output=new CompletableFuture<>();Thread.ofVirtual().start(()->{try{output.complete(line(child.process().getInputStream(),65536));}catch(Throwable error){output.completeExceptionally(error);}});

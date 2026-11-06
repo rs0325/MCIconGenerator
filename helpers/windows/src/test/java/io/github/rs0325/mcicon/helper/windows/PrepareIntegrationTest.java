@@ -94,11 +94,92 @@ class PrepareIntegrationTest {
         for(JsonNode event:events())if(event.path("operation").asText().equals("daemon-prepare")&&!event.path("owner").has("lastStop")){assertEquals(proof.path("claim"),event.path("request").path("claim"));assertFalse(event.path("owner").has("restartClaim"));}
     }
 
+    @Test void 回復keeper開始前に専用distroだけを停止して新しいreceiptを保存する() throws Exception {
+        readyKeeper();JsonNode previous=distribution.owner().path("lastStop");
+        try(var journal=runtime("prepare").journal()) {
+            ObjectNode recovered=runtime("prepare").keeperOwner(journal,true);
+            assertNotEquals(previous,recovered.path("lastStop"));
+            assertTrue(Files.exists(tmp.resolve("fixture-terminated")));
+            assertEquals(List.of("--list","--running","--quiet","--terminate",distribution.name,"--list","--running","--quiet"),Files.readAllLines(tmp.resolve("fixture-host-events")));
+        }
+    }
+    @Test void 回復停止の未確認や他lease不明では停止receiptを更新しない() throws Exception {
+        readyKeeper();JsonNode previous=distribution.owner().path("lastStop");
+        mode("still-running");
+        try(var journal=runtime("prepare").journal()) {
+            assertThrows(IOException.class,()->runtime("prepare").keeperOwner(journal,true));
+        }
+        assertEquals(previous,distribution.owner().path("lastStop"));
+        Files.deleteIfExists(tmp.resolve("fixture-terminated"));Files.delete(tmp.resolve("fixture-host-events"));
+        mode("valid");Files.createDirectory(root.resolve("jobs/unknown"));
+        try(var journal=runtime("prepare").journal()) {
+            assertThrows(IOException.class,()->runtime("prepare").keeperOwner(journal,true));
+        }
+        assertFalse(Files.exists(tmp.resolve("fixture-host-events")));
+        assertEquals(previous,distribution.owner().path("lastStop"));
+    }
+
+    @Test void 回復時の資源所有不一致は停止より前に拒否する() throws Exception {
+        readyKeeper();JsonNode previous=distribution.owner().path("lastStop");
+        ((ObjectNode)lease.path("resources").path("windows")).put("generationOwner",UUID.randomUUID().toString());saveLease();
+        try(var journal=runtime("prepare").journal()) {
+            assertThrows(IOException.class,()->runtime("prepare").keeperOwner(journal,true));
+        }
+        assertFalse(Files.exists(tmp.resolve("fixture-host-events")));
+        assertEquals(previous,distribution.owner().path("lastStop"));
+    }
+
+    @Test void preflight後の停止と別keeper開始を挟む空回復でも次のprepareを妨げない() throws Exception {
+        WindowsRuntime next=runtime("prepare");next.preflight();
+        Path nextTmp=tmp,nextLeasePath=leasePath;ObjectNode nextLease=lease;
+        lease=lease.deepCopy().put("jobId",UUID.randomUUID().toString()).put("ownerId",UUID.randomUUID().toString());lease.putObject("resources");
+        Path job=Files.createDirectories(root.resolve("jobs").resolve(lease.path("jobId").asText()));tmp=Files.createDirectory(job.resolve("tmp"));leasePath=job.resolve("lease.json");saveLease();
+        for(String name:List.of("fixture-facts.json","payload.json","windows-host.exe"))Files.copy(nextTmp.resolve(name),tmp.resolve(name));
+        mode("empty");WindowsRuntime recovery=runtime("release");
+        tmp=nextTmp;leasePath=nextLeasePath;lease=nextLease;
+        distribution.stopped(distribution.owner(),host.boot());JsonNode stop=distribution.owner().path("lastStop");
+        WindowsRuntime keep=runtime("keep");WindowsKeeper keeper=allocate(WindowsKeeper.class);set(keeper,"runtime",keep);set(keeper,"controller",keep.command.keeper());
+        Method start=WindowsKeeper.class.getDeclaredMethod("start");start.setAccessible(true);Commands.Running child=null;
+        try {
+            start.invoke(keeper);Field field=WindowsKeeper.class.getDeclaredField("child");field.setAccessible(true);child=(Commands.Running)field.get(keeper);
+            recovery.commands.keeper(keeper.value());
+            try(var ignored=recovery.lock()) {
+                ObjectNode recovered=recovery.recoverDaemon(distribution.owner(),WindowsFiles.JSON.createObjectNode().put("attempt",UUID.randomUUID().toString()));
+                assertEquals(stop,recovered.path("lastStop"));assertFalse(recovered.has("preparedDaemon"));
+                assertTrue(child.process().isAlive());
+            }
+            // 回収済みleaseの公開を再現し、別keeper生存中は追加停止しない。
+            ObjectNode released=recovery.lease.read();released.put("state","released");WindowsFiles.write(recovery.command.lease(),released);
+            runtime("prepare").prepare();assertTrue(child.process().isAlive());assertTrue(distribution.owner().has("preparedDaemon"));assertFalse(distribution.owner().has("restartClaim"));
+        } finally {
+            if(child==null){Field field=WindowsKeeper.class.getDeclaredField("child");field.setAccessible(true);child=(Commands.Running)field.get(keeper);}
+            if(child!=null){child.process().getOutputStream().close();assertTrue(child.process().waitFor(10,java.util.concurrent.TimeUnit.SECONDS));}
+        }
+    }
+    @Test void 回復ACKだけではnative終端不明と矛盾する空証明を確定しない() throws Exception {
+        readyKeeper();WindowsRuntime recovery=runtime("release");recovery.commands.keeper(recovery.keeperRecord());JsonNode stop=distribution.owner().path("lastStop");
+        for(String mode:List.of("missing-done","mismatch-done","missing-completion","mismatch-completion","nonzero","child-nonzero","empty-ready","empty-daemon")) {
+            mode(mode);assertThrows(IOException.class,()->recovery.recoverDaemon(distribution.owner(),recovery.keeperRecord()),mode);
+            assertEquals(stop,distribution.owner().path("lastStop"));assertTrue(distribution.owner().has("restartClaim"));assertFalse(distribution.owner().has("preparedDaemon"));
+        }
+        mode("valid");ObjectNode recovered=recovery.recoverDaemon(distribution.owner(),recovery.keeperRecord());assertTrue(recovered.has("preparedDaemon"));assertFalse(recovered.has("lastStop"));assertFalse(recovered.has("restartClaim"));
+    }
     public static class Guest {
         public static void main(String[] args) throws Exception {
             Path prefix=Path.of(args[3]),tmp=prefix.getParent();ProcessHandle process=System.getenv("MCICON_FIXTURE_CMD")!=null?ProcessHandle.current().parent().orElseThrow():ProcessHandle.current();
             ObjectNode client=WindowsFiles.JSON.createObjectNode().put("pid",process.pid()).put("started",process.info().startInstant().orElseThrow().toEpochMilli()).put("parent",Long.parseLong(args[1])).put("parentStarted",Long.parseLong(args[2])).put("boot",OwnershipTest.BOOT);WindowsFiles.write(Path.of(prefix+".state.json"),client);
-            if(args[0].equals("exec")){System.out.write(Files.readAllBytes(tmp.resolve("fixture-facts.json")));WindowsFiles.write(Path.of(prefix+".done.json"),client);return;}
+            if(args[0].equals("exec")) {
+                List<String> command=Arrays.asList(args).subList(5,args.length);
+                if(command.contains("--list")||command.contains("--terminate")) {
+                    Files.write(tmp.resolve("fixture-host-events"),command.subList(1,command.size()),StandardOpenOption.CREATE,StandardOpenOption.APPEND);
+                    if(command.contains("--terminate"))Files.writeString(tmp.resolve("fixture-terminated"),"stopped");
+                    else if(!Files.exists(tmp.resolve("fixture-terminated"))||Files.readString(tmp.resolve("fixture-mode")).equals("still-running")) {
+                        Path root=tmp.getParent().getParent().getParent();ObjectNode lease=(ObjectNode)WindowsFiles.json(tmp.getParent().resolve("lease.json"));
+                        System.out.println("MCIcon-"+lease.path("descriptorSha256").asText().substring(0,24));
+                    }
+                } else System.out.write(Files.readAllBytes(tmp.resolve("fixture-facts.json")));
+                WindowsFiles.write(Path.of(prefix+".done.json"),client);return;
+            }
             ObjectNode request=(ObjectNode)WindowsFiles.JSON.readTree(new BufferedReader(new InputStreamReader(System.in)).readLine());String operation=request.path("operation").asText(),mode=Files.readString(tmp.resolve("fixture-mode"));
             Path root=tmp.getParent().getParent().getParent();ObjectNode owner=(ObjectNode)WindowsFiles.json(root.resolve("windows").resolve(request.path("descriptorSha256").asText()).resolve("owner.json"));
             ObjectNode ack=WindowsFiles.JSON.createObjectNode().put("abi",1).put("boot",OwnershipTest.BOOT).put("memoryBytes",16L*1024*1024*1024);ack.set("marker",request.path("marker"));ack.set("bridgeSha256",request.path("bridgeSha256"));
@@ -106,25 +187,26 @@ class PrepareIntegrationTest {
             if(operation.equals("keep")) {
                 ObjectNode identity=WindowsFiles.JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,request.path(key));ack.set("identity",identity);ack.putObject("keeper").put("attempt",request.path("keeperAttempt").asText());
                 client.put("corePid",Long.parseLong(args[5])).put("coreStarted",Long.parseLong(args[6])).put("clientPid",ProcessHandle.current().pid()).put("clientStarted",ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli());WindowsFiles.write(Path.of(prefix+".client.json"),client);WindowsFiles.write(Path.of(prefix+".state.json"),client);
-            } else if(operation.equals("daemon-prepare")) {
+            } else if(Set.of("daemon-prepare","daemon-recover").contains(operation)) {
                 ack.put("ready",true).put("labelVerified",true);ack.set("claim",request.path("claim").deepCopy());ack.putObject("daemon").put("generation",owner.path("generationOwner").asText()).put("boot",OwnershipTest.BOOT).put("pid",mode.equals("guest-mismatch")?124:123).put("started","456");
                 if(mode.equals("guest-attempt"))((ObjectNode)ack.path("claim")).put("keeperAttempt",UUID.randomUUID().toString());
                 if(mode.equals("guest-missing"))exit=23;
                 if(mode.equals("crash")){Files.move(tmp.resolve("windows-operation.json"),tmp.resolve("fixture-pending.json"));Files.createDirectory(tmp.resolve("windows-operation.json"));}
+                if(mode.startsWith("empty")){ack.put("empty",true);if(!mode.equals("empty-ready"))ack.remove("ready");if(!mode.equals("empty-daemon"))ack.remove("daemon");}
             } else if(operation.equals("load")){System.in.transferTo(OutputStream.nullOutputStream());ack=WindowsFiles.JSON.createObjectNode().put("Id","sha256:"+"c".repeat(64)).put("Os","linux").put("Architecture","amd64");}
             else if(operation.equals("create"))ack=WindowsFiles.JSON.createObjectNode().put("id","f".repeat(64));
             else if(operation.equals("remove"))ack=WindowsFiles.JSON.createObjectNode().put("removed",request.path("id").asText());
             ObjectNode event=WindowsFiles.JSON.createObjectNode().put("operation",operation);event.set("request",request);event.set("owner",owner);event.set("ack",ack);Files.writeString(tmp.resolve("fixture-events"),event+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);
             System.out.println(ack);System.out.flush();if(operation.equals("keep"))System.in.transferTo(OutputStream.nullOutputStream());
             ObjectNode proof=WindowsFiles.JSON.createObjectNode().put("schema",1).put("phase","drain-empty").put("childKnown",true).put("childExit",exit).put("plannedGuardExit",exit).put("jobEmpty",true);proof.set("client",client.deepCopy());
-            if(operation.equals("daemon-prepare")) {
+            if(Set.of("daemon-prepare","daemon-recover").contains(operation)) {
                 if(mode.equals("mismatch-completion"))((ObjectNode)proof.path("client")).put("pid",1);
                 if(mode.equals("nonzero")){exit=7;proof.put("childExit",7).put("plannedGuardExit",7);}
                 if(mode.equals("child-nonzero")){exit=125;proof.put("phase","residual-terminated").put("childExit",7).put("plannedGuardExit",125);}
             }
-            if(!operation.equals("daemon-prepare")||!mode.equals("missing-completion"))WindowsFiles.write(Path.of(prefix+".completion.json"),proof);
-            if(operation.equals("daemon-prepare")&&mode.equals("mismatch-done"))client.put("pid",1);
-            if(!operation.equals("daemon-prepare")||!mode.equals("missing-done"))WindowsFiles.write(Path.of(prefix+".done.json"),client);System.exit(exit);
+            if(!Set.of("daemon-prepare","daemon-recover").contains(operation)||!mode.equals("missing-completion"))WindowsFiles.write(Path.of(prefix+".completion.json"),proof);
+            if(Set.of("daemon-prepare","daemon-recover").contains(operation)&&mode.equals("mismatch-done"))client.put("pid",1);
+            if(!Set.of("daemon-prepare","daemon-recover").contains(operation)||!mode.equals("missing-done"))WindowsFiles.write(Path.of(prefix+".done.json"),client);System.exit(exit);
         }
     }
 }

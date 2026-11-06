@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-06",
+  "issue": "#95",
+  "branch": "feature/issue-95-cancel-resume-fix",
+  "baseCommit": "4a33a4cb3562cf9f6ae825704c1c78684678a9fc",
+  "originalEvidence": "qa/e2e-cancel-resume-windows-2026-11-06.json",
+  "cause": "同guest bootでdaemonだけが失われると、旧release-recoverはcontainer清算に必要なdaemonを停止receiptなしでは再準備できなかった。停止後の回復keeper生成とdelegation初期化の順序にも依存する。",
+  "design": {
+    "reuse": "既存のLeaseReferences、Commands.reap、distro停止照合、停止receipt/claim、prepare_daemonを拡張。依存追加・共有コード変更なし。",
+    "recovery": "他leaseの停止禁止/unknownがない場合だけ本人の専用distroを停止確認。停止receiptに結合した回復keeperと閉鎖fenceでdaemonを準備し、旧actorを清算してfull ID/所有labelでcontainerを回収。",
+    "partialState": "container未作成ではdaemonを生成しない。pending create・部分import・native Job終端不明・所有不一致は拒否して記録を保持する。"
+  },
+  "tests": {
+    "redBeforeFix": "test-daemon.py: 閉鎖fenceでの回復成功ケースがerror、開いたfenceの回復拒否ケースがfailure。",
+    "daemon": {
+      "tests": 13,
+      "failures": 0
+    },
+    "guestbridge": {
+      "tests": 27,
+      "failures": 0,
+      "platform": "専用WSL / Python 3.12"
+    },
+    "helperJava": {
+      "tests": 52,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 21,
+      "passed": 31,
+      "skipReason": "CommandsTest全21件は既存のEnabledOnOs(MAC,LINUX)によるWindows対象外。"
+    },
+    "core": {
+      "tests": 170,
+      "failures": 3,
+      "skipped": 28,
+      "relatedManagedTests": "ManagedRuntimeTest、RuntimeHelperTest等は成功。RuntimeLeaseTestにWindowsファイルロック失敗1件あり。",
+      "failuresDetail": [
+        "InstallationImportTest.cacheCannotWriteWithinOrContainTheInstallation: assertThrows不成立",
+        "WorkerArtifactTest.resolvesResourcesAfterFlatteningWithoutOriginalWorkerJar: combined.jar使用中のため一時directory削除失敗",
+        "RuntimeLeaseTest.receiptRegionIsOutsideActiveLockAndExpiredPreparationDoesNotBlockRelease: ロック済receipt領域の読取り失敗"
+      ],
+      "sharedCodeChanged": false
+    },
+    "otherPython": {
+      "buildNative": 8,
+      "nativeArtifact": 5,
+      "renderAcceptance": 6,
+      "rootfsBuild": 2,
+      "allPassed": true
+    },
+    "unmodifiedFixtureFailures": [
+      "test-smoke-candidate.py: 4件中3成功、1件は固定された別worktree/Windows専用gateをmockせずSystemExit(2)。",
+      "test-native-completion.py: 回収・観測・application fixtureは成功。WSL fixtureは固定LLVM 23の-Werror,-Wunused-but-set-global（既存stateWrites）でcompile失敗。最初の実行のDLL探索失敗はtoolchain binをPATHへ指定して解消。"
+    ],
+    "helperAssemble": "成功（JAR、配布ZIP/TAR、Javadoc/source JAR）。Main.mainの既存Javadoc警告1件。app-image/rootfs/署名済みruntimeの再包装は未実施。",
+    "diffCheck": true
+  },
+  "wsl": {
+    "distro": "MCIcon-CancelFix-c3f8a0ae05624b2c",
+    "registration": [
+      "{7aa1148f-0978-4f19-8cd1-d22dbb1fd2df}",
+      {
+        "DistributionName": "MCIcon-CancelFix-c3f8a0ae05624b2c",
+        "BasePath": "H:\\MCIconGenerator\\worktrees\\milestone-fix-windows\\MCIconGenerator\\build\\wsl-regression\\distro",
+        "Version": 2,
+        "Flags": 15,
+        "DefaultUid": 0
+      }
+    ],
+    "runningContainer": "db57fc98b44b864b4ccdbabd09752ea36dcf6ba107bec88039c67c6d9bf3474d",
+    "sameGuestBoot": true,
+    "staleDaemonFailureReproduced": true,
+    "guestCancelRecoverResumePassed": true,
+    "existingStateEqual": true,
+    "ownProcessesRemaining": []
+  },
+  "wslScope": "固定rootfs/rendererを本人の使い捨てdistroへimport。候補guestを専用guest内だけに配置。実containerのrunningを確認し専用distroをterminate、同kernel bootで旧経路の拒否を確認後に停止証明付き回復・旧full ID不存在・次jobのecho実行まで確認。CLI JVM中断やPNG生成の受入とは区別する。",
+  "existingStateComparison": "全既存登録GUID/name/BasePath/Version/Flags/DefaultUid、default GUID、WSL稼働一覧/status、.wslconfig hashが前後一致。既存guestのdisk内容全hashではない。",
+  "cleanup": {
+    "dedicatedDistributionUnregistered": true,
+    "ownProcessesRemaining": [],
+    "reboot": false,
+    "existingDistributionModified": false
+  },
+  "limitations": [
+    "次の配布候補で取消し→再開の再検証が必要。署名済み公開runtimeの同一renderコマンド・PNG/hash一致は未検証。",
+    "公開CLIのruntimeは同梱pin/署名検証を通す。候補helper/rootfsを無署名で差し替えるCLIテスト経路は確認できない。RuntimeCandidateVerifierはbytes検査で実行受入の代用ではない。",
+    "旧公開descriptorのleaseはRuntimeLease.tryRecoveryのdescriptor/toolVersion照合で新世代の回復対象外。本修正による既存旧leaseの救済は未対応。",
+    "core/未変更helper fixtureの失敗は上記のとおり残る。"
+  ],
+  "distributionImpact": "helper JAR/app-imageとguest rootfsの再ビルド、hash/pin/descriptor/同梱runtime資源の更新と再署名・新版が必要。native PE source変更なし。",
+  "evidence": {
+    "directory": "build/wsl-regression",
+    "commands": "C:/Users/ryuma/.codex/logs/commands/",
+    "pythonTests": "build/python-tests",
+    "gradleTests": "helpers/windows/build/test-results/test と core/build/test-results/test"
+  },
+  "publication": {
+    "commit": false,
+    "push": false,
+    "pullRequest": false,
+    "issueMutation": false
+  },
+  "sourceSha256": {
+    "helpers/windows/src/main/guest/guestbridge.py": "8a72b5faa2fd21e300e34af3f419ddfe0e0808afb8e1da8cda6f66014413e31d",
+    "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/WindowsRuntime.java": "edff718105a37d1359ba69b4cfd67f8270a8ee040bab811738a2a35cd381091e",
+    "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/WindowsKeeper.java": "d688f21408226843ce5632cb53837417d0e7ff7d24249c5b8709569d0ed86460"
+  },
+  "acceptancePassed": false,
+  "acceptanceStatus": "実装修正・関連回帰・guest限定実機は完了。全テスト成功と新版公開CLIのE2Eは未達。",
+  "domainKnowledge": "新規・変更ドメイン知識なし。実装と検証結果のため外部AI-Knowledge更新なし。",
+  "reviewFollowup": {
+    "changes": [
+      "空回復成功時はowner全体の比較付きで本人restartClaimだけを解除し、lastStopを保持する。",
+      "daemon-recoverにもdaemon-prepareと同じnative state/done/completion、実終了値、子0終端照合を必須化する。"
+    ],
+    "helperJava": {
+      "tests": 55,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 21,
+      "passed": 34
+    },
+    "helperAssemble": "成功。app-imageと署名済みruntimeの再包装は未実施。",
+    "regression": "別CLIのpreflight→停止receipt保存→別keeper開始→元CLIの空回復→別CLIのprepareをJava子プロセスfixtureで確認。停止と回収済みlease公開はfixture境界で再現し、release全体や実WSLの複数CLI同時実行の受入とは区別する。",
+    "rejectionTests": "本人claimだけの比較付き解除、native done/completion欠落・不一致・非zero、矛盾する空証明を検証。",
+    "redVerification": [
+      "解除を外すと次prepareが別attemptの未確定claimで失敗。",
+      "回復native照合を外すとdone欠落を拒否できず失敗。"
+    ],
+    "guestbridge": {
+      "tests": 27,
+      "failures": 0
+    },
+    "daemon": {
+      "tests": 13,
+      "failures": 0
+    },
+    "wsl": {
+      "distro": "MCIcon-ReviewUnit-ca82f1a7becb4f42",
+      "existingStateEqual": true,
+      "dedicatedDistributionUnregistered": true,
+      "reboot": false,
+      "evidence": "helpers/windows/build/review-wsl-unit/result.json"
+    },
+    "diffCheck": true,
+    "mainComparison": {
+      "base": "71972cf",
+      "main": "3ebd4fa045560b66d0d159ba92a68a25a3b05575",
+      "changedWindowsFiles": [],
+      "operation": "git fetch originのみ。mergeなし。"
+    },
+    "sourceSha256": {
+      "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/WindowsRuntime.java": "6a39a15e1b00149f381656e750709426eba23181b4f8ce22c1fffc3a19ea8c59",
+      "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/WslDistribution.java": "b9bd8fd83c18757b37c6246098f300d3e7db0906cddb1abcf4ec5d44b0980922",
+      "helpers/windows/src/main/java/io/github/rs0325/mcicon/helper/windows/Commands.java": "c36c160ebb8972feb178e016f1e79c21be81b54afaa4be736a5d0566291e6f7c"
+    },
+    "limitations": "元の既知失敗5系統は今回再実行せず対象外として維持。公開CLIの取消し→再開・PNG/hash一致は次の配布候補で検証が必要。"
+  }
+}
