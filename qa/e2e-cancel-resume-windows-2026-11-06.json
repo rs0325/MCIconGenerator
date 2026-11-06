@@ -1,0 +1,3307 @@
+{
+  "schemaVersion": 1,
+  "taskId": "milestone-e2e2-windows",
+  "issue": "#95",
+  "date": "2026-11-06",
+  "host": "windows",
+  "branch": "feature/issue-95-e2e-cancel-resume",
+  "baseCommit": "71972cf6081f4bfea39bf864d3b0e26f44ffdf42",
+  "productVersion": "1.1.0",
+  "acceptancePassed": false,
+  "scope": {
+    "publicArtifactsOnly": true,
+    "localProductBuildUsed": false,
+    "osRebootPerformed": false,
+    "osSettingsModified": false,
+    "sudoUsed": false,
+    "initialDataRootAbsent": true,
+    "initialRuntimeAndInputCachesAbsent": true,
+    "bootstrapAutoUpdate": "最初に単独コマンドで無効化。設定作成のみでruntime/cache空を維持。",
+    "isolatedDataRoots": [
+      "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data",
+      "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-running",
+      "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-active"
+    ],
+    "isolatedTmpTemp": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\tmp",
+    "fixtureReuse": "後続2rootは最初の公開物E2Eのdownloads/cacheだけをcopy2。lease/owner/keeper/世代はコピーせず失敗状態は変更しない。同名distroは直列作成・回収。",
+    "terminationModes": [
+      "CLIツリー全体のtaskkill /T /F",
+      "leaseのPID/開始時刻で特定したCLI JVMだけのtaskkill /F"
+    ],
+    "ctrlCSignalTested": false,
+    "existingHostGuestDiskContentsHashed": false
+  },
+  "publicBootstrap": {
+    "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-bootstrap-1.1.0-windows-x86_64.zip",
+    "bytes": 70496160,
+    "sha256": "2fd5ed53283d77372519368051f67a6bec6be50d32dcc4a61ece13be11e90bfe",
+    "seconds": 3.889088499941863
+  },
+  "results": [
+    {
+      "item": "初回準備中の取消し",
+      "result": "実測済み",
+      "details": "CLIツリー終了でexit 1。部分guest取得とactive lease/lock file/空stagingを残し、distroは未作成。"
+    },
+    {
+      "item": "初回準備中断後の同一コマンド再実行",
+      "result": "合格",
+      "details": "exit 0。検証済みhelperはsize/hash/mtimeNs不変。部分取得を完成させ旧leaseをreleasedへ回復。64x64 PNGは基準SHA-256一致。"
+    },
+    {
+      "item": "破損した部分取得物の検出・再取得",
+      "result": "合格",
+      "details": "別rootで同一sizeのhelper artifact.part先頭1byteを反転。正規hashのartifactへ復元しpart消失。他の検証済み取得物は不変。"
+    },
+    {
+      "item": "描画起動intent時のCLIツリー終了後再実行",
+      "result": "失敗",
+      "details": "keeper ACK不一致。helperは過去keeper Jobの終端不明を報告。実worker running試行とは区別。"
+    },
+    {
+      "item": "container created時のCLI単独終了後再実行",
+      "result": "失敗",
+      "details": "直後に実workerがrunningへ遷移。再実行はrelease-recoverのDAEMON_RESTART_DENIEDでexit 1。"
+    },
+    {
+      "item": "実worker running中のCLI JVM単独終了",
+      "result": "実測済み",
+      "details": "Docker psで完全ID・State=running・製品image/labelを終了直前に確認。leaseのCLI PIDだけを終了。exit 1。"
+    },
+    {
+      "item": "実worker中断後の同一コマンド再実行",
+      "result": "失敗",
+      "details": "exit 1。release-recoverがDAEMON_RESTART_DENIED。旧leaseはactiveのままで、PNG未生成。"
+    },
+    {
+      "item": "アンインストール時のデータ保持",
+      "result": "限定的確認",
+      "details": "ZIPのprogram directoryだけを手動削除し非VHDXデータfileのsize/hash/mtime・元raw/生成PNG・distro/設定/ログの保持を確認。ZIP用uninstall/全データ削除手順は未記載。"
+    },
+    {
+      "item": "後始末と既存状態の前後比較",
+      "result": "合格",
+      "details": "今回の各distroをGUID/BasePath照合後に手動unregister。専用3root・temp・配布ZIPを除去。既存40登録などの観測値は開始前と一致。出力試験データと元rawは保持。"
+    }
+  ],
+  "baselinePngSha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+  "successfulRenderPngs": [
+    {
+      "path": "out-prepare\\java\\1.21.4\\icons\\assets\\minecraft\\textures\\block\\stone.png",
+      "bytes": 1468,
+      "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+      "width": 64,
+      "height": 64,
+      "baselineMatch": true
+    }
+  ],
+  "runs": {
+    "cancel-prepare-actual": {
+      "args": [
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\package\\mcicon.exe",
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\out-prepare",
+        "--json"
+      ],
+      "pid": 58708,
+      "exit": 1,
+      "seconds": 47.97,
+      "interrupted": true,
+      "stdout": "",
+      "stderr": "",
+      "trigger": {
+        "partial": "data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact.part",
+        "bytesAtTrigger": 1669249,
+        "verified": [
+          {
+            "path": "data\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+            "bytes": 33863906,
+            "mtimeNs": 1793948623722359500,
+            "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+          },
+          {
+            "path": "data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact.part",
+            "bytes": 2324609,
+            "mtimeNs": 1793948627085983800,
+            "sha256": "119cdbbb975de854c71724783c65e0cf01156ab98b624259998db75803fdc507"
+          }
+        ]
+      },
+      "kill": {
+        "exit": 0,
+        "stdout": "SUCCESS: The process with PID 33980 (child process of PID 59576) has been terminated.\r\nSUCCESS: The process with PID 59576 (child process of PID 44408) has been terminated.\r\nSUCCESS: The process with PID 44408 (child process of PID 58708) has been terminated.\r\nSUCCESS: The process with PID 58708 (child process of PID 50064) has been terminated.\r\n",
+        "stderr": ""
+      },
+      "containersBeforeTermination": null,
+      "containersAfterTermination": null,
+      "leases": [
+        {
+          "file": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.json",
+          "jobId": "7e81da88-ff9e-4964-8ccf-aeab92d8a175",
+          "state": "active",
+          "resources": {},
+          "pid": 59576,
+          "processStartedAt": "2026-11-06T07:03:39.035Z"
+        }
+      ],
+      "bootstrapReceipts": [
+        {
+          "file": "data\\bootstrap\\runs\\1f061833-bd81-4295-8516-fdf2464235e1.json",
+          "invocationId": "1f061833-bd81-4295-8516-fdf2464235e1",
+          "state": "running",
+          "bootstrap": {
+            "pid": 44408,
+            "startedAt": "2026-11-06T07:02:59.536Z"
+          },
+          "child": {
+            "pid": 59576,
+            "startedAt": "2026-11-06T07:03:39.035Z"
+          },
+          "exitCode": null
+        }
+      ],
+      "residue": {
+        "fileCount": 520,
+        "lockFiles": [
+          {
+            "path": "data\\bootstrap\\state.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948579163960300
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948620600497000
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626465063500
+          },
+          {
+            "path": "data\\runtime\\locks\\generations.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948624680989300
+          },
+          {
+            "path": "data\\runtime\\locks\\helper-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948623763833000
+          },
+          {
+            "path": "data\\runtime\\locks\\runtime-cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626463549300
+          },
+          {
+            "path": "data\\runtime\\workers\\91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf\\agent.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948620482821900
+          },
+          {
+            "path": "data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\generation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626109726000
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948624712269900
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626108720200
+          }
+        ],
+        "partFiles": [
+          {
+            "path": "data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact.part",
+            "bytes": 10188929,
+            "mtimeNs": 1793948627469287900
+          }
+        ],
+        "lockFileCount": 11,
+        "lockFilesByRoot": {
+          "bootstrap": 1,
+          "runtime": 9,
+          "cache": 1
+        },
+        "allLockFilesEvidence": "build/e2e/cancel-prepare-actual-files.json"
+      },
+      "downloads": [
+        {
+          "path": "data\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+          "bytes": 33863906,
+          "mtimeNs": 1793948623722359500,
+          "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+        },
+        {
+          "path": "data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact.part",
+          "bytes": 10188929,
+          "mtimeNs": 1793948627469287900,
+          "sha256": "7177d2a45b839d193007ed2c4af77741cf0c7bf4d5b0a527a8cb6b20812437b2"
+        }
+      ]
+    },
+    "resume-prepare": {
+      "args": [
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\package\\mcicon.exe",
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\out-prepare",
+        "--json"
+      ],
+      "pid": 69764,
+      "exit": 0,
+      "seconds": 219.279,
+      "interrupted": false,
+      "stdout": "{\n  \"version\" : \"1.21.4\",\n  \"mode\" : \"icons\",\n  \"manifest\" : \"H:\\\\MCIconGenerator\\\\worktrees\\\\milestone-e2e2-windows\\\\MCIconGenerator\\\\build\\\\e2e\\\\out-prepare\\\\java\\\\1.21.4\\\\icons\\\\manifest.json\",\n  \"complete\" : true,\n  \"succeeded\" : 1,\n  \"failed\" : 0,\n  \"entries\" : [ {\n    \"id\" : \"minecraft:stone\",\n    \"kind\" : \"block\",\n    \"status\" : \"success\",\n    \"path\" : \"assets/minecraft/textures/block/stone.png\",\n    \"sha256\" : \"b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de\",\n    \"sourceSha256\" : null,\n    \"auxiliary\" : { },\n    \"code\" : null,\n    \"message\" : null\n  } ]\n}\r\n",
+      "stderr": "prepare 1.21.4 0/1\r\nstartup-ready 1.21.4 0/1\r\nrender minecraft:stone 1/1\r\n",
+      "containersBeforeTermination": null,
+      "containersAfterTermination": null,
+      "leases": [
+        {
+          "file": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\lease.json",
+          "jobId": "0e0777a5-a176-4042-9bc2-967f4f3c2319",
+          "state": "released",
+          "resources": {},
+          "pid": 68100,
+          "processStartedAt": "2026-11-06T07:05:18.512Z"
+        },
+        {
+          "file": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.json",
+          "jobId": "7e81da88-ff9e-4964-8ccf-aeab92d8a175",
+          "state": "released",
+          "resources": {},
+          "pid": 59576,
+          "processStartedAt": "2026-11-06T07:03:39.035Z"
+        }
+      ],
+      "bootstrapReceipts": [
+        {
+          "file": "data\\bootstrap\\runs\\1f061833-bd81-4295-8516-fdf2464235e1.json",
+          "invocationId": "1f061833-bd81-4295-8516-fdf2464235e1",
+          "state": "running",
+          "bootstrap": {
+            "pid": 44408,
+            "startedAt": "2026-11-06T07:02:59.536Z"
+          },
+          "child": {
+            "pid": 59576,
+            "startedAt": "2026-11-06T07:03:39.035Z"
+          },
+          "exitCode": null
+        },
+        {
+          "file": "data\\bootstrap\\runs\\b2079856-33e7-437c-b722-f2ec9911e82a.json",
+          "invocationId": "b2079856-33e7-437c-b722-f2ec9911e82a",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 19664,
+            "startedAt": "2026-11-06T07:04:01.691Z"
+          },
+          "child": {
+            "pid": 68100,
+            "startedAt": "2026-11-06T07:05:18.512Z"
+          },
+          "exitCode": 0
+        }
+      ],
+      "residue": {
+        "fileCount": 1798,
+        "lockFiles": [
+          {
+            "path": "data\\bootstrap\\state.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948579163960300
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948620600497000
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948732733564200
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626465063500
+          },
+          {
+            "path": "data\\runtime\\locks\\generations.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948624680989300
+          },
+          {
+            "path": "data\\runtime\\locks\\helper-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948623763833000
+          },
+          {
+            "path": "data\\runtime\\locks\\runtime-cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626463549300
+          },
+          {
+            "path": "data\\runtime\\workers\\91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf\\agent.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948620482821900
+          },
+          {
+            "path": "data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\generation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626109726000
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948725986657400
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948624712269900
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626108720200
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948765068170600
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948726748966000
+          }
+        ],
+        "partFiles": [],
+        "lockFileCount": 273,
+        "lockFilesByRoot": {
+          "bootstrap": 1,
+          "runtime": 13,
+          "cache": 259
+        },
+        "allLockFilesEvidence": "build/e2e/resume-prepare-files.json"
+      },
+      "downloads": [
+        {
+          "path": "data\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+          "bytes": 33863906,
+          "mtimeNs": 1793948623722359500,
+          "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+        },
+        {
+          "path": "data\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+          "bytes": 593385993,
+          "mtimeNs": 1793948762791848400,
+          "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+        },
+        {
+          "path": "data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+          "bytes": 98146824,
+          "mtimeNs": 1793948732583454800,
+          "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+        }
+      ]
+    },
+    "cancel-render": {
+      "args": [
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\package\\mcicon.exe",
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\out-render",
+        "--json"
+      ],
+      "pid": 53008,
+      "exit": 1,
+      "seconds": 115.837,
+      "interrupted": true,
+      "stdout": "",
+      "stderr": "prepare 1.21.4 0/1\r\n",
+      "trigger": {
+        "lease": {
+          "schemaVersion": 1,
+          "jobId": "eaf24e5a-2a44-4f45-996b-f7d1b059b09c",
+          "ownerId": "043d28ee-dd8a-43a8-8107-7fbb244277c8",
+          "toolVersion": "1.1.0",
+          "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "runtimeId": "mcicon-1.1.0-windows-x86_64",
+          "descriptorSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+          "hostId": "030a3706-6c79-4681-92ae-61aec36d70fd",
+          "pid": 49292,
+          "processStartedAt": "2026-11-06T07:09:48.044Z",
+          "createdAt": "2026-11-06T07:09:53.349873300Z",
+          "requirements": {
+            "containerMemoryMiB": 3072,
+            "heapMemoryMiB": 2048,
+            "cpus": 4,
+            "preparationDeadline": "2026-11-06T07:24:49.458792700Z"
+          },
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "8c20f1a9-6ab7-4687-97b7-eb47b8542b05",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "b18d5de7-96c1-439a-819b-d009f5dfa48c",
+                "markerSha256": "3ab2e563223b823a85d58c7b58fa947cadee3747c63bdc9401788e5a07956ac9"
+              },
+              "transports": [
+                {
+                  "id": "cf9e905c-bb83-43c1-89e1-af00337b5228",
+                  "pid": 40512,
+                  "processStartedAt": "2026-11-06T07:09:55.923Z"
+                },
+                {
+                  "id": "4f85734d-6241-4e57-9b71-3f855f598187"
+                },
+                {
+                  "id": "df195f58-9e31-4e8b-82cb-bc80f9898ed1",
+                  "pid": 19356,
+                  "processStartedAt": "2026-11-06T07:10:13.508Z"
+                },
+                {
+                  "id": "e688b8ed-c4ca-4ba7-a3f3-3a3299910e8f",
+                  "pid": 50320,
+                  "processStartedAt": "2026-11-06T07:10:17.540Z"
+                },
+                {
+                  "id": "3240a919-0680-4397-8249-84ed2296e279"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-acfbf233-0114-4f3d-ae53-009bad307479",
+                  "transportId": "3240a919-0680-4397-8249-84ed2296e279"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/eaf24e5a-2a44-4f45-996b-f7d1b059b09c"
+            }
+          }
+        }
+      },
+      "kill": {
+        "exit": 0,
+        "stdout": "SUCCESS: The process with PID 3332 (child process of PID 70384) has been terminated.\r\nSUCCESS: The process with PID 70384 (child process of PID 41956) has been terminated.\r\nSUCCESS: The process with PID 21596 (child process of PID 44872) has been terminated.\r\nSUCCESS: The process with PID 27644 (child process of PID 33980) has been terminated.\r\nSUCCESS: The process with PID 41956 (child process of PID 33980) has been terminated.\r\nSUCCESS: The process with PID 29180 (child process of PID 4624) has been terminated.\r\nSUCCESS: The process with PID 44872 (child process of PID 4624) has been terminated.\r\nSUCCESS: The process with PID 16768 (child process of PID 40512) has been terminated.\r\nSUCCESS: The process with PID 33980 (child process of PID 40512) has been terminated.\r\nSUCCESS: The process with PID 53408 (child process of PID 43892) has been terminated.\r\nSUCCESS: The process with PID 4624 (child process of PID 43892) has been terminated.\r\nSUCCESS: The process with PID 40512 (child process of PID 17480) has been terminated.\r\nSUCCESS: The process with PID 43892 (child process of PID 25096) has been terminated.\r\nSUCCESS: The process with PID 62920 (child process of PID 49292) has been terminated.\r\nSUCCESS: The process with PID 17480 (child process of PID 49292) has been terminated.\r\nSUCCESS: The process with PID 25096 (child process of PID 49292) has been terminated.\r\nSUCCESS: The process with PID 49292 (child process of PID 19672) has been terminated.\r\nSUCCESS: The process with PID 19672 (child process of PID 53008) has been terminated.\r\nSUCCESS: The process with PID 53008 (child process of PID 52488) has been terminated.\r\n",
+        "stderr": ""
+      },
+      "containersBeforeTermination": null,
+      "containersAfterTermination": {
+        "exit": 0,
+        "stderr": "",
+        "containers": []
+      },
+      "leases": [
+        {
+          "file": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\lease.json",
+          "jobId": "0e0777a5-a176-4042-9bc2-967f4f3c2319",
+          "state": "released",
+          "resources": {},
+          "pid": 68100,
+          "processStartedAt": "2026-11-06T07:05:18.512Z"
+        },
+        {
+          "file": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.json",
+          "jobId": "7e81da88-ff9e-4964-8ccf-aeab92d8a175",
+          "state": "released",
+          "resources": {},
+          "pid": 59576,
+          "processStartedAt": "2026-11-06T07:03:39.035Z"
+        },
+        {
+          "file": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\lease.json",
+          "jobId": "eaf24e5a-2a44-4f45-996b-f7d1b059b09c",
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "8c20f1a9-6ab7-4687-97b7-eb47b8542b05",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "b18d5de7-96c1-439a-819b-d009f5dfa48c",
+                "markerSha256": "3ab2e563223b823a85d58c7b58fa947cadee3747c63bdc9401788e5a07956ac9"
+              },
+              "transports": [
+                {
+                  "id": "cf9e905c-bb83-43c1-89e1-af00337b5228",
+                  "pid": 40512,
+                  "processStartedAt": "2026-11-06T07:09:55.923Z"
+                },
+                {
+                  "id": "4f85734d-6241-4e57-9b71-3f855f598187"
+                },
+                {
+                  "id": "df195f58-9e31-4e8b-82cb-bc80f9898ed1",
+                  "pid": 19356,
+                  "processStartedAt": "2026-11-06T07:10:13.508Z"
+                },
+                {
+                  "id": "e688b8ed-c4ca-4ba7-a3f3-3a3299910e8f",
+                  "pid": 50320,
+                  "processStartedAt": "2026-11-06T07:10:17.540Z"
+                },
+                {
+                  "id": "3240a919-0680-4397-8249-84ed2296e279"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-acfbf233-0114-4f3d-ae53-009bad307479",
+                  "transportId": "3240a919-0680-4397-8249-84ed2296e279"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/eaf24e5a-2a44-4f45-996b-f7d1b059b09c"
+            }
+          },
+          "pid": 49292,
+          "processStartedAt": "2026-11-06T07:09:48.044Z"
+        }
+      ],
+      "bootstrapReceipts": [
+        {
+          "file": "data\\bootstrap\\runs\\1f061833-bd81-4295-8516-fdf2464235e1.json",
+          "invocationId": "1f061833-bd81-4295-8516-fdf2464235e1",
+          "state": "running",
+          "bootstrap": {
+            "pid": 44408,
+            "startedAt": "2026-11-06T07:02:59.536Z"
+          },
+          "child": {
+            "pid": 59576,
+            "startedAt": "2026-11-06T07:03:39.035Z"
+          },
+          "exitCode": null
+        },
+        {
+          "file": "data\\bootstrap\\runs\\33e9e823-e871-4d49-953b-fc0278900860.json",
+          "invocationId": "33e9e823-e871-4d49-953b-fc0278900860",
+          "state": "running",
+          "bootstrap": {
+            "pid": 19672,
+            "startedAt": "2026-11-06T07:08:35.070Z"
+          },
+          "child": {
+            "pid": 49292,
+            "startedAt": "2026-11-06T07:09:48.044Z"
+          },
+          "exitCode": null
+        },
+        {
+          "file": "data\\bootstrap\\runs\\b2079856-33e7-437c-b722-f2ec9911e82a.json",
+          "invocationId": "b2079856-33e7-437c-b722-f2ec9911e82a",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 19664,
+            "startedAt": "2026-11-06T07:04:01.691Z"
+          },
+          "child": {
+            "pid": 68100,
+            "startedAt": "2026-11-06T07:05:18.512Z"
+          },
+          "exitCode": 0
+        }
+      ],
+      "residue": {
+        "fileCount": 2239,
+        "lockFiles": [
+          {
+            "path": "data\\bootstrap\\state.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948579163960300
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948620600497000
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948732733564200
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626465063500
+          },
+          {
+            "path": "data\\runtime\\locks\\generations.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948624680989300
+          },
+          {
+            "path": "data\\runtime\\locks\\helper-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948623763833000
+          },
+          {
+            "path": "data\\runtime\\locks\\runtime-cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626463549300
+          },
+          {
+            "path": "data\\runtime\\workers\\91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf\\agent.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948620482821900
+          },
+          {
+            "path": "data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\generation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626109726000
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948725986657400
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948624712269900
+          },
+          {
+            "path": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948993351536400
+          },
+          {
+            "path": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948996947552500
+          },
+          {
+            "path": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948994056724900
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626108720200
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948765068170600
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948726748966000
+          }
+        ],
+        "partFiles": [],
+        "lockFileCount": 276,
+        "lockFilesByRoot": {
+          "bootstrap": 1,
+          "runtime": 16,
+          "cache": 259
+        },
+        "allLockFilesEvidence": "build/e2e/cancel-render-files.json"
+      },
+      "downloads": [
+        {
+          "path": "data\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+          "bytes": 33863906,
+          "mtimeNs": 1793948623722359500,
+          "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+        },
+        {
+          "path": "data\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+          "bytes": 593385993,
+          "mtimeNs": 1793948762791848400,
+          "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+        },
+        {
+          "path": "data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+          "bytes": 98146824,
+          "mtimeNs": 1793948732583454800,
+          "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+        }
+      ]
+    },
+    "resume-render": {
+      "args": [
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\package\\mcicon.exe",
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\out-render",
+        "--json"
+      ],
+      "pid": 11308,
+      "exit": 1,
+      "seconds": 85.686,
+      "interrupted": false,
+      "stdout": "",
+      "stderr": "IO_FAILED: Input/output operation failed\r\nio.github.rs0325.mcicon.McIconException: Input/output operation failed\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$submit$9(MCIconGenerator.java:164)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\r\n\tat java.base/java.lang.Thread.run(Unknown Source)\r\nCaused by: java.io.IOException: keeper ACKが一致しません\r\n\tat io.github.rs0325.mcicon.internal.managed.RuntimeHelper.keep(RuntimeHelper.java:120)\r\n\tat io.github.rs0325.mcicon.internal.managed.RuntimeHelper.control(RuntimeHelper.java:43)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.recover(ManagedRuntime.java:108)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:53)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:28)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$renderManaged$4(MCIconGenerator.java:88)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$submit$9(MCIconGenerator.java:161)\r\n\t... 3 more\r\n",
+      "containersBeforeTermination": null,
+      "containersAfterTermination": null,
+      "leases": [
+        {
+          "file": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\lease.json",
+          "jobId": "0e0777a5-a176-4042-9bc2-967f4f3c2319",
+          "state": "released",
+          "resources": {},
+          "pid": 68100,
+          "processStartedAt": "2026-11-06T07:05:18.512Z"
+        },
+        {
+          "file": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.json",
+          "jobId": "7e81da88-ff9e-4964-8ccf-aeab92d8a175",
+          "state": "released",
+          "resources": {},
+          "pid": 59576,
+          "processStartedAt": "2026-11-06T07:03:39.035Z"
+        },
+        {
+          "file": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\lease.json",
+          "jobId": "eaf24e5a-2a44-4f45-996b-f7d1b059b09c",
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "8c20f1a9-6ab7-4687-97b7-eb47b8542b05",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "b18d5de7-96c1-439a-819b-d009f5dfa48c",
+                "markerSha256": "3ab2e563223b823a85d58c7b58fa947cadee3747c63bdc9401788e5a07956ac9"
+              },
+              "transports": [
+                {
+                  "id": "cf9e905c-bb83-43c1-89e1-af00337b5228",
+                  "pid": 40512,
+                  "processStartedAt": "2026-11-06T07:09:55.923Z"
+                },
+                {
+                  "id": "4f85734d-6241-4e57-9b71-3f855f598187"
+                },
+                {
+                  "id": "df195f58-9e31-4e8b-82cb-bc80f9898ed1",
+                  "pid": 19356,
+                  "processStartedAt": "2026-11-06T07:10:13.508Z"
+                },
+                {
+                  "id": "e688b8ed-c4ca-4ba7-a3f3-3a3299910e8f",
+                  "pid": 50320,
+                  "processStartedAt": "2026-11-06T07:10:17.540Z"
+                },
+                {
+                  "id": "3240a919-0680-4397-8249-84ed2296e279"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-acfbf233-0114-4f3d-ae53-009bad307479",
+                  "transportId": "3240a919-0680-4397-8249-84ed2296e279"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/eaf24e5a-2a44-4f45-996b-f7d1b059b09c"
+            }
+          },
+          "pid": 49292,
+          "processStartedAt": "2026-11-06T07:09:48.044Z"
+        }
+      ],
+      "bootstrapReceipts": [
+        {
+          "file": "data\\bootstrap\\runs\\1f061833-bd81-4295-8516-fdf2464235e1.json",
+          "invocationId": "1f061833-bd81-4295-8516-fdf2464235e1",
+          "state": "running",
+          "bootstrap": {
+            "pid": 44408,
+            "startedAt": "2026-11-06T07:02:59.536Z"
+          },
+          "child": {
+            "pid": 59576,
+            "startedAt": "2026-11-06T07:03:39.035Z"
+          },
+          "exitCode": null
+        },
+        {
+          "file": "data\\bootstrap\\runs\\33e9e823-e871-4d49-953b-fc0278900860.json",
+          "invocationId": "33e9e823-e871-4d49-953b-fc0278900860",
+          "state": "running",
+          "bootstrap": {
+            "pid": 19672,
+            "startedAt": "2026-11-06T07:08:35.070Z"
+          },
+          "child": {
+            "pid": 49292,
+            "startedAt": "2026-11-06T07:09:48.044Z"
+          },
+          "exitCode": null
+        },
+        {
+          "file": "data\\bootstrap\\runs\\b2079856-33e7-437c-b722-f2ec9911e82a.json",
+          "invocationId": "b2079856-33e7-437c-b722-f2ec9911e82a",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 19664,
+            "startedAt": "2026-11-06T07:04:01.691Z"
+          },
+          "child": {
+            "pid": 68100,
+            "startedAt": "2026-11-06T07:05:18.512Z"
+          },
+          "exitCode": 0
+        },
+        {
+          "file": "data\\bootstrap\\runs\\fb86e0f4-5455-413f-b92d-3b59d846aee6.json",
+          "invocationId": "fb86e0f4-5455-413f-b92d-3b59d846aee6",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 53364,
+            "startedAt": "2026-11-06T07:10:32.843Z"
+          },
+          "child": {
+            "pid": 45380,
+            "startedAt": "2026-11-06T07:11:51.239Z"
+          },
+          "exitCode": 1
+        }
+      ],
+      "residue": {
+        "fileCount": 2246,
+        "lockFiles": [
+          {
+            "path": "data\\bootstrap\\state.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948579163960300
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948620600497000
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948732733564200
+          },
+          {
+            "path": "data\\runtime\\locks\\artifact-f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626465063500
+          },
+          {
+            "path": "data\\runtime\\locks\\generations.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948624680989300
+          },
+          {
+            "path": "data\\runtime\\locks\\helper-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948623763833000
+          },
+          {
+            "path": "data\\runtime\\locks\\runtime-cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626463549300
+          },
+          {
+            "path": "data\\runtime\\workers\\91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf\\agent.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948620482821900
+          },
+          {
+            "path": "data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\generation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626109726000
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948725986657400
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948624712269900
+          },
+          {
+            "path": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793948993351536400
+          },
+          {
+            "path": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948996947552500
+          },
+          {
+            "path": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948994056724900
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948626108720200
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948765068170600
+          },
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793948726748966000
+          }
+        ],
+        "partFiles": [],
+        "lockFileCount": 276,
+        "lockFilesByRoot": {
+          "bootstrap": 1,
+          "runtime": 16,
+          "cache": 259
+        },
+        "allLockFilesEvidence": "build/e2e/resume-render-files.json"
+      },
+      "downloads": [
+        {
+          "path": "data\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+          "bytes": 33863906,
+          "mtimeNs": 1793948623722359500,
+          "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+        },
+        {
+          "path": "data\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+          "bytes": 593385993,
+          "mtimeNs": 1793948762791848400,
+          "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+        },
+        {
+          "path": "data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+          "bytes": 98146824,
+          "mtimeNs": 1793948732583454800,
+          "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+        }
+      ]
+    },
+    "cancel-running": {
+      "args": [
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\package\\mcicon.exe",
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\out-running",
+        "--json"
+      ],
+      "pid": 60956,
+      "exit": 1,
+      "seconds": 114.075,
+      "interrupted": true,
+      "stdout": "",
+      "stderr": "prepare 1.21.4 0/1\r\n",
+      "trigger": {
+        "lease": {
+          "schemaVersion": 1,
+          "jobId": "41a31cac-2cd8-44cb-933a-ee6de2af9737",
+          "ownerId": "7203575a-8c87-4489-b1d1-3e6d8cf67ad8",
+          "toolVersion": "1.1.0",
+          "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "runtimeId": "mcicon-1.1.0-windows-x86_64",
+          "descriptorSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+          "hostId": "cd45b87d-7500-4b86-93fc-efe05a1f67a8",
+          "pid": 58796,
+          "processStartedAt": "2026-11-06T07:16:06.471Z",
+          "createdAt": "2026-11-06T07:16:11.821409200Z",
+          "requirements": {
+            "containerMemoryMiB": 3072,
+            "heapMemoryMiB": 2048,
+            "cpus": 4,
+            "preparationDeadline": "2026-11-06T07:31:08.143473600Z"
+          },
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "c2717ead-dc11-4690-8982-3c3773b1d126",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-running\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "a72f890b-2984-443d-8628-8cfad4a566da",
+                "markerSha256": "b5690b6390e1b045b41912fcf246a54f893df2f2bc17a319b0277a17c95545e1"
+              },
+              "transports": [
+                {
+                  "id": "1f7cc72e-7e60-4d3e-986f-b8d6fc188bf2",
+                  "pid": 68808,
+                  "processStartedAt": "2026-11-06T07:16:27.296Z"
+                },
+                {
+                  "id": "ab0f52d4-a126-4703-8408-eb6a9a74b723"
+                },
+                {
+                  "id": "885472a0-1775-4457-b7e7-62b6de4653ed",
+                  "pid": 53832,
+                  "processStartedAt": "2026-11-06T07:17:01.783Z"
+                },
+                {
+                  "id": "6b1fb12e-9104-4bac-8497-33aa1381f15e",
+                  "pid": 22520,
+                  "processStartedAt": "2026-11-06T07:17:05.657Z"
+                },
+                {
+                  "id": "71499c83-341d-44cd-8ae9-2d29abf9c782",
+                  "pid": 16532,
+                  "processStartedAt": "2026-11-06T07:17:19.675Z"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-3557ded4-fb96-4ec7-b195-658c7a6879ef",
+                  "transportId": "71499c83-341d-44cd-8ae9-2d29abf9c782",
+                  "id": "4d9865b8ac573c308631e361c99d9fbbee5057424a1c5d2662cf5fc77a781967"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/41a31cac-2cd8-44cb-933a-ee6de2af9737"
+            }
+          }
+        }
+      },
+      "kill": {
+        "args": [
+          "taskkill",
+          "/PID",
+          "58796",
+          "/F"
+        ],
+        "exit": 0,
+        "stdout": "SUCCESS: The process with PID 58796 has been terminated.\r\n",
+        "stderr": ""
+      },
+      "containersBeforeTermination": {
+        "exit": 0,
+        "stderr": "",
+        "containers": [
+          {
+            "ID": "4d9865b8ac573c308631e361c99d9fbbee5057424a1c5d2662cf5fc77a781967",
+            "Names": "mcicon-worker-3557ded4-fb96-4ec7-b195-658c7a6879ef",
+            "Image": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+            "State": "created",
+            "Status": "Created",
+            "Labels": "io.github.rs0325.mcicon.descriptorSha256=cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294,io.github.rs0325.mcicon.generation=c2717ead-dc11-4690-8982-3c3773b1d126,io.github.rs0325.mcicon.jobId=41a31cac-2cd8-44cb-933a-ee6de2af9737,io.github.rs0325.mcicon.ownerId=7203575a-8c87-4489-b1d1-3e6d8cf67ad8,org.opencontainers.image.version=24.04",
+            "Networks": "none"
+          }
+        ]
+      },
+      "containersAfterTermination": {
+        "exit": 0,
+        "stderr": "",
+        "containers": [
+          {
+            "ID": "4d9865b8ac573c308631e361c99d9fbbee5057424a1c5d2662cf5fc77a781967",
+            "Names": "mcicon-worker-3557ded4-fb96-4ec7-b195-658c7a6879ef",
+            "Image": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+            "State": "running",
+            "Status": "Up 2 seconds",
+            "Labels": "io.github.rs0325.mcicon.descriptorSha256=cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294,io.github.rs0325.mcicon.generation=c2717ead-dc11-4690-8982-3c3773b1d126,io.github.rs0325.mcicon.jobId=41a31cac-2cd8-44cb-933a-ee6de2af9737,io.github.rs0325.mcicon.ownerId=7203575a-8c87-4489-b1d1-3e6d8cf67ad8,org.opencontainers.image.version=24.04",
+            "Networks": "none"
+          }
+        ]
+      },
+      "leases": [
+        {
+          "file": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\lease.json",
+          "jobId": "41a31cac-2cd8-44cb-933a-ee6de2af9737",
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "c2717ead-dc11-4690-8982-3c3773b1d126",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-running\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "a72f890b-2984-443d-8628-8cfad4a566da",
+                "markerSha256": "b5690b6390e1b045b41912fcf246a54f893df2f2bc17a319b0277a17c95545e1"
+              },
+              "transports": [
+                {
+                  "id": "1f7cc72e-7e60-4d3e-986f-b8d6fc188bf2",
+                  "pid": 68808,
+                  "processStartedAt": "2026-11-06T07:16:27.296Z"
+                },
+                {
+                  "id": "ab0f52d4-a126-4703-8408-eb6a9a74b723"
+                },
+                {
+                  "id": "885472a0-1775-4457-b7e7-62b6de4653ed",
+                  "pid": 53832,
+                  "processStartedAt": "2026-11-06T07:17:01.783Z"
+                },
+                {
+                  "id": "6b1fb12e-9104-4bac-8497-33aa1381f15e",
+                  "pid": 22520,
+                  "processStartedAt": "2026-11-06T07:17:05.657Z"
+                },
+                {
+                  "id": "71499c83-341d-44cd-8ae9-2d29abf9c782",
+                  "pid": 16532,
+                  "processStartedAt": "2026-11-06T07:17:19.675Z"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-3557ded4-fb96-4ec7-b195-658c7a6879ef",
+                  "transportId": "71499c83-341d-44cd-8ae9-2d29abf9c782",
+                  "id": "4d9865b8ac573c308631e361c99d9fbbee5057424a1c5d2662cf5fc77a781967"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/41a31cac-2cd8-44cb-933a-ee6de2af9737"
+            }
+          },
+          "pid": 58796,
+          "processStartedAt": "2026-11-06T07:16:06.471Z"
+        }
+      ],
+      "bootstrapReceipts": [
+        {
+          "file": "data-running\\bootstrap\\runs\\c0a6a64c-2f28-46f3-b5cf-eff7c327bc42.json",
+          "invocationId": "c0a6a64c-2f28-46f3-b5cf-eff7c327bc42",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 35968,
+            "startedAt": "2026-11-06T07:15:26.516Z"
+          },
+          "child": {
+            "pid": 58796,
+            "startedAt": "2026-11-06T07:16:06.471Z"
+          },
+          "exitCode": 1
+        }
+      ],
+      "residue": {
+        "fileCount": 1746,
+        "lockFiles": [
+          {
+            "path": "data-running\\bootstrap\\state.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949325107039700
+          },
+          {
+            "path": "data-running\\runtime\\locks\\artifact-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949368368762700
+          },
+          {
+            "path": "data-running\\runtime\\locks\\artifact-dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373746201500
+          },
+          {
+            "path": "data-running\\runtime\\locks\\artifact-f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373590129800
+          },
+          {
+            "path": "data-running\\runtime\\locks\\generations.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949371805870100
+          },
+          {
+            "path": "data-running\\runtime\\locks\\helper-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949370710662700
+          },
+          {
+            "path": "data-running\\runtime\\locks\\runtime-cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373588031800
+          },
+          {
+            "path": "data-running\\runtime\\workers\\91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf\\agent.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949368172593100
+          },
+          {
+            "path": "data-running\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\generation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373253054000
+          },
+          {
+            "path": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793949371842165400
+          },
+          {
+            "path": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949376188858300
+          },
+          {
+            "path": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373252048800
+          }
+        ],
+        "partFiles": [],
+        "lockFileCount": 271,
+        "lockFilesByRoot": {
+          "bootstrap": 1,
+          "runtime": 11,
+          "cache": 259
+        },
+        "allLockFilesEvidence": "build/e2e/cancel-running-files.json"
+      },
+      "downloads": [
+        {
+          "path": "data-running\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+          "bytes": 33863906,
+          "mtimeNs": 1793949370662978100,
+          "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+        },
+        {
+          "path": "data-running\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+          "bytes": 593385993,
+          "mtimeNs": 1793948762791848400,
+          "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+        },
+        {
+          "path": "data-running\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+          "bytes": 98146824,
+          "mtimeNs": 1793948732583454800,
+          "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+        }
+      ]
+    },
+    "resume-running": {
+      "args": [
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\package\\mcicon.exe",
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\out-running",
+        "--json"
+      ],
+      "pid": 30092,
+      "exit": 1,
+      "seconds": 93.508,
+      "interrupted": false,
+      "stdout": "",
+      "stderr": "IO_FAILED: 管理helperの準備に失敗しました: WINDOWS_RUNTIME_FAILED: 専用guestbridge release-recoverが失敗しました（exit 1）\nstderr (168 bytes):\nMCICON_GUEST_REASON=DAEMON_RESTART_DENIED\nnativeJob phase=child-signalled childExit=1 active=3 queries=1\r\nnativeJob phase=drain-empty childExit=1 active=3,0 queries=2\r\n\r\nio.github.rs0325.mcicon.McIconException: 管理helperの準備に失敗しました: WINDOWS_RUNTIME_FAILED: 専用guestbridge release-recoverが失敗しました（exit 1）\nstderr (168 bytes):\nMCICON_GUEST_REASON=DAEMON_RESTART_DENIED\nnativeJob phase=child-signalled childExit=1 active=3 queries=1\r\nnativeJob phase=drain-empty childExit=1 active=3,0 queries=2\r\n\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.requireOk(ManagedRuntime.java:126)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.recover(ManagedRuntime.java:108)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:53)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:28)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$renderManaged$4(MCIconGenerator.java:88)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$submit$9(MCIconGenerator.java:161)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\r\n\tat java.base/java.lang.Thread.run(Unknown Source)\r\n",
+      "containersBeforeTermination": null,
+      "containersAfterTermination": null,
+      "leases": [
+        {
+          "file": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\lease.json",
+          "jobId": "41a31cac-2cd8-44cb-933a-ee6de2af9737",
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "c2717ead-dc11-4690-8982-3c3773b1d126",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-running\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "a72f890b-2984-443d-8628-8cfad4a566da",
+                "markerSha256": "b5690b6390e1b045b41912fcf246a54f893df2f2bc17a319b0277a17c95545e1"
+              },
+              "transports": [
+                {
+                  "id": "1f7cc72e-7e60-4d3e-986f-b8d6fc188bf2",
+                  "pid": 68808,
+                  "processStartedAt": "2026-11-06T07:16:27.296Z"
+                },
+                {
+                  "id": "ab0f52d4-a126-4703-8408-eb6a9a74b723"
+                },
+                {
+                  "id": "885472a0-1775-4457-b7e7-62b6de4653ed",
+                  "pid": 53832,
+                  "processStartedAt": "2026-11-06T07:17:01.783Z"
+                },
+                {
+                  "id": "6b1fb12e-9104-4bac-8497-33aa1381f15e",
+                  "pid": 22520,
+                  "processStartedAt": "2026-11-06T07:17:05.657Z"
+                },
+                {
+                  "id": "71499c83-341d-44cd-8ae9-2d29abf9c782",
+                  "pid": 16532,
+                  "processStartedAt": "2026-11-06T07:17:19.675Z"
+                },
+                {
+                  "id": "4a2e5480-ff2d-4dd4-ac9a-a0677e232182",
+                  "pid": 38308,
+                  "processStartedAt": "2026-11-06T07:18:52.998Z"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-3557ded4-fb96-4ec7-b195-658c7a6879ef",
+                  "transportId": "71499c83-341d-44cd-8ae9-2d29abf9c782",
+                  "id": "4d9865b8ac573c308631e361c99d9fbbee5057424a1c5d2662cf5fc77a781967"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/41a31cac-2cd8-44cb-933a-ee6de2af9737"
+            }
+          },
+          "pid": 58796,
+          "processStartedAt": "2026-11-06T07:16:06.471Z"
+        }
+      ],
+      "bootstrapReceipts": [
+        {
+          "file": "data-running\\bootstrap\\runs\\b8bce41a-19b2-46ca-a9c0-dd6ddeb24412.json",
+          "invocationId": "b8bce41a-19b2-46ca-a9c0-dd6ddeb24412",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 54548,
+            "startedAt": "2026-11-06T07:17:22.737Z"
+          },
+          "child": {
+            "pid": 49520,
+            "startedAt": "2026-11-06T07:18:43.672Z"
+          },
+          "exitCode": 1
+        },
+        {
+          "file": "data-running\\bootstrap\\runs\\c0a6a64c-2f28-46f3-b5cf-eff7c327bc42.json",
+          "invocationId": "c0a6a64c-2f28-46f3-b5cf-eff7c327bc42",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 35968,
+            "startedAt": "2026-11-06T07:15:26.516Z"
+          },
+          "child": {
+            "pid": 58796,
+            "startedAt": "2026-11-06T07:16:06.471Z"
+          },
+          "exitCode": 1
+        }
+      ],
+      "residue": {
+        "fileCount": 1777,
+        "lockFiles": [
+          {
+            "path": "data-running\\bootstrap\\state.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949325107039700
+          },
+          {
+            "path": "data-running\\runtime\\locks\\artifact-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949368368762700
+          },
+          {
+            "path": "data-running\\runtime\\locks\\artifact-dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373746201500
+          },
+          {
+            "path": "data-running\\runtime\\locks\\artifact-f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373590129800
+          },
+          {
+            "path": "data-running\\runtime\\locks\\generations.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949371805870100
+          },
+          {
+            "path": "data-running\\runtime\\locks\\helper-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949370710662700
+          },
+          {
+            "path": "data-running\\runtime\\locks\\runtime-cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373588031800
+          },
+          {
+            "path": "data-running\\runtime\\workers\\91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf\\agent.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949368172593100
+          },
+          {
+            "path": "data-running\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\generation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373253054000
+          },
+          {
+            "path": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793949371842165400
+          },
+          {
+            "path": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949376188858300
+          },
+          {
+            "path": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949373252048800
+          }
+        ],
+        "partFiles": [],
+        "lockFileCount": 271,
+        "lockFilesByRoot": {
+          "bootstrap": 1,
+          "runtime": 11,
+          "cache": 259
+        },
+        "allLockFilesEvidence": "build/e2e/resume-running-files.json"
+      },
+      "downloads": [
+        {
+          "path": "data-running\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+          "bytes": 33863906,
+          "mtimeNs": 1793949370662978100,
+          "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+        },
+        {
+          "path": "data-running\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+          "bytes": 593385993,
+          "mtimeNs": 1793948762791848400,
+          "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+        },
+        {
+          "path": "data-running\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+          "bytes": 98146824,
+          "mtimeNs": 1793948732583454800,
+          "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+        }
+      ]
+    },
+    "cancel-active": {
+      "args": [
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\package\\mcicon.exe",
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\out-active",
+        "--json"
+      ],
+      "pid": 18536,
+      "exit": 1,
+      "seconds": 112.311,
+      "interrupted": true,
+      "stdout": "",
+      "stderr": "prepare 1.21.4 0/1\r\n",
+      "trigger": {
+        "lease": {
+          "schemaVersion": 1,
+          "jobId": "4e1c6c28-f8ed-4f1f-994c-2095729e9418",
+          "ownerId": "5b9a9715-9bec-4d68-825d-1d5315cd404c",
+          "toolVersion": "1.1.0",
+          "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "runtimeId": "mcicon-1.1.0-windows-x86_64",
+          "descriptorSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+          "hostId": "9d400321-3ec3-4a2d-8d2a-9410bacf5700",
+          "pid": 61252,
+          "processStartedAt": "2026-11-06T07:20:53.381Z",
+          "createdAt": "2026-11-06T07:20:56.407037800Z",
+          "requirements": {
+            "containerMemoryMiB": 3072,
+            "heapMemoryMiB": 2048,
+            "cpus": 4,
+            "preparationDeadline": "2026-11-06T07:35:54.895049Z"
+          },
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "d2054ba3-759f-4619-add5-66a93c4c4853",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-active\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "53e329d8-990e-4e98-9e46-f9ff0c6e519b",
+                "markerSha256": "4a6cd0bbe405b48ab74081cc7709a9723daaa7072dc492776581c90b860329a5"
+              },
+              "transports": [
+                {
+                  "id": "0851e992-947c-4a3b-86ec-88569c804dab",
+                  "pid": 12008,
+                  "processStartedAt": "2026-11-06T07:21:12.071Z"
+                },
+                {
+                  "id": "2c8dddf4-6f63-4df8-b074-b933d502a95c"
+                },
+                {
+                  "id": "a8aa16d4-1ecc-4748-bef6-6b8a4f1490eb",
+                  "pid": 16420,
+                  "processStartedAt": "2026-11-06T07:21:46.272Z"
+                },
+                {
+                  "id": "44144c42-f714-48d7-a4bb-96eb2d890cad",
+                  "pid": 58420,
+                  "processStartedAt": "2026-11-06T07:21:50.088Z"
+                },
+                {
+                  "id": "8632d1d9-8391-4c0c-be70-0b5676b82eda",
+                  "pid": 40680,
+                  "processStartedAt": "2026-11-06T07:22:05.765Z"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-c7128900-4673-4893-abc6-dd8d0761227b",
+                  "transportId": "8632d1d9-8391-4c0c-be70-0b5676b82eda",
+                  "id": "d9edab49b6a07ff8630213b0c03f23b7ac6b4493b02ade74a8b998d36a4a6f50"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/4e1c6c28-f8ed-4f1f-994c-2095729e9418"
+            }
+          }
+        }
+      },
+      "kill": {
+        "args": [
+          "taskkill",
+          "/PID",
+          "61252",
+          "/F"
+        ],
+        "exit": 0,
+        "stdout": "SUCCESS: The process with PID 61252 has been terminated.\r\n",
+        "stderr": ""
+      },
+      "containersBeforeTermination": {
+        "exit": 0,
+        "stderr": "",
+        "containers": [
+          {
+            "ID": "d9edab49b6a07ff8630213b0c03f23b7ac6b4493b02ade74a8b998d36a4a6f50",
+            "Names": "mcicon-worker-c7128900-4673-4893-abc6-dd8d0761227b",
+            "Image": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+            "State": "running",
+            "Status": "Up Less than a second",
+            "Labels": "io.github.rs0325.mcicon.descriptorSha256=cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294,io.github.rs0325.mcicon.generation=d2054ba3-759f-4619-add5-66a93c4c4853,io.github.rs0325.mcicon.jobId=4e1c6c28-f8ed-4f1f-994c-2095729e9418,io.github.rs0325.mcicon.ownerId=5b9a9715-9bec-4d68-825d-1d5315cd404c,org.opencontainers.image.version=24.04",
+            "Networks": "none"
+          }
+        ]
+      },
+      "containersAfterTermination": {
+        "exit": 0,
+        "stderr": "",
+        "containers": [
+          {
+            "ID": "d9edab49b6a07ff8630213b0c03f23b7ac6b4493b02ade74a8b998d36a4a6f50",
+            "Names": "mcicon-worker-c7128900-4673-4893-abc6-dd8d0761227b",
+            "Image": "sha256:5493390b3cffc245416a32a855d874204dbe6710a2eca761859a0995242ab2dc",
+            "State": "running",
+            "Status": "Up 3 seconds",
+            "Labels": "io.github.rs0325.mcicon.descriptorSha256=cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294,io.github.rs0325.mcicon.generation=d2054ba3-759f-4619-add5-66a93c4c4853,io.github.rs0325.mcicon.jobId=4e1c6c28-f8ed-4f1f-994c-2095729e9418,io.github.rs0325.mcicon.ownerId=5b9a9715-9bec-4d68-825d-1d5315cd404c,org.opencontainers.image.version=24.04",
+            "Networks": "none"
+          }
+        ]
+      },
+      "leases": [
+        {
+          "file": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\lease.json",
+          "jobId": "4e1c6c28-f8ed-4f1f-994c-2095729e9418",
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "d2054ba3-759f-4619-add5-66a93c4c4853",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-active\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "53e329d8-990e-4e98-9e46-f9ff0c6e519b",
+                "markerSha256": "4a6cd0bbe405b48ab74081cc7709a9723daaa7072dc492776581c90b860329a5"
+              },
+              "transports": [
+                {
+                  "id": "0851e992-947c-4a3b-86ec-88569c804dab",
+                  "pid": 12008,
+                  "processStartedAt": "2026-11-06T07:21:12.071Z"
+                },
+                {
+                  "id": "2c8dddf4-6f63-4df8-b074-b933d502a95c"
+                },
+                {
+                  "id": "a8aa16d4-1ecc-4748-bef6-6b8a4f1490eb",
+                  "pid": 16420,
+                  "processStartedAt": "2026-11-06T07:21:46.272Z"
+                },
+                {
+                  "id": "44144c42-f714-48d7-a4bb-96eb2d890cad",
+                  "pid": 58420,
+                  "processStartedAt": "2026-11-06T07:21:50.088Z"
+                },
+                {
+                  "id": "8632d1d9-8391-4c0c-be70-0b5676b82eda",
+                  "pid": 40680,
+                  "processStartedAt": "2026-11-06T07:22:05.765Z"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-c7128900-4673-4893-abc6-dd8d0761227b",
+                  "transportId": "8632d1d9-8391-4c0c-be70-0b5676b82eda",
+                  "id": "d9edab49b6a07ff8630213b0c03f23b7ac6b4493b02ade74a8b998d36a4a6f50"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/4e1c6c28-f8ed-4f1f-994c-2095729e9418"
+            }
+          },
+          "pid": 61252,
+          "processStartedAt": "2026-11-06T07:20:53.381Z"
+        }
+      ],
+      "bootstrapReceipts": [
+        {
+          "file": "data-active\\bootstrap\\runs\\e5d8eb71-45e7-4355-8144-ff577bb204f4.json",
+          "invocationId": "e5d8eb71-45e7-4355-8144-ff577bb204f4",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 44972,
+            "startedAt": "2026-11-06T07:20:15.096Z"
+          },
+          "child": {
+            "pid": 61252,
+            "startedAt": "2026-11-06T07:20:53.381Z"
+          },
+          "exitCode": 1
+        }
+      ],
+      "residue": {
+        "fileCount": 1750,
+        "lockFiles": [
+          {
+            "path": "data-active\\bootstrap\\state.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949614184034100
+          },
+          {
+            "path": "data-active\\runtime\\locks\\artifact-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949655075740900
+          },
+          {
+            "path": "data-active\\runtime\\locks\\artifact-dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949658282238600
+          },
+          {
+            "path": "data-active\\runtime\\locks\\artifact-f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949658099100500
+          },
+          {
+            "path": "data-active\\runtime\\locks\\generations.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949656394480500
+          },
+          {
+            "path": "data-active\\runtime\\locks\\helper-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949655135567400
+          },
+          {
+            "path": "data-active\\runtime\\locks\\runtime-cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949658097105700
+          },
+          {
+            "path": "data-active\\runtime\\workers\\91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf\\agent.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949654922764600
+          },
+          {
+            "path": "data-active\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\generation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949657772301400
+          },
+          {
+            "path": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793949656425444400
+          },
+          {
+            "path": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949660835725700
+          },
+          {
+            "path": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949657771297300
+          }
+        ],
+        "partFiles": [],
+        "lockFileCount": 271,
+        "lockFilesByRoot": {
+          "bootstrap": 1,
+          "runtime": 11,
+          "cache": 259
+        },
+        "allLockFilesEvidence": "build/e2e/cancel-active-files.json"
+      },
+      "downloads": [
+        {
+          "path": "data-active\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+          "bytes": 33863906,
+          "mtimeNs": 1793949370662978100,
+          "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+        },
+        {
+          "path": "data-active\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+          "bytes": 593385993,
+          "mtimeNs": 1793948762791848400,
+          "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+        },
+        {
+          "path": "data-active\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+          "bytes": 98146824,
+          "mtimeNs": 1793948732583454800,
+          "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+        }
+      ]
+    },
+    "resume-active": {
+      "args": [
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\package\\mcicon.exe",
+        "--debug",
+        "render",
+        "--version",
+        "1.21.4",
+        "--kind",
+        "block",
+        "--id",
+        "minecraft:stone",
+        "--size",
+        "64",
+        "--out",
+        "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\out-active",
+        "--json"
+      ],
+      "pid": 65816,
+      "exit": 1,
+      "seconds": 92.243,
+      "interrupted": false,
+      "stdout": "",
+      "stderr": "IO_FAILED: 管理helperの準備に失敗しました: WINDOWS_RUNTIME_FAILED: 専用guestbridge release-recoverが失敗しました（exit 1）\nstderr (168 bytes):\nMCICON_GUEST_REASON=DAEMON_RESTART_DENIED\nnativeJob phase=child-signalled childExit=1 active=3 queries=1\r\nnativeJob phase=drain-empty childExit=1 active=3,0 queries=2\r\n\r\nio.github.rs0325.mcicon.McIconException: 管理helperの準備に失敗しました: WINDOWS_RUNTIME_FAILED: 専用guestbridge release-recoverが失敗しました（exit 1）\nstderr (168 bytes):\nMCICON_GUEST_REASON=DAEMON_RESTART_DENIED\nnativeJob phase=child-signalled childExit=1 active=3 queries=1\r\nnativeJob phase=drain-empty childExit=1 active=3,0 queries=2\r\n\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.requireOk(ManagedRuntime.java:126)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.recover(ManagedRuntime.java:108)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:53)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:28)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$renderManaged$4(MCIconGenerator.java:88)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$submit$9(MCIconGenerator.java:161)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\r\n\tat java.base/java.lang.Thread.run(Unknown Source)\r\n",
+      "containersBeforeTermination": null,
+      "containersAfterTermination": null,
+      "leases": [
+        {
+          "file": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\lease.json",
+          "jobId": "4e1c6c28-f8ed-4f1f-994c-2095729e9418",
+          "state": "active",
+          "resources": {
+            "windows": {
+              "phase": "ready",
+              "generationOwner": "d2054ba3-759f-4619-add5-66a93c4c4853",
+              "distribution": {
+                "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-active\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                "guid": "53e329d8-990e-4e98-9e46-f9ff0c6e519b",
+                "markerSha256": "4a6cd0bbe405b48ab74081cc7709a9723daaa7072dc492776581c90b860329a5"
+              },
+              "transports": [
+                {
+                  "id": "0851e992-947c-4a3b-86ec-88569c804dab",
+                  "pid": 12008,
+                  "processStartedAt": "2026-11-06T07:21:12.071Z"
+                },
+                {
+                  "id": "2c8dddf4-6f63-4df8-b074-b933d502a95c"
+                },
+                {
+                  "id": "a8aa16d4-1ecc-4748-bef6-6b8a4f1490eb",
+                  "pid": 16420,
+                  "processStartedAt": "2026-11-06T07:21:46.272Z"
+                },
+                {
+                  "id": "44144c42-f714-48d7-a4bb-96eb2d890cad",
+                  "pid": 58420,
+                  "processStartedAt": "2026-11-06T07:21:50.088Z"
+                },
+                {
+                  "id": "8632d1d9-8391-4c0c-be70-0b5676b82eda",
+                  "pid": 40680,
+                  "processStartedAt": "2026-11-06T07:22:05.765Z"
+                },
+                {
+                  "id": "26e4d64e-1e73-471a-9375-5dc29c3e6a86",
+                  "pid": 69684,
+                  "processStartedAt": "2026-11-06T07:23:38.952Z"
+                }
+              ],
+              "containers": [
+                {
+                  "name": "mcicon-worker-c7128900-4673-4893-abc6-dd8d0761227b",
+                  "transportId": "8632d1d9-8391-4c0c-be70-0b5676b82eda",
+                  "id": "d9edab49b6a07ff8630213b0c03f23b7ac6b4493b02ade74a8b998d36a4a6f50"
+                }
+              ],
+              "socketPath": "/run/mcicon/docker.sock",
+              "guestJobPath": "/var/lib/mcicon/jobs/4e1c6c28-f8ed-4f1f-994c-2095729e9418"
+            }
+          },
+          "pid": 61252,
+          "processStartedAt": "2026-11-06T07:20:53.381Z"
+        }
+      ],
+      "bootstrapReceipts": [
+        {
+          "file": "data-active\\bootstrap\\runs\\356283bc-dd03-4d3b-abe4-7c5ad4ff98f3.json",
+          "invocationId": "356283bc-dd03-4d3b-abe4-7c5ad4ff98f3",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 25296,
+            "startedAt": "2026-11-06T07:22:09.540Z"
+          },
+          "child": {
+            "pid": 10036,
+            "startedAt": "2026-11-06T07:23:30.513Z"
+          },
+          "exitCode": 1
+        },
+        {
+          "file": "data-active\\bootstrap\\runs\\e5d8eb71-45e7-4355-8144-ff577bb204f4.json",
+          "invocationId": "e5d8eb71-45e7-4355-8144-ff577bb204f4",
+          "state": "finished",
+          "bootstrap": {
+            "pid": 44972,
+            "startedAt": "2026-11-06T07:20:15.096Z"
+          },
+          "child": {
+            "pid": 61252,
+            "startedAt": "2026-11-06T07:20:53.381Z"
+          },
+          "exitCode": 1
+        }
+      ],
+      "residue": {
+        "fileCount": 1781,
+        "lockFiles": [
+          {
+            "path": "data-active\\bootstrap\\state.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949614184034100
+          },
+          {
+            "path": "data-active\\runtime\\locks\\artifact-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949655075740900
+          },
+          {
+            "path": "data-active\\runtime\\locks\\artifact-dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949658282238600
+          },
+          {
+            "path": "data-active\\runtime\\locks\\artifact-f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949658099100500
+          },
+          {
+            "path": "data-active\\runtime\\locks\\generations.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949656394480500
+          },
+          {
+            "path": "data-active\\runtime\\locks\\helper-58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949655135567400
+          },
+          {
+            "path": "data-active\\runtime\\locks\\runtime-cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949658097105700
+          },
+          {
+            "path": "data-active\\runtime\\workers\\91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf\\agent.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949654922764600
+          },
+          {
+            "path": "data-active\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\generation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949657772301400
+          },
+          {
+            "path": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\lease.lock",
+            "bytes": 64,
+            "mtimeNs": 1793949656425444400
+          },
+          {
+            "path": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\tmp\\helper-lease.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949660835725700
+          },
+          {
+            "path": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\tmp\\windows-operation.lock",
+            "bytes": 0,
+            "mtimeNs": 1793949657771297300
+          }
+        ],
+        "partFiles": [],
+        "lockFileCount": 271,
+        "lockFilesByRoot": {
+          "bootstrap": 1,
+          "runtime": 11,
+          "cache": 259
+        },
+        "allLockFilesEvidence": "build/e2e/resume-active-files.json"
+      },
+      "downloads": [
+        {
+          "path": "data-active\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+          "bytes": 33863906,
+          "mtimeNs": 1793949370662978100,
+          "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+        },
+        {
+          "path": "data-active\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+          "bytes": 593385993,
+          "mtimeNs": 1793948762791848400,
+          "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+        },
+        {
+          "path": "data-active\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+          "bytes": 98146824,
+          "mtimeNs": 1793948732583454800,
+          "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+        }
+      ]
+    }
+  },
+  "prepareReuse": {
+    "verifiedBefore": [
+      {
+        "path": "data\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+        "bytes": 33863906,
+        "mtimeNs": 1793948623722359500,
+        "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+      }
+    ],
+    "after": [
+      {
+        "path": "data\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+        "bytes": 33863906,
+        "mtimeNs": 1793948623722359500,
+        "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+      },
+      {
+        "path": "data\\runtime\\downloads\\dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4\\artifact",
+        "bytes": 593385993,
+        "mtimeNs": 1793948762791848400,
+        "sha256": "dc0a1acc5b8421f04271ffe4b79403fda7967a7a86422488650533a86aaf93d4"
+      },
+      {
+        "path": "data\\runtime\\downloads\\f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5\\artifact",
+        "bytes": 98146824,
+        "mtimeNs": 1793948732583454800,
+        "sha256": "f68070d5b702a00916ecd1108de1c3e8f4b644ebeb603ccf7f6b7b881ffb15c5"
+      }
+    ],
+    "verifiedHelperUnchanged": true,
+    "partialConsumed": true
+  },
+  "corruptPartial": {
+    "injected": {
+      "root": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-running",
+      "path": "data-running\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact.part",
+      "original": {
+        "bytes": 33863906,
+        "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+      },
+      "bytes": 33863906,
+      "sha256": "2adeb5001040bdf3eccae1d65bbbda57263f4dc1bda41bbb6517b60a4f4e1033",
+      "method": "公開物から取得済みのhelper archiveをartifact.partへ移し、同一sizeの先頭1byteを反転。旧失敗状態は変更しない。",
+      "fixtureReuse": "公開物由来のdownloads/cacheだけを新規rootへcopy2。lease/owner/keeper/世代は引き継がない。"
+    },
+    "after": {
+      "path": "data-running\\runtime\\downloads\\58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8\\artifact",
+      "bytes": 33863906,
+      "mtimeNs": 1793949370662978100,
+      "sha256": "58dd0b651b8a93557104c53f933568b2373cd7afe41fa548071279c05315d0a8"
+    },
+    "restored": true,
+    "partialAbsent": true,
+    "knownGoodOtherArtifactsUnchanged": true
+  },
+  "reuseEvidenceLimit": "再取得なしはsize/SHA-256/mtimeNs不変と公開製品の取得経路による確認。TLS復号・全HTTP packet監査は未実施。",
+  "helperFailureDiagnostics": [
+    {
+      "path": "preserved-records\\data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\helper-keep-4644442933422836316.stdout.json",
+      "document": {
+        "protocolVersion": 1,
+        "status": "failed",
+        "diagnostics": [
+          {
+            "code": "WINDOWS_RUNTIME_FAILED",
+            "detail": "過去keeper Jobの終端が不明です",
+            "requiresPrivilege": false,
+            "requiresRestart": false
+          }
+        ]
+      }
+    }
+  ],
+  "uninstall": {
+    "method": "公開ZIPの展開program directoryだけを手動削除。docs/usage.md:138の保持方針を検証し、未記載のZIP手順や未公開MSI uninstallerの実測とは扱わない。",
+    "packageAbsent": true,
+    "nonVhdxDataFilesUnchanged": true,
+    "userOutputAndRawUnchanged": true,
+    "hostStateUnchanged": true,
+    "documentGap": "公開ZIP専用のuninstallコマンドと全データ削除手順はREADME/docs/bootstrap/docsにない。CLI helpにもpurgeコマンドはない。実installer/wingetは対象外。",
+    "retainedRootsObserved": [
+      "data",
+      "data-running",
+      "data-active",
+      "out-prepare",
+      "user-raw"
+    ],
+    "retainedUserOutputFiles": [
+      {
+        "path": "user-raw\\java\\1.21.4\\raw\\.export.lock",
+        "bytes": 0,
+        "mtimeNs": 1793949319515263900,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "user-raw\\java\\1.21.4\\raw\\manifest.json",
+        "bytes": 875,
+        "mtimeNs": 1793949319595215900,
+        "sha256": "43c375e33111234291e85efd2561f3b1f449d56973249601b36a3233c56a1c99"
+      },
+      {
+        "path": "user-raw\\java\\1.21.4\\raw\\assets\\minecraft\\textures\\block\\stone.png",
+        "bytes": 157,
+        "mtimeNs": 1793949319593702100,
+        "sha256": "33ac70ba8cb701087642a12c5fd29c1ba3006dc4730e9b014ed3a19ce7cdda7b"
+      },
+      {
+        "path": "out-prepare\\java\\1.21.4\\icons\\.export.lock",
+        "bytes": 0,
+        "mtimeNs": 1793948855224908700,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "out-prepare\\java\\1.21.4\\icons\\manifest.json",
+        "bytes": 200449,
+        "mtimeNs": 1793948855873432100,
+        "sha256": "bde7a8627b0e8ba4ffab0765763cf64a46c816c6ab12f346e9c0beab9d5197ae"
+      },
+      {
+        "path": "out-prepare\\java\\1.21.4\\icons\\assets\\minecraft\\textures\\block\\stone.png",
+        "bytes": 1468,
+        "mtimeNs": 1793948855865733100,
+        "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+      }
+    ],
+    "dataSummary": {
+      "data": {
+        "fileCount": 2246,
+        "bytesExcludingVhdx": 3116375427,
+        "vhdx": [],
+        "stagingDirectories": [
+          "data\\runtime\\runtimes\\mcicon-1.1.0-windows-x86_64\\staging-793d8324-869a-4b41-a0c6-928743c7deda"
+        ],
+        "lockFiles": 276,
+        "partialFiles": [],
+        "leaseStates": [
+          {
+            "path": "data\\runtime\\jobs\\0e0777a5-a176-4042-9bc2-967f4f3c2319\\lease.json",
+            "jobId": "0e0777a5-a176-4042-9bc2-967f4f3c2319",
+            "state": "released",
+            "resources": {}
+          },
+          {
+            "path": "data\\runtime\\jobs\\7e81da88-ff9e-4964-8ccf-aeab92d8a175\\lease.json",
+            "jobId": "7e81da88-ff9e-4964-8ccf-aeab92d8a175",
+            "state": "released",
+            "resources": {}
+          },
+          {
+            "path": "data\\runtime\\jobs\\eaf24e5a-2a44-4f45-996b-f7d1b059b09c\\lease.json",
+            "jobId": "eaf24e5a-2a44-4f45-996b-f7d1b059b09c",
+            "state": "active",
+            "resources": {
+              "windows": {
+                "phase": "ready",
+                "generationOwner": "8c20f1a9-6ab7-4687-97b7-eb47b8542b05",
+                "distribution": {
+                  "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                  "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                  "guid": "b18d5de7-96c1-439a-819b-d009f5dfa48c",
+                  "markerSha256": "3ab2e563223b823a85d58c7b58fa947cadee3747c63bdc9401788e5a07956ac9"
+                },
+                "transports": [
+                  {
+                    "id": "cf9e905c-bb83-43c1-89e1-af00337b5228",
+                    "pid": 40512,
+                    "processStartedAt": "2026-11-06T07:09:55.923Z"
+                  },
+                  {
+                    "id": "4f85734d-6241-4e57-9b71-3f855f598187"
+                  },
+                  {
+                    "id": "df195f58-9e31-4e8b-82cb-bc80f9898ed1",
+                    "pid": 19356,
+                    "processStartedAt": "2026-11-06T07:10:13.508Z"
+                  },
+                  {
+                    "id": "e688b8ed-c4ca-4ba7-a3f3-3a3299910e8f",
+                    "pid": 50320,
+                    "processStartedAt": "2026-11-06T07:10:17.540Z"
+                  },
+                  {
+                    "id": "3240a919-0680-4397-8249-84ed2296e279"
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "mcicon-worker-acfbf233-0114-4f3d-ae53-009bad307479",
+                    "transportId": "3240a919-0680-4397-8249-84ed2296e279"
+                  }
+                ],
+                "socketPath": "/run/mcicon/docker.sock",
+                "guestJobPath": "/var/lib/mcicon/jobs/eaf24e5a-2a44-4f45-996b-f7d1b059b09c"
+              }
+            }
+          }
+        ],
+        "bootstrapReceiptStates": [
+          {
+            "path": "data\\bootstrap\\runs\\1f061833-bd81-4295-8516-fdf2464235e1.json",
+            "state": "running",
+            "bootstrap": {
+              "pid": 44408,
+              "startedAt": "2026-11-06T07:02:59.536Z"
+            },
+            "child": {
+              "pid": 59576,
+              "startedAt": "2026-11-06T07:03:39.035Z"
+            }
+          },
+          {
+            "path": "data\\bootstrap\\runs\\33e9e823-e871-4d49-953b-fc0278900860.json",
+            "state": "running",
+            "bootstrap": {
+              "pid": 19672,
+              "startedAt": "2026-11-06T07:08:35.070Z"
+            },
+            "child": {
+              "pid": 49292,
+              "startedAt": "2026-11-06T07:09:48.044Z"
+            }
+          },
+          {
+            "path": "data\\bootstrap\\runs\\831c1b26-0661-47cd-8a0c-bf94d3706793.json",
+            "state": "finished",
+            "bootstrap": {
+              "pid": 9984,
+              "startedAt": "2026-11-06T07:13:58.801Z"
+            },
+            "child": {
+              "pid": 10692,
+              "startedAt": "2026-11-06T07:15:18.388Z"
+            }
+          },
+          {
+            "path": "data\\bootstrap\\runs\\b2079856-33e7-437c-b722-f2ec9911e82a.json",
+            "state": "finished",
+            "bootstrap": {
+              "pid": 19664,
+              "startedAt": "2026-11-06T07:04:01.691Z"
+            },
+            "child": {
+              "pid": 68100,
+              "startedAt": "2026-11-06T07:05:18.512Z"
+            }
+          },
+          {
+            "path": "data\\bootstrap\\runs\\fb86e0f4-5455-413f-b92d-3b59d846aee6.json",
+            "state": "finished",
+            "bootstrap": {
+              "pid": 53364,
+              "startedAt": "2026-11-06T07:10:32.843Z"
+            },
+            "child": {
+              "pid": 45380,
+              "startedAt": "2026-11-06T07:11:51.239Z"
+            }
+          }
+        ],
+        "configurationFiles": [
+          {
+            "path": "data\\bootstrap\\config.json",
+            "bytes": 38,
+            "mtimeNs": 1793948579458233900,
+            "sha256": "038456c503d88f289f5b854823e2bddcd753d317b612da9be7e377b2ae0065ee"
+          }
+        ]
+      },
+      "data-running": {
+        "fileCount": 1776,
+        "bytesExcludingVhdx": 2687984281,
+        "vhdx": [],
+        "stagingDirectories": [],
+        "lockFiles": 271,
+        "partialFiles": [],
+        "leaseStates": [
+          {
+            "path": "data-running\\runtime\\jobs\\41a31cac-2cd8-44cb-933a-ee6de2af9737\\lease.json",
+            "jobId": "41a31cac-2cd8-44cb-933a-ee6de2af9737",
+            "state": "active",
+            "resources": {
+              "windows": {
+                "phase": "ready",
+                "generationOwner": "c2717ead-dc11-4690-8982-3c3773b1d126",
+                "distribution": {
+                  "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                  "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-running\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                  "guid": "a72f890b-2984-443d-8628-8cfad4a566da",
+                  "markerSha256": "b5690b6390e1b045b41912fcf246a54f893df2f2bc17a319b0277a17c95545e1"
+                },
+                "transports": [
+                  {
+                    "id": "1f7cc72e-7e60-4d3e-986f-b8d6fc188bf2",
+                    "pid": 68808,
+                    "processStartedAt": "2026-11-06T07:16:27.296Z"
+                  },
+                  {
+                    "id": "ab0f52d4-a126-4703-8408-eb6a9a74b723"
+                  },
+                  {
+                    "id": "885472a0-1775-4457-b7e7-62b6de4653ed",
+                    "pid": 53832,
+                    "processStartedAt": "2026-11-06T07:17:01.783Z"
+                  },
+                  {
+                    "id": "6b1fb12e-9104-4bac-8497-33aa1381f15e",
+                    "pid": 22520,
+                    "processStartedAt": "2026-11-06T07:17:05.657Z"
+                  },
+                  {
+                    "id": "71499c83-341d-44cd-8ae9-2d29abf9c782",
+                    "pid": 16532,
+                    "processStartedAt": "2026-11-06T07:17:19.675Z"
+                  },
+                  {
+                    "id": "4a2e5480-ff2d-4dd4-ac9a-a0677e232182",
+                    "pid": 38308,
+                    "processStartedAt": "2026-11-06T07:18:52.998Z"
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "mcicon-worker-3557ded4-fb96-4ec7-b195-658c7a6879ef",
+                    "transportId": "71499c83-341d-44cd-8ae9-2d29abf9c782",
+                    "id": "4d9865b8ac573c308631e361c99d9fbbee5057424a1c5d2662cf5fc77a781967"
+                  }
+                ],
+                "socketPath": "/run/mcicon/docker.sock",
+                "guestJobPath": "/var/lib/mcicon/jobs/41a31cac-2cd8-44cb-933a-ee6de2af9737"
+              }
+            }
+          }
+        ],
+        "bootstrapReceiptStates": [
+          {
+            "path": "data-running\\bootstrap\\runs\\b8bce41a-19b2-46ca-a9c0-dd6ddeb24412.json",
+            "state": "finished",
+            "bootstrap": {
+              "pid": 54548,
+              "startedAt": "2026-11-06T07:17:22.737Z"
+            },
+            "child": {
+              "pid": 49520,
+              "startedAt": "2026-11-06T07:18:43.672Z"
+            }
+          },
+          {
+            "path": "data-running\\bootstrap\\runs\\c0a6a64c-2f28-46f3-b5cf-eff7c327bc42.json",
+            "state": "finished",
+            "bootstrap": {
+              "pid": 35968,
+              "startedAt": "2026-11-06T07:15:26.516Z"
+            },
+            "child": {
+              "pid": 58796,
+              "startedAt": "2026-11-06T07:16:06.471Z"
+            }
+          }
+        ],
+        "configurationFiles": [
+          {
+            "path": "data-running\\bootstrap\\config.json",
+            "bytes": 38,
+            "mtimeNs": 1793949325506636300,
+            "sha256": "038456c503d88f289f5b854823e2bddcd753d317b612da9be7e377b2ae0065ee"
+          }
+        ]
+      },
+      "data-active": {
+        "fileCount": 1780,
+        "bytesExcludingVhdx": 2688519897,
+        "vhdx": [
+          {
+            "path": "data-active\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro\\ext4.vhdx",
+            "exists": true
+          }
+        ],
+        "stagingDirectories": [],
+        "lockFiles": 271,
+        "partialFiles": [],
+        "leaseStates": [
+          {
+            "path": "data-active\\runtime\\jobs\\4e1c6c28-f8ed-4f1f-994c-2095729e9418\\lease.json",
+            "jobId": "4e1c6c28-f8ed-4f1f-994c-2095729e9418",
+            "state": "active",
+            "resources": {
+              "windows": {
+                "phase": "ready",
+                "generationOwner": "d2054ba3-759f-4619-add5-66a93c4c4853",
+                "distribution": {
+                  "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+                  "basePath": "H:\\MCIconGenerator\\worktrees\\milestone-e2e2-windows\\MCIconGenerator\\build\\e2e\\data-active\\runtime\\windows\\cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294\\distro",
+                  "guid": "53e329d8-990e-4e98-9e46-f9ff0c6e519b",
+                  "markerSha256": "4a6cd0bbe405b48ab74081cc7709a9723daaa7072dc492776581c90b860329a5"
+                },
+                "transports": [
+                  {
+                    "id": "0851e992-947c-4a3b-86ec-88569c804dab",
+                    "pid": 12008,
+                    "processStartedAt": "2026-11-06T07:21:12.071Z"
+                  },
+                  {
+                    "id": "2c8dddf4-6f63-4df8-b074-b933d502a95c"
+                  },
+                  {
+                    "id": "a8aa16d4-1ecc-4748-bef6-6b8a4f1490eb",
+                    "pid": 16420,
+                    "processStartedAt": "2026-11-06T07:21:46.272Z"
+                  },
+                  {
+                    "id": "44144c42-f714-48d7-a4bb-96eb2d890cad",
+                    "pid": 58420,
+                    "processStartedAt": "2026-11-06T07:21:50.088Z"
+                  },
+                  {
+                    "id": "8632d1d9-8391-4c0c-be70-0b5676b82eda",
+                    "pid": 40680,
+                    "processStartedAt": "2026-11-06T07:22:05.765Z"
+                  },
+                  {
+                    "id": "26e4d64e-1e73-471a-9375-5dc29c3e6a86",
+                    "pid": 69684,
+                    "processStartedAt": "2026-11-06T07:23:38.952Z"
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "mcicon-worker-c7128900-4673-4893-abc6-dd8d0761227b",
+                    "transportId": "8632d1d9-8391-4c0c-be70-0b5676b82eda",
+                    "id": "d9edab49b6a07ff8630213b0c03f23b7ac6b4493b02ade74a8b998d36a4a6f50"
+                  }
+                ],
+                "socketPath": "/run/mcicon/docker.sock",
+                "guestJobPath": "/var/lib/mcicon/jobs/4e1c6c28-f8ed-4f1f-994c-2095729e9418"
+              }
+            }
+          }
+        ],
+        "bootstrapReceiptStates": [
+          {
+            "path": "data-active\\bootstrap\\runs\\356283bc-dd03-4d3b-abe4-7c5ad4ff98f3.json",
+            "state": "finished",
+            "bootstrap": {
+              "pid": 25296,
+              "startedAt": "2026-11-06T07:22:09.540Z"
+            },
+            "child": {
+              "pid": 10036,
+              "startedAt": "2026-11-06T07:23:30.513Z"
+            }
+          },
+          {
+            "path": "data-active\\bootstrap\\runs\\e5d8eb71-45e7-4355-8144-ff577bb204f4.json",
+            "state": "finished",
+            "bootstrap": {
+              "pid": 44972,
+              "startedAt": "2026-11-06T07:20:15.096Z"
+            },
+            "child": {
+              "pid": 61252,
+              "startedAt": "2026-11-06T07:20:53.381Z"
+            }
+          }
+        ],
+        "configurationFiles": [
+          {
+            "path": "data-active\\bootstrap\\config.json",
+            "bytes": 38,
+            "mtimeNs": 1793949614426093200,
+            "sha256": "038456c503d88f289f5b854823e2bddcd753d317b612da9be7e377b2ae0065ee"
+          }
+        ]
+      }
+    }
+  },
+  "documentation": {
+    "publicTag": "v1.1.0",
+    "usageAtTagEqualsBaselineMain": true,
+    "usageTagCopySha256": "f07cacfa862c3e78c4100b2eca3905632d217efb1e894ac878a5726dcfc8d95d",
+    "references": [
+      {
+        "path": "docs/usage.md",
+        "lines": [
+          83,
+          138
+        ]
+      },
+      {
+        "path": "docs/managed-runtime-1.1.md",
+        "lines": [
+          107
+        ]
+      },
+      {
+        "path": "bootstrap/docs/windows-packaging.md",
+        "lines": [
+          84,
+          115
+        ]
+      }
+    ],
+    "reviewEvidence": "build/e2e/document-review.json",
+    "differences": [
+      "通常uninstallのデータ保持方針とprogram directory手動削除時の残存は整合。",
+      "公開ZIP用uninstallコマンド・全データ削除手順はない。MSI文書は候補の責務であり公開ZIPのuninstallerではない。"
+    ]
+  },
+  "findings": [
+    {
+      "id": "W-E2E2-1",
+      "result": "確認済み不具合",
+      "trigger": "実worker running中のCLI JVM単独終了後に同一コマンド再実行",
+      "observed": "release-recoverがDAEMON_RESTART_DENIEDで失敗し再開できない。active leaseと専用distroが残る。",
+      "causeStatus": "拒否理由まで確認。根本原因と修正は未確定。製品コード変更は禁止のため未実施。"
+    },
+    {
+      "id": "W-E2E2-2",
+      "result": "確認済みの追加失敗",
+      "trigger": "描画起動intent時のCLIツリー全体終了",
+      "observed": "過去keeper Job終端不明からkeeper ACK不一致。CLI単独終了試験とは区別。"
+    },
+    {
+      "id": "W-E2E2-3",
+      "result": "残存の観測",
+      "observed": "中断bootstrap receiptのrunning表記・lock file・初回の空stagingが残存。初回準備再開自体は成功。lock file存在だけをOS lock保持とは扱わない。"
+    },
+    {
+      "id": "W-E2E2-4",
+      "result": "文書不足",
+      "observed": "公開ZIP用uninstall/全データ削除の実行手順がない。所有照合による手動回収を製品purge成功とは扱わない。"
+    }
+  ],
+  "hostComparison": {
+    "before": {
+      "list": {
+        "exit": 0,
+        "stdout": "NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2",
+        "stderr": ""
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "既定のディストリビューション: MCIcon-82ec446b986db27cff993a27\r\n既定のバージョン: 2",
+        "stderr": ""
+      },
+      "running": {
+        "exit": 0,
+        "stdout": "Ubuntu-24.04",
+        "stderr": ""
+      },
+      "defaultDistribution": "{064cd034-e011-4c35-bc86-41a9f2d157d7}",
+      "distributions": {
+        "{064cd034-e011-4c35-bc86-41a9f2d157d7}": {
+          "DistributionName": "MCIcon-82ec446b986db27cff993a27",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v10\\execution\\runtime\\windows\\82ec446b986db27cff993a27d675c889d5868198816543fbbc3d8ab657a7991e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{077c8a19-d2d7-4c7e-837e-72cdd1d75086}": {
+          "DistributionName": "MCIcon-9333825c39c0df5f8d3ab095",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v12\\execution\\runtime\\windows\\9333825c39c0df5f8d3ab095ce78c7f279a23808268fbf1939d8aa73f1cff3c6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{113e82a5-8576-4da4-a26f-52ea99771b32}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V14",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v19\\execution\\wsl\\MCIcon-Issue95-Builder-V14",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{185b9688-8c62-4e3b-8d76-d33219cb0217}": {
+          "DistributionName": "MCIcon-9922213e9d5e232bf90db2d7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v9\\run-001\\data\\v7-shared\\runtime\\windows\\9922213e9d5e232bf90db2d76a9b03ead0e5340f081e77e4bdd38304a27e499b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{251ca84f-9435-468e-955a-674ac1f5fee0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V9",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v14\\execution\\wsl\\MCIcon-Issue95-Builder-V9",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{29d66d8e-2e84-4277-a4d3-d97d02996f68}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V12",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v17\\execution\\wsl\\MCIcon-Issue95-Builder-V12",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{324df4f0-a387-4f7f-8c0d-7f2fb394b448}": {
+          "DistributionName": "MCIcon-6b7e078236b9d00319f34e40",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v6\\execution\\runtime\\windows\\6b7e078236b9d00319f34e4066fe021c0a3e9e25102e149edaac0aa7808248d4\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{39a3df50-3c2a-4f58-94ca-f191df00e9f9}": {
+          "DistributionName": "MCIcon-5ba0815df4293859842d2fbc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v11\\run-001\\data\\v7-shared\\runtime\\windows\\5ba0815df4293859842d2fbca0bea186a568388be81eec08b97c7b7c77a3efc6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3b3159bd-19d4-494c-b993-0fb5ce31ddfc}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V18",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v23\\execution\\wsl\\MCIcon-Issue95-Builder-V18",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3eff1d21-6cb6-4d57-82aa-c732b8239045}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V5",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v10\\execution\\wsl\\MCIcon-Issue95-Builder-V5",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{46e05d44-6388-480d-9dca-f9b61335d4c2}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v11\\execution\\wsl\\MCIcon-Issue95-Builder-V6",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{558be4d0-cc18-4ae8-a8a9-534479c4fc93}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v16\\execution\\wsl\\MCIcon-Issue95-Builder-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{70891763-840d-4d65-9d9a-b21488fc1772}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v12\\execution\\wsl\\MCIcon-Issue95-Builder-V7",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8314adf2-7a23-4a72-99be-0869baeadb56}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V17",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v22\\execution\\wsl\\MCIcon-Issue95-Builder-V17",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8c80dd3f-8c3a-4017-8f1c-6ecd97c5f6cf}": {
+          "DistributionName": "MCIcon-9862bd8335a9aac8f8f1844f",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v15\\execution\\runtime\\windows\\9862bd8335a9aac8f8f1844fa5194f04defd3af53d2769b21037992a237a7a15\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8d9eb482-68de-4c4b-b9cd-691524ea6c41}": {
+          "DistributionName": "MCIcon-6717dc3f92906fd38d19c3dc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v4\\execution\\runtime\\windows\\6717dc3f92906fd38d19c3dc5e0eab689321191628c360edaa3ddbf5b18fc74a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8f7a348e-ab75-432b-b2e3-da7fa521ea81}": {
+          "DistributionName": "MCIcon-aa038dd224dc38f9939cf22d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v17\\execution\\runtime\\windows\\aa038dd224dc38f9939cf22d1bb11d7780792e00edf868fcaa6d3c2eff11fe85\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{92353240-335d-4bae-bcde-e6dfd20a4851}": {
+          "DistributionName": "MCIcon-a5124a2a2ee645c086f33d07",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\a5124a2a2ee645c086f33d0701395208f6d2d40871b001f8a44de333af986a5e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{96352485-9336-4648-a2a4-9f2d8d96f3d0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V16",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v21\\execution\\wsl\\MCIcon-Issue95-Builder-V16",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9ae51412-9d23-49f5-824f-45c085d5fda6}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V13",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v18\\execution\\wsl\\MCIcon-Issue95-Builder-V13",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9e0a73f1-e23a-4d5b-b8e1-d4f91bb71f2a}": {
+          "DistributionName": "MCIcon-2c9dc6b88d5831cb3a818c68",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v11\\execution\\runtime\\windows\\2c9dc6b88d5831cb3a818c683bb26aaeb8e53726211521c158065302010553e0\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a20424d3-489d-4839-92e7-27f43dcdbabf}": {
+          "DistributionName": "MCIcon-f87fc4aebed84984c9e250f6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-h-c18-v3\\execution-v1\\runtime\\windows\\f87fc4aebed84984c9e250f6c9cfae1d114df685f8781767525c87fb7296ebae\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a823b519-6483-42f8-a2df-bf49e19e5c22}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v13\\execution\\wsl\\MCIcon-Issue95-Builder-V8",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a86a23dd-a7b1-4af4-8955-82dee3d91eca}": {
+          "DistributionName": "docker-desktop",
+          "Version": 2,
+          "BasePath": "\\\\?\\C:\\Users\\ryuma\\AppData\\Local\\Docker\\wsl\\main",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a9285574-2e26-4dbb-8f93-d524f2ae090f}": {
+          "DistributionName": "MCIcon-d8a4dfb01684287672a8eba8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\d8a4dfb01684287672a8eba87bddc2d0bd887d2ca36e03731831e18ac4a39139\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b383c507-977f-4181-b801-26f8ce5c282d}": {
+          "DistributionName": "Ubuntu-24.04",
+          "Version": 2,
+          "BasePath": "H:\\WSL\\colorstats",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b70783eb-11fe-4f3c-9403-d39cc1b78519}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v9\\execution\\wsl\\MCIcon-Issue95-Builder-V4",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{c065f811-314d-4ce9-8b86-667709b4c700}": {
+          "DistributionName": "MCIcon-128c33dcea15a8ea6487eac4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v10\\run-001\\data\\v7-shared\\runtime\\windows\\128c33dcea15a8ea6487eac44e6f16e33361939901380c71b7d1e3da34703bce\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{cc9905db-38e5-4092-bc92-6779714317b0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V15",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v20\\execution\\wsl\\MCIcon-Issue95-Builder-V15",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{d4561e5c-093d-45bf-9c68-96f73e15ebd7}": {
+          "DistributionName": "MCIcon-b28910c0585341f944637b75",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\b28910c0585341f944637b75f3a17aa832341dab179332dea7a8e0e2ba0c1697\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{de20cb1d-d465-40c0-8b5b-7e52934b3212}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V3",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v8\\execution\\wsl\\MCIcon-Issue95-Builder-V3",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e3ed6870-c0d8-4ca2-8b88-108be81baebb}": {
+          "DistributionName": "MCIcon-Issue91-V1",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-91-managed-contract\\resume-encoding-v1\\wsl\\MCIcon-Issue91-V1",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e5297f5f-fca4-40ce-84d3-2d3352431a19}": {
+          "DistributionName": "MCIcon-5ef94cacfdb4b618ae4d791a",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v13\\execution\\runtime\\windows\\5ef94cacfdb4b618ae4d791ac1c4bd3b6e34bfb6dc0cfcbe557311d7fa512b5a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e581e759-ecd7-4999-9246-ac7b889de6ba}": {
+          "DistributionName": "MCIcon-987cb1cb668708b0d7fff9b6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v7\\run-002\\data\\v7-shared\\runtime\\windows\\987cb1cb668708b0d7fff9b620f3fd42febdee04b19eb34df1b118a0207b0346\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e99312fa-3a3c-41d9-ba62-a63bd21a3d61}": {
+          "DistributionName": "MCIcon-0e44596ba5e39d6030376249",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\0e44596ba5e39d60303762491418a9756957001b3aac66c878ee844077cc1754\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e9a61512-b3a9-41a8-aedc-33c1d2118873}": {
+          "DistributionName": "MCIcon-833fcb60d85b240e66f84eff",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v9\\execution\\runtime\\windows\\833fcb60d85b240e66f84eff163c8bd463f40ef40157046c23ea353611fad923\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ed068c71-7535-4dca-9530-918058651f19}": {
+          "DistributionName": "MCIcon-Issue95-ImportQA-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\import-qa-v11\\execution\\wsl\\MCIcon-Issue95-ImportQA-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ef807971-d897-4bbb-96cb-25f9b75c4400}": {
+          "DistributionName": "MCIcon-fa14990d78f8adb210b6936d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v16\\execution\\runtime\\windows\\fa14990d78f8adb210b6936d11de38a365576d83e209b371ecdcc870c407d17b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f58f58d2-05cd-45c6-94d9-102def7478e8}": {
+          "DistributionName": "MCIcon-3c769605f0eb59fd27565bed",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v7\\execution\\runtime\\windows\\3c769605f0eb59fd27565bed48accdb48b57f032c22325abf2184287ffdbf91d\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f8cffce3-4776-41a2-89f9-961946f63569}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V10",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v15\\execution\\wsl\\MCIcon-Issue95-Builder-V10",
+          "Flags": 15,
+          "DefaultUid": 0
+        }
+      },
+      "legacyPaths": {
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconBootstrap": false,
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconGenerator": false
+      },
+      "wslconfig": null
+    },
+    "after": {
+      "list": {
+        "exit": 0,
+        "stdout": "NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2",
+        "stderr": ""
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "既定のディストリビューション: MCIcon-82ec446b986db27cff993a27\r\n既定のバージョン: 2",
+        "stderr": ""
+      },
+      "running": {
+        "exit": 0,
+        "stdout": "Ubuntu-24.04",
+        "stderr": ""
+      },
+      "defaultDistribution": "{064cd034-e011-4c35-bc86-41a9f2d157d7}",
+      "distributions": {
+        "{064cd034-e011-4c35-bc86-41a9f2d157d7}": {
+          "DistributionName": "MCIcon-82ec446b986db27cff993a27",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v10\\execution\\runtime\\windows\\82ec446b986db27cff993a27d675c889d5868198816543fbbc3d8ab657a7991e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{077c8a19-d2d7-4c7e-837e-72cdd1d75086}": {
+          "DistributionName": "MCIcon-9333825c39c0df5f8d3ab095",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v12\\execution\\runtime\\windows\\9333825c39c0df5f8d3ab095ce78c7f279a23808268fbf1939d8aa73f1cff3c6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{113e82a5-8576-4da4-a26f-52ea99771b32}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V14",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v19\\execution\\wsl\\MCIcon-Issue95-Builder-V14",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{185b9688-8c62-4e3b-8d76-d33219cb0217}": {
+          "DistributionName": "MCIcon-9922213e9d5e232bf90db2d7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v9\\run-001\\data\\v7-shared\\runtime\\windows\\9922213e9d5e232bf90db2d76a9b03ead0e5340f081e77e4bdd38304a27e499b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{251ca84f-9435-468e-955a-674ac1f5fee0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V9",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v14\\execution\\wsl\\MCIcon-Issue95-Builder-V9",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{29d66d8e-2e84-4277-a4d3-d97d02996f68}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V12",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v17\\execution\\wsl\\MCIcon-Issue95-Builder-V12",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{324df4f0-a387-4f7f-8c0d-7f2fb394b448}": {
+          "DistributionName": "MCIcon-6b7e078236b9d00319f34e40",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v6\\execution\\runtime\\windows\\6b7e078236b9d00319f34e4066fe021c0a3e9e25102e149edaac0aa7808248d4\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{39a3df50-3c2a-4f58-94ca-f191df00e9f9}": {
+          "DistributionName": "MCIcon-5ba0815df4293859842d2fbc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v11\\run-001\\data\\v7-shared\\runtime\\windows\\5ba0815df4293859842d2fbca0bea186a568388be81eec08b97c7b7c77a3efc6\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3b3159bd-19d4-494c-b993-0fb5ce31ddfc}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V18",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v23\\execution\\wsl\\MCIcon-Issue95-Builder-V18",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{3eff1d21-6cb6-4d57-82aa-c732b8239045}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V5",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v10\\execution\\wsl\\MCIcon-Issue95-Builder-V5",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{46e05d44-6388-480d-9dca-f9b61335d4c2}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v11\\execution\\wsl\\MCIcon-Issue95-Builder-V6",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{558be4d0-cc18-4ae8-a8a9-534479c4fc93}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v16\\execution\\wsl\\MCIcon-Issue95-Builder-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{70891763-840d-4d65-9d9a-b21488fc1772}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V7",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v12\\execution\\wsl\\MCIcon-Issue95-Builder-V7",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8314adf2-7a23-4a72-99be-0869baeadb56}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V17",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v22\\execution\\wsl\\MCIcon-Issue95-Builder-V17",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8c80dd3f-8c3a-4017-8f1c-6ecd97c5f6cf}": {
+          "DistributionName": "MCIcon-9862bd8335a9aac8f8f1844f",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v15\\execution\\runtime\\windows\\9862bd8335a9aac8f8f1844fa5194f04defd3af53d2769b21037992a237a7a15\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8d9eb482-68de-4c4b-b9cd-691524ea6c41}": {
+          "DistributionName": "MCIcon-6717dc3f92906fd38d19c3dc",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v4\\execution\\runtime\\windows\\6717dc3f92906fd38d19c3dc5e0eab689321191628c360edaa3ddbf5b18fc74a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{8f7a348e-ab75-432b-b2e3-da7fa521ea81}": {
+          "DistributionName": "MCIcon-aa038dd224dc38f9939cf22d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v17\\execution\\runtime\\windows\\aa038dd224dc38f9939cf22d1bb11d7780792e00edf868fcaa6d3c2eff11fe85\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{92353240-335d-4bae-bcde-e6dfd20a4851}": {
+          "DistributionName": "MCIcon-a5124a2a2ee645c086f33d07",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\a5124a2a2ee645c086f33d0701395208f6d2d40871b001f8a44de333af986a5e\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{96352485-9336-4648-a2a4-9f2d8d96f3d0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V16",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v21\\execution\\wsl\\MCIcon-Issue95-Builder-V16",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9ae51412-9d23-49f5-824f-45c085d5fda6}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V13",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v18\\execution\\wsl\\MCIcon-Issue95-Builder-V13",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{9e0a73f1-e23a-4d5b-b8e1-d4f91bb71f2a}": {
+          "DistributionName": "MCIcon-2c9dc6b88d5831cb3a818c68",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v11\\execution\\runtime\\windows\\2c9dc6b88d5831cb3a818c683bb26aaeb8e53726211521c158065302010553e0\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a20424d3-489d-4839-92e7-27f43dcdbabf}": {
+          "DistributionName": "MCIcon-f87fc4aebed84984c9e250f6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-h-c18-v3\\execution-v1\\runtime\\windows\\f87fc4aebed84984c9e250f6c9cfae1d114df685f8781767525c87fb7296ebae\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a823b519-6483-42f8-a2df-bf49e19e5c22}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v13\\execution\\wsl\\MCIcon-Issue95-Builder-V8",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a86a23dd-a7b1-4af4-8955-82dee3d91eca}": {
+          "DistributionName": "docker-desktop",
+          "Version": 2,
+          "BasePath": "\\\\?\\C:\\Users\\ryuma\\AppData\\Local\\Docker\\wsl\\main",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{a9285574-2e26-4dbb-8f93-d524f2ae090f}": {
+          "DistributionName": "MCIcon-d8a4dfb01684287672a8eba8",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\d8a4dfb01684287672a8eba87bddc2d0bd887d2ca36e03731831e18ac4a39139\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b383c507-977f-4181-b801-26f8ce5c282d}": {
+          "DistributionName": "Ubuntu-24.04",
+          "Version": 2,
+          "BasePath": "H:\\WSL\\colorstats",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{b70783eb-11fe-4f3c-9403-d39cc1b78519}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v9\\execution\\wsl\\MCIcon-Issue95-Builder-V4",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{c065f811-314d-4ce9-8b86-667709b4c700}": {
+          "DistributionName": "MCIcon-128c33dcea15a8ea6487eac4",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v10\\run-001\\data\\v7-shared\\runtime\\windows\\128c33dcea15a8ea6487eac44e6f16e33361939901380c71b7d1e3da34703bce\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{cc9905db-38e5-4092-bc92-6779714317b0}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V15",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v20\\execution\\wsl\\MCIcon-Issue95-Builder-V15",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{d4561e5c-093d-45bf-9c68-96f73e15ebd7}": {
+          "DistributionName": "MCIcon-b28910c0585341f944637b75",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v16\\run-001\\data\\v7-shared\\runtime\\windows\\b28910c0585341f944637b75f3a17aa832341dab179332dea7a8e0e2ba0c1697\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{de20cb1d-d465-40c0-8b5b-7e52934b3212}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V3",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v8\\execution\\wsl\\MCIcon-Issue95-Builder-V3",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e3ed6870-c0d8-4ca2-8b88-108be81baebb}": {
+          "DistributionName": "MCIcon-Issue91-V1",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-91-managed-contract\\resume-encoding-v1\\wsl\\MCIcon-Issue91-V1",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e5297f5f-fca4-40ce-84d3-2d3352431a19}": {
+          "DistributionName": "MCIcon-5ef94cacfdb4b618ae4d791a",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v13\\execution\\runtime\\windows\\5ef94cacfdb4b618ae4d791ac1c4bd3b6e34bfb6dc0cfcbe557311d7fa512b5a\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e581e759-ecd7-4999-9246-ac7b889de6ba}": {
+          "DistributionName": "MCIcon-987cb1cb668708b0d7fff9b6",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v7\\run-002\\data\\v7-shared\\runtime\\windows\\987cb1cb668708b0d7fff9b620f3fd42febdee04b19eb34df1b118a0207b0346\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e99312fa-3a3c-41d9-ba62-a63bd21a3d61}": {
+          "DistributionName": "MCIcon-0e44596ba5e39d6030376249",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\private\\issue130-acceptance-v17\\run-001\\data\\v7-shared\\runtime\\windows\\0e44596ba5e39d60303762491418a9756957001b3aac66c878ee844077cc1754\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{e9a61512-b3a9-41a8-aedc-33c1d2118873}": {
+          "DistributionName": "MCIcon-833fcb60d85b240e66f84eff",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v9\\execution\\runtime\\windows\\833fcb60d85b240e66f84eff163c8bd463f40ef40157046c23ea353611fad923\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ed068c71-7535-4dca-9530-918058651f19}": {
+          "DistributionName": "MCIcon-Issue95-ImportQA-V11",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\import-qa-v11\\execution\\wsl\\MCIcon-Issue95-ImportQA-V11",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{ef807971-d897-4bbb-96cb-25f9b75c4400}": {
+          "DistributionName": "MCIcon-fa14990d78f8adb210b6936d",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v16\\execution\\runtime\\windows\\fa14990d78f8adb210b6936d11de38a365576d83e209b371ecdcc870c407d17b\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f58f58d2-05cd-45c6-94d9-102def7478e8}": {
+          "DistributionName": "MCIcon-3c769605f0eb59fd27565bed",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\runtime-candidate-v7\\execution\\runtime\\windows\\3c769605f0eb59fd27565bed48accdb48b57f032c22325abf2184287ffdbf91d\\distro",
+          "Flags": 15,
+          "DefaultUid": 0
+        },
+        "{f8cffce3-4776-41a2-89f9-961946f63569}": {
+          "DistributionName": "MCIcon-Issue95-Builder-V10",
+          "Version": 2,
+          "BasePath": "H:\\MCIconGenerator\\issue-95-windows-managed\\rootfs-builder-v15\\execution\\wsl\\MCIcon-Issue95-Builder-V10",
+          "Flags": 15,
+          "DefaultUid": 0
+        }
+      },
+      "legacyPaths": {
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconBootstrap": false,
+        "C:\\Users\\ryuma\\AppData\\Local\\MCIconGenerator": false
+      },
+      "wslconfig": null
+    },
+    "exactMatch": true,
+    "scope": "WSL一覧/status/稼働一覧・全登録GUID/名前/BasePath/Version/Flags/DefaultUid・既定・.wslconfig hash・既定製品path不存在。既存guest内部の全disk hashではない。"
+  },
+  "cleanup": {
+    "existingStateExactlyEqual": true,
+    "existingDistributionCount": 40,
+    "allTaskDistributionsUnregistered": true,
+    "ownProcessesRemaining": [],
+    "removed": [
+      "data",
+      "data-running",
+      "data-active",
+      "tmp",
+      "bootstrap.zip"
+    ],
+    "retainedUserOutputs": [
+      {
+        "path": "user-raw\\java\\1.21.4\\raw\\.export.lock",
+        "bytes": 0,
+        "mtimeNs": 1793949319515263900,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "user-raw\\java\\1.21.4\\raw\\manifest.json",
+        "bytes": 875,
+        "mtimeNs": 1793949319595215900,
+        "sha256": "43c375e33111234291e85efd2561f3b1f449d56973249601b36a3233c56a1c99"
+      },
+      {
+        "path": "user-raw\\java\\1.21.4\\raw\\assets\\minecraft\\textures\\block\\stone.png",
+        "bytes": 157,
+        "mtimeNs": 1793949319593702100,
+        "sha256": "33ac70ba8cb701087642a12c5fd29c1ba3006dc4730e9b014ed3a19ce7cdda7b"
+      },
+      {
+        "path": "out-prepare\\java\\1.21.4\\icons\\.export.lock",
+        "bytes": 0,
+        "mtimeNs": 1793948855224908700,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "out-prepare\\java\\1.21.4\\icons\\manifest.json",
+        "bytes": 200449,
+        "mtimeNs": 1793948855873432100,
+        "sha256": "bde7a8627b0e8ba4ffab0765763cf64a46c816c6ab12f346e9c0beab9d5197ae"
+      },
+      {
+        "path": "out-prepare\\java\\1.21.4\\icons\\assets\\minecraft\\textures\\block\\stone.png",
+        "bytes": 1468,
+        "mtimeNs": 1793948855865733100,
+        "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+      }
+    ],
+    "evidenceDirectory": "build/e2e",
+    "manualCleanupNotProductPurge": true,
+    "comparisonScope": "WSL一覧/status/稼働一覧・全登録GUID/名前/BasePath/Version/Flags/DefaultUid・既定・.wslconfig hash・既定製品path不存在。既存guest内部の全disk hashではない。"
+  },
+  "intermediateCleanup": [
+    {
+      "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+      "exit": 0,
+      "stdout": "この操作を正しく終了しました。 \r\n",
+      "ownProcesses": [],
+      "reason": "回復失敗の状態・ログを保全し、今回作成した所有確認済みdistroだけを回収"
+    },
+    {
+      "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+      "exit": 0,
+      "stdout": "この操作を正しく終了しました。 \r\n",
+      "reason": "回復失敗証拠を保全し所有確認済み専用distroを回収"
+    }
+  ],
+  "finalUnregister": {
+    "name": "MCIcon-cdcd7ce552f0be140a57eae5",
+    "exit": 0,
+    "stdout": "この操作を正しく終了しました。 \r\n",
+    "reason": "失敗状態の証拠保全後、GUID/BasePathと今回の登録であることを確認して手動回収。製品による正常releaseとは区別。"
+  },
+  "unverified": [
+    "実worker中断後の成功PNG/hash一致（再実行失敗）",
+    "Ctrl+Cシグナル経路",
+    "短い破損partのHTTP Range継続（今回は同一size）",
+    "正式MSI/winget uninstall・製品purge",
+    "OS実reboot（禁止・対象外）",
+    "WSL未導入host・OS機能有効化・全51版・全アイテム・既存guest全disk内容比較"
+  ],
+  "validation": {
+    "lfBlobChecksum": true,
+    "gitDiffCheck": true,
+    "productBuildAndUnitTests": "製品コード変更なし・公開物限定のため対象外",
+    "jsonParsed": true,
+    "buildDraftsUtf8WithoutBom": true
+  },
+  "harnessIssues": [
+    {
+      "exitCode": 2,
+      "cause": "bootstrap-auto-updateとrenderを同時指定した初回試行",
+      "resolution": "文書どおり単独設定へ修正。状態未作成を確認しcancel-prepare-actualから正式観測。"
+    },
+    {
+      "cause": "最初のworker試行はcontainer intent、次はcreated",
+      "resolution": "cancel-activeでDocker State=runningを確認してからCLI JVM単独終了。各試行を別記録。"
+    }
+  ],
+  "evidence": {
+    "directory": "build/e2e",
+    "preservedRecords": "build/e2e/preserved-records",
+    "commands": "C:/Users/ryuma/.codex/logs/commands/",
+    "manifest": "build/e2e/evidence-files.json"
+  },
+  "publication": {
+    "commit": false,
+    "push": false,
+    "pullRequest": false,
+    "issueMutation": false,
+    "releaseOrCentralMutation": false
+  }
+}
