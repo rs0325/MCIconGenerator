@@ -133,3 +133,15 @@ bootstrapは67,505,927 bytes（取得5.167秒）、管理artifact3件は1,339,46
 5描画すべてのleaseは通常終了でreleased、resourcesは空。通常release後の専用VMがStoppedであることを確認し、登録・owner marker・VM identity・作成時刻・uid・machine/config hashを照合して同梱Limaの通常deleteを実行した。空一覧・関連processなしを確認して今回のanchorだけを削除し、測定JSON回収後に専用領域も削除した。列挙した既存標準pathの存在、仮想化候補PID/実行file、起動前からの`/private/tmp/mcicon-*`一覧・uid・作成時刻は前後一致した。OS全体の不変を保証する比較ではない。
 
 未検証は全51版・全登録アイテム、実host reboot、未準備host setup、Intel Mac/他macOS、ブラウザ/Finder経路とGUI目視、物理network切断・packet監査、更新取得・適用。commit・push・PR・Issue操作は行っていない。公開準備文面のみbuild配下で更新した。
+
+## 初回取得取消し後の回復修正（2026-11-06、Refs #94）
+
+公開v1.1.0の追加E2Eでは、初回runtime取得中にCLIがexit 130で終了した後、resources空のactive leaseと取得途中fileが残り、同じコマンドの再実行が未作成のVM登録JSON読み取りでexit 1となった。既存の描画成功記録から、この初回取得取消しの成功を推定しない。元の証拠はタスク `milestone-e2e2-macos` の `qa/e2e-cancel-resume-macos-2026-11-06.json` に保全されている。
+
+原因はhelperの未着手releaseが旧coreの生存を必須にしていたこと。resources空・生成intent不在でも、旧core終了後には登録照合を必要とする通常releaseへ進んでいた。修正はこの生存必須条件だけを除き、所有照合とjob/lifecycle排他、durable tombstone、資源・生成痕跡の拒否を維持する。共有core・guest・保存形式は変更しない。登録のみの中断や未知のVM状態は従来どおり保持・診断する。
+
+Macの専用領域 `/Users/ryuman/tmp-mcicon-fix-cancel-resume-20261106` で、旧core終了を模したfixtureのrelease失敗を未修正コードで再現した。修正後は実Main release入口・再試行・次jobの初回登録、既存世代/別job不変、starting資源・未完了/途中journalの拒否を自動テストで確認した。native launcherの代わりにテスト内で `jpackage.app-path` を指定する境界テストであり、公開CLIへのSIGINTやVM描画の再実測ではない。 最終結果はhelper 48件（47成功・実probe任意fixture 1skip）、共通helper 33件成功、core runtime関連94件成功で、failure/errorは0。helper assembleと差分空白検査も成功した。JUnit XMLと集計は担当worktreeの `build/test-results-macos.zip`、`build/validation-summary.json` に保全する。
+
+公開CLIの既存経路は同梱trust/署名済みdescriptorとhelper SHAを固定する。ClassLoader/Transportを差し替える内部fixtureはあるが、公開CLIから修正helperだけを指定するテスト設定はない。署名済み公開runtimeを差し替えずに修正helperを使う公開CLI E2Eは実施できず、**次の配布候補で再検証が必要**。空の専用rootで初回取得中の取消し→同一コマンド再開→PNG生成→released/resources空→専用資源回収まで確認する。
+
+配布にはhelperの再ビルド・app-image再包装と署名整合性確認、artifact/inventoryのsize・SHA更新、descriptor/pinの再生成・配布署名、新版の発行が必要。既存v1.1.0の署名・helperを上書きしない。core回復は同一descriptor世代を対象とするため、この修正だけで新版から旧v1.1.0の残存leaseを回復できるとは保証しない。旧rootのlease・登録・anchorを手動削除する一般的な回復手順は提供せず、証拠を保全して世代別の対応を確認する。

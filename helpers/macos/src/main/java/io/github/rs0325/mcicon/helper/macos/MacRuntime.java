@@ -39,7 +39,7 @@ final class MacRuntime {
         JsonNode initial=lease.read();Path temporary=command.lease().getParent().resolve("tmp");long uid=((Number)Files.getAttribute(command.root(),"unix:uid",LinkOption.NOFOLLOW_LINKS)).longValue();CacheState cache=new CacheState(command.root(),initial.path("hostId").asText(),initial.path("descriptorSha256").asText(),uid);
         try(OperationJournal journal=OperationJournal.acquire(temporary,initial,bounded(deadline,Duration.ofSeconds(5)));CacheState.Lock ignored=cache.lock(bounded(deadline,Duration.ofSeconds(5)))) {
             JsonNode current=lease.read();if(!current.path("resources").isEmpty()||!journal.unstarted())return false;
-            try{owner(lease);}catch(IOException unknownOwner){return false;}journal.markReleased();lease.replaceResources((ObjectNode)current.path("resources"),MacFiles.JSON.createObjectNode());return true;
+            journal.markReleased();lease.replaceResources((ObjectNode)current.path("resources"),MacFiles.JSON.createObjectNode());return true;
         }
     }
     void preflight() throws IOException {
