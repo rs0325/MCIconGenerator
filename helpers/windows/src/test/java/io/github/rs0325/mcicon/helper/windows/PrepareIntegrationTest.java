@@ -12,14 +12,14 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
 
-/** native/guest境界だけをJava子プロセスに置き換え、hostの保存と照合を通す。 */
+/** native/guest境界をJava/.NETのfixture子プロセスに置き換え、hostの保存と照合を通す。 */
 class PrepareIntegrationTest {
     @TempDir Path root;
     Path tmp,leasePath,launcher;
     ObjectNode lease,descriptor,manifest;
     HostFacts host;
     WslDistribution distribution;
-    String attempt=UUID.randomUUID().toString();
+    String attempt=UUID.randomUUID().toString(),classpath;
 
     @BeforeEach void setup() throws Exception {
         root=root.toRealPath();lease=new OwnershipTest().lease().put("schemaVersion",1).put("toolVersion","1.1.0").put("workerSha256","b".repeat(64)).put("runtimeId","fixture").put("pid",ProcessHandle.current().pid()).put("processStartedAt",ProcessHandle.current().info().startInstant().orElseThrow().toString()).put("createdAt",Instant.EPOCH.toString()).put("state","active");
@@ -37,10 +37,10 @@ class PrepareIntegrationTest {
         }
         manifest=WindowsFiles.JSON.createObjectNode().put("schemaVersion",1).put("guestBridgeAbi",1);manifest.putArray("files");var base=manifest.putObject("guestBase").put("bridgeSha256","d".repeat(64)).put("cpuProbeSha256","e".repeat(64));base.putObject("engines");base.put("bytes",Files.size(artifacts.resolve("guest-base.tar.xz"))).put("sha256",WindowsFiles.hash(artifacts.resolve("guest-base.tar.xz")));WindowsFiles.write(tmp.resolve("payload.json"),manifest);
         boolean windows=System.getProperty("os.name").startsWith("Windows");String java=Path.of(System.getProperty("java.home"),"bin",windows?"java.exe":"java").toString();List<String> paths=new ArrayList<>();
-        for(Class<?> type:List.of(PrepareIntegrationTest.class,WindowsFiles.class,com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class))paths.add(Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()).toString());
-        launcher=tmp.resolve(windows?"fixture.cmd":"fixture");String cp=String.join(File.pathSeparator,paths);
-        Files.writeString(launcher,windows?"@echo off\r\nset MCICON_FIXTURE_CMD=1\r\n\""+java+"\" -cp \""+cp+"\" "+Guest.class.getName()+" %*\r\nexit /b %errorlevel%\r\n":"#!/bin/sh\nexec '"+java+"' -cp '"+cp+"' '"+Guest.class.getName()+"' \"$@\"\n");if(!windows)assertTrue(launcher.toFile().setExecutable(true,true));
-        mode("valid");
+        for(Class<?> type:List.of(PrepareIntegrationTest.class,WindowsFiles.class,LeaseFile.class,com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class,org.tukaani.xz.XZInputStream.class))paths.add(Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()).toString());
+        launcher=tmp.resolve(windows?"fixture.cmd":"fixture");classpath=String.join(File.pathSeparator,paths);String cp=classpath;
+        Files.writeString(launcher,windows?"@echo off\r\nset MCICON_FIXTURE_CMD=1\r\nset MCICON_FIXTURE_MAIN="+Guest.class.getName()+"\r\nif \"%~1\"==\"exec\" set MCICON_FIXTURE_MAIN="+NativeExec.class.getName()+"\r\n\""+java+"\" -cp \""+cp+"\" %MCICON_FIXTURE_MAIN% %*\r\nexit /b %errorlevel%\r\n":"#!/bin/sh\nif [ \"$1\" = \"exec\" ]; then exec '"+java+"' -cp '"+cp+"' '"+NativeExec.class.getName()+"' \"$@\"; fi\nexec '"+java+"' -cp '"+cp+"' '"+Guest.class.getName()+"' \"$@\"\n");if(!windows)assertTrue(launcher.toFile().setExecutable(true,true));
+        Files.writeString(tmp.resolve("fixture-distribution-name"),distribution.name);mode("valid");
     }
     void saveLease() throws Exception {WindowsFiles.write(leasePath,lease);lease=(ObjectNode)WindowsFiles.json(leasePath);ObjectNode identity=lease.deepCopy();identity.remove(List.of("state","resources"));Files.write(leasePath.resolveSibling("lease.lock"),LeaseFile.receipt(identity));}
     void mode(String value) throws Exception {Files.writeString(tmp.resolve("fixture-mode"),value);}
@@ -52,8 +52,8 @@ class PrepareIntegrationTest {
     WindowsRuntime runtime(String operation) throws Exception {
         var constructor=LeaseFile.class.getDeclaredConstructor(Path.class,Path.class,ObjectNode.class,JsonNode.class,String.class);constructor.setAccessible(true);ObjectNode identity=lease.deepCopy();identity.remove(List.of("state","resources"));LeaseFile file=constructor.newInstance(root,leasePath,identity,descriptor,"windows");
         var controller=new HelperProtocol.Keeper(ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli(),attempt,Instant.now().plusSeconds(120),false);
-        WindowsRuntime runtime=allocate(WindowsRuntime.class);set(runtime,"command",new HelperProtocol.Command(root,leasePath,operation,List.of(),operation.equals("keep")?controller:null));set(runtime,"lease",file);set(runtime,"executable",launcher);set(runtime,"temporary",tmp);set(runtime,"wsl",launcher);set(runtime,"payload",new Payload(tmp));set(runtime,"descriptor",descriptor.deepCopy());
-        Map<String,String> environment=new HashMap<>();if(System.getenv("SystemRoot")!=null)environment.put("SystemRoot",System.getenv("SystemRoot"));set(runtime,"environment",environment);set(runtime,"commands",new Commands(launcher,tmp,environment,Long.MAX_VALUE));set(runtime,"distribution",new WslDistribution(root,file.read(),host));return runtime;
+        Path support=Files.isDirectory(tmp.resolve("app/support"))?tmp.resolve("app/support"):tmp;WindowsRuntime runtime=allocate(WindowsRuntime.class);set(runtime,"command",new HelperProtocol.Command(root,leasePath,operation,List.of(),operation.equals("keep")?controller:null));set(runtime,"lease",file);set(runtime,"executable",launcher);set(runtime,"temporary",tmp);set(runtime,"wsl",launcher);set(runtime,"payload",new Payload(support));set(runtime,"descriptor",descriptor.deepCopy());
+        Map<String,String> environment=new HashMap<>();if(System.getenv("SystemRoot")!=null)environment.put("SystemRoot",System.getenv("SystemRoot"));set(runtime,"environment",environment);set(runtime,"commands",new Commands(support.equals(tmp)?launcher:support.resolve("windows-host.exe"),tmp,environment,Long.MAX_VALUE));set(runtime,"distribution",new WslDistribution(root,file.read(),host));return runtime;
     }
     void readyKeeper() throws Exception {
         WindowsRuntime runtime=runtime("prepare");var keeper=WindowsFiles.JSON.createObjectNode().put("state","ready").put("attempt",attempt);keeper.set("identity",runtime.identity());keeper.putObject("client").put("clientPid",ProcessHandle.current().pid()).put("clientStarted",ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli());WindowsFiles.write(tmp.resolve("keeper.json"),keeper);
@@ -173,7 +173,7 @@ class PrepareIntegrationTest {
     }
     @Test void 実keeperのEOF後停止照合保存を短い本体期限と予約枠近傍で通す() throws Exception {
         for(int trial=0;trial<4;trial++) {
-            PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Files.createDirectory(root.resolve("release-"+trial));fixture.setup();fixture.mode("release-tail");assertFalse(Files.exists(fixture.tmp.resolve("fixture-eof-ms")));assertFalse(Files.exists(fixture.tmp.resolve("fixture-terminated")));
+            PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Files.createDirectory(root.resolve("release-"+trial));fixture.setup();fixture.mode("release-tail");fixture.prepareRecoveryPayload();assertFalse(Files.exists(fixture.tmp.resolve("fixture-eof-ms")));assertFalse(Files.exists(fixture.tmp.resolve("fixture-terminated")));
             WindowsRuntime keep=fixture.runtime("keep");WindowsKeeper keeper=allocate(WindowsKeeper.class);set(keeper,"runtime",keep);
             ProcessHandle parent=ProcessHandle.current().parent().orElseThrow();set(keeper,"controller",new HelperProtocol.Keeper(parent.pid(),parent.info().startInstant().orElseThrow().toEpochMilli(),fixture.attempt,Instant.now().plusSeconds(20),false));
             Method start=WindowsKeeper.class.getDeclaredMethod("start");start.setAccessible(true);Commands.Running child=null;long elapsed=0;int budget=trial==3?2500:6000;boolean success=false;
@@ -190,7 +190,84 @@ class PrepareIntegrationTest {
             }
         }
     }
-    public static class Guest {
+    @Test void 旧owner終了後の回復releaseがdaemon再準備後もEOF停止保存枠を残す() throws Exception {
+        for(int limit:new int[]{6,15}){PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Files.createDirectory(root.resolve("recovery-"+limit));fixture.setup();fixture.recoverKilledOwner(limit);}
+    }
+    @Test void 回復keeper実行が15秒受渡しと9秒超の本体期限を実コンストラクタで保持する() throws Exception {recoverKilledOwner(14);}
+    private void recoverKilledOwner(int limit) throws Exception {
+        Process owner=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",classpath,Guest.class.getName(),"owner").redirectError(tmp.resolve("owner.stderr").toFile()).start();Commands.Running oldChild=null,recoveredChild=null;
+        try {
+            assertEquals("owner-ready",owner.inputReader().readLine());lease.put("pid",owner.pid()).put("processStartedAt",owner.info().startInstant().orElseThrow().toString());saveLease();
+            if(limit==14)prepareRecoveryPayload();
+            WindowsRuntime original=runtime("keep");WindowsKeeper old=allocate(WindowsKeeper.class);set(old,"runtime",original);set(old,"controller",new HelperProtocol.Keeper(owner.pid(),owner.info().startInstant().orElseThrow().toEpochMilli(),attempt,Instant.now().plusSeconds(20),false));
+            Method start=WindowsKeeper.class.getDeclaredMethod("start");start.setAccessible(true);Field field=WindowsKeeper.class.getDeclaredField("child");field.setAccessible(true);start.invoke(old);oldChild=(Commands.Running)field.get(old);
+            lease=(ObjectNode)WindowsFiles.json(leasePath);lease.withObject("resources").withObject("windows").withArray("containers").addObject().put("name","mcicon-worker-"+lease.path("jobId").asText()).put("id","f".repeat(64)).put("transportId",attempt);saveLease();
+            owner.destroyForcibly();assertTrue(owner.waitFor(3,java.util.concurrent.TimeUnit.SECONDS));oldChild.process().getOutputStream().close();assertTrue(oldChild.process().waitFor(5,java.util.concurrent.TimeUnit.SECONDS));assertTrue(LeaseReferences.ownerDead(lease));
+            if(limit==14){runRecoveryContract();return;}
+            attempt=UUID.randomUUID().toString();mode("recovery-release");long overallEnd=System.nanoTime()+Duration.ofSeconds(18).toNanos();
+            WindowsRuntime recovery=runtime("keep");ProcessHandle parent=ProcessHandle.current().parent().orElseThrow();var controller=new HelperProtocol.Keeper(parent.pid(),parent.info().startInstant().orElseThrow().toEpochMilli(),attempt,Instant.now().plusSeconds(9),true);set(recovery,"command",new HelperProtocol.Command(root,leasePath,"keep",List.of(),controller));
+            WindowsKeeper keeper=allocate(WindowsKeeper.class);set(keeper,"runtime",recovery);set(keeper,"controller",controller);start.invoke(keeper);recoveredChild=(Commands.Running)field.get(keeper);
+            WindowsRuntime cleanup=runtime("release");cleanup.commands.end(limit==6?System.nanoTime()+Duration.ofSeconds(6).toNanos():overallEnd-Duration.ofSeconds(3).toNanos());long began=System.nanoTime();Files.writeString(tmp.resolve("fixture-recovery-began"),Long.toString(System.currentTimeMillis()));
+            if(limit==6){IOException failure=assertThrows(IOException.class,()->cleanup.release(keeper,true));assertTrue(failure.getMessage().contains("EOF後の停止/保存枠"));assertFalse(cleanup.lease.read().path("resources").isEmpty());assertTrue(keeper.value().path("workProof").path("closed").asBoolean());assertFalse(keeper.value().path("stopConfirmed").asBoolean());assertFalse(Files.exists(tmp.resolve("fixture-terminated")));}
+            else {cleanup.release(keeper,true);assertTrue(cleanup.lease.read().path("resources").isEmpty());assertEquals("closed",keeper.value().path("state").asText());assertTrue(keeper.value().path("stopConfirmed").asBoolean());assertTrue(keeper.value().path("jobEmpty").asBoolean());assertFalse(recoveredChild.process().isAlive());assertTrue(Files.exists(tmp.resolve("fixture-terminated")));assertEquals(2,Files.readAllLines(tmp.resolve("fixture-host-events")).stream().filter("--terminate"::equals).count());}
+            long elapsed=Duration.ofNanos(System.nanoTime()-began).toMillis();assertTrue(elapsed>3000);assertTrue(System.nanoTime()<overallEnd);assertTrue(operations().contains("daemon-recover"));assertTrue(operations().contains("release-recover"));
+            System.out.println("RECOVERY_RELEASE_TIMING="+WindowsFiles.JSON.createObjectNode().put("bodyLimit",limit).put("releaseMs",elapsed).put("success",limit!=6).put("overallRemainingMs",Duration.ofNanos(overallEnd-System.nanoTime()).toMillis()));
+        } finally {
+            if(owner.isAlive())owner.destroyForcibly();assertTrue(owner.waitFor(3,java.util.concurrent.TimeUnit.SECONDS));
+            for(Commands.Running child:new Commands.Running[]{oldChild,recoveredChild})if(child!=null){child.process().getOutputStream().close();assertTrue(child.process().waitFor(10,java.util.concurrent.TimeUnit.SECONDS));}
+        }
+    }
+    private void prepareRecoveryPayload() throws Exception {
+        Path support=Files.createDirectories(tmp.resolve("app/support")),nativeHost=support.resolve("windows-host.exe");
+        boolean windows=System.getProperty("os.name").startsWith("Windows");String javaExe=Path.of(System.getProperty("java.home"),"bin",windows?"java.exe":"java").toString();
+        if(windows) {
+            String execute="""
+                static long Ms(DateTime d){return (d.ToUniversalTime().Ticks-621355968000000000L)/10000;}
+                static void Save(string p,string s){string t=p+".tmp";System.IO.File.WriteAllText(t,s);System.IO.File.Move(t,p);}
+                static bool E(string[] a){
+                    if(a[0]!="exec")return false;
+                    string prefix=a[3],tmp=System.IO.Path.GetDirectoryName(prefix),mode=System.IO.File.ReadAllText(System.IO.Path.Combine(tmp,"fixture-mode"));var p=Process.GetCurrentProcess();char q=(char)34;
+                    string state="{"+q+"pid"+q+":"+p.Id+","+q+"started"+q+":"+Ms(p.StartTime)+","+q+"parent"+q+":"+a[1]+","+q+"parentStarted"+q+":"+a[2]+","+q+"boot"+q+":"+q+"00000000-0000-0000-0000-000000000001"+q+"}";
+                    Save(prefix+".state.json",state);bool list=Array.IndexOf(a,"--list")>=0,terminate=Array.IndexOf(a,"--terminate")>=0;string stopped=System.IO.Path.Combine(tmp,"fixture-terminated"),eof=System.IO.Path.Combine(tmp,"fixture-eof-ms");
+                    if(mode=="release-tail"&&System.IO.File.Exists(eof)){long target=long.Parse(System.IO.File.ReadAllText(eof))+(terminate?1600:list?System.IO.File.Exists(stopped)?1900:800:System.IO.File.Exists(stopped)?2600:500);System.Threading.Thread.Sleep((int)Math.Max(0,target-Ms(DateTime.UtcNow)));}
+                    if(list||terminate){System.IO.File.AppendAllLines(System.IO.Path.Combine(tmp,"fixture-host-events"),new ArraySegment<string>(a,6,a.Length-6));if(terminate)System.IO.File.WriteAllText(stopped,"stopped");else if(!System.IO.File.Exists(stopped)||mode=="still-running")Console.WriteLine(System.IO.File.ReadAllText(System.IO.Path.Combine(tmp,"fixture-distribution-name")));}
+                    else Console.Write(System.IO.File.ReadAllText(System.IO.Path.Combine(tmp,"fixture-facts.json")));
+                    Save(prefix+".done.json",state);return true;
+                }
+                """;
+            String source="using System;using System.Diagnostics;class Native{"+execute+"static void F(System.IO.Stream a,System.IO.Stream b){var v=new byte[4096];int n;while((n=a.Read(v,0,v.Length))>0){b.Write(v,0,n);b.Flush();}}static string Q(string s){return \"\\\"\"+s.Replace(\"\\\"\",\"\\\\\\\"\")+\"\\\"\";}static int Main(string[] a){if(E(a))return 0;var p=new ProcessStartInfo("+WindowsFiles.JSON.writeValueAsString(javaExe)+");p.UseShellExecute=false;p.CreateNoWindow=true;p.Arguments=Q(\"-cp\")+\" \"+Q("+WindowsFiles.JSON.writeValueAsString(classpath)+")+\" \"+Q("+WindowsFiles.JSON.writeValueAsString(Guest.class.getName())+");foreach(var s in a)p.Arguments+=\" \"+Q(s);Environment.SetEnvironmentVariable(\"MCICON_FIXTURE_CMD\",\"1\");p.RedirectStandardInput=true;p.RedirectStandardOutput=true;p.RedirectStandardError=true;using(var c=Process.Start(p)){System.Threading.Tasks.Task.Factory.StartNew(()=>{F(Console.OpenStandardInput(),c.StandardInput.BaseStream);c.StandardInput.Close();});var o=System.Threading.Tasks.Task.Factory.StartNew(()=>F(c.StandardOutput.BaseStream,Console.OpenStandardOutput()));var e=System.Threading.Tasks.Task.Factory.StartNew(()=>F(c.StandardError.BaseStream,Console.OpenStandardError()));c.WaitForExit();System.Threading.Tasks.Task.WaitAll(o,e);return c.ExitCode;}}}";
+            Path cs=tmp.resolve("Native.cs");Files.writeString(cs,source);Path compiler=Path.of(System.getenv("SystemRoot"),"Microsoft.NET","Framework64","v4.0.30319","csc.exe");assertTrue(Files.isRegularFile(compiler));
+            Process compile=new ProcessBuilder(compiler.toString(),"/nologo","/out:"+nativeHost,cs.toString()).redirectErrorStream(true).redirectOutput(tmp.resolve("compiler.log").toFile()).start();
+            try{assertTrue(compile.waitFor(15,java.util.concurrent.TimeUnit.SECONDS));assertEquals(0,compile.exitValue(),()->{try{return Files.readString(tmp.resolve("compiler.log"));}catch(IOException e){return e.toString();}});}finally{if(compile.isAlive())compile.destroyForcibly();assertTrue(compile.waitFor(3,java.util.concurrent.TimeUnit.SECONDS));}
+        } else {Files.writeString(nativeHost,"#!/bin/sh\nif [ \"$1\" = \"exec\" ]; then exec '"+javaExe+"' -cp '"+classpath+"' '"+NativeExec.class.getName()+"' \"$@\"; fi\nexec '"+javaExe+"' -cp '"+classpath+"' '"+Guest.class.getName()+"' \"$@\"\n");assertTrue(nativeHost.toFile().setExecutable(true));}
+        Files.writeString(support.resolve("guestbridge.py"),"fixture");ObjectNode pins=manifest.deepCopy();pins.putArray("files");
+        for(String name:List.of("windows-host.exe","guestbridge.py")){Path file=support.resolve(name);pins.withArray("files").addObject().put("path",name).put("bytes",Files.size(file)).put("sha256",WindowsFiles.hash(file));}
+        ((ObjectNode)pins.path("guestBase")).put("format","tar.xz").put("bridgeSha256",WindowsFiles.hash(support.resolve("guestbridge.py")));
+        for(String name:List.of("docker","dockerd","containerd","runc"))((ObjectNode)pins.path("guestBase").path("engines")).put("/usr/bin/"+name,"c".repeat(64));WindowsFiles.write(support.resolve("payload.json"),pins);
+        Path system=Files.createDirectories(tmp.resolve("fixture-system/System32"));Files.writeString(system.resolve("wsl.exe"),"fixture-only");
+    }
+    private void runRecoveryContract() throws Exception {
+        attempt=UUID.randomUUID().toString();mode("recovery-contract");WindowsFiles.write(tmp.resolve("fixture-descriptor.json"),descriptor);
+        boolean windows=System.getProperty("os.name").startsWith("Windows");String javaExe=Path.of(System.getProperty("java.home"),"bin",windows?"java.exe":"java").toString();Path system=tmp.resolve("fixture-system/System32");
+        ProcessBuilder builder=new ProcessBuilder(javaExe,"-cp",classpath,KeeperProcess.class.getName(),root.toString(),leasePath.toString(),attempt,launcher.toString()).redirectError(tmp.resolve("keeper-run.stderr").toFile());builder.environment().put("SystemRoot",windows?System.getenv("SystemRoot"):system.getParent().toString());
+        Process process=null;long began=0;
+        try(var channel=java.nio.channels.FileChannel.open(leasePath.resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE);var lock=channel.lock(64,1,false)) {
+            process=builder.start();String line=process.inputReader().readLine();assertNotNull(line,new String(Files.readAllBytes(tmp.resolve("keeper-run.stderr")),java.nio.charset.StandardCharsets.UTF_8));JsonNode ready=WindowsFiles.JSON.readTree(line);assertEquals("ready",ready.path("state").asText());assertEquals(attempt,ready.path("attempt").asText());
+            began=System.nanoTime();Files.writeString(tmp.resolve("fixture-recovery-began"),Long.toString(System.currentTimeMillis()));var request=WindowsFiles.JSON.createObjectNode().put("operation","release").put("attempt",attempt).put("deadline",Instant.now().plusSeconds(14).toString());
+            try(OutputStream out=process.getOutputStream()){out.write(WindowsFiles.JSON.writeValueAsBytes(request));out.write('\n');}
+            assertTrue(process.waitFor(16,java.util.concurrent.TimeUnit.SECONDS));assertEquals(0,process.exitValue(),new String(Files.readAllBytes(tmp.resolve("keeper-run.stderr")),java.nio.charset.StandardCharsets.UTF_8));
+            assertTrue(WindowsFiles.json(leasePath).path("resources").isEmpty());JsonNode closed=WindowsFiles.json(tmp.resolve("keeper.json"));assertEquals("closed",closed.path("state").asText());assertTrue(closed.path("stopConfirmed").asBoolean());assertTrue(closed.path("jobEmpty").asBoolean());
+            assertEquals(2,Files.readAllLines(tmp.resolve("fixture-host-events")).stream().filter("--terminate"::equals).count());long elapsed=Duration.ofNanos(System.nanoTime()-began).toMillis();assertTrue(elapsed>=7200&&elapsed<14000);System.out.println("RECOVERY_CONTRACT_TIMING="+elapsed);
+        } finally {if(process!=null){process.getOutputStream().close();if(!process.waitFor(3,java.util.concurrent.TimeUnit.SECONDS))process.destroyForcibly();assertTrue(process.waitFor(5,java.util.concurrent.TimeUnit.SECONDS));process.getInputStream().close();process.getErrorStream().close();}}
+    }
+    public static class KeeperProcess {
+        public static void main(String[] args) throws Exception {
+            PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Path.of(args[0]);fixture.leasePath=Path.of(args[1]);fixture.tmp=fixture.leasePath.getParent().resolve("tmp");fixture.attempt=args[2];fixture.launcher=Path.of(args[3]);fixture.lease=(ObjectNode)WindowsFiles.json(fixture.leasePath);fixture.descriptor=(ObjectNode)WindowsFiles.json(fixture.tmp.resolve("fixture-descriptor.json"));fixture.host=HostFacts.parse(WindowsFiles.json(fixture.tmp.resolve("fixture-facts.json")),fixture.descriptor);
+            LeaseFile file=fixture.runtime("keep").lease;ProcessHandle parent=ProcessHandle.current().parent().orElseThrow();var controller=new HelperProtocol.Keeper(parent.pid(),parent.info().startInstant().orElseThrow().toEpochMilli(),fixture.attempt,Instant.now().plusSeconds(9),true);
+            WindowsRuntime runtime=new WindowsRuntime(new HelperProtocol.Command(fixture.root,fixture.leasePath,"keep",List.of(),controller),fixture.launcher,file,System.nanoTime());new WindowsKeeper(runtime).run();return;
+        }
+    }
+    public static class NativeExec {
         private static void save(Path file,String value) throws IOException {
             Path temporary=Files.createTempFile(file.getParent(),"fixture-",".json");try{Files.writeString(temporary,value);Files.move(temporary,file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}finally{Files.deleteIfExists(temporary);}
         }
@@ -198,27 +275,35 @@ class PrepareIntegrationTest {
             Path prefix=Path.of(args[3]),tmp=prefix.getParent();ProcessHandle process=System.getenv("MCICON_FIXTURE_CMD")!=null?ProcessHandle.current().parent().orElseThrow():ProcessHandle.current();
             // 固定receiptはObjectMapperを起動せずに原子的に保存する。
             String state="{\"pid\":"+process.pid()+",\"started\":"+process.info().startInstant().orElseThrow().toEpochMilli()+",\"parent\":"+Long.parseLong(args[1])+",\"parentStarted\":"+Long.parseLong(args[2])+",\"boot\":\""+OwnershipTest.BOOT+"\"}";save(Path.of(prefix+".state.json"),state);
-            if(args[0].equals("exec")) {
-                List<String> command=Arrays.asList(args).subList(5,args.length);
-                if(Files.readString(tmp.resolve("fixture-mode")).equals("release-tail")&&Files.exists(tmp.resolve("fixture-eof-ms"))) {
-                    long target=Long.parseLong(Files.readString(tmp.resolve("fixture-eof-ms")))+(command.contains("--terminate")?1600:command.contains("--list")?Files.exists(tmp.resolve("fixture-terminated"))?1900:800:Files.exists(tmp.resolve("fixture-terminated"))?2600:500);Thread.sleep(Math.max(0,target-System.currentTimeMillis()));
-                }
-                if(command.contains("--list")||command.contains("--terminate")) {
-                    Files.write(tmp.resolve("fixture-host-events"),command.subList(1,command.size()),StandardOpenOption.CREATE,StandardOpenOption.APPEND);
-                    if(command.contains("--terminate"))Files.writeString(tmp.resolve("fixture-terminated"),"stopped");
-                    else if(!Files.exists(tmp.resolve("fixture-terminated"))||Files.readString(tmp.resolve("fixture-mode")).equals("still-running")) {
-                        Path root=tmp.getParent().getParent().getParent();ObjectNode lease=(ObjectNode)WindowsFiles.json(tmp.getParent().resolve("lease.json"));
-                        System.out.println("MCIcon-"+lease.path("descriptorSha256").asText().substring(0,24));
-                    }
-                } else System.out.write(Files.readAllBytes(tmp.resolve("fixture-facts.json")));
-                save(Path.of(prefix+".done.json"),state);return;
+            List<String> command=Arrays.asList(args).subList(5,args.length);
+            if(Files.readString(tmp.resolve("fixture-mode")).equals("release-tail")&&Files.exists(tmp.resolve("fixture-eof-ms"))) {
+                long target=Long.parseLong(Files.readString(tmp.resolve("fixture-eof-ms")))+(command.contains("--terminate")?1600:command.contains("--list")?Files.exists(tmp.resolve("fixture-terminated"))?1900:800:Files.exists(tmp.resolve("fixture-terminated"))?2600:500);Thread.sleep(Math.max(0,target-System.currentTimeMillis()));
             }
+            if(command.contains("--list")||command.contains("--terminate")) {
+                Files.write(tmp.resolve("fixture-host-events"),command.subList(1,command.size()),StandardOpenOption.CREATE,StandardOpenOption.APPEND);
+                if(command.contains("--terminate"))Files.writeString(tmp.resolve("fixture-terminated"),"stopped");
+                else if(!Files.exists(tmp.resolve("fixture-terminated"))||Files.readString(tmp.resolve("fixture-mode")).equals("still-running")) {
+                    System.out.println(Files.readString(tmp.resolve("fixture-distribution-name")));
+                }
+            } else System.out.write(Files.readAllBytes(tmp.resolve("fixture-facts.json")));
+            save(Path.of(prefix+".done.json"),state);return;
+        }
+    }
+    public static class Guest {
+        public static void main(String[] args) throws Exception {
+            if(args[0].equals("owner")){System.out.println("owner-ready");System.out.flush();System.in.transferTo(OutputStream.nullOutputStream());return;}
+            Path prefix=Path.of(args[3]),tmp=prefix.getParent();ProcessHandle process=System.getenv("MCICON_FIXTURE_CMD")!=null?ProcessHandle.current().parent().orElseThrow():ProcessHandle.current();
+            // 固定receiptはObjectMapperを起動せずに原子的に保存する。
+            String state="{\"pid\":"+process.pid()+",\"started\":"+process.info().startInstant().orElseThrow().toEpochMilli()+",\"parent\":"+Long.parseLong(args[1])+",\"parentStarted\":"+Long.parseLong(args[2])+",\"boot\":\""+OwnershipTest.BOOT+"\"}";NativeExec.save(Path.of(prefix+".state.json"),state);
             ObjectNode client=(ObjectNode)WindowsFiles.JSON.readTree(state);
             ObjectNode request=(ObjectNode)WindowsFiles.JSON.readTree(new BufferedReader(new InputStreamReader(System.in)).readLine());String operation=request.path("operation").asText(),mode=Files.readString(tmp.resolve("fixture-mode"));
             Path root=tmp.getParent().getParent().getParent();ObjectNode owner=(ObjectNode)WindowsFiles.json(root.resolve("windows").resolve(request.path("descriptorSha256").asText()).resolve("owner.json"));
             ObjectNode ack=WindowsFiles.JSON.createObjectNode().put("abi",1).put("boot",OwnershipTest.BOOT).put("memoryBytes",16L*1024*1024*1024);ack.set("marker",request.path("marker"));ack.set("bridgeSha256",request.path("bridgeSha256"));
             int exit=0;
-            if(operation.equals("keep")) {
+            if(operation.equals("daemon-recover")&&mode.equals("recovery-release"))Thread.sleep(1000);
+            if(operation.equals("release-recover")&&Set.of("recovery-release","recovery-contract").contains(mode))Thread.sleep(Math.max(0,Long.parseLong(Files.readString(tmp.resolve("fixture-recovery-began")))+(mode.equals("recovery-contract")?7200:3200)-System.currentTimeMillis()));
+            if(Set.of("keep","keep-recover").contains(operation)) {
+                if(operation.equals("keep-recover"))Files.deleteIfExists(tmp.resolve("fixture-terminated"));
                 ObjectNode identity=WindowsFiles.JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,request.path(key));ack.set("identity",identity);ack.putObject("keeper").put("attempt",request.path("keeperAttempt").asText());
                 client.put("corePid",Long.parseLong(args[5])).put("coreStarted",Long.parseLong(args[6])).put("clientPid",ProcessHandle.current().pid()).put("clientStarted",ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli());WindowsFiles.write(Path.of(prefix+".client.json"),client);WindowsFiles.write(Path.of(prefix+".state.json"),client);
             } else if(Set.of("daemon-prepare","daemon-recover").contains(operation)) {
@@ -230,9 +315,9 @@ class PrepareIntegrationTest {
             } else if(operation.equals("load")){System.in.transferTo(OutputStream.nullOutputStream());ack=WindowsFiles.JSON.createObjectNode().put("Id","sha256:"+"c".repeat(64)).put("Os","linux").put("Architecture","amd64");}
             else if(operation.equals("create"))ack=WindowsFiles.JSON.createObjectNode().put("id","f".repeat(64));
             else if(operation.equals("remove"))ack=WindowsFiles.JSON.createObjectNode().put("removed",request.path("id").asText());
-            else if(operation.equals("release")) {ack=WindowsFiles.JSON.createObjectNode().put("closed",true).put("actors",0).put("containers",0);ObjectNode identity=WindowsFiles.JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,request.path(key));ack.set("identity",identity);ack.set("keeper",WindowsFiles.json(tmp.resolve("keeper.json")).path("guest").path("keeper").deepCopy());}
+            else if(Set.of("release","release-recover").contains(operation)) {ack=WindowsFiles.JSON.createObjectNode().put("closed",true).put("actors",0).put("containers",0);ObjectNode identity=WindowsFiles.JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,request.path(key));ack.set("identity",identity);ack.set("keeper",WindowsFiles.json(tmp.resolve("keeper.json")).path("guest").path("keeper").deepCopy());}
             ObjectNode event=WindowsFiles.JSON.createObjectNode().put("operation",operation);event.set("request",request);event.set("owner",owner);event.set("ack",ack);Files.writeString(tmp.resolve("fixture-events"),event+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);
-            System.out.println(ack);System.out.flush();if(operation.equals("keep")){System.in.transferTo(OutputStream.nullOutputStream());Files.writeString(tmp.resolve("fixture-eof-ms"),Long.toString(System.currentTimeMillis()));}
+            System.out.println(ack);System.out.flush();if(Set.of("keep","keep-recover").contains(operation)){System.in.transferTo(OutputStream.nullOutputStream());Files.writeString(tmp.resolve("fixture-eof-ms"),Long.toString(System.currentTimeMillis()));}
             ObjectNode proof=WindowsFiles.JSON.createObjectNode().put("schema",1).put("phase","drain-empty").put("childKnown",true).put("childExit",exit).put("plannedGuardExit",exit).put("jobEmpty",true);proof.set("client",client.deepCopy());
             if(Set.of("daemon-prepare","daemon-recover").contains(operation)) {
                 if(mode.equals("mismatch-completion"))((ObjectNode)proof.path("client")).put("pid",1);

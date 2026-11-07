@@ -41,7 +41,7 @@ final class WindowsKeeper {
             try{request=input.join();}catch(CompletionException error){throw new IOException("keeper終了入力が失敗しました",error.getCause());}
             if(!request.path("operation").asText().equals("release")||!request.path("attempt").asText().equals(controller.attempt()))throw new IOException("keeperの正式releaseではありません");
             Instant deadline;try{deadline=Instant.parse(request.path("deadline").asText());}catch(RuntimeException error){throw new IOException("keeper release期限が不正です",error);}
-            long remaining=Math.max(0,Duration.between(Instant.now(),deadline).toNanos());if(remaining<=0||remaining>Duration.ofSeconds(6).toNanos())throw new IOException("keeper release残予算が不正です");
+            long remaining=Math.max(0,Duration.between(Instant.now(),deadline).toNanos());if(remaining<=0||remaining>Duration.ofSeconds(controller.recovery()?15:6).toNanos())throw new IOException("keeper release残予算が不正です");
             // coreから渡る期限は停止・照合・保存を含む本体期限。core側に終了受取/abort枠がある。
             releaseEnd=System.nanoTime()+remaining;
             HelperProtocol.Command release=new HelperProtocol.Command(runtime.command.root(),runtime.command.lease(),"release",List.of());
