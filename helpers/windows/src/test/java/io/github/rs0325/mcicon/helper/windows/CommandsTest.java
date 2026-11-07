@@ -19,6 +19,11 @@ class CommandsTest {
         List<String> paths=new ArrayList<>();for(Class<?> type:List.of(NativeFixture.class,WindowsFiles.class,com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class))paths.add(Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()).toString());classpath=String.join(java.io.File.pathSeparator,paths);
         Files.writeString(guard,"#!/bin/sh\nexec '"+javaExecutable.replace("'","'\\''")+"' -cp '"+classpath.replace("'","'\\''")+"' "+NativeFixture.class.getName()+" \"$@\"\n");assertTrue(guard.toFile().setExecutable(true,true));return new Commands(guard,root,Map.of(),Long.MAX_VALUE);
     }
+    @Test void 通常のguest非zero終了でも安全な例外分類をローカルへ保存する() throws Exception {
+        Commands commands=commands();var keeper=WindowsFiles.JSON.createObjectNode().put("state","ready");keeper.putObject("client").put("clientPid",1).put("clientStarted",1);commands.keeper(keeper);
+        assertEquals(23,commands.request(List.of("/fixture-guest-timeout"),"{}".getBytes(StandardCharsets.UTF_8),null,Duration.ofSeconds(3)).exit());
+        try(var files=Files.list(temporary)){var saved=WindowsFiles.json(files.filter(path->path.toString().endsWith(".diagnostic.json")).findFirst().orElseThrow());assertEquals("TimeoutExpired",saved.path("guestFailureType").asText());assertTrue(saved.path("guestTimeout").asBoolean());assertFalse(saved.toString().contains("private"));assertFalse(saved.toString().contains("secret"));}
+    }
     @Test void 元残予算に回収枠が無ければ初回captureもspawnしない() throws Exception {
         Commands commands=commands();long original=System.nanoTime()+Duration.ofMillis(100).toNanos();commands.end(original);
         assertEquals(original,commands.end());assertThrows(IOException.class,()->commands.capture(List.of("/fixture-facts"),Duration.ofSeconds(3)));assertEquals(original,commands.end());

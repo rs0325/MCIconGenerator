@@ -41,8 +41,11 @@ def digest(path):
 def output(value):
     sys.stdout.write(json.dumps(value, ensure_ascii=False, separators=(',', ':')) + '\n'); sys.stdout.flush()
 
-def docker(args, binary=False):
-    value = subprocess.run(DOCKER + args, stdin=subprocess.DEVNULL, capture_output=True, timeout=8)
+def docker(args, binary=False, timeout=8, end=None):
+    if end is not None: timeout = min(timeout, end - time.monotonic())
+    if timeout <= 0: raise subprocess.TimeoutExpired(DOCKER[:1], timeout)
+    value = subprocess.run(DOCKER + args, stdin=subprocess.DEVNULL, capture_output=True, timeout=timeout)
+    if end is not None and time.monotonic() >= end: raise subprocess.TimeoutExpired(DOCKER[:1], timeout)
     require(value.returncode == 0, '固定daemon操作失敗')
     return value.stdout if binary else value.stdout.decode('utf-8').strip()
 
@@ -120,7 +123,7 @@ def ensure_delegation():
         require(cgroup_view(directory) == before and set(cgroup_read(directory, 'cgroup.subtree_control').split()) == required, 'cgroup供給readback不一致')
     finally: os.close(directory)
 
-def daemon(owner, restart_allowed, allow_start=True):
+def daemon(owner, restart_allowed, allow_start=True, end=None):
     ROOT.mkdir(mode=0o700, exist_ok=True)
     pidfile = ROOT / 'daemon.json'
     label = 'io.github.rs0325.mcicon.generation=' + owner['generationOwner']
@@ -129,7 +132,7 @@ def daemon(owner, restart_allowed, allow_start=True):
         reject(record['generation'] == owner['generationOwner'], 'OWNERSHIP_MISMATCH', 'daemon世代不一致')
         if record['boot'] == BOOT.read_text().strip():
             if process_start(record['pid']) == record['started']:
-                reject(label in json.loads(docker(['info', '--format', '{{json .Labels}}'])), 'OWNERSHIP_MISMATCH', 'daemon label不一致'); return record
+                reject(label in json.loads(docker(['info', '--format', '{{json .Labels}}'], end=end)), 'OWNERSHIP_MISMATCH', 'daemon label不一致'); return record
             reject(restart_allowed, 'DAEMON_RESTART_DENIED', '停止receiptのないdaemon消失またはPID再使用')
     reject(allow_start, 'DAEMON_PREPARATION_UNKNOWN', '回復中のdaemon新生成拒否')
     ensure_delegation()
@@ -143,7 +146,7 @@ def daemon(owner, restart_allowed, allow_start=True):
     while time.monotonic() < end:
         require(child.poll() is None, 'daemon開始失敗')
         try:
-            if label in json.loads(docker(['info', '--format', '{{json .Labels}}'])): return record
+            if label in json.loads(docker(['info', '--format', '{{json .Labels}}'], end=end)): return record
         except (RuntimeError, subprocess.TimeoutExpired): pass
         time.sleep(.1)
     raise RuntimeError('daemon開始期限超過')
@@ -194,12 +197,12 @@ def job_directory(request):
 
 def identity(request): return {key: request[key] for key in ['jobId', 'ownerId', 'descriptorSha256']}
 
-def owned(request, fullid):
+def owned(request, fullid, end=None):
     require(len(fullid) == 64 and all(c in '0123456789abcdef' for c in fullid), 'full ID不明')
-    ids = docker(['container', 'ls', '--all', '--quiet', '--no-trunc', '--filter', 'id=' + fullid]).splitlines()
+    ids = docker(['container', 'ls', '--all', '--quiet', '--no-trunc', '--filter', 'id=' + fullid], end=end).splitlines()
     if not ids: return None
     require(ids == [fullid], 'full ID一覧不一致')
-    value = json.loads(docker(['container', 'inspect', fullid, '--format', '{{json .}}']))
+    value = json.loads(docker(['container', 'inspect', fullid, '--format', '{{json .}}'], end=end))
     require(value['Id'] == fullid, 'container ID不一致')
     labels = value['Config']['Labels']
     for key, val in identity(request).items(): require(labels.get('io.github.rs0325.mcicon.' + key) == val, 'container所有label不一致')
@@ -242,6 +245,7 @@ def wait_keeper(request):
     return 0
 
 def main(request):
+    create_end = time.monotonic() + min(30, request['timeoutSeconds']) if request['operation'] == 'create' else None
     operation = request['operation']; ROOT.mkdir(mode=0o700, exist_ok=True)
     with (ROOT / 'lifecycle.lock').open('a+b') as lifecycle:
         fcntl.flock(lifecycle, fcntl.LOCK_EX)
@@ -282,7 +286,7 @@ def main(request):
                 output(proof); return
             except BridgeFailure: raise
             except Exception as failure: raise BridgeFailure('DAEMON_PREPARATION_UNKNOWN', 'daemon準備未確定') from failure
-        if operation not in ['release', 'release-recover']: daemon(owner, False, False)
+        if operation not in ['release', 'release-recover']: daemon(owner, False, False, create_end - 3) if create_end is not None else daemon(owner, False, False)
         if operation == 'load':
             child = subprocess.run(DOCKER + ['image', 'load'], stdin=0, stdout=sys.stderr, stderr=sys.stderr, timeout=request['timeoutSeconds'])
             require(child.returncode == 0, 'image load失敗'); output(json.loads(docker(['image', 'inspect', request['imageId'], '--format', '{{json .}}']))); return
@@ -353,8 +357,12 @@ def main(request):
                 require(not any(item['name'] == name for item in record['containers']), 'name重複')
                 # daemon受理前にintentを保存し、曖昧なcreateは自動再実行しない。
                 record['pendingCreate'] = name; write(record_path, record)
-                fullid = docker(args); value = owned(request, fullid); require(value is not None and value['Name'] == '/' + name, 'create所有不一致')
-                record['containers'].append({'name': name, 'id': fullid}); del record['pendingCreate']; write(record_path, record); output({'id': fullid}); return
+                # 所有確認2秒、記録保存と応答1秒をcreateとは別に残す。
+                fullid = docker(args, timeout=30, end=create_end - 3); value = owned(request, fullid, create_end - 1); require(value is not None and value['Name'] == '/' + name, 'create所有不一致')
+                if time.monotonic() >= create_end - 1: raise subprocess.TimeoutExpired(DOCKER[:1], 0)
+                record['containers'].append({'name': name, 'id': fullid}); del record['pendingCreate']; write(record_path, record)
+                if time.monotonic() >= create_end: raise subprocess.TimeoutExpired(DOCKER[:1], 0)
+                output({'id': fullid}); return
             if operation == 'start':
                 require('pendingCreate' not in record, '未確定createあり'); fullid = request['id']; require(any(item['id'] == fullid for item in record['containers']), '未登録container')
                 require(owned(request, fullid) is not None, 'container所有未確認')
@@ -383,6 +391,10 @@ def cli():
         sys.exit(0 if result is None else result)
     except Exception as failure:
         reason = failure.reason if isinstance(failure, BridgeFailure) else 'GUEST_OPERATION_FAILED'
+        kind = type(failure).__name__ if type(failure).__module__ in ['builtins', 'subprocess', __name__] else 'Exception'
+        cause = failure
+        while cause.__cause__ is not None: cause = cause.__cause__
+        print('MCICON_GUEST_FAILURE=' + kind + ' timeout=' + str(isinstance(cause, subprocess.TimeoutExpired)).lower(), file=sys.stderr)
         print('MCICON_GUEST_REASON=' + reason, file=sys.stderr); sys.exit(1)
 
 if __name__ == '__main__': cli()

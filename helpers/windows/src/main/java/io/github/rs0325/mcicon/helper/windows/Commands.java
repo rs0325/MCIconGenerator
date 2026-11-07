@@ -57,6 +57,7 @@ final class Commands {
                     if(writerFailure.get()!=null&&writerFailure.get()!=error)error=merge(error,writerFailure.get());
                 }
             }
+            if(error==null&&result!=null&&result.exit()!=0){ObjectNode summary=WindowsFiles.JSON.createObjectNode().put("nativeExit",result.exit());outputSummary(out,err,target==null?1024*1024:64L*1024*1024,summary);try{WindowsFiles.write(Path.of(prefix+".diagnostic.json"),summary);}catch(IOException failure){diagnosticSaved=false;error=failure;}}
             if(error!=null) {
                 String kind=Thread.currentThread().isInterrupted()?"INTERRUPTED":error.getMessage()!=null&&(error.getMessage().contains("timeout")||error.getMessage().contains("期限"))?"TIMEOUT":"IO_FAILED";
                 ObjectNode summary=WindowsFiles.JSON.createObjectNode().put("inputFailure",writerFailure.get()!=null?"INPUT_IO_FAILED":"NONE").put("executionFailure",kind).put("reclaimed",reclaimed).put("terminal","unknown").put("jobEmpty",false);
@@ -88,6 +89,7 @@ final class Commands {
             summary.put("stderrBytes",size).put("stderrTruncated",size>8192).put("stderrLimitBytes",1024*1024).put("stderrLimitExceeded",size>1024*1024).put("outputLimitExceeded",summary.path("outputLimitExceeded").asBoolean()||size>1024*1024);
             String first=new String(head.array(),0,head.position(),StandardCharsets.UTF_8),last=new String(tail.array(),0,tail.position(),StandardCharsets.UTF_8);StringBuilder safe=new StringBuilder();
             for(String line:last.split("\\R"))if(line.matches("MCICON_GUEST_REASON=(DAEMON_RESTART_DENIED|OWNERSHIP_MISMATCH|DAEMON_PREPARATION_UNKNOWN|GUEST_OPERATION_FAILED)")||line.matches("nativeJob phase=(child-signalled|drain-empty|drain-expired|terminated|termination-unknown|command-empty) childExit=[0-9]{1,10} active=(?:[0-9]{1,10},?){0,16} queries=[0-9]{1,10}"))safe.append(line).append('\n');
+            for(String line:last.split("\\R"))if(line.matches("MCICON_GUEST_FAILURE=[A-Za-z][A-Za-z0-9_]{0,63} timeout=(true|false)")){safe.append(line).append('\n');summary.put("guestFailureType",line.substring(21,line.indexOf(' '))).put("guestTimeout",line.endsWith("=true"));}
             for(String line:(first+"\n"+last).split("\\R"))if(line.matches("MCICON_GUEST_REASON=(DAEMON_RESTART_DENIED|OWNERSHIP_MISMATCH|DAEMON_PREPARATION_UNKNOWN|GUEST_OPERATION_FAILED)"))summary.put("guestReason",line.substring("MCICON_GUEST_REASON=".length()));
             summary.put("stderr",safe.toString());
         }

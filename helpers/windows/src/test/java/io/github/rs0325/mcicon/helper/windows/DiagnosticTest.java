@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DiagnosticTest {
     @TempDir Path temporary;
+    @Test void guest例外分類とtimeoutだけを残しpathと例外本文を除く() throws Exception {
+        Path file=temporary.resolve("stderr.bin");Files.writeString(file,"secret C:/private/token\nMCICON_GUEST_FAILURE=TimeoutExpired timeout=true\nMCICON_GUEST_REASON=GUEST_OPERATION_FAILED\nMCICON_GUEST_FAILURE=C:/secret timeout=false\n");
+        var summary=WindowsFiles.JSON.createObjectNode();Commands.stderrSummary(file,summary);assertEquals("TimeoutExpired",summary.path("guestFailureType").asText());assertTrue(summary.path("guestTimeout").asBoolean());assertFalse(summary.toString().contains("private"));assertFalse(summary.toString().contains("secret"));
+    }
     @Test void stdout読取不能でもstderrの固定reasonを失わない() throws Exception {
         Path err=temporary.resolve("stderr.bin");Files.writeString(err,"MCICON_GUEST_REASON=DAEMON_PREPARATION_UNKNOWN\n");var summary=WindowsFiles.JSON.createObjectNode();Commands.outputSummary(temporary.resolve("absent"),err,1024*1024,summary);assertTrue(summary.path("stdoutUnknown").asBoolean());assertEquals("DAEMON_PREPARATION_UNKNOWN",summary.path("guestReason").asText());assertFalse(summary.has("stderrUnknown"));
     }
