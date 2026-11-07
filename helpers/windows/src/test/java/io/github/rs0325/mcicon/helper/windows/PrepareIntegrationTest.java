@@ -173,7 +173,7 @@ class PrepareIntegrationTest {
     }
     @Test void 実keeperのEOF後停止照合保存を短い本体期限と予約枠近傍で通す() throws Exception {
         for(int trial=0;trial<4;trial++) {
-            PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Files.createDirectory(root.resolve("release-"+trial));fixture.setup();fixture.mode("release-tail");
+            PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Files.createDirectory(root.resolve("release-"+trial));fixture.setup();fixture.mode("release-tail");assertFalse(Files.exists(fixture.tmp.resolve("fixture-eof-ms")));assertFalse(Files.exists(fixture.tmp.resolve("fixture-terminated")));
             WindowsRuntime keep=fixture.runtime("keep");WindowsKeeper keeper=allocate(WindowsKeeper.class);set(keeper,"runtime",keep);
             ProcessHandle parent=ProcessHandle.current().parent().orElseThrow();set(keeper,"controller",new HelperProtocol.Keeper(parent.pid(),parent.info().startInstant().orElseThrow().toEpochMilli(),fixture.attempt,Instant.now().plusSeconds(20),false));
             Method start=WindowsKeeper.class.getDeclaredMethod("start");start.setAccessible(true);Commands.Running child=null;long elapsed=0;int budget=trial==3?2500:6000;boolean success=false;
@@ -183,7 +183,7 @@ class PrepareIntegrationTest {
                 if(trial==3){assertThrows(IOException.class,()->cleanup.release(keeper,false));assertFalse(cleanup.lease.read().path("resources").isEmpty());}
                 else {cleanup.release(keeper,false);assertTrue(cleanup.lease.read().path("resources").isEmpty());assertEquals("closed",keeper.value().path("state").asText());assertTrue(keeper.value().path("stopConfirmed").asBoolean());assertTrue(keeper.value().path("jobEmpty").asBoolean());assertFalse(child.process().isAlive());success=true;}
                 elapsed=Duration.ofNanos(System.nanoTime()-began).toMillis();assertTrue(elapsed<budget);
-                var timing=WindowsFiles.JSON.createObjectNode().put("budgetMs",budget).put("releaseMs",elapsed).put("success",success);Path eof=fixture.tmp.resolve("fixture-eof-ms");if(Files.exists(eof))timing.put("afterEofMs",System.currentTimeMillis()-Long.parseLong(Files.readString(eof)));System.out.println("RELEASE_TIMING="+timing);
+                var timing=WindowsFiles.JSON.createObjectNode().put("budgetMs",budget).put("releaseMs",elapsed).put("success",success);Path eof=fixture.tmp.resolve("fixture-eof-ms");if(Files.exists(eof)){long after=System.currentTimeMillis()-Long.parseLong(Files.readString(eof));timing.put("afterEofMs",after);if(success)assertTrue(after>=2600&&after<3000,"EOF後の予約3秒内で停止・保存を完了する");}System.out.println("RELEASE_TIMING="+timing);
             } finally {
                 if(child==null){Field field=WindowsKeeper.class.getDeclaredField("child");field.setAccessible(true);child=(Commands.Running)field.get(keeper);}
                 if(child!=null){child.process().getOutputStream().close();assertTrue(child.process().waitFor(10,java.util.concurrent.TimeUnit.SECONDS));}
@@ -191,9 +191,13 @@ class PrepareIntegrationTest {
         }
     }
     public static class Guest {
+        private static void save(Path file,String value) throws IOException {
+            Path temporary=Files.createTempFile(file.getParent(),"fixture-",".json");try{Files.writeString(temporary,value);Files.move(temporary,file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}finally{Files.deleteIfExists(temporary);}
+        }
         public static void main(String[] args) throws Exception {
             Path prefix=Path.of(args[3]),tmp=prefix.getParent();ProcessHandle process=System.getenv("MCICON_FIXTURE_CMD")!=null?ProcessHandle.current().parent().orElseThrow():ProcessHandle.current();
-            ObjectNode client=WindowsFiles.JSON.createObjectNode().put("pid",process.pid()).put("started",process.info().startInstant().orElseThrow().toEpochMilli()).put("parent",Long.parseLong(args[1])).put("parentStarted",Long.parseLong(args[2])).put("boot",OwnershipTest.BOOT);WindowsFiles.write(Path.of(prefix+".state.json"),client);
+            // 固定receiptはObjectMapperを起動せずに原子的に保存する。
+            String state="{\"pid\":"+process.pid()+",\"started\":"+process.info().startInstant().orElseThrow().toEpochMilli()+",\"parent\":"+Long.parseLong(args[1])+",\"parentStarted\":"+Long.parseLong(args[2])+",\"boot\":\""+OwnershipTest.BOOT+"\"}";save(Path.of(prefix+".state.json"),state);
             if(args[0].equals("exec")) {
                 List<String> command=Arrays.asList(args).subList(5,args.length);
                 if(Files.readString(tmp.resolve("fixture-mode")).equals("release-tail")&&Files.exists(tmp.resolve("fixture-eof-ms"))) {
@@ -207,8 +211,9 @@ class PrepareIntegrationTest {
                         System.out.println("MCIcon-"+lease.path("descriptorSha256").asText().substring(0,24));
                     }
                 } else System.out.write(Files.readAllBytes(tmp.resolve("fixture-facts.json")));
-                WindowsFiles.write(Path.of(prefix+".done.json"),client);return;
+                save(Path.of(prefix+".done.json"),state);return;
             }
+            ObjectNode client=(ObjectNode)WindowsFiles.JSON.readTree(state);
             ObjectNode request=(ObjectNode)WindowsFiles.JSON.readTree(new BufferedReader(new InputStreamReader(System.in)).readLine());String operation=request.path("operation").asText(),mode=Files.readString(tmp.resolve("fixture-mode"));
             Path root=tmp.getParent().getParent().getParent();ObjectNode owner=(ObjectNode)WindowsFiles.json(root.resolve("windows").resolve(request.path("descriptorSha256").asText()).resolve("owner.json"));
             ObjectNode ack=WindowsFiles.JSON.createObjectNode().put("abi",1).put("boot",OwnershipTest.BOOT).put("memoryBytes",16L*1024*1024*1024);ack.set("marker",request.path("marker"));ack.set("bridgeSha256",request.path("bridgeSha256"));
