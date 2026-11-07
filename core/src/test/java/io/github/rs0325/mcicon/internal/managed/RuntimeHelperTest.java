@@ -27,13 +27,13 @@ class RuntimeHelperTest {
             var state=RuntimeDescriptor.JSON.createObjectNode().put("parent",11).put("parentStarted",22).put("pid",33).put("started",44).put("boot",boot);var client=state.deepCopy().put("corePid",owner.path("pid").asLong()).put("coreStarted",0).put("clientPid",55).put("clientStarted",66);
             List<String> guest=List.of(directory.resolve("System32/wsl.exe").toString(),"--distribution","MCIcon-"+descriptor.digest().substring(0,24),"--user","root","--exec","/usr/bin/python3","/usr/lib/mcicon/guestbridge.py");
             var intent=RuntimeDescriptor.JSON.createObjectNode().put("parent",11).put("started",22).put("native",directory.resolve("app/support/windows-host.exe").toString()).put("argvSha256",io.github.rs0325.mcicon.internal.FilesSupport.hash(RuntimeDescriptor.JSON.writeValueAsBytes(guest)));
-            Files.writeString(exe,"#!/usr/bin/python3\nimport sys,json,pathlib\na=sys.argv\nassert a[7]=='keep' and a[a.index('--recovery')+1]=='true'\npathlib.Path('"+called+"').write_text('keep-recover')\nprint(json.dumps({'state':'ready','attempt':a[a.index('--attempt')+1],'controllerPid':int(a[a.index('--controller')+1]),'controllerStarted':int(a[a.index('--controller')+2])}),flush=True)\nr=json.loads(sys.stdin.readline());assert r['operation']=='release';assert sys.stdin.read()==''\nprint('{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}',flush=True)\n");assertTrue(exe.toFile().setExecutable(true));
+            Files.writeString(exe,"#!/usr/bin/python3\nimport sys,json,pathlib,time,datetime\na=sys.argv\ntime.sleep(1.2)\nassert a[7]=='keep' and a[a.index('--recovery')+1]=='true'\npathlib.Path('"+called+"').write_text('keep-recover')\nprint(json.dumps({'state':'ready','attempt':a[a.index('--attempt')+1],'controllerPid':int(a[a.index('--controller')+1]),'controllerStarted':int(a[a.index('--controller')+2])}),flush=True)\nr=json.loads(sys.stdin.readline());assert r['operation']=='release';assert sys.stdin.read()==''\ntime.sleep(max(0,(datetime.datetime.strptime(r['deadline'][:19],'%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp()+float('0'+r['deadline'][19:-1]))-time.time()-0.1))\nprint('{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}',flush=True)\n");assertTrue(exe.toFile().setExecutable(true));
             switch(mutation) {case "client"->client.put("coreStarted",9);case "identity"->identity.put("ownerId",UUID.randomUUID().toString());case "controller"->prior.put("controllerPid",999);case "boot"->prior.put("boot",UUID.randomUUID().toString());case "intent"->intent.put("argvSha256","0".repeat(64));case "operation"->journal.put("operation","import");case "recovery"->prior.put("recovery",true);default->{}}
             Files.write(tmp.resolve("windows-operation.json"),RuntimeDescriptor.JSON.writeValueAsBytes(journal));Files.write(tmp.resolve("keeper.json"),RuntimeDescriptor.JSON.writeValueAsBytes(prior));Files.write(tmp.resolve("keeper-"+attempt+".json"),RuntimeDescriptor.JSON.writeValueAsBytes(mutation.equals("attempt")?RuntimeDescriptor.JSON.createObjectNode():prior));
             for(var entry:Map.of("intent",intent,"state",state,"client",client,"done",state).entrySet())if(!mutation.equals("done")||!entry.getKey().equals("done"))Files.write(Path.of(prefix+"."+entry.getKey()+".json"),RuntimeDescriptor.JSON.writeValueAsBytes(entry.getValue()));
             try(var lease=RuntimeLease.tryRecovery(store,descriptor,job)) {
                 assertNotNull(lease);RuntimeHelper helper=new RuntimeHelper(exe,store.root(),lease,Map.of("SystemRoot",directory.toString()),true);
-                if(mutation.equals("valid")){assertTrue(helper.control("release",Duration.ofSeconds(5),new CancellationToken()).ok());assertEquals("keep-recover",Files.readString(called));}
+                if(mutation.equals("valid")){assertTrue(helper.control("release",Duration.ofSeconds(18),new CancellationToken()).ok());assertEquals("keep-recover",Files.readString(called));}
                 else {assertThrows(IOException.class,()->helper.control("release",Duration.ofSeconds(5),new CancellationToken()),mutation);assertFalse(Files.exists(called),mutation);assertEquals("active",lease.read().path("state").asText());}
             }
         }
@@ -44,6 +44,33 @@ class RuntimeHelperTest {
         var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(5),(u,o,t)->{throw new AssertionError();});Path exe=root.resolve("must-not-start"),called=root.resolve("called");
         Files.writeString(exe,"#!/bin/sh\ntouch '"+called+"'\n");assertTrue(exe.toFile().setExecutable(true));
         try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())){RuntimeHelper helper=new RuntimeHelper(exe,store.root(),lease,Map.of(),true);assertThrows(IOException.class,()->helper.keep(Duration.ZERO,new CancellationToken(),true));assertFalse(Files.exists(called));assertEquals("active",lease.read().path("state").asText());}
+    }
+    @Test void keeperの本体期限直前の正常終了を受け取り真の超過だけ失敗する() throws Exception {
+        for(String mode:List.of("normal","late","cancel","empty")) {
+            Path directory=Files.createDirectory(root.resolve(mode)).toRealPath();var store=new RuntimeStore(directory,true,new CancellationToken(),Duration.ofSeconds(20),(u,o,t)->{throw new AssertionError();});
+            try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
+                Path output=directory.resolve("keeper.stdout");Files.writeString(output,"{}\n");
+                List<String> paths=new ArrayList<>();for(Class<?> type:List.of(BudgetKeeper.class,RuntimeDescriptor.class,com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class))paths.add(Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()).toString());
+                Process child=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",String.join(java.io.File.pathSeparator,paths),BudgetKeeper.class.getName(),mode).redirectOutput(ProcessBuilder.Redirect.appendTo(output.toFile())).redirectError(directory.resolve("keeper.stderr").toFile()).start();
+                RuntimeHelper helper=new RuntimeHelper(directory.resolve("unused"),directory,lease,Map.of(),true);
+                for(var entry:Map.<String,Object>of("keeper",child,"keeperReady",true,"keeperAttempt","fixture","keeperOutput",output).entrySet()){var field=RuntimeHelper.class.getDeclaredField(entry.getKey());field.setAccessible(true);field.set(helper,entry.getValue());}
+                CancellationToken token=new CancellationToken();if(mode.equals("cancel"))token.cancel();long started=System.nanoTime();
+                try {
+                    if(mode.equals("normal")){assertTrue(helper.control("release",Duration.ofSeconds(9),token).ok());assertEquals("released",RuntimeDescriptor.read(Files.readAllBytes(lease.file())).path("state").asText());}
+                    else {assertThrows(Exception.class,()->helper.control("release",mode.equals("empty")?Duration.ZERO:Duration.ofSeconds(9),token));assertEquals("active",lease.read().path("state").asText());}
+                    assertFalse(child.isAlive());assertTrue(System.nanoTime()-started<Duration.ofSeconds(10).toNanos());
+                }finally{if(child.isAlive())child.destroyForcibly();assertTrue(child.waitFor(2,java.util.concurrent.TimeUnit.SECONDS));}
+            }
+        }
+    }
+    public static class BudgetKeeper {
+        public static void main(String[] arguments) throws Exception {
+            var input=new java.io.BufferedReader(new java.io.InputStreamReader(System.in));String line=input.readLine();if(line==null)return;
+            var request=RuntimeDescriptor.read(line.getBytes(java.nio.charset.StandardCharsets.UTF_8));assert input.readLine()==null;
+            java.time.Instant deadline=java.time.Instant.parse(request.path("deadline").asText());long left=Duration.between(java.time.Instant.now(),deadline).toMillis();
+            if(arguments[0].equals("normal"))Thread.sleep(Math.max(0,left-100));else Thread.sleep(30000);
+            System.out.println("{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}");
+        }
     }
     @Test void writerFailureAtCompletionCannotCrossTheSuccessGate() throws Exception {
         var failure=new java.util.concurrent.atomic.AtomicReference<IOException>();IOException expected=new IOException("writer fixture");

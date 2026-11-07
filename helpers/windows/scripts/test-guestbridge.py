@@ -10,7 +10,7 @@ REAL_DAEMON = bridge.daemon
 class FenceTest(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(); self.root = pathlib.Path(self.temporary.name).resolve()
-        self.request = {'abi': 1, 'operation': 'release', 'jobId': str(uuid.uuid4()), 'ownerId': str(uuid.uuid4()), 'descriptorSha256': 'a' * 64, 'marker': {'generationOwner': str(uuid.uuid4())}, 'restartAllowed': False}
+        self.request = {'abi': 1, 'operation': 'release', 'jobId': str(uuid.uuid4()), 'ownerId': str(uuid.uuid4()), 'descriptorSha256': 'a' * 64, 'marker': {'generationOwner': str(uuid.uuid4())}, 'restartAllowed': False, 'timeoutSeconds': 60}
         (self.root / "boot").write_text("fixture-boot")
         self.patches = [patch.object(bridge, "BOOT", self.root / "boot"), patch.object(bridge, 'ROOT', self.root / 'state'), patch.object(bridge, 'CGROUP', self.root / 'cgroup'), patch.object(bridge, 'marker', return_value=self.request['marker']), patch.object(bridge, 'daemon')]
         for item in self.patches: item.start()
@@ -45,6 +45,76 @@ class FenceTest(unittest.TestCase):
         docker.assert_not_called()
         current = bridge.read(self.path / 'fence.json')
         self.assertTrue(current['closed']); self.assertEqual(current['pendingCreate'], self.record['pendingCreate'])
+
+class CreateBudgetTest(unittest.TestCase):
+    setUp = FenceTest.setUp
+    tearDown = FenceTest.tearDown
+    save = FenceTest.save
+    call = FenceTest.call
+    def create(self, budget):
+        self.request.update(operation='create', args=['create', '--name', 'mcicon-cpu-' + self.request['jobId']], timeoutSeconds=budget)
+        self.save()
+    def test_create_near_deadline_runs_real_daemon_ownership_and_commits_with_reserved_time(self):
+        for budget in [30, 15]:
+            with self.subTest(budget=budget): self.exercise(budget, 'normal')
+    def test_ownership_timeout_keeps_pending_and_save_overrun_keeps_only_confirmed_full_id(self):
+        for mode in ['inspect-timeout', 'save-failure', 'save-overrun']:
+            with self.subTest(mode=mode): self.exercise(30, mode)
+    def exercise(self, budget, mode):
+        self.create(budget); now = [100.0]; calls = []; fullid = 'a'*64
+        bridge.write(bridge.ROOT / 'daemon.json', {'generation':self.request['marker']['generationOwner'], 'boot':'fixture-boot','pid':777,'started':'300'})
+        original_write = bridge.write
+        def run(args, **kwargs):
+            operation = args[len(bridge.DOCKER):]; calls.append((operation, kwargs['timeout']))
+            if operation[0] == 'info': duration, result = .1, json.dumps(['io.github.rs0325.mcicon.generation='+self.request['marker']['generationOwner']])
+            elif operation[0] == 'create':
+                duration, result = budget - 3.2, fullid
+                self.assertGreater(kwargs['timeout'], 8.55)
+            elif operation[:2] == ['container', 'ls']: duration, result = .8, fullid
+            elif operation[:2] == ['container', 'inspect']:
+                duration = 1.4 if mode == 'inspect-timeout' else .8
+                labels = {'io.github.rs0325.mcicon.'+key:value for key,value in bridge.identity(self.request).items()}; labels['io.github.rs0325.mcicon.generation'] = self.request['marker']['generationOwner']
+                result = json.dumps({'Id':fullid,'Name':'/mcicon-cpu-'+self.request['jobId'],'Config':{'Labels':labels}})
+            else: self.fail(operation)
+            if duration >= kwargs['timeout']:
+                now[0] += kwargs['timeout']; raise bridge.subprocess.TimeoutExpired(args, kwargs['timeout'])
+            now[0] += duration
+            return type('Result', (), {'returncode':0, 'stdout':result.encode()})()
+        def write(path, value):
+            if path == self.path / 'fence.json' and 'pendingCreate' not in value:
+                if mode == 'save-failure': raise OSError('fixture save failure')
+                original_write(path, value); now[0] += 2 if mode == 'save-overrun' else .2
+            else: original_write(path, value)
+        output = io.StringIO()
+        with patch.object(bridge.time, 'monotonic', side_effect=lambda:now[0]), patch.object(bridge, 'daemon', side_effect=REAL_DAEMON), patch.object(bridge, 'process_start', return_value='300'), patch.object(bridge.subprocess, 'run', side_effect=run), patch.object(bridge, 'write', side_effect=write), contextlib.redirect_stdout(output):
+            if mode == 'normal': bridge.main(self.request)
+            else:
+                with self.assertRaises(OSError if mode == 'save-failure' else bridge.subprocess.TimeoutExpired): bridge.main(self.request)
+        saved = bridge.read(self.path / 'fence.json')
+        if mode in ['normal', 'save-overrun']:
+            self.assertNotIn('pendingCreate', saved); self.assertEqual(saved['containers'], [{'name':'mcicon-cpu-'+self.request['jobId'], 'id':fullid}])
+        else: self.assertIn('pendingCreate', saved); self.assertEqual(saved['containers'], [])
+        if mode == 'normal': self.assertEqual(json.loads(output.getvalue())['id'],fullid); self.assertLess(now[0],100+budget)
+        else: self.assertEqual(output.getvalue(),'')
+        self.assertLessEqual(calls[-1][1],2); self.assertEqual(len(calls),4)
+    def test_expired_create_never_checks_daemon_or_spawns_or_creates_intent(self):
+        self.create(-1)
+        with patch.object(bridge, 'daemon', side_effect=REAL_DAEMON), patch.object(bridge.subprocess, 'run') as run:
+            bridge.write(bridge.ROOT / 'daemon.json', {'generation':self.request['marker']['generationOwner'], 'boot':'fixture-boot','pid':777,'started':'300'})
+            with patch.object(bridge, 'process_start', return_value='300'):
+                with self.assertRaises(bridge.subprocess.TimeoutExpired): self.call()
+            run.assert_not_called()
+        self.assertNotIn('pendingCreate', bridge.read(self.path / 'fence.json'))
+    def test_cli_reports_safe_type_and_chained_timeout_without_arguments(self):
+        chained = bridge.BridgeFailure('DAEMON_PREPARATION_UNKNOWN', 'secret /private/token'); chained.__cause__ = bridge.subprocess.TimeoutExpired(['/private/token'], 8)
+        for failure in [bridge.subprocess.TimeoutExpired(['/private/token'], 8), ValueError('secret /private/token'), chained]:
+            error = io.StringIO()
+            with patch.object(bridge.os, 'getpgrp', return_value=1), patch.object(bridge.os, 'getpid', return_value=1), patch.object(bridge.os, 'read', return_value=b'\n'), patch.object(bridge, 'main', side_effect=failure), patch.object(bridge.json, 'loads', return_value={}), contextlib.redirect_stderr(error):
+                with self.assertRaises(SystemExit): bridge.cli()
+            self.assertIn(type(failure).__name__, error.getvalue())
+            self.assertIn('timeout=' + str(isinstance(failure, bridge.subprocess.TimeoutExpired) or failure is chained).lower(), error.getvalue())
+            self.assertNotIn('private', error.getvalue()); self.assertNotIn('secret', error.getvalue())
+
 
 class KeeperTest(unittest.TestCase):
     setUp = FenceTest.setUp
@@ -123,7 +193,7 @@ class KeeperTest(unittest.TestCase):
         record = bridge.read(self.path / 'fence.json'); record['containers'] = [{'id': fullid}]; bridge.write(self.path / 'fence.json', record)
         bridge.write(bridge.ROOT / 'daemon.json', {'generation':self.request['marker']['generationOwner'],'boot':'fixture-boot','pid':777,'started':'300'})
         removed = False
-        def docker(args):
+        def docker(args, **kwargs):
             nonlocal removed
             if args[0] == 'info': return json.dumps(['io.github.rs0325.mcicon.generation='+self.request['marker']['generationOwner']])
             if args[:2] == ['container','ls']: return '' if removed else fullid

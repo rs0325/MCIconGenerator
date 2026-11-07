@@ -39,10 +39,10 @@ public final class RuntimeHelper {
     public Result control(String operation,Duration timeout,CancellationToken token) throws IOException {
         if(!Set.of("preflight","prepare","release").contains(operation))throw new IllegalArgumentException("未対応のhelper操作です");
         if(operation.equals("release")&&keeper==null&&windows) {
-            long end=System.nanoTime()+Math.min(timeout.toNanos(),Duration.ofSeconds(9).toNanos());
-            if(!lease.read().path("resources").isEmpty()||pendingKeeper()){keep(end,token,true);return releaseKeeper(token,end);}
+            long start=System.nanoTime(),budget=Math.min(timeout.toNanos(),Duration.ofSeconds(18).toNanos()),end=start+budget;
+            if(!lease.read().path("resources").isEmpty()||pendingKeeper()){keep(start+budget/2,token,true);return releaseKeeper(token,Math.min(end,System.nanoTime()+Duration.ofSeconds(9).toNanos()));}
         }
-        if(operation.equals("release")&&keeper!=null)return releaseKeeper(token,System.nanoTime()+Duration.ofSeconds(9).toNanos());
+        if(operation.equals("release")&&keeper!=null)return releaseKeeper(token,System.nanoTime()+Math.min(timeout.toNanos(),Duration.ofSeconds(9).toNanos()));
         if(operation.equals("prepare")&&keeper!=null)keeperRequired();
         token.check();lease.read();Path log=Files.createTempFile(lease.file().getParent(),"helper-"+operation+"-",".stdout.json");
         Path error=log.resolveSibling(log.getFileName()+".stderr.log");
@@ -127,9 +127,11 @@ public final class RuntimeHelper {
     private Result releaseKeeper(CancellationToken token,long end) throws IOException {
         closing=true;Thread writer=null;java.util.concurrent.atomic.AtomicReference<IOException> writerFailure=new java.util.concurrent.atomic.AtomicReference<>();
         try {
-            keeperRequired();var request=RuntimeDescriptor.JSON.createObjectNode().put("operation","release").put("attempt",keeperAttempt).put("deadline",java.time.Instant.now().plusNanos(Math.max(0,end-System.nanoTime())).toString());
+            // helper処理6秒、正常終了の受取1秒、abort回収2秒。回復keeper開始は別枠で最大9秒。
+            token.check();long helperEnd=end-Duration.ofSeconds(3).toNanos();if(System.nanoTime()>=helperEnd)throw new IOException("keeper releaseの本体予算がありません");
+            keeperRequired();var request=RuntimeDescriptor.JSON.createObjectNode().put("operation","release").put("attempt",keeperAttempt).put("deadline",java.time.Instant.now().plusNanos(Math.max(0,helperEnd-System.nanoTime())).toString());
             writer=Thread.ofVirtual().start(()->{try(OutputStream output=keeper.getOutputStream()){output.write(RuntimeDescriptor.JSON.writeValueAsBytes(request));output.write('\n');}catch(IOException error){writerFailure.set(error);}});
-            long bodyEnd=end-Duration.ofSeconds(3).toNanos();
+            long bodyEnd=end-Duration.ofSeconds(2).toNanos();
             while(keeper.isAlive()&&System.nanoTime()<bodyEnd){token.check();if(writerFailure.get()!=null)throw writerFailure.get();if(Files.size(keeperOutput)>1024*1024)throw new IOException("keeper最終応答が上限を超えました");try{keeper.waitFor(10,TimeUnit.MILLISECONDS);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("keeper releaseが中断されました",error);}}
             if(keeper.isAlive())throw new IOException("keeper releaseの本体期限を超えました");
             joinWriter(writer,end,writerFailure);byte[] output=Files.readAllBytes(keeperOutput);int newline=-1;for(int i=0;i<output.length;i++)if(output[i]=='\n'){newline=i;break;}
@@ -143,7 +145,7 @@ public final class RuntimeHelper {
         if(keeper==null)return;
         try{keeper.getOutputStream().close();}catch(IOException error){failure.addSuppressed(error);}
         try {
-            long tail=Math.min(end,System.nanoTime()+Duration.ofSeconds(2).toNanos());
+            long tail=Math.min(end-Duration.ofMillis(250).toNanos(),System.nanoTime()+Duration.ofSeconds(2).toNanos());
             while(keeper.isAlive()&&System.nanoTime()<tail)keeper.waitFor(Math.max(1,tail-System.nanoTime()),TimeUnit.NANOSECONDS);
             if(keeper.isAlive()){keeper.destroyForcibly();while(keeper.isAlive()&&System.nanoTime()<end)keeper.waitFor(Math.max(1,end-System.nanoTime()),TimeUnit.NANOSECONDS);}
             var record=RuntimeDescriptor.JSON.createObjectNode().put("pid",keeper.pid()).put("terminated",!keeper.isAlive());

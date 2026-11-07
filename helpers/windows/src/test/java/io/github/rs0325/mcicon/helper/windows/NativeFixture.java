@@ -9,6 +9,9 @@ public final class NativeFixture {
         Path record=Path.of(args[3]);var value=WindowsFiles.JSON.createObjectNode().put("parent",Long.parseLong(args[1])).put("parentStarted",Long.parseLong(args[2])).put("pid",ProcessHandle.current().pid()).put("started",ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli()).put("boot",OwnershipTest.BOOT);
         Files.write(record.resolveSibling(record.getFileName()+".state.json"),WindowsFiles.JSON.writeValueAsBytes(value),StandardOpenOption.CREATE_NEW);
         int offset=args[0].equals("exec")?5:8;String operation=args[offset];
+        if(operation.equals("/fixture-guest-timeout")) {
+            System.in.readAllBytes();System.err.println("secret C:/private/token");System.err.println("MCICON_GUEST_FAILURE=TimeoutExpired timeout=true");System.err.println("MCICON_GUEST_REASON=GUEST_OPERATION_FAILED");WindowsFiles.write(Path.of(record+".done.json"),value);System.exit(23);
+        }
         if(operation.equals("/fixture-stdout-large")) {
             System.in.readAllBytes();System.out.write(new byte[1024*1024+1]);WindowsFiles.write(Path.of(record+".done.json"),value);return;
         }

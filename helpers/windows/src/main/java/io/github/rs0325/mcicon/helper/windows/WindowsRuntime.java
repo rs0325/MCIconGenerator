@@ -170,6 +170,7 @@ final class WindowsRuntime {
     ObjectNode identity() throws IOException {ObjectNode value=WindowsFiles.JSON.createObjectNode();JsonNode current=lease.read();for(String key:List.of("jobId","ownerId","descriptorSha256"))value.set(key,current.required(key));return value;}
     ObjectNode request(String operation,ObjectNode owner) throws IOException {
         ObjectNode value=identity().put("abi",1).put("operation",operation).put("bridgeSha256",payload.manifest.path("guestBase").path("bridgeSha256").asText()).put("memoryBytes",Math.max(8L*1024*1024*1024,(lease.read().path("requirements").path("containerMemoryMiB").asLong()*2+1024)*1024*1024)).put("timeoutSeconds",Math.max(1,commands.left(Duration.ofMinutes(3)).toSeconds()));
+        if(operation.equals("create")){long nanos=commands.left(Duration.ofMinutes(3)).toNanos()-Duration.ofSeconds(2).toNanos();if(nanos<=0)throw new IOException("createのnative回収枠を残せません");value.put("timeoutSeconds",Math.min(30,nanos/1_000_000_000.0));}
         value.put("restartAllowed",false).put("cpuProbeSha256",payload.manifest.path("guestBase").path("cpuProbeSha256").asText());value.set("marker",distribution.marker(owner));value.set("engines",payload.manifest.path("guestBase").required("engines"));return value;
     }
     List<String> guest(){return List.of(wsl.toString(),"--distribution",distribution.name,"--user","root","--exec","/usr/bin/python3","/usr/lib/mcicon/guestbridge.py");}
