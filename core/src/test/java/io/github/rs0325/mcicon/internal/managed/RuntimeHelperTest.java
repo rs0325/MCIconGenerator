@@ -72,6 +72,70 @@ class RuntimeHelperTest {
             System.out.println("{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}");
         }
     }
+    @Test void 回復開始で余った18秒枠を本体へ渡し上限を延長しない() throws Exception {
+        var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(20),(u,o,t)->{throw new AssertionError();});
+        try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
+            var value=lease.read();value.withObject("resources").put("fixture",true);Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(value));
+            RuntimeHelper helper=new RuntimeHelper(controlFixture("recovery"),store.root(),lease,fixtureEnvironment(),true);
+            long began=System.nanoTime();assertTrue(helper.control("release",Duration.ofSeconds(18),new CancellationToken()).ok());
+            long budget=Long.parseLong(Files.readString(store.root().resolve("release-budget-ms")));assertTrue(budget>9000&&budget<=15000);assertTrue(System.nanoTime()-began<Duration.ofSeconds(18).toNanos());
+        }
+    }
+    @Test void 子孫が標準出力を保持しても正常応答を失敗にせず一時ログを増やさない() throws Exception {
+        var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(20),(u,o,t)->{throw new AssertionError();});
+        try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
+            RuntimeHelper helper=new RuntimeHelper(controlFixture("retain"),store.root(),lease,fixtureEnvironment(),true);
+            for(int i=0;i<3;i++) {
+                ProcessHandle child=null;
+                try {
+                    assertTrue(helper.control("preflight",Duration.ofSeconds(4),new CancellationToken()).ok());
+                    var record=RuntimeDescriptor.read(Files.readAllBytes(store.root().resolve("retainer.json")));child=ProcessHandle.of(record.path("pid").asLong()).orElseThrow();
+                    assertTrue(child.isAlive());assertEquals(record.path("started").asLong(),child.info().startInstant().orElseThrow().toEpochMilli());
+                    Files.writeString(store.root().resolve("write-"+child.pid()),"write");Path closed=store.root().resolve("closed-"+child.pid());long end=System.nanoTime()+Duration.ofSeconds(3).toNanos();while(!Files.exists(closed)&&System.nanoTime()<end)Thread.sleep(10);assertTrue(Files.exists(closed));assertEquals("true:true",Files.readString(closed));
+                    try(var files=Files.list(lease.file().getParent())){assertEquals(0,files.filter(f->f.getFileName().toString().startsWith("helper-")).count());}
+                }finally{
+                    if(child==null&&Files.exists(store.root().resolve("retainer.json"))){long pid=RuntimeDescriptor.read(Files.readAllBytes(store.root().resolve("retainer.json"))).path("pid").asLong();child=ProcessHandle.of(pid).orElse(null);}
+                    if(child!=null){Files.writeString(store.root().resolve("release-"+child.pid()),"release");try{child.onExit().get(3,java.util.concurrent.TimeUnit.SECONDS);}finally{if(child.isAlive())child.destroyForcibly();}}
+                }
+            }
+        }
+    }
+    @Test void stdout上限超過でもstderr診断と元例外を保持する() throws Exception {
+        var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(20),(u,o,t)->{throw new AssertionError();});
+        try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
+            RuntimeHelper helper=new RuntimeHelper(controlFixture("overflow"),store.root(),lease,fixtureEnvironment(),true);
+            io.github.rs0325.mcicon.McIconException failure=assertThrows(io.github.rs0325.mcicon.McIconException.class,()->helper.control("preflight",Duration.ofSeconds(5),new CancellationToken()));assertTrue(failure.getMessage().contains("上限"));
+            try(var files=Files.list(lease.file().getParent())) {
+                List<Path> logs=files.filter(p->p.getFileName().toString().endsWith(".stdout.json")).toList();assertEquals(1,logs.size());Path log=logs.getFirst();
+                assertTrue(Files.size(log)<=1024*1024);Path error=log.resolveSibling(log.getFileName()+".stderr.log");assertTrue(Files.size(error)<=1024*1024);assertTrue(Files.readString(error).contains("fixture-stderr-before-overflow"));
+                var result=RuntimeDescriptor.read(Files.readAllBytes(log.resolveSibling(log.getFileName()+".result.json")));assertEquals(failure.getClass().getSimpleName(),result.path("failureType").asText());assertEquals(failure.getMessage(),result.path("failureDetail").asText());
+            }
+        }
+    }
+    private Map<String,String> fixtureEnvironment(){return System.getenv("SystemRoot")==null?Map.of():Map.of("SystemRoot",System.getenv("SystemRoot"));}
+    private Path controlFixture(String mode) throws Exception {
+        boolean windows=System.getProperty("os.name").startsWith("Windows");String java=Path.of(System.getProperty("java.home"),"bin",windows?"java.exe":"java").toString();List<String> paths=new ArrayList<>();
+        for(Class<?> type:List.of(ControlFixture.class,RuntimeDescriptor.class,com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class))paths.add(Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()).toString());
+        String cp=String.join(System.getProperty("path.separator"),paths);Path exe=root.resolve(windows?"control.cmd":"control");
+        Files.writeString(exe,windows?"@echo off\r\n\""+java+"\" -cp \""+cp+"\" "+ControlFixture.class.getName()+" "+mode+" %*\r\nexit /b %errorlevel%\r\n":"#!/bin/sh\nexec '"+java+"' -cp '"+cp+"' '"+ControlFixture.class.getName()+"' "+mode+" \"$@\"\n");if(!windows)assertTrue(exe.toFile().setExecutable(true));return exe;
+    }
+    public static class ControlFixture {
+        public static void main(String[] args) throws Exception {
+            if(args[0].equals("hold")){Path root=Path.of(args[1]);long end=System.nanoTime()+Duration.ofSeconds(15).toNanos();while(!Files.exists(root.resolve("write-"+ProcessHandle.current().pid()))&&!Files.exists(root.resolve("release-"+ProcessHandle.current().pid()))&&System.nanoTime()<end)Thread.sleep(10);if(Files.exists(root.resolve("write-"+ProcessHandle.current().pid()))){System.out.write(new byte[65536]);System.out.flush();boolean out=System.out.checkError();System.err.write(new byte[65536]);System.err.flush();io.github.rs0325.mcicon.internal.FilesSupport.atomicWrite(root.resolve("closed-"+ProcessHandle.current().pid()),(out+":"+System.err.checkError()).getBytes(java.nio.charset.StandardCharsets.UTF_8));}while(!Files.exists(root.resolve("release-"+ProcessHandle.current().pid()))&&System.nanoTime()<end)Thread.sleep(10);return;}
+            List<String> a=Arrays.asList(args);Path root=Path.of(a.get(a.indexOf("--root")+1));
+            if(args[0].equals("overflow")){System.err.println("fixture-stderr-before-overflow");System.err.flush();System.out.write(new byte[1024*1024+1]);System.out.flush();return;}
+            if(args[0].equals("retain")){
+                Process child=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",System.getProperty("java.class.path"),ControlFixture.class.getName(),"hold",root.toString()).inheritIO().start();
+                var record=RuntimeDescriptor.JSON.createObjectNode().put("pid",child.pid()).put("started",child.info().startInstant().orElseThrow().toEpochMilli());Files.write(root.resolve("retainer.json"),RuntimeDescriptor.JSON.writeValueAsBytes(record));
+            } else {
+                Thread.sleep(300);System.out.println(RuntimeDescriptor.JSON.createObjectNode().put("state","ready").put("attempt",a.get(a.indexOf("--attempt")+1)).put("controllerPid",Long.parseLong(a.get(a.indexOf("--controller")+1))).put("controllerStarted",Long.parseLong(a.get(a.indexOf("--controller")+2))));System.out.flush();
+                var input=new java.io.BufferedReader(new java.io.InputStreamReader(System.in));var request=RuntimeDescriptor.read(input.readLine().getBytes(java.nio.charset.StandardCharsets.UTF_8));if(input.readLine()!=null)throw new IOException("EOF不足");
+                long left=Duration.between(java.time.Instant.now(),java.time.Instant.parse(request.path("deadline").asText())).toMillis();Files.writeString(root.resolve("release-budget-ms"),Long.toString(left));
+                Path file=Path.of(a.get(a.indexOf("--lease")+1));var lease=(com.fasterxml.jackson.databind.node.ObjectNode)RuntimeDescriptor.read(Files.readAllBytes(file));lease.putObject("resources");Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(lease));
+            }
+            System.out.println("{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}");System.out.flush();
+        }
+    }
     @Test void writerFailureAtCompletionCannotCrossTheSuccessGate() throws Exception {
         var failure=new java.util.concurrent.atomic.AtomicReference<IOException>();IOException expected=new IOException("writer fixture");
         Thread writer=Thread.ofVirtual().start(()->{try{Thread.sleep(20);}catch(InterruptedException error){Thread.currentThread().interrupt();}failure.set(expected);});

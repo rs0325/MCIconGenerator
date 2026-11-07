@@ -27,7 +27,7 @@ final class WindowsRuntime {
         if(!temporary.toRealPath().equals(temporary))throw new IOException("job tmpの所有位置が不正です");
         payload=new Payload(executable.getParent().resolve("app/support"));payload.verify();
         cleanup=command.operation().equals("release")||command.operation().equals("docker")&&command.dockerArguments().getFirst().equals("rm");
-        long end=command.keeper()!=null?started+Math.max(0,Duration.between(Instant.now(),command.keeper().deadline()).toNanos()):cleanup?started+Duration.ofSeconds(9).toNanos():command.operation().equals("docker")?Long.MAX_VALUE:started+Math.max(0,Duration.between(Instant.now(),Instant.parse(lease.read().path("requirements").path("preparationDeadline").asText())).toNanos());
+        long end=command.keeper()!=null?started+Math.max(0,Duration.between(Instant.now(),command.keeper().deadline()).toNanos()):cleanup?endLimit!=Long.MAX_VALUE?endLimit:started+Duration.ofSeconds(9).toNanos():command.operation().equals("docker")?Long.MAX_VALUE:started+Math.max(0,Duration.between(Instant.now(),Instant.parse(lease.read().path("requirements").path("preparationDeadline").asText())).toNanos());
         environment=new HashMap<>();for(String key:List.of("TMP","TEMP","TMPDIR"))environment.put(key,temporary.toString());
         for(String key:List.of("SystemRoot","WINDIR")){String value=System.getenv(key);if(value!=null)environment.put(key,value);}
         String system=environment.get("SystemRoot");if(system==null||!Path.of(system).isAbsolute())throw new IOException("SystemRootが不明です");wsl=Path.of(system).resolve("System32/wsl.exe");if(!Files.isRegularFile(wsl,LinkOption.NOFOLLOW_LINKS)||!wsl.toRealPath().equals(wsl))throw new IOException("固定WSL実行物がありません");

@@ -40,24 +40,27 @@ public final class RuntimeHelper {
         if(!Set.of("preflight","prepare","release").contains(operation))throw new IllegalArgumentException("未対応のhelper操作です");
         if(operation.equals("release")&&keeper==null&&windows) {
             long start=System.nanoTime(),budget=Math.min(timeout.toNanos(),Duration.ofSeconds(18).toNanos()),end=start+budget;
-            if(!lease.read().path("resources").isEmpty()||pendingKeeper()){keep(start+budget/2,token,true);return releaseKeeper(token,Math.min(end,System.nanoTime()+Duration.ofSeconds(9).toNanos()));}
+            if(!lease.read().path("resources").isEmpty()||pendingKeeper()){keep(start+budget/2,token,true);return releaseKeeper(token,end);}
         }
         if(operation.equals("release")&&keeper!=null)return releaseKeeper(token,System.nanoTime()+Math.min(timeout.toNanos(),Duration.ofSeconds(9).toNanos()));
         if(operation.equals("prepare")&&keeper!=null)keeperRequired();
-        token.check();lease.read();Path log=Files.createTempFile(lease.file().getParent(),"helper-"+operation+"-",".stdout.json");
+        token.check();lease.read();Path log=lease.file().getParent().resolve("helper-"+operation+"-"+UUID.randomUUID()+".stdout.json");
         Path error=log.resolveSibling(log.getFileName()+".stderr.log");
+        ByteArrayOutputStream output=new ByteArrayOutputStream(),errors=new ByteArrayOutputStream();
         Process process=null;boolean succeeded=false;Throwable operationFailure=null;java.util.Optional<java.time.Instant> started=java.util.Optional.empty();
         try {
-            process=builder(prefix(operation)).redirectOutput(log.toFile()).redirectError(error.toFile()).start();
+            process=builder(prefix(operation)).start();
             started=process.info().startInstant();
             long deadline=System.nanoTime()+timeout.toNanos();
-            while(!process.waitFor(50,TimeUnit.MILLISECONDS)) {
+            while(true) {
+                drain(process,output,errors);
                 token.check();if(keeper!=null&&!closing)keeperRequired();
-                if(Files.size(log)>1024*1024)throw RuntimeDescriptor.invalid("helper応答が上限を超えています");
+                if(!process.isAlive())break;
                 if(System.nanoTime()>=deadline)throw new IOException("helper操作の期限を超えました: "+operation);
+                process.waitFor(50,TimeUnit.MILLISECONDS);
             }
-            token.check();if(Files.size(log)>1024*1024)throw RuntimeDescriptor.invalid("helper応答が上限を超えています");
-            Result result=parse(Files.readAllBytes(log),process.exitValue());lease.read();
+            drain(process,output,errors);token.check();
+            Result result=parse(output.toByteArray(),process.exitValue());lease.read();
             if(operation.equals("release")&&result.ok())lease.released();
             succeeded=result.ok();return result;
         }catch(InterruptedException failure){Thread.currentThread().interrupt();IOException interrupted=new IOException("helper操作が中断されました",failure);operationFailure=interrupted;throw interrupted;}
@@ -67,19 +70,34 @@ public final class RuntimeHelper {
             try {if(process!=null&&process.isAlive())terminate(process,log.resolveSibling(log.getFileName()+".cleanup.json"));}
             catch(IOException failure){cleanupFailure=failure;if(operationFailure!=null)operationFailure.addSuppressed(failure);else throw failure;}
             finally {
-                if(succeeded)Files.deleteIfExists(log);
-                else {
+                try {if(!succeeded) {
+                    if(process!=null)try{drain(process,output,errors);}catch(IOException|RuntimeException failure){if(operationFailure!=null)operationFailure.addSuppressed(failure);else if(cleanupFailure!=null)cleanupFailure.addSuppressed(failure);else operationFailure=failure;}
                     var record=RuntimeDescriptor.JSON.createObjectNode();record.put("operation",operation);record.put("stdout",log.getFileName().toString());record.put("stderr",error.getFileName().toString());
                     record.put("started",process!=null);record.put("directProcessTerminated",process!=null&&!process.isAlive());
                     if(process!=null){record.put("pid",process.pid());if(!process.isAlive())record.put("exitCode",process.exitValue());else record.putNull("exitCode");}
                     if(started.isPresent())record.put("processStartedAt",started.get().toString());else record.putNull("processStartedAt");
                     if(operationFailure!=null){record.put("failureType",operationFailure.getClass().getSimpleName());record.put("failureDetail",operationFailure.getMessage());}
                     if(cleanupFailure!=null)record.put("cleanupFailure",cleanupFailure.getMessage());
-                    try {FilesSupport.atomicWrite(log.resolveSibling(log.getFileName()+".result.json"),RuntimeDescriptor.JSON.writeValueAsBytes(record));}
-                    catch(IOException failure){if(operationFailure!=null)operationFailure.addSuppressed(failure);else if(cleanupFailure!=null)cleanupFailure.addSuppressed(failure);else throw failure;}
+                    try {Files.write(log,output.toByteArray(),StandardOpenOption.CREATE_NEW);Files.write(error,errors.toByteArray(),StandardOpenOption.CREATE_NEW);FilesSupport.atomicWrite(log.resolveSibling(log.getFileName()+".result.json"),RuntimeDescriptor.JSON.writeValueAsBytes(record));}
+                    catch(IOException failure){if(operationFailure!=null)operationFailure.addSuppressed(failure);else if(cleanupFailure!=null)cleanupFailure.addSuppressed(failure);else {operationFailure=failure;throw failure;}}
+                }} finally {
+                    IOException closeFailure=null;
+                    if(process!=null)for(Closeable stream:List.of(process.getInputStream(),process.getErrorStream(),process.getOutputStream()))try{stream.close();}catch(IOException failure){if(closeFailure==null)closeFailure=failure;else closeFailure.addSuppressed(failure);}
+                    if(closeFailure!=null){if(operationFailure!=null)operationFailure.addSuppressed(closeFailure);else if(cleanupFailure!=null)cleanupFailure.addSuppressed(closeFailure);else throw closeFailure;}
                 }
             }
         }
+    }
+    private static void drain(Process process,ByteArrayOutputStream output,ByteArrayOutputStream errors) throws IOException {
+        Exception failure=null;
+        try{drain(process.getInputStream(),output);}catch(IOException|RuntimeException error){failure=error;}
+        try{drain(process.getErrorStream(),errors);}catch(IOException|RuntimeException error){if(failure==null)failure=error;else failure.addSuppressed(error);}
+        if(failure instanceof IOException error)throw error;if(failure instanceof RuntimeException error)throw error;
+    }
+    /** 子孫へ診断fileのhandleを継承させず、EOFを待たずに確定応答だけを受け取る。 */
+    private static void drain(InputStream input,ByteArrayOutputStream output) throws IOException {
+        byte[] bytes=new byte[8192];int available;
+        while((available=input.available())>0){int count=input.read(bytes,0,Math.min(bytes.length,available));if(count<0)break;if(output.size()+count>1024*1024)throw RuntimeDescriptor.invalid("helper応答が上限を超えています");output.write(bytes,0,count);}
     }
     private boolean pendingKeeper() throws IOException {
         JsonNode owner=lease.read();Path tmp=lease.file().getParent().resolve("tmp"),journal=tmp.resolve("windows-operation.json");
@@ -127,7 +145,7 @@ public final class RuntimeHelper {
     private Result releaseKeeper(CancellationToken token,long end) throws IOException {
         closing=true;Thread writer=null;java.util.concurrent.atomic.AtomicReference<IOException> writerFailure=new java.util.concurrent.atomic.AtomicReference<>();
         try {
-            // helper処理6秒、正常終了の受取1秒、abort回収2秒。回復keeper開始は別枠で最大9秒。
+            // 正常終了の受取1秒とabort2秒を予約。回復時は開始で余った全体予算も本体へ渡す。
             token.check();long helperEnd=end-Duration.ofSeconds(3).toNanos();if(System.nanoTime()>=helperEnd)throw new IOException("keeper releaseの本体予算がありません");
             keeperRequired();var request=RuntimeDescriptor.JSON.createObjectNode().put("operation","release").put("attempt",keeperAttempt).put("deadline",java.time.Instant.now().plusNanos(Math.max(0,helperEnd-System.nanoTime())).toString());
             writer=Thread.ofVirtual().start(()->{try(OutputStream output=keeper.getOutputStream()){output.write(RuntimeDescriptor.JSON.writeValueAsBytes(request));output.write('\n');}catch(IOException error){writerFailure.set(error);}});
