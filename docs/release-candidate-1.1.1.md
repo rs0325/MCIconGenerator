@@ -1,5 +1,7 @@
 # 1.1.1 配布契約（段階A）
 
+> 最新の公開後U01・環境差分は[段階I追記](#stage-i-u01-20261109)を参照。
+
 > 現在の統合判定は[段階H](#stage-h-20261108)を参照。A〜Fの署名前・未着手等は当時の記録として保持し、最新の状態へ読み替えない。
 
 Refs #94 / #95 / #99。起点は2026-11-06 18:10 JSTにfetchした
@@ -68,7 +70,7 @@ B/Cは上記起点と段階A差分の確定commitをメインから受領して�
 
 B（Mac）は[固定入力と手順](mac-helper-candidate-1.1.md)を再利用。
 macOS15.8.1 arm64、JDK21.0.13+9、Python3.12.16、既存Apple toolchain、
-専用root /Users/ryuman/tmp-mcicon-111。各runで出力を分ける。
+専用root /Users/<user>/tmp-mcicon-111。各runで出力を分ける。
 
     ./gradlew :helper-macos:installDist :helper-macos:test -PreleaseVersion=1.1.1 --offline --no-daemon --rerun-tasks
     python3 helpers/macos/scripts/package-helper.py --jdk "$JDK21" --input helpers/macos/build/install/helper-macos/lib --payload "$PAYLOAD" --native helpers/macos/src/main/native --app-version 1.1.1 --output "$RUN_OUTPUT"
@@ -215,7 +217,7 @@ stable署名は64 bytes、Windowsの運用DER成功・回復DER失敗。
 返却公開鍵だけのgpgvでPGP指定fingerprintの10/10を確認し、署名必須Central監査に成功した。
 
 同一の固定coreとbootstrap JAR・resource・seedをMac専用
-`/Users/ryuman/tmp-mcicon-111-f`へ転送し、両OSで正式ManagedPackageVerifierに成功した。
+`/Users/<user>/tmp-mcicon-111-f`へ転送し、両OSで正式ManagedPackageVerifierに成功した。
 Windowsはowner=archiveと1.1.0と同じ固定security reader、Macは既存packagerで包装した。
 readerのsourceはHEAD blobと照合したLFコピーを使用し、checkoutと固定PEは変更しない。
 Macの初回包装後監査は生成Python cacheの追加を検出したが、元入力52fileのhash不変を再確認した。
@@ -297,8 +299,8 @@ stableはtoolVersion=1.1.1、sequence=2候補、minimumBootstrapProtocol=4。
 - `mcicon-central-1.1.1-r2-signing-kit.zip`、SHA-256 `bc2529d971f2e093f206376df11e840aecf20238498c6d6936873d87ec28f66d`。
 
 各隣接.sha256、SIGN-STABLE-ON-MAC.md、SIGN-CENTRAL-ON-MAC.mdを用意した。
-転送は調整役が行い、Mac展開先は `/Users/ryuman/tmp-mcicon-111-sign/stable-r2/kit` と
-`/Users/ryuman/tmp-mcicon-111-sign/central-r2/kit`。stableはHomebrew OpenSSL 3を優先し3未満で停止、
+転送は調整役が行い、Mac展開先は `/Users/<user>/tmp-mcicon-111-sign/stable-r2/kit` と
+`/Users/<user>/tmp-mcicon-111-sign/central-r2/kit`。stableはHomebrew OpenSSL 3を優先し3未満で停止、
 返送ZIPは `stable-signatures-1.1.1-r2.zip`。Centralは従来のsign-central.sh/return-central.sh方式で、
 返送ZIPは `mcicon-central-1.1.1-r2-signatures.zip`。
 **現在はstable/Central署名前で停止中。** 署名返送後の共通Java/gpgv・署名必須監査、F再生成、
@@ -314,7 +316,7 @@ host別JAR再buildは行わず、全fileとcore/worker/CLI/payload/stable/trust�
 署名入りstable/Central・両archiveの値と試験原記録は[段階E/F QA](../qa/release-payload-candidate-1.1.1-2026-11-06.json)の
 `stageEPostSignatureAndF2` と `build/111-f2/HANDOFF.md` を参照する。旧build/111-fは保全した。
 
-固定reader試験はCodex書込root外の新規C:/Users/ryuma配下へTMP・作業先・Gradle出力・reader stageを分離し、
+固定reader試験はCodex書込root外の新規C:/Users/<user>配下へTMP・作業先・Gradle出力・reader stageを分離し、
 require_escalated + run_logged.pyで実行した。42件中失敗1・error0・skip1。
 失敗method再確認は1件、失敗0・error0。 初回の期限超過を保全し、原因を負荷と断定しない。従来のACL拒否14件とは区別する。
 UpdatePreparationは19件中失敗0・error0・skip0。
@@ -323,7 +325,7 @@ UpdatePreparationは19件中失敗0・error0・skip0。
 coreは既知27件中24成功・3失敗、Smokeは固定worktree条件による4件中1errorを再確認した。
 全体成功・公開gate通過とは扱わない。外側専用試験rootはXML/log回収後に削除した。
 
-Mac作業は `/Users/ryuman/tmp-mcicon-111-f2` のみ、sudo・既存Lima/Homebrew/サービス操作なし。
+Mac作業は `/Users/<user>/tmp-mcicon-111-f2` のみ、sudo・既存Lima/Homebrew/サービス操作なし。
 観測したLima設定・既存ディレクトリ・Homebrew導入一覧は不変。
 関連プロセス一覧には並行する別担当tmp-mcicon-111-g配下のlimactl/Virtualization起動が現れたため、一覧不変は主張しない。
 他担当processを停止せず、before/afterと差分を保全した。Mac受入担当の成果物は変更していない。
@@ -383,7 +385,7 @@ Python9件成功、Javaは30件中29成功・既知WorkerArtifactTestのWindows�
 stableはtoolVersion=1.1.1、sequence=2候補、minimumBootstrapProtocol=4で公開直前latest/high-water再照合が必要。
 キットはbuild/111-e3/の `stable-signing-kit-1.1.1-r3.zip`（SHA `43fdd06cb399ddf2ece52dd92488a9be99b0bcdcdab766c4e1a7823bf42c4655`）と
 `mcicon-central-1.1.1-r3-signing-kit.zip`（SHA `7fa73ebaa755922eb918f6879c05353e66b19f0dbe1ebb7685d11f84c792c78e`）。隣接.sha256と署名手順を用意した。
-Mac展開先は `/Users/ryuman/tmp-mcicon-111-sign/stable-r3/kit` と `central-r3/kit`。
+Mac展開先は `/Users/<user>/tmp-mcicon-111-sign/stable-r3/kit` と `central-r3/kit`。
 返送名はstable-signatures-1.1.1-r3.zipとmcicon-central-1.1.1-r3-signatures.zip。
 **stable/Central署名前で停止。** 転送・実署名・公開は行わず、旧出力とMac受入担当領域を変更していない。
 次は署名返送後の原本/trust/gpgv監査、F3 bootstrap再生成、新規rootでの製品受入・全体反証。
@@ -399,7 +401,7 @@ D3のtar.xz/ZIP機械検査を全25asset監査に統合し、宣言あり7資材
 署名入りstable/Central・両archiveの値と試験原記録は[段階E/F QA](../qa/release-payload-candidate-1.1.1-2026-11-06.json)の
 `stageEPostSignatureAndF3` と `build/111-f3/HANDOFF.md` を参照する。旧build/111-fとbuild/111-f2は保全した。
 
-固定reader試験はCodex書込root外の新規C:/Users/ryuma配下へTMP・作業先・Gradle出力・reader stageを分離し、
+固定reader試験はCodex書込root外の新規C:/Users/<user>配下へTMP・作業先・Gradle出力・reader stageを分離し、
 require_escalated + run_logged.pyで実行した。42件中失敗0・error0・skip1。
 初回失敗なしのため再確認は対象なし。 今回の初回結果を保全し、前回F2の期限超過や従来のACL拒否14件と混同しない。
 UpdatePreparationは19件中失敗0・error0・skip0。
@@ -408,7 +410,7 @@ UpdatePreparationは19件中失敗0・error0・skip0。
 coreは既知27件中24成功・3失敗、Smokeは固定worktree条件による4件中1errorを再確認した。
 全体成功・公開gate通過とは扱わない。外側専用試験rootはXML/log回収後に削除した。
 
-Mac作業は `/Users/ryuman/tmp-mcicon-111-f3` のみ、sudo・既存Lima/Homebrew/サービス操作なし。
+Mac作業は `/Users/<user>/tmp-mcicon-111-f3` のみ、sudo・既存Lima/Homebrew/サービス操作なし。
 観測したLima設定・既存ディレクトリ・Homebrew導入一覧は不変。
 関連プロセス一覧の今回比較は一致=True。
 他担当processを停止せず、before/afterと差分を保全した。Mac受入担当の成果物は変更していない。
@@ -440,7 +442,7 @@ Windows descriptorだけを再署名する。runtime5資材はD3機械検査を�
 ZIPはentry内容総和、qcow2は実長、rendererは1.1.0公開image load予算2056219398を維持する。
 source bundle2本のsource1580件・notice2023件を照合し、#180の変更sourceはGit commit/checkout/LF blobへ結び付けた。
 
-Java試験はCodex書込root外の新規C:/Users/ryuma配下でbuild/TMPを隔離し、require_escalated+run_logged.pyで実行した。
+Java試験はCodex書込root外の新規C:/Users/<user>配下でbuild/TMPを隔離し、require_escalated+run_logged.pyで実行した。
 - helpers: {'tests': 92, 'failures': 2, 'errors': 0, 'skipped': 22}（exit 1）
 - core: {'tests': 68, 'failures': 3, 'errors': 0, 'skipped': 10}（exit 1）
 - 再検証helpers: {'tests': 92, 'failures': 1, 'errors': 0, 'skipped': 22}（exit 1）
@@ -451,7 +453,7 @@ Windows Pythonのguestbridgeはfcntl未対応で失敗、Linux側guestbridge/dae
 専用外部試験dirを回収し、自分のDockerタグだけを削除、Dockerを元の停止状態へ戻した。設定・レジストリ・WSL/Dockerの前後比較はenvironment-comparison.jsonに記録。
 
 署名キット/手順はbuild/111-d4/に保存。返送名descriptor-signatures-1.1.1-r4.zip。
-Mac展開想定は/Users/ryuman/tmp-mcicon-111-sign/descriptor-r4/kit。Homebrew OpenSSL3優先・3未満停止・両DER検証・返送ZIP生成は従来どおり。
+Mac展開想定は/Users/<user>/tmp-mcicon-111-sign/descriptor-r4/kit。Homebrew OpenSSL3優先・3未満停止・両DER検証・返送ZIP生成は従来どおり。
 **現在はr4 Windows descriptor署名前で停止。旧D3/E3/F3は#180未取込みの証跡であり現候補へ流用しない。**
 署名返送後のE/F再生成と必要な再署名、製品E2E再受入・全体反証・公開前high-water/source/tag照合が残る。
 本作業では製品ソースの追加変更・Mac接続・G受入・commit/push/PR/公開・秘密鍵/token参照は行っていない。
@@ -469,14 +471,14 @@ runtime5資材と新payload2本へD4のunpackedBytes検査を適用し通過。r
 製品資材・D4 descriptorは変わらず、keeper期限試験1件失敗は解消。外部rootのhelper/commonは92件中70成功・22skip・失敗0。
 keeperの6秒3試行は3677/3582/3595ms、2.5秒は879msで期待拒否。製品期限を緩めていない。
 coreは68件中55成功・既知3失敗・10skip。Smoke固定path1error、Windows guestbridge fcntl未対応も再確認し成功扱いしない。
-製品Java試験はCodex書込root外の新規C:/Users/ryuma配下へbuild/TMPを分離し、require_escalated+run_logged.pyで実行・証跡回収後に専用dirを削除した。
+製品Java試験はCodex書込root外の新規C:/Users/<user>配下へbuild/TMPを分離し、require_escalated+run_logged.pyで実行・証跡回収後に専用dirを削除した。
 旧C3失敗と署名当時inventoryは履歴として保持し、D4の現行SIGN.md/HANDOFFとQAには#181解消を明記した。
 
 stableはtoolVersion1.1.1・sequence2候補・minimumBootstrapProtocol4。公開直前のlatest/high-water再照合が必要。
 キットはbuild/111-e4/stable-signing-kit-1.1.1-r4.zip（SHA `2f5fd419ea182b3cbc4d35818d36340da250fc4424e570b64c1586d4a4cbb0de`）と
 mcicon-central-1.1.1-r4-signing-kit.zip（SHA `c7a2b4257fff4aa9476b74bfb831173e1a0cfc016545766eeef80722c1620147`）。隣接.sha256と実行順の手順書を用意した。
 stable手順に既存Mac運用鍵パスをED25519_PRIVATE_KEYへexportする手順、Central手順に既存GNUPGHOME・GPG_TTYとローカルpinentry前提を明記した。
-Mac展開想定は/Users/ryuman/tmp-mcicon-111-sign/stable-r4/kit と central-r4/kit。
+Mac展開想定は/Users/<user>/tmp-mcicon-111-sign/stable-r4/kit と central-r4/kit。
 返送名はstable-signatures-1.1.1-r4.zipとmcicon-central-1.1.1-r4-signatures.zip。
 **現在はstable/Central署名前で停止。** Mac接続・転送・署名・公開・秘密鍵/token参照・G作業は行っていない。
 署名返送後の原本/正式Java/gpgv検証、F4生成・製品E2E再受入・全体反証・公開前照合が残る。
@@ -494,7 +496,7 @@ F3から25asset中12件を更新し13件は不変。Windows bootstrapはseed3fil
 署名入りstable/Central・両archiveの値と試験原記録は[段階E/F QA](../qa/release-payload-candidate-1.1.1-2026-11-06.json)の
 `stageEPostSignatureAndF4` と `build/111-f4/HANDOFF.md` を参照する。旧build/111-f・111-f2・111-f3は保全した。
 
-固定reader試験はCodex書込root外の新規C:/Users/ryuma配下へTMP・作業先・Gradle出力・reader stageを分離し、
+固定reader試験はCodex書込root外の新規C:/Users/<user>配下へTMP・作業先・Gradle出力・reader stageを分離し、
 require_escalated + run_logged.pyで実行した。42件中失敗9・error0・skip1。
 失敗method再確認は9件、失敗0・error0。 今回の初回結果を保全し、前回F2の期限超過や従来のACL拒否14件と混同しない。
 UpdatePreparationは19件中失敗0・error0・skip0。
@@ -503,7 +505,7 @@ UpdatePreparationは19件中失敗0・error0・skip0。
 coreは既知27件中24成功・3失敗、Smokeは固定worktree条件による4件中1errorを再確認した。
 全体成功・公開gate通過とは扱わない。外側専用試験rootはXML/log回収後に削除した。
 
-Mac作業は `/Users/ryuman/tmp-mcicon-111-f4` のみ、sudo・既存Lima/Homebrew/サービス操作なし。
+Mac作業は `/Users/<user>/tmp-mcicon-111-f4` のみ、sudo・既存Lima/Homebrew/サービス操作なし。
 観測したLima設定・既存ディレクトリ・Homebrew導入一覧は不変。
 関連プロセス一覧の今回比較は一致=True。
 他担当processを停止せず、before/afterと差分を保全した。Mac受入担当の成果物は変更していない。
@@ -543,7 +545,7 @@ F4 reader調査のfixture10秒失敗・低負荷対照未実施は履歴とし�
 既知問題#182: Macの通常release期限超過で未確定stopが残る。1.1.2対応予定。
 
 署名キットと実行順の鍵環境変数設定・両DER検証・返送手順はbuild/111-d5/SIGN.md。
-返送名descriptor-signatures-1.1.1-r5.zip、Mac展開先想定/Users/ryuman/tmp-mcicon-111-sign/descriptor-r5/kit。
+返送名descriptor-signatures-1.1.1-r5.zip、Mac展開先想定/Users/<user>/tmp-mcicon-111-sign/descriptor-r5/kit。
 現在はWindows descriptor r5署名前で停止。旧D4/E4/F4は証拠として保全し公開候補へ流用しない。
 署名返送後のE/F再生成・必要な再署名、製品再受入と全体反証、公開前high-water/source/tag照合が残る。
 製品ソースの追加変更・Mac接続・G領域編集・commit/push/PR/公開・秘密鍵/token参照なし。
@@ -557,7 +559,7 @@ E4からcoreはRuntimeHelper.classとWindows descriptor/署名・helper inventor
 worker/agent/CLI JARとMac descriptor/署名、rootfs/Mac helper/qcow2/rendererは不変。CLI ZIPは新coreと生成時点のdocs/QAを反映する。
 runtime5資材とpayload2本へunpackedBytes機械検査を適用した。rootfsはtar全長403507200、ZIPはentry総和、rendererは旧公開load予算を維持する。
 
-Java試験はCodex書込root外の新規C:/Users/ryuma配下へbuild/TMPを分離し、require_escalated+run_logged.pyで実行・証跡回収後に専用dirを削除した。
+Java試験はCodex書込root外の新規C:/Users/<user>配下へbuild/TMPを分離し、require_escalated+run_logged.pyで実行・証跡回収後に専用dirを削除した。
 - helpers: {'tests': 94, 'failures': 0, 'errors': 0, 'skipped': 22}、exit 0
 - core: {'tests': 71, 'failures': 3, 'errors': 0, 'skipped': 10}、exit 1
 keeper期限試験を含む原XMLはE5/test-results、概要はkeeper-retest.json。D5初回TIMEOUTとfocused成功は保全し、期限を緩めていない。
@@ -568,7 +570,7 @@ stableはtoolVersion1.1.1・sequence2候補・minimumBootstrapProtocol4。公開
 キットはbuild/111-e5/stable-signing-kit-1.1.1-r5.zip（SHA `38715d025c87020e9c3c0f5a4a27c4e48518ce6c1ab38c298b782cbb88c4ab5c`）と
 mcicon-central-1.1.1-r5-signing-kit.zip（SHA `faea3d547878488c71d0f123c81f67a1ab1346753aea82b2ba10be4e80782ffc`）。隣接.sha256と手順書を用意した。
 stableのED25519_PRIVATE_KEY、CentralのGNUPGHOME/GPG_TTYとローカルpinentry前提を実行順で記載。
-Mac展開想定は/Users/ryuman/tmp-mcicon-111-sign/stable-r5/kit と central-r5/kit。
+Mac展開想定は/Users/<user>/tmp-mcicon-111-sign/stable-r5/kit と central-r5/kit。
 返送名はstable-signatures-1.1.1-r5.zip、mcicon-central-1.1.1-r5-signatures.zip。
 現在はstable/Central署名前で停止。Mac接続・転送・署名・公開・秘密鍵/token参照・G作業なし。
 返送後の原本/正式Java/gpgv検証、bootstrap再生成・製品再受入・全体反証・公開前照合が残る。
@@ -591,12 +593,12 @@ archive全fileとcore/worker/CLI/payload/stable/trustのE5固定hash一致を確
 F4から10asset変更・15asset不変。Windowsはseed3file、Macはseed3fileとad-hoc署名/CodeResourcesのみ変更。Mach-O署名領域外・他全fileは不変。
 詳細はf4-differences.json。旧F群とE4/F4署名済み資材は保全した。
 
-固定readerは新規C:/Users/ryuma配下へTMP/build/専用Gradle home/同梱readerを隔離し、require_escalated+run_logged.pyで実行。
+固定readerは新規C:/Users/<user>配下へTMP/build/専用Gradle home/同梱readerを隔離し、require_escalated+run_logged.pyで実行。
 reader初回: {'tests': 42, 'failures': 10, 'errors': 0, 'skipped': 1}（580.547秒）。focused再確認: {"tests": 10, "failures": 3, "errors": 0, "skipped": 0}。preparation: {'tests': 19, 'failures': 0, 'errors': 0, 'skipped': 0}。
 初回失敗と同一期限・fixture無変更の別root再確認を区別する。原XML/log・reader-investigation.jsonを保全し、再試行で初回失敗を成功へ置換しない。
 改変・旧sequence/同版拒否はsecurityCases/candidate-tamper-tests.json参照。core既知試験は{'tests': 27, 'failures': 3, 'errors': 0, 'skipped': 0}、Smoke固定path errorは再確認し成功扱いしない。
 包装/reader/payload Python、Mac native fixtureの成否はknown-test-results.json/native-result.jsonを参照。Windows LLVM警告とWindows guestbridgeのfcntl試験は今回未再実行。
-Macは新規/Users/ryuman/tmp-mcicon-111-f5だけを使用し、成果・証跡回収後に削除済み。sudoなし、Lima設定・既存dir・Homebrew・関連process一覧は不変。
+Macは新規/Users/<user>/tmp-mcicon-111-f5だけを使用し、成果・証跡回収後に削除済み。sudoなし、Lima設定・既存dir・Homebrew・関連process一覧は不変。
 Windows Lxss/WSL/Dockerの前後不変を確認。外部試験rootも回収済み。
 既知問題#182（Mac通常release期限超過で未確定stopが残る）は1.1.2対応予定。E5 keeper成功は今回製品E2E成功の代替ではない。
 段階Fまでで停止し、Gへ進んでいない。全体反証・公開前latest/high-water/source/tag照合と別指示による公開が残る。
@@ -675,3 +677,22 @@ Mac g6はpending journal・live別job/unknownを正規CLI/OS signalで9条件成
 D/E/F PRのbaseはmain `d6d33a7`。現HEAD `5c474f4`との差は試験4fileだけで、docs/qa差分とのpath重複なし。merge/rebase未実行のため将来競合なしを保証しない。tagはD/E/F PR merge後のmainに付け、5c474f4との製品tree同一性・第三者source対応を直前に確認する。署名済みF5 bytesを再生成しない。生成時docs/QAを内包するCLI ZIPと、最新H記録を収録する将来tagのdocs/qaは時点を区別する。
 
 現在の公開Latestはv1.1.0、stable sequence1/protocol4を読み取り確認。候補sequence2は公開直前再照合が必要。公開後にしか成立しないgateを事前fixtureで埋めない。Central/tag/Release作成と25asset upload・公開化/Latestは個別承認が必要。実行順・照合・公開後の必須確認は`build/111-h/publish-plan.md`、Release notes案は`build/111-h/release-notes-1.1.1.md`。今回は公開操作・Mac/WSL新規操作・秘密鍵/token参照なし。
+
+<a id="stage-i-u01-20261109"></a>
+
+## 段階I 公開後U01失敗と既知問題追記の準備（2026-11-09）
+
+ユーザー回答の原文は「両方行う」。U01不具合のIssue作成とv1.1.1 Release本文への既知問題追記・差替えが承認された。実行はgit_operatorが担当し、この記録更新ではIssue作成・Release編集・commit/push/PRを行っていない。Issue番号は公開担当が`#189`を機械置換する。
+
+| 項目 | 状態・根拠 |
+|---|---|
+| Mac U01旧job世代 | **失敗**。旧jobは200/200・元descriptor/core/agentで完了したが、新版は他leaseのhelper世代不一致でUNKNOWN→preflight拒否。active=1.1.0、pending=1.1.1、previous=null、trialInvocation残存、high-water=2、badCandidates空。旧job完了後も通常起動は1.1.0。原因・1.1.2向けIssueは`#189`。 |
+| Windows U01旧job世代 | **本hostで未検証**。未改変v1.1.0の旧native factsが失敗し実workerに到達しない。#179のDistributionName欠損Lxssキー除外との差が高確度候補だが、registry変更による原因消失は検証していない。新native成功と旧job稼働中の更新成功は別。 |
+| Ubuntu-24.04 | Windows側でRunning→Stopped。起動者・状態変化主体（自動停止を含む）は不明。前後list/running差分を保全し、隠す復元や既存distro操作はしない。既存registry/ACL一致・本人資源回収と、全環境完全不変を区別する。 |
+| #98 | **close不可**。ジョブ中更新・次回新版適用の完成条件を満たさない。公開完了・旧job保護・旧版の再起動成功だけではcloseしない。 |
+
+Mac根拠は`qa/post-publish-1.1.1-macos-2026-11-08.json`と`build/111-i/macos/update/u01-oldjob/REPORT.md`、同`evidence/final/case-attempt-3.json`。Windows根拠は`qa/post-publish-1.1.1-windows-2026-11-08.json`のitems/environmentDifferencesと`build/111-i/windows/update/old-native-facts-comparison.json`。ソース確認は公開commit f2654a4固定で、Mac LeaseReferences.java:40→共通LeaseFile.java:53→MacRuntime.java:48、bootstrap Bootstrap.java:245/254を照合した。Windowsにも同等経路があるが製品再現は未確認。UNKNOWN保全は安全契約どおりでも、健全な別世代liveから更新が固定化する全体挙動はU01不成立として残す。
+
+通常再試行・repair・auto-update設定の切替は残存trialの解除操作ではない。署名済みlocal slotへの正式pinは明示実行経路で、自動更新stateを修復しない。本件rootでのpin実行は未検証。内部state/lease/receiptの編集・削除や未知資源の一括回収を案内しない。修正はbootstrapの提供・正式修復経路も含む1.1.2向けIssueで扱う。
+
+Release本文は公開担当が現本文と`build/111-i/release-notes-approved-post-central.md`の一致を確認し、追記だけの候補`build/111-i/release-notes-approved-candidate-u01.md`のplaceholderを置換して公開する前提。既存本文は追記箇所以外を変更しない。公開後QAの数値/hash/判定は保持し、公開文面のOSユーザー名だけ`<user>`へ匿名化した。匿名化前の原記録は`build/111-i/qa-closure/previous/`に保全している。以下を含む段階H以前の未公開/公開後確認記載は当時の記録であり、最新のU01成功へ読み替えない。

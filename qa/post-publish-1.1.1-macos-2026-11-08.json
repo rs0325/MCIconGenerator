@@ -1,0 +1,1763 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-08",
+  "taskId": "post-publish-111-macos-update-i6",
+  "status": "失敗（U01旧job同時更新）",
+  "completed": false,
+  "acceptancePassed": false,
+  "scope": "Latest切替後の未改変公開v1.1.0からの実更新。Central/G04は前段成功を継承。",
+  "inputs": {
+    "downloads": [
+      {
+        "url": "https://api.github.com/repos/rs0325/MCIconGenerator/releases/tags/v1.1.0",
+        "bytes": 39750,
+        "sha256": "af96502e9a9e99af2b4c679544172316ce88a3a4e402734faa389b7ad15460bf",
+        "http": 200,
+        "seconds": 0.31949687004089355
+      },
+      {
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-bootstrap-1.1.0-macos-aarch64.tar.gz",
+        "bytes": 67505927,
+        "sha256": "7cbf377d7ed65319d653ad4ab748bc7c1b74b248cd397e6aeb09c65b310a821c",
+        "http": 200,
+        "seconds": 6.373868942260742
+      },
+      {
+        "url": "https://api.github.com/repos/rs0325/MCIconGenerator/releases/latest",
+        "bytes": 47623,
+        "sha256": "761803c193698687eaed11e7a1333630eb2f518e8c892cc19faa3597f7a17409",
+        "http": 200,
+        "seconds": 0.2860910892486572
+      },
+      {
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.1/stable.json",
+        "bytes": 16565,
+        "sha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c",
+        "http": 200,
+        "seconds": 0.3722047805786133
+      },
+      {
+        "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.1/stable.json.sig",
+        "bytes": 64,
+        "sha256": "26c11924305ab5b9d11c2a319dc4a380ab5ded9744a6a5eb2369a182c6edd6dd",
+        "http": 200,
+        "seconds": 0.47074389457702637
+      }
+    ],
+    "entry": "/Users/<user>/tmp-mcicon-111-i6/program/MCIconBootstrap.app/Contents/MacOS/MCIconBootstrap",
+    "installed": "/Users/<user>/tmp-mcicon-111-i6/program/MCIconBootstrap.app/Contents/app",
+    "package": {
+      "schemaVersion": 1,
+      "bootstrapVersion": "1.1.0",
+      "bootstrapProtocol": 4,
+      "owner": "archive",
+      "stableManifestUrl": "https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json",
+      "host": {
+        "os": "macos",
+        "arch": "aarch64"
+      }
+    },
+    "seed": {
+      "channel": "stable",
+      "minimumBootstrapProtocol": 4,
+      "platforms": [
+        {
+          "host": {
+            "arch": "x86_64",
+            "os": "windows"
+          },
+          "payload": {
+            "bytes": 37126358,
+            "format": "zip",
+            "id": "mcicon-tool-1.1.0-windows-x86_64",
+            "inventoryPath": "inventories/tool-windows-x86_64.json",
+            "inventorySha256": "2ee0547b06dc36911d4fa40ccff3294ea99e9953693399048149c026c61eae15",
+            "licenseFiles": [
+              "LICENSE",
+              "licenses/runtime-helper/MCIconHelper/MICROSOFT-RUNTIME-TERMS.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/LICENSE",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/THIRD_PARTY_NOTICES.md",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Apache-2.0.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Commons-Codec.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Commons-Compress.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Commons-IO.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Commons-Lang.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/XZ-for-Java.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/native-build/licenses/LICENSE.TXT",
+              "licenses/runtime-helper/MCIconHelper/app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING",
+              "licenses/runtime-helper/MCIconHelper/app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/NOTICE.txt",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/inventory.json",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/visual-cpp-runtime-2015-2022.docx",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/visual-studio-2022-community.docx",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/windows-sdk-license.rtf",
+              "java/legal/java.base/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.base/ASSEMBLY_EXCEPTION",
+              "java/legal/java.base/LICENSE",
+              "java/legal/java.base/aes.md",
+              "java/legal/java.base/asm.md",
+              "java/legal/java.base/c-libutl.md",
+              "java/legal/java.base/cldr.md",
+              "java/legal/java.base/icu.md",
+              "java/legal/java.base/public_suffix.md",
+              "java/legal/java.base/siphash.md",
+              "java/legal/java.base/unicode.md",
+              "java/legal/java.base/wepoll.md",
+              "java/legal/java.base/zlib.md",
+              "java/legal/java.compiler/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.compiler/ASSEMBLY_EXCEPTION",
+              "java/legal/java.compiler/LICENSE",
+              "java/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.datatransfer/ASSEMBLY_EXCEPTION",
+              "java/legal/java.datatransfer/LICENSE",
+              "java/legal/java.desktop/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.desktop/ASSEMBLY_EXCEPTION",
+              "java/legal/java.desktop/LICENSE",
+              "java/legal/java.desktop/colorimaging.md",
+              "java/legal/java.desktop/freetype.md",
+              "java/legal/java.desktop/giflib.md",
+              "java/legal/java.desktop/harfbuzz.md",
+              "java/legal/java.desktop/jpeg.md",
+              "java/legal/java.desktop/lcms.md",
+              "java/legal/java.desktop/libpng.md",
+              "java/legal/java.desktop/mesa3d.md",
+              "java/legal/java.instrument/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.instrument/ASSEMBLY_EXCEPTION",
+              "java/legal/java.instrument/LICENSE",
+              "java/legal/java.logging/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.logging/ASSEMBLY_EXCEPTION",
+              "java/legal/java.logging/LICENSE",
+              "java/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.management.rmi/ASSEMBLY_EXCEPTION",
+              "java/legal/java.management.rmi/LICENSE",
+              "java/legal/java.management/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.management/ASSEMBLY_EXCEPTION",
+              "java/legal/java.management/LICENSE",
+              "java/legal/java.naming/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.naming/ASSEMBLY_EXCEPTION",
+              "java/legal/java.naming/LICENSE",
+              "java/legal/java.net.http/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.net.http/ASSEMBLY_EXCEPTION",
+              "java/legal/java.net.http/LICENSE",
+              "java/legal/java.prefs/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.prefs/ASSEMBLY_EXCEPTION",
+              "java/legal/java.prefs/LICENSE",
+              "java/legal/java.rmi/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.rmi/ASSEMBLY_EXCEPTION",
+              "java/legal/java.rmi/LICENSE",
+              "java/legal/java.scripting/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.scripting/ASSEMBLY_EXCEPTION",
+              "java/legal/java.scripting/LICENSE",
+              "java/legal/java.se/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.se/ASSEMBLY_EXCEPTION",
+              "java/legal/java.se/LICENSE",
+              "java/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.security.jgss/ASSEMBLY_EXCEPTION",
+              "java/legal/java.security.jgss/LICENSE",
+              "java/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.security.sasl/ASSEMBLY_EXCEPTION",
+              "java/legal/java.security.sasl/LICENSE",
+              "java/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.sql.rowset/ASSEMBLY_EXCEPTION",
+              "java/legal/java.sql.rowset/LICENSE",
+              "java/legal/java.sql/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.sql/ASSEMBLY_EXCEPTION",
+              "java/legal/java.sql/LICENSE",
+              "java/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.transaction.xa/ASSEMBLY_EXCEPTION",
+              "java/legal/java.transaction.xa/LICENSE",
+              "java/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.xml.crypto/ASSEMBLY_EXCEPTION",
+              "java/legal/java.xml.crypto/LICENSE",
+              "java/legal/java.xml.crypto/santuario.md",
+              "java/legal/java.xml/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.xml/ASSEMBLY_EXCEPTION",
+              "java/legal/java.xml/LICENSE",
+              "java/legal/java.xml/bcel.md",
+              "java/legal/java.xml/dom.md",
+              "java/legal/java.xml/jcup.md",
+              "java/legal/java.xml/xalan.md",
+              "java/legal/java.xml/xerces.md",
+              "java/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO",
+              "java/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION",
+              "java/legal/jdk.crypto.ec/LICENSE"
+            ],
+            "noticeFiles": [
+              "THIRD_PARTY_NOTICES.md",
+              "licenses/runtime-helper/MCIconHelper/MICROSOFT-RUNTIME-TERMS.txt",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/NOTICE.txt",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/inventory.json",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/visual-cpp-runtime-2015-2022.docx",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/visual-studio-2022-community.docx",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/windows-sdk-license.rtf"
+            ],
+            "role": "tool-payload",
+            "sha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3",
+            "sourceArchives": [
+              {
+                "sha256": "6e2e101c9700ac5b09571f9fefd0386872f8f06392645355feedbe05e2546133",
+                "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-01.tar"
+              },
+              {
+                "sha256": "cf984cad246b1572e04cf0ed013b61343772e698016dcad59f88885d28344f51",
+                "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-02.tar"
+              }
+            ],
+            "unpackedBytes": 93912415,
+            "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-tool-1.1.0-windows-x86_64.zip"
+          },
+          "runtimeDescriptor": {
+            "path": "descriptors/windows-x86_64.json",
+            "sha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294"
+          }
+        },
+        {
+          "host": {
+            "arch": "aarch64",
+            "os": "macos"
+          },
+          "payload": {
+            "bytes": 35983846,
+            "format": "zip",
+            "id": "mcicon-tool-1.1.0-macos-aarch64",
+            "inventoryPath": "inventories/tool-macos-aarch64.json",
+            "inventorySha256": "c6a9cc51c87b81071239a02e0d6ccc8f0274b2804d673d39f853283d5eb42216",
+            "licenseFiles": [
+              "LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/NOTICE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-ThirdParty-LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/NOTICE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/Schubfach-LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/NOTICE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/mcicon/LICENSE",
+              "java/legal/java.base/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.base/ASSEMBLY_EXCEPTION",
+              "java/legal/java.base/LICENSE",
+              "java/legal/java.base/aes.md",
+              "java/legal/java.base/asm.md",
+              "java/legal/java.base/c-libutl.md",
+              "java/legal/java.base/cldr.md",
+              "java/legal/java.base/icu.md",
+              "java/legal/java.base/public_suffix.md",
+              "java/legal/java.base/siphash.md",
+              "java/legal/java.base/unicode.md",
+              "java/legal/java.base/zlib.md",
+              "java/legal/java.compiler/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.compiler/ASSEMBLY_EXCEPTION",
+              "java/legal/java.compiler/LICENSE",
+              "java/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.datatransfer/ASSEMBLY_EXCEPTION",
+              "java/legal/java.datatransfer/LICENSE",
+              "java/legal/java.desktop/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.desktop/ASSEMBLY_EXCEPTION",
+              "java/legal/java.desktop/LICENSE",
+              "java/legal/java.desktop/colorimaging.md",
+              "java/legal/java.desktop/freetype.md",
+              "java/legal/java.desktop/giflib.md",
+              "java/legal/java.desktop/harfbuzz.md",
+              "java/legal/java.desktop/jpeg.md",
+              "java/legal/java.desktop/lcms.md",
+              "java/legal/java.desktop/libpng.md",
+              "java/legal/java.desktop/mesa3d.md",
+              "java/legal/java.desktop/pipewire.md",
+              "java/legal/java.desktop/xwd.md",
+              "java/legal/java.instrument/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.instrument/ASSEMBLY_EXCEPTION",
+              "java/legal/java.instrument/LICENSE",
+              "java/legal/java.logging/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.logging/ASSEMBLY_EXCEPTION",
+              "java/legal/java.logging/LICENSE",
+              "java/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.management.rmi/ASSEMBLY_EXCEPTION",
+              "java/legal/java.management.rmi/LICENSE",
+              "java/legal/java.management/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.management/ASSEMBLY_EXCEPTION",
+              "java/legal/java.management/LICENSE",
+              "java/legal/java.naming/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.naming/ASSEMBLY_EXCEPTION",
+              "java/legal/java.naming/LICENSE",
+              "java/legal/java.net.http/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.net.http/ASSEMBLY_EXCEPTION",
+              "java/legal/java.net.http/LICENSE",
+              "java/legal/java.prefs/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.prefs/ASSEMBLY_EXCEPTION",
+              "java/legal/java.prefs/LICENSE",
+              "java/legal/java.rmi/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.rmi/ASSEMBLY_EXCEPTION",
+              "java/legal/java.rmi/LICENSE",
+              "java/legal/java.scripting/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.scripting/ASSEMBLY_EXCEPTION",
+              "java/legal/java.scripting/LICENSE",
+              "java/legal/java.se/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.se/ASSEMBLY_EXCEPTION",
+              "java/legal/java.se/LICENSE",
+              "java/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.security.jgss/ASSEMBLY_EXCEPTION",
+              "java/legal/java.security.jgss/LICENSE",
+              "java/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.security.sasl/ASSEMBLY_EXCEPTION",
+              "java/legal/java.security.sasl/LICENSE",
+              "java/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.sql.rowset/ASSEMBLY_EXCEPTION",
+              "java/legal/java.sql.rowset/LICENSE",
+              "java/legal/java.sql/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.sql/ASSEMBLY_EXCEPTION",
+              "java/legal/java.sql/LICENSE",
+              "java/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.transaction.xa/ASSEMBLY_EXCEPTION",
+              "java/legal/java.transaction.xa/LICENSE",
+              "java/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.xml.crypto/ASSEMBLY_EXCEPTION",
+              "java/legal/java.xml.crypto/LICENSE",
+              "java/legal/java.xml.crypto/santuario.md",
+              "java/legal/java.xml/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.xml/ASSEMBLY_EXCEPTION",
+              "java/legal/java.xml/LICENSE",
+              "java/legal/java.xml/bcel.md",
+              "java/legal/java.xml/dom.md",
+              "java/legal/java.xml/jcup.md",
+              "java/legal/java.xml/xalan.md",
+              "java/legal/java.xml/xerces.md",
+              "java/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO",
+              "java/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION",
+              "java/legal/jdk.crypto.ec/LICENSE"
+            ],
+            "noticeFiles": [
+              "THIRD_PARTY_NOTICES.md"
+            ],
+            "role": "tool-payload",
+            "sha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+            "sourceArchives": [
+              {
+                "sha256": "6e2e101c9700ac5b09571f9fefd0386872f8f06392645355feedbe05e2546133",
+                "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-01.tar"
+              },
+              {
+                "sha256": "cf984cad246b1572e04cf0ed013b61343772e698016dcad59f88885d28344f51",
+                "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-02.tar"
+              }
+            ],
+            "unpackedBytes": 96994945,
+            "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-tool-1.1.0-macos-aarch64.zip"
+          },
+          "runtimeDescriptor": {
+            "path": "descriptors/macos-aarch64.json",
+            "sha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101"
+          }
+        }
+      ],
+      "schemaVersion": 1,
+      "sequence": 1,
+      "toolVersion": "1.1.0"
+    },
+    "immutableFiles": 187,
+    "at": 1794144534.591667
+  },
+  "checks": {
+    "0-bytecode-restoration": {
+      "status": "成功",
+      "removed": {
+        "userAuthorization": "許可（2026-11-08）",
+        "at": 1794144309.266019,
+        "before": [
+          {
+            "path": "/opt/homebrew/Cellar/python@3.12/3.12.16/Frameworks/Python.framework/Versions/3.12/lib/python3.12/__pycache__/hmac.cpython-312.pyc",
+            "bytes": 10769,
+            "uid": 501,
+            "birth": 1794142118.053481,
+            "mtimeNs": 1794142118053572153,
+            "sha256": "4f330497125dbcc541b69a6864119da65ea9a8972adca7ca6bb06bf3ce87e2c7"
+          },
+          {
+            "path": "/opt/homebrew/Cellar/python@3.12/3.12.16/Frameworks/Python.framework/Versions/3.12/lib/python3.12/__pycache__/secrets.cpython-312.pyc",
+            "bytes": 2634,
+            "uid": 501,
+            "birth": 1794142118.0514362,
+            "mtimeNs": 1794142118051519834,
+            "sha256": "0ee2bf10e6eec8e32acb1add8b91eab4edee43ed93c680a07389d81398747508"
+          }
+        ],
+        "removed": 2,
+        "parentMtimeRestoredNs": 1794058085216070619,
+        "onlyRecordedFilesRemoved": true
+      },
+      "originalPathsRestored": {
+        "/Users/<user>/.lima": true,
+        "/Users/<user>/.docker": true,
+        "/opt/homebrew/Cellar": true,
+        "/opt/homebrew/var/homebrew/linked": true,
+        "/Users/<user>/Library/Application Support/MCIconBootstrap": true,
+        "/Users/<user>/Library/Application Support/MCIconGenerator": true
+      }
+    },
+    "U01-healthy": {
+      "case": "healthy",
+      "status": "成功",
+      "seconds": 261.24608302116394,
+      "renders": [
+        {
+          "name": "old-first",
+          "seconds": 183.0338649749756,
+          "png": "build/111-i/macos/update/evidence/healthy/healthy/out/old-first/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+          "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "width": 64,
+          "height": 64,
+          "visiblePixels": 2744,
+          "counts": {
+            "failed": 0,
+            "noItemForm": 76,
+            "succeeded": 1
+          },
+          "commandReceiptsFinished": true,
+          "executedSlots": [
+            "1.1.0"
+          ]
+        },
+        {
+          "name": "apply-next-managed",
+          "seconds": 67.24728202819824,
+          "png": "build/111-i/macos/update/evidence/healthy/healthy/out/apply-next-managed/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+          "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+          "width": 64,
+          "height": 64,
+          "visiblePixels": 2744,
+          "counts": {
+            "failed": 0,
+            "noItemForm": 76,
+            "succeeded": 1
+          },
+          "commandReceiptsFinished": true,
+          "executedSlots": [
+            "1.1.0",
+            "1.1.1"
+          ]
+        }
+      ],
+      "minimumFreeBytes": 12240089088,
+      "admission": {
+        "freeBytes": 22283214848,
+        "requiredBytes": 9663676416,
+        "projectedFreeBytes": 12619538432
+      },
+      "capacitySamples": 258,
+      "snapshots": {
+        "initial": {
+          "schemaVersion": 4,
+          "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+          "channel": "stable",
+          "host": {
+            "os": "macos",
+            "arch": "aarch64"
+          },
+          "active": {
+            "toolVersion": "1.1.0",
+            "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+            "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+            "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+          },
+          "pending": null,
+          "previous": null,
+          "trialInvocation": null,
+          "preparation": null,
+          "highestAcceptedSequence": 1,
+          "badCandidates": []
+        },
+        "background-pending": {
+          "schemaVersion": 4,
+          "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+          "channel": "stable",
+          "host": {
+            "os": "macos",
+            "arch": "aarch64"
+          },
+          "active": {
+            "toolVersion": "1.1.0",
+            "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+            "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+            "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+          },
+          "pending": {
+            "toolVersion": "1.1.1",
+            "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+            "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+            "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+          },
+          "previous": null,
+          "trialInvocation": null,
+          "preparation": null,
+          "highestAcceptedSequence": 2,
+          "badCandidates": []
+        },
+        "activated": {
+          "schemaVersion": 4,
+          "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+          "channel": "stable",
+          "host": {
+            "os": "macos",
+            "arch": "aarch64"
+          },
+          "active": {
+            "toolVersion": "1.1.1",
+            "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+            "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+            "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+          },
+          "pending": null,
+          "previous": {
+            "toolVersion": "1.1.0",
+            "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+            "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+            "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+          },
+          "trialInvocation": null,
+          "preparation": null,
+          "highestAcceptedSequence": 2,
+          "badCandidates": []
+        }
+      }
+    },
+    "U01-old-live-job": {
+      "status": "失敗",
+      "continuedDate": "2026-11-09",
+      "history": [
+        {
+          "at": 1794146241.5861819,
+          "freeBytes": 17590448128,
+          "oldVmMeasuredBytes": 4439638016,
+          "newGenerationMeasuredPeakBytes": 6248656896,
+          "bootstrapAndCloneBufferBytes": 536870912,
+          "requiredBytes": 11225165824,
+          "projectedFreeBytes": 6365282304,
+          "allowed": false,
+          "status": "未検証",
+          "method": "別descriptorの旧workerと新trial workerは専用VM2台を要する。今回の実使用量から追加量を算出。reuse cacheは既に空きから除かれている。",
+          "source": [
+            "helpers/macos/CacheState.java:25",
+            "helpers/macos/MacRuntime.java:78"
+          ],
+          "startedProductProcesses": 0
+        }
+      ],
+      "result": {
+        "status": "失敗",
+        "continuedDate": "2026-11-09",
+        "acceptancePassed": false,
+        "oldJobPreserved": true,
+        "candidateApplied": false,
+        "oldCompleted": true,
+        "oldCounts": {
+          "failed": 0,
+          "noItemForm": 76,
+          "succeeded": 200
+        },
+        "steps": [
+          {
+            "name": "initialize-v110",
+            "seconds": 3.798963785171509,
+            "exit": 0,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          },
+          {
+            "name": "new-after-update",
+            "seconds": 12.779819011688232,
+            "exit": 1,
+            "executedSlots": [
+              "1.1.0",
+              "1.1.1"
+            ]
+          },
+          {
+            "name": "old-live",
+            "seconds": 63.20164108276367,
+            "exit": 0,
+            "png": {
+              "path": "attempt-3/out/old-live/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+              "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+            },
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 200
+            },
+            "executedSlots": [
+              "1.1.0"
+            ]
+          },
+          {
+            "name": "after-old-finished-retry",
+            "seconds": 43.703136920928955,
+            "exit": 0,
+            "png": {
+              "path": "attempt-3/out/after-old-finished-retry/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+              "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+            },
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "executedSlots": [
+              "1.1.0"
+            ]
+          }
+        ],
+        "seconds": 117.6935670375824,
+        "oldCliHoldSeconds": 13.06208610534668,
+        "oldJobId": "5cbf4780-98d7-41be-b943-527f484fe228",
+        "oldContainer": {
+          "name": "mcicon-worker-d1587019-da21-40b2-be37-7b67bb22d2b9",
+          "id": "57f8d4ae62a6917216657fe52d5bfa7d473a6473b322de21a198b46570fec9b5"
+        },
+        "oldHostCli": {
+          "pid": 8050,
+          "ppid": 8043,
+          "uid": 501,
+          "start": "Mon Nov 9 01:46:17 2026",
+          "args": "/Users/<user>/tmp-mcicon-111-i7/attempt-3/home/Library/Application Support/MCIconBootstrap/tools/1.1.0/c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d/java/bin/java -Dmcicon.bootstrap.control=eyJwcm90b2NvbCI6NCwicG9ydCI6NTgxNzQsIm5vbmNlIjoiN2FmNzQxOTQtMTBhZS00ZTRlLTllYTAtNjNhMDIyODI5NDZmIiwiaW52b2NhdGlvbiI6IjZjNzRhNWYwLTJlYWItNDk5Yi1hMTQ4LWFlZTZiYjgzMmZhMSIsInNsb3QiOnsidG9vbFZlcnNpb24iOiIxLjEuMCIsInBheWxvYWRTaGEyNTYiOiJjNTY1ZTAyMmIxNmJiY2FmMTlhYzEyMjNhYTk4MjdmNmExOTNlOWM3NzZlMjYzY2Q0ZGY5MjBjMzgwMTY0NzZkIiwicnVudGltZURlc2NyaXB0b3JTaGEyNTYiOiIyMTAzODM1Y2ExNGU4OGQ1MGNmZjcwMTYyNTg1MzA0YWY1YWExMzM1MWJhYmIwMjg0YjJmMTNkYWQyOTk4MTAxIiwibWFuaWZlc3RTaGEyNTYiOiIyNmE3OWZlZTBmOGJkZjY1Yjg3OWI5OTZkMmU1YjUyMjM2MjZjYzY3YzFkOWQ2NTllYTBkOTZmNDUyZGRiZTIwIn19 -cp /Users/<user>/tmp-mcicon-111-i7/attempt-3/home/Library/Application Support/MCIconBootstrap/tools/1.1.0/c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d/app/lib/* io.github.rs0325.mcicon.cli.Main --debug render --version 1.21.4 --kind block --size 64 --startup-timeout 600 --item-timeout 600 --out /Users/<user>/tmp-mcicon-111-i7/attempt-3/out/old-live --cache /Users/<user>/tmp-mcicon-111-i7/attempt-3/cache --json --id minecraft:stone --id minecraft:acacia_button --id minecraft:acacia_door --id minecraft:acacia_fence --id minecraft:acacia_fence_gate --id minecraft:acacia_hanging_sign --id minecraft:acacia_leaves --id minecraft:acacia_log --id minecraft:acacia_planks --id minecraft:acacia_pressure_plate --id minecraft:acacia_sapling --id minecraft:acacia_sign --id minecraft:acacia_slab --id minecraft:acacia_stairs --id minecraft:acacia_trapdoor --id minecraft:acacia_wood --id minecraft:activator_rail --id minecraft:allium --id minecraft:amethyst_block --id minecraft:amethyst_cluster --id minecraft:ancient_debris --id minecraft:andesite --id minecraft:andesite_slab --id minecraft:andesite_stairs --id minecraft:andesite_wall --id minecraft:anvil --id minecraft:azalea --id minecraft:azalea_leaves --id minecraft:azure_bluet --id minecraft:bamboo --id minecraft:bamboo_block --id minecraft:bamboo_button --id minecraft:bamboo_door --id minecraft:bamboo_fence --id minecraft:bamboo_fence_gate --id minecraft:bamboo_hanging_sign --id minecraft:bamboo_mosaic --id minecraft:bamboo_mosaic_slab --id minecraft:bamboo_mosaic_stairs --id minecraft:bamboo_planks --id minecraft:bamboo_pressure_plate --id minecraft:bamboo_sign --id minecraft:bamboo_slab --id minecraft:bamboo_stairs --id minecraft:bamboo_trapdoor --id minecraft:barrel --id minecraft:barrier --id minecraft:basalt --id minecraft:beacon --id minecraft:bedrock --id minecraft:bee_nest --id minecraft:beehive --id minecraft:beetroot_seeds --id minecraft:bell --id minecraft:big_dripleaf --id minecraft:birch_button --id minecraft:birch_door --id minecraft:birch_fence --id minecraft:birch_fence_gate --id minecraft:birch_hanging_sign --id minecraft:birch_leaves --id minecraft:birch_log --id minecraft:birch_planks --id minecraft:birch_pressure_plate --id minecraft:birch_sapling --id minecraft:birch_sign --id minecraft:birch_slab --id minecraft:birch_stairs --id minecraft:birch_trapdoor --id minecraft:birch_wood --id minecraft:black_banner --id minecraft:black_bed --id minecraft:black_candle --id minecraft:black_carpet --id minecraft:black_concrete --id minecraft:black_concrete_powder --id minecraft:black_glazed_terracotta --id minecraft:black_shulker_box --id minecraft:black_stained_glass --id minecraft:black_stained_glass_pane --id minecraft:black_terracotta --id minecraft:black_wool --id minecraft:blackstone --id minecraft:blackstone_slab --id minecraft:blackstone_stairs --id minecraft:blackstone_wall --id minecraft:blast_furnace --id minecraft:blue_banner --id minecraft:blue_bed --id minecraft:blue_candle --id minecraft:blue_carpet --id minecraft:blue_concrete --id minecraft:blue_concrete_powder --id minecraft:blue_glazed_terracotta --id minecraft:blue_ice --id minecraft:blue_orchid --id minecraft:blue_shulker_box --id minecraft:blue_stained_glass --id minecraft:blue_stained_glass_pane --id minecraft:blue_terracotta --id minecraft:blue_wool --id minecraft:bone_block --id minecraft:bookshelf --id minecraft:brain_coral --id minecraft:brain_coral_block --id minecraft:brain_coral_fan --id minecraft:brewing_stand --id minecraft:brick_slab --id minecraft:brick_stairs --id minecraft:brick_wall --id minecraft:bricks --id minecraft:brown_banner --id minecraft:brown_bed --id minecraft:brown_candle --id minecraft:brown_carpet --id minecraft:brown_concrete --id minecraft:brown_concrete_powder --id minecraft:brown_glazed_terracotta --id minecraft:brown_mushroom --id minecraft:brown_mushroom_block --id minecraft:brown_shulker_box --id minecraft:brown_stained_glass --id minecraft:brown_stained_glass_pane --id minecraft:brown_terracotta --id minecraft:brown_wool --id minecraft:bubble_coral --id minecraft:bubble_coral_block --id minecraft:bubble_coral_fan --id minecraft:budding_amethyst --id minecraft:cactus --id minecraft:cake --id minecraft:calcite --id minecraft:calibrated_sculk_sensor --id minecraft:campfire --id minecraft:candle --id minecraft:carrot --id minecraft:cartography_table --id minecraft:carved_pumpkin --id minecraft:cauldron --id minecraft:chain --id minecraft:chain_command_block --id minecraft:cherry_button --id minecraft:cherry_door --id minecraft:cherry_fence --id minecraft:cherry_fence_gate --id minecraft:cherry_hanging_sign --id minecraft:cherry_leaves --id minecraft:cherry_log --id minecraft:cherry_planks --id minecraft:cherry_pressure_plate --id minecraft:cherry_sapling --id minecraft:cherry_sign --id minecraft:cherry_slab --id minecraft:cherry_stairs --id minecraft:cherry_trapdoor --id minecraft:cherry_wood --id minecraft:chest --id minecraft:chipped_anvil --id minecraft:chiseled_bookshelf --id minecraft:chiseled_copper --id minecraft:chiseled_deepslate --id minecraft:chiseled_nether_bricks --id minecraft:chiseled_polished_blackstone --id minecraft:chiseled_quartz_block --id minecraft:chiseled_red_sandstone --id minecraft:chiseled_resin_bricks --id minecraft:chiseled_sandstone --id minecraft:chiseled_stone_bricks --id minecraft:chiseled_tuff --id minecraft:chiseled_tuff_bricks --id minecraft:chorus_flower --id minecraft:chorus_plant --id minecraft:clay --id minecraft:closed_eyeblossom --id minecraft:coal_block --id minecraft:coal_ore --id minecraft:coarse_dirt --id minecraft:cobbled_deepslate --id minecraft:cobbled_deepslate_slab --id minecraft:cobbled_deepslate_stairs --id minecraft:cobbled_deepslate_wall --id minecraft:cobblestone --id minecraft:cobblestone_slab --id minecraft:cobblestone_stairs --id minecraft:cobblestone_wall --id minecraft:cobweb --id minecraft:cocoa_beans --id minecraft:command_block --id minecraft:comparator --id minecraft:composter --id minecraft:conduit --id minecraft:copper_block --id minecraft:copper_bulb --id minecraft:copper_door --id minecraft:copper_grate --id minecraft:copper_ore --id minecraft:copper_trapdoor --id minecraft:cornflower --id minecraft:cracked_deepslate_bricks --id minecraft:cracked_deepslate_tiles"
+        },
+        "oldGuestWorker": {
+          "pid": 3626,
+          "ppid": 3602,
+          "startedAtGuest": "Mon Nov 9 01:46:55 2026",
+          "runningObserved": true
+        },
+        "oldDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+        "oldAgentSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+        "oldReleasedReceipt": "3a1bcc65956c1c5ceca1314458f18d81ff5e9f7a13ec0ebbc14a78b6b63c0e98",
+        "stateAfterRetry": {
+          "schemaVersion": 4,
+          "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+          "channel": "stable",
+          "host": {
+            "os": "macos",
+            "arch": "aarch64"
+          },
+          "active": {
+            "toolVersion": "1.1.0",
+            "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+            "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+            "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+          },
+          "pending": {
+            "toolVersion": "1.1.1",
+            "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+            "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+            "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+          },
+          "previous": null,
+          "trialInvocation": "0c067ec6-6f7c-4224-8bcc-8c48189cc972",
+          "preparation": null,
+          "highestAcceptedSequence": 2,
+          "badCandidates": []
+        },
+        "minimumFreeBytes": 110746492928,
+        "admission": {
+          "freeBytes": 116544245760,
+          "requiredBytes": 16106127360,
+          "projectedFreeBytes": 100438118400
+        },
+        "cleanup": {
+          "at": 1794156598.112355,
+          "root": "/Users/<user>/tmp-mcicon-111-i7",
+          "removed": true,
+          "verifiedRecordFiles": 2446,
+          "duBytesBefore": 14459166720,
+          "freeBytesBefore": 115116535808,
+          "freeBytesAfter": 120673447936,
+          "dfBefore": "Filesystem   1024-blocks      Used Available Capacity iused      ifree %iused  Mounted on\n/dev/disk3s5   482797652 348660188 112418492    76% 2703983 1124184920    0%   /System/Volumes/Data\n",
+          "dfAfter": "Filesystem   1024-blocks      Used Available Capacity iused      ifree %iused  Mounted on\n/dev/disk3s5   482797652 343233500 117845180    75% 2690409 1178451800    0%   /System/Volumes/Data\n",
+          "symlinksNotFollowed": [],
+          "ownedProcesses": [],
+          "existingPathsUnchanged": true,
+          "existingAnchorsUnchanged": true
+        },
+        "verification": {
+          "at": 1794156541.130305,
+          "existingPathsUnchanged": {
+            "/Users/<user>/.lima": true,
+            "/Users/<user>/.docker": true,
+            "/opt/homebrew/Cellar": true,
+            "/opt/homebrew/var/homebrew/linked": true,
+            "/Users/<user>/Library/Application Support/MCIconBootstrap": true,
+            "/Users/<user>/Library/Application Support/MCIconGenerator": true
+          },
+          "existingAnchorsUnchanged": true,
+          "immutablePublicV110Files": 187,
+          "remainingTracked": [],
+          "ownedProcesses": [],
+          "freeBytes": 115199606784,
+          "minimumFreeBytes": 110746492928
+        },
+        "sourceEvidence": [
+          {
+            "path": "helpers/macos/src/main/java/io/github/rs0325/mcicon/helper/macos/LeaseReferences.java",
+            "sha256": "a51e0b29d00be87ec10975856236e44814df09b5709c8d5e366408d04c7b0f16",
+            "v110SameBytes": true,
+            "lines": [
+              {
+                "line": 40,
+                "text": "LeaseFile current=LeaseFile.open(new HelperProtocol.Command(command.root(),lease,\"release\",List.of()),executable);JsonNode checked=current.read();"
+              },
+              {
+                "line": 45,
+                "text": "if(!released&&!same)pristine=false;"
+              },
+              {
+                "line": 46,
+                "text": "if(!value.path(\"resources\").isEmpty()||!emptyJournal(directory,value)){if(same||!released)pristine=false;if(!released)activeStarted=true;}"
+              },
+              {
+                "line": 49,
+                "text": "}catch(IOException|RuntimeException failure){pristine=false;diagnostics.add(directory.getFileName()+\": \"+failure.getMessage());}"
+              }
+            ]
+          },
+          {
+            "path": "helpers/common/src/main/java/io/github/rs0325/mcicon/helper/LeaseFile.java",
+            "sha256": "bda00aad7b623c92d528a1701e2384659c20392809ee7bf654b78c9e270b08c5",
+            "v110SameBytes": true,
+            "lines": [
+              {
+                "line": 53,
+                "text": "if(!installed.equals(executable.toAbsolutePath().normalize())||!installed.toRealPath().equals(installed)||!Files.isRegularFile(installed,LinkOption.NOFOLLOW_LINKS))throw invalid(\"起動helperの世代が一致しません\");"
+              }
+            ]
+          },
+          {
+            "path": "helpers/macos/src/main/java/io/github/rs0325/mcicon/helper/macos/MacRuntime.java",
+            "sha256": "47f4f230f5738f84612ee2ebe87678549d98c67d9b9af2a0d9c81e28e6be08ee",
+            "v110SameBytes": false,
+            "lines": [
+              {
+                "line": 48,
+                "text": "operation.requireActive();new RebootRecovery(this).prepare(operation);LeaseReferences.Scan references=references();if(references.unknown())throw new IOException(\"他leaseの所有が不明です: \"+references.diagnostics());"
+              },
+              {
+                "line": 59,
+                "text": "operation.requireActive();operation.requireSettled();new RebootRecovery(this).prepare(operation);LeaseReferences.Scan references=references();if(references.unknown())throw new IOException(\"他leaseの所有が不明です: \"+references.diagnostics());"
+              }
+            ]
+          }
+        ],
+        "evidence": "build/111-i/macos/update/u01-oldjob/REPORT.md",
+        "archive": {
+          "path": "final-evidence.tar.gz",
+          "sha256": "c2b745b752d5b5167bb13e429fd8cbdeb0a596c0d60aeb04daa7d7ce33a34b57",
+          "verifiedFiles": 2446
+        },
+        "firstAttempts": [
+          {
+            "attempt": 1,
+            "scope": "観測経路",
+            "status": "旧worker捕捉前に観測失敗、更新未開始",
+            "oldRendersSucceeded": 200,
+            "error": "host側Docker socketがRemoteDisconnectedで閉じる。製品描画は成功。"
+          },
+          {
+            "attempt": 2,
+            "scope": "観測経路",
+            "status": "旧worker捕捉前に観測失敗、更新未開始",
+            "oldRendersSucceeded": 200,
+            "error": "host側Docker socketがRemoteDisconnectedで閉じる。製品描画は成功。"
+          }
+        ],
+        "cause": "新helperが他世代active leaseを自身のexecutableでLeaseFile.openし、旧descriptorのhelper path不一致をunknownとして拒否。旧jobは保存されるが候補trialが成功せず、完了後の通常起動でも旧世代が実行されtrialInvocation/pendingが残る。",
+        "remaining": [
+          "U01旧job同時更新の失敗に対する製品側の判断・対応。修正は実施していない。"
+        ],
+        "workerObservationLimitation": "保持前はjava引数付きmcicon-display shell wrapper、失敗直後は同一PID/PPID/開始時刻でJVMへexec済み。保持前psだけでJVM起動完了とせず、create settled full ID/label・lease完全一致と合わせworker継続性を検証。"
+      }
+    },
+    "U01-not-applied": [
+      {
+        "case": "disabled",
+        "status": "成功",
+        "seconds": 161.0917661190033,
+        "renders": [
+          {
+            "name": "fresh-not-applied",
+            "seconds": 60.704121112823486,
+            "png": "build/111-i/macos/update/evidence/disabled/disabled/out/fresh-not-applied/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          },
+          {
+            "name": "real-background-trigger",
+            "seconds": 43.49150586128235,
+            "png": "build/111-i/macos/update/evidence/disabled/disabled/out/real-background-trigger/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          },
+          {
+            "name": "pending-not-applied",
+            "seconds": 43.49680304527283,
+            "png": "build/111-i/macos/update/evidence/disabled/disabled/out/pending-not-applied/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          }
+        ],
+        "minimumFreeBytes": 13009604608,
+        "admission": {
+          "freeBytes": 18635599872,
+          "requiredBytes": 6442450944,
+          "projectedFreeBytes": 12193148928
+        },
+        "capacitySamples": 159,
+        "snapshots": {
+          "initial": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": null,
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 1,
+            "badCandidates": []
+          },
+          "fresh-not-applied": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": null,
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 1,
+            "badCandidates": []
+          },
+          "real-pending": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": {
+              "toolVersion": "1.1.1",
+              "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+              "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+              "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+            },
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 2,
+            "badCandidates": []
+          },
+          "pending-not-applied": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": {
+              "toolVersion": "1.1.1",
+              "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+              "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+              "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+            },
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 2,
+            "badCandidates": []
+          }
+        },
+        "notApplied": [
+          {
+            "name": "fresh-not-applied",
+            "pendingAlreadyPrepared": false,
+            "stateUnchanged": true,
+            "oldSlotExecuted": true,
+            "backgroundWasRunning": false
+          },
+          {
+            "name": "pending-not-applied",
+            "pendingAlreadyPrepared": true,
+            "stateUnchanged": true,
+            "oldSlotExecuted": true,
+            "backgroundWasRunning": false
+          }
+        ]
+      },
+      {
+        "case": "offline",
+        "status": "成功",
+        "seconds": 155.20936703681946,
+        "renders": [
+          {
+            "name": "fresh-not-applied",
+            "seconds": 56.50979495048523,
+            "png": "build/111-i/macos/update/evidence/offline/offline/out/fresh-not-applied/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          },
+          {
+            "name": "real-background-trigger",
+            "seconds": 43.855852127075195,
+            "png": "build/111-i/macos/update/evidence/offline/offline/out/real-background-trigger/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          },
+          {
+            "name": "pending-not-applied",
+            "seconds": 42.945493936538696,
+            "png": "build/111-i/macos/update/evidence/offline/offline/out/pending-not-applied/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          }
+        ],
+        "minimumFreeBytes": 12711071744,
+        "admission": {
+          "freeBytes": 18358013952,
+          "requiredBytes": 6442450944,
+          "projectedFreeBytes": 11915563008
+        },
+        "capacitySamples": 153,
+        "snapshots": {
+          "initial": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": null,
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 1,
+            "badCandidates": []
+          },
+          "fresh-not-applied": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": null,
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 1,
+            "badCandidates": []
+          },
+          "real-pending": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": {
+              "toolVersion": "1.1.1",
+              "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+              "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+              "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+            },
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 2,
+            "badCandidates": []
+          },
+          "pending-not-applied": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": {
+              "toolVersion": "1.1.1",
+              "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+              "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+              "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+            },
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 2,
+            "badCandidates": []
+          }
+        },
+        "notApplied": [
+          {
+            "name": "fresh-not-applied",
+            "pendingAlreadyPrepared": false,
+            "stateUnchanged": true,
+            "oldSlotExecuted": true,
+            "backgroundWasRunning": false
+          },
+          {
+            "name": "pending-not-applied",
+            "pendingAlreadyPrepared": true,
+            "stateUnchanged": true,
+            "oldSlotExecuted": true,
+            "backgroundWasRunning": false
+          }
+        ]
+      },
+      {
+        "case": "pin",
+        "status": "成功",
+        "seconds": 158.74800992012024,
+        "renders": [
+          {
+            "name": "fresh-not-applied",
+            "seconds": 57.28630208969116,
+            "png": "build/111-i/macos/update/evidence/pin/pin/out/fresh-not-applied/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          },
+          {
+            "name": "real-background-trigger",
+            "seconds": 43.85380411148071,
+            "png": "build/111-i/macos/update/evidence/pin/pin/out/real-background-trigger/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          },
+          {
+            "name": "pending-not-applied",
+            "seconds": 44.32225680351257,
+            "png": "build/111-i/macos/update/evidence/pin/pin/out/pending-not-applied/java/1.21.4/icons/assets/minecraft/textures/block/stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "counts": {
+              "failed": 0,
+              "noItemForm": 76,
+              "succeeded": 1
+            },
+            "commandReceiptsFinished": true,
+            "executedSlots": [
+              "1.1.0"
+            ]
+          }
+        ],
+        "minimumFreeBytes": 12380377088,
+        "admission": {
+          "freeBytes": 18007515136,
+          "requiredBytes": 6442450944,
+          "projectedFreeBytes": 11565064192
+        },
+        "capacitySamples": 157,
+        "snapshots": {
+          "initial": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": null,
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 1,
+            "badCandidates": []
+          },
+          "fresh-not-applied": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": null,
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 1,
+            "badCandidates": []
+          },
+          "real-pending": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": {
+              "toolVersion": "1.1.1",
+              "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+              "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+              "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+            },
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 2,
+            "badCandidates": []
+          },
+          "pending-not-applied": {
+            "schemaVersion": 4,
+            "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+            "channel": "stable",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            },
+            "active": {
+              "toolVersion": "1.1.0",
+              "payloadSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "runtimeDescriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+              "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+            },
+            "pending": {
+              "toolVersion": "1.1.1",
+              "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+              "runtimeDescriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+              "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+            },
+            "previous": null,
+            "trialInvocation": null,
+            "preparation": null,
+            "highestAcceptedSequence": 2,
+            "badCandidates": []
+          }
+        },
+        "notApplied": [
+          {
+            "name": "fresh-not-applied",
+            "pendingAlreadyPrepared": false,
+            "stateUnchanged": true,
+            "oldSlotExecuted": true,
+            "backgroundWasRunning": false
+          },
+          {
+            "name": "pending-not-applied",
+            "pendingAlreadyPrepared": true,
+            "stateUnchanged": true,
+            "oldSlotExecuted": true,
+            "backgroundWasRunning": false
+          }
+        ]
+      }
+    ],
+    "T02-I02": {
+      "status": "成功（旧sequenceは実配布classの判定実測）",
+      "result": {
+        "started": 1794145765.2475882,
+        "steps": [
+          {
+            "name": "manifest",
+            "args": [
+              "/Users/<user>/tmp-mcicon-111-i6/negatives/manifest/program/MCIconBootstrap.app/Contents/MacOS/MCIconBootstrap",
+              "--version"
+            ],
+            "seconds": 0.7392189502716064,
+            "exit": 1,
+            "expectedExit": 1,
+            "minimumFreeBytes": 13104390144,
+            "mutation": {
+              "path": "negatives/manifest/program/MCIconBootstrap.app/Contents/app/seed/stable.json",
+              "offset": 16253,
+              "beforeByte": 49,
+              "afterByte": 51,
+              "originalSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20",
+              "mutatedSha256": "b5cfa8e01b31e13367b3c4c3d3a9b65b7d4093205dee65c19b36a8f80461923b",
+              "bytes": 16283
+            },
+            "noActiveStatePublished": true
+          },
+          {
+            "name": "signature",
+            "args": [
+              "/Users/<user>/tmp-mcicon-111-i6/negatives/signature/program/MCIconBootstrap.app/Contents/MacOS/MCIconBootstrap",
+              "--version"
+            ],
+            "seconds": 0.7547018527984619,
+            "exit": 1,
+            "expectedExit": 1,
+            "minimumFreeBytes": 13100376064,
+            "mutation": {
+              "path": "negatives/signature/program/MCIconBootstrap.app/Contents/app/seed/stable.json.sig",
+              "offset": 0,
+              "beforeByte": 19,
+              "afterByte": 18,
+              "originalSha256": "0a7a5c0a60db6095fa8469d73487792378991aa4607725385fa0411c0603ad63",
+              "mutatedSha256": "971aa5587624aed5279013897b9556b66fac4d02923be3fec5be080880571327",
+              "bytes": 64
+            },
+            "noActiveStatePublished": true
+          },
+          {
+            "name": "payload",
+            "args": [
+              "/Users/<user>/tmp-mcicon-111-i6/negatives/payload/program/MCIconBootstrap.app/Contents/MacOS/MCIconBootstrap",
+              "--version"
+            ],
+            "seconds": 0.7529001235961914,
+            "exit": 1,
+            "expectedExit": 1,
+            "minimumFreeBytes": 13064171520,
+            "mutation": {
+              "path": "negatives/payload/program/MCIconBootstrap.app/Contents/app/seed/tool.zip",
+              "offset": 100,
+              "beforeByte": 161,
+              "afterByte": 160,
+              "originalSha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+              "mutatedSha256": "d79c5878746be17ee330557bd7b7577bd9639abd6bf119a8249da310cc4a1f81",
+              "bytes": 35983846
+            },
+            "noActiveStatePublished": true
+          },
+          {
+            "name": "old-sequence-policy",
+            "args": [
+              "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home/bin/java",
+              "-cp",
+              "/Users/<user>/tmp-mcicon-111-i6/program/MCIconBootstrap.app/Contents/app/*",
+              "/Users/<user>/tmp-mcicon-111-i6/SeedPolicyProbe.java",
+              "/Users/<user>/tmp-mcicon-111-i6/program/MCIconBootstrap.app/Contents/app",
+              "/Users/<user>/tmp-mcicon-111-i6"
+            ],
+            "seconds": 0.4160120487213135,
+            "exit": 0,
+            "expectedExit": 0,
+            "minimumFreeBytes": 13028175872
+          }
+        ],
+        "productRebuilt": false,
+        "productionSigningKeyUsed": false,
+        "sequenceCoverage": "実公開bootstrapの未改変Seed/UpdateDownload.newerへ、正式署名bytes(sequence1/2)と実更新で保存したstate(高水位1/2)を入力。HTTP replayのE2Eではなく実配布classの判定実測。",
+        "passed": true,
+        "finished": 1794145768.037657,
+        "seconds": 2.7900688648223877
+      },
+      "httpReplayE2E": "未実施。本番Latestはsequence2で、公開元・URL・署名は変更していない。"
+    },
+    "U02": {
+      "status": "状態記録のみ",
+      "readOnly": true,
+      "leases": 458,
+      "unreleasedOrResourcesPresent": 8,
+      "recoveryAttempted": false,
+      "automaticLegacyRescueExpected": false,
+      "evidence": "build/111-i/macos/update/evidence/root/u02-state.json"
+    }
+  },
+  "background": [
+    {
+      "case": "healthy",
+      "invocationId": "2dc5deee-a177-408f-b310-958629227a56",
+      "result": "pending",
+      "exitCode": 0,
+      "secondsByReceiptMtime": 10.40151333808899,
+      "measurement": "receipt最終mtime−issuedAt（filesystem時刻による近似）"
+    },
+    {
+      "case": "disabled",
+      "invocationId": "4c93ff22-9955-4615-a09d-82b780c5193a",
+      "result": "pending",
+      "exitCode": 0,
+      "secondsByReceiptMtime": 3.0140461921691895,
+      "measurement": "receipt最終mtime−issuedAt（filesystem時刻による近似）"
+    },
+    {
+      "case": "offline",
+      "invocationId": "b182ebba-29ec-4eda-8d63-9dca1f962f53",
+      "result": "pending",
+      "exitCode": 0,
+      "secondsByReceiptMtime": 3.0220296382904053,
+      "measurement": "receipt最終mtime−issuedAt（filesystem時刻による近似）"
+    },
+    {
+      "case": "pin",
+      "invocationId": "c9bb4725-cade-429e-b5f5-6a6ae60d79d5",
+      "result": "pending",
+      "exitCode": 0,
+      "secondsByReceiptMtime": 4.618715763092041,
+      "measurement": "receipt最終mtime−issuedAt（filesystem時刻による近似）"
+    }
+  ],
+  "pngs": {
+    "passed": 11,
+    "failed": 0,
+    "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de"
+  },
+  "jobReceipts": [
+    {
+      "case": "healthy",
+      "jobId": "1f483689-2a29-4e5c-93a4-540a215c9d30",
+      "toolVersion": "1.1.1",
+      "descriptorSha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "healthy",
+      "jobId": "f095baf8-6a3b-4f20-bd64-027feffe529d",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "disabled",
+      "jobId": "1fe404d3-23da-432a-a47e-97336cf01249",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "disabled",
+      "jobId": "b4c07baf-c3c9-4f57-9e76-1a47f2c659e8",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "disabled",
+      "jobId": "e663aa78-d1cc-4c59-9f57-3ab7d2bfc805",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "offline",
+      "jobId": "79e69a4f-bc8a-4869-aa28-b0062afb3722",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "offline",
+      "jobId": "e4145229-77f3-41ef-b97f-84accdfe048f",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "offline",
+      "jobId": "e6e623e3-30a3-4c72-8aa5-a63148fff424",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "pin",
+      "jobId": "1a5af58c-2606-4310-9741-618f126d0104",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "pin",
+      "jobId": "25411c5f-ea2d-4962-abd5-60556fb91feb",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    },
+    {
+      "case": "pin",
+      "jobId": "b59f0c2f-06f4-4378-aef3-3aeb934afa56",
+      "toolVersion": "1.1.0",
+      "descriptorSha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101",
+      "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+      "state": "released",
+      "resourcesEmpty": true,
+      "receiptVerified": true
+    }
+  ],
+  "initialAttemptFailures": [
+    {
+      "scope": "local-harness",
+      "error": "WinError 206: Windowsコマンド長上限。SSH起動前に失敗。",
+      "atUtc": "2026-11-08T13:24:45Z",
+      "log": "C:/Users/<user>/.codex/logs/commands/20261108T132445Z-5eeda4a7d17045499d1b70b090b2e273.jsonl",
+      "response": "未使用の埋込みsnapshotを除去し、同じ許可対象2本の復元を再実行して成功。"
+    },
+    {
+      "attempt": 1,
+      "scope": "観測経路",
+      "status": "旧worker捕捉前に観測失敗、更新未開始",
+      "oldRendersSucceeded": 200,
+      "error": "host側Docker socketがRemoteDisconnectedで閉じる。製品描画は成功。"
+    },
+    {
+      "attempt": 2,
+      "scope": "観測経路",
+      "status": "旧worker捕捉前に観測失敗、更新未開始",
+      "oldRendersSucceeded": 200,
+      "error": "host側Docker socketがRemoteDisconnectedで閉じる。製品描画は成功。"
+    }
+  ],
+  "productUnexpectedFailures": 1,
+  "cleanup": {
+    "allStartedProcessesEnded": true,
+    "ownedVmAnchorsRecovered": 5,
+    "root": {
+      "root": "/Users/<user>/tmp-mcicon-111-i6",
+      "removed": true,
+      "duBytesBefore": 3895820288,
+      "freeBytesBefore": 17412345856,
+      "freeBytesAfter": 20929011712,
+      "at": 1794146374.0893881,
+      "ownedProcesses": []
+    },
+    "existingPathsUnchanged": {
+      "/Users/<user>/.lima": true,
+      "/Users/<user>/.docker": true,
+      "/opt/homebrew/Cellar": true,
+      "/opt/homebrew/var/homebrew/linked": true,
+      "/Users/<user>/Library/Application Support/MCIconBootstrap": true,
+      "/Users/<user>/Library/Application Support/MCIconGenerator": true
+    },
+    "existingAnchorsUnchanged": true,
+    "publicV110OriginalFilesUnchanged": 187,
+    "i7Continuation": {
+      "at": 1794156598.112355,
+      "root": "/Users/<user>/tmp-mcicon-111-i7",
+      "removed": true,
+      "verifiedRecordFiles": 2446,
+      "duBytesBefore": 14459166720,
+      "freeBytesBefore": 115116535808,
+      "freeBytesAfter": 120673447936,
+      "dfBefore": "Filesystem   1024-blocks      Used Available Capacity iused      ifree %iused  Mounted on\n/dev/disk3s5   482797652 348660188 112418492    76% 2703983 1124184920    0%   /System/Volumes/Data\n",
+      "dfAfter": "Filesystem   1024-blocks      Used Available Capacity iused      ifree %iused  Mounted on\n/dev/disk3s5   482797652 343233500 117845180    75% 2690409 1178451800    0%   /System/Volumes/Data\n",
+      "symlinksNotFollowed": [],
+      "ownedProcesses": [],
+      "existingPathsUnchanged": true,
+      "existingAnchorsUnchanged": true,
+      "verification": {
+        "at": 1794156541.130305,
+        "existingPathsUnchanged": {
+          "/Users/<user>/.lima": true,
+          "/Users/<user>/.docker": true,
+          "/opt/homebrew/Cellar": true,
+          "/opt/homebrew/var/homebrew/linked": true,
+          "/Users/<user>/Library/Application Support/MCIconBootstrap": true,
+          "/Users/<user>/Library/Application Support/MCIconGenerator": true
+        },
+        "existingAnchorsUnchanged": true,
+        "immutablePublicV110Files": 187,
+        "remainingTracked": [],
+        "ownedProcesses": [],
+        "freeBytes": 115199606784,
+        "minimumFreeBytes": 110746492928
+      }
+    }
+  },
+  "minimumFreeBytes": 12240089088,
+  "prepublishComparison": {
+    "path": "qa/acceptance-1.1.1-macos-2026-11-07.json",
+    "sha256": "b78a19f09d211442a7572dc52ea42ee5f593a223ead28bc812c4c59ecf686184",
+    "note": "公開前候補のfixture契約確認・未公開URLによる未検証と区別。本記録は本番Latest・原v1.1.0でbackground完了/pending/managed適用を実測。旧job同時更新は今回も未検証。 2026-11-09継続で旧job保護は成功、同時更新trialは失敗。旧未検証記録はhistoryに保存。"
+  },
+  "evidence": "build/111-i/macos/update/REPORT.md",
+  "publicOperations": false,
+  "remaining": [
+    "U01旧job同時更新の失敗に対する製品側の判断・対応。修正は実施していない。"
+  ],
+  "limitations": [
+    "不適用は新規backgroundなしと、実background完了後のpending保持の両状態を実測。background worker稼働中にoffline/pinへ切替えて中止されるという主張はしていない。",
+    "旧sequenceは正式署名bytesと実測stateで実公開classを検証。HTTP旧sequence再配信のE2Eへ読み替えない。"
+  ],
+  "postprocessingDiagnostics": [
+    {
+      "type": "記録スクリプト",
+      "detail": "初回healthy回収時のslot列挙先をslotsと誤記。全tools bytesはarchiveに保全されていたため、Windowsで正しいtoolsからhash記録を補完。実更新・製品bytesの変更なし。",
+      "evidence": "slot-jars-healthy-corrected.json"
+    },
+    {
+      "type": "記録スクリプト",
+      "detail": "集計時の実core path照合をslash文字列からPath.partsへ修正。Windows path区切りが原因で、actual core SHAはF5と一致。Mac再実行なし。",
+      "log": "C:/Users/<user>/.codex/logs/commands/20261108T140303Z-5835846890c34858be6f3dfc9ea55488.jsonl"
+    },
+    {
+      "type": "i7集計",
+      "detail": "guest workerがdisplay wrapperからJVMへ同一PIDでexecしargvが変化。過剰な全情報一致assertをPID/PPID/開始identityと製品full ID/labelの照合へ訂正。保持前JVM起動完了と誤記しない。実機再実行なし。"
+    }
+  ],
+  "continuationEvidence": "build/111-i/macos/update/u01-oldjob/REPORT.md",
+  "stageIClosure": {
+    "date": "2026-11-09",
+    "userDecision": {
+      "date": "2026-11-09",
+      "originalText": "両方行う",
+      "approvedActions": [
+        "U01不具合のIssue作成",
+        "v1.1.1 Release本文への既知問題追記・差替え"
+      ],
+      "executor": "git_operator",
+      "performedByThisPreparation": false,
+      "notAuthorizedHere": [
+        "commit",
+        "push",
+        "PR作成",
+        "Issue作成",
+        "Release編集"
+      ]
+    },
+    "overallGatePassed": false,
+    "U01": {
+      "macos": {
+        "status": "失敗",
+        "issue": "#189",
+        "oldJobProtected": true,
+        "oldJobSucceeded": 200,
+        "oldJobFailed": 0,
+        "newGenerationApplied": false,
+        "cause": "異世代active leaseを現helperでLeaseFile.open→helper path不一致→UNKNOWN→preflight拒否。UNKNOWN試行のtrialInvocationが残存。",
+        "stateAfter": {
+          "active": "1.1.0",
+          "pending": "1.1.1",
+          "previous": null,
+          "trialInvocation": "0c067ec6-6f7c-4224-8bcc-8c48189cc972",
+          "highestAcceptedSequence": 2,
+          "badCandidates": []
+        },
+        "subsequentLaunch": "通常再起動は1.1.0で成功。trial再試行/新しいbackground取得は進まない。repairは解除操作ではない。",
+        "evidence": "build/111-i/macos/update/u01-oldjob/REPORT.md",
+        "rawCase": "build/111-i/macos/update/u01-oldjob/evidence/final/case-attempt-3.json",
+        "sourceAnalysis": "build/111-i/issues/u01-oldjob-update/REPORT.md"
+      },
+      "windows": {
+        "status": "本hostでは未検証",
+        "reason": "未改変v1.1.0の旧native facts/preflightが失敗して実workerへ到達しない。DistributionName欠損Lxssキーに関するPR #179との差が高確度候補。registry改変による原因消失は未確認。",
+        "oldNativeFailureRelatedPr": 179,
+        "oldJobGenerationVerified": false,
+        "actualBackgroundAndNextApplyPassed": true,
+        "healthyOldManagedPassed": false,
+        "crossGenerationSourceRiskIssue": "#189",
+        "evidence": "build/111-i/windows/update/old-native-facts-comparison.json"
+      }
+    },
+    "environmentDifference": {
+      "host": "windows",
+      "distribution": "Ubuntu-24.04",
+      "before": "Running",
+      "after": "Stopped",
+      "initiatorAndChangeActor": "起動者・状態変化主体（自動停止を含む）は不明",
+      "differencePreserved": true,
+      "restoredToHideDifference": false,
+      "existingEnvironmentExactlyEqual": false,
+      "evidence": "qa/post-publish-1.1.1-windows-2026-11-08.json#environmentDifferences",
+      "actorInvestigationOrNewHostOperationPerformed": false
+    },
+    "issue98CloseAllowed": false,
+    "issue98Reason": "旧job稼働中の新版適用がMacで失敗し、Windows健全旧job条件も未検証。公開完了や旧job保護だけでは完成条件を満たさない。",
+    "publicOperationsPerformed": false
+  },
+  "publicTextRedaction": {
+    "osUsernamesReplacedWith": "<user>",
+    "originalPreserved": {
+      "path": "build/111-i/qa-closure/previous/qa/post-publish-1.1.1-macos-2026-11-08.json",
+      "bytes": 81698,
+      "sha256": "406b0854558fc8fbbbb23599dfcb87724ddfd9597ca5f42e76edb89029bd178e"
+    },
+    "scope": "OSユーザー名の表記だけ匿名化し、数値・hash・判定・失敗/skipを変更しない。元の原証拠はbuild内に保全。"
+  }
+}
