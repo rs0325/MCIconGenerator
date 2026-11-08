@@ -10,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SeedTest {
     @TempDir Path directory;
-    @org.junit.jupiter.api.BeforeEach void canonicalDirectory() throws Exception {directory=directory.toRealPath();}
-    Fixture fixture() throws Exception {return new Fixture(directory.toRealPath());}
+    @org.junit.jupiter.api.BeforeEach void canonicalDirectory() throws Exception {directory=directory.toRealPath();org.junit.jupiter.api.Assumptions.assumeTrue(!System.getProperty("os.name").startsWith("Windows")||System.getenv("MCICON_WINDOWS_READER_STAGE")!=null,"Windows実機ではstage済みreaderが必要");}
+    Fixture fixture() throws Exception {return new Fixture(directory.toRealPath(),true);}
     long deadline(){return System.nanoTime()+Duration.ofSeconds(10).toNanos();}
     @Test void temporaryFixtureKeysOnlyValidateTheirOwnSignedSeed() throws Exception {
         Fixture first=new Fixture(directory.toRealPath().resolve("first")),second=new Fixture(directory.toRealPath().resolve("second"));
@@ -20,7 +20,15 @@ class SeedTest {
         first.manifest.put("sequence",2);first.writeManifest();assertEquals(2,first.seed().manifest.path("sequence").asInt());
     }
     @Test void verifiesTemporaryTestSignatureAndExactArchiveTree() throws Exception {
-        Fixture f=fixture();Seed seed=f.seed();Path extracted=directory.resolve("extracted");seed.extract(f.bootstrap(directory),f.installed.resolve("seed/tool.zip"),extracted,deadline());assertTrue(Files.isExecutable(extracted.resolve(f.host.os().equals("windows")?"java/bin/java.exe":"java/bin/java")));assertEquals("1.1.0",seed.version);
+        Fixture f=fixture();f.files.keySet().removeIf(name->name.startsWith("app/lib/jackson-"));f.publish();Seed seed=f.seed();Bootstrap bootstrap=f.bootstrap(directory);Path extracted=directory.resolve("extracted");long end=deadline();seed.extract(bootstrap,f.installed.resolve("seed/tool.zip"),extracted,end);assertTrue(Files.isExecutable(extracted.resolve(f.host.os().equals("windows")?"java/bin/java.exe":"java/bin/java")));assertEquals("1.1.0",seed.version);
+        tree(f,bootstrap,extracted,end);
+    }
+    private void tree(Fixture fixture,Bootstrap bootstrap,Path slot,long deadline) throws Exception {
+        java.util.Map<String,String> expected=new java.util.TreeMap<>();for(var row:fixture.files.entrySet()){expected.put(row.getKey(),row.getValue().length+":"+Seed.hash(row.getValue())+":"+(fixture.host.os().equals("windows")||row.getKey().equals("java/bin/java")||fixture.executableFiles.contains(row.getKey())));for(Path parent=Path.of(row.getKey()).getParent();parent!=null;parent=parent.getParent())expected.put(parent.toString().replace('\\','/'),"directory");}
+        assertEquals(expected,Seed.tree(bootstrap,slot,deadline));
+    }
+    @Test void fullRuntimeIsVerifiedThroughTheProductionPreparationBudget() throws Exception {
+        Fixture f=fixture();f.useFullRuntime();Bootstrap bootstrap=f.bootstrap(directory.resolve("root"));bootstrap.repair();Seed seed=f.seed();assertEquals(seed.reference(),bootstrap.state().get("active"));assertEquals(0,bootstrap.launch(java.util.List.of("list")));assertEquals(seed.reference(),bootstrap.state().get("active"));tree(f,bootstrap,bootstrap.slot(seed),System.nanoTime()+UpdatePreparation.BUDGET.toNanos());
     }
     @Test void posixSlotRetainsExistingDirectoryModes() throws Exception {
         org.junit.jupiter.api.Assumptions.assumeTrue(Files.getFileStore(directory).supportsFileAttributeView("posix"));
@@ -50,8 +58,8 @@ class SeedTest {
         assertFalse(Files.exists(directory.resolve("outside")));
     }
     @Test void declaredUnpackedLimitAndDeadlineAreEnforced() throws Exception {
-        Fixture f=fixture();((ObjectNode)f.manifest.path("platforms").get(0).get("payload")).put("unpackedBytes",1);f.writeManifest();assertThrows(IOException.class,()->f.seed().extract(f.bootstrap(directory),f.installed.resolve("seed/tool.zip"),directory.resolve("small"),deadline()));
-        f.publish();assertThrows(IOException.class,()->f.seed().extract(f.bootstrap(directory),f.installed.resolve("seed/tool.zip"),directory.resolve("expired"),System.nanoTime()-1));
+        Fixture f=fixture();((ObjectNode)f.manifest.path("platforms").get(0).get("payload")).put("unpackedBytes",1);f.writeManifest();assertTrue(assertThrows(IOException.class,()->f.seed().extract(f.bootstrap(directory),f.installed.resolve("seed/tool.zip"),directory.resolve("small"),deadline())).getMessage().contains("展開上限"));
+        f.publish();assertTrue(assertThrows(IOException.class,()->f.seed().extract(f.bootstrap(directory),f.installed.resolve("seed/tool.zip"),directory.resolve("expired"),System.nanoTime()-1)).getMessage().contains("期限"));
     }
     @Test void descriptorAndInventoryMismatchCannotBecomeSlot() throws Exception {
         Fixture f=fixture();f.files.put("inventory/tool.json",new byte[]{1});f.publish();assertThrows(IOException.class,()->f.seed().extract(f.bootstrap(directory),f.installed.resolve("seed/tool.zip"),directory.resolve("inventory"),deadline()));
