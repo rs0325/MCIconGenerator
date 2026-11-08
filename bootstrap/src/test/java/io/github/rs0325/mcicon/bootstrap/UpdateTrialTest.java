@@ -15,14 +15,20 @@ class UpdateTrialTest {
     private Fixture fixture;
     private Bootstrap bootstrap;
     private JsonNode old;
+    private JsonNode preparation;
     private long deadline(){return System.nanoTime()+Duration.ofSeconds(10).toNanos();}
     private void pending() throws Exception {
         directory=directory.toRealPath();fixture=new Fixture(directory);bootstrap=fixture.bootstrap(directory.resolve("root"));assertEquals(0,bootstrap.launch(List.of()));old=bootstrap.state().get("active");
-        fixture.manifest.put("toolVersion","1.1.1").put("sequence",2);fixture.descriptor.put("toolVersion","1.1.1");for(String name:new ArrayList<>(fixture.files.keySet()))if(name.endsWith("-1.1.0.jar")){byte[] bytes=fixture.files.remove(name);fixture.files.put(name.replace("-1.1.0.jar","-1.1.1.jar"),bytes);}fixture.publish();Seed seed=fixture.seed();bootstrap.copyArchive(seed,deadline());bootstrap.saveManifest(seed);bootstrap.verifySlot(seed,deadline());ObjectNode state=(ObjectNode)bootstrap.state();state.set("pending",seed.reference());state.put("highestAcceptedSequence",2);bootstrap.atomic(bootstrap.root.resolve("active.json"),state);
+        fixture.manifest.put("toolVersion","1.1.1").put("sequence",2);fixture.descriptor.put("toolVersion","1.1.1");for(String name:new ArrayList<>(fixture.files.keySet()))if(name.endsWith("-1.1.0.jar")){byte[] bytes=fixture.files.remove(name);fixture.files.put(name.replace("-1.1.0.jar","-1.1.1.jar"),bytes);}fixture.publish();preparation=fixture.preparePending(bootstrap);
+        assertEquals("preparation",preparation.path("kind").asText());assertEquals("finished",preparation.path("state").asText());assertEquals(0,preparation.path("exitCode").asInt());assertEquals("pending",preparation.path("result").asText());
+        JsonNode state=bootstrap.state();assertEquals(old,state.get("active"));assertEquals(fixture.seed().reference(),state.get("pending"));assertEquals(2,state.path("highestAcceptedSequence").asInt());assertTrue(state.path("preparation").isNull());assertTrue(state.path("trialInvocation").isNull());
+    }
+    private void finishedRuns(int commands) throws Exception {
+        try(var paths=Files.list(bootstrap.root.resolve("runs"))){List<Path> runs=paths.toList();assertEquals(commands+1,runs.size());int found=0;for(Path path:runs){JsonNode record=Seed.json(Seed.read(path,65536));assertEquals("finished",record.path("state").asText());if(record.path("kind").asText().equals("preparation"))assertEquals(preparation,record);else {assertEquals("command",record.path("kind").asText());found++;}}assertEquals(commands,found);}
     }
     @Test void eligibleListReapsOldParserAndActivatesOnlyBeforeOutput() throws Exception {
         pending();Path output=directory.resolve("result");assertEquals(0,bootstrap.launch(List.of("list","output",output.toString())));assertTrue(Files.exists(output));JsonNode state=bootstrap.state();assertEquals("1.1.1",state.path("active").path("toolVersion").asText());assertEquals(old,state.get("previous"));assertTrue(state.path("pending").isNull());assertTrue(state.path("trialInvocation").isNull());
-        try(var paths=Files.list(bootstrap.root.resolve("runs"))){List<Path> runs=paths.toList();assertEquals(3,runs.size());for(Path run:runs)assertEquals("finished",Seed.json(Seed.read(run,65536)).path("state").asText());}
+        finishedRuns(3);
     }
     @Test void candidateFailureRecoversOnceAndRejectsLocalAndDownloadedBadPayload() throws Exception {
         pending();JsonNode candidate=bootstrap.state().get("pending");Path output=directory.resolve("recovered");
@@ -37,7 +43,7 @@ class UpdateTrialTest {
     }
     @Test void oldJobFailureIsReturnedWithoutRetryingAfterRecovery() throws Exception {
         pending();assertEquals(1,bootstrap.launch(List.of("list","candidate-fail","old-fail")));JsonNode current=bootstrap.state();assertEquals(old,current.get("active"));assertTrue(current.path("pending").isNull());assertTrue(current.path("trialInvocation").isNull());assertEquals(1,current.path("badCandidates").size());
-        try(var paths=Files.list(bootstrap.root.resolve("runs"))){assertEquals(4,paths.count());}
+        finishedRuns(4);
     }
     @Test void incompleteCleanupKeepsCandidateAndReceiptUnknown() throws Exception {
         pending();Path output=directory.resolve("must-not-write");assertThrows(IOException.class,()->bootstrap.launch(List.of("list","candidate-fail","cleanup-unknown","output",output.toString())));
