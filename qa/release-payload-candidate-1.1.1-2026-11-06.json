@@ -1,0 +1,2353 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-08",
+  "taskId": "milestone-111-d",
+  "owner": "complex_worker（同一担当、r5署名結合・段階F）",
+  "branch": "feature/issue-99-descriptor-111",
+  "baseCommit": "5c474f4151ba8f9dc932819a15cd3f3c4ee7657d",
+  "refs": [
+    95,
+    99
+  ],
+  "status": "R5_SIGNATURES_MERGED_BOOTSTRAP_ARCHIVES_FIXED_WITH_KNOWN_TEST_FAILURES",
+  "eligibleForCurrentPublication": false,
+  "regenerationReason": "#183の回復予算・ログ処理修正を含むWindows helper・coreから同一最終coreで再生成。rootfs/Mac helper/qcow2/rendererは不変。",
+  "priorDescriptorEvidence": {
+    "path": "qa/descriptor-candidate-1.1.1-2026-11-06.json",
+    "bytes": 1225757,
+    "sha256": "d539f17aaaf9caabe25f179eec1e3ac9d7cbe46574b6a3e84041b1acc2070170"
+  },
+  "previousCandidate": {
+    "qaSnapshot": {
+      "path": "build/111-e5/previous-release-payload-candidate-1.1.1-2026-11-06.json",
+      "bytes": 87818,
+      "sha256": "e9d3a4c6e36c67ea59f788404909e8a444b16a12c6a627c61c3b10cc0d9404b4"
+    },
+    "directories": [
+      "build/111-e4",
+      "build/111-f4"
+    ],
+    "retainedAsEvidence": true,
+    "eligibleForR5Publication": false
+  },
+  "descriptorVerification": {
+    "agent": {
+      "bytes": 535302,
+      "path": "worker/build/libs/worker-1.1.1-agent.jar",
+      "sha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf"
+    },
+    "descriptors": [
+      {
+        "descriptor": {
+          "bytes": 278044,
+          "path": "build/111-d5/candidate/descriptors/windows-x86_64.json",
+          "sha256": "e41d30a5241beac9e7276e5ad14caf9c279b5e8a9022123e8cd736221bb47d57"
+        },
+        "publicKeyVerification": {
+          "operating": true,
+          "recovery": false
+        },
+        "signature": {
+          "bytes": 64,
+          "path": "build/111-d5/candidate/descriptors/windows-x86_64.json.sig",
+          "sha256": "606c7c93f53be93de03d3ba1cd6e0becda8aa743b270edb8b3c5239264e473e2"
+        }
+      },
+      {
+        "descriptor": {
+          "bytes": 374723,
+          "path": "build/111-d5/candidate/descriptors/macos-aarch64.json",
+          "sha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857"
+        },
+        "publicKeyVerification": {
+          "operating": true,
+          "recovery": false
+        },
+        "signature": {
+          "bytes": 64,
+          "path": "build/111-d5/candidate/descriptors/macos-aarch64.json.sig",
+          "sha256": "8bf72da3cfa5733902a13bacb2355929a2ef3e4d3c4273ba434e109b2dbe521e"
+        }
+      }
+    ],
+    "returned": {
+      "bytes": 503,
+      "path": "build/111-d5/returned/descriptor-signatures-1.1.1-r5.zip",
+      "sha256": "41c64cd987dc9ee6b641639e8640d2ead7a8f6816919d5d50bea14d599af27f9"
+    }
+  },
+  "artifacts": {
+    "central": {
+      "candidate": {
+        "bytes": 1484253,
+        "path": "build/111-e5/mcicon-central-1.1.1-candidate.zip",
+        "sha256": "a413bbea7a29edce2be7e184905dc3e72f5c1ab664c7cac4d7ab76f92c8448d8"
+      },
+      "files": [
+        {
+          "bytes": 310620,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar",
+          "sha256": "5bf50028fcd405a377c37241f0f6bae1b0705e9a4bd2fc87bc36aefa30c888a1"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.md5",
+          "sha256": "e9952751fa2ed1ccb725916667df4bd859f2d0521a41a01b384533af79584c36"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.sha1",
+          "sha256": "9faf23302ea81db85164d1fbf593d24af6475eadb672856ecfff29d1659ba806"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.sha256",
+          "sha256": "b7c909d81c1d6c8b5335b7cc1d34f60cc44c29ffad9ce376ba4e332d3e78a857"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.sha512",
+          "sha256": "d266f077d4f11868bd9952b3a34570a40bb219cbe82905ec3afddd28d56b9a32"
+        },
+        {
+          "bytes": 82589,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar",
+          "sha256": "8cb92a749402706e49a5a3d1b7abbbf129429697f298c229f604c639754fa9a4"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.md5",
+          "sha256": "979146727133f60581428ab3e8c25c402da6043c670ad4e6fafd92f0fef3c18e"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha1",
+          "sha256": "265efc2f1c613a16deaf4c18ee230d30a5e2dd74d500f7dfe4bb65d03cf0e7f9"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha256",
+          "sha256": "8dabad136b6b053cb7fd73a690da9383c35ebd0766084f7323aded05a1210e05"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha512",
+          "sha256": "8711405c4e17efa37e243070540e0c70dec28c7ebd4c7f4a273d06f41d38f2cc"
+        },
+        {
+          "bytes": 453909,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar",
+          "sha256": "2ef10533e2f6e3b0283dc68715d68e74980c26a762a5a59cd17eb62276cdd970"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.md5",
+          "sha256": "a0ac5a300e16d6d1a6a24f1b0f0545d07d2ff0813092a538292441d64b86e819"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha1",
+          "sha256": "00078ee347bbff78745f500944a1d5b3e6dd5d4c110ae1d83278799fab6d9a5e"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha256",
+          "sha256": "b674bc014ce6885d8dae09d66e2820970ebf467d4e29f1f87bb5ac875bf05396"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha512",
+          "sha256": "133831adb83d760df8fc60128f63287ad54d9470c79c231b8fa15c35b9b69b0e"
+        },
+        {
+          "bytes": 4393,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module",
+          "sha256": "03f09063b3ff8a9d35222336dfbb3f36f8aacaa9077da3cd2269dbb69f1ebb8a"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.md5",
+          "sha256": "8146fa8e645b0b79921b106ee8c041df51cb75a03da60f9fd09c90dfbc22ad03"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha1",
+          "sha256": "98f6efc7e2a8aee8e0bc534b52715172966313a2aac83507c8e260a480be4395"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha256",
+          "sha256": "42d81cd26520587052b441ea50144f3469b1b7093cbe33a4572d6965dcf3f876"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha512",
+          "sha256": "b5adb1de0886d86a3603ae466c889cedb258e9f8c446b0919803c7a53b0f0346"
+        },
+        {
+          "bytes": 2365,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom",
+          "sha256": "a749b4cd914e8ced8fd9ae8eb1d79329fbf67ace0d9450190ec96590d432b7fa"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.md5",
+          "sha256": "a7a768d8cad137c2038b034d6a9b66c4f1058e2d6ef54ef4c10d2afae57c832c"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.sha1",
+          "sha256": "43024d4f9a39c53646db0be7095724a172792a50f34d0b6aefed2b8c5f8d8b1e"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.sha256",
+          "sha256": "4f517fb6d9da374f27a1be87b2081aee326d53fd55ff6ec73710072334afc0bf"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.sha512",
+          "sha256": "7f27f5d8575c15e77c4a49f8cfebfef53c4ec27eb20cf75789abc30c0394a8ea"
+        },
+        {
+          "bytes": 134495,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar",
+          "sha256": "c7d0fe63914b9fb9c795860099ff2dad05159b530f4e66530173bd16112af751"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.md5",
+          "sha256": "8baead5350ceb378aca20ba77b1a2b4f19928cb24a2cb06c4298e8e84682514f"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.sha1",
+          "sha256": "87209885e1714a8cbc813b90db9177e0dc9a5156bb436582229c03484dae5756"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.sha256",
+          "sha256": "929a14c65d1c2392069c53bdc1644a5a644ff7668bb72179f059e51bb3b05274"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.sha512",
+          "sha256": "5231b4f56e9431fa7277ce6754a43d0ff504e15493533af2ed15fb782be55c14"
+        },
+        {
+          "bytes": 31730,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar",
+          "sha256": "3931d24d514b8338a2170ccbe2197e721ccc10a41a68912403d24379a31f4a79"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.md5",
+          "sha256": "319ca395f02426116eda102d6640ef1b63dba2dfa40ed0b600cb59b2f7f0a811"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.sha1",
+          "sha256": "57c1adaf0db6690b85e02c96b2b876993281d5dbcfc915fdfd867afd6cff92fe"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.sha256",
+          "sha256": "f0a25f0f17ee365d4ad15919fafd4c42e32c64502025a922f85e7954e21ad0f4"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.sha512",
+          "sha256": "2ca3bc141e752f8ab7a4e9eb244837a4dd64c704d62d2533b3268ac7c934d33e"
+        },
+        {
+          "bytes": 489341,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar",
+          "sha256": "1b0826dc9585a74e707551624cb1701a96c0b6954c433f6a2c7d574dbfcb7f86"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.md5",
+          "sha256": "0f4539103301d5f2175aa1c4fac71f05d71fd764acd0cf2989700e0e918a6f2f"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.sha1",
+          "sha256": "3b58e06f1ad7cda09d0da585acf352ea68fa2afc6b88d04457c91d497ff5f7ba"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.sha256",
+          "sha256": "4e689de2d1eb5954343fb0197b1b289f3495d2d0ab417cceed2c2e734b4cdb27"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.sha512",
+          "sha256": "7734eecb464b4958b1874c7b2fe2fa7336d35647e952982beeb5ff750a0ed1fe"
+        },
+        {
+          "bytes": 3501,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module",
+          "sha256": "3b75a382ad4f72b93af5a0294f95a9cfb9d8b93bc47f8e55ad7c1e4fa2c306bd"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.md5",
+          "sha256": "ac7bb82d460d30b9b95016ced40ed045741baf7ba7fe5d5811a536b0f5dc0b7e"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.sha1",
+          "sha256": "132f11591050cf6c529e06c80799bd68251f0f726c68708b210f756c59337895"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.sha256",
+          "sha256": "128ea675f78e5a405dac7d33ab72de8de92f382dc08361db74635983d9ae5a47"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.sha512",
+          "sha256": "a822edc76b6c169037e363091269330cd3af9fc9615830a3e32d5cbfcd5fe12d"
+        },
+        {
+          "bytes": 1547,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom",
+          "sha256": "d970b73ed2d916db3989a6e322dae284e84cb5580eae5f5f530e33ef279624d2"
+        },
+        {
+          "bytes": 32,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.md5",
+          "sha256": "dc5b5a6e352ed8e694740d741bba667c9e16f8d4287daf31ed513eecd2c6f883"
+        },
+        {
+          "bytes": 40,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.sha1",
+          "sha256": "d0f8a02398575d3256d98f7046775dba0a09c21897f97e52209fb4d048d83203"
+        },
+        {
+          "bytes": 64,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.sha256",
+          "sha256": "4be9bc3706e1508a33d1e620400df442d22cdad754bc3e8a89cc802a74cbfc6b"
+        },
+        {
+          "bytes": 128,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.sha512",
+          "sha256": "40bad345780b01047457b375a44cd8ff7e3086ff55de4e88cb8f1c3e8b9a5ba6"
+        }
+      ],
+      "kit": {
+        "bytes": 1496453,
+        "path": "build/111-e5/mcicon-central-1.1.1-r5-signing-kit.zip",
+        "sha256": "faea3d547878488c71d0f123c81f67a1ab1346753aea82b2ba10be4e80782ffc"
+      },
+      "signingTargets": [
+        {
+          "bytes": 310620,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar",
+          "sha256": "5bf50028fcd405a377c37241f0f6bae1b0705e9a4bd2fc87bc36aefa30c888a1"
+        },
+        {
+          "bytes": 82589,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar",
+          "sha256": "8cb92a749402706e49a5a3d1b7abbbf129429697f298c229f604c639754fa9a4"
+        },
+        {
+          "bytes": 453909,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar",
+          "sha256": "2ef10533e2f6e3b0283dc68715d68e74980c26a762a5a59cd17eb62276cdd970"
+        },
+        {
+          "bytes": 4393,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module",
+          "sha256": "03f09063b3ff8a9d35222336dfbb3f36f8aacaa9077da3cd2269dbb69f1ebb8a"
+        },
+        {
+          "bytes": 2365,
+          "path": "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom",
+          "sha256": "a749b4cd914e8ced8fd9ae8eb1d79329fbf67ace0d9450190ec96590d432b7fa"
+        },
+        {
+          "bytes": 134495,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar",
+          "sha256": "c7d0fe63914b9fb9c795860099ff2dad05159b530f4e66530173bd16112af751"
+        },
+        {
+          "bytes": 31730,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar",
+          "sha256": "3931d24d514b8338a2170ccbe2197e721ccc10a41a68912403d24379a31f4a79"
+        },
+        {
+          "bytes": 489341,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar",
+          "sha256": "1b0826dc9585a74e707551624cb1701a96c0b6954c433f6a2c7d574dbfcb7f86"
+        },
+        {
+          "bytes": 3501,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module",
+          "sha256": "3b75a382ad4f72b93af5a0294f95a9cfb9d8b93bc47f8e55ad7c1e4fa2c306bd"
+        },
+        {
+          "bytes": 1547,
+          "path": "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom",
+          "sha256": "d970b73ed2d916db3989a6e322dae284e84cb5580eae5f5f530e33ef279624d2"
+        }
+      ],
+      "signedBundle": {
+        "path": "build/111-e5/mcicon-central-1.1.1.zip",
+        "bytes": 1499032,
+        "sha256": "815260d33d7f0cf470d2195f1871c51adb87be6146796263fa4c24334272b151"
+      }
+    },
+    "cliDistribution": {
+      "bytes": 10807626,
+      "path": "build/111-e5/final-jars/mcicon-1.1.1.zip",
+      "sha256": "ce42aed16649f2f0a1792dfba628e5284f9c310a71a966793596f2051876b7f4"
+    },
+    "jars": [
+      {
+        "bytes": 453909,
+        "path": "build/111-e5/final-jars/core-1.1.1.jar",
+        "sha256": "2ef10533e2f6e3b0283dc68715d68e74980c26a762a5a59cd17eb62276cdd970"
+      },
+      {
+        "bytes": 489341,
+        "path": "build/111-e5/final-jars/worker-1.1.1.jar",
+        "sha256": "1b0826dc9585a74e707551624cb1701a96c0b6954c433f6a2c7d574dbfcb7f86"
+      },
+      {
+        "bytes": 535302,
+        "path": "build/111-e5/final-jars/worker-1.1.1-agent.jar",
+        "sha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf"
+      },
+      {
+        "bytes": 37315,
+        "path": "build/111-e5/final-jars/cli-1.1.1.jar",
+        "sha256": "fadceb974b706521c6c16eaa519940f563c462338de53846be51467c8efadce1"
+      }
+    ],
+    "payloads": [
+      {
+        "bytes": 37152074,
+        "path": "build/111-e5/payloads/mcicon-tool-1.1.1-windows-x86_64.zip",
+        "sha256": "035fafeae94b7f62dc8f616f3357d27384688ac014162f7e126c330a09c728da"
+      },
+      {
+        "bytes": 36015984,
+        "path": "build/111-e5/payloads/mcicon-tool-1.1.1-macos-aarch64.zip",
+        "sha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522"
+      }
+    ],
+    "runtimeResources": [
+      {
+        "bytes": 374723,
+        "path": "META-INF/mcicon/runtime/descriptors/macos-aarch64.json",
+        "sha256": "23757eae57959c789d1baa3cbd37a23592ed8c508d6b030ea740caf7ba1cc857"
+      },
+      {
+        "bytes": 64,
+        "path": "META-INF/mcicon/runtime/descriptors/macos-aarch64.json.sig",
+        "sha256": "8bf72da3cfa5733902a13bacb2355929a2ef3e4d3c4273ba434e109b2dbe521e"
+      },
+      {
+        "bytes": 278044,
+        "path": "META-INF/mcicon/runtime/descriptors/windows-x86_64.json",
+        "sha256": "e41d30a5241beac9e7276e5ad14caf9c279b5e8a9022123e8cd736221bb47d57"
+      },
+      {
+        "bytes": 64,
+        "path": "META-INF/mcicon/runtime/descriptors/windows-x86_64.json.sig",
+        "sha256": "606c7c93f53be93de03d3ba1cd6e0becda8aa743b270edb8b3c5239264e473e2"
+      },
+      {
+        "bytes": 481374,
+        "path": "META-INF/mcicon/runtime/inventories/macos-aarch64/mcicon-renderer-1.1.0-linux-amd64.json",
+        "sha256": "8266b941427e0a894148c6b39553454561cca878bbec34907a1a1c568677fcb6"
+      },
+      {
+        "bytes": 442726,
+        "path": "META-INF/mcicon/runtime/inventories/mcicon-guest-1.1.0-macos-aarch64.json",
+        "sha256": "096e63cb9f6bcd926549545897b2244421b1624b91f9a6b0e8db756fdaed529e"
+      },
+      {
+        "bytes": 171530,
+        "path": "META-INF/mcicon/runtime/inventories/mcicon-guest-1.1.1-windows-x86_64.json",
+        "sha256": "5b47373ac7510aeecbec3b730c04374b7202e8a0d9c360683bba62e7be09b670"
+      },
+      {
+        "bytes": 327532,
+        "path": "META-INF/mcicon/runtime/inventories/mcicon-helper-1.1.1-macos-aarch64.json",
+        "sha256": "4df3e3b46e528cd15f8584d31a5fa623ba163d8a3a7362164a61b653ef072fb6"
+      },
+      {
+        "bytes": 215002,
+        "path": "META-INF/mcicon/runtime/inventories/mcicon-helper-1.1.1-windows-x86_64.json",
+        "sha256": "bf85d87210ac613e738bcf6196f9d32993142f73a1e80b003e60b74482452d2f"
+      },
+      {
+        "bytes": 481374,
+        "path": "META-INF/mcicon/runtime/inventories/windows-x86_64/mcicon-renderer-1.1.0-linux-amd64.json",
+        "sha256": "8266b941427e0a894148c6b39553454561cca878bbec34907a1a1c568677fcb6"
+      },
+      {
+        "bytes": 44,
+        "path": "META-INF/mcicon/runtime/mcicon-operating.pub.der",
+        "sha256": "8dc54c096f222fb1665e19446debec844e2c726d20cc91eab2a392f1e6902f5a"
+      },
+      {
+        "bytes": 44,
+        "path": "META-INF/mcicon/runtime/mcicon-recovery.pub.der",
+        "sha256": "0e468cc27d1fdad02bc90e2fb8de58a39152333c408a940f27f99df591dd9ccf"
+      },
+      {
+        "bytes": 450,
+        "path": "META-INF/mcicon/runtime/pins.json",
+        "sha256": "4ba5d98eccaf12f88c57927196f154b5114481c8e25d5cb8017be4eabab5ecd7"
+      },
+      {
+        "bytes": 96,
+        "path": "META-INF/mcicon/runtime/trust-set.bin",
+        "sha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283"
+      }
+    ],
+    "stable": {
+      "bytes": 16565,
+      "path": "build/111-e5/payloads/stable.json",
+      "sha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+    },
+    "stableSigningKit": {
+      "bytes": 5193,
+      "path": "build/111-e5/stable-signing-kit-1.1.1-r5.zip",
+      "sha256": "38715d025c87020e9c3c0f5a4a27c4e48518ce6c1ab38c298b782cbb88c4ab5c"
+    },
+    "stableSignature": {
+      "path": "build/111-e5/payloads/stable.json.sig",
+      "bytes": 64,
+      "sha256": "26c11924305ab5b9d11c2a319dc4a380ab5ded9744a6a5eb2369a182c6edd6dd"
+    },
+    "bootstrapArchives": [
+      {
+        "path": "build/111-f5/mcicon-bootstrap-1.1.1-windows-x86_64.zip",
+        "bytes": 70521791,
+        "sha256": "957019130ccd0204b313ed37f6c4068b77f9c80c8f47a4401c56e284e2ab7e54"
+      },
+      {
+        "path": "build/111-f5/mcicon-bootstrap-1.1.1-macos-aarch64.tar.gz",
+        "bytes": 67526980,
+        "sha256": "8f83caacd705e23dc95da9424e5cee31539ce0613c73cbd06d904da01f18eec9"
+      }
+    ]
+  },
+  "r4Differences": {
+    "centralChangedFiles": [
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.md5",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha1",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha256",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha512",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.md5",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha1",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha256",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha512",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.md5",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha1",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha256",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha512"
+    ],
+    "centralChangedSigningTargets": [
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar",
+      "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module"
+    ],
+    "centralReason": "core binary/sourcesと、そのsize/hashを持つmodule、各checksum4種の計15file。他7署名対象は不変。",
+    "cliDistributionReason": "新coreと生成時点docs/QAを収録。CLI JARは不変。",
+    "core": {
+      "changedEntries": [
+        "META-INF/mcicon/runtime/descriptors/windows-x86_64.json",
+        "META-INF/mcicon/runtime/descriptors/windows-x86_64.json.sig",
+        "META-INF/mcicon/runtime/inventories/mcicon-helper-1.1.1-windows-x86_64.json",
+        "META-INF/mcicon/runtime/pins.json",
+        "io/github/rs0325/mcicon/internal/managed/RuntimeHelper.class"
+      ],
+      "new": {
+        "bytes": 453909,
+        "path": "build/111-e5/final-jars/core-1.1.1.jar",
+        "sha256": "2ef10533e2f6e3b0283dc68715d68e74980c26a762a5a59cd17eb62276cdd970"
+      },
+      "old": {
+        "bytes": 451556,
+        "path": "build/111-e4/final-jars/core-1.1.1.jar",
+        "sha256": "93393d1c367700549f2e055c499487c7e9b6e69fa32a54169fc2dc705ea1090b"
+      },
+      "reason": "#183のRuntimeHelper回復予算・ログ処理修正と、新Windows helperのinventory・descriptor・運用署名・pin更新。"
+    },
+    "helperReason": "WindowsKeeper/WindowsRuntimeの回復期限修正。raw helperの変更はhelper-windows JAR内の2classだけ。D5監査済み。",
+    "payloadReason": "両hostで同じ新coreを収録。Windows側はdescriptor/署名を更新。payload inventoryとstable参照pinも更新。",
+    "priorF4": "F4 bootstrapは#183取込み前の証跡。r5 stable/Central署名返送後に再生成する。",
+    "result": "PASS",
+    "unchangedJars": [
+      {
+        "bytes": 489341,
+        "path": "build/111-e5/final-jars/worker-1.1.1.jar",
+        "sha256": "1b0826dc9585a74e707551624cb1701a96c0b6954c433f6a2c7d574dbfcb7f86"
+      },
+      {
+        "bytes": 535302,
+        "path": "build/111-e5/final-jars/worker-1.1.1-agent.jar",
+        "sha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf"
+      },
+      {
+        "bytes": 37315,
+        "path": "build/111-e5/final-jars/cli-1.1.1.jar",
+        "sha256": "fadceb974b706521c6c16eaa519940f563c462338de53846be51467c8efadce1"
+      }
+    ],
+    "unchangedRuntimeArtifacts": [
+      "Windows guest rootfs",
+      "Mac helper",
+      "Mac qcow2",
+      "renderer",
+      "Mac descriptor/signature"
+    ]
+  },
+  "unpackedBytesAudit": {
+    "rendererPolicy": "公開1.1.0由来image load予算を維持。Docker load/inspect未実行。",
+    "result": "PASS",
+    "rows": [
+      {
+        "id": "mcicon-helper-1.1.1-macos-aarch64",
+        "result": "PASS",
+        "unpackedBytes": 206610147
+      },
+      {
+        "id": "mcicon-guest-1.1.0-macos-aarch64",
+        "result": "PASS",
+        "unpackedBytes": 620224512
+      },
+      {
+        "id": "mcicon-renderer-1.1.0-linux-amd64",
+        "policy": "rendererの公開1.1.0予算はUNPACKED-AUDIT.mdで別途確認"
+      },
+      {
+        "id": "mcicon-helper-1.1.1-windows-x86_64",
+        "result": "PASS",
+        "unpackedBytes": 93889216
+      },
+      {
+        "id": "mcicon-guest-1.1.1-windows-x86_64",
+        "result": "PASS",
+        "unpackedBytes": 403507200
+      },
+      {
+        "id": "mcicon-tool-1.1.1-windows-x86_64",
+        "result": "PASS",
+        "scope": "新r5 payloadのZIP entry総和",
+        "unpackedBytes": 93938504
+      },
+      {
+        "id": "mcicon-tool-1.1.1-macos-aarch64",
+        "result": "PASS",
+        "scope": "新r5 payloadのZIP entry総和",
+        "unpackedBytes": 97035843
+      }
+    ],
+    "runtimeAuditSource": {
+      "bytes": 1488,
+      "path": "build/111-d5/verify-budgets.py",
+      "sha256": "706f7bffeab18de1ddc29e84d12e9abea68430ab24e6ae37b46b94ded23dec8f"
+    },
+    "tarXzPolicy": "解凍後tar全長と一致",
+    "zipPolicy": "非directory entryの内容size総和と一致"
+  },
+  "keeperRetest": {
+    "scope": "D5で初回TIMEOUTしたkeeper期限試験を含むhelper/common全関連試験を、新規外部root・同一期限で再実行。",
+    "helpers": {
+      "tests": 94,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 22
+    },
+    "keeperSuite": {
+      "name": "io.github.rs0325.mcicon.helper.windows.PrepareIntegrationTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "details": []
+    },
+    "initialD5FailurePreserved": "build/111-c5/product-tests.json",
+    "d5FocusedFollowup": "build/111-c5/followup-tests.json",
+    "e5Evidence": "build/111-e5/test-results/helpers/TEST-io.github.rs0325.mcicon.helper.windows.PrepareIntegrationTest.xml",
+    "deadlineChanged": false,
+    "productE2eExecuted": false
+  },
+  "knownIssue182": "Macの通常release期限超過で未確定stopが残る。1.1.2で対応予定。今回解消したとは扱わない。",
+  "stablePolicy": {
+    "toolVersion": "1.1.1",
+    "sequenceCandidate": 2,
+    "minimumBootstrapProtocol": 4,
+    "signaturePresent": true,
+    "latestAndHighWaterRechecked": false,
+    "publicationGate": "公開直前にlatest/high-water再照合。sequence2が既発行値を上回らなければ別候補と再署名。"
+  },
+  "centralPolicy": {
+    "signingTargets": 10,
+    "checksums": 40,
+    "pgpFingerprint": "B766BA473AF3178D42371A0F50562040DFAE0F27",
+    "signaturesPresent": true,
+    "gpgvVerified": true,
+    "acceptedByCentral": false,
+    "reassembly": "元50fileは再生成せず返送署名10件と公開鍵を検証して結合。Gradle再publish禁止。"
+  },
+  "signingHandoff": {
+    "stableMacDirectory": "/Users/ryuman/tmp-mcicon-111-sign/stable-r5/kit",
+    "centralMacDirectory": "/Users/ryuman/tmp-mcicon-111-sign/central-r5/kit",
+    "stableReturnedZip": "stable-signatures-1.1.1-r5.zip",
+    "centralReturnedZip": "mcicon-central-1.1.1-r5-signatures.zip",
+    "transferOwner": "調整役",
+    "transferredByThisWorker": false,
+    "environmentPrerequisites": "stable: ED25519_PRIVATE_KEY既存運用鍵パスをexport。Central: GNUPGHOME/GPG_TTY・既存署名鍵/ローカルpinentryを実行順で明記。"
+  },
+  "validation": {
+    "finalBuild": "PASS 正式TrustSet/RuntimeResourceGenerator検証を含む",
+    "audit": {
+      "centralSignaturesAbsent": true,
+      "centralSigningTargets": 10,
+      "cliVersion": "MCIconGenerator 1.1.1",
+      "oldStageEArtifactsPreserved": true,
+      "pythonVerifiersCompile": "PASS",
+      "result": "PASS",
+      "scope": "両payload全entry/inventory、JRE bytes/mode、runtime resource集合、CLI/lib・distribution、agent、Central binary/sources/javadoc/POM/module、キット全entry/checksum",
+      "shellSyntax": "PASS",
+      "stableSignatureAbsent": true,
+      "workerAgentUnchanged": true
+    },
+    "java": [
+      {
+        "name": "helpers",
+        "exit": 0,
+        "suites": [
+          {
+            "name": "io.github.rs0325.mcicon.helper.DockerRequestTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.HelperCommonTest",
+            "tests": 12,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.LinuxResourceRecordsTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.SnapshotTest",
+            "tests": 12,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.windows.CommandsTest",
+            "tests": 22,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 22,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.windows.DiagnosticTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.windows.OwnershipTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.windows.PayloadTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.windows.PrepareIntegrationTest",
+            "tests": 12,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.windows.RestartReceiptTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.helper.windows.WindowsKeeperTest",
+            "tests": 8,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          }
+        ],
+        "counts": {
+          "tests": 94,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 22
+        }
+      },
+      {
+        "name": "core",
+        "exit": 1,
+        "suites": [
+          {
+            "name": "io.github.rs0325.mcicon.internal.InstallationImportTest",
+            "tests": 6,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0,
+            "details": [
+              {
+                "test": "cacheCannotWriteWithinOrContainTheInstallation()",
+                "message": "org.opentest4j.AssertionFailedError: Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+              }
+            ]
+          },
+          {
+            "name": "io.github.rs0325.mcicon.internal.managed.RuntimeDescriptorTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.internal.managed.RuntimeHelperTest",
+            "tests": 21,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 10,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.internal.managed.RuntimeLeaseTest",
+            "tests": 14,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0,
+            "details": [
+              {
+                "test": "receiptRegionIsOutsideActiveLockAndExpiredPreparationDoesNotBlockRelease()",
+                "message": "java.io.IOException: プロセスはファイルにアクセスできません。別のプロセスがファイルの一部をロックしています。"
+              }
+            ]
+          },
+          {
+            "name": "io.github.rs0325.mcicon.internal.managed.RuntimeResourceGeneratorTest",
+            "tests": 19,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "details": []
+          },
+          {
+            "name": "io.github.rs0325.mcicon.internal.WorkerArtifactTest",
+            "tests": 7,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0,
+            "details": [
+              {
+                "test": "resolvesResourcesAfterFlatteningWithoutOriginalWorkerJar()",
+                "message": "org.junit.platform.commons.JUnitException: Failed to close extension context"
+              }
+            ]
+          }
+        ],
+        "counts": {
+          "tests": 71,
+          "failures": 3,
+          "errors": 0,
+          "skipped": 10
+        }
+      }
+    ],
+    "python": [
+      {
+        "test": "helpers/windows/scripts/test-native-artifact.py",
+        "exit": 0,
+        "log": "build/111-e5/helpers_windows_scripts_test-native-artifact.py.log"
+      },
+      {
+        "test": "helpers/windows/scripts/test-smoke-candidate.py",
+        "exit": 1,
+        "log": "build/111-e5/helpers_windows_scripts_test-smoke-candidate.py.log"
+      },
+      {
+        "test": "helpers/windows/scripts/test-daemon.py",
+        "exit": 0,
+        "log": "build/111-e5/helpers_windows_scripts_test-daemon.py.log"
+      },
+      {
+        "test": "helpers/windows/scripts/test-guestbridge.py",
+        "exit": 1,
+        "log": "build/111-e5/helpers_windows_scripts_test-guestbridge.py.log"
+      },
+      {
+        "test": "helpers/windows/rootfs/test-build.py",
+        "exit": 0,
+        "log": "build/111-e5/helpers_windows_rootfs_test-build.py.log"
+      },
+      {
+        "test": "scripts/test-release-candidate.py",
+        "exit": 0,
+        "log": "build/111-e5/scripts_test-release-candidate.py.log"
+      },
+      {
+        "test": "scripts/test-release-payloads.py",
+        "exit": 0,
+        "log": "build/111-e5/scripts_test-release-payloads.py.log"
+      },
+      {
+        "test": "scripts/test-runtime-inputs.py",
+        "exit": 0,
+        "log": "build/111-e5/scripts_test-runtime-inputs.py.log"
+      }
+    ],
+    "centralUnsignedAudit": {
+      "version": "1.1.1",
+      "bundle": "H:\\MCIconGenerator\\worktrees\\milestone-111-d\\MCIconGenerator\\build\\111-e5\\mcicon-central-1.1.1-candidate.zip",
+      "signatureFilesRequired": false,
+      "cryptographicSignatureVerification": "未実施。公開鍵だけを指定したgpgvとCentral検証が別途必要",
+      "failures": [],
+      "passed": true
+    },
+    "externalRootRemoved": true,
+    "knownFailures": "core既知3失敗、Smoke固定path1error、Windows guestbridge fcntl未対応は原本を保存。OS専用skipと未実行は成功扱いしない。",
+    "readerInvestigation": "F4 cold反復fixture10秒失敗・低負荷対照未実施を履歴として保持。今回reader再試験なし。",
+    "linuxTests": "guestbridge本体は未変更。今回はLinux試験未実行。"
+  },
+  "remaining": [
+    "G: r5候補で両OS描画・製品受入/更新E2E、Windows kill/Ctrl+C後回復・ログ処理を再確認（今回未着手）",
+    "H: reader初回/再試行・core/Smoke既知失敗と未実行項目の判断、全体反証",
+    "#182: Mac通常release期限超過で未確定stopが残る。1.1.2対応予定。",
+    "I: 公開直前latest/high-waterとsource/tag対応照合、別指示による公開・公開後consumer確認"
+  ],
+  "publicOperations": {
+    "commit": false,
+    "push": false,
+    "pr": false,
+    "issue": false,
+    "tag": false,
+    "release": false,
+    "central": false,
+    "latest": false
+  },
+  "secretsAccessed": false,
+  "macConnected": false,
+  "backgroundTasksRemaining": [],
+  "stageEPostSignatureAndF5": {
+    "completedAt": "2026-11-08 JST",
+    "owner": "complex_worker（同一担当、r5署名結合・段階F）",
+    "signatureMerge": {
+      "stable": {
+        "path": "build/111-e5/payloads/stable.json",
+        "bytes": 16565,
+        "sha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+      },
+      "signature": {
+        "path": "build/111-e5/payloads/stable.json.sig",
+        "bytes": 64,
+        "sha256": "26c11924305ab5b9d11c2a319dc4a380ab5ded9744a6a5eb2369a182c6edd6dd"
+      },
+      "publicKeyVerification": {
+        "operating": true,
+        "recovery": false
+      },
+      "centralBundle": {
+        "path": "build/111-e5/mcicon-central-1.1.1.zip",
+        "bytes": 1499032,
+        "sha256": "815260d33d7f0cf470d2195f1871c51adb87be6146796263fa4c24334272b151"
+      },
+      "centralPublicKey": {
+        "path": "build/111-e5/central-signing-kit/central-public-key.gpg",
+        "bytes": 480,
+        "sha256": "2c751e8ccbbd54c8e3cfcb51ea1acd98cd0d4438691ad55ba83f47ec36700aec"
+      },
+      "centralOriginalFilesVerified": 50,
+      "gpgvValidSignatures": 10
+    },
+    "returnedSignatures": [
+      {
+        "path": "build/111-e5/returned/stable-signatures-1.1.1-r5.zip",
+        "bytes": 481,
+        "sha256": "35bd8591f9a544cda9cfbb2164d4a50960d0553287d128c336e9f19ddea87a1a"
+      },
+      {
+        "path": "build/111-e5/returned/mcicon-central-1.1.1-r5-signatures.zip",
+        "bytes": 5737,
+        "sha256": "d2558dea16274c5632752a22dd075e179bfc87bb7680260d05a3771f7331097c"
+      }
+    ],
+    "centralSignedAudit": {
+      "version": "1.1.1",
+      "bundle": "H:\\MCIconGenerator\\worktrees\\milestone-111-d\\MCIconGenerator\\build\\111-e5\\mcicon-central-1.1.1.zip",
+      "signatureFilesRequired": true,
+      "cryptographicSignatureVerification": "未実施。公開鍵だけを指定したgpgvとCentral検証が別途必要",
+      "failures": [],
+      "passed": true
+    },
+    "signedStableBundle": {
+      "path": "build/111-f5/stable-signed-1.1.1.zip",
+      "bytes": 2283,
+      "sha256": "6cc5c570c6a915a2de199cd3d16c063ab77cf0c36e93da4a4b02d78d6a068b7c"
+    },
+    "formalSeedVerification": {
+      "windows": "PASS 正式ManagedPackageVerifier/trust-set",
+      "macos": "PASS 同一最終core/bootstrap JAR/resource/seedを転送。host別JAR再buildなし。"
+    },
+    "bootstrapBuild": "PASS bootstrap:installDist。E5固定core/worker/CLIは不変。",
+    "archiveAudit": {
+      "passed": true,
+      "archives": [
+        {
+          "host": "windows-x86_64",
+          "archive": {
+            "path": "build/111-f5/mcicon-bootstrap-1.1.1-windows-x86_64.zip",
+            "bytes": 70521791,
+            "sha256": "957019130ccd0204b313ed37f6c4068b77f9c80c8f47a4401c56e284e2ab7e54"
+          },
+          "allFilesVerified": 240,
+          "seedStableSignatureTrustExactBytes": true,
+          "payloadSha256": "035fafeae94b7f62dc8f616f3357d27384688ac014162f7e126c330a09c728da",
+          "fixedJars": [
+            {
+              "entry": "app/lib/core-1.1.1.jar",
+              "sha256": "2ef10533e2f6e3b0283dc68715d68e74980c26a762a5a59cd17eb62276cdd970"
+            },
+            {
+              "entry": "app/lib/worker-1.1.1.jar",
+              "sha256": "1b0826dc9585a74e707551624cb1701a96c0b6954c433f6a2c7d574dbfcb7f86"
+            },
+            {
+              "entry": "app/worker/worker-agent.jar",
+              "sha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf"
+            },
+            {
+              "entry": "app/lib/cli-1.1.1.jar",
+              "sha256": "fadceb974b706521c6c16eaa519940f563c462338de53846be51467c8efadce1"
+            }
+          ],
+          "coreRuntimeResourcesExactBytes": true,
+          "package": {
+            "schemaVersion": 1,
+            "bootstrapVersion": "1.1.1",
+            "bootstrapProtocol": 4,
+            "owner": "archive",
+            "stableManifestUrl": "https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json",
+            "host": {
+              "os": "windows",
+              "arch": "x86_64"
+            }
+          }
+        },
+        {
+          "host": "macos-aarch64",
+          "archive": {
+            "path": "build/111-f5/mcicon-bootstrap-1.1.1-macos-aarch64.tar.gz",
+            "bytes": 67526980,
+            "sha256": "8f83caacd705e23dc95da9424e5cee31539ce0613c73cbd06d904da01f18eec9"
+          },
+          "allFilesVerified": 187,
+          "seedStableSignatureTrustExactBytes": true,
+          "payloadSha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522",
+          "fixedJars": [
+            {
+              "entry": "app/lib/core-1.1.1.jar",
+              "sha256": "2ef10533e2f6e3b0283dc68715d68e74980c26a762a5a59cd17eb62276cdd970"
+            },
+            {
+              "entry": "app/lib/worker-1.1.1.jar",
+              "sha256": "1b0826dc9585a74e707551624cb1701a96c0b6954c433f6a2c7d574dbfcb7f86"
+            },
+            {
+              "entry": "app/worker/worker-agent.jar",
+              "sha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf"
+            },
+            {
+              "entry": "app/lib/cli-1.1.1.jar",
+              "sha256": "fadceb974b706521c6c16eaa519940f563c462338de53846be51467c8efadce1"
+            }
+          ],
+          "coreRuntimeResourcesExactBytes": true,
+          "package": {
+            "schemaVersion": 1,
+            "bootstrapVersion": "1.1.1",
+            "bootstrapProtocol": 4,
+            "owner": "archive",
+            "stableManifestUrl": "https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json",
+            "host": {
+              "os": "macos",
+              "arch": "aarch64"
+            }
+          }
+        }
+      ],
+      "releaseAssetsVerified": 25,
+      "referencesVerified": 29
+    },
+    "releaseAssets": {
+      "manifest": {
+        "path": "build/111-f5/release-assets.json",
+        "bytes": 14855,
+        "sha256": "c20cf42499d593747e3d5c65ce4aeabb82c779cbf5c48d834a65d7fde4bf1c3b"
+      },
+      "table": {
+        "path": "build/111-f5/release-assets.md",
+        "bytes": 5416,
+        "sha256": "59dc02aa2a9dd4b26b0050d85561faff393001910c208ac1e77ccf94fdf70c12"
+      },
+      "count": 25,
+      "totalBytes": 4412895931,
+      "referencesVerified": 29,
+      "publication": "未公開の将来URL、新規+再掲。"
+    },
+    "windowsReader": {
+      "sourceProof": {
+        "path": "build/111-f5/reader-source-proof.json",
+        "bytes": 724,
+        "sha256": "c9159b4affd803e6800e128cfb8ee9c1f7b67e010e24a176135d7ec2fce81d39"
+      },
+      "aclModified": false,
+      "externalRoot": {
+        "directory": "C:\\Users\\ryuma\\mcicon-111-f5-reader-ad0c191d719946c3869855155f0af7a3",
+        "scope": "専用試験root/TMP/Gradle出力のみ。ACL変更なし。"
+      },
+      "cleanup": {
+        "directory": "C:\\Users\\ryuma\\mcicon-111-f5-reader-ad0c191d719946c3869855155f0af7a3",
+        "removed": true,
+        "resultsPreserved": [
+          "reader",
+          "preparation"
+        ]
+      }
+    },
+    "bootstrapReaderTests": {
+      "name": "reader",
+      "exit": 1,
+      "seconds": 580.547,
+      "classes": [
+        {
+          "name": "io.github.rs0325.mcicon.bootstrap.ManagedPackageVerifierTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "test": "rejectsCoreResourceMissing()",
+              "seconds": 1.196,
+              "passed": true
+            },
+            {
+              "test": "rejectsRuntimeResourcesInAnotherJar()",
+              "seconds": 0.549,
+              "passed": true
+            },
+            {
+              "test": "rejectsOtherCoreBodyWithIdenticalRuntimeResources()",
+              "seconds": 0.497,
+              "passed": true
+            },
+            {
+              "test": "rejectsCoreResourceMismatch()",
+              "seconds": 0.672,
+              "passed": true
+            },
+            {
+              "test": "rejectsVersionMismatch()",
+              "seconds": 0.399,
+              "passed": true
+            },
+            {
+              "test": "rejectsPayloadAgentMismatch()",
+              "seconds": 0.651,
+              "passed": true
+            },
+            {
+              "test": "rejectsPackageTrustDifferentFromRuntimeTrust()",
+              "seconds": 0.336,
+              "passed": true
+            },
+            {
+              "test": "recoverySignedSeedAndDescriptorAreAccepted()",
+              "seconds": 0.479,
+              "passed": true
+            },
+            {
+              "test": "rejectsSeedDescriptorDifferentFromCoreEvenWithValidSignature()",
+              "seconds": 0.442,
+              "passed": true
+            },
+            {
+              "test": "signedSeedAndCoreUseIdenticalDescriptorSignatureAndTrust()",
+              "seconds": 0.376,
+              "passed": true
+            }
+          ],
+          "failureDetails": []
+        },
+        {
+          "name": "io.github.rs0325.mcicon.bootstrap.SeedTest",
+          "tests": 9,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 1,
+          "cases": [
+            {
+              "test": "declaredUnpackedLimitAndDeadlineAreEnforced()",
+              "seconds": 9.029,
+              "passed": true
+            },
+            {
+              "test": "verifiesTemporaryTestSignatureAndExactArchiveTree()",
+              "seconds": 11.491,
+              "passed": false
+            },
+            {
+              "test": "temporaryFixtureKeysOnlyValidateTheirOwnSignedSeed()",
+              "seconds": 3.194,
+              "passed": true
+            },
+            {
+              "test": "duplicateJsonKeyIsRejectedAfterSignature()",
+              "seconds": 1.445,
+              "passed": true
+            },
+            {
+              "test": "zipTraversalSymlinkAndDuplicateEntryAreRejected()",
+              "seconds": 16.465,
+              "passed": true
+            },
+            {
+              "test": "unknownFieldDuplicateHostAndProtocolAreRejected()",
+              "seconds": 1.47,
+              "passed": true
+            },
+            {
+              "test": "rawSignatureAndUnsignedZipChangesAreRejected()",
+              "seconds": 1.49,
+              "passed": true
+            },
+            {
+              "test": "descriptorAndInventoryMismatchCannotBecomeSlot()",
+              "seconds": 24.28,
+              "passed": true
+            },
+            {
+              "test": "posixSlotRetainsExistingDirectoryModes()",
+              "seconds": 0.009,
+              "passed": false
+            }
+          ],
+          "failureDetails": [
+            {
+              "test": "verifiesTemporaryTestSignatureAndExactArchiveTree()",
+              "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました"
+            }
+          ]
+        },
+        {
+          "name": "io.github.rs0325.mcicon.bootstrap.TrustSetTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "test": "acceptsEitherKeyAndRejectsUnknownOrTamperedSignatures()",
+              "seconds": 0.024,
+              "passed": true
+            },
+            {
+              "test": "rejectsDuplicatesWrongCountsInvalidDerLegacyAndNoncanonicalOrder()",
+              "seconds": 0.009,
+              "passed": true
+            },
+            {
+              "test": "seedAcceptsOperationalAndRecoverySignaturesWithoutPlatformFixture()",
+              "seconds": 0.092,
+              "passed": true
+            },
+            {
+              "test": "rejectsOffCurvePointsInEitherPosition()",
+              "seconds": 0.008,
+              "passed": true
+            }
+          ],
+          "failureDetails": []
+        },
+        {
+          "name": "io.github.rs0325.mcicon.bootstrap.UpdateDownloadTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "test": "continuousProgressCannotExtendTheTransferDeadline()",
+              "seconds": 1.678,
+              "passed": true
+            },
+            {
+              "test": "missingHeadersTimeOutAndTheLateBodyIsClosed()",
+              "seconds": 1.595,
+              "passed": true
+            },
+            {
+              "test": "signedOldSequenceAndSameVersionCannotAdvanceHighWater()",
+              "seconds": 3.278,
+              "passed": true
+            },
+            {
+              "test": "exactBytesAreWrittenWithoutNetworkAndOversizeRemainsPartial()",
+              "seconds": 1.755,
+              "passed": true
+            },
+            {
+              "test": "stalledReadIsClosedByTheOriginalAbsoluteDeadline()",
+              "seconds": 1.728,
+              "passed": true
+            },
+            {
+              "test": "insecureInitialAndRedirectTargetsAreRejectedBeforeTheirRequest()",
+              "seconds": 1.55,
+              "passed": true
+            }
+          ],
+          "failureDetails": []
+        },
+        {
+          "name": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "tests": 13,
+          "failures": 9,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "test": "disabledUpdatesNeverStartThePendingTrial()",
+              "seconds": 26.499,
+              "passed": false
+            },
+            {
+              "test": "stateChangedBetweenPrepareAndReadyPreventsGoAndOutput()",
+              "seconds": 26.597,
+              "passed": false
+            },
+            {
+              "test": "oldJobFailureIsReturnedWithoutRetryingAfterRecovery()",
+              "seconds": 26.495,
+              "passed": false
+            },
+            {
+              "test": "eligibleListReapsOldParserAndActivatesOnlyBeforeOutput()",
+              "seconds": 27.768,
+              "passed": false
+            },
+            {
+              "test": "initializationFailureKeepsOldActiveAndUnknownTrialWithoutOutputOrRetry()",
+              "seconds": 98.866,
+              "passed": true
+            },
+            {
+              "test": "replacedReceiptPreventsRecoveryEvenWithValidFailureNotification()",
+              "seconds": 26.257,
+              "passed": false
+            },
+            {
+              "test": "incompleteCleanupKeepsCandidateAndReceiptUnknown()",
+              "seconds": 70.995,
+              "passed": true
+            },
+            {
+              "test": "candidateFailureRecoversOnceAndRejectsLocalAndDownloadedBadPayload()",
+              "seconds": 25.816,
+              "passed": false
+            },
+            {
+              "test": "malformedPinNeverCreatesTheRootAndMissingPinNeverInstallsTheSeed()",
+              "seconds": 1.862,
+              "passed": true
+            },
+            {
+              "test": "schemaTwoIsRejectedWithoutMigratingTheRoot()",
+              "seconds": 26.247,
+              "passed": false
+            },
+            {
+              "test": "rawAndOfflineKeepPendingAndActiveUnchanged()",
+              "seconds": 71.814,
+              "passed": true
+            },
+            {
+              "test": "explicitLocalPinDoesNotConsumeOrPromotePending()",
+              "seconds": 26.156,
+              "passed": false
+            },
+            {
+              "test": "concurrentRunAndDisabledRecoveryNeverStealTheTrial()",
+              "seconds": 26.069,
+              "passed": false
+            }
+          ],
+          "failureDetails": [
+            {
+              "test": "disabledUpdatesNeverStartThePendingTrial()",
+              "message": "java.io.IOException: readerの起動/成功確認が期限を超えました"
+            },
+            {
+              "test": "stateChangedBetweenPrepareAndReadyPreventsGoAndOutput()",
+              "message": "java.io.IOException: readerの起動/成功確認が期限を超えました"
+            },
+            {
+              "test": "oldJobFailureIsReturnedWithoutRetryingAfterRecovery()",
+              "message": "java.io.IOException: readerの起動/成功確認が期限を超えました"
+            },
+            {
+              "test": "eligibleListReapsOldParserAndActivatesOnlyBeforeOutput()",
+              "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました"
+            },
+            {
+              "test": "replacedReceiptPreventsRecoveryEvenWithValidFailureNotification()",
+              "message": "java.io.IOException: readerの起動/成功確認が期限を超えました"
+            },
+            {
+              "test": "candidateFailureRecoversOnceAndRejectsLocalAndDownloadedBadPayload()",
+              "message": "java.io.IOException: readerの起動/成功確認が期限を超えました"
+            },
+            {
+              "test": "schemaTwoIsRejectedWithoutMigratingTheRoot()",
+              "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました"
+            },
+            {
+              "test": "explicitLocalPinDoesNotConsumeOrPromotePending()",
+              "message": "java.io.IOException: readerの起動/成功確認が期限を超えました"
+            },
+            {
+              "test": "concurrentRunAndDisabledRecoveryNeverStealTheTrial()",
+              "message": "java.io.IOException: bootstrap準備期限を超えました"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "tests": 42,
+        "failures": 10,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "bootstrapPreparationTests": {
+      "name": "preparation",
+      "exit": 0,
+      "seconds": 280.281,
+      "classes": [
+        {
+          "name": "io.github.rs0325.mcicon.bootstrap.UpdatePreparationTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "test": "expiredSameInodeAndStateCasFenceCreateOnlyOneFreshIntent()",
+              "seconds": 16.966,
+              "passed": true
+            },
+            {
+              "test": "concurrentReservationsGiveOnlyOneFreshPermission()",
+              "seconds": 14.875,
+              "passed": true
+            },
+            {
+              "test": "identicalBodyOnAnotherInodeCannotFenceTheOriginalLiveWorker()",
+              "seconds": 14.534,
+              "passed": true
+            },
+            {
+              "test": "anOldUuidCannotUseTheNewOwnersPermission()",
+              "seconds": 16.884,
+              "passed": true
+            },
+            {
+              "test": "lockedChannelReadRetainsTheOsLockAgainstAnotherJvm()",
+              "seconds": 14.852,
+              "passed": true
+            },
+            {
+              "test": "disableAndPendingSuppressFuturePreparation()",
+              "seconds": 15.101,
+              "passed": true
+            },
+            {
+              "test": "reservationPrecedesStartAndSecondOwnerCannotObtainPermit()",
+              "seconds": 14.594,
+              "passed": true
+            },
+            {
+              "test": "finishedPreparationLogOutsideRunsDoesNotBlockMissingActiveRepair()",
+              "seconds": 28.033,
+              "passed": true
+            },
+            {
+              "test": "workerRequiresDurableOwnedIdentityAndConfigBeforePermission()",
+              "seconds": 17.029,
+              "passed": true
+            },
+            {
+              "test": "processIdentityUsesNumericValuesInsteadOfJacksonNodeRepresentation()",
+              "seconds": 0.004,
+              "passed": true
+            },
+            {
+              "test": "selfDeadlineAlreadyRunsWhilePreAckInputIsBlocked()",
+              "seconds": 5.695,
+              "passed": true
+            },
+            {
+              "test": "childClasspathKeepsWildcardOutsideTheInstalledPath()",
+              "seconds": 19.166,
+              "passed": true
+            },
+            {
+              "test": "expiryWithoutReceiptLockNeverPermitsAnotherWorker()",
+              "seconds": 15.584,
+              "passed": true
+            },
+            {
+              "test": "ackReceiveHasOneAbsoluteDeadlineWithoutBlockingOnUnavailablePipe()",
+              "seconds": 0.041,
+              "passed": true
+            },
+            {
+              "test": "missingOrPartialReceiptIsUnknownRatherThanFreshQualification()",
+              "seconds": 15.713,
+              "passed": true
+            },
+            {
+              "test": "oldReceiptKeyIsNotMigratedOrFenced()",
+              "seconds": 14.978,
+              "passed": true
+            },
+            {
+              "test": "rejectedPackageBeforeAckKeepsAReadableIdentityAndReleasesReceiptLock()",
+              "seconds": 14.441,
+              "passed": true
+            },
+            {
+              "test": "childRejectsChangedIdentityBeforeAckAndReleasesLock()",
+              "seconds": 14.912,
+              "passed": true
+            },
+            {
+              "test": "changedStateCannotBeFencedFromStaleSnapshot()",
+              "seconds": 15.318,
+              "passed": true
+            }
+          ],
+          "failureDetails": []
+        }
+      ],
+      "counts": {
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "readerFocusedRetry": {
+      "name": "reader-retry",
+      "exit": 1,
+      "seconds": 655.703,
+      "classes": [
+        {
+          "name": "io.github.rs0325.mcicon.bootstrap.SeedTest",
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "test": "verifiesTemporaryTestSignatureAndExactArchiveTree()",
+              "seconds": 17.51,
+              "passed": false
+            }
+          ],
+          "failureDetails": [
+            {
+              "test": "verifiesTemporaryTestSignatureAndExactArchiveTree()",
+              "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました"
+            }
+          ]
+        },
+        {
+          "name": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "tests": 9,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "test": "disabledUpdatesNeverStartThePendingTrial()",
+              "seconds": 26.223,
+              "passed": false
+            },
+            {
+              "test": "stateChangedBetweenPrepareAndReadyPreventsGoAndOutput()",
+              "seconds": 75.838,
+              "passed": true
+            },
+            {
+              "test": "oldJobFailureIsReturnedWithoutRetryingAfterRecovery()",
+              "seconds": 115.111,
+              "passed": true
+            },
+            {
+              "test": "eligibleListReapsOldParserAndActivatesOnlyBeforeOutput()",
+              "seconds": 73.815,
+              "passed": true
+            },
+            {
+              "test": "replacedReceiptPreventsRecoveryEvenWithValidFailureNotification()",
+              "seconds": 48.679,
+              "passed": true
+            },
+            {
+              "test": "candidateFailureRecoversOnceAndRejectsLocalAndDownloadedBadPayload()",
+              "seconds": 138.385,
+              "passed": true
+            },
+            {
+              "test": "schemaTwoIsRejectedWithoutMigratingTheRoot()",
+              "seconds": 26.53,
+              "passed": true
+            },
+            {
+              "test": "explicitLocalPinDoesNotConsumeOrPromotePending()",
+              "seconds": 26.393,
+              "passed": false
+            },
+            {
+              "test": "concurrentRunAndDisabledRecoveryNeverStealTheTrial()",
+              "seconds": 94.744,
+              "passed": true
+            }
+          ],
+          "failureDetails": [
+            {
+              "test": "disabledUpdatesNeverStartThePendingTrial()",
+              "message": "java.io.IOException: readerの起動/成功確認が期限を超えました"
+            },
+            {
+              "test": "explicitLocalPinDoesNotConsumeOrPromotePending()",
+              "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "tests": 10,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "readerInvestigation": {
+      "initialCounts": {
+        "tests": 42,
+        "failures": 10,
+        "errors": 0,
+        "skipped": 1
+      },
+      "initialFailures": [
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.SeedTest",
+          "method": "verifiesTemporaryTestSignatureAndExactArchiveTree()",
+          "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました",
+          "fixturePendingLine21": false,
+          "fixtureSeedLine23": true,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 11.491
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "disabledUpdatesNeverStartThePendingTrial()",
+          "message": "java.io.IOException: readerの起動/成功確認が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 26.499
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "stateChangedBetweenPrepareAndReadyPreventsGoAndOutput()",
+          "message": "java.io.IOException: readerの起動/成功確認が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 26.597
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "oldJobFailureIsReturnedWithoutRetryingAfterRecovery()",
+          "message": "java.io.IOException: readerの起動/成功確認が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 26.495
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "eligibleListReapsOldParserAndActivatesOnlyBeforeOutput()",
+          "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 27.768
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "replacedReceiptPreventsRecoveryEvenWithValidFailureNotification()",
+          "message": "java.io.IOException: readerの起動/成功確認が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 26.257
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "candidateFailureRecoversOnceAndRejectsLocalAndDownloadedBadPayload()",
+          "message": "java.io.IOException: readerの起動/成功確認が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 25.816
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "schemaTwoIsRejectedWithoutMigratingTheRoot()",
+          "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 26.247
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "explicitLocalPinDoesNotConsumeOrPromotePending()",
+          "message": "java.io.IOException: readerの起動/成功確認が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 26.156
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "concurrentRunAndDisabledRecoveryNeverStealTheTrial()",
+          "message": "java.io.IOException: bootstrap準備期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": false,
+          "testDurationSeconds": 26.069
+        }
+      ],
+      "bootstrapProductAndFixtureSourcesUnchangedFromF4": true,
+      "confirmed": "UpdateTrialTest.pendingからの失敗はverifySlot準備のfixture絶対10秒期限をSeed/WindowsPrivateFilesへ伝播。reader固有5秒との早い方が期限。今回stackと個別実測を参照。",
+      "priorInvestigation": "build/111-f4-reader-investigation/REPORT.json。fixture10秒枯渇、実製品repairの300秒との差を確認済み。今回はその性能調査を繰り返していない。",
+      "notProven": "今回の負荷・JIT/Defender寄与と実製品更新への影響は未確定。初回失敗を再試行で成功へ置換しない。",
+      "productOrFixtureChangedForRetry": false,
+      "deadlinesChangedForRetry": false,
+      "retryCounts": {
+        "tests": 10,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0
+      },
+      "retrySeconds": 655.703,
+      "productE2eExecuted": false,
+      "retryFailures": [
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.SeedTest",
+          "method": "verifiesTemporaryTestSignatureAndExactArchiveTree()",
+          "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました",
+          "fixturePendingLine21": false,
+          "fixtureSeedLine23": true,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 17.51
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "disabledUpdatesNeverStartThePendingTrial()",
+          "message": "java.io.IOException: readerの起動/成功確認が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 26.223
+        },
+        {
+          "suite": "io.github.rs0325.mcicon.bootstrap.UpdateTrialTest",
+          "method": "explicitLocalPinDoesNotConsumeOrPromotePending()",
+          "message": "java.io.IOException: readerの送信/待機/読取が期限を超えました",
+          "fixturePendingLine21": true,
+          "fixtureSeedLine23": false,
+          "readerDeadlineFailure": true,
+          "testDurationSeconds": 26.393
+        }
+      ],
+      "initialReaderSeconds": 580.547,
+      "allInitialFailuresInFixturePreparation": true,
+      "initialReaderDeadlineFailures": 9,
+      "initialBootstrapPreparationDeadlineFailures": 1,
+      "allRetryFailuresInFixturePreparation": true
+    },
+    "readerFailureAssessment": "初回10失敗はreader期限超過9件とbootstrap準備期限超過1件（全件fixture準備中）。focused再確認はreader期限超過3件。初回580.547秒、再確認655.703秒、preparation280.281秒。 負荷原因・実製品への影響は未確定。期限/fixture変更なし。",
+    "knownCoreAndPythonTests": {
+      "pythonCommands": [
+        {
+          "name": "test-package-bootstrap",
+          "exit": 0,
+          "log": {
+            "path": "build/111-f5/test-package-bootstrap.log",
+            "bytes": 186,
+            "sha256": "2b44f4f83c9a5bd40cf9f7f70cca7d21fe4e60ab952e49cc641b91cadfbf3af2"
+          }
+        },
+        {
+          "name": "test-release-payloads",
+          "exit": 0,
+          "log": {
+            "path": "build/111-f5/test-release-payloads.log",
+            "bytes": 310,
+            "sha256": "bd50c6a3801f1302a453c64c0112942cf503e54ca32b0ac70b01f92c6166e224"
+          }
+        },
+        {
+          "name": "test-package-windows-bootstrap",
+          "exit": 0,
+          "log": {
+            "path": "build/111-f5/test-package-windows-bootstrap.log",
+            "bytes": 114,
+            "sha256": "3e2b38e4220c62a9a7765d66a0166f40c2c72a491ecdbf790098b4f57edc8cd0"
+          }
+        },
+        {
+          "name": "test-security-reader-package",
+          "exit": 0,
+          "log": {
+            "path": "build/111-f5/test-security-reader-package.log",
+            "bytes": 108,
+            "sha256": "d0753e03800f1f748a400e1eb562059fc346145c40e90079f5f11c6a20f3982a"
+          }
+        },
+        {
+          "name": "test-smoke-candidate",
+          "exit": 1,
+          "log": {
+            "path": "build/111-f5/test-smoke-candidate.log",
+            "bytes": 1413,
+            "sha256": "e980374dc100c9b61b84bfbc12abd9c56cd836c1218494d6c13108c7bd801d35"
+          }
+        }
+      ],
+      "coreExit": 1,
+      "core": [
+        {
+          "name": "io.github.rs0325.mcicon.internal.InstallationImportTest",
+          "tests": 6,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "failureDetails": [
+            {
+              "test": "cacheCannotWriteWithinOrContainTheInstallation()",
+              "message": "org.opentest4j.AssertionFailedError: Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+            }
+          ]
+        },
+        {
+          "name": "io.github.rs0325.mcicon.internal.managed.RuntimeLeaseTest",
+          "tests": 14,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "failureDetails": [
+            {
+              "test": "receiptRegionIsOutsideActiveLockAndExpiredPreparationDoesNotBlockRelease()",
+              "message": "java.io.IOException: プロセスはファイルにアクセスできません。別のプロセスがファイルの一部をロックしています。"
+            }
+          ]
+        },
+        {
+          "name": "io.github.rs0325.mcicon.internal.WorkerArtifactTest",
+          "tests": 7,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "failureDetails": [
+            {
+              "test": "resolvesResourcesAfterFlatteningWithoutOriginalWorkerJar()",
+              "message": "org.junit.platform.commons.JUnitException: Failed to close extension context"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "tests": 27,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "securityCases": {
+      "rawSignatureAndUnsignedZipChangesAreRejected()": "PASS",
+      "signedOldSequenceAndSameVersionCannotAdvanceHighWater()": "PASS"
+    },
+    "candidateTamperTests": [
+      {
+        "modified": "stable.json",
+        "rejected": true,
+        "exitCode": 1,
+        "log": {
+          "path": "build/111-f5/reject-manifest.log",
+          "bytes": 509,
+          "sha256": "122b26300b09cad57fef9617f98752b4f5abda36cf08081e93d5e773b05ed084"
+        }
+      },
+      {
+        "modified": "stable.json.sig",
+        "rejected": true,
+        "exitCode": 1,
+        "log": {
+          "path": "build/111-f5/reject-signature.log",
+          "bytes": 509,
+          "sha256": "122b26300b09cad57fef9617f98752b4f5abda36cf08081e93d5e773b05ed084"
+        }
+      },
+      {
+        "modified": "tool.zip",
+        "rejected": true,
+        "exitCode": 1,
+        "log": {
+          "path": "build/111-f5/reject-payload.log",
+          "bytes": 568,
+          "sha256": "ebc4277621605f0747609fba60980969bda65c9b73ec3332da47c2cdaced7504"
+        }
+      }
+    ],
+    "nativeTests": {
+      "host": "Mac既存clang++・fake WinAPI、実WSLなし",
+      "result": {
+        "all": 0,
+        "wslCompile": 0,
+        "wslRun": 0
+      },
+      "conditions": {
+        "completion": 46,
+        "observer": 36,
+        "applicationPath": 17,
+        "wsl": 39
+      },
+      "note": "Windows LLVM側の既知未使用変数警告は今回未再試験。"
+    },
+    "macWorkDirectory": "/Users/ryuman/tmp-mcicon-111-f5",
+    "macTransfer": {
+      "path": "build/111-f5/mac-input.zip",
+      "bytes": 41171719,
+      "sha256": "f29c884f00ae913dba11e8388c24391ef441136cb855652f6bc3fa8db4afcc14"
+    },
+    "macPackaging": {
+      "archive": "mcicon-bootstrap-1.1.1-macos-aarch64.tar.gz",
+      "bytes": 67526980,
+      "sha256": "8f83caacd705e23dc95da9424e5cee31539ce0613c73cbd06d904da01f18eec9",
+      "formalSeedVerifier": "PASS",
+      "inputFilesVerified": 52,
+      "inputBytesUnchangedAfterPackaging": true
+    },
+    "macEnvironment": {
+      "limaConfigsUnchanged": true,
+      "limaDirectoriesUnchanged": true,
+      "homebrewPackagesUnchanged": true,
+      "relatedProcessesUnchanged": true,
+      "sudoUsed": false,
+      "workDirectory": "/Users/ryuman/tmp-mcicon-111-f5",
+      "processDifferenceAssessment": "本F5 before/afterとprocess-diffを参照。Lima/サービス起動操作なし。他担当processは停止しない。",
+      "settingsAndPackagesUnchanged": true
+    },
+    "macCleanup": {
+      "root": "/Users/ryuman/tmp-mcicon-111-f5",
+      "removed": true,
+      "activeOwnedProcesses": [],
+      "archiveRecovered": {
+        "archive": "mcicon-bootstrap-1.1.1-macos-aarch64.tar.gz",
+        "bytes": 67526980,
+        "sha256": "8f83caacd705e23dc95da9424e5cee31539ce0613c73cbd06d904da01f18eec9",
+        "formalSeedVerifier": "PASS",
+        "inputFilesVerified": 52,
+        "inputBytesUnchangedAfterPackaging": true
+      }
+    },
+    "windowsEnvironment": {
+      "baseline": "build/111-f5/windows-before.json",
+      "registryEqual": true,
+      "wslAndDockerEqual": true,
+      "operations": "既存WSL/Docker/レジストリ操作なし。固定readerは専用試験fileだけを観測。"
+    },
+    "fixedBytesPrecheck": {
+      "path": "build/111-f5/precheck.json",
+      "bytes": 208,
+      "sha256": "6bf54c622cf8a107e91d2849d20d5a1c4f3821d67334e84d1bb59a044e8d101d"
+    },
+    "inputPreflight": {
+      "path": "build/111-f5/preflight.json",
+      "bytes": 2763,
+      "sha256": "90a7188368f585a00b2b179410d575ba9a9f717d080907ac316e2f987ffa86d0"
+    },
+    "allAssetBudgetAudit": {
+      "evidence": {
+        "path": "build/111-f5/all-asset-budget-audit.json",
+        "bytes": 9508,
+        "sha256": "6a7aebc4a1c9d1a52f0d5e19ebdc9edda28327f284d09520035453495cc67bce"
+      },
+      "table": {
+        "path": "build/111-f5/all-asset-budget-audit.md",
+        "bytes": 4362,
+        "sha256": "44a7aa0fcbc71aa439c5baf58810010ac84340e435081d2482ee40d07c6bc6c5"
+      },
+      "assetCount": 25,
+      "declaredUnpackedBytesArtifacts": 7,
+      "result": "PASS"
+    },
+    "f4Differences": {
+      "result": "PASS",
+      "assetCount": 25,
+      "changedAssets": [
+        {
+          "name": "mcicon-bootstrap-1.1.1-macos-aarch64.tar.gz",
+          "old": {
+            "bytes": 67526315,
+            "sha256": "3986b25af182044f14eef3f57b58ccb664859e1a4577968e891f1d961267353d"
+          },
+          "new": {
+            "bytes": 67526980,
+            "sha256": "8f83caacd705e23dc95da9424e5cee31539ce0613c73cbd06d904da01f18eec9"
+          }
+        },
+        {
+          "name": "mcicon-bootstrap-1.1.1-windows-x86_64.zip",
+          "old": {
+            "bytes": 70520352,
+            "sha256": "e2eb8c2642b3eb009054e84f9b3eca4c8713d773a3e668cdbfc58cbb2ed84e84"
+          },
+          "new": {
+            "bytes": 70521791,
+            "sha256": "957019130ccd0204b313ed37f6c4068b77f9c80c8f47a4401c56e284e2ab7e54"
+          }
+        },
+        {
+          "name": "mcicon-helper-1.1.1-windows-x86_64.json",
+          "old": {
+            "bytes": 214201,
+            "sha256": "05c076f3ac358a0b7d168e7da04283ec6e9a8619f91e46f3369b9966e38fc1eb"
+          },
+          "new": {
+            "bytes": 215002,
+            "sha256": "bf85d87210ac613e738bcf6196f9d32993142f73a1e80b003e60b74482452d2f"
+          }
+        },
+        {
+          "name": "mcicon-helper-1.1.1-windows-x86_64.zip",
+          "old": {
+            "bytes": 36168736,
+            "sha256": "5059919a7b71c57a69421a8ec02ff566bdd8bae7a71c065ed2e77646c62a4c5d"
+          },
+          "new": {
+            "bytes": 36168765,
+            "sha256": "f0d7bf6c4a3ddedb0eaed501a00b200e8b41773609ead445e2aa6fdb102e721d"
+          }
+        },
+        {
+          "name": "mcicon-tool-1.1.1-macos-aarch64.zip",
+          "old": {
+            "bytes": 36013447,
+            "sha256": "3f6e573ea1321ca697d0027a61ba641777a8bfabae243f1eb6e281523e9b33cf"
+          },
+          "new": {
+            "bytes": 36015984,
+            "sha256": "224687416e4a559dfc06a7db8973fb29df084bbda0077ff7a33537bd88b59522"
+          }
+        },
+        {
+          "name": "mcicon-tool-1.1.1-windows-x86_64.zip",
+          "old": {
+            "bytes": 37149538,
+            "sha256": "4fa99c134717a5aa07947ee7e8008fab9825872913c489d3ecf2389b55d963e8"
+          },
+          "new": {
+            "bytes": 37152074,
+            "sha256": "035fafeae94b7f62dc8f616f3357d27384688ac014162f7e126c330a09c728da"
+          }
+        },
+        {
+          "name": "stable.json",
+          "old": {
+            "bytes": 16565,
+            "sha256": "2e28cd582e99cf4edf0553a303949ea1a25e2e181d55272227bb16807b1227e5"
+          },
+          "new": {
+            "bytes": 16565,
+            "sha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+          }
+        },
+        {
+          "name": "stable.json.sig",
+          "old": {
+            "bytes": 64,
+            "sha256": "a2f3d3d773786a0d5be1b2e35014da8b08719496dd3bf664e319b87a05b61dda"
+          },
+          "new": {
+            "bytes": 64,
+            "sha256": "26c11924305ab5b9d11c2a319dc4a380ab5ded9744a6a5eb2369a182c6edd6dd"
+          }
+        },
+        {
+          "name": "windows-x86_64.json",
+          "old": {
+            "bytes": 278044,
+            "sha256": "08a33241bf7de06373045cabd46385f44a1499adb0bd53ca669e6e2220404e0a"
+          },
+          "new": {
+            "bytes": 278044,
+            "sha256": "e41d30a5241beac9e7276e5ad14caf9c279b5e8a9022123e8cd736221bb47d57"
+          }
+        },
+        {
+          "name": "windows-x86_64.json.sig",
+          "old": {
+            "bytes": 64,
+            "sha256": "2c9e32e9c2a3b6d56990334ea2167917a6157a6f08aed1254ed8205974ac935f"
+          },
+          "new": {
+            "bytes": 64,
+            "sha256": "606c7c93f53be93de03d3ba1cd6e0becda8aa743b270edb8b3c5239264e473e2"
+          }
+        }
+      ],
+      "unchangedAssets": [
+        "macos-aarch64.json",
+        "macos-aarch64.json.sig",
+        "mcicon-guest-1.1.0-macos-aarch64.json",
+        "mcicon-guest-1.1.0-macos-aarch64.qcow2",
+        "mcicon-guest-1.1.1-windows-x86_64.json",
+        "mcicon-guest-1.1.1-windows-x86_64.tar.xz",
+        "mcicon-helper-1.1.1-macos-aarch64.json",
+        "mcicon-helper-1.1.1-macos-aarch64.zip",
+        "mcicon-operating.pub.der",
+        "mcicon-recovery.pub.der",
+        "mcicon-renderer-1.1.0-linux-amd64.json",
+        "mcicon-renderer-1.1.0-linux-amd64.tar.gz",
+        "mcicon-sources-1.1.0-part-01.tar",
+        "mcicon-sources-1.1.0-part-02.tar",
+        "trust-set.bin"
+      ],
+      "archives": [
+        {
+          "host": "windows-x86_64",
+          "changedFiles": [
+            "app/seed/stable.json",
+            "app/seed/stable.json.sig",
+            "app/seed/tool.zip"
+          ],
+          "unchangedFiles": 237,
+          "macAdhocSignatureProof": null,
+          "reason": "bootstrap/JRE/readerは不変。E5の新stable・運用署名・同一最終core入りtool payloadを収録。Macはseed変更に伴いjpackageのad-hoc署名とCodeResourcesを更新し、tar包装時刻metadataも変わる。"
+        },
+        {
+          "host": "macos-aarch64",
+          "changedFiles": [
+            "Contents/MacOS/MCIconBootstrap",
+            "Contents/_CodeSignature/CodeResources",
+            "Contents/app/seed/stable.json",
+            "Contents/app/seed/stable.json.sig",
+            "Contents/app/seed/tool.zip"
+          ],
+          "unchangedFiles": 182,
+          "macAdhocSignatureProof": {
+            "machoCodeSignatureOffset": 158640,
+            "machoCodeSignatureBytes": 19536,
+            "bytesOutsideSignatureUnchanged": true,
+            "codeResourcesChangedSeedReferences": [
+              {
+                "section": "files2",
+                "path": "app/seed/stable.json"
+              },
+              {
+                "section": "files2",
+                "path": "app/seed/stable.json.sig"
+              },
+              {
+                "section": "files2",
+                "path": "app/seed/tool.zip"
+              }
+            ],
+            "packagerCodesignVerify": "PASS --deep --strict。jpackageのad-hoc署名更新でありDeveloper ID署名ではない。"
+          },
+          "reason": "bootstrap/JRE/readerは不変。E5の新stable・運用署名・同一最終core入りtool payloadを収録。Macはseed変更に伴いjpackageのad-hoc署名とCodeResourcesを更新し、tar包装時刻metadataも変わる。"
+        }
+      ],
+      "e5DifferenceEvidence": {
+        "path": "build/111-e5/r4-differences.json",
+        "bytes": 3746,
+        "sha256": "fe10d3872ff87a1588c61c60cfc80e5b39d4c9cdee56ac8c416302836bf2b99f"
+      },
+      "reason": "#183の回復予算・ログ処理修正をcoreとWindows helperへ反映。rootfsは不変。Windows descriptor/署名・inventoryと両payload/stableのpinが更新される。Mac helper/qcow2/renderer・Mac descriptor/署名は不変。bootstrap/JRE/固定readerは不変。",
+      "signedCentralReason": "E4からcore binary/sources/moduleとchecksumだけが変更。固定E5元50fileはそのまま、返送PGP10署名を結合する。 署名入りbundleではPGP再署名10件と各署名checksum40件の更新も別途比較し、元成果物の変更と区別する。",
+      "centralUnsignedCandidate": {
+        "bytes": 1484253,
+        "path": "build/111-e5/mcicon-central-1.1.1-candidate.zip",
+        "sha256": "a413bbea7a29edce2be7e184905dc3e72f5c1ab664c7cac4d7ab76f92c8448d8"
+      },
+      "priorOutputsPreserved": true,
+      "signedCentralDifferences": {
+        "changedFiles": [
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.asc",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-javadoc.jar.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.asc",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.md5",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha1",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha256",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1-sources.jar.sha512",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.asc",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.md5",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha1",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha256",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.jar.sha512",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.asc",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.md5",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha1",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha256",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.module.sha512",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.asc",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-core/1.1.1/mcicon-core-1.1.1.pom.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.asc",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-javadoc.jar.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.asc",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1-sources.jar.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.asc",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.jar.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.asc",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.module.asc.sha512",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.asc",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.asc.md5",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.asc.sha1",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.asc.sha256",
+          "io/github/rs0325/mcicon/mcicon-worker/1.1.1/mcicon-worker-1.1.1.pom.asc.sha512"
+        ],
+        "changedOriginals": 15,
+        "changedSignatures": 10,
+        "changedSignatureChecksums": 40
+      }
+    },
+    "validationLimits": [
+      "Gの製品描画/更新E2Eは未実行。fixture検証で代替しない。",
+      "公開前latest/high-water未照合、sequence=2は候補。",
+      "Developer ID/notarization/Authenticode/MOTW/quarantine/実reboot受入・公開後consumerは未実行。"
+    ],
+    "knownIssue182": "Macの通常release期限超過で未確定stopが残る。1.1.2で対応予定。今回解消したとは扱わない。",
+    "backgroundTasksRemaining": [],
+    "macWorkspaceRetained": false,
+    "publicOperations": {
+      "commit": false,
+      "push": false,
+      "pr": false,
+      "issue": false,
+      "tag": false,
+      "release": false,
+      "central": false,
+      "latest": false
+    },
+    "secretsAccessed": false,
+    "readerSetup": {
+      "initialInvocation": "相対gradlew.batをcmdが解決できず試験前に失敗。絶対パスへ修正し本スクリプトで実行。",
+      "testsExecutedByFailedInvocation": false,
+      "compile": "PASS"
+    }
+  },
+  "knownFailuresNotRerun": {
+    "items": [
+      "Windows LLVM WSL fixture未使用変数警告",
+      "Windows guestbridge fcntl依存"
+    ],
+    "scope": "core/SmokeはF5で再実行、helper/commonはE5の記録を維持。"
+  }
+}
