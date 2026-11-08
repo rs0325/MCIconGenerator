@@ -1,0 +1,976 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-08",
+  "os": "windows-x86_64",
+  "productVersion": "1.1.1",
+  "phase": "I after Latest",
+  "status": "partial-v110-native-facts-blocked",
+  "executionComplete": true,
+  "acceptancePassed": false,
+  "gateComplete": false,
+  "checkedAtUtc": "2026-11-08T14:20:47.280407+00:00",
+  "latest": {
+    "id": 438130649,
+    "tag_name": "v1.1.1"
+  },
+  "latestStable": {
+    "sha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c",
+    "sequence": 2,
+    "minimumBootstrapProtocol": 4,
+    "actualProductStoredManifests": "build/111-i/windows/update/evidence/actual-manifests"
+  },
+  "inputs": {
+    "version110Archive": {
+      "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-bootstrap-1.1.0-windows-x86_64.zip",
+      "bytes": 70496160,
+      "sha256": "2fd5ed53283d77372519368051f67a6bec6be50d32dcc4a61ece13be11e90bfe",
+      "seconds": 11.536
+    },
+    "version111Archive": {
+      "path": "H:\\MCIconGenerator\\worktrees\\milestone-111-d\\MCIconGenerator\\build\\111-i\\windows\\release-audit-gh\\release-download\\assets\\mcicon-bootstrap-1.1.1-windows-x86_64.zip",
+      "sha256": "957019130ccd0204b313ed37f6c4068b77f9c80c8f47a4401c56e284e2ab7e54"
+    },
+    "seed110": {
+      "channel": "stable",
+      "minimumBootstrapProtocol": 4,
+      "platforms": [
+        {
+          "host": {
+            "arch": "x86_64",
+            "os": "windows"
+          },
+          "payload": {
+            "bytes": 37126358,
+            "format": "zip",
+            "id": "mcicon-tool-1.1.0-windows-x86_64",
+            "inventoryPath": "inventories/tool-windows-x86_64.json",
+            "inventorySha256": "2ee0547b06dc36911d4fa40ccff3294ea99e9953693399048149c026c61eae15",
+            "licenseFiles": [
+              "LICENSE",
+              "licenses/runtime-helper/MCIconHelper/MICROSOFT-RUNTIME-TERMS.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/LICENSE",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/THIRD_PARTY_NOTICES.md",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Apache-2.0.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Commons-Codec.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Commons-Compress.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Commons-IO.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/Commons-Lang.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/licenses/mcicon/licenses/XZ-for-Java.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/native-build/licenses/LICENSE.TXT",
+              "licenses/runtime-helper/MCIconHelper/app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING",
+              "licenses/runtime-helper/MCIconHelper/app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt",
+              "licenses/runtime-helper/MCIconHelper/app/support/native-build/licenses/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/NOTICE.txt",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/inventory.json",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/visual-cpp-runtime-2015-2022.docx",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/visual-studio-2022-community.docx",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/windows-sdk-license.rtf",
+              "java/legal/java.base/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.base/ASSEMBLY_EXCEPTION",
+              "java/legal/java.base/LICENSE",
+              "java/legal/java.base/aes.md",
+              "java/legal/java.base/asm.md",
+              "java/legal/java.base/c-libutl.md",
+              "java/legal/java.base/cldr.md",
+              "java/legal/java.base/icu.md",
+              "java/legal/java.base/public_suffix.md",
+              "java/legal/java.base/siphash.md",
+              "java/legal/java.base/unicode.md",
+              "java/legal/java.base/wepoll.md",
+              "java/legal/java.base/zlib.md",
+              "java/legal/java.compiler/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.compiler/ASSEMBLY_EXCEPTION",
+              "java/legal/java.compiler/LICENSE",
+              "java/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.datatransfer/ASSEMBLY_EXCEPTION",
+              "java/legal/java.datatransfer/LICENSE",
+              "java/legal/java.desktop/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.desktop/ASSEMBLY_EXCEPTION",
+              "java/legal/java.desktop/LICENSE",
+              "java/legal/java.desktop/colorimaging.md",
+              "java/legal/java.desktop/freetype.md",
+              "java/legal/java.desktop/giflib.md",
+              "java/legal/java.desktop/harfbuzz.md",
+              "java/legal/java.desktop/jpeg.md",
+              "java/legal/java.desktop/lcms.md",
+              "java/legal/java.desktop/libpng.md",
+              "java/legal/java.desktop/mesa3d.md",
+              "java/legal/java.instrument/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.instrument/ASSEMBLY_EXCEPTION",
+              "java/legal/java.instrument/LICENSE",
+              "java/legal/java.logging/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.logging/ASSEMBLY_EXCEPTION",
+              "java/legal/java.logging/LICENSE",
+              "java/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.management.rmi/ASSEMBLY_EXCEPTION",
+              "java/legal/java.management.rmi/LICENSE",
+              "java/legal/java.management/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.management/ASSEMBLY_EXCEPTION",
+              "java/legal/java.management/LICENSE",
+              "java/legal/java.naming/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.naming/ASSEMBLY_EXCEPTION",
+              "java/legal/java.naming/LICENSE",
+              "java/legal/java.net.http/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.net.http/ASSEMBLY_EXCEPTION",
+              "java/legal/java.net.http/LICENSE",
+              "java/legal/java.prefs/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.prefs/ASSEMBLY_EXCEPTION",
+              "java/legal/java.prefs/LICENSE",
+              "java/legal/java.rmi/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.rmi/ASSEMBLY_EXCEPTION",
+              "java/legal/java.rmi/LICENSE",
+              "java/legal/java.scripting/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.scripting/ASSEMBLY_EXCEPTION",
+              "java/legal/java.scripting/LICENSE",
+              "java/legal/java.se/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.se/ASSEMBLY_EXCEPTION",
+              "java/legal/java.se/LICENSE",
+              "java/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.security.jgss/ASSEMBLY_EXCEPTION",
+              "java/legal/java.security.jgss/LICENSE",
+              "java/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.security.sasl/ASSEMBLY_EXCEPTION",
+              "java/legal/java.security.sasl/LICENSE",
+              "java/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.sql.rowset/ASSEMBLY_EXCEPTION",
+              "java/legal/java.sql.rowset/LICENSE",
+              "java/legal/java.sql/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.sql/ASSEMBLY_EXCEPTION",
+              "java/legal/java.sql/LICENSE",
+              "java/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.transaction.xa/ASSEMBLY_EXCEPTION",
+              "java/legal/java.transaction.xa/LICENSE",
+              "java/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.xml.crypto/ASSEMBLY_EXCEPTION",
+              "java/legal/java.xml.crypto/LICENSE",
+              "java/legal/java.xml.crypto/santuario.md",
+              "java/legal/java.xml/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.xml/ASSEMBLY_EXCEPTION",
+              "java/legal/java.xml/LICENSE",
+              "java/legal/java.xml/bcel.md",
+              "java/legal/java.xml/dom.md",
+              "java/legal/java.xml/jcup.md",
+              "java/legal/java.xml/xalan.md",
+              "java/legal/java.xml/xerces.md",
+              "java/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO",
+              "java/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION",
+              "java/legal/jdk.crypto.ec/LICENSE"
+            ],
+            "noticeFiles": [
+              "THIRD_PARTY_NOTICES.md",
+              "licenses/runtime-helper/MCIconHelper/MICROSOFT-RUNTIME-TERMS.txt",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/NOTICE.txt",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/inventory.json",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/visual-cpp-runtime-2015-2022.docx",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/visual-studio-2022-community.docx",
+              "licenses/runtime-helper/MCIconHelper/licenses/microsoft/windows-sdk-license.rtf"
+            ],
+            "role": "tool-payload",
+            "sha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3",
+            "sourceArchives": [
+              {
+                "sha256": "6e2e101c9700ac5b09571f9fefd0386872f8f06392645355feedbe05e2546133",
+                "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-01.tar"
+              },
+              {
+                "sha256": "cf984cad246b1572e04cf0ed013b61343772e698016dcad59f88885d28344f51",
+                "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-02.tar"
+              }
+            ],
+            "unpackedBytes": 93912415,
+            "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-tool-1.1.0-windows-x86_64.zip"
+          },
+          "runtimeDescriptor": {
+            "path": "descriptors/windows-x86_64.json",
+            "sha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294"
+          }
+        },
+        {
+          "host": {
+            "arch": "aarch64",
+            "os": "macos"
+          },
+          "payload": {
+            "bytes": 35983846,
+            "format": "zip",
+            "id": "mcicon-tool-1.1.0-macos-aarch64",
+            "inventoryPath": "inventories/tool-macos-aarch64.json",
+            "inventorySha256": "c6a9cc51c87b81071239a02e0d6ccc8f0274b2804d673d39f853283d5eb42216",
+            "licenseFiles": [
+              "LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-annotations-2.22/META-INF/NOTICE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/FastDoubleParser-ThirdParty-LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/NOTICE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-core-2.22.3/META-INF/Schubfach-LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/LICENSE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/jackson/jackson-databind-2.22.3/META-INF/NOTICE",
+              "licenses/runtime-helper/MCIconHelper.app/Contents/app/support/licenses/mcicon/LICENSE",
+              "java/legal/java.base/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.base/ASSEMBLY_EXCEPTION",
+              "java/legal/java.base/LICENSE",
+              "java/legal/java.base/aes.md",
+              "java/legal/java.base/asm.md",
+              "java/legal/java.base/c-libutl.md",
+              "java/legal/java.base/cldr.md",
+              "java/legal/java.base/icu.md",
+              "java/legal/java.base/public_suffix.md",
+              "java/legal/java.base/siphash.md",
+              "java/legal/java.base/unicode.md",
+              "java/legal/java.base/zlib.md",
+              "java/legal/java.compiler/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.compiler/ASSEMBLY_EXCEPTION",
+              "java/legal/java.compiler/LICENSE",
+              "java/legal/java.datatransfer/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.datatransfer/ASSEMBLY_EXCEPTION",
+              "java/legal/java.datatransfer/LICENSE",
+              "java/legal/java.desktop/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.desktop/ASSEMBLY_EXCEPTION",
+              "java/legal/java.desktop/LICENSE",
+              "java/legal/java.desktop/colorimaging.md",
+              "java/legal/java.desktop/freetype.md",
+              "java/legal/java.desktop/giflib.md",
+              "java/legal/java.desktop/harfbuzz.md",
+              "java/legal/java.desktop/jpeg.md",
+              "java/legal/java.desktop/lcms.md",
+              "java/legal/java.desktop/libpng.md",
+              "java/legal/java.desktop/mesa3d.md",
+              "java/legal/java.desktop/pipewire.md",
+              "java/legal/java.desktop/xwd.md",
+              "java/legal/java.instrument/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.instrument/ASSEMBLY_EXCEPTION",
+              "java/legal/java.instrument/LICENSE",
+              "java/legal/java.logging/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.logging/ASSEMBLY_EXCEPTION",
+              "java/legal/java.logging/LICENSE",
+              "java/legal/java.management.rmi/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.management.rmi/ASSEMBLY_EXCEPTION",
+              "java/legal/java.management.rmi/LICENSE",
+              "java/legal/java.management/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.management/ASSEMBLY_EXCEPTION",
+              "java/legal/java.management/LICENSE",
+              "java/legal/java.naming/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.naming/ASSEMBLY_EXCEPTION",
+              "java/legal/java.naming/LICENSE",
+              "java/legal/java.net.http/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.net.http/ASSEMBLY_EXCEPTION",
+              "java/legal/java.net.http/LICENSE",
+              "java/legal/java.prefs/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.prefs/ASSEMBLY_EXCEPTION",
+              "java/legal/java.prefs/LICENSE",
+              "java/legal/java.rmi/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.rmi/ASSEMBLY_EXCEPTION",
+              "java/legal/java.rmi/LICENSE",
+              "java/legal/java.scripting/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.scripting/ASSEMBLY_EXCEPTION",
+              "java/legal/java.scripting/LICENSE",
+              "java/legal/java.se/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.se/ASSEMBLY_EXCEPTION",
+              "java/legal/java.se/LICENSE",
+              "java/legal/java.security.jgss/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.security.jgss/ASSEMBLY_EXCEPTION",
+              "java/legal/java.security.jgss/LICENSE",
+              "java/legal/java.security.sasl/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.security.sasl/ASSEMBLY_EXCEPTION",
+              "java/legal/java.security.sasl/LICENSE",
+              "java/legal/java.sql.rowset/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.sql.rowset/ASSEMBLY_EXCEPTION",
+              "java/legal/java.sql.rowset/LICENSE",
+              "java/legal/java.sql/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.sql/ASSEMBLY_EXCEPTION",
+              "java/legal/java.sql/LICENSE",
+              "java/legal/java.transaction.xa/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.transaction.xa/ASSEMBLY_EXCEPTION",
+              "java/legal/java.transaction.xa/LICENSE",
+              "java/legal/java.xml.crypto/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.xml.crypto/ASSEMBLY_EXCEPTION",
+              "java/legal/java.xml.crypto/LICENSE",
+              "java/legal/java.xml.crypto/santuario.md",
+              "java/legal/java.xml/ADDITIONAL_LICENSE_INFO",
+              "java/legal/java.xml/ASSEMBLY_EXCEPTION",
+              "java/legal/java.xml/LICENSE",
+              "java/legal/java.xml/bcel.md",
+              "java/legal/java.xml/dom.md",
+              "java/legal/java.xml/jcup.md",
+              "java/legal/java.xml/xalan.md",
+              "java/legal/java.xml/xerces.md",
+              "java/legal/jdk.crypto.ec/ADDITIONAL_LICENSE_INFO",
+              "java/legal/jdk.crypto.ec/ASSEMBLY_EXCEPTION",
+              "java/legal/jdk.crypto.ec/LICENSE"
+            ],
+            "noticeFiles": [
+              "THIRD_PARTY_NOTICES.md"
+            ],
+            "role": "tool-payload",
+            "sha256": "c565e022b16bbcaf19ac1223aa9827f6a193e9c776e263cd4df920c38016476d",
+            "sourceArchives": [
+              {
+                "sha256": "6e2e101c9700ac5b09571f9fefd0386872f8f06392645355feedbe05e2546133",
+                "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-01.tar"
+              },
+              {
+                "sha256": "cf984cad246b1572e04cf0ed013b61343772e698016dcad59f88885d28344f51",
+                "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-sources-1.1.0-part-02.tar"
+              }
+            ],
+            "unpackedBytes": 96994945,
+            "url": "https://github.com/rs0325/MCIconGenerator/releases/download/v1.1.0/mcicon-tool-1.1.0-macos-aarch64.zip"
+          },
+          "runtimeDescriptor": {
+            "path": "descriptors/macos-aarch64.json",
+            "sha256": "2103835ca14e88d50cff70162585304af5aa13351babb0284b2f13dad2998101"
+          }
+        }
+      ],
+      "schemaVersion": 1,
+      "sequence": 1,
+      "toolVersion": "1.1.0"
+    },
+    "packageMetadata110": [
+      {
+        "path": "app\\bootstrap-package.json",
+        "text": "{\n  \"schemaVersion\": 1,\n  \"bootstrapVersion\": \"1.1.0\",\n  \"bootstrapProtocol\": 4,\n  \"owner\": \"archive\",\n  \"stableManifestUrl\": \"https://github.com/rs0325/MCIconGenerator/releases/latest/download/stable.json\",\n  \"host\": {\n    \"os\": \"windows\",\n    \"arch\": \"x86_64\"\n  }\n}\n"
+      }
+    ],
+    "latestStableSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c",
+    "latestVersion": "1.1.1",
+    "signedBytesRegenerated": false,
+    "package110Unmodified": true
+  },
+  "items": [
+    {
+      "item": "U01 実配信background/pending/次回適用",
+      "status": "partial",
+      "actualUpdateControlPassed": true,
+      "healthyV110ManagedPassed": false,
+      "initialManagedExit": 1,
+      "initialManagedSeconds": 82.501,
+      "initialManagedFailureEvidence": "logs/basic-first.stderr",
+      "backgroundFinishedExit0": true,
+      "backgroundReceipt": {
+        "schemaVersion": 1,
+        "kind": "preparation",
+        "invocationId": "5a42eef6-e798-477e-b90a-3c8140e22b15",
+        "state": "finished",
+        "issuedAt": "2026-11-08T13:35:16.984883300Z",
+        "expiresAt": "2026-11-08T13:40:16.984883300Z",
+        "result": "pending",
+        "slot": {
+          "toolVersion": "1.1.0",
+          "payloadSha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3",
+          "runtimeDescriptorSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+          "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+        },
+        "bootstrap": {
+          "pid": 50060,
+          "startedAt": "2026-11-08T13:34:10.958Z"
+        },
+        "child": {
+          "pid": 54780,
+          "startedAt": "2026-11-08T13:35:17.406Z"
+        },
+        "exitCode": 0,
+        "packagePin": {
+          "java": "82051fdab26319d77d20cc0065045d05ec00b3e3d05f44935d7c06b96b621d55",
+          "metadata": "331a23120a780a4df52bd618e317672c7aa495da9a20c8bb539da8fe7d644799",
+          "jars": {
+            "bootstrap-1.1.0.jar": "51bba7e2dd2f89ab762f96b9216a53fbb459fc0f7340412507ef6c8f2bcad1b5",
+            "commons-codec-1.19.0.jar": "5c3881e4f556855e9c532927ee0c9dfde94cc66760d5805c031a59887070af5f",
+            "commons-compress-1.28.0.jar": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca",
+            "commons-io-2.20.0.jar": "df90bba0fe3cb586b7f164e78fe8f8f4da3f2dd5c27fa645f888100ccc25dd72",
+            "commons-lang3-3.18.0.jar": "4eeeae8d20c078abb64b015ec158add383ac581571cddc45c68f0c9ae0230720",
+            "jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+            "jackson-core-2.22.3.jar": "8a501126a385b25841915d839508f8a66e2a0dbc8a6709d055ef3b3e852b094c",
+            "jackson-databind-2.22.3.jar": "556db5439e206114346043f68d200497dc96a0bca62a360a81784092ebd0e0a9"
+          }
+        },
+        "receiptKey": "windows-file-id-v1:17211705959194501607:c2481700000049000000000000000000"
+      },
+      "backgroundTiming": {
+        "childStartedAtUtc": "2026-11-08T13:35:17.406000+00:00",
+        "finishedReceiptLastWriteAtUtc": "2026-11-08T13:36:00.489786+00:00",
+        "observedSeconds": 43.084,
+        "scope": "背景JVM child開始からfinished receipt最終書込まで。CLI終了後の待機秒とは区別。"
+      },
+      "pendingBefore": {
+        "schemaVersion": 4,
+        "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+        "channel": "stable",
+        "host": {
+          "os": "windows",
+          "arch": "x86_64"
+        },
+        "active": {
+          "toolVersion": "1.1.0",
+          "payloadSha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3",
+          "runtimeDescriptorSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+          "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+        },
+        "pending": {
+          "toolVersion": "1.1.1",
+          "payloadSha256": "035fafeae94b7f62dc8f616f3357d27384688ac014162f7e126c330a09c728da",
+          "runtimeDescriptorSha256": "e41d30a5241beac9e7276e5ad14caf9c279b5e8a9022123e8cd736221bb47d57",
+          "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+        },
+        "previous": null,
+        "trialInvocation": null,
+        "preparation": null,
+        "highestAcceptedSequence": 2,
+        "badCandidates": []
+      },
+      "nextManagedExit": 0,
+      "nextManagedSeconds": 267.539,
+      "stateAfter": {
+        "schemaVersion": 4,
+        "trustSetSha256": "8529ace9f49e4b46c915e51d0cad5b576e6a9c536afe665ec779dd279ed51283",
+        "channel": "stable",
+        "host": {
+          "os": "windows",
+          "arch": "x86_64"
+        },
+        "active": {
+          "toolVersion": "1.1.1",
+          "payloadSha256": "035fafeae94b7f62dc8f616f3357d27384688ac014162f7e126c330a09c728da",
+          "runtimeDescriptorSha256": "e41d30a5241beac9e7276e5ad14caf9c279b5e8a9022123e8cd736221bb47d57",
+          "manifestSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c"
+        },
+        "pending": null,
+        "previous": {
+          "toolVersion": "1.1.0",
+          "payloadSha256": "c1646e84c9e6b878769916ef5d06816e212bce62a3c829a4d7b672c54f7c0fe3",
+          "runtimeDescriptorSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+          "manifestSha256": "26a79fee0f8bdf65b879b996d2e5b5223626cc67c1d9d659ea0d96f452ddbe20"
+        },
+        "trialInvocation": null,
+        "preparation": null,
+        "highestAcceptedSequence": 2,
+        "badCandidates": []
+      },
+      "png": {
+        "pngs": [
+          {
+            "path": "png\\basic-new\\java\\1.21.4\\icons\\assets\\minecraft\\textures\\block\\stone.png",
+            "sha256": "b4bbd5b1cad5746ee377debf884df1b3ae4cfdcb91e9a0a198be67a592e443de",
+            "width": 64,
+            "height": 64,
+            "visiblePixels": 2744,
+            "crcValid": true,
+            "rgbaValid": true
+          }
+        ],
+        "passed": true
+      },
+      "unmodifiedV110ProgramUsed": true,
+      "urlInjectedOrPendingEdited": false,
+      "reason": "公開1.1.0の新規bootstrap rootで実更新は成立したが、初回旧managed描画は旧native facts失敗。健全旧managed成功と同一視しない。"
+    },
+    {
+      "item": "U01 旧live job世代維持",
+      "status": "unverified",
+      "oldLiveWorkerObserved": false,
+      "oldContainerFullIdAndLabelsAvailable": false,
+      "osSuspendOrSignalUsed": false,
+      "reason": "未改変公開1.1.0は新規rootでも旧native facts/preflightで失敗し、実worker起動に到達しない。旧helper/registryを改変せず、別transportや偽の旧jobで代替しない。",
+      "sourceFailure": "basic-first.json",
+      "oldLeases": [
+        {
+          "schemaVersion": 1,
+          "jobId": "42e6cd56-4362-4c0c-873d-d6e1760b606f",
+          "ownerId": "023fdf31-0795-4b56-9cce-8e5d70913347",
+          "toolVersion": "1.1.0",
+          "workerSha256": "91620c0f9fc7d679a93d0b3dc0bbed98c76c5d4ce3a3a329d9fc779d6c2c1cdf",
+          "runtimeId": "mcicon-1.1.0-windows-x86_64",
+          "descriptorSha256": "cdcd7ce552f0be140a57eae56c0497e4156238a1914f68a3a5bd2654e87c3294",
+          "hostId": "f7ea9922-6757-479a-bf66-29f813b77341",
+          "pid": 53012,
+          "processStartedAt": "2026-11-08T13:35:16.343Z",
+          "createdAt": "2026-11-08T13:35:30.969748400Z",
+          "requirements": {
+            "containerMemoryMiB": 3072,
+            "heapMemoryMiB": 2048,
+            "cpus": 4,
+            "preparationDeadline": "2026-11-08T13:50:19.429079Z"
+          },
+          "state": "released",
+          "resources": {}
+        }
+      ],
+      "newGenerationPngSuccessIsNotOldJobGenerationProof": true
+    },
+    {
+      "item": "U01 不適用 disabled",
+      "status": "partial",
+      "mode": "disabled",
+      "stateControlPassed": true,
+      "healthyManagedExecutionPassed": false,
+      "primeSeconds": 67.479,
+      "nonapplySeconds": 66.63,
+      "nonapplyExit": 1,
+      "active": "1.1.0",
+      "pending": "1.1.1",
+      "highWater": 2,
+      "noNewPreparation": true,
+      "error": "MANAGED_SETUP_REQUIRED: 管理helperの準備に失敗しました: WINDOWS_RUNTIME_SETUP_REQUIRED: Windows所有情報の読取が失敗しました（exit 1）\nstderr (175 bytes):\nWindows native所有操作に失敗しました\r\nnativeJob phase=child-signalled childExit=1 active=1 queries=1\r\nnativeJob phase=drain-empty childExit=1 active=1,0 queries=2\r\n\r\nio.github.rs0325.mcicon.McIconException: 管理helperの準備に失敗しました: WINDOWS_RUNTIME_SETUP_REQUIRED: Windows所有情報の読取が失敗しました（exit 1）\nstderr (175 bytes):\nWindows native所有操作に失敗しました\r\nnativeJob phase=child-signalled childExit=1 active=1 queries=1\r\nnativeJob phase=drain-empty childExit=1 active=1,0 queries=2\r\n\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.requireOk(ManagedRuntime.java:126)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:64)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:28)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$listEntriesManaged$6(MCIconGenerator.java:129)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$submit$9(MCIconGenerator.java:161)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\r\n\tat java.base/java.lang.Thread.run(Unknown Source)\r\n",
+      "evidence": "disabled-result.json",
+      "backgroundTiming": {
+        "childStartedAtUtc": "2026-11-08T13:43:15.208000+00:00",
+        "finishedReceiptLastWriteAtUtc": "2026-11-08T13:43:50.218142+00:00",
+        "observedSeconds": 35.01,
+        "scope": "背景JVM child開始からfinished receipt最終書込まで。CLI終了後の待機秒とは区別。"
+      },
+      "stateCriterionResult": "passed",
+      "healthyOldManagedCriterionResult": "failed"
+    },
+    {
+      "item": "U01 不適用 offline",
+      "status": "partial",
+      "mode": "offline",
+      "stateControlPassed": true,
+      "healthyManagedExecutionPassed": false,
+      "primeSeconds": 69.149,
+      "nonapplySeconds": 60.541,
+      "nonapplyExit": 1,
+      "active": "1.1.0",
+      "pending": "1.1.1",
+      "highWater": 2,
+      "noNewPreparation": true,
+      "error": "OFFLINE_CACHE_MISS: Verified cached input is unavailable: metadata/version_manifest_v2.json\r\nio.github.rs0325.mcicon.McIconException: Verified cached input is unavailable: metadata/version_manifest_v2.json\r\n\tat io.github.rs0325.mcicon.internal.AssetStore.obtain(AssetStore.java:131)\r\n\tat io.github.rs0325.mcicon.internal.VersionService.manifest(VersionService.java:18)\r\n\tat io.github.rs0325.mcicon.internal.VersionService.list(VersionService.java:29)\r\n\tat io.github.rs0325.mcicon.internal.VersionService.resolve(VersionService.java:43)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.renderVersion(MCIconGenerator.java:136)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$renderManaged$4(MCIconGenerator.java:87)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$submit$9(MCIconGenerator.java:161)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\r\n\tat java.base/java.lang.Thread.run(Unknown Source)\r\n",
+      "evidence": "offline-result.json",
+      "backgroundTiming": {
+        "childStartedAtUtc": "2026-11-08T13:48:05.305000+00:00",
+        "finishedReceiptLastWriteAtUtc": "2026-11-08T13:48:39.374393+00:00",
+        "observedSeconds": 34.069,
+        "scope": "背景JVM child開始からfinished receipt最終書込まで。CLI終了後の待機秒とは区別。"
+      },
+      "stateCriterionResult": "passed",
+      "healthyOldManagedCriterionResult": "failed"
+    },
+    {
+      "item": "U01 不適用 pin",
+      "status": "partial",
+      "mode": "pin",
+      "stateControlPassed": true,
+      "healthyManagedExecutionPassed": false,
+      "primeSeconds": 79.688,
+      "nonapplySeconds": 69.68,
+      "nonapplyExit": 1,
+      "active": "1.1.0",
+      "pending": "1.1.1",
+      "highWater": 2,
+      "noNewPreparation": true,
+      "error": "MANAGED_SETUP_REQUIRED: 管理helperの準備に失敗しました: WINDOWS_RUNTIME_SETUP_REQUIRED: Windows所有情報の読取が失敗しました（exit 1）\nstderr (175 bytes):\nWindows native所有操作に失敗しました\r\nnativeJob phase=child-signalled childExit=1 active=1 queries=1\r\nnativeJob phase=drain-empty childExit=1 active=1,0 queries=2\r\n\r\nio.github.rs0325.mcicon.McIconException: 管理helperの準備に失敗しました: WINDOWS_RUNTIME_SETUP_REQUIRED: Windows所有情報の読取が失敗しました（exit 1）\nstderr (175 bytes):\nWindows native所有操作に失敗しました\r\nnativeJob phase=child-signalled childExit=1 active=1 queries=1\r\nnativeJob phase=drain-empty childExit=1 active=1,0 queries=2\r\n\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.requireOk(ManagedRuntime.java:126)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:64)\r\n\tat io.github.rs0325.mcicon.internal.managed.ManagedRuntime.prepare(ManagedRuntime.java:28)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$renderManaged$4(MCIconGenerator.java:88)\r\n\tat io.github.rs0325.mcicon.MCIconGenerator.lambda$submit$9(MCIconGenerator.java:161)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\r\n\tat java.base/java.lang.Thread.run(Unknown Source)\r\n",
+      "evidence": "pin-result.json",
+      "backgroundTiming": {
+        "childStartedAtUtc": "2026-11-08T13:53:05.883000+00:00",
+        "finishedReceiptLastWriteAtUtc": "2026-11-08T13:53:47.044979+00:00",
+        "observedSeconds": 41.162,
+        "scope": "背景JVM child開始からfinished receipt最終書込まで。CLI終了後の待機秒とは区別。"
+      },
+      "stateCriterionResult": "passed",
+      "healthyOldManagedCriterionResult": "failed"
+    },
+    {
+      "item": "T02/I02 tamper-manifest",
+      "status": "passed",
+      "seconds": 1.503,
+      "expectedRefusalExit": 1,
+      "originalSha256": "98fd7a101469b6885ffb6c5c549f31089c2e90dfcaa800402d9e12bbf7e1d63c",
+      "modifiedSha256": "34d0941e071bfe1bbe7b0580a7dacff0434858bd44a094badbce5d3857395c72",
+      "evidence": "tamper-manifest-result.json"
+    },
+    {
+      "item": "T02/I02 tamper-signature",
+      "status": "passed",
+      "seconds": 1.53,
+      "expectedRefusalExit": 1,
+      "originalSha256": "26c11924305ab5b9d11c2a319dc4a380ab5ded9744a6a5eb2369a182c6edd6dd",
+      "modifiedSha256": "d681860bc28b41e8481a09f6a57935d748876728ce006cc8737ade6c27c47da7",
+      "evidence": "tamper-signature-result.json"
+    },
+    {
+      "item": "T02/I02 tamper-payload",
+      "status": "passed",
+      "seconds": 1.694,
+      "expectedRefusalExit": 1,
+      "originalSha256": "035fafeae94b7f62dc8f616f3357d27384688ac014162f7e126c330a09c728da",
+      "modifiedSha256": "db8ec4e45e5b4aa6e98678a3094a208eed0dd47bbd4c709656324448ecd54129",
+      "evidence": "tamper-payload-result.json"
+    },
+    {
+      "item": "T02/I02 正しい旧署名sequence1拒否",
+      "status": "passed",
+      "managedSeconds": 212.321,
+      "correctOldPublicSignatureKey": "recovery",
+      "oldSequence": 1,
+      "highestAcceptedSequence": 2,
+      "activeUnchanged": true,
+      "pendingAbsent": true,
+      "backgroundFinishedExit1": true,
+      "failedWorkerEnded": true,
+      "oldPayloadNotDownloaded": true,
+      "dedicated111CopyUrlOverride": true,
+      "unmodifiedV110RealUpdateSubstitution": false,
+      "resultEvidence": "old-sequence-reassessed.json",
+      "firstQaAssessmentEvidence": "old-sequence-result.json",
+      "reassessedWithoutProductReexecution": true
+    },
+    {
+      "item": "U02 旧詰まり資源",
+      "status": "recorded",
+      "hostRootsObserved": 18,
+      "filesPreserved": 68,
+      "existingDistroConnectedOrRepairedOrCollected": false,
+      "automaticRescueTested": false,
+      "publicV110IdentityNotAssumed": true,
+      "evidence": "legacy-state-observation.json"
+    }
+  ],
+  "resultCounts": {
+    "partial": 4,
+    "unverified": 1,
+    "passed": 4,
+    "recorded": 1
+  },
+  "realUpdateControlPassed": true,
+  "healthyV110ManagedPassed": false,
+  "oldLiveJobGenerationVerified": false,
+  "nonapplicationStateControlsPassed": 3,
+  "fullHealthyNonapplicationCasesPassed": 0,
+  "tamperRefusalsPassed": 3,
+  "correctSignedOldSequenceRefusalPassed": true,
+  "observedFailedManagedCommands": [
+    {
+      "case": "basic-first",
+      "exit": 1,
+      "seconds": 82.501,
+      "stderr": "logs/basic-first.stderr",
+      "firstFailureRetained": true
+    },
+    {
+      "case": "disabled-online-prime",
+      "exit": 1,
+      "seconds": 67.479,
+      "stderr": "logs/disabled-online-prime.stderr",
+      "firstFailureRetained": true
+    },
+    {
+      "case": "disabled-nonapply",
+      "exit": 1,
+      "seconds": 66.63,
+      "stderr": "logs/disabled-nonapply.stderr",
+      "firstFailureRetained": true
+    },
+    {
+      "case": "offline-online-prime",
+      "exit": 1,
+      "seconds": 69.149,
+      "stderr": "logs/offline-online-prime.stderr",
+      "firstFailureRetained": true
+    },
+    {
+      "case": "offline-nonapply",
+      "exit": 1,
+      "seconds": 60.541,
+      "stderr": "logs/offline-nonapply.stderr",
+      "firstFailureRetained": true
+    },
+    {
+      "case": "pin-online-prime",
+      "exit": 1,
+      "seconds": 79.688,
+      "stderr": "logs/pin-online-prime.stderr",
+      "firstFailureRetained": true
+    },
+    {
+      "case": "pin-nonapply",
+      "exit": 1,
+      "seconds": 69.68,
+      "stderr": "logs/pin-nonapply.stderr",
+      "firstFailureRetained": true
+    }
+  ],
+  "oldNativeFailureAssessment": {
+    "confirmed": "未改変v1.1.0のhelp/署名/slot初期化は成功。旧native windows-host factsは同じhostでexit1、新nativeはexit0。旧managedは実worker前の所有情報読取で失敗。",
+    "candidateCause": "DistributionNameの無いLxssキー1件。現在native.cpp:129は欠損キーをskipし、新native factsも同じ1件を除外。PR #179の既知差と一致する高確度候補。registryを変更しての消失確認はしていない。",
+    "source": "helpers/windows/src/main/native/windows-host.cpp:129",
+    "evidence": "build/111-i/windows/update/old-native-facts-comparison.json",
+    "sourceOrRegistryFixed": false
+  },
+  "qaPreparationFailuresRetained": [
+    {
+      "evidence": "sequence-harness-error.json",
+      "cause": "旧公開signatureはrecovery鍵で署名されていたが、準備コードがoperating鍵だけを前提にした。公開trust両鍵で検証しrecovery成功を確認。署名を変更していない。"
+    },
+    {
+      "evidence": "old-sequence-result.json",
+      "cause": "正しい旧sequence拒否はfinished/1で完了したがstateのowned予約が残る。QAの予約解除待機がtimeoutしfalse判定。原判定を残し、製品再実行/状態編集なしでreceipt・ログから再採点。",
+      "reassessment": "old-sequence-reassessed.json"
+    }
+  ],
+  "comparisonToPreRelease": {
+    "qa": "qa\\acceptance-1.1.1-windows-2026-11-07.json",
+    "sha256": "04f1ae23d696a313e9096514a9a9f32b88ecaeb55e9dccddc0cf9210a7b4b151",
+    "candidateGeneration": "f5/r5",
+    "preReleaseUpdateE2E": [
+      {
+        "item": "候補stable実配信",
+        "status": "skip",
+        "reason": "公開1.1.0には正規のruntime latest URL上書き経路がない。公開物/package/DNS/TLSを変更せず、公開後に確認。",
+        "evidence": [
+          "bootstrap/docs/auto-update.md"
+        ]
+      },
+      {
+        "item": "更新fixture契約",
+        "status": "failed",
+        "reason": "F5最新結果をmethod単位で集計。準備段階の失敗であり、対象契約の成功とは扱わない。",
+        "evidence": [
+          "update-fixture-contract.json"
+        ],
+        "counts": {
+          "unique": 38,
+          "passed": 36,
+          "failed": 2
+        }
+      },
+      {
+        "item": "候補改変拒否",
+        "status": "passed",
+        "reason": "stable原文/署名/tool改変のF5上流証拠を再利用。",
+        "evidence": [
+          "build/111-f5/candidate-tamper-tests.json"
+        ]
+      },
+      {
+        "item": "健全1.1.0からbackground完了/pending保存",
+        "status": "unverified",
+        "reason": "正規の候補配信経路がなく、本番公開後に実測する。",
+        "evidence": [
+          "update-fixture-contract.json"
+        ]
+      },
+      {
+        "item": "次回managed適用/active=1.1.1",
+        "status": "unverified",
+        "reason": "正規の候補配信経路がなく、本番公開後に実測する。",
+        "evidence": [
+          "update-fixture-contract.json"
+        ]
+      },
+      {
+        "item": "旧job世代維持",
+        "status": "unverified",
+        "reason": "正規の候補配信経路がなく、本番公開後に実測する。",
+        "evidence": [
+          "update-fixture-contract.json"
+        ]
+      },
+      {
+        "item": "無効/offline/明示pinの候補不適用",
+        "status": "unverified",
+        "reason": "正規の候補配信経路がなく、本番公開後に実測する。",
+        "evidence": [
+          "update-fixture-contract.json"
+        ]
+      },
+      {
+        "item": "実配信で署名/sequence改変拒否",
+        "status": "unverified",
+        "reason": "正規の候補配信経路がなく、本番公開後に実測する。",
+        "evidence": [
+          "update-fixture-contract.json"
+        ]
+      }
+    ],
+    "publicDistributionPreviouslyUnverifiedNowObserved": true,
+    "candidateBootstrapShaEqualsPublished": true,
+    "priorQaModified": false
+  },
+  "U02": {
+    "status": "recorded-only",
+    "evidence": "build/111-i/windows/update/legacy-state-observation.json",
+    "hostRoots": 18,
+    "retainedMetadataFiles": 68,
+    "oldResourcesAutomaticallyRescued": false,
+    "oldRootsOrDistrosCollected": false
+  },
+  "cleanup": {
+    "externalRootRemoved": true,
+    "topRemoved": true,
+    "ownProcessesRemaining": [],
+    "dedicatedDistributionsCreated": 2,
+    "dedicatedDistributionsRemoved": 2,
+    "createdGuids": [
+      "8f6b07fe-3ab2-4616-aab9-5ec0c2635770",
+      "0497fc44-b711-4d9a-b31d-353626f499a7"
+    ],
+    "existingLxssValuesUnchanged": true,
+    "existingEnvironmentExactlyEqual": false,
+    "parentAclUnchanged": true,
+    "originalPublishedProgramsUnmodified": true,
+    "oldRootsOrDistrosRecoveredOrModified": false,
+    "sourcesOrOsSettingsModified": false,
+    "publicArtifactsModified": false,
+    "commitPushPerformed": false
+  },
+  "environmentComparison": {
+    "exactlyEqual": false,
+    "fields": {
+      "list": false,
+      "status": true,
+      "running": false,
+      "defaultDistribution": true,
+      "distributions": true,
+      "hostFiles": true,
+      "legacyPaths": true,
+      "dockerProcesses": true,
+      "lxssRootValues": true,
+      "lxssAllValues": true
+    },
+    "parentAcl": [
+      {
+        "path": "C:\\",
+        "same": true
+      },
+      {
+        "path": "C:\\Users",
+        "same": true
+      },
+      {
+        "path": "C:\\Users\\<user>",
+        "same": true
+      }
+    ]
+  },
+  "environmentDifferences": {
+    "list": {
+      "before": {
+        "exit": 0,
+        "stdout": "NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Running         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2",
+        "stderr": ""
+      },
+      "after": {
+        "exit": 0,
+        "stdout": "NAME                               STATE           VERSION\r\n* MCIcon-82ec446b986db27cff993a27    Stopped         2\r\n  MCIcon-9333825c39c0df5f8d3ab095    Stopped         2\r\n  MCIcon-Issue95-Builder-V14         Stopped         2\r\n  MCIcon-9922213e9d5e232bf90db2d7    Stopped         2\r\n  MCIcon-Issue95-Builder-V9          Stopped         2\r\n  MCIcon-Issue95-Builder-V12         Stopped         2\r\n  MCIcon-6b7e078236b9d00319f34e40    Stopped         2\r\n  MCIcon-5ba0815df4293859842d2fbc    Stopped         2\r\n  docker-desktop                     Stopped         2\r\n  MCIcon-Issue95-Builder-V18         Stopped         2\r\n  MCIcon-Issue95-Builder-V5          Stopped         2\r\n  MCIcon-Issue95-Builder-V6          Stopped         2\r\n  MCIcon-Issue95-Builder-V11         Stopped         2\r\n  MCIcon-Issue95-Builder-V7          Stopped         2\r\n  MCIcon-Issue95-Builder-V17         Stopped         2\r\n  MCIcon-9862bd8335a9aac8f8f1844f    Stopped         2\r\n  MCIcon-6717dc3f92906fd38d19c3dc    Stopped         2\r\n  MCIcon-aa038dd224dc38f9939cf22d    Stopped         2\r\n  MCIcon-a5124a2a2ee645c086f33d07    Stopped         2\r\n  MCIcon-Issue95-Builder-V16         Stopped         2\r\n  MCIcon-Issue95-Builder-V13         Stopped         2\r\n  MCIcon-2c9dc6b88d5831cb3a818c68    Stopped         2\r\n  MCIcon-f87fc4aebed84984c9e250f6    Stopped         2\r\n  MCIcon-Issue95-Builder-V8          Stopped         2\r\n  MCIcon-d8a4dfb01684287672a8eba8    Stopped         2\r\n  Ubuntu-24.04                       Stopped         2\r\n  MCIcon-Issue95-Builder-V4          Stopped         2\r\n  MCIcon-128c33dcea15a8ea6487eac4    Stopped         2\r\n  MCIcon-Issue95-Builder-V15         Stopped         2\r\n  MCIcon-b28910c0585341f944637b75    Stopped         2\r\n  MCIcon-Issue95-Builder-V3          Stopped         2\r\n  MCIcon-Issue91-V1                  Stopped         2\r\n  MCIcon-5ef94cacfdb4b618ae4d791a    Stopped         2\r\n  MCIcon-987cb1cb668708b0d7fff9b6    Stopped         2\r\n  MCIcon-0e44596ba5e39d6030376249    Stopped         2\r\n  MCIcon-833fcb60d85b240e66f84eff    Stopped         2\r\n  MCIcon-Issue95-ImportQA-V11        Stopped         2\r\n  MCIcon-fa14990d78f8adb210b6936d    Stopped         2\r\n  MCIcon-3c769605f0eb59fd27565bed    Stopped         2\r\n  MCIcon-Issue95-Builder-V10         Stopped         2",
+        "stderr": ""
+      }
+    },
+    "running": {
+      "before": {
+        "exit": 0,
+        "stdout": "Ubuntu-24.04",
+        "stderr": ""
+      },
+      "after": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    }
+  },
+  "environmentAssessment": {
+    "existingRegistrySettingsAndAclUnchanged": true,
+    "rawEnvironmentExactlyEqual": false,
+    "difference": "Ubuntu-24.04 Running→Stopped。前後list/running以外は全て一致。",
+    "directUbuntuStartStopCommandsPerformed": false,
+    "stateChangeActorOrAutomaticStopUnknown": true,
+    "stateRestoredToHideDifference": false
+  },
+  "scope": {
+    "requireEscalatedAndRunLogged": true,
+    "MCICON_DATA_HOMEExplicit": true,
+    "TMP_TEMPIsolated": true,
+    "published110PackageMetadataSeedTrustUnmodified": true,
+    "actualU01UrlInjectionOrFixturePendingUsed": false,
+    "productionKeyResigningPerformed": false,
+    "negativeBytesOnlyDedicatedCopies": true,
+    "osSignalTimingControlUsed": false,
+    "sourceOtherOsEvidenceOrPublicArtifactsModified": false,
+    "commitPushReleaseTagCentralLatestModified": false
+  },
+  "remainingWork": [
+    "本hostでは旧native factsが失敗し健全旧managed/旧live workerの開始条件を満たせない。既存Lxss/ACL変更や旧helper改変をせず、健全な別Windows条件での旧job世代維持確認または範囲判断が必要。",
+    "不適用3条件の状態保持は成功したが、健全旧managed実行込みの全条件成功へ読み替えない。",
+    "Ubuntu Running→Stopped差の主体/自動停止は未特定。既存distroへ復元操作を行わずメインへ返す。"
+  ],
+  "stageIClosure": {
+    "date": "2026-11-09",
+    "userDecision": {
+      "date": "2026-11-09",
+      "originalText": "両方行う",
+      "approvedActions": [
+        "U01不具合のIssue作成",
+        "v1.1.1 Release本文への既知問題追記・差替え"
+      ],
+      "executor": "git_operator",
+      "performedByThisPreparation": false,
+      "notAuthorizedHere": [
+        "commit",
+        "push",
+        "PR作成",
+        "Issue作成",
+        "Release編集"
+      ]
+    },
+    "overallGatePassed": false,
+    "U01": {
+      "macos": {
+        "status": "失敗",
+        "issue": "#189",
+        "oldJobProtected": true,
+        "oldJobSucceeded": 200,
+        "oldJobFailed": 0,
+        "newGenerationApplied": false,
+        "cause": "異世代active leaseを現helperでLeaseFile.open→helper path不一致→UNKNOWN→preflight拒否。UNKNOWN試行のtrialInvocationが残存。",
+        "stateAfter": {
+          "active": "1.1.0",
+          "pending": "1.1.1",
+          "previous": null,
+          "trialInvocation": "0c067ec6-6f7c-4224-8bcc-8c48189cc972",
+          "highestAcceptedSequence": 2,
+          "badCandidates": []
+        },
+        "subsequentLaunch": "通常再起動は1.1.0で成功。trial再試行/新しいbackground取得は進まない。repairは解除操作ではない。",
+        "evidence": "build/111-i/macos/update/u01-oldjob/REPORT.md",
+        "rawCase": "build/111-i/macos/update/u01-oldjob/evidence/final/case-attempt-3.json",
+        "sourceAnalysis": "build/111-i/issues/u01-oldjob-update/REPORT.md"
+      },
+      "windows": {
+        "status": "本hostでは未検証",
+        "reason": "未改変v1.1.0の旧native facts/preflightが失敗して実workerへ到達しない。DistributionName欠損Lxssキーに関するPR #179との差が高確度候補。registry改変による原因消失は未確認。",
+        "oldNativeFailureRelatedPr": 179,
+        "oldJobGenerationVerified": false,
+        "actualBackgroundAndNextApplyPassed": true,
+        "healthyOldManagedPassed": false,
+        "crossGenerationSourceRiskIssue": "#189",
+        "evidence": "build/111-i/windows/update/old-native-facts-comparison.json"
+      }
+    },
+    "environmentDifference": {
+      "host": "windows",
+      "distribution": "Ubuntu-24.04",
+      "before": "Running",
+      "after": "Stopped",
+      "initiatorAndChangeActor": "起動者・状態変化主体（自動停止を含む）は不明",
+      "differencePreserved": true,
+      "restoredToHideDifference": false,
+      "existingEnvironmentExactlyEqual": false,
+      "evidence": "qa/post-publish-1.1.1-windows-2026-11-08.json#environmentDifferences",
+      "actorInvestigationOrNewHostOperationPerformed": false
+    },
+    "issue98CloseAllowed": false,
+    "issue98Reason": "旧job稼働中の新版適用がMacで失敗し、Windows健全旧job条件も未検証。公開完了や旧job保護だけでは完成条件を満たさない。",
+    "publicOperationsPerformed": false
+  },
+  "publicTextRedaction": {
+    "osUsernamesReplacedWith": "<user>",
+    "originalPreserved": {
+      "path": "build/111-i/qa-closure/previous/qa/post-publish-1.1.1-windows-2026-11-08.json",
+      "bytes": 49209,
+      "sha256": "a9bf71c1fe5e87ff0a01b512d4a419f02185f09cd1e91220f4a7d3106b48603a"
+    },
+    "scope": "OSユーザー名の表記だけ匿名化し、数値・hash・判定・失敗/skipを変更しない。元の原証拠はbuild内に保全。"
+  }
+}
