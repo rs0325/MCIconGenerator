@@ -23,26 +23,30 @@ public final class LeaseSnapshot {
     private final JsonNode descriptor,inventory;
     private final Map<Path,byte[]> bytes=new LinkedHashMap<>();
     private final Map<Path,Object> keys=new LinkedHashMap<>();
-    private LeaseSnapshot(Path root,Path file,ObjectNode lease,JsonNode descriptor,JsonNode helperArtifact,LeaseTrust trust,byte[] leaseBytes) throws IOException {
+    private LeaseSnapshot(Path root,Path file,ObjectNode lease,JsonNode descriptor,JsonNode helperArtifact,LeaseTrust trust,byte[] leaseBytes,FileChannel receiptChannel) throws IOException {
         this.trust=trust;this.root=root;this.file=file;this.lease=lease.deepCopy();this.descriptor=descriptor.deepCopy();
         helperRoot=root.resolve("helpers").resolve(text(descriptor.get("host"),"os",16)+"-"+text(descriptor.get("host"),"arch",16)).resolve(hash(helperArtifact,"sha256"));
         byte[] inventoryBytes=readFile(file.getParent().resolve(relative(helperArtifact,"inventoryPath")),4*1024*1024);if(!digest(inventoryBytes).equals(hash(helperArtifact,"inventorySha256")))throw invalid("snapshotのinventoryが変化しました");inventory=read(inventoryBytes);
-        capture(root.resolve("host-id"));capture(file);capture(file.resolveSibling("lease.lock"));capture(file.resolveSibling("descriptor.json"));
+        capture(root.resolve("host-id"));capture(file);capture(file.resolveSibling("lease.lock"),receiptChannel);capture(file.resolveSibling("descriptor.json"));
         for(JsonNode artifact:descriptor.get("artifacts"))capture(file.getParent().resolve(relative(artifact,"inventoryPath")));
         Path signature=LeaseTrust.evidence(root,hash(lease,"descriptorSha256"));if(!LeaseTrust.legacy(hash(lease,"descriptorSha256")))capture(signature);
         if(!Arrays.equals(leaseBytes,bytes.get(file))||!Arrays.equals(receipt(identity(lease)),bytes.get(file.resolveSibling("lease.lock")))||!digest(bytes.get(file.resolveSibling("descriptor.json"))).equals(hash(lease,"descriptorSha256")))throw invalid("検証中にlease/receipt/descriptorが変化しました");
         if(!new String(bytes.get(root.resolve("host-id")),StandardCharsets.US_ASCII).trim().equals(text(lease,"hostId",36)))throw invalid("検証中にhostIdが変化しました");
         for(JsonNode artifact:descriptor.get("artifacts"))if(!digest(bytes.get(file.getParent().resolve(relative(artifact,"inventoryPath")))).equals(hash(artifact,"inventorySha256")))throw invalid("検証中にinventoryが変化しました");
-        helperExecutable();verifyUnchanged();
+        helperExecutable();verifyUnchanged(receiptChannel);
     }
-    /** 全fileを検証した独立snapshotを返す。信頼入力はpackage由来に限定する。 */
+    /** package由来の信頼入力で全fileを検証したsnapshotを返す。自分でreceipt lockを持つ場合はchannel付き入口を使う。 */
     public static LeaseSnapshot read(Path root,Path file,LeaseTrust trust) throws IOException {
+        return read(root,file,trust,null);
+    }
+    /** callerが同じlease.lockを開いたchannelからreceiptを読む。channelを保存・closeせず、位置も変更しない。 */
+    public static LeaseSnapshot read(Path root,Path file,LeaseTrust trust,FileChannel receiptChannel) throws IOException {
         if(!root.isAbsolute()||!file.isAbsolute())throw invalid("snapshotには絶対pathが必要です");if(!root.toRealPath().equals(root))throw invalid("管理rootにlinkがあります");
         byte[] leaseBytes=readFile(file,1024*1024);ObjectNode lease=(ObjectNode)read(leaseBytes);ObjectNode identity=identity(lease);
         Path expected=root.resolve("jobs").resolve(text(identity,"jobId",36)).resolve("lease.json");
         if(!file.equals(expected)||!expected.getParent().toRealPath().equals(expected.getParent()))throw invalid("job pathが一致しません");
         String host=new String(readFile(root.resolve("host-id"),64),StandardCharsets.US_ASCII).trim();if(!host.equals(text(identity,"hostId",36)))throw invalid("管理rootのhostIdが一致しません");
-        checkReceipt(expected,identity);byte[] original=readFile(expected.resolveSibling("descriptor.json"),1024*1024);
+        checkReceipt(expected,identity,receiptChannel);byte[] original=readFile(expected.resolveSibling("descriptor.json"),1024*1024);
         if(!digest(original).equals(hash(identity,"descriptorSha256")))throw invalid("descriptor元bytesが一致しません");JsonNode descriptor=read(original);trust.verify(root,original);
         fields(descriptor,"schemaVersion","runtimeId","toolVersion","host","minimumOsVersion","helper","worker","rendering","artifacts");
         if(integer(descriptor,"schemaVersion",1)!=1||!text(descriptor,"runtimeId",96).equals(text(identity,"runtimeId",96))||!text(descriptor,"toolVersion",256).equals(text(identity,"toolVersion",256)))throw invalid("descriptor世代が一致しません");
@@ -68,22 +72,24 @@ public final class LeaseSnapshot {
 
         LeaseResources.validate(lease.get("resources"),os);
         if(text(lease,"state",16).equals("released")&&!lease.get("resources").isEmpty())throw invalid("released資源が残っています");
-        return new LeaseSnapshot(root,expected,lease,descriptor,helperArtifact,trust,leaseBytes);
+        return new LeaseSnapshot(root,expected,lease,descriptor,helperArtifact,trust,leaseBytes,receiptChannel);
     }
     public ObjectNode lease(){return lease.deepCopy();}
     public JsonNode descriptor(){return descriptor.deepCopy();}
     public Path file(){return file;}
     LeaseTrust trust(){return trust;}
     public String receiptKey(){return keys.get(file.resolveSibling("lease.lock")).toString();}
+    /** snapshotへ固定したreceipt元bytesのSHA-256。現在値の照合にはverifyUnchangedを先に呼ぶ。 */
+    public String receiptSha256(){return digest(bytes.get(file.resolveSibling("lease.lock")));}
     public Path helperExecutable() throws IOException {
         Path executable=helperFile(relative(descriptor.get("helper"),"executable"));
-        for(JsonNode row:inventory.path("contents").path("files"))if(row.path("path").asText().endsWith(".jar"))helperFile(row.path("path").asText());
+        for(JsonNode row:helperFiles())if(row.path("path").asText().endsWith(".jar"))helperFile(row.path("path").asText());
         return executable;
     }
     /** 元inventoryのarchive相対pathでpinを指定する。 */
     public Path helperFile(String relative) throws IOException {
         if(!relative.matches("[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*")||Arrays.stream(relative.split("/")).anyMatch(x->x.equals(".")||x.equals("..")))throw invalid("helper相対pathが不正です");
-        JsonNode files=inventory.path("contents").path("files");if(!files.isArray())throw invalid("helper inventoryのfile表がありません");
+        JsonNode files=helperFiles();
         Set<String> names=new HashSet<>();JsonNode selected=null;
         for(JsonNode row:files){String name=text(row,"path",4096);if(!names.add(name))throw invalid("helper inventoryのpathが重複しています");if(name.equals(relative))selected=row;}
         if(selected==null)throw invalid("helper inventoryにpinがありません");
@@ -93,10 +99,20 @@ public final class LeaseSnapshot {
         if(!HexFormat.of().formatHex(digest.digest()).equals(hash(selected,"sha256")))throw invalid("helper実体のhashが一致しません");
         return path;
     }
-    public void verifyUnchanged() throws IOException {
-        for(var entry:bytes.entrySet())if(!Objects.equals(keys.get(entry.getKey()),key(entry.getKey()))||!Arrays.equals(entry.getValue(),readFile(entry.getKey(),4*1024*1024)))throw invalid("snapshotのfile identity/bytesが変化しました");
+    private JsonNode helperFiles() throws IOException {
+        JsonNode direct=inventory.path("contents").path("files"),published=inventory.path("contents").path("r1").path("files");
+        if(!direct.isMissingNode()&&!published.isMissingNode())throw invalid("helper inventoryのfile表が重複しています");
+        JsonNode files=direct.isMissingNode()?published:direct;if(!files.isArray())throw invalid("helper inventoryのfile表がありません");return files;
     }
-    private void capture(Path path) throws IOException {if(!Files.getOwner(path,LinkOption.NOFOLLOW_LINKS).equals(Files.getOwner(root,LinkOption.NOFOLLOW_LINKS)))throw invalid("snapshot fileのOS所有者が一致しません");Object before=key(path);byte[] original=readFile(path,4*1024*1024);if(!before.equals(key(path)))throw invalid("snapshot保存中にfileが置換されました");keys.put(path,before);bytes.put(path,original);}
+    public void verifyUnchanged() throws IOException {
+        verifyUnchanged(null);
+    }
+    /** 同fileのlock保持中は取得済みchannelを渡す。別FDのcloseによるPOSIX lock解除を避ける。nullは通常の読取り。 */
+    public void verifyUnchanged(FileChannel receiptChannel) throws IOException {
+        for(var entry:bytes.entrySet())if(!Objects.equals(keys.get(entry.getKey()),key(entry.getKey()))||!Arrays.equals(entry.getValue(),receiptChannel!=null&&entry.getKey().equals(file.resolveSibling("lease.lock"))?readReceipt(receiptChannel):readFile(entry.getKey(),4*1024*1024)))throw invalid("snapshotのfile identity/bytesが変化しました");
+    }
+    private void capture(Path path) throws IOException {capture(path,null);}
+    private void capture(Path path,FileChannel receiptChannel) throws IOException {if(!Files.getOwner(path,LinkOption.NOFOLLOW_LINKS).equals(Files.getOwner(root,LinkOption.NOFOLLOW_LINKS)))throw invalid("snapshot fileのOS所有者が一致しません");Object before=key(path);byte[] original=receiptChannel==null?readFile(path,4*1024*1024):readReceipt(receiptChannel);if(!before.equals(key(path)))throw invalid("snapshot保存中にfileが置換されました");keys.put(path,before);bytes.put(path,original);}
     private Object key(Path path) throws IOException {if(!path.toRealPath().equals(path))throw invalid("snapshotにlinkがあります");return trust.identity(path);}
     public static byte[] receipt(ObjectNode identity) throws IOException {return digest(JSON.writer().with(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS).writeValueAsBytes(JSON.convertValue(identity,Map.class))).getBytes(StandardCharsets.US_ASCII);}
     static byte[] readFile(Path file,int limit) throws IOException {
@@ -105,6 +121,8 @@ public final class LeaseSnapshot {
     }
     public static ObjectNode activeIdentity(ObjectNode lease) throws IOException {if(!text(lease,"state",16).equals("active"))throw invalid("操作leaseがactiveではありません");return identity(lease);}
     public static void verifyReceipt(Path lease,ObjectNode identity) throws IOException {checkReceipt(lease,identity);}
+    /** 同じreceiptの取得済みchannelで厳密64byteを照合する。channelの所有権・位置・lockは変更しない。 */
+    public static void verifyReceipt(Path lease,ObjectNode identity,FileChannel receiptChannel) throws IOException {checkReceipt(lease,identity,receiptChannel);}
     private static ObjectNode identity(ObjectNode lease) throws IOException {
         fields(lease,"schemaVersion","jobId","ownerId","toolVersion","workerSha256","runtimeId","descriptorSha256","hostId","pid","processStartedAt","createdAt","requirements","state","resources");
         if(integer(lease,"schemaVersion",1)!=1||!Set.of("active","released").contains(text(lease,"state",16))||uuid(lease,"jobId").equals(uuid(lease,"ownerId")))throw invalid("lease状態/所有者が不正です");uuid(lease,"hostId");integer(lease,"pid",1);
@@ -114,10 +132,19 @@ public final class LeaseSnapshot {
         ObjectNode identity=lease.deepCopy();identity.remove(List.of("state","resources"));return identity;
     }
     private static void checkReceipt(Path lease,ObjectNode identity) throws IOException {
+        checkReceipt(lease,identity,null);
+    }
+    private static void checkReceipt(Path lease,ObjectNode identity,FileChannel receiptChannel) throws IOException {
         Path file=lease.resolveSibling("lease.lock");if(!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS))throw invalid("receiptがありません");
+        if(receiptChannel!=null){if(!Arrays.equals(readReceipt(receiptChannel),receipt(identity)))throw invalid("receiptが一致しません");return;}
         try(FileChannel input=FileChannel.open(file,StandardOpenOption.READ)) {
-            if(input.size()!=64)throw invalid("receiptは厳密64bytesが必要です");ByteBuffer saved=ByteBuffer.allocate(64);while(saved.hasRemaining())if(input.read(saved)<0)throw invalid("receiptが不足しています");if(!Arrays.equals(saved.array(),receipt(identity)))throw invalid("receiptが一致しません");
+            if(!Arrays.equals(readReceipt(input),receipt(identity)))throw invalid("receiptが一致しません");
         }
+    }
+    private static byte[] readReceipt(FileChannel channel) throws IOException {
+        if(channel.size()!=64)throw invalid("receiptは厳密64bytesが必要です");ByteBuffer saved=ByteBuffer.allocate(64);
+        while(saved.hasRemaining())if(channel.read(saved,saved.position())<0)throw invalid("receiptが不足しています");
+        if(channel.size()!=64)throw invalid("receipt読取り中にsizeが変化しました");return saved.array();
     }
     static JsonNode read(byte[] bytes) throws IOException {
         String text=StandardCharsets.UTF_8.newDecoder().onMalformedInput(java.nio.charset.CodingErrorAction.REPORT).onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT).decode(java.nio.ByteBuffer.wrap(bytes)).toString();

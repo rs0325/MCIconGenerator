@@ -1,5 +1,25 @@
 # 同世代の旧jobを回収するcore内部経路
 
+## Macの未確定stopの限定回復（1.1.2）
+
+通常closeのcore10秒・Mac helper9秒・native回収余裕3秒は維持する。stopが期限を超えた場合も、その呼出しは失敗として残す。次のprepare/doctorは同じdescriptorの旧jobのactive lockを取得し、元core死亡を確認してから回復する。
+
+対象は同boot・phase=releasing・container除去済みのVMだけである。唯一のstop intent、65byteのclient完了印、他操作の正常終端、作成した全containerの除去、登録・実VMのmachine/config・旧hostAgentの終了を照合し、固定helperのlimactlでStoppedを新しく観測する。Running、別boot、PID再利用、開始identity不明、未確定create、他のlive/unknown leaseは保持して拒否する。guestへの接続やVMのstart/stop/removeは回復中に実行しない。
+
+新しいsettled証拠は`recoveryKind=observed-stopped`とし、元exitCodeを補完しない。元intent・完了印・失敗ログを残し、証拠のdurable保存、release記録、resources空のCAS、coreのreleased記録の順で進める。
+
+1.1.0/1.1.1の既知公開Mac descriptorは、自動回復と別の明示保守で扱う。新しい1.1.2 tool packageを別directoryへ展開し、そのpackageの`bin/mcicon`を絶対pathで直接実行する。旧bootstrapのactive slotを選ぶ入口は使用しない。
+
+```sh
+/absolute/path/to/mcicon-tool-1.1.2/bin/mcicon runtime repair \
+  --job 00000000-0000-0000-0000-000000000000 \
+  --runtime-root /absolute/path/to/existing-runtime
+```
+
+job UUIDは対象の`jobs/<UUID>/lease.json`に合わせる。元rootとVMが存在する同じMac・同じbootで実行する。旧descriptor/inventory/helper treeは書き換えず、新packageの署名済みhelperが参照検証と停止終端の確定だけを行う。署名済み資材がまだ配布されていない候補buildでは、この手順を配布済み修復として扱わない。
+
+修復はbootstrap trialを解除しない。残存trialがある場合は、runtime修復の後に新bootstrapの正式なtrial再開手順を別に行う。証跡を別hostへコピーしただけのroot、旧bootやRunningの一般救済は対象外である。
+
 Issue #93の後続。公開API・helper protocol・lease形式は増やさない。対象はMac/Windowsのcurrent tool exact版/current descriptorに束縛された旧active jobである。WindowsはH-C18 v3で同bootのready本人死亡後のprepare回復・peer描画継続・正常closeを限定受入した。core fixtureやこの確認をACK前死亡/partial import・同時release・実再起動・全51版・新Mac実VMの成功として扱わない。
 
 ## 処理順序

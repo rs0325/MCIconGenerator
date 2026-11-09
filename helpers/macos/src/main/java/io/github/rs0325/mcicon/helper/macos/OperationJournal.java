@@ -120,7 +120,8 @@ final class OperationJournal implements AutoCloseable {
         if(!Files.exists(tombstone,LinkOption.NOFOLLOW_LINKS))return false;verifyTombstone();return true;
     }
     void requireSettled() throws IOException {requireRecords(false);}
-    private void requireRecords(boolean boundedStart) throws IOException {
+    private void requireRecords(boolean boundedStart) throws IOException {requireRecords(boundedStart,false);}
+    private void requireRecords(boolean boundedStart,boolean observedStop) throws IOException {
         requireHeld();boolean pending=false;
         try(DirectoryStream<Path> entries=Files.newDirectoryStream(directory)) {
             for(Path entry:entries) {
@@ -138,12 +139,60 @@ final class OperationJournal implements AutoCloseable {
                     }
                 }
                 try{clientComplete(operation);}catch(ClientPending missing){if(!boundedStart)throw missing;pending=true;}
+                if(observedStop&&MacFiles.json(entry.resolve("intent.json")).path("kind").asText().equals("stop")&&!Files.exists(entry.resolve("settled.json"),LinkOption.NOFOLLOW_LINKS))continue;
                 if(boundedStart&&MacFiles.json(entry.resolve("intent.json")).path("kind").asText().equals("start")&&!Files.exists(entry.resolve("settled.json"),LinkOption.NOFOLLOW_LINKS))continue;
                 JsonNode outcome=MacFiles.json(entry.resolve("settled.json"));
                 if(!outcome.path("intentSha256").asText().equals(operation.sha256())||!outcome.path("evidence").isObject()||outcome.path("evidence").isEmpty())throw new IOException("daemon操作終端が未確定です");
             }
         }
         if(pending)throw new ClientPending();
+    }
+    record Stop(Operation operation,ObjectNode records,boolean settled) {}
+    ObjectNode recoveredMac() throws IOException {
+        requireSettled();if(!released())throw new IOException("resources確定前のrelease証拠がありません");ObjectNode result=null;
+        try(var entries=Files.newDirectoryStream(directory)) {
+            for(Path entry:entries) {
+                if(entry.equals(tombstone))continue;JsonNode intent=MacFiles.json(entry.resolve("intent.json"));if(!intent.path("kind").asText().equals("stop"))continue;
+                JsonNode evidence=MacFiles.json(entry.resolve("settled.json")).path("evidence");
+                if(result!=null||!evidence.path("recoveryKind").asText().equals("observed-stopped")||!evidence.path("resources").isObject())throw new IOException("中断前の停止回復証拠が不正です");result=(ObjectNode)evidence.path("resources").deepCopy();
+            }
+        }
+        if(result==null)throw new IOException("中断前の停止回復証拠がありません");return result;
+    }
+    /** stop以外の全操作の終端と、作成した全containerの除去を元記録に結合する。 */
+    Stop stoppedSnapshot(JsonNode mac) throws IOException {
+        requireHeld();List<Path> entries;try(var files=Files.list(directory)){entries=files.sorted().toList();}
+        Operation stop=null;for(Path entry:entries) {
+            if(entry.equals(tombstone))continue;checkDirectory(entry);
+            if(MacFiles.json(entry.resolve("intent.json")).path("kind").asText().equals("stop")) {
+                if(stop!=null)throw new IOException("stopが複数あるため限定回復できません");stop=new Operation(entry,MacFiles.hash(entry.resolve("intent.json")));verify(stop);
+            }
+        }
+        if(stop==null)return null;requireRecords(false,true);
+        ObjectNode records=MacFiles.JSON.createObjectNode();boolean prepared=false;
+        Set<String> created=new HashSet<>(),removed=new HashSet<>(),started=new HashSet<>();
+        for(Path entry:entries) {
+            if(entry.equals(tombstone))continue;
+            JsonNode intent=MacFiles.json(entry.resolve("intent.json"));String kind=intent.path("kind").asText();
+            for(String name:List.of("intent.json","client-complete","settled.json")) {
+                if(name.equals("settled.json")&&entry.equals(stop.directory()))continue;
+                records.put(entry.getFileName()+"/"+name,MacFiles.hash(entry.resolve(name)));
+            }
+            if(kind.equals("stop"))continue;JsonNode evidence=MacFiles.json(entry.resolve("settled.json")).path("evidence");
+            if(kind.equals("prepare")&&evidence.path("phase").asText().equals("ready")) {
+                boolean matches=true;for(String key:List.of("generationOwner","instanceDir","machineIdSha256","forwardConfigSha256","hostAgent","guestOwnerMarkerSha256"))matches&=evidence.path(key).equals(mac.path(key));
+                prepared|=matches;
+            }
+            if(kind.equals("create")) {
+                String id=evidence.path("Id").asText();JsonNode labels=evidence.path("Config").path("Labels");
+                if(!id.matches("[0-9a-f]{64}")||!labels.path("io.github.rs0325.mcicon.generation").equals(mac.path("generationOwner")))throw new IOException("createの所有が一致しません");
+                for(String key:List.of("jobId","ownerId","descriptorSha256"))if(!labels.path("io.github.rs0325.mcicon."+key).equals(identity.path(key)))throw new IOException("createのidentityが一致しません");created.add(id);
+            }
+            if(kind.equals("remove")&&evidence.path("absenceVerified").asBoolean())removed.add(evidence.path("removedFullId").asText());
+            if(kind.equals("start")) {if(!evidence.path("absenceVerified").asBoolean()||!evidence.path("removedFullId").equals(intent.path("containerId")))throw new IOException("startの除去証拠がありません");started.add(intent.path("containerId").asText());}
+        }
+        if(!prepared||!removed.containsAll(created)||!created.containsAll(started))throw new IOException("prepareまたはcontainer除去証拠が不足しています");
+        return new Stop(stop,records,Files.exists(stop.directory().resolve("settled.json"),LinkOption.NOFOLLOW_LINKS));
     }
     void markReleased() throws IOException {
         requireSettled();if(released())return;

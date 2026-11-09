@@ -1,9 +1,12 @@
 package io.github.rs0325.mcicon.helper;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.ByteBuffer;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.MessageDigest;
@@ -18,6 +21,68 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HelperCommonTest {
     @TempDir Path root;
+    @Test void 公開旧版r1のfile表も元署名とJARのpinを照合する() throws Exception {
+        Fixture fixture=new Fixture();ObjectNode inventory=(ObjectNode)HelperProtocol.read(fixture.inventory("helper"));
+        ObjectNode contents=(ObjectNode)inventory.get("contents");JsonNode files=contents.remove("files");contents.putObject("r1").set("files",files);
+        Path jar=fixture.executable.getParent().resolve("pinned.jar");Files.writeString(jar,"pinned-jar");
+        ((ArrayNode)files).addObject().put("path","bin/pinned.jar").put("bytes",Files.size(jar)).put("sha256",hash(Files.readAllBytes(jar)));
+        fixture.rebindInventory(inventory);LeaseSnapshot snapshot=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust);
+        assertEquals(fixture.executable,snapshot.helperExecutable());assertEquals(jar,snapshot.helperFile("bin/pinned.jar"));snapshot.verifyUnchanged();
+        Files.writeString(jar,"broken-jar");assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,fixture.trust));
+    }
+    @Test void 直接と公開旧版r1のfile表の併存は選択せず拒否する() throws Exception {
+        Fixture fixture=new Fixture();ObjectNode inventory=(ObjectNode)HelperProtocol.read(fixture.inventory("helper"));
+        ((ObjectNode)inventory.get("contents")).putObject("r1").set("files",inventory.path("contents").path("files").deepCopy());
+        fixture.rebindInventory(inventory);assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,fixture.trust));
+    }
+    @Test void 取得済みchannelで再照合と再生成しても別JVMへactiveLockを渡さない() throws Exception {
+        Fixture fixture=new Fixture();Path receipt=fixture.file.resolveSibling("lease.lock");LeaseSnapshot snapshot=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust);
+        assertReceiptLock(receipt,"FREE");
+        try(var channel=FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE);var held=channel.lock(64,1,false)) {
+            channel.position(19);assertReceiptLock(receipt,"BUSY");snapshot.verifyUnchanged(channel);assertEquals(19,channel.position());assertReceiptLock(receipt,"BUSY");
+            LeaseSnapshot rebuilt=LeaseSnapshot.read(fixture.base,fixture.file,fixture.trust,channel);assertEquals(snapshot.lease(),rebuilt.lease());assertEquals(19,channel.position());assertReceiptLock(receipt,"BUSY");
+            ObjectNode cleared=rebuilt.lease();cleared.put("state","released");Path staged=Files.createTempFile(fixture.file.getParent(),"receipt-test-",".json");Files.write(staged,HelperProtocol.JSON.writeValueAsBytes(cleared));Files.move(staged,fixture.file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
+            LeaseSnapshot released=LeaseSnapshot.read(fixture.base,fixture.file,fixture.trust,channel);released.verifyUnchanged(channel);assertEquals("released",released.lease().path("state").asText());assertReceiptLock(receipt,"BUSY");
+        }
+        assertReceiptLock(receipt,"FREE");
+    }
+    @Test void channel再照合がreceipt改変とsize超過を拒否してもactiveLockを保持する() throws Exception {
+        Fixture fixture=new Fixture();Path receipt=fixture.file.resolveSibling("lease.lock");LeaseSnapshot snapshot=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust);byte[] original=Files.readAllBytes(receipt);
+        try(var channel=FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE);var held=channel.lock(64,1,false)) {
+            channel.write(ByteBuffer.wrap(new byte[]{(byte)(original[0]=='a'?'b':'a')}),0);
+            assertThrows(IOException.class,()->snapshot.verifyUnchanged(channel));assertThrows(IOException.class,()->LeaseSnapshot.read(fixture.base,fixture.file,fixture.trust,channel));assertReceiptLock(receipt,"BUSY");
+            channel.write(ByteBuffer.wrap(original),0);channel.write(ByteBuffer.wrap(new byte[]{0}),64);
+            assertThrows(IOException.class,()->LeaseSnapshot.read(fixture.base,fixture.file,fixture.trust,channel));assertReceiptLock(receipt,"BUSY");channel.truncate(64);snapshot.verifyUnchanged(channel);
+        }
+        assertReceiptLock(receipt,"FREE");
+    }
+    @Test @org.junit.jupiter.api.condition.EnabledOnOs(org.junit.jupiter.api.condition.OS.MAC)
+    void Macでは別FDcloseでactiveLockが外れることを別JVMから検出する() throws Exception {
+        Fixture fixture=new Fixture();Path receipt=fixture.file.resolveSibling("lease.lock");
+        try(var channel=FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE);var held=channel.lock(64,1,false)) {
+            assertReceiptLock(receipt,"BUSY");try(var other=FileChannel.open(receipt,StandardOpenOption.READ)){other.read(ByteBuffer.allocate(1),0);}assertReceiptLock(receipt,"FREE");
+        }
+    }
+    @Test @org.junit.jupiter.api.condition.EnabledOnOs(org.junit.jupiter.api.condition.OS.MAC)
+    void bootstrap終端検証のreceipt再照合中も別JVMへprobeLockを渡さない() throws Exception {
+        Fixture fixture=new Fixture();ObjectNode lease=(ObjectNode)HelperProtocol.read(Files.readAllBytes(fixture.file));lease.put("state","released");Files.write(fixture.file,HelperProtocol.JSON.writeValueAsBytes(lease));
+        boolean[] armed={false},observed={false};Path receipt=fixture.file.resolveSibling("lease.lock"),descriptor=fixture.file.resolveSibling("descriptor.json");
+        LeaseTrust trust=LeaseTrust.verified(fixture.trustSet,path->{
+            if(armed[0]&&path.equals(descriptor)) {
+                try{assertReceiptLock(receipt,"BUSY");observed[0]=true;}catch(Exception failure){throw new IOException("別JVMからのprobeに失敗しました",failure);}
+            }
+            return Files.readAttributes(path,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey().toString();
+        });
+        LeaseSnapshot snapshot=LeaseSnapshot.read(fixture.base,fixture.file,trust);armed[0]=true;
+        RuntimeMaintenanceVerifier.requireTerminal(snapshot);assertTrue(observed[0]);assertReceiptLock(receipt,"FREE");observed[0]=false;
+        RuntimeMaintenanceVerifier.requireReleased(snapshot);assertTrue(observed[0]);assertReceiptLock(receipt,"FREE");
+    }
+    private static void assertReceiptLock(Path receipt,String expected) throws Exception {
+        String classpath=Path.of(ReceiptProbeProcess.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toString();
+        Process child=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",classpath,ReceiptProbeProcess.class.getName(),receipt.toString()).redirectError(ProcessBuilder.Redirect.INHERIT).start();
+        try {assertTrue(child.waitFor(5,TimeUnit.SECONDS),"別JVMのlock照合期限");assertEquals(0,child.exitValue());assertEquals(expected,new String(child.getInputStream().readAllBytes(),StandardCharsets.US_ASCII).trim());}
+        finally {if(child.isAlive()){child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));}child.getInputStream().close();child.getErrorStream().close();child.getOutputStream().close();}
+    }
     static JsonNode examples() throws Exception {return HelperProtocol.read(Files.readAllBytes(Path.of("..","..","schemas","managed-helper-v1.examples.json")));}
     @Test void fixedBytesReceiptAndControlMatchCoreFixtures() throws Exception {
         var example=examples();var receipt=example.get("receipt");assertEquals(9007199254740993L,receipt.path("identity").path("pid").longValue());
@@ -246,6 +311,13 @@ class HelperCommonTest {
         LeaseFile open() throws Exception {return LeaseFile.open(command,executable,trust);}
         void publish(byte[] definition) throws Exception {
             var signer=Signature.getInstance("Ed25519");signer.initSign(pair.getPrivate());signer.update(definition);LeaseTrust.publish(base,definition,signer.sign(),trustSet);
+        }
+        void rebindInventory(ObjectNode inventory) throws Exception {
+            byte[] listing=HelperProtocol.JSON.writeValueAsBytes(inventory);Files.write(file.resolveSibling("inventory/helper.json"),listing);
+            ObjectNode descriptor=(ObjectNode)HelperProtocol.read(Files.readAllBytes(file.resolveSibling("descriptor.json")));
+            ((ObjectNode)descriptor.path("artifacts").get(0)).put("inventorySha256",hash(listing));byte[] definition=HelperProtocol.JSON.writeValueAsBytes(descriptor);publish(definition);Files.write(file.resolveSibling("descriptor.json"),definition);
+            ObjectNode lease=(ObjectNode)HelperProtocol.read(Files.readAllBytes(file));lease.put("descriptorSha256",hash(definition));Files.write(file,HelperProtocol.JSON.writeValueAsBytes(lease));
+            ObjectNode identity=lease.deepCopy();identity.remove(List.of("state","resources"));Files.write(file.resolveSibling("lease.lock"),LeaseFile.receipt(identity));
         }
         byte[] inventory(String id) throws Exception {
             ObjectNode value=HelperProtocol.JSON.createObjectNode();

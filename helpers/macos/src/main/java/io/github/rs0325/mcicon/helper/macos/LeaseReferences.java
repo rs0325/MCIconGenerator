@@ -40,14 +40,14 @@ final class LeaseReferences {
                                 if(!value.path("jobId").asText().equals(directory.getFileName().toString()))throw new IOException("released job識別が不正です");
                                 validateReleased(value,hostId);
                                 ObjectNode identity=value.deepCopy();identity.remove(List.of("state","resources"));
-                                if(channel.size()!=64||!Files.readString(receipt,StandardCharsets.US_ASCII).equals(new String(LeaseFile.receipt(identity),StandardCharsets.US_ASCII)))throw new IOException("released receiptが一致しません");
+                                LeaseSnapshot.verifyReceipt(lease,identity,channel);
                             }else {
                                 active=true;
-                                LeaseSnapshot current=LeaseFile.inspect(command.root(),lease,trust);JsonNode checked=current.lease();
+                                LeaseSnapshot current=LeaseSnapshot.read(command.root(),lease,trust,channel);JsonNode checked=current.lease();
                                 if(!current.descriptor().path("host").path("os").asText().equals("macos")||!current.descriptor().path("host").path("arch").asText().equals("aarch64"))throw new IOException("参照元descriptorのhostが一致しません");
                                 if(lock!=null||!live(checked))throw new IOException("他jobのactive所有者が不明です");
                                 if(checked.path("descriptorSha256").asText().equals(descriptorSha256))memory=Math.addExact(memory,checked.path("requirements").path("containerMemoryMiB").longValue());
-                                generations.computeIfAbsent(checked.path("descriptorSha256").asText(),key->new ArrayList<>()).add(current);current.verifyUnchanged();
+                                generations.computeIfAbsent(checked.path("descriptorSha256").asText(),key->new ArrayList<>()).add(current);current.verifyUnchanged(channel);
                             }
                             boolean released=value.path("state").asText().equals("released"),same=value.path("descriptorSha256").asText().equals(descriptorSha256);
                             if(!value.path("resources").isEmpty()||!emptyJournal(directory,value)){if(same)pristine=false;if(same&&!released)activeStarted=true;}

@@ -3,6 +3,7 @@ package io.github.rs0325.mcicon.helper.macos;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.helper.*;
+import io.github.rs0325.mcicon.internal.LeaseSnapshot;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.channels.*;
@@ -107,7 +108,7 @@ final class RebootRecovery {
         try(FileChannel channel=FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
             FileLock lock=null;try{lock=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
             if(lock==null)throw new IOException("released参照のcore lockが保持されています");
-            try {if(!Files.readString(receipt,StandardCharsets.US_ASCII).equals(new String(LeaseFile.receipt(identity),StandardCharsets.US_ASCII)))throw new IOException("released参照receiptが不正です");}finally {lock.release();}
+            try {LeaseSnapshot.verifyReceipt(job.resolve("lease.json"),identity,channel);}finally {lock.release();}
         }
     }
     static void requireDead(JsonNode lease) throws IOException {

@@ -14,6 +14,10 @@ public final class Main {
     static int run(String[] arguments) {
         long invocationStarted=System.nanoTime();HelperProtocol.Command command=null;String failureStatus="failed";
         try {
+            if(arguments.length>0&&arguments[0].equals("--repair")) {
+                String launcher=System.getProperty("jpackage.app-path");if(launcher==null)throw new IOException("自己完結native entrypointから起動してください");
+                RuntimeRepair.run(arguments,Path.of(launcher));System.out.write(HelperProtocol.response("ok",List.of()));System.out.write('\n');return 0;
+            }
             command=HelperProtocol.parse(arguments);String launcher=System.getProperty("jpackage.app-path");if(launcher==null)throw new IOException("自己完結native entrypointから起動してください");Path executable=Path.of(launcher);if(!executable.isAbsolute())throw new IOException("native entrypointは絶対pathが必要です");
             LeaseFile lease=LeaseFile.open(command,executable);if(command.operation().equals("preflight"))failureStatus="setup-required";
             if(command.operation().equals("release")&&MacRuntime.releaseUnstarted(command,lease,invocationStarted)){System.out.write(HelperProtocol.response("ok",List.of()));System.out.write('\n');return 0;}
