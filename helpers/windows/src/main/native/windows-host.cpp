@@ -163,4 +163,16 @@ static int wslExecute(int argc,wchar_t** argv,bool bridge){
     }
     std::vector<wchar_t*> normalized(argv,argv+6);normalized.insert(normalized.end(),argv+9,argv+argc);return executeStarted((int)normalized.size(),normalized.data(),startup,witness.value,bridge,!bridge,pid,start);
 }
-int wmain(int argc,wchar_t** argv){try{if(argc==2&&std::wstring(argv[1])==L"facts")return facts();if(argc>=2&&std::wstring(argv[1])==L"exec")return execute(argc,argv);if(argc>=2&&std::wstring(argv[1])==L"exec-bridge")return wslExecute(argc,argv,true);if(argc>=2&&std::wstring(argv[1])==L"exec-keeper")return wslExecute(argc,argv,false);throw std::runtime_error("固定native操作が必要です");}catch(const std::exception&){std::cerr<<"Windows native所有操作に失敗しました\n";return 1;}}
+// 同一handleからvolume/file IDを観測する。reparse・directoryは参照に採用しない。
+static int fileIdentity(const std::wstring& path){
+    applicationPath(path);
+    Handle file(CreateFileW(extended(path).c_str(),FILE_READ_ATTRIBUTES,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+    require(file.value!=INVALID_HANDLE_VALUE);
+    FILE_ATTRIBUTE_TAG_INFO tag{};FILE_ID_INFO id{};FILE_STANDARD_INFO standard{};
+    require(GetFileInformationByHandleEx(file.value,FileAttributeTagInfo,&tag,sizeof(tag))&&!(tag.FileAttributes&(FILE_ATTRIBUTE_REPARSE_POINT|FILE_ATTRIBUTE_DIRECTORY)));
+    require(GetFileInformationByHandleEx(file.value,FileIdInfo,&id,sizeof(id)));
+    require(GetFileInformationByHandleEx(file.value,FileStandardInfo,&standard,sizeof(standard))&&standard.NumberOfLinks==1);
+    std::string hex;const char* digits="0123456789abcdef";for(unsigned char byte:id.FileId.Identifier){hex+=digits[byte>>4];hex+=digits[byte&15];}
+    std::cout<<"{\"schemaVersion\":1,\"volumeSerial\":\""<<id.VolumeSerialNumber<<"\",\"fileId\":\""<<hex<<"\"}\n";return 0;
+}
+int wmain(int argc,wchar_t** argv){try{if(argc==3&&std::wstring(argv[1])==L"file-identity")return fileIdentity(argv[2]);if(argc==2&&std::wstring(argv[1])==L"facts")return facts();if(argc>=2&&std::wstring(argv[1])==L"exec")return execute(argc,argv);if(argc>=2&&std::wstring(argv[1])==L"exec-bridge")return wslExecute(argc,argv,true);if(argc>=2&&std::wstring(argv[1])==L"exec-keeper")return wslExecute(argc,argv,false);throw std::runtime_error("固定native操作が必要です");}catch(const std::exception&){std::cerr<<"Windows native所有操作に失敗しました\n";return 1;}}

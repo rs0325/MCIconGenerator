@@ -8,13 +8,14 @@ import java.util.*;
 public final class Main {
     private Main() {}
     /** package内trust/seedから選択slotを起動し、元CLIの終了codeを返す。
-     * @param arguments CLIへ渡す引数。--bootstrap-repairは単独指定する
+     * @param arguments CLIへ渡す引数。保守commandはそれぞれ単独指定する
      */
     public static void main(String[] arguments) {System.exit(run(arguments));}
     static int run(String[] arguments) {
         try {
             if(System.getProperty("jpackage.app-path")==null)throw Seed.invalid("Java同梱のpackage entryから起動してください");
             Path jar=Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());Seed.regular(jar);Seed.Host host=host();Bootstrap bootstrap=new Bootstrap(jar.getParent(),root(host),host);
+            if(Arrays.asList(arguments).contains("--bootstrap-resume-trial")){if(arguments.length!=2||!arguments[0].equals("--bootstrap-resume-trial"))throw new IllegalArgumentException("--bootstrap-resume-trial UUIDを単独で指定してください");new TrialRecovery(bootstrap).resume(arguments[1]);return 0;}
             if(Arrays.asList(arguments).contains("--bootstrap-repair")){if(arguments.length!=1)throw new IllegalArgumentException("--bootstrap-repairは単独で指定してください");bootstrap.repair();return 0;}
             if(Arrays.asList(arguments).contains("--bootstrap-auto-update")){if(arguments.length!=2||!arguments[0].equals("--bootstrap-auto-update")||!Set.of("true","false").contains(arguments[1]))throw new IllegalArgumentException("--bootstrap-auto-update true|falseを単独で指定してください");new UpdatePreparation(bootstrap).configure(Boolean.parseBoolean(arguments[1]),System.nanoTime()+java.time.Duration.ofSeconds(30).toNanos());return 0;}
             List<String> cli=new ArrayList<>(List.of(arguments));String pin=null;if(!cli.isEmpty()&&cli.getFirst().equals("--bootstrap-pin")){if(cli.size()<2)throw new IllegalArgumentException("--bootstrap-pinに指定版が必要です");pin=cli.remove(1);cli.removeFirst();}

@@ -212,7 +212,7 @@ class ManagedRuntimeTest {
         final ManagedFixture definition=new ManagedFixture();
         final WorkerArtifact.Resolved worker=WorkerArtifact.resolve(root.resolve("worker-fixture"),new CancellationToken());
         final Path resources=Files.createTempDirectory(root,"resources-").resolve("META-INF/mcicon/runtime");
-        final byte[] helper,image={1,2,3},inventory="test-only inventory".getBytes(StandardCharsets.UTF_8);
+        final byte[] helper,image={1,2,3},inventory;
         byte[] descriptor;
         Fixture(boolean setup) throws Exception {this(setup,false);}
         Fixture(boolean setup,boolean cleanupFails) throws Exception {this(setup,cleanupFails,false);}
@@ -227,7 +227,11 @@ class ManagedRuntimeTest {
                 ObjectNode response=RuntimeDescriptor.JSON.createObjectNode().put("protocolVersion",1).put("status","failed");response.putArray("diagnostics").addObject().put("code","WINDOWS_RUNTIME_FAILED").put("detail",prepareFailure).put("requiresPrivilege",false).put("requiresRestart",false);
                 script=script.replace("#!/bin/sh\n","#!/bin/sh\nif [ \"$7\" = prepare ]; then printf '%s' '"+response+"'; exit 1; fi\n");
             }
-            ByteArrayOutputStream bytes=new ByteArrayOutputStream();try(var zip=new org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream(bytes)){var entry=new org.apache.commons.compress.archivers.zip.ZipArchiveEntry("bin/helper");entry.setUnixMode(0100700);zip.putArchiveEntry(entry);zip.write(script.getBytes(StandardCharsets.UTF_8));zip.closeArchiveEntry();}helper=bytes.toByteArray();
+            Map<String,byte[]> payload=new LinkedHashMap<>();payload.put("bin/helper",script.getBytes(StandardCharsets.UTF_8));payload.put("bin/app/support/lease-trust.bin",definition.trustBytes);payload.put("bin/app/support/windows-host.exe",new byte[]{1,2,3});
+            ObjectNode listing=RuntimeDescriptor.JSON.createObjectNode();var rows=listing.putObject("contents").putArray("files");
+            ByteArrayOutputStream bytes=new ByteArrayOutputStream();
+            try(var zip=new org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream(bytes)){for(var file:payload.entrySet()){var entry=new org.apache.commons.compress.archivers.zip.ZipArchiveEntry(file.getKey());entry.setUnixMode(0100700);zip.putArchiveEntry(entry);zip.write(file.getValue());zip.closeArchiveEntry();rows.addObject().put("path",file.getKey()).put("bytes",file.getValue().length).put("sha256",FilesSupport.hash(file.getValue()));}}
+            helper=bytes.toByteArray();inventory=RuntimeDescriptor.JSON.writeValueAsBytes(listing);
             definition.json.put("toolVersion",ToolVersion.VERSION);((ObjectNode)definition.json.get("worker")).put("toolVersion",ToolVersion.VERSION).put("agentSha256",worker.sha256()).put("adapterSetSha256",ManagedRuntime.adapterDigest(ManagedRuntime.class.getClassLoader()));
             ArrayNode java=(ArrayNode)definition.json.get("rendering").get("javaExecutables");java.removeAll();for(int major:List.of(8,17,21,25))java.addObject().put("major",major).put("executable","/opt/java/java"+major+"/bin/java").put("sha256",ManagedFixture.HASH);
             for(int i=0;i<2;i++){byte[] artifact=i==0?helper:image;((ObjectNode)definition.json.get("artifacts").get(i)).put("bytes",artifact.length).put("sha256",FilesSupport.hash(artifact)).put("unpackedBytes",16384).put("inventorySha256",FilesSupport.hash(inventory));}

@@ -6,12 +6,14 @@ tasks.register('appImage', Exec) {
     dependsOn installDist
     def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
     doFirst {
+        if (!providers.gradleProperty('helperLeaseTrust').isPresent()) throw new GradleException('-PhelperLeaseTrustに既存公開TrustSetを指定してください')
         if (!org.gradle.internal.os.OperatingSystem.current().isWindows()) throw new GradleException('Windows app-imageはWindowsで生成してください')
         if (!project.hasProperty('windowsPayloadDir')) throw new GradleException('-PwindowsPayloadDirで検証済payloadを指定してください')
         if (!project.hasProperty('windowsNativeDir')) throw new GradleException('-PwindowsNativeDirで事前build PE/build.json/licenseを指定してください')
         def nativeDir = file(project.property('windowsNativeDir'))
         commandLine 'python', file('scripts/package-helper.py'), '--jdk', launcher.get().metadata.installationPath.asFile,
                 '--app-version', project.version.toString(),
+                '--lease-trust', file(providers.gradleProperty('helperLeaseTrust').get()),
                 '--input', layout.buildDirectory.dir('install/helper-windows/lib').get().asFile,
                 '--payload', project.property('windowsPayloadDir'), '--native', new File(nativeDir, 'windows-host.exe'),
                 '--native-build', new File(nativeDir, 'build.json'), '--native-source', file('src/main/native/windows-host.cpp'),

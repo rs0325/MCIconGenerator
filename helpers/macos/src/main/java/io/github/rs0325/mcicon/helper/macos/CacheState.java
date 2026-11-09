@@ -46,7 +46,7 @@ final class CacheState {
         }catch(IOException|RuntimeException failure){channel.close();throw failure;}
     }
     /** 不明anchorを引き取らず、作成途中の失敗も上書きで隠さない。呼出し元はlifecycle lockを保持する。 */
-    ObjectNode register(LeaseReferences.Scan references,OperationJournal operation) throws IOException {return register(firstUse()&&references.pristine()&&operation.unstarted());}
+    ObjectNode register(LeaseReferences.Scan references,OperationJournal operation) throws IOException {return register(firstUse()&&references.currentPristine()&&operation.unstarted());}
     ObjectNode register(boolean recreateAllowed) throws IOException {
         if(((Number)Files.getAttribute(root,"unix:uid",LinkOption.NOFOLLOW_LINKS)).longValue()!=uid)throw new IOException("管理rootのUIDが一致しません");
         MacFiles.privateDirectory(registration.getParent());ObjectNode identity;

@@ -11,6 +11,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StartupControlTest {
     ObjectNode slot(){return Seed.JSON.createObjectNode().put("toolVersion","1.1.0").put("payloadSha256","a".repeat(64)).put("runtimeDescriptorSha256","b".repeat(64)).put("manifestSha256","c".repeat(64));}
+    @Test void deferredRequiresExactlyOneProofVariantAndKeepsProtocolFour() throws Exception {
+        ObjectNode value=Seed.JSON.createObjectNode().put("protocol",4).put("type","DEFERRED").put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString()).put("pid",1).put("startedAt","2026-11-09T00:00:00Z").put("reason","MANAGED_BUSY");value.set("slot",slot());value.putArray("jobs");
+        assertThrows(IOException.class,()->StartupControl.deferred(value));
+        value.putObject("admission").put("attemptId",UUID.randomUUID().toString()).put("evidenceSha256","e".repeat(64));StartupControl.deferred(value);
+        for(String field:List.of("protocol","type","reason","nonce","invocation","pid","startedAt")){ObjectNode invalid=value.deepCopy();invalid.put(field,"invalid");assertThrows(IOException.class,()->StartupControl.deferred(invalid),field);}
+        ObjectNode unknown=value.deepCopy();((ObjectNode)unknown.path("admission")).put("path","arbitrary");assertThrows(IOException.class,()->StartupControl.deferred(unknown));
+        ObjectNode mixed=value.deepCopy();((com.fasterxml.jackson.databind.node.ArrayNode)mixed.path("jobs")).addObject();assertThrows(IOException.class,()->StartupControl.deferred(mixed));
+        ObjectNode job=value.deepCopy();job.remove("admission");((com.fasterxml.jackson.databind.node.ArrayNode)job.path("jobs")).addObject().put("jobId",UUID.randomUUID().toString()).put("ownerId",UUID.randomUUID().toString()).put("descriptorSha256","a".repeat(64)).put("receiptSha256","b".repeat(64)).put("evidenceSha256","c".repeat(64));StartupControl.deferred(job);
+        assertThrows(IOException.class,()->StartupControl.failure(value));
+    }
     static final class BlockedSocket extends java.net.Socket {
         final CountDownLatch entered=new CountDownLatch(1),closed=new CountDownLatch(1);
         @Override public OutputStream getOutputStream(){return new OutputStream(){@Override public void write(int value) throws IOException {entered.countDown();try{closed.await();}catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException();}throw new java.net.SocketException("closed");}};}

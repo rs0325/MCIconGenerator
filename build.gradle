@@ -28,7 +28,12 @@ subprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
-    tasks.withType(Test).configureEach { useJUnitPlatform() }
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        for (String name : ['leaseIdentityReader', 'leaseIdentityReaderSha256']) {
+            if (providers.gradleProperty(name).isPresent()) systemProperty(name == 'leaseIdentityReader' ? 'mcicon.testIdentityReader' : 'mcicon.testIdentityReaderSha256', providers.gradleProperty(name).get())
+        }
+    }
 }
 
 evaluationDependsOn(':core')

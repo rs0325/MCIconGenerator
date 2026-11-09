@@ -11,17 +11,25 @@ import java.util.*;
 /** SID/root/descriptor/generationとregistry GUID/BasePathが一致する登録だけを使う。 */
 final class WslDistribution {
     final Path anchor,basePath;
+    private final Path lifecycle;
     final String name;
     private final ObjectNode binding;
     WslDistribution(Path root,JsonNode lease,HostFacts host) throws IOException {
+        lifecycle=root.resolve("locks/windows-lifecycle.lock");
         Path parent=root.resolve("windows");WindowsFiles.privateDirectory(parent);anchor=parent.resolve(lease.path("descriptorSha256").asText());WindowsFiles.privateDirectory(anchor);basePath=anchor.resolve("distro");name="MCIcon-"+lease.path("descriptorSha256").asText().substring(0,24);
         binding=WindowsFiles.JSON.createObjectNode().put("sid",host.sid()).put("root",root.toRealPath().toString());for(String key:List.of("hostId","descriptorSha256"))binding.set(key,lease.required(key));
     }
     Lock lock(Duration budget) throws IOException {
-        FileChannel channel=FileChannel.open(anchor.resolve("generation.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);long end=System.nanoTime()+budget.toNanos();
-        try {while(true){FileLock lock=null;try{lock=channel.tryLock();}catch(OverlappingFileLockException busy){}if(lock!=null)return new Lock(channel,lock);if(System.nanoTime()>=end)throw new IOException("専用distroのlifecycle lockがbusyです");try{Thread.sleep(10);}catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException("distro lockが中断されました");}}}catch(IOException|RuntimeException failure){channel.close();throw failure;}
+        long end=System.nanoTime()+budget.toNanos();
+        Files.createDirectories(lifecycle.getParent());if(!lifecycle.getParent().toRealPath().equals(lifecycle.getParent()))throw new IOException("root lockにlinkがあります");
+        Lock outer=acquire(lifecycle,end);
+        try {Lock generation=acquire(anchor.resolve("generation.lock"),end);return new Lock(generation.channel(),generation.lock(),outer);}catch(IOException|RuntimeException failure){outer.close();throw failure;}
     }
-    record Lock(FileChannel channel,FileLock lock) implements AutoCloseable {public void close() throws IOException{try{lock.release();}finally{channel.close();}}}
+    private static Lock acquire(Path path,long end) throws IOException {
+        FileChannel channel=FileChannel.open(path,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
+        try {while(true){if(System.nanoTime()>=end)throw new IOException("専用distroのlifecycle lockがbusyです");FileLock lock=null;try{lock=channel.tryLock();}catch(OverlappingFileLockException busy){}if(lock!=null)return new Lock(channel,lock,null);if(System.nanoTime()>=end)throw new IOException("専用distroのlifecycle lockがbusyです");try{Thread.sleep(10);}catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException("distro lockが中断されました");}}}catch(IOException|RuntimeException failure){channel.close();throw failure;}
+    }
+    record Lock(FileChannel channel,FileLock lock,Lock outer) implements AutoCloseable {public void close() throws IOException{try{try{lock.release();}finally{channel.close();}}finally{if(outer!=null)outer.close();}}}
     boolean exists(){return Files.exists(anchor.resolve("owner.json"),LinkOption.NOFOLLOW_LINKS);}
     ObjectNode owner() throws IOException {
         ObjectNode value=(ObjectNode)WindowsFiles.json(anchor.resolve("owner.json"));if(!value.path("binding").equals(binding)||!HostFacts.uuid(value.path("generationOwner").asText())||!value.path("name").asText().equals(name)||!value.path("basePath").asText().equals(basePath.toString())||!Set.of("reserved","registered").contains(value.path("state").asText()))throw new IOException("distro所有anchorが一致しません");return value;

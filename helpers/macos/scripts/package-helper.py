@@ -2,7 +2,8 @@
 from pathlib import Path
 import argparse,subprocess,json,hashlib,shutil,os,struct,plistlib,zipfile
 if not __debug__:raise RuntimeError("検証を省略するPython最適化設定は使用できません")
-p=argparse.ArgumentParser();p.add_argument('--jdk',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--payload',type=Path,required=True);p.add_argument('--native',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--app-version',required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--jdk',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--payload',type=Path,required=True);p.add_argument('--native',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--app-version',required=True);p.add_argument('--lease-trust',type=Path,required=True);a=p.parse_args()
+trust=a.lease_trust.read_bytes();assert len(trust)==96 and trust[:8]==b'MCITRS1\n' and trust[8:20]==bytes.fromhex('302a300506032b6570032100') and trust[52:64]==trust[8:20] and trust[8:52]<trust[52:96],'公開TrustSet形式が不正'
 assert not a.output.exists(),'既存app-imageは上書きしない';a.output.mkdir(parents=True);work=a.output/'staging';work.mkdir();runtime=work/'runtime';inputs=work/'input';inputs.mkdir()
 def run(args,timeout=90):subprocess.run([str(x) for x in args],check=True,timeout=timeout)
 manifest=json.loads((a.payload/'payload.json').read_text());assert manifest['schemaVersion']==1 and manifest['limaVersion']=='2.2.1';names=[]
@@ -10,6 +11,7 @@ for row in manifest['files']:
  path=Path(row['path']);assert not path.is_absolute() and '..' not in path.parts;source=a.payload/path;assert source.is_file() and not source.is_symlink() and source.resolve().is_relative_to(a.payload.resolve());assert source.stat().st_size==row['bytes'] and hashlib.sha256(source.read_bytes()).hexdigest()==row['sha256'];names.append(row['path'])
 assert len(names)==len(set(names)) and 'bin/limactl' in names and 'share/lima/lima-guestagent.Linux-aarch64.gz' in names
 support=inputs/'support';support.mkdir();shutil.copy2(a.payload/'payload.json',support/'payload.json')
+shutil.copyfile(a.lease_trust,support/'lease-trust.bin')
 for row in manifest['files']:
  target=support/row['path'];target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(a.payload/row['path'],target);target.chmod(0o755 if row['executable'] else 0o644)
 for jar in a.input.glob('*.jar'):shutil.copyfile(jar,inputs/jar.name)

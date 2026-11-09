@@ -163,7 +163,7 @@ class BootstrapTest {
         String capture=observed.toString().replace("'","'\"'\"'");byte[] launcher=f.files.get("java/bin/java");org.junit.jupiter.api.Assumptions.assumeTrue(launcher!=null);String script=new String(launcher,java.nio.charset.StandardCharsets.UTF_8).replace("exec ","printf '%s\\n' \"$@\" > '"+capture+"'\nexec ");f.files.put("java/bin/java",script.getBytes(java.nio.charset.StandardCharsets.UTF_8));f.publish();
         Bootstrap bootstrap=f.bootstrap(base.resolve("state"));assertEquals(0,bootstrap.launch(List.of("space value","literal*","日本語")));
         List<String> argv=Files.readAllLines(observed,java.nio.charset.StandardCharsets.UTF_8);JsonNode active=Seed.json(Files.readAllBytes(base.resolve("state/active.json"))).get("active");Path slot=base.resolve("state/tools/"+active.path("toolVersion").asText()+"/"+active.path("payloadSha256").asText());
-        assertEquals("-cp",argv.get(1));assertEquals(slot.resolve("app/lib").toString()+File.separator+"*",argv.get(2));assertEquals(List.of("space value","literal*","日本語"),argv.subList(4,argv.size()));
+        assertEquals("-Dmcicon.bootstrap.capabilities=deferred-v1",argv.get(1));assertEquals("-cp",argv.get(2));assertEquals(slot.resolve("app/lib").toString()+File.separator+"*",argv.get(3));assertEquals(List.of("space value","literal*","日本語"),argv.subList(5,argv.size()));
     }
     @Test void initialSeedStartsRealJavaChildAndRecordsItsExit() throws Exception {
         Fixture f=fixture();assertEquals(7,f.bootstrap(root()).launch(List.of("exit7","日本語","space value")));JsonNode state=state();assertEquals(1,state.path("highestAcceptedSequence").asInt());assertTrue(state.path("pending").isNull());

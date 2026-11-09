@@ -16,6 +16,27 @@ class OwnershipTest {
     ObjectNode lease(){return WindowsFiles.JSON.createObjectNode().put("jobId",UUID.randomUUID().toString()).put("ownerId",UUID.randomUUID().toString()).put("hostId",UUID.randomUUID().toString()).put("descriptorSha256","a".repeat(64));}
     ObjectNode descriptor(){ObjectNode value=WindowsFiles.JSON.createObjectNode().put("minimumOsVersion","10.0.19045");value.putObject("host").put("os","windows").put("arch","x86_64");return value;}
     HostFacts host(String defaultGuid,List<HostFacts.Distribution> rows){return new HostFacts("S-1-5-21-1",BOOT,"10.0.26200",16L*1024*1024*1024,8,defaultGuid,rows);}
+    @Test void rootとgenerationの競合待機で予算を再開始しない() throws Exception {
+        Path root=temporary.toRealPath();WslDistribution distribution=new WslDistribution(root,lease(),host(DEFAULT,List.of()));
+        Files.createDirectories(root.resolve("locks"));Path outer=root.resolve("locks/windows-lifecycle.lock"),inner=distribution.anchor.resolve("generation.lock");Files.write(outer,new byte[0]);Files.write(inner,new byte[0]);
+        var ready=new java.util.concurrent.CountDownLatch(1);var release=new java.util.concurrent.CountDownLatch(1);var pool=java.util.concurrent.Executors.newSingleThreadExecutor();
+        try(var channel=java.nio.channels.FileChannel.open(inner,StandardOpenOption.WRITE);var held=channel.lock()) {
+            var owner=pool.submit(()->{try(var file=java.nio.channels.FileChannel.open(outer,StandardOpenOption.WRITE);var lock=file.lock()){ready.countDown();assertTrue(release.await(2,java.util.concurrent.TimeUnit.SECONDS));Thread.sleep(750);}return null;});
+            assertTrue(ready.await(2,java.util.concurrent.TimeUnit.SECONDS));long start=System.nanoTime();release.countDown();
+            assertThrows(IOException.class,()->distribution.lock(Duration.ofMillis(1000)));long elapsed=Duration.ofNanos(System.nanoTime()-start).toMillis();
+            assertTrue(elapsed>=650,"root側の競合を実際に待機する");assertTrue(elapsed<1450,"二段合計で1秒の予算を使う: "+elapsed);owner.get(2,java.util.concurrent.TimeUnit.SECONDS);
+            try(var file=java.nio.channels.FileChannel.open(outer,StandardOpenOption.WRITE);var lock=file.tryLock()){assertNotNull(lock,"失敗時も外側lockを解放する");}
+        }finally{pool.shutdownNow();assertTrue(pool.awaitTermination(3,java.util.concurrent.TimeUnit.SECONDS));}
+    }
+    @Test void Windows共有VMは世代別に容量を割り当てず全要求とdistroOverheadを一度ずつ数える() throws Exception {
+        long shared=16L*1024*1024*1024;
+        assertDoesNotThrow(()->GuestBudget.require(shared,GuestBudget.requiredBytes(12*1024,0,1)));
+        assertDoesNotThrow(()->GuestBudget.require(shared,GuestBudget.requiredBytes(6*1024,0,1)));
+        long combined=GuestBudget.requiredBytes(6*1024,12*1024,2);
+        assertEquals(20L*1024*1024*1024,combined);assertThrows(IOException.class,()->GuestBudget.require(shared,combined));
+        assertEquals(10L*1024*1024*1024,GuestBudget.requiredBytes(6*1024,3*1024,1));
+        assertThrows(IOException.class,()->GuestBudget.requiredBytes(3072,3072,0));assertThrows(IOException.class,()->GuestBudget.requiredBytes(Long.MAX_VALUE,3072,2));
+    }
     @Test void GUIDとBasePathとSIDの一致を全て必要とする() throws Exception {
         Path root=temporary.toRealPath();ObjectNode lease=lease();HostFacts original=host(DEFAULT,List.of(new HostFacts.Distribution("existing",DEFAULT,"C:\\existing",2)));WslDistribution distribution=new WslDistribution(root,lease,original);ObjectNode owner=distribution.reserve(original);Files.createDirectory(distribution.basePath);
         String guid=UUID.randomUUID().toString();HostFacts registered=host(DEFAULT,List.of(original.distributions().getFirst(),new HostFacts.Distribution(distribution.name,guid,distribution.basePath.toString(),2)));distribution.registered(owner,registered,"b".repeat(64));assertEquals(guid,distribution.verify(registered).path("guid").asText());

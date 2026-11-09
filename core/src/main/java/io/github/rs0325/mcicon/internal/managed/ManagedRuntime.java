@@ -43,6 +43,7 @@ public final class ManagedRuntime implements AutoCloseable {
         try {key=TrustSet.parse(resource(loader,selected.get("trustKeyPath").asText(),TrustSet.SIZE));}
         catch(IOException failure){throw new McIconException("MANAGED_RUNTIME_INVALID","同梱信頼鍵が不正です",1,failure);}
         RuntimeDescriptor descriptor=RuntimeDescriptor.verify(original,signature,key,new RuntimeDescriptor.Pin(selected.get("descriptorSha256").asText(),ToolVersion.VERSION,worker.sha256(),adapterDigest(loader),host,Set.of(8,17,21,25)));
+        LeaseTrust.publish(store.root(),original,signature,key);
         Map<String,byte[]> inventories=new TreeMap<>();
         for(var artifact:descriptor.artifacts()) {
             String path=artifact.inventoryPath();checkJobPath(path);
@@ -51,7 +52,9 @@ public final class ManagedRuntime implements AutoCloseable {
         }
         RuntimeGeneration generation=new RuntimeGeneration(store);Path executable=generation.helper(descriptor);
         recover(store,descriptor,executable,token);store.check();
-        RuntimeLease lease=RuntimeLease.create(store,descriptor,options,preparationDeadline);RuntimeHelper helper=null;
+        WindowsAdmission admission=host.os().equals("windows")?new WindowsAdmission(store,descriptor,executable,inventories,original):null;
+        LeaseTrust proofTrust=admission==null?LeaseTrust.pinned(key,descriptor.digest(),null):admission.trust().restrictTo(descriptor.digest());
+        RuntimeLease lease=RuntimeLease.create(store,descriptor,options,preparationDeadline,admission);RuntimeHelper helper=null;
         try {
             FilesSupport.atomicWrite(lease.file().getParent().resolve("descriptor.json"),original);
             for(var entry:inventories.entrySet()) {
@@ -61,13 +64,19 @@ public final class ManagedRuntime implements AutoCloseable {
             environment.put("TMPDIR",temp.toString());environment.put("TMP",temp.toString());environment.put("TEMP",temp.toString());
             if(host.os().equals("windows"))for(String name:List.of("SystemRoot","WINDIR")){String value=System.getenv(name);if(value!=null)environment.put(name,value);}
             helper=new RuntimeHelper(executable,store.root(),lease,environment,descriptor.host().os().equals("windows"));
-            requireOk(helper.control("preflight",store.remaining(),token));
-            generation.prepare(descriptor,inventories);if(host.os().equals("windows"))helper.keep(store.remaining(),token,false);requireOk(helper.control("prepare",store.remaining(),token));store.check();
+            requireAdmission(helper.control("preflight",store.remaining(),token),store,lease,descriptor,proofTrust);
+            generation.prepare(descriptor,inventories);if(host.os().equals("windows"))helper.keep(store.remaining(),token,false);requireAdmission(helper.control("prepare",store.remaining(),token),store,lease,descriptor,proofTrust);store.check();
             ProcessBuilder prefix=helper.docker(List.of());Map<Integer,String> hashes=new TreeMap<>();for(var java:descriptor.javaExecutables())hashes.put(java.major(),java.sha256());
             WorkerLaunch launch=new WorkerLaunch(prefix.command(),prefix.environment(),descriptor.imageId(),descriptor.agentSha256(),hashes,descriptor.environment());
             return new ManagedRuntime(options,descriptor,worker,lease,helper,launch);
         }catch(IOException|RuntimeException|Error failure) {
-            try {release(helper,lease);}catch(Exception cleanup){failure.addSuppressed(cleanup);}throw failure;
+            try {release(helper,lease);}catch(Exception cleanup){failure.addSuppressed(cleanup);}
+            if(failure instanceof AdmissionEvidence.Busy&&failure.getSuppressed().length==0) {
+                JsonNode claim=((AdmissionEvidence.Busy)failure).job();
+                AdmissionEvidence.verifyJob(store.root(),claim,descriptor.digest(),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("core開始identityが不明です")).toString(),proofTrust.restrictTo(descriptor.digest()),true);
+                var jobs=RuntimeDescriptor.JSON.createArrayNode();jobs.add(claim);throw new ManagedBusyFailure(jobs);
+            }
+            throw failure;
         }
     }
     private static JsonNode selectPins(ClassLoader loader,RuntimeDescriptor.Host host) throws IOException {
@@ -119,6 +128,14 @@ public final class ManagedRuntime implements AutoCloseable {
         boolean interrupted=Thread.interrupted();
         try {if(helper!=null)requireOk(helper.control("release",Duration.ofSeconds(10),new CancellationToken()));}
         finally {try {lease.close();}finally{if(interrupted)Thread.currentThread().interrupt();}}
+    }
+    static void requireAdmission(RuntimeHelper.Result result,RuntimeStore store,RuntimeLease lease,RuntimeDescriptor descriptor,LeaseTrust trust) throws IOException {
+        if(!result.ok()&&result.diagnostics().stream().anyMatch(d->d.code().equals("MANAGED_BUSY"))) {
+            JsonNode claim=AdmissionEvidence.jobReference(store.root(),lease.read().path("jobId").asText());
+            AdmissionEvidence.verifyJob(store.root(),claim,descriptor.digest(),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("core開始identityが不明です")).toString(),trust.restrictTo(descriptor.digest()),false);
+            throw new AdmissionEvidence.Busy(claim);
+        }
+        requireOk(result);
     }
     private static void requireOk(RuntimeHelper.Result result) {
         if(result.ok())return;

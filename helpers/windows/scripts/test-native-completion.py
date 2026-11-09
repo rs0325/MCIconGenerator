@@ -34,7 +34,7 @@ def main():
         subprocess.run([str(binary)], check=True)
         (stage / 'native-completion-type.inc').write_text(next(line for line in lines if line.startswith('struct Completion ')))
         (stage / 'native-startup.inc').write_text(source[source.index('struct Startup {'):source.index('static int executeStarted(')])
-        (stage / 'native-wsl.inc').write_text(source[source.index('static int wslExecute('):])
+        (stage / 'native-wsl.inc').write_text(source[source.index('static int wslExecute('):source.index('static int fileIdentity(')] + source[source.index('int wmain('):])
         client = next(line.strip() for line in lines if line.strip().startswith('ULONGLONG end=0;int exit;Completion completion;'))
         (stage / 'native-client.inc').write_text(client)
         fixture = root / 'src/test/native/wsl-fixture.cpp'

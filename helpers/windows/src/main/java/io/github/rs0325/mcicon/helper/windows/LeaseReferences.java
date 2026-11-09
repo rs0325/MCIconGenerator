@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.helper.HelperProtocol;
 import io.github.rs0325.mcicon.helper.LeaseFile;
+import io.github.rs0325.mcicon.internal.LeaseSnapshot;
+import io.github.rs0325.mcicon.internal.LeaseTrust;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
@@ -15,12 +17,14 @@ import java.util.*;
 
 /** 他世代をskipせず、全jobのbusy/不明を共有distroの停止禁止へ反映する。 */
 final class LeaseReferences {
-    record Scan(boolean active,List<String> diagnostics,long memoryMiB,boolean pristine,boolean activeStarted,boolean stopBlocked) {boolean restartAllowed(){return !activeStarted&&!unknown();}boolean unknown(){return !diagnostics.isEmpty();}boolean stopAllowed(){return !stopBlocked&&!unknown();}}
+    record Generation(String descriptorSha256,long containerMemoryMiB,List<LeaseSnapshot> leases) {}
+    record Scan(boolean active,List<String> diagnostics,long memoryMiB,boolean currentPristine,boolean currentStarted,boolean stopBlocked,List<Generation> generations) {boolean restartAllowed(){return !currentStarted&&!unknown();}boolean unknown(){return !diagnostics.isEmpty();}boolean stopAllowed(){return !stopBlocked&&!unknown();}}
     private LeaseReferences() {}
     static Scan inspect(HelperProtocol.Command command,Path executable,String descriptorSha256) throws IOException {
         Path jobs=command.root().resolve("jobs");if(!jobs.toRealPath().equals(jobs))throw new IOException("job一覧にlinkがあります");
+        LeaseTrust trust=null;
         String hostId=Files.readString(command.root().resolve("host-id"),StandardCharsets.US_ASCII).trim();
-        boolean active=false,pristine=true,activeStarted=false,stopBlocked=false;List<String> diagnostics=new ArrayList<>();long memory=0;
+        boolean active=false,pristine=true,activeStarted=false,stopBlocked=false;List<String> diagnostics=new ArrayList<>();long memory=0;Map<String,List<LeaseSnapshot>> generations=new LinkedHashMap<>();
         try(DirectoryStream<Path> entries=Files.newDirectoryStream(jobs)) {
             for(Path directory:entries) {
                 Path lease=directory.resolve("lease.json");if(lease.equals(command.lease()))continue;
@@ -30,9 +34,9 @@ final class LeaseReferences {
                     try(FileChannel channel=FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
                         FileLock lock=null;try{lock=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
                         try {
-                            ObjectNode value=(ObjectNode)WindowsFiles.json(lease);
+                            ObjectNode value=(ObjectNode)WindowsFiles.json(lease);Path referredExecutable=executable;
                             if(value.path("state").asText().equals("released")) {
-                                if(lock==null&&(!value.path("descriptorSha256").asText().equals(descriptorSha256)||!quiescent(directory,value,executable)))throw new IOException("released記録のlockが保持されています");
+                                if(lock==null&&(!value.path("descriptorSha256").asText().equals(descriptorSha256)||!quiescent(directory,value,referredExecutable)))throw new IOException("released記録のlockが保持されています");
                                 if(!value.path("jobId").asText().equals(directory.getFileName().toString()))throw new IOException("released job識別が不正です");
                                 validateReleased(value,hostId);
                                 ObjectNode identity=value.deepCopy();identity.remove(List.of("state","resources"));
@@ -42,27 +46,32 @@ final class LeaseReferences {
                                 if(channel.size()!=64||!Arrays.equals(saved.array(),LeaseFile.receipt(identity)))throw new IOException("released receiptが一致しません");
                             }else {
                                 active=true;
-                                LeaseFile current=LeaseFile.open(new HelperProtocol.Command(command.root(),lease,"release",List.of()),executable);JsonNode checked=current.read();
+                                if(trust==null)trust=LeaseFile.trust(command,executable);
+                                LeaseSnapshot current=LeaseFile.inspect(command.root(),lease,trust);JsonNode checked=current.lease();
+                                if(!current.descriptor().path("host").path("os").asText().equals("windows")||!current.descriptor().path("host").path("arch").asText().equals("x86_64"))throw new IOException("参照元descriptorのhostが一致しません");referredExecutable=current.helperExecutable();
+                                if(!checked.path("resources").isEmpty()||Files.exists(directory.resolve("tmp/keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
+                                    Path entry=Path.of(current.descriptor().path("helper").path("executable").asText());current.helperFile(entry.getParent().resolve("app/support/windows-host.exe").toString().replace('\\','/'));
+                                }
                                 if(lock!=null||!live(checked))throw new IOException("他jobのactive所有者が不明です");
                                 memory=Math.addExact(memory,checked.path("requirements").path("containerMemoryMiB").longValue());
+                                generations.computeIfAbsent(checked.path("descriptorSha256").asText(),key->new ArrayList<>()).add(current);current.verifyUnchanged();
                             }
                             boolean released=value.path("state").asText().equals("released"),same=value.path("descriptorSha256").asText().equals(descriptorSha256);
                             if(!released) {
                                 if(!same)stopBlocked=true;
-                                else if(value.path("resources").isEmpty()&&emptyJournal(directory,value)&&!Files.exists(directory.resolve("tmp/keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
+                                if(value.path("resources").isEmpty()&&emptyJournal(directory,value)&&!Files.exists(directory.resolve("tmp/keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
                                     try(var records=Files.newDirectoryStream(directory.resolve("tmp"),"keeper-*.json")){if(records.iterator().hasNext())throw new IOException("keeper部分開始が残っています");}
-                                }else if(!quiescent(directory,value,executable)) {
-                                    keeperLive(directory,value,executable);stopBlocked=true;
+                                }else if(!quiescent(directory,value,referredExecutable)) {
+                                    keeperLive(directory,value,referredExecutable);stopBlocked=true;
                                 }
                             }
-                            if(!released&&!same)pristine=false;
-                            if(!value.path("resources").isEmpty()||!emptyJournal(directory,value)){if(same||!released)pristine=false;if(!released)activeStarted=true;}
+                            if(!value.path("resources").isEmpty()||!emptyJournal(directory,value)){if(same)pristine=false;if(same&&!released)activeStarted=true;}
                         }finally {if(lock!=null&&lock.isValid())lock.release();}
                     }
                 }catch(IOException|RuntimeException failure){pristine=false;diagnostics.add(directory.getFileName()+": "+failure.getMessage());}
             }
         }
-        return new Scan(active,List.copyOf(diagnostics),memory,pristine,activeStarted,stopBlocked);
+        return new Scan(active,List.copyOf(diagnostics),memory,pristine,activeStarted,stopBlocked,summary(generations));
     }
     private static JsonNode keeper(Path job,JsonNode lease,Path executable) throws IOException {
         JsonNode keeper=WindowsFiles.json(job.resolve("tmp/keeper.json"));ObjectNode identity=WindowsFiles.JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,lease.required(key));
@@ -81,6 +90,11 @@ final class LeaseReferences {
     private static void keeperLive(Path job,JsonNode lease,Path executable) throws IOException {
         JsonNode keeper=keeper(job,lease,executable);if(!keeper.path("state").asText().equals("ready"))throw new IOException("他keeperはstarting/closing/unknownです");
         JsonNode client=keeper.path("client");if(!ProcessHandle.of(client.path("clientPid").asLong()).filter(ProcessHandle::isAlive).flatMap(process->process.info().startInstant()).map(Instant::toEpochMilli).filter(value->value==client.path("clientStarted").asLong()).isPresent())throw new IOException("他keeper実clientが不明です");
+    }
+    private static List<Generation> summary(Map<String,List<LeaseSnapshot>> snapshots) {
+        List<Generation> result=new ArrayList<>();
+        snapshots.forEach((digest,leases)->{long memory=0;for(LeaseSnapshot lease:leases)memory=Math.addExact(memory,lease.lease().path("requirements").path("containerMemoryMiB").asLong());result.add(new Generation(digest,memory,List.copyOf(leases)));});
+        return List.copyOf(result);
     }
     private static boolean emptyJournal(Path job,JsonNode lease) throws IOException {
         Path directory=job.resolve("tmp"),record=directory.resolve("windows-operation.json");

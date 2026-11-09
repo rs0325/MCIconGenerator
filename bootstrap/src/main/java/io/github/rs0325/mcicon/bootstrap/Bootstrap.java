@@ -155,7 +155,7 @@ final class Bootstrap {
             }
         }}
     }
-    private JsonNode receipt(FileChannel channel) throws IOException {
+    JsonNode receipt(FileChannel channel) throws IOException {
         JsonNode value=Seed.json(read(channel,65536));if(value.path("kind").asText().equals("preparation"))return UpdatePreparation.receipt(value);Seed.constant(value,"schemaVersion",3);Seed.fields(value,"schemaVersion","kind","invocationId","slot","bootstrap","state","child","exitCode","startup","initialization","receiptKey","argsSha256");Seed.exact(value,"kind","command");try{UUID.fromString(Seed.text(value,"invocationId"));}catch(IllegalArgumentException failure){throw new IOException("invocation UUIDが不正です",failure);}reference(value.get("slot"));process(value.get("bootstrap"));String state=Seed.choice(value,"state","launching","running","finished");
         Seed.digest(value,"argsSha256");Seed.choice(value,"startup","request","run","switch","prepare","ready","go","failed");Seed.text(value,"receiptKey");
         if(!value.path("initialization").isNull()){StartupControl.failure(value.get("initialization"));if(!value.path("startup").asText().equals("failed"))throw Seed.invalid("失敗receiptのphaseが不一致です");}
@@ -187,7 +187,7 @@ final class Bootstrap {
         return command(arguments,selected,reference,null,null,null,false,deadline).code();
     }
     private Seed managedSeed(Path path,long deadline) throws IOException {Seed.check(deadline);directory(path,deadline);file(path.resolve("stable.json"),deadline);file(path.resolve("stable.json.sig"),deadline);Seed seed=new Seed(path,key,host);Seed.check(deadline);return seed;}
-    private Seed accepted(JsonNode reference,JsonNode state,long deadline) throws IOException {Seed.check(deadline);
+    Seed accepted(JsonNode reference,JsonNode state,long deadline) throws IOException {Seed.check(deadline);
         Seed seed=managedSeed(root.resolve("manifests/"+Seed.digest(reference,"manifestSha256")),deadline);if(!seed.reference().equals(reference)||Seed.positive(seed.manifest,"sequence")>Seed.positive(state,"highestAcceptedSequence"))throw Seed.invalid("署名slot参照が不一致です");Seed.check(deadline);return seed;
     }
     private static String[] parsePin(String pin) {
@@ -221,14 +221,14 @@ String[] parts=pin.split("@",-1);if(parts.length!=2||!parts[0].matches("[0-9]+\\
         }
     }
     private LaunchResult command(List<String> arguments,Path slot,JsonNode reference,JsonNode pending,String trial,JsonNode expectedRequest,boolean automatic,long deadline) throws IOException {
-        Path run;JsonNode transaction;FileChannel channel=null;FileLock held=null;ObjectNode record;Process child=null;StartupControl control=null;IOException original=null;
+        Path run;JsonNode transaction,transactionSettings=null;FileChannel channel=null;FileLock held=null;ObjectNode record;Process child=null;StartupControl control=null;IOException original=null;
         try {
             try(StateLock ignored=lock(deadline)) {
-                transaction=trial==null?null:state(deadline);if(trial!=null&&(!trial.equals(transaction.path("trialInvocation").asText())||!reference.equals(transaction.get("pending"))))throw Seed.invalid("候補開始前の予約が変化しました");String id=trial==null?UUID.randomUUID().toString():trial;run=root.resolve("runs/"+id+".json");channel=create(run,deadline);held=channel.lock();record=Seed.JSON.createObjectNode().put("schemaVersion",3).put("kind","command").put("invocationId",id).put("state","launching");record.set("slot",reference);record.set("bootstrap",identity(ProcessHandle.current()));record.putNull("child").putNull("exitCode").putNull("initialization").put("startup","request").put("receiptKey",fileIdentity(run,deadline)).put("argsSha256",Seed.hash(Seed.JSON.writeValueAsBytes(arguments)));write(channel,record);
+                transaction=trial==null?null:state(deadline);transactionSettings=trial==null?null:new TrialRecovery(this).settings(deadline);if(trial!=null&&(!trial.equals(transaction.path("trialInvocation").asText())||!reference.equals(transaction.get("pending"))))throw Seed.invalid("候補開始前の予約が変化しました");String id=trial==null?UUID.randomUUID().toString():trial;run=root.resolve("runs/"+id+".json");channel=create(run,deadline);held=channel.lock();record=Seed.JSON.createObjectNode().put("schemaVersion",3).put("kind","command").put("invocationId",id).put("state","launching");record.set("slot",reference);record.set("bootstrap",identity(ProcessHandle.current()));record.putNull("child").putNull("exitCode").putNull("initialization").put("startup","request").put("receiptKey",fileIdentity(run,deadline)).put("argsSha256",Seed.hash(Seed.JSON.writeValueAsBytes(arguments)));write(channel,record);
             }
             if(arguments.equals(List.of("--version"))||arguments.equals(List.of("-V")))System.err.println("Bootstrap "+Seed.text(info,"bootstrapVersion")+" (owner: "+Seed.text(info,"owner")+")");
             control=new StartupControl(reference,record.path("invocationId").asText(),arguments);
-            List<String> command=new ArrayList<>(List.of(slot.resolve("java/bin/"+(host.os().equals("windows")?"java.exe":"java")).toString(),control.property(),"-cp",slot.resolve("app/lib").toString()+File.separator+"*","io.github.rs0325.mcicon.cli.Main"));command.addAll(arguments);
+            List<String> command=new ArrayList<>(List.of(slot.resolve("java/bin/"+(host.os().equals("windows")?"java.exe":"java")).toString(),control.property(),control.capability(),"-cp",slot.resolve("app/lib").toString()+File.separator+"*","io.github.rs0325.mcicon.cli.Main"));command.addAll(arguments);
             Seed.check(deadline);child=configureChild(new ProcessBuilder(command),deadline).inheritIO().start();Seed.check(deadline);
             var started=child.info().startInstant();if(started.isPresent()){record.put("state","running");record.set("child",Seed.JSON.createObjectNode().put("pid",child.pid()).put("startedAt",started.get().toString()));write(channel,record);}
             try(StartupControl.Session session=control.accept(child,Duration.ofSeconds(30))) {
@@ -238,6 +238,11 @@ String[] parts=pin.split("@",-1);if(parts.length!=2||!parts[0].matches("[0-9]+\\
                     long millis;try{millis=Math.addExact(Math.addExact(Seed.positive(session.request,"preparationMillis"),Seed.positive(session.request,"startupMillis")),Seed.positive(session.request,"itemMillis"));}catch(ArithmeticException failure){throw new IOException("trial予算が上限外です",failure);}
                     long end;try{end=Math.addExact(System.nanoTime(),Duration.ofMillis(millis).toNanos());}catch(ArithmeticException failure){throw new IOException("trial予算が上限外です",failure);}
                     record.put("startup","prepare");write(channel,record);session.send("PREPARE");JsonNode failure=session.ready(end);
+                    if(failure!=null&&failure.path("type").asText().equals("DEFERRED")) {
+                        try{if(!child.waitFor(StartupControl.remaining(end),TimeUnit.MILLISECONDS))throw Seed.invalid("延期CLIの終端が未確認です");}catch(InterruptedException failureWait){Thread.currentThread().interrupt();throw new InterruptedIOException("延期CLIの終端待機を中断しました");}
+                        int code=awaitChild(child,channel,record);new TrialRecovery(this).defer(trial,reference,transaction,run,channel,record,session.request,failure,transactionSettings,end);
+                        return new LaunchResult(code,session.request,null,null,true);
+                    }
                     if(failure!=null) {
                         record.put("startup","failed");record.set("initialization",failure);write(channel,record);
                         try{if(!child.waitFor(StartupControl.remaining(end),TimeUnit.MILLISECONDS))throw Seed.invalid("失敗CLIの終端が未確認です");}catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new InterruptedIOException("失敗CLIの終端待機を中断しました");}
@@ -251,7 +256,7 @@ String[] parts=pin.split("@",-1);if(parts.length!=2||!parts[0].matches("[0-9]+\\
                     String next=null;
                     if(automatic&&eligible(session.request)) {
                         UpdatePreparation prep=new UpdatePreparation(this);
-                        try(StateLock ignored=lock(session.deadline)){ObjectNode current=(ObjectNode)state(session.deadline);if(prep.enabled(session.deadline)&&pending!=null&&!pending.isNull()&&pending.equals(current.get("pending"))&&reference.equals(current.get("active"))&&current.path("trialInvocation").isNull()&&!badCandidate(pending,current)){next=UUID.randomUUID().toString();current.put("trialInvocation",next);atomic(root.resolve("active.json"),current,session.deadline);}}
+                        try(StateLock ignored=lock(session.deadline)){ObjectNode current=(ObjectNode)state(session.deadline);if(prep.enabled(session.deadline)&&pending!=null&&!pending.isNull()&&pending.equals(current.get("pending"))&&reference.equals(current.get("active"))&&current.path("trialInvocation").isNull()&&!badCandidate(pending,current)&&!new TrialRecovery(this).legacyCandidateBlocked(pending,session.deadline)){next=UUID.randomUUID().toString();current.put("trialInvocation",next);atomic(root.resolve("active.json"),current,session.deadline);}}
                         if(next==null&&pending!=null&&pending.isNull())try{prep.start(session.deadline);}catch(IOException failure){System.err.println("UPDATE_NOT_APPLIED: "+failure.getMessage());}
                     }
                     if(next!=null){record.put("startup","switch");write(channel,record);session.send("SWITCH");int code=awaitChild(child,channel,record);if(code!=0)throw Seed.invalid("旧parserの正常終了を確認できません");return new LaunchResult(code,session.request,next,pending,false);}
