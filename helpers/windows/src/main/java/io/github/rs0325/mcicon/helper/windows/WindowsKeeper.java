@@ -31,37 +31,43 @@ final class WindowsKeeper {
         if(parent.pid()!=controller.pid()||!parent.info().startInstant().map(Instant::toEpochMilli).filter(value->value==controller.started()).isPresent()||!parent.isAlive())throw new IOException("keeper controllerの実親が一致しません");
     }
     void run() throws IOException {
+        runtime.trace.event("keeper-start",runtime.commands.end(),0);
         Throwable failure=null;
         try {
-            start();System.out.write(WindowsFiles.JSON.writeValueAsBytes(record));System.out.write('\n');System.out.flush();
+            start();runtime.trace.event("keeper-ack-write",runtime.commands.end(),0,child.process());System.out.write(WindowsFiles.JSON.writeValueAsBytes(record));System.out.write('\n');System.out.flush();
             CompletableFuture<JsonNode> input=new CompletableFuture<>();Thread.ofVirtual().start(()->{try{input.complete(releaseInput(System.in));}catch(Throwable error){input.completeExceptionally(error);}});
             ProcessHandle client=ProcessHandle.of(record.path("client").path("clientPid").asLong()).orElseThrow(()->new IOException("keeper clientが消失しました"));
             try {CompletableFuture.anyOf(input,client.onExit()).join();}catch(CompletionException error){throw new IOException("keeper終了入力が失敗しました",error.getCause());}
             if(!input.isDone()||!client.isAlive())throw new IOException("keeperが終了要求前に消失しました");JsonNode request;
             try{request=input.join();}catch(CompletionException error){throw new IOException("keeper終了入力が失敗しました",error.getCause());}
+            runtime.trace.event("release-request-read",Long.MAX_VALUE,0,child.process());
             if(!request.path("operation").asText().equals("release")||!request.path("attempt").asText().equals(controller.attempt()))throw new IOException("keeperの正式releaseではありません");
             Instant deadline;try{deadline=Instant.parse(request.path("deadline").asText());}catch(RuntimeException error){throw new IOException("keeper release期限が不正です",error);}
             long remaining=Math.max(0,Duration.between(Instant.now(),deadline).toNanos());if(remaining<=0||remaining>Duration.ofSeconds(controller.recovery()?15:6).toNanos())throw new IOException("keeper release残予算が不正です");
             // coreから渡る期限は停止・照合・保存を含む本体期限。core側に終了受取/abort枠がある。
             releaseEnd=System.nanoTime()+remaining;
+            runtime.trace.event("release-deadline",releaseEnd,remaining,child.process());
             HelperProtocol.Command release=new HelperProtocol.Command(runtime.command.root(),runtime.command.lease(),"release",List.of());
             WindowsRuntime cleanup=new WindowsRuntime(release,runtime.executable,runtime.lease,System.nanoTime(),releaseEnd);
             cleanup.release(this,controller.recovery());
             return;
-        }catch(IOException|RuntimeException|Error error){failure=error;throw error;}
+        }catch(IOException|RuntimeException|Error error){failure=error;runtime.trace.event("keeper-failed",releaseEnd,0,child==null?null:child.process());throw error;}
         finally {
             if(failure!=null&&child!=null){
+                runtime.trace.event("keeper-native-reclaim",releaseEnd,0,child.process());
                 long end=Math.min(releaseEnd,System.nanoTime()+Duration.ofSeconds(2).toNanos());
                 Commands cleanup=new Commands(runtime.payload.path("windows-host.exe"),runtime.temporary,runtime.environment,end);
                 try{child.process().getOutputStream().close();}catch(IOException error){failure.addSuppressed(error);}
                 try{if(child.process().isAlive())cleanup.waitFor(child.process(),Duration.ofNanos(Math.max(0,end-System.nanoTime()-Duration.ofMillis(250).toNanos())));}catch(IOException error){failure.addSuppressed(error);}
                 try{if(child.process().isAlive())cleanup.stop(child.process());}catch(IOException error){failure.addSuppressed(error);}
                 try{record.put("state","unknown").put("failure",failure.getMessage());save();}catch(IOException error){failure.addSuppressed(error);}
+                runtime.trace.event("keeper-native-reclaimed",end,0,child.process());
             }
         }
     }
     private long releaseEnd=Long.MAX_VALUE;
     private void start() throws IOException {
+        runtime.trace.event("keeper-owner-start",runtime.commands.end(),0);
         try(OperationJournal journal=runtime.journal();var ignored=runtime.lock()) {
             Path current=runtime.temporary.resolve("keeper.json");
             if(controller.recovery()&&runtime.lease.read().path("resources").isEmpty()||Files.exists(current,LinkOption.NOFOLLOW_LINKS)) {
@@ -70,20 +76,23 @@ final class WindowsKeeper {
                 if(runtime.lease.read().path("resources").isEmpty())pendingRequired(runtime.temporary,runtime.lease.read(),journal.state(),prior,runtime.commands,runtime.guest());
             }
             ObjectNode owner=runtime.keeperOwner(journal,controller.recovery());HostFacts host=runtime.facts();
+            runtime.trace.event("keeper-owner-ready",runtime.commands.end(),0);
             record=WindowsFiles.JSON.createObjectNode().put("state","starting").put("attempt",controller.attempt()).put("boot",host.boot()).put("controllerPid",controller.pid()).put("controllerStarted",controller.started()).put("recovery",controller.recovery());
             record.set("identity",runtime.identity());save();
             ObjectNode request=runtime.request(controller.recovery()?"keep-recover":owner.path("needsInit").asBoolean()?"keep-init":"keep",owner).put("keeperAttempt",controller.attempt());owner.remove("needsInit");
             if(controller.recovery()&&owner.has("lastStop"))request.set("stop",owner.path("lastStop"));
-            child=runtime.commands.keep(runtime.guest(),controller.pid(),controller.started());record.put("prefix",child.prefix().toString());save();
-            CompletableFuture<Void> writing=new CompletableFuture<>();Thread.ofVirtual().start(()->{try{OutputStream writer=child.process().getOutputStream();writer.write(WindowsFiles.JSON.writeValueAsBytes(request));writer.write('\n');writer.flush();writing.complete(null);}catch(Throwable error){writing.completeExceptionally(error);}});
+            runtime.trace.event("keeper-native-spawn",runtime.commands.end(),0);child=runtime.commands.keep(runtime.guest(),controller.pid(),controller.started());record.put("prefix",child.prefix().toString());save();runtime.trace.event("keeper-native-started",runtime.commands.end(),0,child.process());
+            CompletableFuture<Void> writing=new CompletableFuture<>();Thread.ofVirtual().start(()->{try{OutputStream writer=child.process().getOutputStream();runtime.trace.event("keeper-guest-write",runtime.commands.end(),0,child.process());writer.write(WindowsFiles.JSON.writeValueAsBytes(request));writer.write('\n');writer.flush();writing.complete(null);}catch(Throwable error){writing.completeExceptionally(error);}});
             CompletableFuture<JsonNode> output=new CompletableFuture<>();Thread.ofVirtual().start(()->{try{output.complete(line(child.process().getInputStream(),65536));}catch(Throwable error){output.completeExceptionally(error);}});
             while(!output.isDone()||!writing.isDone()){if(writing.isCompletedExceptionally())try{writing.join();}catch(CompletionException error){throw new IOException("keeper要求の書込みが失敗しました",error.getCause());}runtime.commands.left(Duration.ofMinutes(3));if(!child.process().isAlive())throw new IOException("keeper ACK前に終了しました");try{Thread.sleep(10);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new InterruptedIOException("keeper ACKが中断されました");}}
             JsonNode ack;try{ack=output.join();}catch(CompletionException error){throw new IOException("keeper ACKが不正です",error.getCause());}
+            runtime.trace.event("keeper-guest-ack",runtime.commands.end(),0,child.process());
             runtime.verifyHello(ack,owner);if(!controller.recovery())GuestBudget.require(ack.path("memoryBytes").asLong(),request.path("memoryBytes").asLong());if(!ack.path("identity").equals(runtime.identity())||!ack.path("keeper").path("attempt").asText().equals(controller.attempt()))throw new IOException("keeper ACK所有が一致しません");
             JsonNode client=WindowsFiles.json(Path.of(child.prefix()+".client.json"));
             if(client.path("pid").asLong()!=child.process().pid()||client.path("parent").asLong()!=ProcessHandle.current().pid()||client.path("started").asLong()!=child.process().info().startInstant().orElseThrow(()->new IOException("keeper guard開始時刻不明")).toEpochMilli()||client.path("parentStarted").asLong()!=ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("keeper helper開始時刻不明")).toEpochMilli()||client.path("corePid").asLong()!=controller.pid()||client.path("coreStarted").asLong()!=controller.started()||!client.path("boot").asText().equals(host.boot()))throw new IOException("keeper client所有が一致しません");
             record.set("client",client);record.set("guest",ack);record.put("state","ready");save();runtime.keeperRecord();runtime.commands.keeper(record);
             runtime.keeperResource(owner,record);if(!controller.recovery())journal.settled(ack);
+            runtime.trace.event("keeper-ready",runtime.commands.end(),0,child.process());
         }
     }
     static void pendingRequired(Path tmp,JsonNode lease,JsonNode journal,JsonNode prior,Commands commands,List<String> guest) throws IOException {
@@ -112,6 +121,7 @@ final class WindowsKeeper {
     void endClient(Commands commands) throws IOException {
         releaseEnd=commands.end();long end=Math.min(releaseEnd-Duration.ofSeconds(3).toNanos(),System.nanoTime()+Duration.ofSeconds(2).toNanos());
         if(System.nanoTime()>=end)throw new IOException("keeper EOF後の停止/保存枠を残せません");
+        runtime.trace.event("keeper-eof-start",end,Math.max(0,end-System.nanoTime()),child.process());
         if(!record.path("closeIntent").asBoolean()||!child.process().isAlive())throw new IOException("keeperの先行close intent/guardがありません");requireControllerLive();requireClientLive(record);
         if(System.nanoTime()>=end)throw new IOException("keeper EOF期限を超えました");child.process().getOutputStream().close();
         int exit=commands.waitFor(child.process(),Duration.ofNanos(Math.max(0,end-System.nanoTime())));
@@ -119,12 +129,13 @@ final class WindowsKeeper {
         IOException failure=exit!=0&&exit!=125?new IOException("keeper guard終了値が不正です（exit "+exit+" / unsigned "+Integer.toUnsignedLong(exit)+"）"):null;
         try {boolean empty=commands.terminal(child.prefix());termination.put("jobEmpty",empty);if(!empty)failure=Commands.merge(failure,new IOException("keeper Job0終端がありません"));}
         catch(IOException error){termination.put("jobEmptyUnknown",true).put("error",error.getClass().getSimpleName());failure=Commands.merge(failure,error);}
-        try{if(System.nanoTime()>=end)throw new IOException("keeper EOF期限を超えました");JsonNode proof=completion(child.prefix(),record.path("client"),exit);termination.set("completion",proof);
+        try{if(System.nanoTime()>=end)throw new IOException("keeper EOF期限を超えました");runtime.trace.event("keeper-completion-read",end,0,child.process());JsonNode proof=completion(child.prefix(),record.path("client"),exit);termination.set("completion",proof);runtime.trace.event("keeper-completion-read-done",end,0,child.process());
             if(!proof.path("childKnown").asBoolean()||proof.path("childExit").asLong()!=0||!(exit==0&&proof.path("phase").asText().equals("drain-empty")||exit==125&&proof.path("phase").asText().equals("residual-terminated")))throw new IOException("keeper EOFの正常な子0終端がありません");
             if(System.nanoTime()>=end)throw new IOException("keeper EOF期限を超えました");}
         catch(IOException error){termination.put("completionUnknown",true);failure=Commands.merge(failure,error);}
         record.set("termination",termination);try{save();}catch(IOException error){failure=Commands.merge(failure,error);}if(System.nanoTime()>=end)failure=Commands.merge(failure,new IOException("keeper EOF保存後の期限を超えました"));if(failure!=null)throw failure;
         clientEnded=true;
+        runtime.trace.event("keeper-eof-done",end,0,child.process());
     }
     void finish(Commands commands) throws IOException {
         commands.left(Duration.ofSeconds(2));requireControllerLive();requireCloseProof(record);if(!clientEnded)throw new IOException("keeper EOFの本人終端がありません");

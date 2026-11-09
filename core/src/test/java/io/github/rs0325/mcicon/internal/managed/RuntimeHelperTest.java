@@ -49,6 +49,7 @@ class RuntimeHelperTest {
         for(String mode:List.of("normal","late","cancel","empty")) {
             Path directory=Files.createDirectory(root.resolve(mode)).toRealPath();var store=new RuntimeStore(directory,true,new CancellationToken(),Duration.ofSeconds(20),(u,o,t)->{throw new AssertionError();});
             try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
+                Path phaseDirectory=Files.createDirectory(lease.file().getParent().resolve("tmp"));
                 Path output=directory.resolve("keeper.stdout");Files.writeString(output,"{}\n");
                 List<String> paths=new ArrayList<>();for(Class<?> type:List.of(BudgetKeeper.class,RuntimeDescriptor.class,com.fasterxml.jackson.databind.ObjectMapper.class,com.fasterxml.jackson.core.JsonFactory.class,com.fasterxml.jackson.annotation.JsonProperty.class))paths.add(Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()).toString());
                 Process child=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",String.join(java.io.File.pathSeparator,paths),BudgetKeeper.class.getName(),mode).redirectOutput(ProcessBuilder.Redirect.appendTo(output.toFile())).redirectError(directory.resolve("keeper.stderr").toFile()).start();
@@ -59,6 +60,8 @@ class RuntimeHelperTest {
                     if(mode.equals("normal")){assertTrue(helper.control("release",Duration.ofSeconds(9),token).ok());assertEquals("released",RuntimeDescriptor.read(Files.readAllBytes(lease.file())).path("state").asText());}
                     else {assertThrows(Exception.class,()->helper.control("release",mode.equals("empty")?Duration.ZERO:Duration.ofSeconds(9),token));assertEquals("active",lease.read().path("state").asText());}
                     assertFalse(child.isAlive());assertTrue(System.nanoTime()-started<Duration.ofSeconds(10).toNanos());
+                    String phases;try(var files=Files.list(phaseDirectory)){phases=Files.readString(files.filter(path->path.getFileName().toString().startsWith("phase-")).findFirst().orElseThrow());}
+                    assertTrue(phases.contains("\"phase\":\""+(mode.equals("normal")?"release-ok":"release-failed")+"\""));assertFalse(phases.contains(directory.toString()));
                 }finally{if(child.isAlive())child.destroyForcibly();assertTrue(child.waitFor(2,java.util.concurrent.TimeUnit.SECONDS));}
             }
         }
