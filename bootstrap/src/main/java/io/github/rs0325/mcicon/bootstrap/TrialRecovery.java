@@ -57,7 +57,11 @@ final class TrialRecovery {
     private void resumeDeferred(String trial,JsonNode expected,JsonNode configuration,Path run,FileChannel channel,ObjectNode record,long deadline) throws IOException {
         Path path=evidencePath(trial,"deferred");bootstrap.file(path,deadline);JsonNode saved=Seed.json(Seed.read(path,1024*1024));
         Seed.fields(saved,"schemaVersion","kind","capability","request","message","receipt","expectedState","settings","runtimeProof","evidenceKey");Seed.constant(saved,"schemaVersion",1);Seed.exact(saved,"kind","deferred");Seed.exact(saved,"capability","deferred-v1");
-        if(!saved.path("evidenceKey").asText().equals(bootstrap.fileIdentity(path,deadline))||!saved.path("receipt").equals(record)||!saved.path("expectedState").equals(expected)||!saved.path("settings").equals(configuration))throw Seed.invalid("保存済み延期証拠が変化しました");
+        JsonNode priorSettings=saved.path("settings");
+        if(!priorSettings.path("present").isBoolean())throw Seed.invalid("保存済み設定snapshotの形式が不正です");
+        if(priorSettings.path("present").asBoolean()){Seed.fields(priorSettings,"present","sha256","fileKey");Seed.digest(priorSettings,"sha256");UpdatePreparation.key(priorSettings,"fileKey");}
+        else Seed.fields(priorSettings,"present");
+        if(!saved.path("evidenceKey").asText().equals(bootstrap.fileIdentity(path,deadline))||!saved.path("receipt").equals(record)||!saved.path("expectedState").equals(expected))throw Seed.invalid("保存済み延期証拠が変化しました");
         requireReceipt(trial,expected.path("pending"),run,channel,record,"prepare",deadline);StartupControl.deferred(saved.path("message"));
         for(String field:List.of("nonce","invocation","slot","pid","startedAt"))if(!saved.path("message").path(field).equals(saved.path("request").path(field)))throw Seed.invalid("保存済み延期REQUESTが不一致です");
         if(!saved.path("message").path("invocation").asText().equals(trial)||!saved.path("message").path("slot").equals(record.path("slot"))||!saved.path("message").path("pid").equals(record.path("child").path("pid"))||!saved.path("message").path("startedAt").equals(record.path("child").path("startedAt")))throw Seed.invalid("保存済み延期childが不一致です");
@@ -69,9 +73,7 @@ final class TrialRecovery {
     private void saveResume(String trial,JsonNode state,JsonNode configuration,JsonNode record,JsonNode proof,String startup,long deadline) throws IOException {
         ObjectNode value=Seed.JSON.createObjectNode().put("schemaVersion",1).put("kind","resume").put("startup",startup);value.set("expectedState",state);value.set("settings",configuration);value.set("receipt",record);value.set("runtimeProof",proof);
         Path path=evidencePath(trial,"resume");
-        if(Files.exists(path,LinkOption.NOFOLLOW_LINKS)){
-            bootstrap.file(path,deadline);JsonNode saved=Seed.json(Seed.read(path,1024*1024));value.put("evidenceKey",bootstrap.fileIdentity(path,deadline));if(!saved.equals(value))throw Seed.invalid("既存再開証拠が一致しません");return;
-        }
+        if(Files.exists(path,LinkOption.NOFOLLOW_LINKS))path=evidencePath(trial,"resume-"+UUID.randomUUID());
         try(FileChannel output=bootstrap.create(path,deadline)){value.put("evidenceKey",bootstrap.fileIdentity(path,deadline));Bootstrap.write(output,value);}
     }
     private Path evidencePath(String trial,String kind) throws IOException {UpdatePreparation.uuid(trial);return bootstrap.root.resolve("logs/"+trial+"."+kind+"-v1.json");}

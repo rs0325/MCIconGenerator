@@ -83,26 +83,33 @@ public final class LeaseSnapshot {
     public String receiptSha256(){return digest(bytes.get(file.resolveSibling("lease.lock")));}
     public Path helperExecutable() throws IOException {
         Path executable=helperFile(relative(descriptor.get("helper"),"executable"));
-        for(JsonNode row:helperFiles())if(row.path("path").asText().endsWith(".jar"))helperFile(row.path("path").asText());
+        for(JsonNode row:helperFiles(inventory))if(row.path("path").asText().endsWith(".jar"))helperFile(row.path("path").asText());
         return executable;
     }
     /** 元inventoryのarchive相対pathでpinを指定する。 */
     public Path helperFile(String relative) throws IOException {
         if(!relative.matches("[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*")||Arrays.stream(relative.split("/")).anyMatch(x->x.equals(".")||x.equals("..")))throw invalid("helper相対pathが不正です");
-        JsonNode files=helperFiles();
-        Set<String> names=new HashSet<>();JsonNode selected=null;
-        for(JsonNode row:files){String name=text(row,"path",4096);if(!names.add(name))throw invalid("helper inventoryのpathが重複しています");if(name.equals(relative))selected=row;}
-        if(selected==null)throw invalid("helper inventoryにpinがありません");
+        JsonNode selected=helperPin(inventory,relative);
         Path path=helperRoot.resolve(relative);if(!path.toRealPath().equals(path)||!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||Files.size(path)!=integer(selected,"bytes",0))throw invalid("helper実体のpath/sizeが一致しません");
         MessageDigest digest=sha256();
         try(InputStream input=Files.newInputStream(path)){byte[] buffer=new byte[65536];int count;while((count=input.read(buffer))!=-1){if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("helper検証を中断しました");digest.update(buffer,0,count);}}
         if(!HexFormat.of().formatHex(digest.digest()).equals(hash(selected,"sha256")))throw invalid("helper実体のhashが一致しません");
         return path;
     }
-    private JsonNode helperFiles() throws IOException {
+    static JsonNode helperFiles(JsonNode inventory) throws IOException {
         JsonNode direct=inventory.path("contents").path("files"),published=inventory.path("contents").path("r1").path("files");
         if(!direct.isMissingNode()&&!published.isMissingNode())throw invalid("helper inventoryのfile表が重複しています");
         JsonNode files=direct.isMissingNode()?published:direct;if(!files.isArray())throw invalid("helper inventoryのfile表がありません");return files;
+    }
+    static JsonNode helperPin(JsonNode inventory,String relative) throws IOException {
+        Set<String> names=new HashSet<>();JsonNode selected=null;
+        for(JsonNode row:helperFiles(inventory)) {
+            String name=text(row,"path",4096);
+            if(!names.add(name))throw invalid("helper inventoryのpathが重複しています");
+            if(name.equals(relative))selected=row;
+        }
+        if(selected==null)throw invalid("helper inventoryにpinがありません");
+        return selected;
     }
     public void verifyUnchanged() throws IOException {
         verifyUnchanged(null);

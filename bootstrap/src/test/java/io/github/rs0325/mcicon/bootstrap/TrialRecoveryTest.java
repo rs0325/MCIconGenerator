@@ -1,5 +1,6 @@
 package io.github.rs0325.mcicon.bootstrap;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.internal.*;
 import java.io.*;
@@ -42,29 +43,66 @@ class TrialRecoveryTest {
     @Test void 延期証拠保存後CAS前の停止を正式resumeで再開し置換は拒否する() throws Exception {
         Assumptions.assumeTrue(Main.host().os().equals("macos"));
         for(boolean replace:List.of(false,true))try(Context c=new Context(Files.createDirectory(temporary.resolve("case-"+replace)))) {
-            var trust=LeaseTrust.verified(c.fixture.trust);c.record.put("startup","prepare").putNull("initialization");c.writeReceipt();
-            ObjectNode active=(ObjectNode)Seed.json(Files.readAllBytes(c.job.resolve("lease.json")));active.put("state","active");Files.write(c.job.resolve("lease.json"),Seed.JSON.writeValueAsBytes(active));
-            Path other=c.runtime.resolve("jobs/"+UUID.randomUUID());Files.createDirectories(other.resolve("tmp"));ObjectNode owner=active.deepCopy().put("jobId",other.getFileName().toString()).put("ownerId",UUID.randomUUID().toString()).put("pid",ProcessHandle.current().pid()).put("processStartedAt",ProcessHandle.current().info().startInstant().orElseThrow().toString());
-            c.writeJob(other,owner);ObjectNode identity=owner.deepCopy();identity.remove(List.of("state","resources"));
-            try(FileChannel channel=FileChannel.open(other.resolve("lease.lock"),StandardOpenOption.WRITE);FileLock held=channel.lock(64,1,false)) {
-                LeaseSnapshot reference=LeaseSnapshot.read(c.runtime,other.resolve("lease.json"),trust),candidate=LeaseSnapshot.read(c.runtime,c.job.resolve("lease.json"),trust);
-                var budget=Seed.JSON.createObjectNode().put("domain","macos-vm").put("constraint","generation").put("hostMiB",16384).put("requiredMiB",7168).put("availableMiB",4096);budget.putArray("generations").addObject().put("descriptorSha256",Seed.hash(c.definition)).put("reservedMiB",4096).put("requestedMiB",6144);
-                assertThrows(AdmissionEvidence.Busy.class,()->AdmissionEvidence.capacity(c.runtime,candidate,List.of(reference),budget));
-                active.put("state","released");Files.write(c.job.resolve("lease.json"),Seed.JSON.writeValueAsBytes(active));
-                ObjectNode message=Seed.JSON.createObjectNode().put("protocol",4).put("type","DEFERRED").put("reason","MANAGED_BUSY").put("nonce",UUID.randomUUID().toString()).put("invocation",c.trial).put("pid",c.record.path("child").path("pid").asLong()).put("startedAt",c.record.path("child").path("startedAt").asText());message.set("slot",c.record.path("slot"));message.putArray("jobs").add(AdmissionEvidence.jobReference(c.runtime,c.job.getFileName().toString()));
-                ObjectNode request=message.deepCopy();request.put("type","REQUEST");request.remove(List.of("reason","jobs"));
-                TrialRecovery recovery=new TrialRecovery(c.bootstrap);com.fasterxml.jackson.databind.JsonNode state=c.bootstrap.state(),settings=recovery.settings(Long.MAX_VALUE);Path evidence=c.bootstrap.root.resolve("logs/"+c.trial+".deferred-v1.json");
-                ExecutorService executor=Executors.newSingleThreadExecutor();ObjectNode sent=message;
-                try(FileChannel receipt=FileChannel.open(c.run,StandardOpenOption.READ,StandardOpenOption.WRITE);FileLock receiptLock=receipt.lock();var stateLock=c.bootstrap.lock(Long.MAX_VALUE)) {
-                    Future<?> operation=executor.submit(()->{try{recovery.defer(c.trial,c.pending,state,c.run,receipt,c.record,request,sent,settings,System.nanoTime()+Duration.ofSeconds(20).toNanos());}catch(IOException failure){throw new UncheckedIOException(failure);}});
-                    long end=System.nanoTime()+Duration.ofSeconds(10).toNanos();boolean complete=false;
-                    while(System.nanoTime()<end&&!operation.isDone()){if(Files.isRegularFile(evidence)){try{complete=Seed.json(Files.readAllBytes(evidence)).has("evidenceKey");if(complete)break;}catch(IOException partial){}}Thread.sleep(10);}
-                    assertTrue(complete,"durable延期証拠の保存へ到達する");assertTrue(operation.cancel(true));
-                }finally{executor.shutdownNow();assertTrue(executor.awaitTermination(3,TimeUnit.SECONDS));}
+            Path evidence=c.saveDeferred();TrialRecovery recovery=new TrialRecovery(c.bootstrap);
+            if(replace){byte[] original=Files.readAllBytes(evidence);Files.delete(evidence);Files.write(evidence,original);assertThrows(IOException.class,()->recovery.resume(c.trial));assertEquals(c.trial,c.bootstrap.state().path("trialInvocation").asText());}
+            else {JsonNodeCopy before=new JsonNodeCopy(c.bootstrap.state());recovery.resume(c.trial);assertTrue(c.bootstrap.state().path("trialInvocation").isNull());before.assertPreserved(c.bootstrap.state());c.nextTrialAndSequence();}
+        }
+    }
+    @Test void 保存済み延期の後でも現在設定の明示有効化と再有効化で正式resumeする() throws Exception {
+        Assumptions.assumeTrue(Main.host().os().equals("macos"));
+        for(boolean wasConfigured:List.of(false,true))try(Context c=new Context(Files.createDirectory(temporary.resolve("config-"+wasConfigured)))) {
+            UpdatePreparation updates=new UpdatePreparation(c.bootstrap);
+            if(wasConfigured)updates.configure(true,Long.MAX_VALUE);
+            Path evidence=c.saveDeferred();byte[] original=Files.readAllBytes(evidence),receipt=Files.readAllBytes(c.run);
+            JsonNodeCopy before=new JsonNodeCopy(c.bootstrap.state());TrialRecovery recovery=new TrialRecovery(c.bootstrap);
+            ObjectNode broken=(ObjectNode)Seed.json(original);broken.putObject("settings").put("present",true);
+            Files.write(evidence,Seed.JSON.writeValueAsBytes(broken));
+            assertThrows(IOException.class,()->recovery.resume(c.trial));assertEquals(c.trial,c.bootstrap.state().path("trialInvocation").asText());
+            Files.write(evidence,original);
+            if(wasConfigured) {
+                updates.configure(false,Long.MAX_VALUE);
+                assertThrows(IOException.class,()->recovery.resume(c.trial));
                 assertEquals(c.trial,c.bootstrap.state().path("trialInvocation").asText());
-                if(replace){byte[] original=Files.readAllBytes(evidence);Files.delete(evidence);Files.write(evidence,original);assertThrows(IOException.class,()->recovery.resume(c.trial));assertEquals(c.trial,c.bootstrap.state().path("trialInvocation").asText());}
-                else {JsonNodeCopy before=new JsonNodeCopy(c.bootstrap.state());recovery.resume(c.trial);assertTrue(c.bootstrap.state().path("trialInvocation").isNull());before.assertPreserved(c.bootstrap.state());c.nextTrialAndSequence();}
             }
+            updates.configure(true,Long.MAX_VALUE);
+            var configuration=recovery.settings(Long.MAX_VALUE);
+            assertNotEquals(Seed.json(original).path("settings"),configuration);
+            recovery.resume(c.trial);
+            assertTrue(c.bootstrap.state().path("trialInvocation").isNull());before.assertPreserved(c.bootstrap.state());
+            assertArrayEquals(original,Files.readAllBytes(evidence));assertArrayEquals(receipt,Files.readAllBytes(c.run));
+            var attempt=Seed.json(Files.readAllBytes(c.bootstrap.root.resolve("logs/"+c.trial+".resume-v1.json")));
+            assertEquals(configuration,attempt.path("settings"));c.nextTrialAndSequence();
+        }
+    }
+    @Test void 再開証拠保存後の設定競合は旧証拠を保持し新しい試行で正式resumeする() throws Exception {
+        Assumptions.assumeTrue(Main.host().os().equals("macos"));
+        try(Context c=new Context(temporary)) {
+            Path deferred=c.saveDeferred();byte[] savedDeferred=Files.readAllBytes(deferred),receipt=Files.readAllBytes(c.run);
+            TrialRecovery recovery=new TrialRecovery(c.bootstrap);var state=c.bootstrap.state();var configuration=recovery.settings(Long.MAX_VALUE);
+            var proof=Seed.json(savedDeferred).path("runtimeProof");
+            var save=TrialRecovery.class.getDeclaredMethod("saveResume",String.class,JsonNode.class,
+                    JsonNode.class,JsonNode.class,
+                    JsonNode.class,String.class,long.class);
+            save.setAccessible(true);save.invoke(recovery,c.trial,state,configuration,c.record,proof,"prepare",Long.MAX_VALUE);
+            Path original=c.bootstrap.root.resolve("logs/"+c.trial+".resume-v1.json");byte[] originalBytes=Files.readAllBytes(original);
+            UpdatePreparation updates=new UpdatePreparation(c.bootstrap);updates.configure(false,Long.MAX_VALUE);updates.configure(true,Long.MAX_VALUE);
+            var current=recovery.settings(Long.MAX_VALUE);assertNotEquals(configuration,current);
+            var clear=TrialRecovery.class.getDeclaredMethod("clear",String.class,JsonNode.class,
+                    JsonNode.class,JsonNode.class,Path.class,
+                    FileChannel.class,ObjectNode.class,String.class,JsonNode.class,
+                    JsonNode.class,long.class);
+            clear.setAccessible(true);
+            try(FileChannel channel=FileChannel.open(c.run,StandardOpenOption.READ,StandardOpenOption.WRITE);var held=channel.lock()) {
+                var refused=assertThrows(java.lang.reflect.InvocationTargetException.class,
+                        ()->clear.invoke(recovery,c.trial,c.pending,state,configuration,c.run,channel,c.record,"prepare",proof,Seed.json(savedDeferred).path("message"),Long.MAX_VALUE));
+                assertInstanceOf(IOException.class,refused.getCause());assertTrue(refused.getCause().getMessage().contains("state/settings CAS"));
+            }
+            assertEquals(state,c.bootstrap.state());assertArrayEquals(originalBytes,Files.readAllBytes(original));
+            recovery.resume(c.trial);assertTrue(c.bootstrap.state().path("trialInvocation").isNull());new JsonNodeCopy(state).assertPreserved(c.bootstrap.state());
+            List<Path> attempts;try(var files=Files.newDirectoryStream(c.bootstrap.root.resolve("logs"),c.trial+".resume-*-v1.json")){attempts=new ArrayList<>();for(Path file:files)attempts.add(file);}
+            assertEquals(1,attempts.size());assertEquals(current,Seed.json(Files.readAllBytes(attempts.getFirst())).path("settings"));
+            assertArrayEquals(originalBytes,Files.readAllBytes(original));assertArrayEquals(savedDeferred,Files.readAllBytes(deferred));assertArrayEquals(receipt,Files.readAllBytes(c.run));
+            c.nextTrialAndSequence();
         }
     }
     private record JsonNodeCopy(com.fasterxml.jackson.databind.JsonNode value) {
@@ -77,6 +115,7 @@ class TrialRecoveryTest {
         final Path runtime,run,job;
         final ObjectNode record,pending;
         final byte[] inventory,definition;
+        Process peer;
         Context(Path root) throws Exception {
             root=root.toRealPath();
             try {
@@ -98,6 +137,44 @@ class TrialRecoveryTest {
             job=runtime.resolve("jobs/"+UUID.randomUUID());Files.createDirectories(job.resolve("tmp"));ObjectNode lease=Seed.JSON.createObjectNode().put("schemaVersion",1).put("jobId",job.getFileName().toString()).put("ownerId",UUID.randomUUID().toString()).put("hostId",host).put("toolVersion","1.1.1").put("runtimeId","fixture").put("workerSha256","b".repeat(64)).put("descriptorSha256",Seed.hash(definition)).put("pid",child.path("pid").asLong()).put("processStartedAt",child.path("startedAt").asText()).put("createdAt",Instant.now().toString()).put("state","released");lease.putObject("requirements").put("containerMemoryMiB",3072).put("heapMemoryMiB",2048).put("cpus",4).put("preparationDeadline",Instant.now().plusSeconds(60).toString());lease.putObject("resources");writeJob(job,lease);
             }catch(Exception failure){System.setProperty("user.home",previousHome);throw failure;}
         }
+        Path saveDeferred() throws Exception {
+            var trust=LeaseTrust.verified(fixture.trust);record.put("startup","prepare").putNull("initialization");writeReceipt();
+            ObjectNode active=(ObjectNode)Seed.json(Files.readAllBytes(job.resolve("lease.json")));
+            active.put("state","active");Files.write(job.resolve("lease.json"),Seed.JSON.writeValueAsBytes(active));
+            Path other=runtime.resolve("jobs/"+UUID.randomUUID());
+            ObjectNode owner=active.deepCopy().put("jobId",other.getFileName().toString()).put("ownerId",UUID.randomUUID().toString());
+            writeJob(other,owner);
+            Path source=Path.of("..","core","src/test/java/io/github/rs0325/mcicon/internal/managed/LeaseLockProcess.java").toAbsolutePath().normalize();
+            peer=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),
+                    "-Djava.io.tmpdir="+System.getProperty("java.io.tmpdir"),"--source","21",source.toString(),
+                    other.resolve("lease.lock").toString(),"true").redirectError(ProcessBuilder.Redirect.INHERIT).start();
+            var ready=CompletableFuture.supplyAsync(()->{try{return new String(peer.getInputStream().readNBytes(5),java.nio.charset.StandardCharsets.US_ASCII);}catch(IOException failure){throw new UncheckedIOException(failure);}});
+            assertEquals("HELD\n",ready.get(10,TimeUnit.SECONDS));
+            var actor=Bootstrap.identity(peer.toHandle());
+            owner.put("pid",actor.path("pid").asLong()).put("processStartedAt",actor.path("startedAt").asText()).put("createdAt",Instant.now().toString());writeJob(other,owner);
+            LeaseSnapshot reference=LeaseSnapshot.read(runtime,other.resolve("lease.json"),trust),candidate=LeaseSnapshot.read(runtime,job.resolve("lease.json"),trust);
+            var budget=Seed.JSON.createObjectNode().put("domain","macos-vm").put("constraint","generation").put("hostMiB",16384).put("requiredMiB",7168).put("availableMiB",4096);
+            budget.putArray("generations").addObject().put("descriptorSha256",Seed.hash(definition)).put("reservedMiB",4096).put("requestedMiB",6144);
+            assertThrows(AdmissionEvidence.Busy.class,()->AdmissionEvidence.capacity(runtime,candidate,List.of(reference),budget));
+            active.put("state","released");Files.write(job.resolve("lease.json"),Seed.JSON.writeValueAsBytes(active));
+            ObjectNode message=Seed.JSON.createObjectNode().put("protocol",4).put("type","DEFERRED").put("reason","MANAGED_BUSY")
+                    .put("nonce",UUID.randomUUID().toString()).put("invocation",trial).put("pid",record.path("child").path("pid").asLong()).put("startedAt",record.path("child").path("startedAt").asText());
+            message.set("slot",record.path("slot"));message.putArray("jobs").add(AdmissionEvidence.jobReference(runtime,job.getFileName().toString()));
+            ObjectNode request=message.deepCopy();request.put("type","REQUEST");request.remove(List.of("reason","jobs"));
+            TrialRecovery recovery=new TrialRecovery(bootstrap);JsonNode state=bootstrap.state(),settings=recovery.settings(Long.MAX_VALUE);
+            Path evidence=bootstrap.root.resolve("logs/"+trial+".deferred-v1.json");ExecutorService executor=Executors.newSingleThreadExecutor();
+            try(FileChannel receipt=FileChannel.open(run,StandardOpenOption.READ,StandardOpenOption.WRITE);
+                FileLock receiptLock=receipt.lock();var stateLock=bootstrap.lock(Long.MAX_VALUE)) {
+                Future<?> operation=executor.submit(()->{try{recovery.defer(trial,pending,state,run,receipt,record,request,message,settings,System.nanoTime()+Duration.ofSeconds(20).toNanos());}catch(IOException failure){throw new UncheckedIOException(failure);}});
+                long end=System.nanoTime()+Duration.ofSeconds(10).toNanos();boolean complete=false;
+                while(System.nanoTime()<end&&!operation.isDone()) {
+                    if(Files.isRegularFile(evidence)){try{complete=Seed.json(Files.readAllBytes(evidence)).has("evidenceKey");if(complete)break;}catch(IOException partial){}}
+                    Thread.sleep(10);
+                }
+                assertTrue(complete,"durable延期証拠の保存へ到達する");assertTrue(operation.cancel(true));
+            }finally{executor.shutdownNow();assertTrue(executor.awaitTermination(3,TimeUnit.SECONDS));}
+            assertEquals(trial,bootstrap.state().path("trialInvocation").asText());return evidence;
+        }
         void nextTrialAndSequence() throws Exception {
             Path output=bootstrap.root.resolve("after-resume-output");assertEquals(0,bootstrap.launch(List.of("list","output",output.toString())));assertTrue(Files.isRegularFile(output));
             var state=bootstrap.state();assertEquals(pending,state.path("active"));assertTrue(state.path("trialInvocation").isNull());assertTrue(state.path("pending").isNull());assertEquals(2,state.path("highestAcceptedSequence").asLong());
@@ -114,6 +191,14 @@ class TrialRecoveryTest {
             try(JarOutputStream jar=new JarOutputStream(bytes);var files=Files.walk(classes.resolve("io/github/rs0325/mcicon/internal"))){for(Path file:files.filter(Files::isRegularFile).toList()){jar.putNextEntry(new JarEntry(classes.relativize(file).toString().replace('\\','/')));jar.write(Files.readAllBytes(file));jar.closeEntry();}}
             return bytes.toByteArray();
         }
-        public void close(){System.setProperty("user.home",previousHome);}
+        public void close() throws Exception {
+            try {
+                if(peer!=null) {
+                    peer.getOutputStream().close();
+                    if(!peer.waitFor(5,TimeUnit.SECONDS)){peer.destroyForcibly();assertTrue(peer.waitFor(3,TimeUnit.SECONDS));}
+                    peer.getInputStream().close();peer.getErrorStream().close();
+                }
+            }finally{System.setProperty("user.home",previousHome);}
+        }
     }
 }
