@@ -2,6 +2,7 @@ package io.github.rs0325.mcicon.helper.windows;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.github.rs0325.mcicon.internal.RuntimePhaseLog;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -15,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /** native Jobの終端recordだけを信頼する。guest終端は別のfenceで検査する。 */
 final class Commands {
     record Result(int exit,byte[] stdout,byte[] stderr) {}
+    record TimedRequest(byte[] bytes,long budgetNanos) {}
     private final Path nativeHost,temporary;
     private final Map<String,String> environment;
     private volatile long deadline;
@@ -33,25 +35,43 @@ final class Commands {
     Result capture(List<String> args,Duration maximum,Path input) throws IOException {return exchange(args,null,input,null,maximum);}
     Result request(List<String> args,byte[] request,Path input,Duration maximum) throws IOException {return exchange(args,request,input,null,maximum);}
     void fetch(List<String> args,byte[] request,Path target,Duration maximum) throws IOException {exchange(args,request,null,target,maximum);}
+    static TimedRequest boundedRequest(byte[] request,long end) throws IOException {
+        JsonNode value=WindowsFiles.JSON.readTree(request);
+        if(value==null||!value.isObject()||!value.path("timeoutSeconds").isNumber())return new TimedRequest(request,0);
+        long remaining=end-System.nanoTime();if(remaining<=0)throw new IOException("guest送信前にnative操作がtimeoutしました");
+        double seconds=Math.min(value.path("timeoutSeconds").asDouble(),remaining/1_000_000_000.0);
+        ((ObjectNode)value).put("timeoutSeconds",seconds);return new TimedRequest(WindowsFiles.JSON.writeValueAsBytes(value),(long)(seconds*1_000_000_000));
+    }
+    private String operation(List<String> args,byte[] request) {
+        if(request!=null)try{JsonNode node=WindowsFiles.JSON.readTree(request);String value=node==null?"":node.path("operation").asText();return Set.of("hello","daemon-prepare","daemon-recover","load","create","start","remove","fetch","release","release-recover").contains(value)?"guest-"+value:"guest-other";}catch(IOException failure){return "guest-other";}
+        if(args.size()==2&&args.getFirst().equals(nativeHost.toString())&&args.get(1).equals("facts"))return "facts";
+        if(args.size()>1)return switch(args.get(1)){case "--status"->"wsl-status";case "--list"->"wsl-list";case "--terminate"->"wsl-stop";case "--import"->"wsl-import";default->"native-other";};return "native-other";
+    }
     private Result exchange(List<String> args,byte[] request,Path input,Path target,Duration maximum) throws IOException {
-        runBudget(maximum);Path prefix=temporary.resolve("native-"+UUID.randomUUID()),out=target==null?Files.createTempFile(temporary,"stdout-",".bin"):target,err=Files.createTempFile(temporary,"stderr-",".bin");Process process=null;Thread writer=null;IOException error=null;Result result=null;AtomicReference<IOException> writerFailure=new AtomicReference<>();boolean reclaimed=false,diagnosticSaved=true;long started=0;
+        String operation=operation(args,request),phase="native-budget";RuntimePhaseLog trace=new RuntimePhaseLog(temporary,"windows",operation,keeper==null?null:keeper.path("attempt").asText());trace.event("exchange-start",deadline,maximum.toNanos());
+        Path prefix=temporary.resolve("native-"+UUID.randomUUID()),out=target==null?Files.createTempFile(temporary,"stdout-",".bin"):target,err=Files.createTempFile(temporary,"stderr-",".bin");Process process=null;Thread writer=null;IOException error=null;Result result=null;AtomicReference<IOException> writerFailure=new AtomicReference<>();boolean reclaimed=false,diagnosticSaved=true;long started=0,runEnd=deadline;
         try {
-            ProcessBuilder builder=(request==null?builder(args,"exec",0,0,prefix):bridgeBuilder(args,prefix)).redirectOutput(out.toFile()).redirectError(err.toFile());if(request==null&&input!=null)builder.redirectInput(input.toFile());process=builder.start();Process child=process;started=process.info().startInstant().orElseThrow(()->new IOException("native開始identity不明")).toEpochMilli();
-            if(request!=null)writer=Thread.ofVirtual().start(()->{try(OutputStream stream=child.getOutputStream()){stream.write(request);stream.write('\n');if(input!=null)try(InputStream source=Files.newInputStream(input)){source.transferTo(stream);}}catch(IOException failure){writerFailure.set(failure);}});
+            runEnd=System.nanoTime()+runBudget(maximum).toNanos();long executionEnd=runEnd;trace.event(phase,runEnd,Math.max(0,runEnd-System.nanoTime()));
+            phase="native-spawn";trace.event(phase,runEnd,0);
+            ProcessBuilder builder=(request==null?builder(args,"exec",0,0,prefix):bridgeBuilder(args,prefix)).redirectOutput(out.toFile()).redirectError(err.toFile());if(request==null&&input!=null)builder.redirectInput(input.toFile());process=builder.start();Process child=process;started=process.info().startInstant().orElseThrow(()->new IOException("native開始identity不明")).toEpochMilli();trace.event("native-started",runEnd,0,process);
+            if(request!=null)writer=Thread.ofVirtual().start(()->{try(OutputStream stream=child.getOutputStream()){trace.event("guest-write",executionEnd,0,child);TimedRequest bounded=boundedRequest(request,executionEnd);stream.write(bounded.bytes());stream.write('\n');trace.event("guest-request-written",executionEnd,bounded.budgetNanos(),child);if(input!=null)try(InputStream source=Files.newInputStream(input)){source.transferTo(stream);}trace.event("guest-written",executionEnd,0,child);}catch(IOException failure){writerFailure.set(failure);}});
             else if(input==null)process.getOutputStream().close();
-            int exit=waitFor(process,runBudget(maximum));
+            phase="native-wait";trace.event(phase,runEnd,Math.max(0,runEnd-System.nanoTime()),process);int exit=waitUntil(process,runEnd);trace.event("native-exited",runEnd,0,process);
+            phase="response-read";
             if(writer!=null)join(writer,left(Duration.ofMillis(500)));
             if(writerFailure.get()!=null)throw writerFailure.get();
             if(request!=null&&Set.of("daemon-prepare","daemon-recover").contains(WindowsFiles.JSON.readTree(request).path("operation").asText())) {
-                Receipt receipt=observed(prefix,process,started);JsonNode proof=WindowsKeeper.completion(prefix,receipt.value(),exit);
+                phase="completion-read";
+                trace.event("completion-read",deadline,0,process);Receipt receipt=observed(prefix,process,started);JsonNode proof=WindowsKeeper.completion(prefix,receipt.value(),exit);trace.event("completion-read-done",deadline,0,process);
                 if(!receipt.done()||exit!=0||!proof.path("childKnown").asBoolean()||proof.path("childExit").asLong()!=0||!Set.of("drain-empty","command-empty").contains(proof.path("phase").asText()))throw new IOException("daemon準備native終端が未確認です");
             }
+            phase="response-read";trace.event(phase,deadline,0,process);
             if(Files.size(out)>(target==null?1024*1024:64L*1024*1024)||Files.size(err)>1024*1024)throw new IOException("Windows応答が上限を超えました");
-            if(target!=null&&exit!=0)throw new IOException("guest PNGの取得に失敗しました");result=new Result(exit,target==null?Files.readAllBytes(out):new byte[0],Files.readAllBytes(err));
-        }catch(IOException failure){error=failure;}
+            if(target!=null&&exit!=0)throw new IOException("guest PNGの取得に失敗しました");Result response=new Result(exit,target==null?Files.readAllBytes(out):new byte[0],Files.readAllBytes(err));trace.event("response-read-done",deadline,0,process);checkDeadline(runEnd);result=response;
+        }catch(IOException failure){error=failure;trace.event("exchange-failed",runEnd,0,process);}
         finally {
             if(process!=null) {
-                if(process.isAlive()){reclaimed=true;try{stop(process);}catch(IOException failure){error=merge(error,failure);}}
+                if(process.isAlive()){reclaimed=true;trace.event("native-reclaim",deadline,0,process);try{stop(process);}catch(IOException failure){error=merge(error,failure);}trace.event("native-reclaimed",deadline,0,process);}
                 if(writer!=null) {
                     try{join(writer,Duration.ofMillis(500));}catch(IOException failure){error=merge(error,failure);}
                     if(writerFailure.get()!=null&&writerFailure.get()!=error)error=merge(error,writerFailure.get());
@@ -60,10 +80,10 @@ final class Commands {
             if(error==null&&result!=null&&result.exit()!=0){ObjectNode summary=WindowsFiles.JSON.createObjectNode().put("nativeExit",result.exit());outputSummary(out,err,target==null?1024*1024:64L*1024*1024,summary);try{WindowsFiles.write(Path.of(prefix+".diagnostic.json"),summary);}catch(IOException failure){diagnosticSaved=false;error=failure;}}
             if(error!=null) {
                 String kind=Thread.currentThread().isInterrupted()?"INTERRUPTED":error.getMessage()!=null&&(error.getMessage().contains("timeout")||error.getMessage().contains("期限"))?"TIMEOUT":"IO_FAILED";
-                ObjectNode summary=WindowsFiles.JSON.createObjectNode().put("inputFailure",writerFailure.get()!=null?"INPUT_IO_FAILED":"NONE").put("executionFailure",kind).put("reclaimed",reclaimed).put("terminal","unknown").put("jobEmpty",false);
+                ObjectNode summary=WindowsFiles.JSON.createObjectNode().put("inputFailure",writerFailure.get()!=null?"INPUT_IO_FAILED":"NONE").put("executionFailure",kind).put("operation",operation).put("failedPhase",phase).put("phaseLog",trace.fileName()).put("reclaimed",reclaimed).put("terminal","unknown").put("jobEmpty",false);
                 if(process!=null&&!process.isAlive()) {
                     summary.put("nativeExit",process.exitValue());
-                    try{Receipt receipt=observed(prefix,process,started);summary.put("terminal",receipt.done()?"done":"unknown");JsonNode proof=WindowsKeeper.completion(prefix,receipt.value(),process.exitValue());summary.set("completion",proof);summary.put("jobEmpty",receipt.done()&&proof.path("jobEmpty").asBoolean());}catch(IOException failure){summary.put("completionUnknown",true);}
+                    trace.event("completion-read",deadline,0,process);try{Receipt receipt=observed(prefix,process,started);summary.put("terminal",receipt.done()?"done":"unknown");JsonNode proof=WindowsKeeper.completion(prefix,receipt.value(),process.exitValue());summary.set("completion",proof);summary.put("jobEmpty",receipt.done()&&proof.path("jobEmpty").asBoolean());trace.event("completion-read-done",deadline,0,process);}catch(IOException failure){summary.put("completionUnknown",true);trace.event("completion-unknown",deadline,0,process);}
                 }
                 outputSummary(out,err,target==null?1024*1024:64L*1024*1024,summary);
                 try{WindowsFiles.write(Path.of(prefix+".diagnostic.json"),summary);}catch(IOException failure){diagnosticSaved=false;summary.put("diagnosticSaveFailed",true);}
@@ -71,6 +91,7 @@ final class Commands {
             }
             if(diagnosticSaved)try{if(target==null)Files.deleteIfExists(out);Files.deleteIfExists(err);}catch(IOException failure){error=error==null?failure:new IOException(error.getMessage()+"; cleanupFailed=true",error);}
         }
+        trace.event(error==null?"exchange-return":"exchange-throw",deadline,0,process);
         if(error!=null)throw error;return result;
     }
     private Receipt observed(Path prefix,Process process,long started) throws IOException {
@@ -173,6 +194,10 @@ final class Commands {
         try{if(!process.waitFor(Math.max(0,maximum.toNanos()),TimeUnit.NANOSECONDS))throw new IOException("Windows native操作がtimeoutしました");return process.exitValue();}
         catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException("Windows native待機が中断されました");}
     }
+    int waitUntil(Process process,long end) throws IOException {
+        checkDeadline(end);int exit=waitFor(process,Duration.ofNanos(Math.max(0,end-System.nanoTime())));checkDeadline(end);return exit;
+    }
+    private static void checkDeadline(long end) throws IOException {if(System.nanoTime()>=end)throw new IOException("Windows native操作がtimeoutしました");}
     void join(Thread thread,Duration maximum) throws IOException {
         boolean interrupted=Thread.interrupted();
         try{long nanos=Math.max(0,Math.min(maximum.toNanos(),deadline-System.nanoTime()));if(nanos>0)thread.join(Duration.ofNanos(nanos));if(thread.isAlive())throw new IOException("Windows入力/出力clientの回収が未確認です");}
