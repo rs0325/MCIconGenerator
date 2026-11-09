@@ -122,7 +122,12 @@ public final class Diagnostics {
                 try {
                 bytes+=Files.size(file);files++;
                 if(verify && file.getFileName().toString().endsWith(".sha256")) {
-                    String relative=root.relativize(file).toString();
+                    StringBuilder path=new StringBuilder();
+                    for(Path part:root.relativize(file)) {
+                        if(!path.isEmpty())path.append('/');
+                        path.append(part);
+                    }
+                    String relative=path.toString();
                     Path source=FilesSupport.safeResolve(root,relative.substring(0,relative.length()-7));
                     if(Files.isRegularFile(source,LinkOption.NOFOLLOW_LINKS) && Files.readString(file).trim().equals(FilesSupport.hash(source,"SHA-256")))verified++;
                     else failures.add(relative.substring(0,relative.length()-7));
