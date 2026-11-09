@@ -4,6 +4,7 @@ import io.github.rs0325.mcicon.CancellationToken;
 import io.github.rs0325.mcicon.McIconException;
 import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -31,12 +32,12 @@ public final class WorkerArtifact {
         URL metadata=uniqueResource(loader,"version.properties");
         URL agent=uniqueResource(loader,"agent.jar");
         String expected="toolVersion="+ToolVersion.VERSION+"\nagentSha256="+WorkerArtifactInfo.SHA256+"\n";
-        try(InputStream input=metadata.openStream()) {
+        try(InputStream input=open(metadata)) {
             if(!Arrays.equals(expected.getBytes(StandardCharsets.UTF_8),input.readNBytes(1025)))
                 throw invalid("workerのmetadataが同版coreの契約と一致しません");
         }
         byte[] bytes;
-        try(InputStream input=agent.openStream()) {bytes=input.readNBytes(64*1024*1024+1);}
+        try(InputStream input=open(agent)) {bytes=input.readNBytes(64*1024*1024+1);}
         token.check();
         if(bytes.length>64*1024*1024||!FilesSupport.hash(bytes).equals(WorkerArtifactInfo.SHA256))
             throw invalid("worker agentのSHA-256が同版coreと一致しません");
@@ -74,6 +75,12 @@ public final class WorkerArtifact {
         if(resources.isEmpty())throw new McIconException("WORKER_NOT_FOUND","同版mcicon-workerのresourceがありません。runtime依存とJAR統合時のresource保持を確認してください",1);
         if(resources.size()!=1)throw invalid("worker resourceが重複しています: "+name);
         return resources.getFirst();
+    }
+
+    private static InputStream open(URL resource) throws IOException {
+        URLConnection connection=resource.openConnection();
+        connection.setUseCaches(false);
+        return connection.getInputStream();
     }
     private static McIconException invalid(String message) {return new McIconException("WORKER_INVALID",message,1);}
 }

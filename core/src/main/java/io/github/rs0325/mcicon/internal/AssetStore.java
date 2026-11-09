@@ -34,10 +34,16 @@ public final class AssetStore {
         if(this.minecraft!=null&&!Files.isDirectory(this.minecraft,LinkOption.NOFOLLOW_LINKS))throw new IllegalArgumentException("Minecraft installation must be a directory");
         if(this.minecraft!=null) {
             try {
-                Path input=this.minecraft.toRealPath(),cache=this.root.toFile().getCanonicalFile().toPath();
+                Path input=this.minecraft.toRealPath(),cache=resolveThroughExistingParent(this.root);
                 if(input.startsWith(cache)||cache.startsWith(input))throw new IllegalArgumentException("Cache and Minecraft installation directories must not overlap");
             }catch(IOException failure){throw new IllegalArgumentException("Input directories could not be resolved");}
         }
+    }
+    private static Path resolveThroughExistingParent(Path path) throws IOException {
+        Path existing=path;
+        while(existing!=null&&!Files.exists(existing,LinkOption.NOFOLLOW_LINKS))existing=existing.getParent();
+        if(existing==null)throw new IOException("Cache path has no existing parent");
+        return existing.toRealPath().resolve(existing.relativize(path)).normalize();
     }
     private static Transport httpsTransport(CancellationToken cancellation) {
         HttpClient client=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).followRedirects(HttpClient.Redirect.NEVER).build();

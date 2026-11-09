@@ -35,9 +35,11 @@ class RuntimeLeaseTest {
     @Test void receiptRegionIsOutsideActiveLockAndExpiredPreparationDoesNotBlockRelease() throws Exception {
         var store=store();var descriptor=new ManagedFixture().descriptor();var options=ManagedOptions.defaults();
         var lease=RuntimeLease.create(store,descriptor,options,java.time.Instant.EPOCH);
-        try(lease;var channel=java.nio.channels.FileChannel.open(lease.file().resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE);
-                var receipt=channel.tryLock(0,64,false)) {
-            assertNotNull(receipt);assertEquals(64,channel.size());assertFalse(RuntimeLease.idle(store,descriptor));lease.released();
+        try(lease;var channel=java.nio.channels.FileChannel.open(lease.file().resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE)) {
+            try(var receipt=channel.tryLock(0,64,false)) {
+                assertNotNull(receipt);assertEquals(64,channel.size());assertFalse(RuntimeLease.idle(store,descriptor));
+            }
+            lease.released();
         }
         assertTrue(RuntimeLease.idle(store,descriptor));
     }
