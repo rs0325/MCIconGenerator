@@ -15,7 +15,7 @@ import java.time.Duration;
 
 @Command(name="mcicon", version="MCIconGenerator " + ToolVersion.VERSION, mixinStandardHelpOptions=true,
         description="Export vanilla Minecraft Java textures and inventory icons.",
-        subcommands={Main.Versions.class,Main.Extract.class,Main.Render.class,Main.Catalog.class,Main.Doctor.class,Main.Cache.class})
+        subcommands={Main.Versions.class,Main.Extract.class,Main.Render.class,Main.Catalog.class,Main.Doctor.class,Main.Cache.class,Main.RuntimeCommand.class})
 public final class Main implements Runnable {
     @Spec Model.CommandSpec spec;
     @Option(names="--debug",scope=ScopeType.INHERIT,description="Print exception causes to stderr on failure.") boolean debug;
@@ -53,6 +53,14 @@ public final class Main implements Runnable {
         if(!help&&!version){if(command instanceof Render render)render.prepareRequest();else if(command instanceof Catalog catalog)catalog.prepareKind();}
         boolean managed=!help&&!version&&worker!=null&&worker.managed();ManagedOptions options=managed?worker.managedOptions():ManagedOptions.defaults();
         ObjectNode request=StartupControl.JSON.createObjectNode().put("command",help?"help":version?"version":command instanceof Main?"root":leaf.commandSpec().name()).put("managed",managed).put("offline",common!=null&&common.offline).put("help",help||version).put("preparationMillis",options.preparationTimeout().toMillis()).put("startupMillis",options.startupTimeout().toMillis()).put("itemMillis",options.itemTimeout().toMillis());request.set("args",StartupControl.JSON.valueToTree(parsed.originalArgs()));return request;
+    }
+    @Command(name="runtime",description="管理runtimeの明示保守。",mixinStandardHelpOptions=true,subcommands={Repair.class})
+    static final class RuntimeCommand implements Runnable {public void run(){new CommandLine(this).usage(System.out);}}
+    @Command(name="repair",description="同bootで停止した既知旧Mac jobの終端を確定します。",mixinStandardHelpOptions=true)
+    static final class Repair implements Callable<Integer> {
+        @Option(names="--job",required=true) UUID job;
+        @Option(names="--runtime-root",required=true) Path root;
+        public Integer call() throws IOException {io.github.rs0325.mcicon.internal.managed.RuntimeRepair.repair(root,job);return 0;}
     }
     @Command(name="doctor",description="管理環境または指定DockerのJava・Mesa・adapterを診断します。")
     static final class Doctor implements Callable<Integer> {

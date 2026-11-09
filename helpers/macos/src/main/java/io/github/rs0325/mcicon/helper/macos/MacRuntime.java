@@ -91,6 +91,9 @@ final class MacRuntime {
             if(new RebootRecovery(this).release(operation))return;cache.verify();ObjectNode current=lease.read();
             if(current.path("resources").isEmpty()&&operation.unstarted()){operation.markReleased();return;}
             new RebootRecovery(this).requireDiskCleaned();
+            if(!current.path("resources").isEmpty()&&StoppedRecovery.recover(command,executable,current,cache,host,payload,commands,LeaseFile.trust(command,executable),operation)) {
+                lease.replaceResources((ObjectNode)current.path("resources"),MacFiles.JSON.createObjectNode());return;
+            }
             if(operation.released()) {if(!current.path("resources").isEmpty())lease.replaceResources((ObjectNode)current.get("resources"),MacFiles.JSON.createObjectNode());return;}
             operation.awaitRecoverable(cleanupBudget(Duration.ofSeconds(3)));
             if(!current.path("resources").isEmpty()) {

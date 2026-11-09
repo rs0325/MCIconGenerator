@@ -62,20 +62,29 @@ public final class RuntimeMaintenanceVerifier {
             return actual.get().equals(started);
         }catch(SecurityException failure){throw new IOException("process identityを確認できません",failure);}
     }
-    /** active lockは待たず、canonical receipt・元core・必要なkeeperを照合する。 */
+    /** 別プロセスのactive lockを待たず所有を照合する。同JVMの所有者はchannel付き入口を使う。 */
     public static void requireLive(LeaseSnapshot snapshot) throws IOException {
-        ObjectNode lease=snapshot.lease();if(!text(lease,"state",16).equals("active")||!live(lease))throw invalid("元coreの生存を確認できません");
         try(FileChannel channel=FileChannel.open(snapshot.file().resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
-            FileLock held=null;try{held=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
-            if(held!=null){held.release();throw invalid("active lockが保持されていません");}
-            if(snapshot.descriptor().path("host").path("os").asText().equals("windows")&&!lease.path("resources").isEmpty())keeper(snapshot,true);
-            else if(lease.path("resources").isEmpty())unstarted(snapshot);
-            snapshot.verifyUnchanged();
+            requireLive(snapshot,channel);
         }
     }
+    /** 同JVMの所有者から借りたchannelを使い、開閉によるPOSIX lock解除を避ける。 */
+    public static void requireLive(LeaseSnapshot snapshot,FileChannel channel) throws IOException {
+        if(channel==null){requireLive(snapshot);return;}
+        ObjectNode lease=snapshot.lease();if(!text(lease,"state",16).equals("active")||!live(lease))throw invalid("元coreの生存を確認できません");
+        FileLock held=null;try{held=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
+        if(held!=null){held.release();throw invalid("active lockが保持されていません");}
+        if(snapshot.descriptor().path("host").path("os").asText().equals("windows")&&!lease.path("resources").isEmpty())keeper(snapshot,true);
+        else if(lease.path("resources").isEmpty())unstarted(snapshot);
+        snapshot.verifyUnchanged(channel);
+    }
     public static ObjectNode proof(LeaseSnapshot snapshot) throws IOException {
-        snapshot.verifyUnchanged();ObjectNode lease=snapshot.lease(),proof=JSON.createObjectNode();
-        proof.set("lease",lease);proof.put("receiptSha256",digest(readFile(snapshot.file().resolveSibling("lease.lock"),64)));
+        return proof(snapshot,null);
+    }
+    /** 借用channelで再照合し、固定したreceipt bytesから証拠を返す。channelの所有権は移さない。 */
+    public static ObjectNode proof(LeaseSnapshot snapshot,FileChannel receiptChannel) throws IOException {
+        snapshot.verifyUnchanged(receiptChannel);ObjectNode lease=snapshot.lease(),proof=JSON.createObjectNode();
+        proof.set("lease",lease);proof.put("receiptSha256",snapshot.receiptSha256());
         proof.put("receiptKey",snapshot.receiptKey());proof.put("descriptorSha256",hash(lease,"descriptorSha256"));return proof;
     }
     /** 生成journalが未着手か、未着手のままreleaseされたことだけを確認する。 */
@@ -105,36 +114,46 @@ public final class RuntimeMaintenanceVerifier {
     }
     /** native/read-clientの終端記録を照合する。PID不在だけでは完了としない。 */
     public static void requireTerminal(LeaseSnapshot snapshot) throws IOException {
+        try(FileChannel channel=FileChannel.open(snapshot.file().resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
+            requireTerminal(snapshot,channel);
+        }
+    }
+    /** 借用channelのlock競合と終端を照合する。nullなら専用channelを開く。借用channelはcloseしない。 */
+    public static void requireTerminal(LeaseSnapshot snapshot,FileChannel channel) throws IOException {
+        if(channel==null){requireTerminal(snapshot);return;}
         unstarted(snapshot);JsonNode lease=snapshot.lease();Path temporary=snapshot.file().getParent().resolve("tmp");
         if(!text(lease,"state",16).equals("released"))throw invalid("候補leaseがreleasedではありません");
-        try(FileChannel channel=FileChannel.open(snapshot.file().resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)){
-            FileLock held=null;try{held=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
-            if(held==null)throw invalid("候補leaseのactive lockが残っています");
-            try {
-                actors(snapshot);
-                snapshot.verifyUnchanged();
-            }finally{held.release();}
-        }
+        FileLock held=null;try{held=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
+        if(held==null)throw invalid("候補leaseのactive lockが残っています");
+        try {
+            actors(snapshot);
+            snapshot.verifyUnchanged(channel);
+        }finally{held.release();}
     }
     /** 通常終了した参照元を確認する。未着手候補の保守条件とは分ける。 */
     public static void requireReleased(LeaseSnapshot snapshot) throws IOException {
-        JsonNode lease=snapshot.lease();if(!lease.path("state").asText().equals("released")||!lease.path("resources").isEmpty())throw invalid("参照元の回収が未完了です");
         try(FileChannel channel=FileChannel.open(snapshot.file().resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
-            FileLock held=null;try{held=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
-            if(held==null)throw invalid("参照元のactive lockが残っています");
-            try {
-                Path temporary=snapshot.file().getParent().resolve("tmp");directory(temporary);
-                if(snapshot.descriptor().path("host").path("os").asText().equals("windows")&&Files.exists(temporary.resolve("keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
-                    JsonNode record=read(readFile(temporary.resolve("keeper.json"),1024*1024)),proof=record.path("workProof");
-                    ObjectNode identity=JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,lease.required(key));
-                    if(!record.path("identity").equals(identity)||!record.path("state").asText().equals("closed")||!record.path("closeIntent").asBoolean()||!record.path("jobEmpty").asBoolean()||!proof.path("closed").asBoolean()||proof.path("actors").asInt(-1)!=0||proof.path("containers").asInt(-1)!=0||!proof.path("identity").equals(identity))throw invalid("参照元keeperの回収が不明です");
-                    Path prefix=Path.of(text(record,"prefix",4096));if(!prefix.getParent().equals(temporary)||!prefix.getFileName().toString().matches("native-[0-9a-f-]{36}")||!read(readFile(Path.of(prefix+".state.json"),65536)).equals(read(readFile(Path.of(prefix+".done.json"),65536))))throw invalid("参照元nativeの終端が不明です");
-                }
-                actors(snapshot);
-                if(snapshot.descriptor().path("host").path("os").asText().equals("macos"))releasedMacJournal(snapshot);
-                snapshot.verifyUnchanged();
-            }finally{held.release();}
+            requireReleased(snapshot,channel);
         }
+    }
+    /** 借用channelで通常回収済み参照を確認する。借用channelはcloseせず、active lockが残れば拒否する。 */
+    public static void requireReleased(LeaseSnapshot snapshot,FileChannel channel) throws IOException {
+        if(channel==null){requireReleased(snapshot);return;}
+        JsonNode lease=snapshot.lease();if(!lease.path("state").asText().equals("released")||!lease.path("resources").isEmpty())throw invalid("参照元の回収が未完了です");
+        FileLock held=null;try{held=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
+        if(held==null)throw invalid("参照元のactive lockが残っています");
+        try {
+            Path temporary=snapshot.file().getParent().resolve("tmp");directory(temporary);
+            if(snapshot.descriptor().path("host").path("os").asText().equals("windows")&&Files.exists(temporary.resolve("keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
+                JsonNode record=read(readFile(temporary.resolve("keeper.json"),1024*1024)),proof=record.path("workProof");
+                ObjectNode identity=JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,lease.required(key));
+                if(!record.path("identity").equals(identity)||!record.path("state").asText().equals("closed")||!record.path("closeIntent").asBoolean()||!record.path("jobEmpty").asBoolean()||!proof.path("closed").asBoolean()||proof.path("actors").asInt(-1)!=0||proof.path("containers").asInt(-1)!=0||!proof.path("identity").equals(identity))throw invalid("参照元keeperの回収が不明です");
+                Path prefix=Path.of(text(record,"prefix",4096));if(!prefix.getParent().equals(temporary)||!prefix.getFileName().toString().matches("native-[0-9a-f-]{36}")||!read(readFile(Path.of(prefix+".state.json"),65536)).equals(read(readFile(Path.of(prefix+".done.json"),65536))))throw invalid("参照元nativeの終端が不明です");
+            }
+            actors(snapshot);
+            if(snapshot.descriptor().path("host").path("os").asText().equals("macos"))releasedMacJournal(snapshot);
+            snapshot.verifyUnchanged(channel);
+        }finally{held.release();}
     }
     private static void actors(LeaseSnapshot snapshot) throws IOException {
         Path temporary=snapshot.file().getParent().resolve("tmp");
