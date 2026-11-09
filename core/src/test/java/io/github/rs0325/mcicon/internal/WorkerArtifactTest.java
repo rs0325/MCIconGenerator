@@ -41,6 +41,8 @@ class WorkerArtifactTest {
             var resolved=WorkerArtifact.resolve(directory.resolve("cache"),new CancellationToken(),loader);
             assertEquals(WorkerArtifactInfo.SHA256,FilesSupport.hash(resolved.agentJar(),"SHA-256"));
         }
+        Files.delete(combined);
+        assertFalse(Files.exists(combined));
     }
     @Test void rejectsMissingAndDuplicatedResources() throws Exception {
         assertCode("WORKER_NOT_FOUND",()->WorkerArtifact.resolve(directory,new CancellationToken(),new ClassLoader(null){}));

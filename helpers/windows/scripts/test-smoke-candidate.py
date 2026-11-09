@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import lzma
 from pathlib import Path
+from types import SimpleNamespace
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
@@ -65,8 +66,29 @@ class SmokeTest(unittest.TestCase):
             fake.run = Path(directory)
             fake.result = {'errors': [], 'checks': {'g': {'passed': False}}}
             args = ['smoke-candidate.py', '--rootfs', directory, '--renderer', directory, '--helper', directory]
-            with patch.object(smoke, 'Smoke', return_value=fake), patch('sys.argv', args), contextlib.redirect_stdout(io.StringIO()):
+            with patch.object(smoke, 'REPO', Path('H:/MCIconGenerator/worktrees/milestone-windows-smoke-e2/MCIconGenerator')), \
+                    patch.object(smoke, 'os', SimpleNamespace(name='nt')), \
+                    patch.object(smoke, 'Smoke', return_value=fake), patch('sys.argv', args), \
+                    contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(smoke.main(), 1)
+            fake.execute.assert_called_once()
+            fake.cleanup.assert_called_once()
+
+    def test_main_runs_with_fixture_repo_and_cleans_up(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ['rootfs', 'renderer', 'helper']:
+                (root / name).write_bytes(b'fixture')
+            fake = Mock()
+            fake.run = root
+            fake.result = {'errors': [], 'checks': {key: {'passed': True} for key in 'abcdefg'}}
+            args = ['smoke-candidate.py', '--rootfs', str(root / 'rootfs'),
+                    '--renderer', str(root / 'renderer'), '--helper', str(root / 'helper')]
+            with patch.object(smoke, 'REPO', Path('H:/MCIconGenerator/worktrees/milestone-windows-smoke-e2/MCIconGenerator')), \
+                    patch.object(smoke, 'os', SimpleNamespace(name='nt')), \
+                    patch.object(smoke, 'Smoke', return_value=fake), patch('sys.argv', args), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(smoke.main(), 0)
             fake.execute.assert_called_once()
             fake.cleanup.assert_called_once()
 
