@@ -6,16 +6,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.McIconException;
 import io.github.rs0325.mcicon.ManagedOptions;
 import io.github.rs0325.mcicon.internal.FilesSupport;
+import io.github.rs0325.mcicon.internal.AdmissionEvidence;
 import java.io.IOException;
 import java.nio.channels.*;
 import java.nio.file.*;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /** ジョブの世代と所有証拠を固定する。PID単独でプロセスやVMを停止しない。 */
 public final class RuntimeLease implements AutoCloseable {
     static final long ACTIVE_LOCK_OFFSET=64,ACTIVE_LOCK_LENGTH=1;
-    private record Receipt(FileChannel channel,boolean owned) {}
+    private static final class Receipt {
+        final ReentrantLock gate=new ReentrantLock();
+        int users;
+        FileChannel channel;
+        boolean owned;
+    }
     private static final Map<Path,Receipt> receipts=new HashMap<>();
     private final Path file;
     private final ObjectNode identity;
@@ -24,7 +32,7 @@ public final class RuntimeLease implements AutoCloseable {
     private boolean closed;
     private RuntimeLease(Path file,ObjectNode identity,FileChannel channel,FileLock lock) {
         this.file=file;this.identity=identity;this.channel=channel;this.lock=lock;
-        synchronized(RuntimeLease.class){receipts.put(file,new Receipt(channel,true));}
+        synchronized(receipts){receipts.get(file).owned=true;}
     }
     public static RuntimeLease create(RuntimeStore store,RuntimeDescriptor descriptor,ManagedOptions options,Instant preparationDeadline) throws IOException {
         return create(store,descriptor,options,preparationDeadline,null);
@@ -37,9 +45,11 @@ public final class RuntimeLease implements AutoCloseable {
             String hostId=Files.readString(host).trim();
             try {UUID.fromString(hostId);}catch(IllegalArgumentException failure){throw mismatch("管理rootのhostIdが不正です");}
             UUID job=UUID.randomUUID(),owner=UUID.randomUUID();
-            Path directory=store.path("jobs/"+job);Files.createDirectories(directory.getParent());Files.createDirectory(directory);
+            Path directory=store.path("jobs/"+job);
+            Files.createDirectories(directory.getParent());
+            Files.createDirectory(directory);
             Path file=directory.resolve("lease.json");
-            FileChannel channel=openReceipt(file,true);
+            FileChannel channel=openReceipt(file,true,store);
             if(channel==null)throw mismatch("同じjobのreceiptを既に保持しています");
             FileLock lock=null;
             try {
@@ -57,7 +67,12 @@ public final class RuntimeLease implements AutoCloseable {
                 ObjectNode document=identity.deepCopy();document.put("state","active");document.putObject("resources");
                 FilesSupport.atomicWrite(file,RuntimeDescriptor.JSON.writeValueAsBytes(document));
                 return new RuntimeLease(file,identity,channel,lock);
-            }catch(IOException|RuntimeException failure){try{if(lock!=null)lock.release();}finally{closeReceipt(file,channel);}throw failure;}
+            }catch(IOException|RuntimeException failure) {
+                try {
+                    closeReceipt(file,channel,lock);
+                }catch(IOException cleanup){failure.addSuppressed(cleanup);}
+                throw failure;
+            }
         }
     }
     /** 同じ信頼世代の終了coreだけを引き継ぐ。OS資源の回収可否は同版helperのreleaseへ委ねる。 */
@@ -65,7 +80,7 @@ public final class RuntimeLease implements AutoCloseable {
         if(!Files.isDirectory(directory,LinkOption.NOFOLLOW_LINKS)||!directory.toRealPath().equals(directory))throw mismatch("旧job directoryが不正です");
         Path file=directory.resolve("lease.json"),receipt=directory.resolve("lease.lock");
         if(!Files.isRegularFile(receipt,LinkOption.NOFOLLOW_LINKS))throw mismatch("旧job receiptがありません");
-        FileChannel channel=openReceipt(file,false);if(channel==null)return null;FileLock lock=null;boolean retained=false;
+        FileChannel channel=openReceipt(file,false,store);if(channel==null)return null;FileLock lock=null;boolean retained=false;
         try {
             try {lock=channel.tryLock(ACTIVE_LOCK_OFFSET,ACTIVE_LOCK_LENGTH,false);}catch(OverlappingFileLockException busy){return null;}
             if(lock==null)return null;store.check();
@@ -87,7 +102,7 @@ public final class RuntimeLease implements AutoCloseable {
             }
             Path temp=directory.resolve("tmp");if(!Files.isDirectory(temp,LinkOption.NOFOLLOW_LINKS)||!temp.toRealPath().equals(temp))throw mismatch("旧job tmpが不正です");
             RuntimeLease lease=new RuntimeLease(file,identity,channel,lock);lease.read();retained=true;return lease;
-        }finally {if(!retained)try {if(lock!=null)lock.release();}finally {closeReceipt(file,channel);}}
+        }finally {if(!retained)closeReceipt(file,channel,lock);}
     }
     static boolean ownerDead(long pid,Instant expectedStart) {
         try {
@@ -102,22 +117,108 @@ public final class RuntimeLease implements AutoCloseable {
         return channel;
     }
     /** 同JVMのpeer参照で別FDを開かず、所有者のchannelを借りる。close競合は検証失敗として扱う。 */
-    static synchronized FileChannel receiptChannel(Path file) throws IOException {
-        Receipt receipt=receipts.get(file);
-        if(receipt==null)return null;
-        if(!receipt.owned())throw new IOException("receiptの所有確認が進行中です");
-        return receipt.channel();
+    static FileChannel receiptChannel(Path file) throws IOException {
+        synchronized(receipts) {
+            Receipt receipt=receipts.get(file);
+            if(receipt==null||receipt.channel==null)return null;
+            if(!receipt.owned)throw new IOException("receiptの所有確認が進行中です");
+            return receipt.channel;
+        }
     }
-    private static synchronized FileChannel openReceipt(Path file,boolean create) throws IOException {
-        if(receipts.containsKey(file))return null;
-        FileChannel channel=create
-                ?FileChannel.open(file.resolveSibling("lease.lock"),StandardOpenOption.CREATE_NEW,StandardOpenOption.READ,StandardOpenOption.WRITE)
-                :FileChannel.open(file.resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE);
-        receipts.put(file,new Receipt(channel,false));
-        return channel;
+    static AdmissionEvidence.ReceiptChannels receipts(RuntimeStore store) {
+        return new AdmissionEvidence.ReceiptChannels() {
+            public FileChannel find(Path file) throws IOException {return receiptChannel(file);}
+            public <T> T read(Path file,AdmissionEvidence.ReceiptRead<T> operation) throws IOException {
+                return withReceipt(file,store,operation);
+            }
+        };
     }
-    private static synchronized void closeReceipt(Path file,FileChannel channel) throws IOException {
-        try{channel.close();}finally{receipts.remove(file);}
+    private static Receipt retainReceipt(Path file) {
+        synchronized(receipts) {
+            Receipt receipt=receipts.computeIfAbsent(file,ignored->new Receipt());
+            receipt.users++;
+            return receipt;
+        }
+    }
+    private static void releaseReceipt(Path file,Receipt receipt) {
+        synchronized(receipts) {
+            if(--receipt.users==0)receipts.remove(file);
+        }
+    }
+    private static void lockReceipt(Receipt receipt,RuntimeStore store) throws IOException {
+        while(true) {
+            store.check();
+            try {
+                long wait=Math.max(1,Math.min(store.remaining().toNanos(),TimeUnit.MILLISECONDS.toNanos(10)));
+                if(receipt.gate.tryLock(wait,TimeUnit.NANOSECONDS)) {
+                    try {
+                        store.check();
+                        return;
+                    }catch(IOException|RuntimeException failure) {
+                        receipt.gate.unlock();
+                        throw failure;
+                    }
+                }
+            }catch(InterruptedException failure) {
+                Thread.currentThread().interrupt();
+                throw new java.io.InterruptedIOException("receiptの待機が中断されました");
+            }
+        }
+    }
+    private static <T> T withReceipt(Path file,RuntimeStore store,AdmissionEvidence.ReceiptRead<T> operation) throws IOException {
+        Receipt receipt=retainReceipt(file);
+        boolean held=false;
+        try {
+            lockReceipt(receipt,store);held=true;
+            FileChannel channel;
+            synchronized(receipts) {
+                channel=receipt.channel;
+                if(channel!=null&&!receipt.owned)throw new IOException("receiptの所有確認が進行中です");
+            }
+            // 借用済みchannelのclose競合は照合失敗で扱い、所有者のcloseを待たせない。
+            if(channel!=null) {
+                receipt.gate.unlock();
+                held=false;
+            }
+            return operation.read(channel);
+        }finally {
+            if(held)receipt.gate.unlock();
+            releaseReceipt(file,receipt);
+        }
+    }
+    private static FileChannel openReceipt(Path file,boolean create,RuntimeStore store) throws IOException {
+        Receipt receipt=retainReceipt(file);
+        boolean held=false,retained=false;
+        try {
+            // 新規UUIDはgenerations lock内で初期化し、lease公開までは期限・取消しで中断しない。
+            if(create)receipt.gate.lock();else lockReceipt(receipt,store);
+            held=true;
+            synchronized(receipts){if(receipt.channel!=null)return null;}
+            FileChannel channel=create
+                    ?FileChannel.open(file.resolveSibling("lease.lock"),StandardOpenOption.CREATE_NEW,StandardOpenOption.READ,StandardOpenOption.WRITE)
+                    :FileChannel.open(file.resolveSibling("lease.lock"),StandardOpenOption.READ,StandardOpenOption.WRITE);
+            synchronized(receipts){receipt.channel=channel;}
+            retained=true;
+            return channel;
+        }finally {
+            if(held)receipt.gate.unlock();
+            if(!retained)releaseReceipt(file,receipt);
+        }
+    }
+    private static void closeReceipt(Path file,FileChannel channel,FileLock lock) throws IOException {
+        Receipt receipt;
+        synchronized(receipts) {
+            receipt=receipts.get(file);receipt.owned=false;
+        }
+        try {
+            if(lock!=null)lock.release();
+        }finally {
+            try{channel.close();}
+            finally {
+                synchronized(receipts){receipt.channel=null;}
+                releaseReceipt(file,receipt);
+            }
+        }
     }
     /** helperの書込み完了後だけ呼ぶ。immutableなfieldの追加・変更・削除を拒否する。 */
     public synchronized ObjectNode read() throws IOException {
@@ -136,7 +237,9 @@ public final class RuntimeLease implements AutoCloseable {
         value.put("state","released");FilesSupport.atomicWrite(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));
     }
     /** 回収失敗時もJVMを止めない。lease.jsonは削除せず、次回の不明lease診断に残す。 */
-    @Override public synchronized void close() throws IOException {if(!closed){closed=true;try {lock.release();}finally{closeReceipt(file,channel);}}}
+    @Override public synchronized void close() throws IOException {
+        if(!closed){closed=true;closeReceipt(file,channel,lock);}
+    }
     static McIconException mismatch(String message) {return new McIconException("MANAGED_OWNERSHIP_MISMATCH",message,1);}
     /** 回収可能性だけを判定し、VMや世代を削除しない。不明な過去leaseも稼働扱いにする。 */
     public static boolean idle(RuntimeStore store,RuntimeDescriptor descriptor) throws IOException {
@@ -152,7 +255,7 @@ public final class RuntimeLease implements AutoCloseable {
                 JsonNode value;
                 try {value=RuntimeDescriptor.read(Files.readAllBytes(file));}catch(IOException failure){return false;}
                 if(!validIdentity(value,directory.getFileName().toString(),hostId))return false;
-                FileChannel channel=openReceipt(file,false);if(channel==null)return false;
+                FileChannel channel=openReceipt(file,false,store);if(channel==null)return false;
                 try {
                     FileLock acquired;
                     try {acquired=channel.tryLock(ACTIVE_LOCK_OFFSET,ACTIVE_LOCK_LENGTH,false);}catch(OverlappingFileLockException busy){return false;}
@@ -164,7 +267,7 @@ public final class RuntimeLease implements AutoCloseable {
                         if(!value.path("toolVersion").asText().equals(descriptor.toolVersion())||!value.path("workerSha256").asText().equals(descriptor.agentSha256())||!value.path("runtimeId").asText().equals(descriptor.runtimeId()))return false;
                         if(!value.path("state").asText().equals("released")||!value.path("resources").isObject()||!value.path("resources").isEmpty())return false;
                     }finally {acquired.release();}
-                }finally{closeReceipt(file,channel);}
+                }finally{closeReceipt(file,channel,null);}
             }
         }
         return true;

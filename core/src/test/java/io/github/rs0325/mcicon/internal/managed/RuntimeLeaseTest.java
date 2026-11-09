@@ -5,12 +5,88 @@ import io.github.rs0325.mcicon.*;
 import java.nio.file.*;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RuntimeLeaseTest {
     @TempDir Path root;
+    @Test void 新規receipt作成前の取消しでもleaseを完成し次回の準備へ進める() throws Exception {
+        createAfterStop("cancel");
+    }
+    @Test void 新規receipt作成前の期限超過でもleaseを完成し次回の準備へ進める() throws Exception {
+        createAfterStop("timeout");
+    }
+    @Test void receipt取得前のIO失敗は他者のfileを保持する() throws Exception {
+        createAfterStop("io");
+    }
+    private void createAfterStop(String mode) throws Exception {
+        var descriptor=new ManagedFixture().descriptor();CancellationToken token=new CancellationToken();
+        var store=new RuntimeStore(root,true,token,Duration.ofSeconds(2),(u,o,t)->{throw new AssertionError();});
+        Path jobs=store.root().resolve("jobs"),created=null;
+        var field=RuntimeLease.class.getDeclaredField("receipts");field.setAccessible(true);Object receipts=field.get(null);
+        FutureTask<RuntimeLease> result=new FutureTask<>(()->RuntimeLease.create(store,descriptor,ManagedOptions.defaults(),java.time.Instant.now().plusSeconds(2)));
+        Thread worker=Thread.ofPlatform().unstarted(result);
+        try {
+            synchronized(receipts) {
+                worker.start();long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+                while(created==null&&System.nanoTime()<end&&!result.isDone()) {
+                    if(Files.isDirectory(jobs))try(var paths=Files.list(jobs)){created=paths.findFirst().orElse(null);}
+                    if(created==null)Thread.yield();
+                }
+                assertNotNull(created,"新規job directoryへ到達しません");
+                var threads=java.lang.management.ManagementFactory.getThreadMXBean();boolean blocked=false;
+                while(worker.isAlive()&&System.nanoTime()<end) {
+                    var waiting=threads.getThreadInfo(worker.threadId());
+                    if(waiting!=null&&waiting.getLockInfo()!=null&&waiting.getLockInfo().getIdentityHashCode()==System.identityHashCode(receipts)&&waiting.getLockOwnerId()==Thread.currentThread().threadId()){blocked=true;break;}
+                    Thread.yield();
+                }
+                assertTrue(blocked,"receipt作成前の管理入口へ到達しません");
+                try(var paths=Files.list(created)){assertEquals(0,paths.count());}
+                switch(mode) {
+                    case "cancel"->token.cancel();
+                    case "timeout"->{
+                        while(true) {
+                            try{store.check();}catch(java.net.http.HttpTimeoutException expired){break;}
+                            Thread.sleep(1);
+                        }
+                    }
+                    case "io"->Files.writeString(created.resolve("lease.lock"),"foreign");
+                    default->throw new AssertionError(mode);
+                }
+            }
+            if(mode.equals("io")) {
+                var failure=assertThrows(java.util.concurrent.ExecutionException.class,()->result.get(5,TimeUnit.SECONDS));
+                assertInstanceOf(FileAlreadyExistsException.class,failure.getCause());
+                assertEquals("foreign",Files.readString(created.resolve("lease.lock")));
+                assertFalse(Files.exists(created.resolve("lease.json")));return;
+            }
+            try(var lease=assertDoesNotThrow(()->result.get(5,TimeUnit.SECONDS),"取消し・期限超過でreceiptが未完成になりました")) {
+                assertEquals(created,lease.file().getParent());assertEquals(64,Files.size(created.resolve("lease.lock")));
+                assertEquals("active",lease.read().path("state").asText());
+                if(mode.equals("cancel"))assertEquals("CANCELLED",assertThrows(McIconException.class,store::check).code());
+                else assertThrows(java.net.http.HttpTimeoutException.class,store::check);
+                lease.released();
+            }
+            var next=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(5),(u,o,t)->{throw new AssertionError();});
+            assertTrue(RuntimeLease.idle(next,descriptor));
+            try(var held=next.lock("generations");var paths=Files.list(jobs)) {
+                for(Path job:paths.toList())assertNull(RuntimeLease.tryRecovery(next,descriptor,job));
+            }
+            try(var lease=RuntimeLease.create(next,descriptor,ManagedOptions.defaults(),java.time.Instant.now().plusSeconds(5))) {lease.released();}
+            assertTrue(RuntimeLease.idle(next,descriptor));
+            try(var paths=Files.list(jobs)) {
+                List<Path> complete=paths.toList();assertEquals(2,complete.size());
+                for(Path job:complete){assertTrue(Files.isRegularFile(job.resolve("lease.json")));assertEquals(64,Files.size(job.resolve("lease.lock")));}
+            }
+        }finally {
+            if(worker.isAlive()){worker.interrupt();worker.join(3000);}assertFalse(worker.isAlive());
+            if(result.isDone())try{RuntimeLease lease=result.get();if(lease!=null)lease.close();}catch(java.util.concurrent.ExecutionException ignored){}
+        }
+    }
     RuntimeStore store() throws Exception {return new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(10),(u,o,t)->{throw new AssertionError();});}
     @Test void requirementsReachLeaseAndArePartOfImmutableReceipt() throws Exception {
         var descriptor=new ManagedFixture().descriptor();var store=store();var deadline=java.time.Instant.parse("2026-10-18T00:15:00Z");

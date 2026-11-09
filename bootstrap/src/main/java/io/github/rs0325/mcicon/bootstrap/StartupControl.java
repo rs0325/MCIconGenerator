@@ -62,7 +62,7 @@ final class StartupControl implements AutoCloseable {
         Seed.fields(value,"protocol","type","nonce","invocation","slot","pid","startedAt","args","command","managed","offline","help","preparationMillis","startupMillis","itemMillis");Seed.constant(value,"protocol",4);Seed.exact(value,"type","REQUEST");
         if(!value.path("nonce").equals(context.get("nonce"))||!value.path("invocation").equals(context.get("invocation"))||!value.path("slot").equals(context.get("slot"))||!value.path("args").equals(Seed.JSON.valueToTree(arguments)))throw Seed.invalid("CLI REQUESTの起動参照が一致しません");
         if(Seed.positive(value,"pid")!=child.pid()||!child.info().startInstant().orElseThrow(()->Seed.invalid("CLI開始識別が読めません")).toString().equals(Seed.text(value,"startedAt")))throw Seed.invalid("CLI REQUESTのprocessが一致しません");
-        Seed.choice(value,"command","help","version","root","cache","versions","extract","doctor","list","render");for(String name:List.of("managed","offline","help"))if(!value.path(name).isBoolean())throw Seed.invalid("CLI REQUESTのbooleanが不正です");
+        Seed.choice(value,"command","help","version","root","cache","versions","extract","doctor","list","render","runtime","repair");for(String name:List.of("managed","offline","help"))if(!value.path(name).isBoolean())throw Seed.invalid("CLI REQUESTのbooleanが不正です");
         for(String name:List.of("preparationMillis","startupMillis","itemMillis"))Seed.positive(value,name);
     }
     static void deferred(JsonNode value) throws IOException {

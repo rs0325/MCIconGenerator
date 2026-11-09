@@ -12,8 +12,14 @@ import static io.github.rs0325.mcicon.internal.LeaseSnapshot.*;
 /** 未着手/未公開のadmission証拠。診断codeだけでは延期を許可しない。 */
 public final class AdmissionEvidence {
     private AdmissionEvidence() {}
-    /** 自プロセスが所有するreceipt channelを借りる。所有確認中はIOException、保持していないfileはnullを返す。 */
-    @FunctionalInterface public interface ReceiptChannels {FileChannel find(Path lease) throws IOException;}
+    /** receiptの照合区間。channelの所有権は呼出し元に残る。 */
+    @FunctionalInterface public interface ReceiptRead<T> {T read(FileChannel channel) throws IOException;}
+    /** 自プロセスのreceiptを借りる。未保有の場合のreadは、そのleaseの所有開始と直列化する。 */
+    @FunctionalInterface public interface ReceiptChannels {
+        FileChannel find(Path lease) throws IOException;
+        default <T> T read(Path lease,ReceiptRead<T> operation) throws IOException {return operation.read(find(lease));}
+    }
+    private record JobEvidence(LeaseSnapshot snapshot,JsonNode value) {}
     public static final class Busy extends IOException {
         private final JsonNode job;
         public Busy(JsonNode job){super("既知live jobと容量不足のため候補を延期します");this.job=job.deepCopy();}
@@ -27,12 +33,21 @@ public final class AdmissionEvidence {
         if(references.isEmpty())throw invalid("他live jobに起因する容量不足ではありません");
         validateBudget(candidate.lease(),references.stream().map(LeaseSnapshot::lease).map(v->(JsonNode)v).toList(),budget);
         RuntimeMaintenanceVerifier.unstarted(candidate);
-        FileChannel channel=receiptChannel(candidate.file(),candidate.lease(),receipts);candidate.verifyUnchanged(channel);
+        withReceipt(receipts,candidate.file(),channel->{candidate.verifyUnchanged(channel);return null;});
         ObjectNode value=JSON.createObjectNode().put("schemaVersion",1).put("kind","job-admission").put("cause","CAPACITY");value.set("lease",candidate.lease());value.put("receiptKey",candidate.receiptKey()).put("receiptSha256",candidate.receiptSha256());
         value.put("journalSha256",journal(candidate.lease()));value.set("budget",budget);var proofs=value.putArray("references");
-        for(LeaseSnapshot reference:references){FileChannel other=receiptChannel(reference.file(),reference.lease(),receipts);RuntimeMaintenanceVerifier.requireLive(reference,other);proofs.add(RuntimeMaintenanceVerifier.proof(reference,other));}
-        Path file=candidate.file().getParent().resolve("tmp/admission-v1.json");candidate.verifyUnchanged(channel);save(file,value,candidate.trust());
-        throw new Busy(jobReference(root,candidate.lease().path("jobId").asText(),channel));
+        for(LeaseSnapshot reference:references) {
+            ObjectNode proof=withReceipt(receipts,reference.file(),channel->{
+                RuntimeMaintenanceVerifier.requireLive(reference,channel);
+                return RuntimeMaintenanceVerifier.proof(reference,channel);
+            });
+            proofs.add(proof);
+        }
+        withReceipt(receipts,candidate.file(),channel->{
+            Path file=candidate.file().getParent().resolve("tmp/admission-v1.json");
+            candidate.verifyUnchanged(channel);save(file,value,candidate.trust());
+            throw new Busy(jobReference(root,candidate.lease().path("jobId").asText(),channel));
+        });
     }
     private static String journal(JsonNode lease) throws IOException {
         ObjectNode identity=((ObjectNode)lease).deepCopy();identity.remove(List.of("state","resources"));return digest(JSON.writeValueAsBytes(identity));
@@ -57,7 +72,18 @@ public final class AdmissionEvidence {
     /** 候補と参照元のうち同JVMが所有するreceiptをresolverから借りて照合する。 */
     public static JsonNode verifyJob(Path root,JsonNode reference,String descriptor,long pid,String started,LeaseTrust trust,boolean released,ReceiptChannels receipts) throws IOException {
         fields(reference,"jobId","ownerId","descriptorSha256","receiptSha256","evidenceSha256");
-        Path file=root.resolve("jobs/"+uuid(reference,"jobId")+"/lease.json");FileChannel channel=receiptChannel(file,read(readFile(file,1024*1024)),receipts);
+        Path file=root.resolve("jobs/"+uuid(reference,"jobId")+"/lease.json");
+        JobEvidence checked=withReceipt(receipts,file,channel->verifyCandidate(root,file,reference,descriptor,pid,started,trust,released,channel));
+        LeaseSnapshot snapshot=checked.snapshot();JsonNode lease=snapshot.lease(),value=checked.value();
+        for(JsonNode proof:value.path("references")) {
+            JsonNode original=proof.path("lease");Path otherFile=root.resolve("jobs/"+uuid(original,"jobId")+"/lease.json");
+            withReceipt(receipts,otherFile,channel->{verifyReference(root,otherFile,trust,snapshot,proof,channel);return null;});
+        }
+        validateBudget(lease,java.util.stream.StreamSupport.stream(value.path("references").spliterator(),false).map(v->v.path("lease")).toList(),value.path("budget"));
+        withReceipt(receipts,file,channel->{snapshot.verifyUnchanged(channel);return null;});
+        return value;
+    }
+    private static JobEvidence verifyCandidate(Path root,Path file,JsonNode reference,String descriptor,long pid,String started,LeaseTrust trust,boolean released,FileChannel channel) throws IOException {
         LeaseSnapshot snapshot=LeaseSnapshot.read(root,file,trust,channel);JsonNode lease=snapshot.lease();
         if(!uuid(lease,"ownerId").equals(uuid(reference,"ownerId"))||!hash(lease,"descriptorSha256").equals(descriptor)||!hash(reference,"descriptorSha256").equals(descriptor)||integer(lease,"pid",1)!=pid||!text(lease,"processStartedAt",64).equals(started)||!snapshot.receiptSha256().equals(hash(reference,"receiptSha256")))throw invalid("容量延期jobの試行が一致しません");
         byte[] bytes=readFile(snapshot.file().getParent().resolve("tmp/admission-v1.json"),1024*1024);if(!digest(bytes).equals(hash(reference,"evidenceSha256")))throw invalid("容量延期証拠が変化しました");
@@ -69,22 +95,23 @@ public final class AdmissionEvidence {
         if(!budget.path("generations").isArray()||!text(budget,"domain",32).equals("macos-vm")||integer(budget,"requiredMiB",1)<=integer(budget,"availableMiB",0)||!value.path("references").isArray()||value.path("references").isEmpty())throw invalid("既知liveと容量不足の肯定証拠がありません");
         RuntimeMaintenanceVerifier.unstarted(snapshot);if(released)RuntimeMaintenanceVerifier.requireTerminal(snapshot,channel);
         else if(!lease.path("state").asText().equals("active"))throw invalid("延期判定前のlease状態が不正です");
-        for(JsonNode proof:value.path("references")) {
-            JsonNode original=proof.path("lease");Path otherFile=root.resolve("jobs/"+uuid(original,"jobId")+"/lease.json");FileChannel otherChannel=receiptChannel(otherFile,read(readFile(otherFile,1024*1024)),receipts);
-            LeaseSnapshot other=LeaseSnapshot.read(root,otherFile,trust,otherChannel);
-            if(!other.descriptor().path("host").equals(snapshot.descriptor().path("host")))throw invalid("容量参照元のhostが一致しません");
-            ObjectNode before=((ObjectNode)original).deepCopy(),after=other.lease();before.remove(List.of("state","resources"));after.remove(List.of("state","resources"));
-            if(!before.equals(after)||!other.receiptKey().equals(text(proof,"receiptKey",4096))||!other.receiptSha256().equals(hash(proof,"receiptSha256")))throw invalid("容量判定の参照元が変化しました");
-            if(other.lease().path("state").asText().equals("active"))RuntimeMaintenanceVerifier.requireLive(other,otherChannel);else RuntimeMaintenanceVerifier.requireReleased(other,otherChannel);
-        }
-        validateBudget(lease,java.util.stream.StreamSupport.stream(value.path("references").spliterator(),false).map(v->v.path("lease")).toList(),budget);
-        snapshot.verifyUnchanged(channel);return value;
+        return new JobEvidence(snapshot,value);
     }
-    private static FileChannel receiptChannel(Path file,JsonNode lease,ReceiptChannels receipts) throws IOException {
-        if(receipts==null)return null;
-        FileChannel channel=receipts.find(file);
-        if(channel==null&&lease.path("state").asText().equals("active")&&lease.path("pid").asLong()==ProcessHandle.current().pid())throw invalid("同JVMのactive receipt channelを確認できません");
-        return channel;
+    private static void verifyReference(Path root,Path file,LeaseTrust trust,LeaseSnapshot snapshot,JsonNode proof,FileChannel channel) throws IOException {
+        JsonNode original=proof.path("lease");
+        LeaseSnapshot other=LeaseSnapshot.read(root,file,trust,channel);
+        if(!other.descriptor().path("host").equals(snapshot.descriptor().path("host")))throw invalid("容量参照元のhostが一致しません");
+        ObjectNode before=((ObjectNode)original).deepCopy(),after=other.lease();before.remove(List.of("state","resources"));after.remove(List.of("state","resources"));
+        if(!before.equals(after)||!other.receiptKey().equals(text(proof,"receiptKey",4096))||!other.receiptSha256().equals(hash(proof,"receiptSha256")))throw invalid("容量判定の参照元が変化しました");
+        if(other.lease().path("state").asText().equals("active"))RuntimeMaintenanceVerifier.requireLive(other,channel);else RuntimeMaintenanceVerifier.requireReleased(other,channel);
+    }
+    private static <T> T withReceipt(ReceiptChannels receipts,Path file,ReceiptRead<T> operation) throws IOException {
+        if(receipts==null)return operation.read(null);
+        return receipts.read(file,channel->{
+            JsonNode lease=read(readFile(file,1024*1024));
+            if(channel==null&&lease.path("state").asText().equals("active")&&lease.path("pid").asLong()==ProcessHandle.current().pid())throw invalid("同JVMのactive receipt channelを確認できません");
+            return operation.read(channel);
+        });
     }
 
     private static void validateBudget(JsonNode candidate,List<JsonNode> references,JsonNode budget) throws IOException {

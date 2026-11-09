@@ -41,6 +41,14 @@ class StartupControlTest {
         for(String[] args:new String[][]{{"--help"},{"--version"},{"extract","--help"},{"cache","status","--offline"},{"versions","--offline"}}) {var request=Main.request(Main.commandLine().parseArgs(args));assertFalse(request.path("managed").asBoolean());}
     }
     ObjectNode request(){ObjectNode value=StartupControl.JSON.createObjectNode().put("command","render").put("managed",true).put("offline",false).put("help",false).put("preparationMillis",5000).put("startupMillis",1000).put("itemMillis",1000);value.putArray("args").add("render");return value;}
+    @Test void runtimeとrepairは実parserのleaf名を非managedとして通知する() {
+        for(String[] args:new String[][]{{"runtime"},{"runtime","repair","--job",UUID.randomUUID().toString(),"--runtime-root",directory.toString()}}) {
+            var request=Main.request(Main.commandLine().parseArgs(args));
+            assertEquals(args.length==1?"runtime":"repair",request.path("command").asText());
+            assertFalse(request.path("managed").asBoolean());assertFalse(request.path("offline").asBoolean());assertFalse(request.path("help").asBoolean());
+            assertEquals(List.of(args),StartupControl.JSON.convertValue(request.path("args"),List.class));
+        }
+    }
     Path jar() throws Exception {Path path=directory.resolve("1.1.0/"+"a".repeat(64)+"/app/lib/cli.jar");Files.createDirectories(path.getParent());Files.write(path,new byte[]{1});return path;}
     ObjectNode context(int port) {ObjectNode value=StartupControl.JSON.createObjectNode().put("protocol",4).put("port",port).put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString());value.putObject("slot").put("toolVersion","1.1.0").put("payloadSha256","a".repeat(64)).put("runtimeDescriptorSha256","b".repeat(64)).put("manifestSha256","c".repeat(64));return value;}
     void property(ObjectNode context) throws Exception {System.setProperty(StartupControl.PROPERTY,Base64.getUrlEncoder().withoutPadding().encodeToString(StartupControl.JSON.writeValueAsBytes(context)));}
