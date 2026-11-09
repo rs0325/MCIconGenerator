@@ -35,6 +35,59 @@ class HelperCommonTest {
         ((ObjectNode)inventory.get("contents")).putObject("r1").set("files",inventory.path("contents").path("files").deepCopy());
         fixture.rebindInventory(inventory);assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,fixture.trust));
     }
+    @Test void 通常helperの信頼入口もdirectとr1の同じpinを採用する() throws Exception {
+        for(boolean r1:List.of(false,true)) {
+            Fixture fixture=new Fixture();fixture.packageTrust();
+            ObjectNode inventory=(ObjectNode)HelperProtocol.read(fixture.inventory("helper"));
+            if(r1){ObjectNode contents=(ObjectNode)inventory.get("contents");contents.putObject("r1").set("files",contents.remove("files"));}
+            fixture.rebindInventory(inventory);
+            assertNotNull(LeaseFile.trust(fixture.command,fixture.executable));
+            assertEquals(fixture.executable,LeaseFile.inspect(fixture.base,fixture.file,fixture.trust).helperExecutable());
+            if(!System.getProperty("os.name").startsWith("Windows"))assertNotNull(LeaseFile.open(fixture.command,fixture.executable));
+        }
+    }
+    @Test void 通常helperとsnapshotはfile表の併存欠落重複pin欠落改変を同じく拒否する() throws Exception {
+        for(boolean r1:List.of(false,true))for(String fault:List.of("both","absent","not-array","duplicate","duplicate-other","no-pin","bad-pin")) {
+            Fixture fixture=new Fixture();fixture.packageTrust();
+            ObjectNode inventory=(ObjectNode)HelperProtocol.read(fixture.inventory("helper"));
+            ObjectNode contents=(ObjectNode)inventory.get("contents");ArrayNode files=(ArrayNode)contents.get("files");
+            if(r1){contents.remove("files");contents.putObject("r1").set("files",files);}
+            ObjectNode table=r1?(ObjectNode)contents.get("r1"):contents;
+            switch(fault) {
+                case "both" -> {if(r1)contents.set("files",files.deepCopy());else contents.putObject("r1").set("files",files.deepCopy());}
+                case "absent" -> table.remove("files");
+                case "not-array" -> table.put("files","invalid");
+                case "duplicate" -> files.add(files.get(0).deepCopy());
+                case "duplicate-other" -> {var row=files.addObject().put("path","unrelated").put("bytes",1).put("sha256","a".repeat(64));files.add(row.deepCopy());}
+                case "no-pin" -> files.removeAll();
+                case "bad-pin" -> ((ObjectNode)files.get(0)).put("sha256","f".repeat(64));
+                default -> throw new AssertionError(fault);
+            }
+            fixture.rebindInventory(inventory);
+            assertThrows(IOException.class,()->LeaseFile.trust(fixture.command,fixture.executable),r1+"/"+fault);
+            assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,fixture.trust),r1+"/"+fault);
+        }
+    }
+    @Test @org.junit.jupiter.api.condition.EnabledOnOs(org.junit.jupiter.api.condition.OS.WINDOWS)
+    void Windows通常helperのr1readerPinも実nativeで結合し欠落重複を拒否する() throws Exception {
+        Fixture fixture=new Fixture();
+        Path reader=Path.of(System.getProperty("mcicon.testIdentityReader"));
+        ObjectNode inventory=(ObjectNode)HelperProtocol.read(fixture.inventory("helper"));
+        ObjectNode contents=(ObjectNode)inventory.get("contents");ArrayNode files=(ArrayNode)contents.remove("files");contents.putObject("r1").set("files",files);
+        Path executable=fixture.base.resolve("helpers/windows-x86_64/"+"1".repeat(64)+"/bin/helper");
+        Files.createDirectories(executable.getParent());Files.copy(fixture.executable,executable);
+        Path support=executable.getParent().resolve("app/support");Files.createDirectories(support);Files.copy(reader,support.resolve("windows-host.exe"));
+        var recovery=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        Files.write(support.resolve("lease-trust.bin"),TrustFixtures.bytes(fixture.pair.getPublic(),recovery.getPublic()));
+        ObjectNode descriptor=(ObjectNode)HelperProtocol.read(Files.readAllBytes(fixture.file.resolveSibling("descriptor.json")));
+        ((ObjectNode)descriptor.path("host")).put("os","windows").put("arch","x86_64");Files.write(fixture.file.resolveSibling("descriptor.json"),HelperProtocol.JSON.writeValueAsBytes(descriptor));
+        ObjectNode pin=files.addObject().put("path","bin/app/support/windows-host.exe").put("bytes",Files.size(reader)).put("sha256",hash(Files.readAllBytes(reader)));
+        fixture.rebindInventory(inventory);assertNotNull(LeaseFile.open(fixture.command,executable));
+        files.remove(files.size()-1);fixture.rebindInventory(inventory);
+        assertThrows(IOException.class,()->LeaseFile.trust(fixture.command,executable));
+        files.add(pin);files.add(pin.deepCopy());fixture.rebindInventory(inventory);
+        assertThrows(IOException.class,()->LeaseFile.trust(fixture.command,executable));
+    }
     @Test void 取得済みchannelで再照合と再生成しても別JVMへactiveLockを渡さない() throws Exception {
         Fixture fixture=new Fixture();Path receipt=fixture.file.resolveSibling("lease.lock");LeaseSnapshot snapshot=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust);
         assertReceiptLock(receipt,"FREE");
@@ -307,6 +360,11 @@ class HelperCommonTest {
             }
             pair=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();var recovery=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();trustSet=TrustSet.parse(TrustFixtures.bytes(pair.getPublic(),recovery.getPublic()));trust=IdentityFixtures.trust(trustSet);
             byte[] definition=HelperProtocol.JSON.writeValueAsBytes(descriptor);var signer=Signature.getInstance("Ed25519");signer.initSign(pair.getPrivate());signer.update(definition);LeaseTrust.publish(base,definition,signer.sign(),trustSet);identity.put("descriptorSha256",hash(definition));Files.write(job.resolve("descriptor.json"),definition);file=job.resolve("lease.json");ObjectNode lease=identity.deepCopy().put("state","active");lease.putObject("resources");Files.write(file,HelperProtocol.JSON.writeValueAsBytes(lease));Files.write(job.resolve("lease.lock"),LeaseFile.receipt(identity));executable=base.resolve("helpers/macos-aarch64/"+"1".repeat(64)+"/bin/helper");Files.createDirectories(executable.getParent());Files.writeString(executable,"test-only");image=base.resolve("runtimes/fixture/"+identity.path("descriptorSha256").asText()+"/image.zip");command=new HelperProtocol.Command(base,file,"preflight",List.of());
+        }
+        void packageTrust() throws Exception {
+            Path support=executable.getParent().getParent().resolve("app/support");Files.createDirectories(support);
+            var recovery=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+            Files.write(support.resolve("lease-trust.bin"),TrustFixtures.bytes(pair.getPublic(),recovery.getPublic()));
         }
         LeaseFile open() throws Exception {return LeaseFile.open(command,executable,trust);}
         void publish(byte[] definition) throws Exception {

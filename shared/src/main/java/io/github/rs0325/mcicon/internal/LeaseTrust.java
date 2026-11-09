@@ -57,14 +57,14 @@ public final class LeaseTrust {
         Path helperRoot=root.resolve("helpers").resolve(LeaseSnapshot.text(definition.path("host"),"os",16)+"-"+LeaseSnapshot.text(definition.path("host"),"arch",16)).resolve(LeaseSnapshot.hash(selected,"sha256"));
         if(!helperRoot.resolve(LeaseSnapshot.relative(definition.path("helper"),"executable")).equals(executable))throw new IOException("readerのhelper世代が一致しません");
         if(!executable.toRealPath().equals(executable)||!Files.isRegularFile(executable,LinkOption.NOFOLLOW_LINKS))throw new IOException("現helper実体にlinkがあります");
-        JsonNode executablePin=null;
-        for(JsonNode row:LeaseSnapshot.read(inventory).path("contents").path("files"))if(row.path("path").asText().equals(helperRoot.relativize(executable).toString().replace('\\','/'))){if(executablePin!=null)throw new IOException("helper pinが重複しています");executablePin=row;}
-        if(executablePin==null||Files.size(executable)!=LeaseSnapshot.integer(executablePin,"bytes",1)||!LeaseSnapshot.fileDigest(executable).equals(LeaseSnapshot.hash(executablePin,"sha256")))throw new IOException("現helperの実体と元inventoryが一致しません");
+        JsonNode listing=LeaseSnapshot.read(inventory);
+        JsonNode executablePin=LeaseSnapshot.helperPin(listing,helperRoot.relativize(executable).toString().replace('\\','/'));
+        if(Files.size(executable)!=LeaseSnapshot.integer(executablePin,"bytes",1)||!LeaseSnapshot.fileDigest(executable).equals(LeaseSnapshot.hash(executablePin,"sha256")))throw new IOException("現helperの実体と元inventoryが一致しません");
         if(identityReader==null){currentDescriptor=LeaseSnapshot.digest(descriptor);packageUnbound=false;return;}
         if(!identityReader.toRealPath().equals(identityReader)||!Files.isRegularFile(identityReader,LinkOption.NOFOLLOW_LINKS))throw new IOException("identity readerにlinkがあります");
-        String relative=helperRoot.relativize(identityReader).toString().replace('\\','/');JsonNode pin=null;
-        for(JsonNode row:LeaseSnapshot.read(inventory).path("contents").path("files"))if(row.path("path").asText().equals(relative)){if(pin!=null)throw new IOException("reader pinが重複しています");pin=row;}
-        if(pin==null||Files.size(identityReader)!=LeaseSnapshot.integer(pin,"bytes",1)||!readerSha256.equals(LeaseSnapshot.hash(pin,"sha256")))throw new IOException("署名descriptorとreader実体が一致しません");
+        String relative=helperRoot.relativize(identityReader).toString().replace('\\','/');
+        JsonNode pin=LeaseSnapshot.helperPin(listing,relative);
+        if(Files.size(identityReader)!=LeaseSnapshot.integer(pin,"bytes",1)||!readerSha256.equals(LeaseSnapshot.hash(pin,"sha256")))throw new IOException("署名descriptorとreader実体が一致しません");
         readerVerified=true;currentDescriptor=LeaseSnapshot.digest(descriptor);packageUnbound=false;
     }
     Object identity(Path file) throws IOException {
