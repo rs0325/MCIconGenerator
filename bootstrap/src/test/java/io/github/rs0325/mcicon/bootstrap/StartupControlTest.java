@@ -1,6 +1,8 @@
 package io.github.rs0325.mcicon.bootstrap;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import java.nio.file.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.SocketTimeoutException;
 import java.io.*;
@@ -10,6 +12,25 @@ import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StartupControlTest {
+    @TempDir Path directory;
+    @Test void runtimeとrepairのREQUESTを許可しtrialと自動更新の対象にしない() throws Exception {
+        Path receipt=directory.resolve("child-receipt.json");Files.writeString(receipt,"{}");
+        Process child=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",System.getProperty("bootstrap.testClasspath"),ReceiptLockProcess.class.getName(),receipt.toString()).redirectError(ProcessBuilder.Redirect.INHERIT).start();
+        try {
+            var eligible=Bootstrap.class.getDeclaredMethod("eligible",com.fasterxml.jackson.databind.JsonNode.class);eligible.setAccessible(true);
+            for(String command:List.of("runtime","repair")) {
+                List<String> args=command.equals("runtime")?List.of("runtime"):List.of("runtime","repair","--job",UUID.randomUUID().toString(),"--runtime-root",directory.toString());
+                try(StartupControl control=new StartupControl(slot(),UUID.randomUUID().toString(),args)) {
+                    String property=control.property();var context=Seed.json(Base64.getUrlDecoder().decode(property.substring(property.indexOf('=')+1)));
+                    ObjectNode request=Seed.JSON.createObjectNode().put("protocol",4).put("type","REQUEST").put("pid",child.pid()).put("startedAt",child.info().startInstant().orElseThrow().toString()).put("command",command).put("managed",false).put("offline",false).put("help",false).put("preparationMillis",1).put("startupMillis",1).put("itemMillis",1);
+                    for(String key:List.of("nonce","invocation","slot"))request.set(key,context.get(key));request.set("args",Seed.JSON.valueToTree(args));
+                    control.validate(request,child);assertEquals(false,eligible.invoke(null,request));
+                    request.put("managed",true);control.validate(request,child);assertEquals(false,eligible.invoke(null,request));
+                    request.put("command","arbitrary");assertThrows(IOException.class,()->control.validate(request,child));
+                }
+            }
+        }finally{child.destroyForcibly();assertTrue(child.waitFor(3,TimeUnit.SECONDS));child.getInputStream().close();child.getErrorStream().close();child.getOutputStream().close();}
+    }
     ObjectNode slot(){return Seed.JSON.createObjectNode().put("toolVersion","1.1.0").put("payloadSha256","a".repeat(64)).put("runtimeDescriptorSha256","b".repeat(64)).put("manifestSha256","c".repeat(64));}
     @Test void deferredRequiresExactlyOneProofVariantAndKeepsProtocolFour() throws Exception {
         ObjectNode value=Seed.JSON.createObjectNode().put("protocol",4).put("type","DEFERRED").put("nonce",UUID.randomUUID().toString()).put("invocation",UUID.randomUUID().toString()).put("pid",1).put("startedAt","2026-11-09T00:00:00Z").put("reason","MANAGED_BUSY");value.set("slot",slot());value.putArray("jobs");

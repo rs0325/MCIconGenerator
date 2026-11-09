@@ -73,7 +73,7 @@ public final class ManagedRuntime implements AutoCloseable {
             try {release(helper,lease);}catch(Exception cleanup){failure.addSuppressed(cleanup);}
             if(failure instanceof AdmissionEvidence.Busy&&failure.getSuppressed().length==0) {
                 JsonNode claim=((AdmissionEvidence.Busy)failure).job();
-                AdmissionEvidence.verifyJob(store.root(),claim,descriptor.digest(),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("core開始identityが不明です")).toString(),proofTrust.restrictTo(descriptor.digest()),true,RuntimeLease::receiptChannel);
+                AdmissionEvidence.verifyJob(store.root(),claim,descriptor.digest(),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("core開始identityが不明です")).toString(),proofTrust.restrictTo(descriptor.digest()),true,RuntimeLease.receipts(store));
                 var jobs=RuntimeDescriptor.JSON.createArrayNode();jobs.add(claim);throw new ManagedBusyFailure(jobs);
             }
             throw failure;
@@ -132,7 +132,7 @@ public final class ManagedRuntime implements AutoCloseable {
     static void requireAdmission(RuntimeHelper.Result result,RuntimeStore store,RuntimeLease lease,RuntimeDescriptor descriptor,LeaseTrust trust) throws IOException {
         if(!result.ok()&&result.diagnostics().stream().anyMatch(d->d.code().equals("MANAGED_BUSY"))) {
             JsonNode claim=AdmissionEvidence.jobReference(store.root(),lease.read().path("jobId").asText(),lease.receiptChannel());
-            AdmissionEvidence.verifyJob(store.root(),claim,descriptor.digest(),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("core開始identityが不明です")).toString(),trust.restrictTo(descriptor.digest()),false,RuntimeLease::receiptChannel);
+            AdmissionEvidence.verifyJob(store.root(),claim,descriptor.digest(),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("core開始identityが不明です")).toString(),trust.restrictTo(descriptor.digest()),false,RuntimeLease.receipts(store));
             throw new AdmissionEvidence.Busy(claim);
         }
         requireOk(result);

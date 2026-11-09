@@ -18,7 +18,7 @@
 
 job UUIDは対象の`jobs/<UUID>/lease.json`に合わせる。元rootとVMが存在する同じMac・同じbootで実行する。旧descriptor/inventory/helper treeは書き換えず、新packageの署名済みhelperが参照検証と停止終端の確定だけを行う。署名済み資材がまだ配布されていない候補buildでは、この手順を配布済み修復として扱わない。
 
-修復はbootstrap trialを解除しない。残存trialがある場合は、runtime修復の後に新bootstrapの正式なtrial再開手順を別に行う。証跡を別hostへコピーしただけのroot、旧bootやRunningの一般救済は対象外である。
+修復はbootstrap trialを解除しない。未着手のtrial候補を阻害する別の旧jobを修復した場合は、残存trialについて新bootstrapの正式なtrial再開手順を別に行う。一方、trial候補自身をStopped修復した場合は生成journalが残り、未着手条件を満たさないため正式resumeも拒否する。停止終端の確定を候補の未着手証明へ読み替えない。証跡を別hostへコピーしただけのroot、旧bootやRunningの一般救済は対象外である。
 
 Issue #93の後続。公開API・helper protocol・lease形式は増やさない。対象はMac/Windowsのcurrent tool exact版/current descriptorに束縛された旧active jobである。WindowsはH-C18 v3で同bootのready本人死亡後のprepare回復・peer描画継続・正常closeを限定受入した。core fixtureやこの確認をACK前死亡/partial import・同時release・実再起動・全51版・新Mac実VMの成功として扱わない。
 
