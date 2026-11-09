@@ -126,6 +126,7 @@ class ExportIntegrityTest {
         Path root=directory.resolve("output");Files.createDirectory(root);Files.createSymbolicLink(root.resolve("assets"),outside);
         assertThrows(McIconException.class,()->FilesSupport.safeResolve(root,"assets/minecraft/textures/item/test.png"));
         assertThrows(McIconException.class,()->FilesSupport.safeResolve(root,"../outside/file"));
+        assertThrows(McIconException.class,()->FilesSupport.safeResolve(root,outside.resolve("file").toString()));
     }
     @Test void changedInputIsRejectedWithoutExplicitOverwrite() throws Exception {
         Path jar=jar(Map.of("assets/minecraft/textures/item/test.png",png()));
