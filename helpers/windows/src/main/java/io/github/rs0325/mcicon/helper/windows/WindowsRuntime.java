@@ -45,7 +45,7 @@ final class WindowsRuntime {
     LeaseReferences.Scan references() throws IOException {return LeaseReferences.inspect(command,executable,lease.read().path("descriptorSha256").asText());}
     void preflight() throws IOException {
         try(OperationJournal journal=journal();var ignored=lock()) {
-            journal.settledRequired();HostFacts host=facts();LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseの所有が不明です");
+            journal.settledRequired();HostFacts host=facts();LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseの所有が不明です");requireSharedCapacity(others);
             long memory=Math.addExact(lease.read().path("requirements").path("containerMemoryMiB").asLong(),others.memoryMiB());if(host.memoryBytes()/1024/1024<memory+2048)throw new IOException("hostの並行job memory予算が不足しています");
             if(Files.getFileStore(command.root()).getUsableSpace()<4L*1024*1024*1024)throw new IOException("WSL準備の空き容量が不足しています");
             Commands.zero(commands.capture(List.of(wsl.toString(),"--status"),Duration.ofSeconds(5)),"導入済みWSL確認");
@@ -60,7 +60,7 @@ final class WindowsRuntime {
             journal.active();ObjectNode owner=ready();JsonNode keeper=keeperRecord();commands.keeper(keeper);
             JsonNode resources=lease.read().path("resources").path("windows");
             if(resources.path("transports").size()!=1||!resources.path("containers").isEmpty()||!resources.path("transports").get(0).path("id").asText().equals(keeper.path("attempt").asText()))throw new IOException("prepare前のkeeper資源が一致しません");
-            LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseが不明です");long guestRequired=GuestBudget.requiredBytes(lease.read().path("requirements").path("containerMemoryMiB").asLong(),others.memoryMiB());
+            LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseが不明です");requireSharedCapacity(others);long guestRequired=guestRequired(lease.read(),others);
             String boot=facts().boot(),attempt=keeper.path("attempt").asText();
             if(journal.pending()&&!journal.state().path("operation").asText().equals("daemon-prepare"))journal.settledRequired();
             if(!journal.pending())journal.begin("daemon-prepare",boot);
@@ -122,6 +122,15 @@ final class WindowsRuntime {
         Path target=distribution.anchor.resolve("rootfs.tar");if(Files.exists(target,LinkOption.NOFOLLOW_LINKS))throw new IOException("import stagingが既にあります");long limit=0;
         for(JsonNode row:descriptor.path("artifacts"))if(row.path("role").asText().equals("guest-base"))limit=row.path("unpackedBytes").asLong();if(limit<1)throw new IOException("rootfs展開上限がありません");
         try(InputStream source=new XZInputStream(Files.newInputStream(artifact.path()),256*1024);OutputStream output=Files.newOutputStream(target,StandardOpenOption.CREATE_NEW)) {byte[] bytes=new byte[65536];long count=0;int length;while((length=source.read(bytes))!=-1){commands.left(Duration.ofMinutes(3));count=Math.addExact(count,length);if(count>limit)throw new IOException("rootfs展開上限を超えました");output.write(bytes,0,length);}}return target;
+    }
+    private static long guestRequired(JsonNode current,LeaseReferences.Scan others) throws IOException {
+        Set<String> domains=new HashSet<>();domains.add(current.path("descriptorSha256").asText());for(var generation:others.generations())domains.add(generation.descriptorSha256());
+        return GuestBudget.requiredBytes(current.path("requirements").path("containerMemoryMiB").asLong(),others.memoryMiB(),domains.size());
+    }
+    private void requireSharedCapacity(LeaseReferences.Scan others) throws IOException {
+        if(others.unknown())throw new IOException("共有WSL VMの所有が不明です");
+        String current=lease.read().path("descriptorSha256").asText();
+        if(others.generations().stream().anyMatch(generation->!generation.descriptorSha256().equals(current)))throw new IOException("共有WSL VMの利用可能容量とhost余裕の肯定証拠が不足しています");
     }
     void release() throws IOException {throw new IOException("keeperを通さないguest releaseを拒否しました");}
     void release(WindowsKeeper keeper,boolean recovery) throws IOException {

@@ -9,9 +9,10 @@ def run(args): subprocess.run([str(value) for value in args], check=True, timeou
 
 def main():
     parser = argparse.ArgumentParser()
-    for name in ['jdk', 'input', 'payload', 'native', 'native-source', 'native-build', 'output']: parser.add_argument('--' + name, type=pathlib.Path, required=True)
+    for name in ['jdk', 'input', 'payload', 'native', 'native-source', 'native-build', 'output', 'lease-trust']: parser.add_argument('--' + name, type=pathlib.Path, required=True)
     parser.add_argument('--app-version', required=True)
     args = parser.parse_args(); require(sys.platform == 'win32', 'Windows上で生成してください'); require(not args.output.exists(), '既存出力の上書き拒否')
+    trust = args.lease_trust.read_bytes(); require(len(trust) == 96 and trust[:8] == b'MCITRS1\n' and trust[8:20] == bytes.fromhex('302a300506032b6570032100') and trust[52:64] == trust[8:20] and trust[8:52] < trust[52:96], '公開TrustSet形式が不正')
     native_build = verify(args.native, args.native_source, args.native_build)
     manifest = json.loads((args.payload / 'payload.json').read_text(encoding='utf-8'))
     require(manifest['schemaVersion'] == 1 and manifest['guestBridgeAbi'] == 1, 'payload ABI不一致')
@@ -29,10 +30,12 @@ def main():
     args.output.mkdir(parents=True); work = args.output / 'staging'; work.mkdir()
     native = args.native
     inputs = work / 'input'; inputs.mkdir(); support = inputs / 'support'; support.mkdir()
+    shutil.copyfile(args.lease_trust, support / 'lease-trust.bin')
     for row in rows:
         target = support / row['path']; target.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(args.payload / row['path'], target)
     shutil.copyfile(native, support / 'windows-host.exe')
     rows.append({'path': 'windows-host.exe', 'bytes': native.stat().st_size, 'sha256': digest(native)})
+    rows.append({'path': 'lease-trust.bin', 'bytes': len(trust), 'sha256': digest(args.lease_trust)})
     for row in [{'path': args.native_build.name, 'bytes': args.native_build.stat().st_size, 'sha256': digest(args.native_build)}, *native_build['notices']]:
         relative = 'native-build/' + row['path']; target = support / relative
         target.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(args.native_build.parent / row['path'], target)

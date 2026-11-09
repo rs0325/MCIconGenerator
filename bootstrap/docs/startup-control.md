@@ -6,7 +6,7 @@
 
 packageの`bootstrapProtocol`と実制御相手に4を要求し、protocol 2/3を拒否する。署名Seedの`minimumBootstrapProtocol`=4を必要とする。protocol 4対応package/CLIの生成は配布統合側の依存である。worker protocol 1、helper protocol 1、runtime descriptor schema 1を変更する意味ではない。stable manifestのschemaVersionは1のまま、制御protocolの条件だけを更新する。
 
-1.1は未releaseなので、旧protocol/schemaの開発用seed/rootを自動移行しない。旧QA seed/rootは保持し、protocol 4対応CLI/packageとschema 4のfreshなQA rootを作り直す。旧結果を新版の検証結果へ書き換えない。正式trust/配信URLはこの成果では発行しない。
+公開1.1.0/1.1.1のprotocol 4・state schema 4・command receipt schema 3は維持し、旧protocol/schemaの開発用seed/rootを自動移行しない。旧QA seed/rootは保持し、protocol 4対応CLI/packageとschema 4のfreshなQA rootを作り直す。旧結果を新版の検証結果へ書き換えない。正式trust/配信URLはこの成果では発行しない。
 
 ## REQUESTと通常起動
 
@@ -38,7 +38,7 @@ SWITCH/PREPARE/READY/GOは直接fixtureで確認する接続契約であり、�
 
 ## unknownと未受入
 
-例外codeやclose例外無しだけから、candidate固有故障やOS資源の回収を証明しない。復旧allowlistはcore内部の型で確定したBUNDLED_PINS_INVALIDとNOT_STARTED/jobs=[]の組合せだけであり、helper/worker起動後の失敗はUNKNOWNを保持する。証拠とreceipt/stateのCASを[復旧契約](initialization-recovery.md)で定義する。pending/trialInvocation/previous、高水位と取得は更新契約に従う。GCは未実装である。
+例外codeやclose例外無しだけから、candidate固有故障やOS資源の回収を証明しない。復旧allowlistはcore内部の型で確定したBUNDLED_PINS_INVALIDとNOT_STARTED/jobs=[]の組合せだけであり、一般のhelper/worker起動後の失敗はUNKNOWNを保持する。1.1.2の肯定証拠付き延期は任意capabilityの別通知とし、自動切戻しallowlistを広げない。証拠とreceipt/stateのCASを[復旧契約](initialization-recovery.md)で定義する。pending/trialInvocation/previous、高水位と取得は更新契約に従う。GCは未実装である。
 
 直接fixtureは実CLIのREQUEST/RUN、parse-only SWITCHの正常回収とcache未生成、GO前のfixture出力遮断、親切断による取消、分割readの絶対期限、nonce/slot/argv/PIDの拒否を確認する。実managed描画・実installer・Java未導入実host・本番trust/更新配信の受入には代用しない。
 
@@ -47,3 +47,11 @@ REQUESTの前にはCLI自身の純粋なrender/list引数検証も完了する�
 送信監督は開始が既に期限後なら待機せずsocketを閉じる。通常送信後に監督をinterruptして取り消した場合は閉じない。期限後の監督開始とblocking write解除を固定fixtureで確認する。
 
 この制御protocol変更は未release 1.1の開発用seed/rootへの影響であり、公開1.0.1の保存形式を変更するものではない。
+
+## 任意capability deferred-v1
+
+bootstrap contextは既存のまま、新bootstrapだけが別property mcicon.bootstrap.capabilities=deferred-v1 を渡す。旧CLIはこのpropertyを使わず、旧bootstrap向け新CLIも既存FAILEDだけを送る。minimumBootstrapProtocolは4を維持する。
+
+DEFERREDの厳密fieldはprotocol/type/nonce/invocation/slot/pid/startedAt/reason/jobs。protocol=4、type=DEFERRED、reason=MANAGED_BUSYとし、jobsの各要素はjobId/ownerId/descriptorSha256/receiptSha256/evidenceSha256だけ。jobの固定tmpにあるadmission-v1証拠を参照する。
+
+Windowsのlease公開前延期だけは、jobsを空にし、admission（attemptId/evidenceSha256）を追加する別variantを使う。参照先はruntime root/logs/<attemptId>.pre-admission-v1.jsonから導出する。任意path、空jobs単独、variant混在、未知fieldは拒否する。親はREQUESTの実child/nonce/slotと証拠元bytesを照合してから、復旧文書のreceipt/state/settings CASへ進む。

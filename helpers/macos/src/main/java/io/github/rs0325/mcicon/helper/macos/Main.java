@@ -2,6 +2,7 @@ package io.github.rs0325.mcicon.helper.macos;
 
 import io.github.rs0325.mcicon.helper.HelperProtocol;
 import io.github.rs0325.mcicon.helper.LeaseFile;
+import io.github.rs0325.mcicon.internal.AdmissionEvidence;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
@@ -28,7 +29,7 @@ public final class Main {
         }catch(IOException|InvalidPathException failure) {
             String detail=failure.getMessage();if(detail==null||detail.isEmpty())detail="macOS helper操作に失敗しました";if(detail.length()>16000)detail=detail.substring(0,16000);
             if(command!=null&&command.operation().equals("docker")){System.err.println(detail);return 1;}
-            try {System.out.write(HelperProtocol.response(failureStatus,List.of(new HelperProtocol.Diagnostic(failureStatus.equals("setup-required")?"MACOS_RUNTIME_SETUP_REQUIRED":"MACOS_RUNTIME_FAILED",detail,false,false))));System.out.write('\n');return HelperProtocol.exitCode(failureStatus);}
+            try {System.out.write(HelperProtocol.response(failureStatus,List.of(new HelperProtocol.Diagnostic(failure instanceof AdmissionEvidence.Busy?"MANAGED_BUSY":failureStatus.equals("setup-required")?"MACOS_RUNTIME_SETUP_REQUIRED":"MACOS_RUNTIME_FAILED",detail,false,false))));System.out.write('\n');return HelperProtocol.exitCode(failureStatus);}
             catch(IOException outputFailure){System.err.println("helper制御応答を書き込めません");return 1;}
         }
     }

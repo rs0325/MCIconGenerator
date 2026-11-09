@@ -16,7 +16,7 @@ class WindowsDataHomeChildTest {
     private void probe(String data) throws Exception {probe(data,false);}
     private void probe(String data,boolean mixedCase) throws Exception {
         String cp=System.getProperty("bootstrap.testClasspath");
-        ProcessBuilder builder=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-Dstdout.encoding=UTF-8","-Dbootstrap.testClasspath="+cp,"-cp",cp,Probe.class.getName(),directory.toRealPath().toString(),Boolean.toString(mixedCase));
+        ProcessBuilder builder=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-Dstdout.encoding=UTF-8","-Dstderr.encoding=UTF-8","-Dbootstrap.testClasspath="+cp,"-cp",cp,Probe.class.getName(),directory.toRealPath().toString(),Boolean.toString(mixedCase));
         builder.environment().keySet().removeIf(name->name.equalsIgnoreCase("MCICON_DATA_HOME"));
         if(data!=null)builder.environment().put(mixedCase?"mcicon_data_home":"MCICON_DATA_HOME",data);
         if(mixedCase) {

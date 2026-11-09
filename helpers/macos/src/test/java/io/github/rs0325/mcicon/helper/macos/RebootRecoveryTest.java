@@ -1,6 +1,7 @@
 package io.github.rs0325.mcicon.helper.macos;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.github.rs0325.mcicon.internal.AdmissionEvidence;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 import java.io.*;
@@ -15,13 +16,29 @@ class RebootRecoveryTest {
     @TempDir Path temporary;
     MacRuntimeTest.Fixture fixture;
     String generation;ObjectNode ready,registration;Path support;
+    final List<CacheState> extraCaches=new ArrayList<>();
     static final String OLD="00000000-0000-0000-0000-000000000001",NOW="00000000-0000-0000-0000-000000000002",ID="b".repeat(64);
     @BeforeEach void setup() throws Exception {
-        fixture=new MacRuntimeTest.Fixture(temporary.toRealPath());CacheState cache=fixture.cache();registration=cache.register(true);generation=registration.path("generationOwner").asText();Files.createDirectory(cache.instance());Files.writeString(cache.instance().resolve("vz-identifier"),"fixture-machine");Files.writeString(cache.instance().resolve("lima.yaml"),"fixture-config");
+        fixture=new MacRuntimeTest.Fixture(temporary.toRealPath());CacheState cache=fixture.cache();registration=cache.register(true);generation=registration.path("generationOwner").asText();Files.createDirectory(cache.instance());Files.writeString(cache.instance().resolve("vz-identifier"),"fixture-machine");Files.writeString(cache.instance().resolve("lima.yaml"),"memory: 9GiB\n");Files.writeString(cache.anchor().resolve("instance.yaml"),"memory: 9GiB\n");
         ready=MacFiles.JSON.createObjectNode().put("phase","ready").put("generationOwner",generation).put("instanceDir",cache.instance().toString()).put("machineIdSha256",MacFiles.hash(cache.instance().resolve("vz-identifier"))).put("forwardConfigSha256",MacFiles.hash(cache.instance().resolve("lima.yaml"))).put("guestOwnerMarkerSha256","c".repeat(64));ready.putArray("containers");ready.putObject("hostAgent").put("pid",2147483647).put("processStartedAt","2000-01-01T00:00:00Z").put("bootSessionId",OLD);ready.putObject("dockerSocket").put("path",cache.socket().toString()).put("dev",1).put("ino",1).put("uid",registration.path("uid").asLong());
         ObjectNode vm=MacFiles.JSON.createObjectNode();vm.set("identity",registration);vm.set("resources",ready);vm.put("memoryMiB",9216);MacFiles.write(cache.anchor().resolve("vm.json"),vm);
         support=fixture.executable.getParent().getParent().resolve("app/support");Files.createDirectories(support.resolve("bin"));ObjectNode manifest=MacFiles.JSON.createObjectNode().put("schemaVersion",1).put("limaVersion","2.2.1");manifest.putArray("files");manifest.putArray("debs");MacFiles.write(support.resolve("payload.json"),manifest);
-        script("process-guard","#!/bin/sh\nc=$2; d=$4; shift 4\nif [ \"$1\" = --owner ]; then shift 3; fi\nshift\n\"$@\"\nr=$?\nprintf '%s\\n' \"$d\" > \"$c\"\nexit $r\n");probe(false);lima("Stopped");
+        script("process-guard","#!/bin/sh\nc=$2; d=$4; shift 4\nif [ \"$1\" = --owner ]; then shift 3; fi\nshift\n\"$@\"\nr=$?\nprintf '%s\\n' \"$d\" > \"$c\"\nexit $r\n");probe(false);lima("Stopped");payload();
+    }
+    void payload() throws Exception {
+        ObjectNode manifest=MacFiles.JSON.createObjectNode().put("schemaVersion",1).put("limaVersion","2.2.1");
+        var files=manifest.putArray("files");var debs=manifest.putArray("debs");
+        String agent="share/lima/lima-guestagent.Linux-aarch64.gz";
+        Files.createDirectories(support.resolve(agent).getParent());Files.writeString(support.resolve(agent),"fixture");
+        Map<String,String> versions=Map.of("docker.io","29.1.3-0ubuntu3~24.04.2","containerd","2.2.1-0ubuntu1~24.04.3","runc","1.3.4-0ubuntu1~24.04.1");
+        List<String> names=new ArrayList<>(List.of("bin/limactl",agent));
+        for(var entry:versions.entrySet()) {
+            String name="offline/debs/"+entry.getKey()+".deb";names.add(name);
+            Files.createDirectories(support.resolve(name).getParent());Files.writeString(support.resolve(name),"fixture");
+            debs.addObject().put("package",entry.getKey()).put("version",entry.getValue()).put("architecture","arm64").put("path",name);
+        }
+        for(String name:names)files.addObject().put("path",name).put("bytes",Files.size(support.resolve(name))).put("sha256",MacFiles.hash(support.resolve(name))).put("executable",name.equals("bin/limactl"));
+        MacFiles.write(support.resolve("payload.json"),manifest);
     }
     void script(String name,String text) throws Exception {Path file=support.resolve(name);Files.writeString(file,text);file.toFile().setExecutable(true,true);}
     void probe(boolean matched) throws Exception {
@@ -29,7 +46,7 @@ class RebootRecoveryTest {
         script("host-probe","#!/bin/sh\nif [ \"$1\" = --owned-executable ]; then echo '{\"complete\":true,\"matched\":"+matched+"}'; else echo '"+MacFiles.JSON.writeValueAsString(facts)+"'; fi\n");
     }
     void lima(String status) throws Exception {ObjectNode value=MacFiles.JSON.createObjectNode().put("name","v").put("status",status).put("dir",fixture.cache().instance().toString()).put("vmType","vz").put("arch","aarch64");script("bin/limactl","#!/bin/sh\necho '"+MacFiles.JSON.writeValueAsString(value)+"'\n");}
-    @AfterEach void cleanup() throws Exception {erase(fixture.cache().anchor());}
+    @AfterEach void cleanup() throws Exception {for(CacheState cache:extraCaches){cache.verify();erase(cache.anchor());}erase(fixture.cache().anchor());}
     void erase(Path path) throws Exception {if(Files.exists(path,LinkOption.NOFOLLOW_LINKS))Files.walkFileTree(path,new SimpleFileVisitor<>(){public FileVisitResult visitFile(Path p,BasicFileAttributes a)throws IOException{Files.delete(p);return FileVisitResult.CONTINUE;}public FileVisitResult postVisitDirectory(Path p,IOException e)throws IOException{if(e!=null)throw e;Files.delete(p);return FileVisitResult.CONTINUE;}});}
     MacRuntimeTest.Job oldJob(boolean pendingCreate) throws Exception {
         var job=fixture.job(true);ObjectNode lease=job.lease().read(),mac=ready.deepCopy();mac.withArray("containers").addObject().put("id",ID).put("name","old-worker");lease.withObject("resources").set("macos",mac);MacFiles.write(job.command().lease(),lease);
@@ -57,6 +74,7 @@ class RebootRecoveryTest {
     @Test void 欠落anchorでも終了参照解消後だけ同pathfreshownerへ進む() throws Exception {
         var old=oldJob(false);erase(fixture.cache().anchor());release(old);ObjectNode value=old.lease().read();value.put("state","released");MacFiles.write(old.command().lease(),value);var next=fixture.job(false);MacRuntime current=runtime(next);
         try(var journal=current.journal(Duration.ofSeconds(1));var lock=current.cache.lock(Duration.ofSeconds(1))){new RebootRecovery(current).prepare(journal);assertTrue(current.cache.freshIncarnation());assertTrue(current.cache.anchor().equals(fixture.cache().anchor()));assertFalse(current.cache.registered().path("generationOwner").asText().equals(generation));assertTrue(current.cache.history(generation,OLD).equals(registration));}
+        current.preflight();assertTrue(current.cache.freshIncarnation());assertFalse(Files.exists(current.cache.anchor().resolve("vm.json")));
     }
     @Test void 通常close済み旧bootは終了証拠を捏造せず欠落cacheを新ownerで準備する() throws Exception {
         var old=oldJob(false);Path tmp=old.command().lease().getParent().resolve("tmp");ObjectNode lease=old.lease().read();
@@ -76,6 +94,7 @@ class RebootRecoveryTest {
             new RebootRecovery(current).prepare(journal);assertTrue(current.cache.freshIncarnation());assertTrue(current.cache.history(generation,OLD).equals(registration));assertNotEquals(generation,current.cache.registered().path("generationOwner").asText());
             assertEquals(fixture.cache().anchor(),current.cache.anchor());assertFalse(Files.exists(current.cache.instance()));assertFalse(Files.exists(current.cache.anchor().resolve("vm.json")));
         }
+        current.preflight();assertTrue(current.cache.freshIncarnation());assertFalse(Files.exists(current.cache.anchor().resolve("vm.json")));
         assertArrayEquals(original,Files.readAllBytes(old.command().lease()));assertArrayEquals(receipt,Files.readAllBytes(old.command().lease().resolveSibling("lease.lock")));assertEquals(snapshot,OperationJournal.rebootSnapshot(tmp,lease,null));assertFalse(Files.exists(tmp.resolve("macos-ended-by-reboot.json")));
     }
     @Test void fresh生成資格を先に消費し同boot欠落で再使用しない() throws Exception {
@@ -88,6 +107,34 @@ class RebootRecoveryTest {
             assertFalse(current.cache.freshIncarnation());assertThrows(IOException.class,current.cache::consumeFreshIncarnation);assertArrayEquals(retained,Files.readAllBytes(proof));
             assertEquals(MacFiles.hash(proof),MacFiles.json(current.cache.anchor().resolve("boot-recreated-used.json")).path("bootRecreatedSha256").asText());
         }
+    }
+    private MacRuntime recreated() throws Exception {
+        var old=oldJob(false);erase(fixture.cache().anchor());release(old);ObjectNode value=old.lease().read();value.put("state","released");MacFiles.write(old.command().lease(),value);MacRuntime current=runtime(fixture.job(false));
+        try(var journal=current.journal(Duration.ofSeconds(1));var lock=current.cache.lock(Duration.ofSeconds(1))){new RebootRecovery(current).prepare(journal);assertTrue(current.cache.freshIncarnation());}
+        current.preflight();return current;
+    }
+    @Test void fresh証拠なし改変消費済みのvm欠落を予算で許可しない() throws Exception {
+        MacRuntime current=recreated();Path proof=current.cache.anchor().resolve("boot-recreated.json"),retained=proof.resolveSibling("retained.json");byte[] original=Files.readAllBytes(proof);
+        Files.move(proof,retained);IOException failure=assertThrows(IOException.class,current::preflight);assertFalse(failure instanceof AdmissionEvidence.Busy);assertTrue(failure.getMessage().contains("生成/停止状態が不明"));Files.move(retained,proof);
+        ObjectNode broken=(ObjectNode)MacFiles.json(proof);((ObjectNode)broken.path("identity")).put("generationOwner",UUID.randomUUID().toString());MacFiles.write(proof,broken);
+        failure=assertThrows(IOException.class,current::preflight);assertFalse(failure instanceof AdmissionEvidence.Busy);assertTrue(failure.getMessage().contains("元世代が不正"));Files.write(proof,original);
+        current.preflight();current.cache.consumeFreshIncarnation();assertFalse(current.cache.freshIncarnation());
+        failure=assertThrows(IOException.class,current::preflight);assertFalse(failure instanceof AdmissionEvidence.Busy);assertTrue(failure.getMessage().contains("生成/停止状態が不明"));assertFalse(Files.exists(current.cache.instance()));assertFalse(Files.exists(current.cache.anchor().resolve("vm.json")));assertArrayEquals(original,Files.readAllBytes(proof));
+    }
+    @Test void freshでも現jobの生成journalまたは資源があれば予算で許可しない() throws Exception {
+        MacRuntime current=recreated();byte[] proof=Files.readAllBytes(current.cache.anchor().resolve("boot-recreated.json"));
+        try(var journal=current.journal(Duration.ofSeconds(1))){journal.begin("prepare");}
+        IOException failure=assertThrows(IOException.class,current::preflight);assertFalse(failure instanceof AdmissionEvidence.Busy);assertTrue(failure.getMessage().contains("Mac生成journalが残っています"));erase(current.temporary.resolve("macos-operations"));
+        ObjectNode starting=MacFiles.JSON.createObjectNode().put("phase","starting").put("generationOwner",current.cache.registered().path("generationOwner").asText()).put("instanceDir",current.cache.instance().toString());starting.putArray("containers");current.replace(starting);
+        failure=assertThrows(IOException.class,current::preflight);assertFalse(failure instanceof AdmissionEvidence.Busy);assertTrue(failure.getMessage().contains("生成済み資源が残っています"));
+        ObjectNode lease=current.lease.read();current.lease.replaceResources((ObjectNode)lease.path("resources"),MacFiles.JSON.createObjectNode());
+        current.preflight();assertTrue(current.cache.freshIncarnation());assertArrayEquals(proof,Files.readAllBytes(current.cache.anchor().resolve("boot-recreated.json")));assertFalse(Files.exists(current.cache.anchor().resolve("vm.json")));
+    }
+    @Test void 検証済みfreshでも他descriptorのvm欠落を予算で許可しない() throws Exception {
+        MacRuntime current=recreated();String other="f".repeat(64);long uid=registration.path("uid").asLong();
+        CacheState before=new CacheState(fixture.root,fixture.host,other,uid,"a".repeat(64),OLD);before.register(true);before.verify();erase(before.anchor());
+        CacheState foreign=new CacheState(fixture.root,fixture.host,other,uid,"a".repeat(64),NOW);foreign.transitionBoot(true);extraCaches.add(foreign);assertTrue(foreign.freshIncarnation());
+        IOException failure=assertThrows(IOException.class,current::preflight);assertFalse(failure instanceof AdmissionEvidence.Busy);assertTrue(failure.getMessage().contains("生成/停止状態が不明"));assertTrue(current.cache.freshIncarnation());assertTrue(foreign.freshIncarnation());assertFalse(Files.exists(foreign.anchor().resolve("vm.json")));
     }
     @Test void 新bootの厳格live未着手だけを並行待機として許可する() throws Exception {
         var old=oldJob(false);release(old);ObjectNode previous=old.lease().read();previous.put("state","released");MacFiles.write(old.command().lease(),previous);MacRuntime current=runtime(fixture.job(false));

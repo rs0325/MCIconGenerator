@@ -18,7 +18,7 @@ def verify(tree,owner_modes=False):
   else:assert file.stat().st_mode&0o777==required,'modeが不一致'
 def launch(tree,name):
  root=a.output/(name+'-root');root.mkdir();temporary=a.output/(name+'-tmp');temporary.mkdir();entry=tree/'Contents/MacOS/MCIconHelper';argv=[str(entry),'--protocol','1','--root',str(root),'--lease',str(root/'jobs/00000000-0000-0000-0000-000000000001/lease.json'),'preflight'];environment={key:str(temporary) for key in ['TMP','TEMP','TMPDIR']};r=subprocess.run(argv,env=environment,capture_output=True,timeout=10)
- (a.output/(name+'.stdout')).write_bytes(r.stdout);(a.output/(name+'.stderr')).write_bytes(r.stderr);value=json.loads(r.stdout);assert r.returncode==1 and value['status']=='failed' and value['diagnostics'][0]['detail']=='所有fileを読み取れません: lease.json' and not r.stderr
+ (a.output/(name+'.stdout')).write_bytes(r.stdout);(a.output/(name+'.stderr')).write_bytes(r.stderr);value=json.loads(r.stdout);assert r.returncode==1 and value['status']=='failed' and value['diagnostics'][0]['detail']=='所有fileを読み取れません: descriptor.json' and not r.stderr
  results.append({'name':name,'argv':argv,'environment':environment,'exit':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout).hexdigest(),'scope':'invalid-lease-only-no-vm'})
 verify(a.image);relocated=a.output/'relocated with space/MCIconHelper.app';shutil.copytree(a.image,relocated);verify(relocated);subprocess.run(['/usr/bin/codesign','--verify','--deep','--strict',str(relocated)],check=True,timeout=15);launch(relocated,'relocated-TMP-only')
 choices=[next(name for name in expected if name.endswith('.jar')),next(name for name in expected if '/runtime/' in name and name.endswith('/lib/modules')),next(name for name in expected if name.endswith('/MCIconHelper.cfg'))]

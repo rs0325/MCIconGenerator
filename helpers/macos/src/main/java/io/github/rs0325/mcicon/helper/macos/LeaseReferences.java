@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.helper.HelperProtocol;
 import io.github.rs0325.mcicon.helper.LeaseFile;
+import io.github.rs0325.mcicon.internal.LeaseSnapshot;
+import io.github.rs0325.mcicon.internal.LeaseTrust;
 import java.io.IOException;
 import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
@@ -13,12 +15,16 @@ import java.util.*;
 
 /** 他世代をskipせず、全jobのbusy/不明を共有VMの停止禁止へ反映する。 */
 final class LeaseReferences {
-    record Scan(boolean active,List<String> diagnostics,long memoryMiB,boolean pristine,boolean activeStarted) {boolean restartAllowed(){return !activeStarted&&!unknown();}boolean unknown(){return !diagnostics.isEmpty();}boolean stopAllowed(){return !active&&!unknown();}}
+    record Generation(String descriptorSha256,long containerMemoryMiB,List<LeaseSnapshot> leases) {}
+    record Scan(boolean active,List<String> diagnostics,long memoryMiB,boolean currentPristine,boolean currentStarted,List<Generation> generations) {boolean restartAllowed(){return !currentStarted&&!unknown();}boolean unknown(){return !diagnostics.isEmpty();}boolean stopAllowed(){return !active&&!unknown();}}
     private LeaseReferences() {}
     static Scan inspect(HelperProtocol.Command command,Path executable,String descriptorSha256) throws IOException {
+        return inspect(command,executable,descriptorSha256,LeaseFile.trust(command,executable));
+    }
+    static Scan inspect(HelperProtocol.Command command,Path executable,String descriptorSha256,LeaseTrust trust) throws IOException {
         Path jobs=command.root().resolve("jobs");if(!jobs.toRealPath().equals(jobs))throw new IOException("job一覧にlinkがあります");
         String hostId=Files.readString(command.root().resolve("host-id"),StandardCharsets.US_ASCII).trim();
-        boolean active=false,pristine=true,activeStarted=false;List<String> diagnostics=new ArrayList<>();long memory=0;
+        boolean active=false,pristine=true,activeStarted=false;List<String> diagnostics=new ArrayList<>();long memory=0;Map<String,List<LeaseSnapshot>> generations=new LinkedHashMap<>();
         try(DirectoryStream<Path> entries=Files.newDirectoryStream(jobs)) {
             for(Path directory:entries) {
                 Path lease=directory.resolve("lease.json");if(lease.equals(command.lease()))continue;
@@ -37,19 +43,25 @@ final class LeaseReferences {
                                 if(channel.size()!=64||!Files.readString(receipt,StandardCharsets.US_ASCII).equals(new String(LeaseFile.receipt(identity),StandardCharsets.US_ASCII)))throw new IOException("released receiptが一致しません");
                             }else {
                                 active=true;
-                                LeaseFile current=LeaseFile.open(new HelperProtocol.Command(command.root(),lease,"release",List.of()),executable);JsonNode checked=current.read();
+                                LeaseSnapshot current=LeaseFile.inspect(command.root(),lease,trust);JsonNode checked=current.lease();
+                                if(!current.descriptor().path("host").path("os").asText().equals("macos")||!current.descriptor().path("host").path("arch").asText().equals("aarch64"))throw new IOException("参照元descriptorのhostが一致しません");
                                 if(lock!=null||!live(checked))throw new IOException("他jobのactive所有者が不明です");
-                                memory=Math.addExact(memory,checked.path("requirements").path("containerMemoryMiB").longValue());
+                                if(checked.path("descriptorSha256").asText().equals(descriptorSha256))memory=Math.addExact(memory,checked.path("requirements").path("containerMemoryMiB").longValue());
+                                generations.computeIfAbsent(checked.path("descriptorSha256").asText(),key->new ArrayList<>()).add(current);current.verifyUnchanged();
                             }
                             boolean released=value.path("state").asText().equals("released"),same=value.path("descriptorSha256").asText().equals(descriptorSha256);
-                            if(!released&&!same)pristine=false;
-                            if(!value.path("resources").isEmpty()||!emptyJournal(directory,value)){if(same||!released)pristine=false;if(!released)activeStarted=true;}
+                            if(!value.path("resources").isEmpty()||!emptyJournal(directory,value)){if(same)pristine=false;if(same&&!released)activeStarted=true;}
                         }finally {if(lock!=null)lock.release();}
                     }
                 }catch(IOException|RuntimeException failure){pristine=false;diagnostics.add(directory.getFileName()+": "+failure.getMessage());}
             }
         }
-        return new Scan(active,List.copyOf(diagnostics),memory,pristine,activeStarted);
+        return new Scan(active,List.copyOf(diagnostics),memory,pristine,activeStarted,summary(generations));
+    }
+    private static List<Generation> summary(Map<String,List<LeaseSnapshot>> snapshots) {
+        List<Generation> result=new ArrayList<>();
+        snapshots.forEach((digest,leases)->{long memory=0;for(LeaseSnapshot lease:leases)memory=Math.addExact(memory,lease.lease().path("requirements").path("containerMemoryMiB").asLong());result.add(new Generation(digest,memory,List.copyOf(leases)));});
+        return List.copyOf(result);
     }
     private static boolean emptyJournal(Path job,JsonNode lease) throws IOException {
         Path temporary=job.resolve("tmp"),directory=temporary.resolve("macos-operations");

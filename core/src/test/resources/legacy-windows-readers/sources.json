@@ -1,0 +1,74 @@
+[
+  {
+    "version": "1.1.0",
+    "commit": "e876e520ac96005d1a6f6a1f3e04a8e753ebc7d1",
+    "path": "1.1.0/io/github/rs0325/mcicon/helper/HelperProtocol.java",
+    "sha256": "8bac8fd85d0326e32a3eec953e9677a56922c0ea86ce1dd44c207990e46c712c"
+  },
+  {
+    "version": "1.1.0",
+    "commit": "e876e520ac96005d1a6f6a1f3e04a8e753ebc7d1",
+    "path": "1.1.0/io/github/rs0325/mcicon/helper/LeaseFile.java",
+    "sha256": "8d6c1346742c8a43025513382244c8a58852c957ef9ff29907ddf6cbd73a2fb5"
+  },
+  {
+    "version": "1.1.0",
+    "commit": "e876e520ac96005d1a6f6a1f3e04a8e753ebc7d1",
+    "path": "1.1.0/io/github/rs0325/mcicon/helper/ResourceRecords.java",
+    "sha256": "1fe95c8c0864e6bb22d3c57e63d9615af0880394574cb09f5090bf66b9259756"
+  },
+  {
+    "version": "1.1.0",
+    "commit": "e876e520ac96005d1a6f6a1f3e04a8e753ebc7d1",
+    "path": "1.1.0/io/github/rs0325/mcicon/helper/windows/WindowsFiles.java",
+    "sha256": "eda7940aa96076de7304e953949f67b887ea04be9e27081aa2d273d868fac920"
+  },
+  {
+    "version": "1.1.0",
+    "commit": "e876e520ac96005d1a6f6a1f3e04a8e753ebc7d1",
+    "path": "1.1.0/io/github/rs0325/mcicon/helper/windows/HostFacts.java",
+    "sha256": "55437d3533a52221333fe830281ae9c7b5fedcca82b6e6f45b796f9f86948374"
+  },
+  {
+    "version": "1.1.0",
+    "commit": "e876e520ac96005d1a6f6a1f3e04a8e753ebc7d1",
+    "path": "1.1.0/io/github/rs0325/mcicon/helper/windows/LeaseReferences.java",
+    "sha256": "68d0075f79e25ffa01216db061ef71b6bed4d9ec0c4db5c174496ba3d57dc677"
+  },
+  {
+    "version": "1.1.1",
+    "commit": "18d15d62ab9beb1af736f16c2aede1d63849b422",
+    "path": "1.1.1/io/github/rs0325/mcicon/helper/HelperProtocol.java",
+    "sha256": "8bac8fd85d0326e32a3eec953e9677a56922c0ea86ce1dd44c207990e46c712c"
+  },
+  {
+    "version": "1.1.1",
+    "commit": "18d15d62ab9beb1af736f16c2aede1d63849b422",
+    "path": "1.1.1/io/github/rs0325/mcicon/helper/LeaseFile.java",
+    "sha256": "8d6c1346742c8a43025513382244c8a58852c957ef9ff29907ddf6cbd73a2fb5"
+  },
+  {
+    "version": "1.1.1",
+    "commit": "18d15d62ab9beb1af736f16c2aede1d63849b422",
+    "path": "1.1.1/io/github/rs0325/mcicon/helper/ResourceRecords.java",
+    "sha256": "1fe95c8c0864e6bb22d3c57e63d9615af0880394574cb09f5090bf66b9259756"
+  },
+  {
+    "version": "1.1.1",
+    "commit": "18d15d62ab9beb1af736f16c2aede1d63849b422",
+    "path": "1.1.1/io/github/rs0325/mcicon/helper/windows/WindowsFiles.java",
+    "sha256": "eda7940aa96076de7304e953949f67b887ea04be9e27081aa2d273d868fac920"
+  },
+  {
+    "version": "1.1.1",
+    "commit": "18d15d62ab9beb1af736f16c2aede1d63849b422",
+    "path": "1.1.1/io/github/rs0325/mcicon/helper/windows/HostFacts.java",
+    "sha256": "55437d3533a52221333fe830281ae9c7b5fedcca82b6e6f45b796f9f86948374"
+  },
+  {
+    "version": "1.1.1",
+    "commit": "18d15d62ab9beb1af736f16c2aede1d63849b422",
+    "path": "1.1.1/io/github/rs0325/mcicon/helper/windows/LeaseReferences.java",
+    "sha256": "68d0075f79e25ffa01216db061ef71b6bed4d9ec0c4db5c174496ba3d57dc677"
+  }
+]

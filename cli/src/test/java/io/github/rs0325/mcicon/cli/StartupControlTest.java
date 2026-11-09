@@ -83,6 +83,26 @@ class StartupControlTest {
             }finally{System.clearProperty(StartupControl.PROPERTY);pool.shutdownNow();assertTrue(pool.awaitTermination(3,TimeUnit.SECONDS));}
         }
     }
+    @Test void typedBusyUsesDeferredOnlyWithCapabilityAndNoCleanupFailure() throws Exception {
+        Path cli=jar();for(String mode:List.of("old-bootstrap","deferred","cleanup-failed")) {
+            if(!mode.equals("old-bootstrap"))System.setProperty(StartupControl.CAPABILITIES_PROPERTY,"deferred-v1");
+            try(ServerSocket server=new ServerSocket(0,1,InetAddress.getByName("127.0.0.1"))) {
+                property(context(server.getLocalPort()));ExecutorService pool=Executors.newSingleThreadExecutor();
+                try {
+                    var peer=pool.submit(()->{try(Socket socket=server.accept()){var request=StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(3));StartupControl.write(socket,StartupControl.JSON.createObjectNode().put("protocol",4).put("type","PREPARE"));var result=StartupControl.read(socket,System.nanoTime()+TimeUnit.SECONDS.toNanos(3));for(String name:List.of("nonce","invocation","slot","pid","startedAt"))assertEquals(request.path(name),result.path(name));return result;}});
+                    try(StartupControl control=StartupControl.open(request(),"1.1.0",cli)) {
+                        var type=io.github.rs0325.mcicon.internal.managed.ManagedBusyFailure.class;var constructor=type.getDeclaredConstructor(com.fasterxml.jackson.databind.JsonNode.class);constructor.setAccessible(true);
+                        var claim=StartupControl.JSON.createObjectNode().put("attemptId",UUID.randomUUID().toString()).put("evidenceSha256","a".repeat(64));
+                        Throwable cause=constructor.newInstance(claim);if(mode.equals("cleanup-failed"))cause.addSuppressed(new IOException("回収失敗"));
+                        control.initializationFailure(new CompletionException(cause));var result=peer.get(3,TimeUnit.SECONDS);
+                        assertEquals(mode.equals("deferred")?"DEFERRED":"FAILED",result.path("type").asText());assertEquals(4,result.path("protocol").asInt());
+                        if(mode.equals("deferred")){assertEquals(claim,result.path("admission"));assertTrue(result.path("jobs").isEmpty());}
+                        else {assertEquals("UNKNOWN",result.path("failure").asText());assertFalse(result.has("admission"));}
+                    }
+                }finally{System.clearProperty(StartupControl.PROPERTY);pool.shutdownNow();assertTrue(pool.awaitTermination(3,TimeUnit.SECONDS));}
+            }finally{System.clearProperty(StartupControl.CAPABILITIES_PROPERTY);}
+        }
+    }
     @Test void protocolTwoContextIsRejectedBeforeConnecting() throws Exception {
         Path jar=jar();ObjectNode context=context(1);context.put("protocol",2);property(context);
         try{assertThrows(IOException.class,()->StartupControl.open(request(),"1.1.0",jar));}finally{System.clearProperty(StartupControl.PROPERTY);}

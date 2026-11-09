@@ -46,7 +46,7 @@ final class MacRuntime {
         payload.verify();cache.checkSocketLength();
         try(OperationJournal operation=journal(Duration.ofSeconds(5));CacheState.Lock ignored=cache.lock(Duration.ofSeconds(5))) {
             operation.requireActive();new RebootRecovery(this).prepare(operation);LeaseReferences.Scan references=references();if(references.unknown())throw new IOException("他leaseの所有が不明です: "+references.diagnostics());
-            memoryMiB(references);if(Files.exists(cache.anchor(),LinkOption.NOFOLLOW_LINKS))cache.verify();
+            VmBudget.require(this,references);if(Files.exists(cache.anchor(),LinkOption.NOFOLLOW_LINKS))cache.verify();
             if(Files.getFileStore(command.root()).getUsableSpace()<2L*1024*1024*1024)throw new IOException("VM準備の空き容量が不足しています");
         }
     }
@@ -57,7 +57,7 @@ final class MacRuntime {
         if(base.bytes()!=620224512L||!base.sha256().equals("1d6bffe64b848468ac97f821d369a4846d983de1800ccf6b5ec8853e85cefc55"))throw new IOException("固定offline closureとguest baseが一致しません");
         try(OperationJournal operation=journal(timeLeft());CacheState.Lock ignored=cache.lock(timeLeft())) {
             operation.requireActive();operation.requireSettled();new RebootRecovery(this).prepare(operation);LeaseReferences.Scan references=references();if(references.unknown())throw new IOException("他leaseの所有が不明です: "+references.diagnostics());
-            ObjectNode current=lease.read();if(!current.path("resources").isEmpty())throw new IOException("同一jobのprepareを重複実行できません");boolean fresh=cache.freshIncarnation();boolean recreate=(cache.firstUse()&&references.pristine()||fresh)&&operation.unstarted();ObjectNode registration=cache.register(references,operation);String owner=registration.path("generationOwner").asText();
+            int admitted=VmBudget.require(this,references);ObjectNode current=lease.read();if(!current.path("resources").isEmpty())throw new IOException("同一jobのprepareを重複実行できません");boolean fresh=cache.freshIncarnation();boolean recreate=(cache.firstUse()&&references.currentPristine()||fresh)&&operation.unstarted();ObjectNode registration=cache.register(references,operation);String owner=registration.path("generationOwner").asText();
             Path staging=staging();Path vmRecord=cache.anchor().resolve("vm.json");ObjectNode ready;
             if(Files.exists(cache.instance(),LinkOption.NOFOLLOW_LINKS)) {
                 JsonNode record=MacFiles.json(vmRecord);checkRegistration(record,registration);ObjectNode previous=(ObjectNode)record.required("resources");checkDisk(previous);
@@ -74,7 +74,7 @@ final class MacRuntime {
             }else {
                 if(Files.exists(vmRecord,LinkOption.NOFOLLOW_LINKS)||!recreate)throw new IOException("VM実体が失われたためactiveを保持します");
                 if(fresh)cache.consumeFreshIncarnation();
-                int memory=memoryMiB(references);ObjectNode starting=MacFiles.JSON.createObjectNode().put("phase","starting").put("generationOwner",owner).put("instanceDir",cache.instance().toString());starting.putArray("containers");replace(starting);
+                int memory=admitted;ObjectNode starting=MacFiles.JSON.createObjectNode().put("phase","starting").put("generationOwner",owner).put("instanceDir",cache.instance().toString());starting.putArray("containers");replace(starting);
                 Path yaml=cache.anchor().resolve("instance.yaml");MacFiles.write(yaml,VmConfiguration.create(base.path(),base.sha256(),image.path().getParent(),staging,payload.root().resolve("offline"),memory,VmConfiguration.guestMarker(owner,current.path("descriptorSha256").asText()),payload.debNames()));
                 var intent=operation.begin("prepare");Commands.Result start=commands.generate(lima("start","--tty=false","--name=v",yaml.toString()),timeLeft(),intent,owner());requireZero(start,"専用VMの初回準備");
                 ready=inspect(owner,null,null);saveVm(registration,ready,memory);operation.settled(intent,ready);
@@ -145,10 +145,14 @@ final class MacRuntime {
         if(transport.path("uid").asLong()!=host.uid())throw new IOException("Docker socket UIDが一致しません");return (ObjectNode)MacFiles.JSON.readTree(MacFiles.JSON.writeValueAsBytes(result));
     }
     void checkDisk(ObjectNode previous) throws IOException {if(!previous.path("generationOwner").asText().equals(cache.registered().path("generationOwner").asText())||!previous.path("instanceDir").asText().equals(cache.instance().toString())||!checkedHash(cache.instance().resolve("vz-identifier"),4096).equals(previous.path("machineIdSha256").asText())||!checkedHash(cache.instance().resolve("lima.yaml"),1024*1024).equals(previous.path("forwardConfigSha256").asText()))throw new IOException("既存VMのdisk所有が一致しません");}
-    JsonNode instance() throws IOException {var result=commands.capture(lima("list","--json","v"),cleanupBudget(Duration.ofSeconds(5)));requireZero(result,"専用instance照合");JsonNode value=MacFiles.JSON.readTree(result.stdout());if(value==null||!value.path("name").asText().equals("v")||!value.path("dir").asText().equals(cache.instance().toString())||!value.path("vmType").asText().equals("vz")||!value.path("arch").asText().equals("aarch64"))throw new IOException("Lima instance照合が一致しません");return value;}
+    JsonNode instance() throws IOException {return instance(cache);}
+    JsonNode instance(CacheState observed) throws IOException {
+        List<String> argv=observed==cache?lima("list","--json","v"):List.of("/usr/bin/env","LIMA_HOME="+observed.limaHome(),"HOME="+observed.home(),"DOCKER_CONFIG="+observed.anchor().resolve("d"),payload.path("bin/limactl").toString(),"--log-level=error","list","--json","v");
+        var result=commands.capture(argv,cleanupBudget(Duration.ofSeconds(5)));requireZero(result,"専用instance照合");JsonNode value=MacFiles.JSON.readTree(result.stdout());
+        if(value==null||!value.path("name").asText().equals("v")||!value.path("dir").asText().equals(observed.instance().toString())||!value.path("vmType").asText().equals("vz")||!value.path("arch").asText().equals("aarch64"))throw new IOException("Lima instance照合が一致しません");return value;
+    }
     private void checkRegistration(JsonNode record,JsonNode registration) throws IOException {if(!record.path("identity").equals(registration)||!record.path("resources").isObject()||record.path("memoryMiB").asInt()<1)throw new IOException("VM登録snapshotが一致しません");}
     private void saveVm(ObjectNode identity,ObjectNode ready,int memory) throws IOException {ObjectNode record=MacFiles.JSON.createObjectNode();record.set("identity",identity);record.set("resources",ready);record.put("memoryMiB",memory);MacFiles.write(cache.anchor().resolve("vm.json"),record);}
-    private int memoryMiB(LeaseReferences.Scan references) throws IOException {long current=lease.read().path("requirements").path("containerMemoryMiB").asLong(),available=host.memoryBytes()/1024/1024-2048,desired=Math.max(2048,Math.addExact(Math.multiplyExact(current,2),1024));if(desired>available||current+references.memoryMiB()+1024>desired)throw new IOException("VMと並行jobのmemory予算を確保できません");return Math.toIntExact(desired);}
     void startCleanup(){cleanupEnd=Math.min(cleanupEnd,System.nanoTime()+Duration.ofSeconds(9).toNanos());commands.cleanupDeadline(cleanupEnd);}
     Duration cleanupBudget(Duration maximum) throws IOException {return bounded(cleanupEnd,maximum);}
     private static Duration bounded(long deadline,Duration maximum) throws IOException {
@@ -157,6 +161,6 @@ final class MacRuntime {
     }
     private Duration timeLeft() throws IOException {long left=preparationEnd-System.nanoTime();if(left<=0)throw new IOException("VM準備期限を超えました");return Duration.ofNanos(left);}
     private static String checkedHash(Path path,int limit) throws IOException {if(!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||!path.toRealPath().equals(path)||(Files.size(path)<1||Files.size(path)>limit))throw new IOException("VM所有fileを読めません: "+path.getFileName());return MacFiles.hash(path);}
-    private static String readSmall(Path path,int limit) throws IOException {if(!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||!path.toRealPath().equals(path)||(Files.size(path)<1||Files.size(path)>limit))throw new IOException("VM所有fileを読めません: "+path.getFileName());return Files.readString(path,StandardCharsets.UTF_8);}
+    static String readSmall(Path path,int limit) throws IOException {if(!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||!path.toRealPath().equals(path)||(Files.size(path)<1||Files.size(path)>limit))throw new IOException("VM所有fileを読めません: "+path.getFileName());return Files.readString(path,StandardCharsets.UTF_8);}
     static void requireZero(Commands.Result result,String operation) throws IOException {if(result.exit()!=0)throw new IOException(operation+"が失敗しました（exit "+result.exit()+"）");}
 }

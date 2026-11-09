@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.McIconException;
 import io.github.rs0325.mcicon.internal.managed.BundledPinsFailure;
+import io.github.rs0325.mcicon.internal.managed.ManagedBusyFailure;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -17,6 +18,7 @@ import java.util.concurrent.*;
 /** bootstrap専用の起動境界。通常CLI/APIに更新処理を持ち込まない。 */
 final class StartupControl implements AutoCloseable {
     static final String PROPERTY="mcicon.bootstrap.control";
+    static final String CAPABILITIES_PROPERTY="mcicon.bootstrap.capabilities";
     static final ObjectMapper JSON=JsonMapper.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
     private final Socket socket;
     private final boolean prepare;
@@ -61,8 +63,16 @@ final class StartupControl implements AutoCloseable {
     }
     void initializationFailure(Throwable cause) throws IOException {
         while(cause instanceof CompletionException&&cause.getCause()!=null)cause=cause.getCause();
+        Throwable busy=cause;while(busy instanceof McIconException&&busy.getCause()!=null&&busy.getSuppressed().length==0)busy=busy.getCause();
+        if(busy instanceof ManagedBusyFailure&&busy.getSuppressed().length==0&&"deferred-v1".equals(System.getProperty(CAPABILITIES_PROPERTY))){deferred((ManagedBusyFailure)busy);return;}
         if(cause instanceof McIconException&&cause.getCause() instanceof BundledPinsFailure&&cause.getSuppressed().length==0)failed("BUNDLED_PINS_INVALID","NOT_STARTED");
         else failed("UNKNOWN","UNKNOWN");
+    }
+    void deferred(ManagedBusyFailure cause) throws IOException {
+        if(!prepare||ready||failed||notified)return;
+        notified=true;ObjectNode value=JSON.createObjectNode().put("protocol",4).put("type","DEFERRED").put("reason","MANAGED_BUSY");
+        for(String name:List.of("nonce","invocation","slot","pid","startedAt"))value.set(name,identity.get(name));
+        value.set("jobs",cause.jobs());if(!cause.admission().isNull())value.set("admission",cause.admission());write(socket,value,Math.min(deadline,System.nanoTime()+TimeUnit.SECONDS.toNanos(30)));
     }
     void failed(String failure,String cleanup) throws IOException {
         if(!prepare||ready||failed||notified)return;

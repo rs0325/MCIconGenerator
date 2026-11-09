@@ -1,3 +1,9 @@
+sourceSets.main.java.srcDir(rootProject.file('shared/src/main/java'))
+sourceSets.test.java.srcDir(rootProject.file('shared/src/test/java'))
 dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
+}
+
+tasks.named('test') {
+    if (providers.gradleProperty('publishedDescriptorsDir').isPresent()) systemProperty 'mcicon.publishedDescriptors', providers.gradleProperty('publishedDescriptorsDir').get()
 }

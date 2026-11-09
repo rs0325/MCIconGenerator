@@ -25,6 +25,7 @@ static int CompareStringOrdinal(const wchar_t* a,int,const wchar_t* b,int,int){s
 static int executeStarted(int argc,wchar_t** argv,Startup& startup,HANDLE witness=0,bool bridge=false,bool keeper=false,DWORD pid=0,ULONGLONG start=0){require(startup.parent.value==11);if(postJobFail)throw std::runtime_error("Job以後の失敗");require(argc==14&&std::wstring(argv[6])==L"C:\\Windows\\System32\\wsl.exe"&&witness==9&&bridge!=keeper&&pid==42&&start==23);calls++;return 7;}
 static int execute(int,wchar_t**){return 0;}
 static int facts(){return 0;}
+static int identityCalls=0;static int fileIdentity(const std::wstring& path){require(path==L"C:\\record");identityCalls++;return 0;}
 static int remainingUntil(ULONGLONG end){return clockValue<end?1:0;}
 #include "native-wsl.inc"
 #include "native-completion-type.inc"
@@ -36,7 +37,8 @@ static int client(){std::wstring base=L"record";std::string receipt="{\"pid\":1}
 static std::vector<std::wstring> valid(){return {L"host",L"exec-bridge",L"1",L"2",L"C:\\record",L"--",L"42",L"23",L"--",L"C:\\Windows\\System32\\wsl.exe",L"--distribution",L"MCIcon-0123456789abcdef01234567",L"--user",L"root",L"--exec",L"/usr/bin/python3",L"/usr/lib/mcicon/guestbridge.py"};}
 static int invoke(std::vector<std::wstring> args,bool bridge=true){std::vector<wchar_t*> argv;for(auto& arg:args)argv.push_back(arg.data());return wslExecute(argv.size(),argv.data(),bridge);}
 int main(){int count=0;auto accept=[&](bool value){require(value);count++;};auto reject=[&](std::vector<std::wstring> args){int before=calls;try{accept(invoke(args)==1);}catch(const std::runtime_error&){}accept(calls==before);};
-accept(invoke(valid())==7);accept(invoke(valid(),false)==7);
+accept(invoke(valid())==7);accept(stateWrites==1);accept(invoke(valid(),false)==7);accept(stateWrites==2);
+std::vector<std::wstring> identityArgs={L"host",L"file-identity",L"C:\\record"};std::vector<wchar_t*> identityArgv;for(auto& arg:identityArgs)identityArgv.push_back(arg.data());accept(wmain(identityArgv.size(),identityArgv.data())==0);accept(identityCalls==1);
 for(auto [index,value]:std::vector<std::pair<int,std::wstring>>{{5,L"x"},{8,L"x"},{9,L"C:\\other\\wsl.exe"},{10,L"--exec"},{11,L"MCIcon-0123456789ABCDEF01234567"},{12,L"--other"},{13,L"user"},{14,L"--shell"},{15,L"/bin/sh"},{16,L"/tmp/bridge"},{6,L"43"},{7,L"24"}}){auto args=valid();args[index]=value;reject(args);}auto shortArgs=valid();shortArgs.pop_back();reject(shortArgs);alive=false;reject(valid());alive=true;
 auto badMode=valid();badMode[1]=L"exec-other";std::vector<wchar_t*> mode;for(auto& arg:badMode)mode.push_back(arg.data());accept(wmain(mode.size(),mode.data())==1);
 

@@ -1,0 +1,3 @@
+# 公開旧Windows readerのprotocol fixture
+
+公開v1.1.0/v1.1.1から未改変の6sourceを収録する。元commitと各元bytesのSHAはsources.jsonを参照する。rootのLICENSEが適用される。テスト時だけ別classloaderでcompile/loadし、製品から旧helperをロードする経路には使わない。新世代active/releasedに対する旧readerの診断を、実WSLや公開実更新とは別に検証する。

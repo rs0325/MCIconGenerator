@@ -7,6 +7,9 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.MessageDigest;
+import java.security.KeyPairGenerator;
+import java.security.Signature;
+import io.github.rs0325.mcicon.internal.*;
 import java.util.*;
 import java.util.concurrent.*;
 import org.junit.jupiter.api.Test;
@@ -106,17 +109,149 @@ class HelperCommonTest {
         Fixture fixture=new Fixture();LeaseFile lease=fixture.open();assertThrows(IOException.class,()->lease.verifiedArtifact("renderer-image"));assertFalse(Files.exists(fixture.image));
         Files.createDirectories(fixture.image.getParent());Files.write(fixture.image,new byte[]{1,2,3});assertEquals(3,lease.verifiedArtifact("renderer-image").bytes());Files.write(fixture.image,new byte[]{3,2,1});assertThrows(IOException.class,()->lease.verifiedArtifact("renderer-image"));assertArrayEquals(new byte[]{3,2,1},Files.readAllBytes(fixture.image));
     }
+    @Test void signedReferenceHasNoOperationAuthorityAndDetectsReplacement() throws Exception {
+        Fixture fixture=new Fixture();LeaseSnapshot snapshot=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust);
+        assertEquals(fixture.executable,snapshot.helperExecutable());
+        assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,LeaseTrust.legacy()));
+        ObjectNode copy=snapshot.lease();copy.put("ownerId",UUID.randomUUID().toString());assertNotEquals(copy,snapshot.lease());
+        Path receipt=fixture.file.resolveSibling("lease.lock");byte[] bytes=Files.readAllBytes(receipt);
+        Files.delete(receipt);Files.write(receipt,bytes);assertThrows(IOException.class,snapshot::verifyUnchanged);
+    }
+    @Test void helperAndSignatureMustRemainPinnedEvenWhenReceiptIsConsistent() throws Exception {
+        Fixture fixture=new Fixture();
+        Path evidence=LeaseTrust.evidence(fixture.base,fixture.open().read().path("descriptorSha256").asText());
+        byte[] original=Files.readAllBytes(evidence);ObjectNode value=(ObjectNode)HelperProtocol.read(original);
+        value.put("signature",Base64.getEncoder().encodeToString(new byte[64]));Files.write(evidence,HelperProtocol.JSON.writeValueAsBytes(value));
+        assertThrows(IOException.class,fixture::open);Files.write(evidence,original);
+        Files.writeString(fixture.executable,"different");assertThrows(IOException.class,fixture::open);
+    }
+    @Test void releasedReferenceRequiresEmptyResourcesAndOperationOpenRejectsIt() throws Exception {
+        Fixture fixture=new Fixture();ObjectNode value=fixture.open().read();value.put("state","released");Files.write(fixture.file,HelperProtocol.JSON.writeValueAsBytes(value));
+        assertEquals("released",LeaseFile.inspect(fixture.base,fixture.file,fixture.trust).lease().path("state").asText());assertThrows(IOException.class,fixture::open);
+        value.set("resources",fixture.starting());Files.write(fixture.file,HelperProtocol.JSON.writeValueAsBytes(value));assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,fixture.trust));
+    }
+    @Test void hardlinkによるreceipt別root参照を既知所有へしない() throws Exception {
+        Fixture fixture=new Fixture();Path receipt=fixture.file.resolveSibling("lease.lock"),alias=fixture.base.resolve("aliased-receipt");
+        Files.createLink(alias,receipt);assertThrows(IOException.class,fixture::open);
+    }
+    @Test void signatureSidecarの偽trustとfield改変を認証根へしない() throws Exception {
+        Fixture fixture=new Fixture();String digest=fixture.open().read().path("descriptorSha256").asText();Path evidence=LeaseTrust.evidence(fixture.base,digest);byte[] original=Files.readAllBytes(evidence);
+        var forged=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();var recovery=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        Files.write(fixture.base.resolve("logs/trust.bin"),TrustFixtures.bytes(forged.getPublic(),recovery.getPublic()));
+        var signer=Signature.getInstance("Ed25519");signer.initSign(forged.getPrivate());signer.update(Files.readAllBytes(fixture.file.resolveSibling("descriptor.json")));
+        ObjectNode forgedProof=(ObjectNode)HelperProtocol.read(original);forgedProof.put("signature",Base64.getEncoder().encodeToString(signer.sign()));Files.write(evidence,HelperProtocol.JSON.writeValueAsBytes(forgedProof));assertThrows(IOException.class,fixture::open);
+        for(String value:List.of("{","{}","{\"schemaVersion\":1,\"schemaVersion\":1}")){Files.writeString(evidence,value);assertThrows(IOException.class,fixture::open);}
+        for(String field:List.of("descriptorSha256","signature","schemaVersion")) {
+            ObjectNode value=(ObjectNode)HelperProtocol.read(original);value.remove(field);Files.write(evidence,HelperProtocol.JSON.writeValueAsBytes(value));assertThrows(IOException.class,fixture::open);
+        }
+        ObjectNode value=(ObjectNode)HelperProtocol.read(original);value.put("signature","A".repeat(200));Files.write(evidence,HelperProtocol.JSON.writeValueAsBytes(value));assertThrows(IOException.class,fixture::open);
+        value=(ObjectNode)HelperProtocol.read(original);value.put("descriptorSha256","f".repeat(64));Files.write(evidence,HelperProtocol.JSON.writeValueAsBytes(value));assertThrows(IOException.class,fixture::open);
+        Files.write(evidence,original);assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,LeaseTrust.legacy()));assertNotNull(fixture.open());
+    }
+    @Test void capacity証拠は世代要求を再計算し重複と捏造した不足を拒否する() throws Exception {
+        Fixture fixture=new Fixture();ObjectNode candidate=fixture.open().read();candidate.put("pid",ProcessHandle.current().pid()).put("processStartedAt",ProcessHandle.current().info().startInstant().orElseThrow().toString());
+        ObjectNode identity=candidate.deepCopy();identity.remove(List.of("state","resources"));Files.write(fixture.file,HelperProtocol.JSON.writeValueAsBytes(candidate));Files.write(fixture.file.resolveSibling("lease.lock"),LeaseFile.receipt(identity));
+        Path directory=fixture.file.getParent().getParent().resolve(UUID.randomUUID().toString());Files.createDirectories(directory.resolve("tmp"));Files.createDirectory(directory.resolve("inventory"));
+        for(String file:List.of("descriptor.json","inventory/helper.json","inventory/image.json"))Files.copy(fixture.file.getParent().resolve(file),directory.resolve(file));
+        ObjectNode other=candidate.deepCopy().put("jobId",directory.getFileName().toString()).put("ownerId",UUID.randomUUID().toString());identity=other.deepCopy();identity.remove(List.of("state","resources"));Files.write(directory.resolve("lease.json"),HelperProtocol.JSON.writeValueAsBytes(other));Files.write(directory.resolve("lease.lock"),LeaseFile.receipt(identity));
+        long request=candidate.path("requirements").path("containerMemoryMiB").asLong();String digest=candidate.path("descriptorSha256").asText();
+        ObjectNode budget=HelperProtocol.JSON.createObjectNode().put("domain","macos-vm").put("constraint","generation").put("hostMiB",65536).put("requiredMiB",request*2+1024).put("availableMiB",request+1024);
+        budget.putArray("generations").addObject().put("descriptorSha256",digest).put("reservedMiB",request+1024).put("requestedMiB",request*2);
+        LeaseSnapshot own=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust),reference=LeaseFile.inspect(fixture.base,directory.resolve("lease.json"),fixture.trust);
+        try(var channel=FileChannel.open(directory.resolve("lease.lock"),StandardOpenOption.WRITE);var active=channel.lock(64,1,false)) {
+            ObjectNode invalid=budget.deepCopy();invalid.put("requiredMiB",request*2+1025);assertThrows(IOException.class,()->AdmissionEvidence.capacity(fixture.base,own,List.of(reference),invalid));
+            assertThrows(IOException.class,()->AdmissionEvidence.capacity(fixture.base,own,List.of(reference,reference),budget));
+            ObjectNode alone=budget.deepCopy();((ObjectNode)alone.path("generations").get(0)).put("reservedMiB",request);alone.put("availableMiB",request);
+            IOException insufficient=assertThrows(IOException.class,()->AdmissionEvidence.capacity(fixture.base,own,List.of(reference),alone));assertFalse(insufficient instanceof AdmissionEvidence.Busy);assertTrue(insufficient.getMessage().contains("候補単独でもVM容量"));
+            assertFalse(Files.exists(fixture.file.getParent().resolve("tmp/admission-v1.json")));
+            assertThrows(AdmissionEvidence.Busy.class,()->AdmissionEvidence.capacity(fixture.base,own,List.of(reference),budget));
+            JsonNode proof=AdmissionEvidence.jobReference(fixture.base,candidate.path("jobId").asText());
+            assertNotNull(AdmissionEvidence.verifyJob(fixture.base,proof,digest,ProcessHandle.current().pid(),candidate.path("processStartedAt").asText(),fixture.trust,false));
+            Path savedEvidence=fixture.file.getParent().resolve("tmp/admission-v1.json");byte[] originalEvidence=Files.readAllBytes(savedEvidence);ObjectNode insufficientProof=(ObjectNode)HelperProtocol.read(originalEvidence);((ObjectNode)insufficientProof.path("budget")).put("availableMiB",request);((ObjectNode)insufficientProof.path("budget").path("generations").get(0)).put("reservedMiB",request);Files.write(savedEvidence,HelperProtocol.JSON.writeValueAsBytes(insufficientProof));JsonNode insufficientClaim=AdmissionEvidence.jobReference(fixture.base,candidate.path("jobId").asText());
+            IOException refused=assertThrows(IOException.class,()->AdmissionEvidence.verifyJob(fixture.base,insufficientClaim,digest,ProcessHandle.current().pid(),candidate.path("processStartedAt").asText(),fixture.trust,false));assertTrue(refused.getMessage().contains("候補単独でもVM容量"));Files.write(savedEvidence,originalEvidence);
+
+            Path evidence=fixture.file.getParent().resolve("tmp/admission-v1.json");ObjectNode value=(ObjectNode)HelperProtocol.read(Files.readAllBytes(evidence));((ObjectNode)value.path("budget").path("generations").get(0)).put("requestedMiB",1);Files.write(evidence,HelperProtocol.JSON.writeValueAsBytes(value));
+            JsonNode changed=AdmissionEvidence.jobReference(fixture.base,candidate.path("jobId").asText());assertThrows(IOException.class,()->AdmissionEvidence.verifyJob(fixture.base,changed,digest,ProcessHandle.current().pid(),candidate.path("processStartedAt").asText(),fixture.trust,false));
+        }
+    }
+    @Test void releasedでもMacjournal未終端を回収済みへしない() throws Exception {
+        Fixture fixture=new Fixture();ObjectNode lease=fixture.open().read().put("state","released");Files.write(fixture.file,HelperProtocol.JSON.writeValueAsBytes(lease));
+        Path journal=Files.createDirectories(fixture.file.getParent().resolve("tmp/macos-operations"));ObjectNode identity=HelperProtocol.JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,lease.get(key));Files.write(journal.resolve("released.json"),HelperProtocol.JSON.writeValueAsBytes(identity));
+        Path operation=Files.createDirectory(journal.resolve(UUID.randomUUID().toString()));ObjectNode intent=HelperProtocol.JSON.createObjectNode().put("operationId",operation.getFileName().toString()).put("kind","prepare");intent.set("identity",identity);byte[] bytes=HelperProtocol.JSON.writeValueAsBytes(intent);Files.write(operation.resolve("intent.json"),bytes);
+        LeaseSnapshot snapshot=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust);assertThrows(IOException.class,()->RuntimeMaintenanceVerifier.requireReleased(snapshot));
+        Files.writeString(operation.resolve("client-complete"),hash(bytes)+"\n");ObjectNode settled=HelperProtocol.JSON.createObjectNode().put("intentSha256",hash(bytes));settled.putObject("evidence").put("owned",true);Files.write(operation.resolve("settled.json"),HelperProtocol.JSON.writeValueAsBytes(settled));assertDoesNotThrow(()->RuntimeMaintenanceVerifier.requireReleased(snapshot));
+        Files.writeString(operation.resolve("client-complete.pending"),"");assertThrows(IOException.class,()->RuntimeMaintenanceVerifier.requireReleased(snapshot));
+    }
+    @Test void 署名が正しくても固定helperや保守pinに結合しない世代は拒否する() throws Exception {
+        Fixture fixture=new Fixture();byte[] original=Files.readAllBytes(fixture.file.resolveSibling("descriptor.json"));
+        LeaseTrust bound=IdentityFixtures.trust(fixture.trustSet);bound.bindReader(fixture.base,original,Files.readAllBytes(fixture.file.resolveSibling("inventory/helper.json")),fixture.executable);
+        assertNotNull(LeaseFile.inspect(fixture.base,fixture.file,bound));
+        assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,LeaseTrust.pinned(fixture.trustSet,"f".repeat(64),null)));
+        ObjectNode descriptor=(ObjectNode)HelperProtocol.read(original);((ObjectNode)descriptor.path("artifacts").get(0)).put("sha256","2".repeat(64));
+        byte[] changed=HelperProtocol.JSON.writeValueAsBytes(descriptor);fixture.publish(changed);Files.write(fixture.file.resolveSibling("descriptor.json"),changed);
+        ObjectNode lease=(ObjectNode)HelperProtocol.read(Files.readAllBytes(fixture.file));lease.put("descriptorSha256",hash(changed));ObjectNode identity=lease.deepCopy();identity.remove(List.of("state","resources"));Files.write(fixture.file,HelperProtocol.JSON.writeValueAsBytes(lease));Files.write(fixture.file.resolveSibling("lease.lock"),LeaseFile.receipt(identity));
+        Path other=fixture.base.resolve("helpers/macos-aarch64/"+"2".repeat(64)+"/bin/helper");Files.createDirectories(other.getParent());Files.copy(fixture.executable,other);
+        assertNotNull(LeaseFile.inspect(fixture.base,fixture.file,fixture.trust));
+        IOException failure=assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,bound));assertTrue(failure.getMessage().contains("既知の署名descriptor"));
+    }
+    @Test @org.junit.jupiter.api.condition.EnabledOnOs(org.junit.jupiter.api.condition.OS.MAC)
+    void signatureSidecarのlinkを固定証拠として読まない() throws Exception {
+        Fixture fixture=new Fixture();Path evidence=LeaseTrust.evidence(fixture.base,fixture.open().read().path("descriptorSha256").asText()),target=fixture.base.resolve("linked-proof");
+        Files.move(evidence,target);Files.createSymbolicLink(evidence,target);assertThrows(IOException.class,fixture::open);
+    }
+    @Test void 未公開証拠の再検証はgenerations排他を飛ばさず有限時間で拒否する() throws Exception {
+        Fixture fixture=new Fixture();Path lock=fixture.base.resolve("locks/generations.lock");Files.createDirectory(lock.getParent());Files.write(lock,new byte[0]);
+        try(var channel=FileChannel.open(lock,StandardOpenOption.WRITE);var held=channel.lock()) {
+            IOException failure=assertTimeoutPreemptively(java.time.Duration.ofSeconds(5),()->assertThrows(IOException.class,()->AdmissionEvidence.verifyPreAdmission(fixture.base,HelperProtocol.JSON.createObjectNode(),"f".repeat(64),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow().toString(),fixture.trust)));
+            assertTrue(failure.getMessage().contains("generations lock"));
+        }
+        assertThrows(IOException.class,()->AdmissionEvidence.verifyPreAdmission(fixture.base,HelperProtocol.JSON.createObjectNode(),"f".repeat(64),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow().toString(),fixture.trust));
+    }
+    @Test void packageの署名検証とhelper結合前に現在hashを認証しない() throws Exception {
+        Fixture fixture=new Fixture();Path support=fixture.executable.getParent().getParent().resolve("app/support");Files.createDirectories(support);var recovery=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        // 証拠はfixtureの既存署名鍵で検証できるが、まだhelper bindingを実施していない。
+        Files.write(support.resolve("lease-trust.bin"),TrustFixtures.bytes(fixture.pair.getPublic(),recovery.getPublic()));
+        LeaseTrust unbound=LeaseTrust.packaged(fixture.executable,"macos");assertThrows(IOException.class,()->LeaseFile.inspect(fixture.base,fixture.file,unbound));
+        unbound.bindReader(fixture.base,Files.readAllBytes(fixture.file.resolveSibling("descriptor.json")),Files.readAllBytes(fixture.file.resolveSibling("inventory/helper.json")),fixture.executable);
+        if(!System.getProperty("os.name").startsWith("Windows"))assertNotNull(LeaseFile.inspect(fixture.base,fixture.file,unbound));
+    }
+    @Test void 証拠保存後に追加されたjobのdeadactiveとactor未終端を完全走査で拒否する() throws Exception {
+        Fixture fixture=new Fixture();ObjectNode descriptor=(ObjectNode)HelperProtocol.read(Files.readAllBytes(fixture.file.resolveSibling("descriptor.json")));((ObjectNode)descriptor.path("host")).put("os","windows").put("arch","x86_64");byte[] definition=HelperProtocol.JSON.writeValueAsBytes(descriptor);fixture.publish(definition);Files.write(fixture.file.resolveSibling("descriptor.json"),definition);
+        Path executable=fixture.base.resolve("helpers/windows-x86_64/"+"1".repeat(64)+"/bin/helper");Files.createDirectories(executable.getParent());Files.copy(fixture.executable,executable);
+        ObjectNode lease=(ObjectNode)HelperProtocol.read(Files.readAllBytes(fixture.file));lease.put("descriptorSha256",hash(definition)).put("pid",ProcessHandle.current().pid()).put("processStartedAt",ProcessHandle.current().info().startInstant().orElseThrow().toString());
+        ObjectNode identity=lease.deepCopy();identity.remove(List.of("state","resources"));Files.write(fixture.file,HelperProtocol.JSON.writeValueAsBytes(lease));Files.write(fixture.file.resolveSibling("lease.lock"),LeaseFile.receipt(identity));
+        var method=AdmissionEvidence.class.getDeclaredMethod("verifyUnpublishedJobs",Path.class,String.class,long.class,String.class,LeaseTrust.class);method.setAccessible(true);
+        Object[] args={fixture.base,"f".repeat(64),ProcessHandle.current().pid(),lease.path("processStartedAt").asText(),fixture.trust};
+        try(var channel=FileChannel.open(fixture.file.resolveSibling("lease.lock"),StandardOpenOption.WRITE);var held=channel.lock(64,1,false)) {
+            method.invoke(null,args);
+            Path proof=fixture.base.resolve("logs/"+UUID.randomUUID()+".pre-admission-v1.json");ObjectNode saved=HelperProtocol.JSON.createObjectNode();saved.putArray("references").add(RuntimeMaintenanceVerifier.proof(LeaseFile.inspect(fixture.base,fixture.file,fixture.trust)));AdmissionEvidence.save(proof,saved,fixture.trust);byte[] original=Files.readAllBytes(proof);
+            Path extra=fixture.file.getParent().getParent().resolve(UUID.randomUUID().toString());Files.createDirectories(extra.resolve("tmp"));Files.createDirectory(extra.resolve("inventory"));for(String file:List.of("descriptor.json","inventory/helper.json","inventory/image.json"))Files.copy(fixture.file.getParent().resolve(file),extra.resolve(file));
+            ObjectNode unknown=lease.deepCopy().put("jobId",extra.getFileName().toString()).put("ownerId",UUID.randomUUID().toString()).put("processStartedAt",java.time.Instant.EPOCH.toString());identity=unknown.deepCopy();identity.remove(List.of("state","resources"));Files.write(extra.resolve("lease.lock"),LeaseFile.receipt(identity));Files.write(extra.resolve("lease.json"),HelperProtocol.JSON.writeValueAsBytes(unknown));
+            var failure=assertThrows(java.lang.reflect.InvocationTargetException.class,()->method.invoke(null,args));assertInstanceOf(IOException.class,failure.getCause());assertArrayEquals(original,Files.readAllBytes(proof));
+            unknown.put("state","released");Files.write(extra.resolve("lease.json"),HelperProtocol.JSON.writeValueAsBytes(unknown));method.invoke(null,args);
+            Files.writeString(extra.resolve("tmp/native-"+UUID.randomUUID()+".intent.json"),"{}");failure=assertThrows(java.lang.reflect.InvocationTargetException.class,()->method.invoke(null,args));assertInstanceOf(IOException.class,failure.getCause());assertArrayEquals(original,Files.readAllBytes(proof));
+        }
+    }
     final class Fixture {
-        final Path base=Files.createTempDirectory(root,"fixture-").toRealPath(),file,executable,image;final HelperProtocol.Command command;
+        final Path base=Files.createTempDirectory(root,"fixture-").toRealPath(),file,executable,image;final HelperProtocol.Command command;final LeaseTrust trust;final java.security.KeyPair pair;final TrustSet trustSet;
         Fixture() throws Exception {
             ObjectNode identity=((ObjectNode)examples().path("receipt").get("identity")).deepCopy();Files.writeString(base.resolve("host-id"),identity.path("hostId").asText());Path job=base.resolve("jobs").resolve(identity.path("jobId").asText());Files.createDirectories(job.resolve("tmp"));Files.createDirectory(job.resolve("inventory"));
             ObjectNode descriptor=HelperProtocol.JSON.createObjectNode().put("schemaVersion",1).put("runtimeId","fixture").put("toolVersion","1.1.0").put("minimumOsVersion","15");descriptor.putObject("host").put("os","macos").put("arch","aarch64");descriptor.putObject("worker").put("toolVersion","1.1.0").put("protocolVersion",1).put("agentSha256",identity.path("workerSha256").asText()).put("adapterSetSha256","a".repeat(64));descriptor.putObject("helper").put("protocolVersion",1).put("artifactId","helper").put("executable","bin/helper");descriptor.putObject("rendering");var artifacts=descriptor.putArray("artifacts");
             for(String id:List.of("helper","image")) {
-                String digest=id.equals("helper")?"1".repeat(64):hash(new byte[]{1,2,3});var artifact=artifacts.addObject().put("id",id).put("role",id.equals("helper")?"host-helper":"renderer-image").put("url","https://fixture.invalid/"+id).put("bytes",3).put("sha256",digest).put("unpackedBytes",3).put("format","zip").put("inventoryPath","inventory/"+id+".json").put("inventorySha256",hash("{}".getBytes(StandardCharsets.UTF_8)));artifact.putArray("licenseFiles").add("LICENSE");artifact.putArray("noticeFiles");artifact.putArray("sourceArchives");Files.writeString(job.resolve("inventory/"+id+".json"),"{}");
+                String digest=id.equals("helper")?"1".repeat(64):hash(new byte[]{1,2,3});var artifact=artifacts.addObject().put("id",id).put("role",id.equals("helper")?"host-helper":"renderer-image").put("url","https://fixture.invalid/"+id).put("bytes",3).put("sha256",digest).put("unpackedBytes",3).put("format","zip").put("inventoryPath","inventory/"+id+".json").put("inventorySha256",hash(inventory(id)));artifact.putArray("licenseFiles").add("LICENSE");artifact.putArray("noticeFiles");artifact.putArray("sourceArchives");Files.write(job.resolve("inventory/"+id+".json"),inventory(id));
             }
-            byte[] definition=HelperProtocol.JSON.writeValueAsBytes(descriptor);identity.put("descriptorSha256",hash(definition));Files.write(job.resolve("descriptor.json"),definition);file=job.resolve("lease.json");ObjectNode lease=identity.deepCopy().put("state","active");lease.putObject("resources");Files.write(file,HelperProtocol.JSON.writeValueAsBytes(lease));Files.write(job.resolve("lease.lock"),LeaseFile.receipt(identity));executable=base.resolve("helpers/macos-aarch64/"+"1".repeat(64)+"/bin/helper");Files.createDirectories(executable.getParent());Files.writeString(executable,"test-only");image=base.resolve("runtimes/fixture/"+identity.path("descriptorSha256").asText()+"/image.zip");command=new HelperProtocol.Command(base,file,"preflight",List.of());
+            pair=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();var recovery=KeyPairGenerator.getInstance("Ed25519").generateKeyPair();trustSet=TrustSet.parse(TrustFixtures.bytes(pair.getPublic(),recovery.getPublic()));trust=IdentityFixtures.trust(trustSet);
+            byte[] definition=HelperProtocol.JSON.writeValueAsBytes(descriptor);var signer=Signature.getInstance("Ed25519");signer.initSign(pair.getPrivate());signer.update(definition);LeaseTrust.publish(base,definition,signer.sign(),trustSet);identity.put("descriptorSha256",hash(definition));Files.write(job.resolve("descriptor.json"),definition);file=job.resolve("lease.json");ObjectNode lease=identity.deepCopy().put("state","active");lease.putObject("resources");Files.write(file,HelperProtocol.JSON.writeValueAsBytes(lease));Files.write(job.resolve("lease.lock"),LeaseFile.receipt(identity));executable=base.resolve("helpers/macos-aarch64/"+"1".repeat(64)+"/bin/helper");Files.createDirectories(executable.getParent());Files.writeString(executable,"test-only");image=base.resolve("runtimes/fixture/"+identity.path("descriptorSha256").asText()+"/image.zip");command=new HelperProtocol.Command(base,file,"preflight",List.of());
         }
-        LeaseFile open() throws Exception {return LeaseFile.open(command,executable);}
+        LeaseFile open() throws Exception {return LeaseFile.open(command,executable,trust);}
+        void publish(byte[] definition) throws Exception {
+            var signer=Signature.getInstance("Ed25519");signer.initSign(pair.getPrivate());signer.update(definition);LeaseTrust.publish(base,definition,signer.sign(),trustSet);
+        }
+        byte[] inventory(String id) throws Exception {
+            ObjectNode value=HelperProtocol.JSON.createObjectNode();
+            if(id.equals("helper"))value.putObject("contents").putArray("files").addObject().put("path","bin/helper").put("bytes","test-only".getBytes(StandardCharsets.UTF_8).length).put("sha256",hash("test-only".getBytes(StandardCharsets.UTF_8)));
+            return HelperProtocol.JSON.writeValueAsBytes(value);
+        }
         ObjectNode starting() {var resources=HelperProtocol.JSON.createObjectNode();resources.putObject("macos").put("phase","starting").put("generationOwner",UUID.randomUUID().toString()).put("instanceDir",base.resolve("instance").toString()).putArray("containers");return resources;}
     }
     static String hash(byte[] bytes) throws Exception {return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));}

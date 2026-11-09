@@ -1,6 +1,8 @@
 plugins {
     id 'application'
 }
+sourceSets.test.java.srcDir(rootProject.file('shared/src/test/java'))
+
 
 dependencies {
     implementation project(':helper-common')
@@ -13,6 +15,7 @@ tasks.register('appImage', Exec) {
     dependsOn 'installDist'
     def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
     doFirst {
+        if (!providers.gradleProperty('helperLeaseTrust').isPresent()) throw new GradleException('-PhelperLeaseTrustに既存公開TrustSetを指定してください')
         if (!System.getProperty('os.name').toLowerCase().contains('mac')) {
             throw new GradleException('macOS app-imageはmacOSで生成してください')
         }
@@ -24,6 +27,7 @@ tasks.register('appImage', Exec) {
                 '--input', layout.buildDirectory.dir('install/helper-macos/lib').get().asFile,
                 '--payload', file(providers.gradleProperty('macosPayloadDir').get()),
                 '--app-version', project.version.toString(),
+                '--lease-trust', file(providers.gradleProperty('helperLeaseTrust').get()),
                 '--native', file('src/main/native'), '--output', layout.buildDirectory.dir('app-image').get().asFile
     }
 }

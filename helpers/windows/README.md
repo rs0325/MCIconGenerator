@@ -124,3 +124,16 @@ class90のboot GUIDを今回読取り、両caseを同じ現bootへ結合した�
 ### Job終端失敗時の限定診断候補
 
 drain-expiredの既失敗枝だけで、今回JobのPID一覧を最大8件一回採取し、所属・開始時刻・image（不明時error）・Wait0を観測する。全観測handleを閉じた後にaccountingを再読する。最大50msの協調予算を既2秒のend内へclampし、親終了優先・強制回収・125判定を変更しない。stderr frameは4KiB以下で、上限・切断・API不明はunknownを保持する。accounting countは生存PID数の証明ではない。新PEのWindows5条件・製品経路は未受入であり、旧b38実測を自動継承しない。
+
+
+## 異世代参照と更新延期（Issue #189）
+
+LeaseSnapshotは元descriptorの認証・canonical receipt・file identity・helper/inventory pinを確認する読取り専用境界とし、操作は自世代のLeaseFile.openに限定する。helper package生成には -PhelperLeaseTrust（scriptは --lease-trust）で既存の公開TrustSetを明示し、app/support/lease-trust.binへ固定同梱する。runtime rootのtrustを認証根にしない。coreから渡す署名証拠はlogs/descriptor-<descriptor SHA>.trust-v1.jsonだけで、既存jobには追記しない。
+
+公開1.1.0/1.1.1の既知live readerがある間は、新候補のdirectory/leaseをjobsへ公開する前にLEGACY_READER_ACTIVEとして延期する。generations lock内の検査と公開を一体化し、追加のroot lifecycle lockだけで旧readerとの互換を保証したとは扱わない。旧jobの正常完了後、次の適格起動で新版を試す。未知の所有・dead-active・終端不足はUNKNOWNのまま保全する。
+
+WSL2の各distroは同じutility VMを共有するため、容量をdescriptor別に満額配分しない。全世代container要求とdistroごとのoverheadを共有容量へ照合する。現行helloのMemTotalだけでは異世代の共有利用可能量とhost余裕を肯定できず、この場合はUNKNOWNで拒否する。Windows異世代admissionの完成・実WSL受入を意味しない。lock順はjob journal → root lifecycle → generationとする。
+
+Windowsのsnapshot置換負例は実native file IDを使う。現在sourceからbuildしたwindows-host.exeとbuild.jsonのartifact.sha256を、Testタスクへ-PleaseIdentityReader=<絶対path>、-PleaseIdentityReaderSha256=<SHA>で明示する。これらはtest JVM専用で、製品の信頼入力を差し替えるpropertyではない。公開4descriptorの署名試験は-PpublishedDescriptorsDir=<取得済みdescriptor・署名・public-trust-set.binのdirectory>を指定する。通常の単体試験で省略される公開物照合と、明示実行した結果を区別する。
+
+bootstrapの実CLI fixtureは1.1.0 slotを使うため、関連試験は-PreleaseVersion=1.1.0で実行する。配布候補のbuild版は別途1.1.2とする。bootstrapのWindows実file試験にはstage済みの固定security readerを使い、ACLを変更せず、既存の所有検証に合格する本人専用一時rootをjava.io.tmpdirへ指定する。

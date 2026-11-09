@@ -22,7 +22,11 @@ public final class RuntimeLease implements AutoCloseable {
     private boolean closed;
     private RuntimeLease(Path file,ObjectNode identity,FileChannel channel,FileLock lock) {this.file=file;this.identity=identity;this.channel=channel;this.lock=lock;}
     public static RuntimeLease create(RuntimeStore store,RuntimeDescriptor descriptor,ManagedOptions options,Instant preparationDeadline) throws IOException {
+        return create(store,descriptor,options,preparationDeadline,null);
+    }
+    static RuntimeLease create(RuntimeStore store,RuntimeDescriptor descriptor,ManagedOptions options,Instant preparationDeadline,WindowsAdmission admission) throws IOException {
         try(var ignored=store.lock("generations")) {
+            if(admission!=null)admission.check();
             Path host=store.path("host-id");
             if(!Files.exists(host))FilesSupport.atomicWrite(host,UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.US_ASCII));
             String hostId=Files.readString(host).trim();
