@@ -57,7 +57,7 @@ public final class Diagnostics {
         var check=command("worker_java",launch,
                 List.of("run","--rm","--platform","linux/amd64","--network","none","--entrypoint",executable,image,"-version"),45,token);
         token.check();
-        if(!check.check().passed())throw new McIconException("WORKER_JAVA_UNAVAILABLE","The selected Java is unavailable inside the Docker image",1);
+        if(!check.check().passed())throw new McIconException("WORKER_JAVA_UNAVAILABLE","The selected Java is unavailable inside the Docker image: "+check.check().detail(),1,check.cause()==null?new IOException(check.check().detail()):check.cause());
         WorkerJava java=parseJava(executable,check.stderr(),minimum);
         if(launch.managed()) {
             String expected=launch.javaHashes().get(minimum);
@@ -67,7 +67,7 @@ public final class Diagnostics {
         }
         return java;
     }
-    private record CommandResult(DiagnosticReport.Check check,String stdout,String stderr) {}
+    private record CommandResult(DiagnosticReport.Check check,String stdout,String stderr,Throwable cause) {}
     private static CommandResult command(String name, WorkerLaunch launch, List<String> args, int seconds,CancellationToken token) {
         List<String> command = new ArrayList<>(args);
         String container=null;
@@ -83,20 +83,22 @@ public final class Diagnostics {
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(seconds);
             while(!process.waitFor(100,TimeUnit.MILLISECONDS)) {
                 token.check();
-                if(System.nanoTime()>=deadline){process.destroyForcibly();return new CommandResult(new DiagnosticReport.Check(name,false,"Diagnostic timed out"),"","");}
+                if(System.nanoTime()>=deadline){process.destroyForcibly();return failed(name,"Diagnostic timed out",log,errorLog,null);}
             }
             long size=Files.size(log),errorSize=Files.size(errorLog);
-            if(size>65536||errorSize>65536-size)return new CommandResult(new DiagnosticReport.Check(name,false,"Diagnostic応答が上限を超えました"),"","");
+            if(size>65536||errorSize>65536-size)return failed(name,"Diagnostic response limit exceeded",log,errorLog,null);
             String stdout,stderr;
             try(InputStream output=Files.newInputStream(log);InputStream error=Files.newInputStream(errorLog)) {
                 byte[] out=output.readNBytes((int)size),err=error.readNBytes((int)errorSize);
-                if(out.length!=size||err.length!=errorSize||Files.size(log)!=size||Files.size(errorLog)!=errorSize)return new CommandResult(new DiagnosticReport.Check(name,false,"Diagnostic応答が変化しました"),"","");
+                if(out.length!=size||err.length!=errorSize||Files.size(log)!=size||Files.size(errorLog)!=errorSize)return failed(name,"Diagnostic response changed while reading",log,errorLog,null);
                 stdout=new String(out,java.nio.charset.StandardCharsets.UTF_8);stderr=new String(err,java.nio.charset.StandardCharsets.UTF_8);
             }
-            return new CommandResult(new DiagnosticReport.Check(name,process.exitValue()==0,(stdout+stderr).trim()),stdout,stderr);
+            int exit=process.exitValue();
+            if(exit!=0)return failed(name,"Process exited with code "+exit,log,errorLog,null);
+            return new CommandResult(new DiagnosticReport.Check(name,true,(stdout+stderr).trim()),stdout,stderr,null);
         } catch (Exception e) {
             if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            return new CommandResult(new DiagnosticReport.Check(name,false,e.getClass().getSimpleName()),"","");
+            return failed(name,"Process start or diagnostic failed: "+e.getClass().getSimpleName(),log,errorLog,new IOException("Process start or diagnostic failed: "+e.getClass().getSimpleName()));
         } finally {
             if(process != null && process.isAlive()) process.destroyForcibly();
             if(container!=null) {
@@ -110,6 +112,14 @@ public final class Diagnostics {
             if(log != null)try { Files.deleteIfExists(log); } catch(IOException ignored) {}
             if(errorLog != null)try { Files.deleteIfExists(errorLog); } catch(IOException ignored) {}
         }
+    }
+    private static CommandResult failed(String name,String reason,Path log,Path errorLog,Throwable cause) {
+        String detail=reason+"; stdoutBytes="+byteCount(log)+"; stderrBytes="+byteCount(errorLog);
+        return new CommandResult(new DiagnosticReport.Check(name,false,detail),"","",cause);
+    }
+    private static String byteCount(Path file) {
+        if(file==null)return "unknown";
+        try{return Long.toString(Files.size(file));}catch(IOException ignored){return "unknown";}
     }
     public static CacheReport cache(Path root, boolean verify, CancellationToken token) throws IOException {
         root = root.toAbsolutePath().normalize();
