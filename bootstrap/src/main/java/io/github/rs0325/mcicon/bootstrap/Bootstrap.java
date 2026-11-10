@@ -23,6 +23,7 @@ final class Bootstrap {
     private final UserPrincipal owner;
     private final WindowsPrivateFiles windows;
     private final Path dataRoot;
+    private final Map<String,Map<String,String>> verifiedTrees=new HashMap<>();
     Bootstrap(Path installed,Path root,Seed.Host host) throws IOException {
         this.installed=installed.toAbsolutePath().normalize();this.root=root.toAbsolutePath().normalize();this.host=host;
         dataRoot=host.os().equals("windows")?WindowsDataHome.configuredRoot():null;
@@ -122,8 +123,20 @@ final class Bootstrap {
         Path stage=root.resolve("staging/manifest-"+UUID.randomUUID());directory(stage,deadline);bytes(stage.resolve("stable.json"),seed.manifestBytes,deadline);bytes(stage.resolve("stable.json.sig"),seed.signatureBytes,deadline);Seed.check(deadline);Files.move(stage,target,StandardCopyOption.ATOMIC_MOVE);Seed.check(deadline);
     }
     Path verifySlot(Seed seed,long deadline) throws IOException {
-        Path archive=root.resolve("archives/"+seed.hash+".zip"),slot=slot(seed),stage=root.resolve("staging/slot-"+UUID.randomUUID());if(Files.getFileStore(root).getUsableSpace()<Seed.positive(seed.payload,"unpackedBytes"))throw Seed.invalid("展開空き容量が不足しています");file(archive,deadline);seed.extract(this,archive,stage,deadline);
-        if(!Files.notExists(slot,LinkOption.NOFOLLOW_LINKS)) {directory(slot,deadline);if(!Seed.tree(this,stage,deadline).equals(Seed.tree(this,slot,deadline)))throw Seed.invalid("既存slotの完全treeが破損しています");removeOwnStage(stage,deadline);}
+        Seed.check(deadline);Path archive=root.resolve("archives/"+seed.hash+".zip"),slot=slot(seed);
+        Map<String,String> expected=host.os().equals("windows")?verifiedTrees.get(seed.manifestHash):null;
+        if(expected!=null&&!Files.notExists(slot,LinkOption.NOFOLLOW_LINKS)) {
+            file(archive,deadline);seed.verifyArchive(archive,deadline);
+            if(!expected.equals(Seed.tree(this,slot,deadline)))throw Seed.invalid("既存slotの完全treeが破損しています");
+            Seed.check(deadline);return slot;
+        }
+        Path stage=root.resolve("staging/slot-"+UUID.randomUUID());if(Files.getFileStore(root).getUsableSpace()<Seed.positive(seed.payload,"unpackedBytes"))throw Seed.invalid("展開空き容量が不足しています");file(archive,deadline);seed.extract(this,archive,stage,deadline);
+        if(!Files.notExists(slot,LinkOption.NOFOLLOW_LINKS)) {
+            directory(slot,deadline);Map<String,String> reference=Seed.tree(this,stage,deadline);
+            if(!reference.equals(Seed.tree(this,slot,deadline)))throw Seed.invalid("既存slotの完全treeが破損しています");removeOwnStage(stage,deadline);
+            // 署名ZIPから得た期待値だけを保持し、slotの安全性と内容は毎回観測する。
+            if(host.os().equals("windows"))verifiedTrees.put(seed.manifestHash,Map.copyOf(reference));
+        }
         else {directory(slot.getParent(),deadline);Seed.check(deadline);Files.move(stage,slot,StandardCopyOption.ATOMIC_MOVE);}
         Seed.check(deadline);return slot;
     }
