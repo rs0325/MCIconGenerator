@@ -26,6 +26,20 @@ class MacRuntimeTest {
             public FileVisitResult postVisitDirectory(Path directory,java.io.IOException error) throws java.io.IOException {if(error!=null)throw error;Files.delete(directory);return FileVisitResult.CONTINUE;}
         });
     }
+    @Test void tmpリンクを拒否する前にphaseを外側へ保存しない() throws Exception {
+        var job=fixture.job(false);Path tmp=job.command().lease().getParent().resolve("tmp"),outside=temporary.resolve("outside");
+        Files.createDirectory(outside);Files.delete(tmp);Files.createSymbolicLink(tmp,outside);
+        byte[] original=Files.readAllBytes(job.command().lease());String launcher=System.getProperty("jpackage.app-path");
+        try {
+            System.setProperty("jpackage.app-path",fixture.executable.toString());
+            assertEquals(1,Main.run(new String[]{"--protocol","1","--root",fixture.root.toString(),"--lease",job.command().lease().toString(),"release"}));
+            try(var files=Files.list(outside)){assertEquals(0,files.count(),"検証前にリンク先へphaseを保存しました");}
+            assertArrayEquals(original,Files.readAllBytes(job.command().lease()));
+        }finally {
+            if(launcher==null)System.clearProperty("jpackage.app-path");else System.setProperty("jpackage.app-path",launcher);
+            Files.delete(tmp);Files.createDirectory(tmp);
+        }
+    }
     @Test void live未着手の失敗cleanupはanchorを要求せず自身だけを閉じる() throws Exception {
         var job=fixture.job(false);assertTrue(MacRuntime.releaseUnstarted(job.command(),job.lease(),System.nanoTime()));assertTrue(job.lease().read().path("resources").isEmpty());assertFalse(Files.exists(fixture.cache().anchor()));assertFalse(Files.exists(fixture.root.resolve("macos")));
         try(var journal=OperationJournal.acquire(job.command().lease().getParent().resolve("tmp"),job.lease().read(),Duration.ofSeconds(1))){assertTrue(journal.released());assertThrows(java.io.IOException.class,()->journal.begin("create"));}

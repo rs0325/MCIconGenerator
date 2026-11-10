@@ -1,6 +1,7 @@
 package io.github.rs0325.mcicon.helper.macos;
 
 import java.io.*;
+import io.github.rs0325.mcicon.internal.RuntimePhaseLog;
 import java.nio.file.*;
 import java.time.Duration;
 import java.util.*;
@@ -8,6 +9,8 @@ import java.util.concurrent.*;
 
 /** 固定native guardを介し、helperの終了時にも自作成client groupを監督する。 */
 class Commands {
+    // native guardの200回×10msの回収に、終了記録とscheduleの余裕を加える。
+    static final long GUARD_RESERVE_NANOS=Duration.ofMillis(2250).toNanos();
     record Result(int exit,byte[] stdout,byte[] stderr) {}
     record Owner(long pid,long startedAtMillis) {}
     private final Path guard;
@@ -17,26 +20,38 @@ class Commands {
     Commands(Path guard,Map<String,String> environment,Path temporary) {this.guard=guard;this.environment=Map.copyOf(environment);this.temporary=temporary;}
     void cleanupDeadline(long deadline){cleanupEnd=Math.min(cleanupEnd,deadline);}
     Result capture(List<String> arguments,Duration timeout) throws IOException {
-        return capture(arguments,timeout,builder(arguments,null,null));
+        return capture(arguments,System.nanoTime()+timeout.toNanos(),builder(arguments,null,null),null);
     }
     Result generate(List<String> arguments,Duration timeout,OperationJournal.Operation operation,Owner owner) throws IOException {
         if(owner==null)throw new IOException("生成操作には元core identityが必要です");
-        return capture(arguments,timeout,builder(arguments,operation,owner));
+        return capture(arguments,System.nanoTime()+timeout.toNanos(),builder(arguments,operation,owner),operation);
     }
     Result recover(List<String> arguments,Duration timeout,OperationJournal.Operation operation) throws IOException {
-        return capture(arguments,timeout,builder(arguments,operation,null));
+        return recoverUntil(arguments,System.nanoTime()+timeout.toNanos(),operation);
     }
-    private Result capture(List<String> arguments,Duration timeout,ProcessBuilder builder) throws IOException {
+    Result recoverUntil(List<String> arguments,long deadline,OperationJournal.Operation operation) throws IOException {
+        return capture(arguments,deadline,builder(arguments,operation,null),operation);
+    }
+    private Result capture(List<String> arguments,long deadline,ProcessBuilder builder,OperationJournal.Operation operation) throws IOException {
         Path output=Files.createTempFile(temporary,"client-",".stdout"),error=Files.createTempFile(temporary,"client-",".stderr");
         Process process=null;IOException failure=null;
+        RuntimePhaseLog phases=cleanupEnd==Long.MAX_VALUE?null:new RuntimePhaseLog(temporary,"macos-client",operation==null?"capture":"recover",operation==null?null:operation.directory().getFileName().toString());
         try {
-            Duration wait=timeout;
-            if(cleanupEnd!=Long.MAX_VALUE){long remaining=cleanupEnd-System.nanoTime()-TimeUnit.SECONDS.toNanos(3);if(remaining<=0)throw new IOException("client開始前に回収余裕が不足しました");wait=Duration.ofNanos(Math.min(timeout.toNanos(),remaining));}
+            long clientEnd=deadline;
+            if(cleanupEnd!=Long.MAX_VALUE)clientEnd=Math.min(clientEnd,cleanupEnd-GUARD_RESERVE_NANOS);
+            long remaining=clientEnd-System.nanoTime();
+            if(remaining<=0)throw new IOException("client開始前に回収余裕が不足しました");
+            Duration wait=Duration.ofNanos(remaining);
+            if(phases!=null)phases.event("client-start",cleanupEnd,wait.toNanos());
             process=launch(builder.redirectInput(ProcessBuilder.Redirect.from(Path.of("/dev/null").toFile())).redirectOutput(output.toFile()).redirectError(error.toFile()));
-            waitFor(process,wait);if(Files.size(output)>1024*1024||Files.size(error)>1024*1024)throw new IOException("client応答が上限を超えています");
+            if(phases!=null)phases.event("client-started",cleanupEnd,wait.toNanos());
+            waitFor(process,clientEnd);if(phases!=null)phases.event("client-ended",cleanupEnd,0);if(Files.size(output)>1024*1024||Files.size(error)>1024*1024)throw new IOException("client応答が上限を超えています");
             return new Result(process.exitValue(),Files.readAllBytes(output),Files.readAllBytes(error));
-        }catch(IOException original){failure=original;throw original;}
-        finally {if(process!=null&&process.isAlive())try{stop(process,cleanupEnd);}catch(IOException cleanup){if(failure==null)throw cleanup;failure.addSuppressed(cleanup);}}
+        }catch(IOException original){failure=original;if(phases!=null)phases.event("client-failed",cleanupEnd,0);throw original;}
+        finally {
+            if(process!=null&&process.isAlive())try{if(phases!=null)phases.event("guard-reap-start",cleanupEnd,TimeUnit.SECONDS.toNanos(3));stop(process,cleanupEnd);if(phases!=null)phases.event("guard-reaped",cleanupEnd,0);}catch(IOException cleanup){if(phases!=null)phases.event("guard-reap-failed",cleanupEnd,0);if(failure==null)throw cleanup;failure.addSuppressed(cleanup);}
+            if(phases!=null&&operation!=null)phases.event(Files.isRegularFile(operation.completion(),LinkOption.NOFOLLOW_LINKS)?"completion-present":"completion-absent",cleanupEnd,0);
+        }
     }
     Process launch(ProcessBuilder builder) throws IOException {return builder.start();}
     int attached(List<String> arguments) throws IOException {
@@ -58,8 +73,8 @@ class Commands {
         if(owner!=null)argv.addAll(List.of("--owner",Long.toString(owner.pid()),Long.toString(owner.startedAtMillis())));
         argv.add("--");argv.addAll(arguments);ProcessBuilder builder=new ProcessBuilder(argv);builder.environment().clear();builder.environment().putAll(environment);return builder;
     }
-    private static void waitFor(Process process,Duration timeout) throws IOException {
-        try {if(!process.waitFor(Math.max(1,timeout.toMillis()),TimeUnit.MILLISECONDS))throw new IOException("client操作の期限を超えました");}
+    private static void waitFor(Process process,long deadline) throws IOException {
+        try {long left=deadline-System.nanoTime();if(left<=0||!process.waitFor(left,TimeUnit.NANOSECONDS)||System.nanoTime()>deadline)throw new IOException("client操作の期限を超えました");}
         catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException("client操作が中断されました");}
     }
     static void stop(Process process) throws IOException {stop(process,Long.MAX_VALUE);}
