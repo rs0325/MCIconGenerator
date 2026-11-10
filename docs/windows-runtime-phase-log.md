@@ -26,7 +26,11 @@ controllerや新規jobが渡した壁時計の絶対期限は、変換時点の�
 
 native交換は既存の回収予約2秒とsubcommand上限から、1つのmonotonic実行期限を確定する。spawn後に新しいsubcommand予算を開始し直さず、guest要求の `timeoutSeconds` を送信時の同じ期限の残時間以内へclampする。元要求が持つ短い上限も維持する。転送・guest側での読取りや処理開始の遅れはphaseログで別途確認する必要があり、相対秒数だけでguest内部全処理の絶対期限遵守を証明するものではない。
 
-通常releaseの所有確認・停止前一覧・停止・再一覧・停止後所有確認は、close全体の同じ絶対期限からnative回収2秒を引いた残時間を順に使う。各呼出しに固定2秒/3秒の追加切詰めを設けず、後続へ未使用時間を渡す。たとえば残り約4.899秒なら実行枠は約2.899秒であり、固定2秒をわずかに超える一覧を全体期限前に切らない。先行処理が消費した時間は後続から差し引き、回収枠を確保できない呼出しは開始しない。close10秒・helper本体期限・lock期限は延長しない。
+通常releaseの各native呼出しは、同じ絶対期限からnative回収2秒と後続必須段ごとの250msを引いた残時間を上限にする。現在段にも250msの最小実行枠がなければ、nativeを開始せずnative-budgetで期限不足を記録する。250msは固定の打切り上限ではなく、未使用時間は後続へ渡す。keeper EOF後は所有確認・一覧・停止・再一覧・最終所有確認の5段を見込み、2秒＋5×250ms=3.25秒を予約する。初期factsは後続8段、lock内owner factsは7段、guest releaseは6段（EOFを含む）、停止後は4/3/2/1/0段を予約する。全体のclose10秒・core keeper上限9秒・helper本体約6秒とlock期限は延長しない。
+
+段別予約は通常closeの変更であり、旧lease回復releaseは既存の予算・EOF後予約3秒を維持する。lock内でownerを検証したHostFactsのbootは、その直後のnative reapにも使い、重複factsだけを削減する。停止前後のfresh factsとowner照合は省かない。
+
+native-requiredイベントのbudgetNanosは、回収2秒＋現在/後続必須段の最小枠を表す。references-start/doneで参照走査を他の前後処理と区別する。いずれも固定phase名と時刻だけを追加し、argv・利用者名・任意requestは記録しない。
 
 固定した実行期限は、native待機の前後と応答読取り後の正常結果確定時に検査する。待機開始が遅れ、既にexit 0で終了している場合も、期限超過後の `waitFor(0)` 成功を元操作の成功にはしない。結果確定前の超過はTIMEOUTとして通常の失敗診断・cleanupへ渡す。
 

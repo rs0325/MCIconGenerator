@@ -242,6 +242,19 @@ class PrepareIntegrationTest {
             } finally {if(child==null)child=(Commands.Running)childField.get(keeper);if(child!=null){child.process().getOutputStream().close();assertTrue(child.process().waitFor(10,java.util.concurrent.TimeUnit.SECONDS));}}
         }
     }
+    @Test void 後続必須段へ最小枠を残して現在のnative実行期限を固定する() throws Exception {
+        prepareRecoveryPayload();mode("exec-late");WindowsRuntime runtime=runtime("release");long end=System.nanoTime()+Duration.ofSeconds(6).toNanos();runtime.commands.end(end);
+        Commands.Result result=runtime.commands.releaseCapture(List.of(tmp.resolve("app/support/windows-host.exe").toString(),"facts"),3);assertEquals(0,result.exit());assertEquals(end,runtime.commands.end());
+        boolean required=false,budget=false;try(var paths=Files.list(tmp)){for(Path path:paths.filter(p->p.getFileName().toString().startsWith("phase-")).toList())for(String line:Files.readAllLines(path)){JsonNode value=WindowsFiles.JSON.readTree(line);if(!value.path("operation").asText().equals("facts"))continue;if(value.path("phase").asText().equals("native-required")){assertEquals(Duration.ofSeconds(3).toNanos(),value.path("budgetNanos").asLong());required=true;}if(value.path("phase").asText().equals("native-budget")){assertTrue(value.path("deadlineNanos").asLong()<=end-Duration.ofMillis(2750).toNanos());assertTrue(value.path("budgetNanos").asLong()>Duration.ofMillis(250).toNanos());budget=true;}}}assertTrue(required);assertTrue(budget);
+    }
+    @Test void 前段消費後の二秒近傍ではnativeを起動せず保存を保持する() throws Exception {
+        prepareRecoveryPayload();mode("exec-late");WindowsRuntime runtime=runtime("release");try(var initial=runtime.journal()){initial.release();}
+        byte[] before=Files.readAllBytes(leasePath),journal=Files.readAllBytes(tmp.resolve("windows-operation.json"));List<Path> intents;try(var paths=Files.list(tmp)){intents=paths.filter(p->p.getFileName().toString().endsWith(".intent.json")).sorted().toList();}
+        long original=System.nanoTime()+Duration.ofSeconds(6).toNanos();runtime.commands.end(original);long reduced=original-Duration.ofMillis(3981).toNanos();runtime.commands.end(reduced);
+        IOException failure=assertThrows(IOException.class,runtime::facts);assertNotNull(failure.getCause());assertTrue(failure.getCause().getMessage().contains("最小実行枠"),failure.toString());assertTrue(failure.getMessage().contains("\"failedPhase\":\"native-budget\""));
+        try(var paths=Files.list(tmp)){assertEquals(intents,paths.filter(p->p.getFileName().toString().endsWith(".intent.json")).sorted().toList());}
+        assertArrayEquals(before,Files.readAllBytes(leasePath));assertArrayEquals(journal,Files.readAllBytes(tmp.resolve("windows-operation.json")));assertEquals(reduced,runtime.commands.end());
+    }
     @Test void plainExecのdoneを本人照合してcompletion不在とJob残留を分ける() throws Exception {
         prepareRecoveryPayload();
         for(String mode:List.of("exec-late","exec-late-mismatch","exec-late-missing")) {
