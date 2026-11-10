@@ -223,6 +223,36 @@ class PrepareIntegrationTest {
             }
         }
     }
+    @Test void 一覧が二秒を超えても共有close期限内だけ停止保存を確定する() throws Exception {
+        for(int budget:new int[]{9000,4200,1900}) {
+            PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Files.createDirectory(root.resolve("list-"+budget));fixture.setup();fixture.mode("release-list");fixture.prepareRecoveryPayload();Files.writeString(fixture.tmp.resolve("fixture-list-ms"),"2100");
+            WindowsRuntime keep=fixture.runtime("keep");WindowsKeeper keeper=allocate(WindowsKeeper.class);set(keeper,"runtime",keep);
+            ProcessHandle parent=ProcessHandle.current().parent().orElseThrow();set(keeper,"controller",new HelperProtocol.Keeper(parent.pid(),parent.info().startInstant().orElseThrow().toEpochMilli(),fixture.attempt,Instant.now().plusSeconds(20),false));
+            Method start=WindowsKeeper.class.getDeclaredMethod("start");start.setAccessible(true);Field childField=WindowsKeeper.class.getDeclaredField("child");childField.setAccessible(true);Commands.Running child=null;
+            try {
+                start.invoke(keeper);child=(Commands.Running)childField.get(keeper);WindowsRuntime cleanup=fixture.runtime("release");long end=System.nanoTime()+Duration.ofMillis(budget).toNanos();cleanup.commands.end(end);
+                byte[] leaseBefore=Files.readAllBytes(fixture.leasePath),journalBefore=Files.readAllBytes(fixture.tmp.resolve("windows-operation.json"));
+                List<Path> intentsBefore;try(var paths=Files.list(fixture.tmp)){intentsBefore=paths.filter(p->p.getFileName().toString().endsWith(".intent.json")).sorted().toList();}
+                if(budget==9000){cleanup.release(keeper,false);assertTrue(cleanup.lease.read().path("resources").isEmpty());assertEquals("closed",keeper.value().path("state").asText());assertTrue(keeper.value().path("termination").path("jobEmpty").asBoolean());assertTrue(keeper.value().path("workProof").path("closed").asBoolean());assertEquals(0,keeper.value().path("workProof").path("actors").asInt());assertEquals(0,keeper.value().path("workProof").path("containers").asInt());assertTrue(keeper.value().path("stopConfirmed").asBoolean());try(var journal=cleanup.journal()){assertTrue(journal.released());}
+                    boolean waited=false;try(var paths=Files.list(fixture.tmp)){for(Path path:paths.filter(p->p.getFileName().toString().startsWith("phase-")).toList()){List<JsonNode> rows=new ArrayList<>();for(String line:Files.readAllLines(path))rows.add(WindowsFiles.JSON.readTree(line));if(rows.isEmpty()||!rows.getFirst().path("operation").asText().equals("wsl-list"))continue;JsonNode before=rows.stream().filter(v->v.path("phase").asText().equals("native-wait")).findFirst().orElseThrow(),after=rows.stream().filter(v->v.path("phase").asText().equals("native-exited")).findFirst().orElseThrow();if(after.path("nanoTime").asLong()-before.path("nanoTime").asLong()>Duration.ofSeconds(2).toNanos()){assertTrue(before.path("remainingNanos").asLong()>Duration.ofMillis(2100).toNanos());waited=true;}}}assertTrue(waited,"2.1秒遅延する一覧が固定2秒を超えて実際に待機し、共有期限内で成功する");}
+                else {IOException failure=assertThrows(IOException.class,()->cleanup.release(keeper,false));if(budget==4200)assertTrue(failure.getMessage().contains("TIMEOUT"),failure.getMessage());
+                    else {assertNotNull(failure.getCause());assertEquals("native回収枠を残せません",failure.getCause().getMessage());assertTrue(failure.getMessage().contains("\"failedPhase\":\"native-budget\""));try(var paths=Files.list(fixture.tmp)){assertEquals(intentsBefore,paths.filter(p->p.getFileName().toString().endsWith(".intent.json")).sorted().toList(),"回収枠不足では新しいnative intentを作らず起動しない");}}
+                    assertFalse(cleanup.lease.read().path("resources").isEmpty());assertArrayEquals(leaseBefore,Files.readAllBytes(fixture.leasePath));assertArrayEquals(journalBefore,Files.readAllBytes(fixture.tmp.resolve("windows-operation.json")));assertFalse(keeper.value().path("stopConfirmed").asBoolean());assertFalse(Files.exists(fixture.tmp.resolve("fixture-terminated")));}
+                assertEquals(end,cleanup.commands.end());assertTrue(System.nanoTime()<end,"native回収2秒を含むclose元期限内で終了する");
+            } finally {if(child==null)child=(Commands.Running)childField.get(keeper);if(child!=null){child.process().getOutputStream().close();assertTrue(child.process().waitFor(10,java.util.concurrent.TimeUnit.SECONDS));}}
+        }
+    }
+    @Test void plainExecのdoneを本人照合してcompletion不在とJob残留を分ける() throws Exception {
+        prepareRecoveryPayload();
+        for(String mode:List.of("exec-late","exec-late-mismatch","exec-late-missing")) {
+            mode(mode);WindowsRuntime runtime=runtime("release");
+            IOException failure=assertThrows(IOException.class,()->runtime.commands.capture(List.of(tmp.resolve("app/support/windows-host.exe").toString(),"facts"),Duration.ofMillis(100)));
+            assertTrue(failure.getMessage().contains("\"executionFailure\":\"TIMEOUT\""));assertTrue(failure.getMessage().contains("\"nativeExit\":0"));assertTrue(failure.getMessage().contains("\"completionRequired\":false"));assertFalse(failure.getMessage().contains("completionUnknown"));
+            assertEquals(mode.equals("exec-late"),failure.getMessage().contains("\"jobEmpty\":true"));assertEquals(mode.equals("exec-late"),failure.getMessage().contains("\"terminal\":\"done\""));
+            JsonNode diagnostic=WindowsFiles.JSON.readTree(failure.getMessage().substring(failure.getMessage().indexOf('{')));assertEquals(!mode.equals("exec-late"),diagnostic.path("terminalUnknown").asBoolean());
+            List<String> phases=new ArrayList<>();for(String line:Files.readAllLines(tmp.resolve(diagnostic.path("phaseLog").asText())))phases.add(WindowsFiles.JSON.readTree(line).path("phase").asText());assertEquals(!mode.equals("exec-late"),phases.contains("terminal-unknown"));assertEquals(mode.equals("exec-late"),phases.contains("terminal-read-done"));
+        }
+    }
     @Test void 旧owner終了後の回復releaseがdaemon再準備後もEOF停止保存枠を残す() throws Exception {
         for(int limit:new int[]{6,15}){PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Files.createDirectory(root.resolve("recovery-"+limit));fixture.setup();fixture.recoverKilledOwner(limit);}
     }
@@ -263,9 +293,11 @@ class PrepareIntegrationTest {
                     string state="{"+q+"pid"+q+":"+p.Id+","+q+"started"+q+":"+Ms(p.StartTime)+","+q+"parent"+q+":"+a[1]+","+q+"parentStarted"+q+":"+a[2]+","+q+"boot"+q+":"+q+"00000000-0000-0000-0000-000000000001"+q+"}";
                     Save(prefix+".state.json",state);bool list=Array.IndexOf(a,"--list")>=0,terminate=Array.IndexOf(a,"--terminate")>=0;string stopped=System.IO.Path.Combine(tmp,"fixture-terminated"),eof=System.IO.Path.Combine(tmp,"fixture-eof-ms");
                     if(mode=="release-tail"&&System.IO.File.Exists(eof)){long target=long.Parse(System.IO.File.ReadAllText(eof))+(terminate?1600:list?System.IO.File.Exists(stopped)?1900:800:System.IO.File.Exists(stopped)?2600:500);System.Threading.Thread.Sleep((int)Math.Max(0,target-Ms(DateTime.UtcNow)));}
+                    if(mode=="release-list"&&list&&!System.IO.File.Exists(stopped)&&System.IO.File.Exists(eof))System.Threading.Thread.Sleep(int.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(tmp,"fixture-list-ms"))));
+                    if(mode.StartsWith("exec-late"))System.Threading.Thread.Sleep(250);
                     if(list||terminate){System.IO.File.AppendAllLines(System.IO.Path.Combine(tmp,"fixture-host-events"),new ArraySegment<string>(a,6,a.Length-6));if(terminate)System.IO.File.WriteAllText(stopped,"stopped");else if(!System.IO.File.Exists(stopped)||mode=="still-running")Console.WriteLine(System.IO.File.ReadAllText(System.IO.Path.Combine(tmp,"fixture-distribution-name")));}
                     else Console.Write(System.IO.File.ReadAllText(System.IO.Path.Combine(tmp,"fixture-facts.json")));
-                    Save(prefix+".done.json",state);return true;
+                    if(mode!="exec-late-missing")Save(prefix+".done.json",mode=="exec-late-mismatch"?state.Replace(q+"pid"+q+":"+p.Id+",",q+"pid"+q+":0,"):state);return true;
                 }
                 """;
             String source="using System;using System.Diagnostics;class Native{"+execute+"static void F(System.IO.Stream a,System.IO.Stream b){var v=new byte[4096];int n;while((n=a.Read(v,0,v.Length))>0){b.Write(v,0,n);b.Flush();}}static string Q(string s){return \"\\\"\"+s.Replace(\"\\\"\",\"\\\\\\\"\")+\"\\\"\";}static int Main(string[] a){if(E(a))return 0;var p=new ProcessStartInfo("+WindowsFiles.JSON.writeValueAsString(javaExe)+");p.UseShellExecute=false;p.CreateNoWindow=true;p.Arguments=Q(\"-cp\")+\" \"+Q("+WindowsFiles.JSON.writeValueAsString(classpath)+")+\" \"+Q("+WindowsFiles.JSON.writeValueAsString(Guest.class.getName())+");foreach(var s in a)p.Arguments+=\" \"+Q(s);Environment.SetEnvironmentVariable(\"MCICON_FIXTURE_CMD\",\"1\");p.RedirectStandardInput=true;p.RedirectStandardOutput=true;p.RedirectStandardError=true;using(var c=Process.Start(p)){System.Threading.Tasks.Task.Factory.StartNew(()=>{F(Console.OpenStandardInput(),c.StandardInput.BaseStream);c.StandardInput.Close();});var o=System.Threading.Tasks.Task.Factory.StartNew(()=>F(c.StandardOutput.BaseStream,Console.OpenStandardOutput()));var e=System.Threading.Tasks.Task.Factory.StartNew(()=>F(c.StandardError.BaseStream,Console.OpenStandardError()));c.WaitForExit();System.Threading.Tasks.Task.WaitAll(o,e);return c.ExitCode;}}}";
@@ -309,9 +341,11 @@ class PrepareIntegrationTest {
             // 固定receiptはObjectMapperを起動せずに原子的に保存する。
             String state="{\"pid\":"+process.pid()+",\"started\":"+process.info().startInstant().orElseThrow().toEpochMilli()+",\"parent\":"+Long.parseLong(args[1])+",\"parentStarted\":"+Long.parseLong(args[2])+",\"boot\":\""+OwnershipTest.BOOT+"\"}";save(Path.of(prefix+".state.json"),state);
             List<String> command=Arrays.asList(args).subList(5,args.length);
-            if(Files.readString(tmp.resolve("fixture-mode")).equals("release-tail")&&Files.exists(tmp.resolve("fixture-eof-ms"))) {
+            String mode=Files.readString(tmp.resolve("fixture-mode"));if(mode.equals("release-tail")&&Files.exists(tmp.resolve("fixture-eof-ms"))) {
                 long target=Long.parseLong(Files.readString(tmp.resolve("fixture-eof-ms")))+(command.contains("--terminate")?1600:command.contains("--list")?Files.exists(tmp.resolve("fixture-terminated"))?1900:800:Files.exists(tmp.resolve("fixture-terminated"))?2600:500);Thread.sleep(Math.max(0,target-System.currentTimeMillis()));
             }
+            if(mode.equals("release-list")&&command.contains("--list")&&!Files.exists(tmp.resolve("fixture-terminated"))&&Files.exists(tmp.resolve("fixture-eof-ms")))Thread.sleep(Long.parseLong(Files.readString(tmp.resolve("fixture-list-ms"))));
+            if(mode.startsWith("exec-late"))Thread.sleep(250);
             if(command.contains("--list")||command.contains("--terminate")) {
                 Files.write(tmp.resolve("fixture-host-events"),command.subList(1,command.size()),StandardOpenOption.CREATE,StandardOpenOption.APPEND);
                 if(command.contains("--terminate"))Files.writeString(tmp.resolve("fixture-terminated"),"stopped");
@@ -319,7 +353,7 @@ class PrepareIntegrationTest {
                     System.out.println(Files.readString(tmp.resolve("fixture-distribution-name")));
                 }
             } else System.out.write(Files.readAllBytes(tmp.resolve("fixture-facts.json")));
-            save(Path.of(prefix+".done.json"),state);return;
+            if(!mode.equals("exec-late-missing"))save(Path.of(prefix+".done.json"),mode.equals("exec-late-mismatch")?state.replace("\"pid\":"+process.pid()+",","\"pid\":0,"):state);return;
         }
     }
     public static class Guest {

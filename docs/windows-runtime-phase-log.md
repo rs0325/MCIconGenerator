@@ -12,9 +12,11 @@ Windowsのcoreとhelperは、検証済みjobの `jobs/<job-id>/tmp/phase-<UUID>.
 
 - core: 回復開始と呼出し元予算、keeper spawn・ACK、release本体期限と送信、応答待機・読取り、abort。
 - Windows helper: payload検証、絶対期限への変換、journal/generation lock待機、keeper所有照合とnative開始・guest ACK、daemon回復、guest release、keeper EOF・completion読取り、lease回収確定。
-- native交換: subcommand上限、spawn前後、guest送信時の予算、native待機・終端、応答読取り、失敗後の回収・completion読取り。
+- native交換: subcommand上限、spawn前後、guest送信時の予算、native待機・終端、応答読取り、失敗後の回収・terminal/completion読取り。
 
 native交換の失敗診断には `operation`、`failedPhase`、pathを含まない `phaseLog` 名が付く。guest operationは既知の固定名に限定し、argv・request本文・root path・例外文言・利用者名を新しいphaseログへ書かない。
+
+失敗診断の `mode / completionRequired` は実ABIを表す。plain `exec` はProcessのPID・開始時刻、intentの実行物・親identity、bootのUUID形式、state/doneの一致を検査してnative Job終端を判定し、生成されないcompletionを要求しない。`exec-bridge` とkeeperの終端には従来どおりcompletionが必要である。execのrecord欠落・identity不一致は `terminalUnknown`、bridgeのcompletion確認失敗は `completionUnknown` として残す。stateが正常でもdone欠落時は `terminalUnknown=true` と `terminal-unknown` イベントを記録し、`terminal-read-done` を記録しない。native Job終端だけではguestの解放完了を証明しない。
 
 ログ保存失敗は固定stderr行 `MCICON_PHASE_LOG_UNAVAILABLE` で一度だけ通知し、そのloggerでの追加記録を停止する。元操作の成功・失敗、typed busy、cleanup証明をログの有無で変更しない。不完全な末尾行やログ欠落を補完して成功証明にしてはいけない。
 
@@ -23,6 +25,8 @@ native交換の失敗診断には `operation`、`failedPhase`、pathを含まな
 controllerや新規jobが渡した壁時計の絶対期限は、変換時点の壁時計とmonotonic時刻を対にして変換する。helper初期化前のmonotonic開始時刻へ残時間を加えると、初期化済み時間を再び差し引いてしまう。相対上限の通常releaseや明示的な共通lock期限は変更しない。
 
 native交換は既存の回収予約2秒とsubcommand上限から、1つのmonotonic実行期限を確定する。spawn後に新しいsubcommand予算を開始し直さず、guest要求の `timeoutSeconds` を送信時の同じ期限の残時間以内へclampする。元要求が持つ短い上限も維持する。転送・guest側での読取りや処理開始の遅れはphaseログで別途確認する必要があり、相対秒数だけでguest内部全処理の絶対期限遵守を証明するものではない。
+
+通常releaseの所有確認・停止前一覧・停止・再一覧・停止後所有確認は、close全体の同じ絶対期限からnative回収2秒を引いた残時間を順に使う。各呼出しに固定2秒/3秒の追加切詰めを設けず、後続へ未使用時間を渡す。たとえば残り約4.899秒なら実行枠は約2.899秒であり、固定2秒をわずかに超える一覧を全体期限前に切らない。先行処理が消費した時間は後続から差し引き、回収枠を確保できない呼出しは開始しない。close10秒・helper本体期限・lock期限は延長しない。
 
 固定した実行期限は、native待機の前後と応答読取り後の正常結果確定時に検査する。待機開始が遅れ、既にexit 0で終了している場合も、期限超過後の `waitFor(0)` 成功を元操作の成功にはしない。結果確定前の超過はTIMEOUTとして通常の失敗診断・cleanupへ渡す。
 
