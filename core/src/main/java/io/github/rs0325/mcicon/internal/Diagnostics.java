@@ -114,8 +114,16 @@ public final class Diagnostics {
         }
     }
     private static CommandResult failed(String name,String reason,Path log,Path errorLog,Throwable cause) {
-        String detail=reason+"; stdoutBytes="+byteCount(log)+"; stderrBytes="+byteCount(errorLog);
+        String detail=failureDetail(reason,null,byteCount(log),byteCount(errorLog),null);
         return new CommandResult(new DiagnosticReport.Check(name,false,detail),"","",cause);
+    }
+    static String failureDetail(String classification,String exitCode,String stdoutBytes,String stderrBytes,String exceptionClass) {
+        String detail=classification;
+        if(exitCode!=null)detail+="; exitCode="+exitCode;
+        detail+="; stdoutBytes="+stdoutBytes;
+        if(stderrBytes!=null)detail+="; stderrBytes="+stderrBytes;
+        if(exceptionClass!=null)detail+="; exceptionClass="+exceptionClass;
+        return detail;
     }
     private static String byteCount(Path file) {
         if(file==null)return "unknown";

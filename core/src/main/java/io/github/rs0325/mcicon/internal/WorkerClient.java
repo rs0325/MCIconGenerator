@@ -134,17 +134,50 @@ public final class WorkerClient implements AutoCloseable,IconWorker {
     public String agentSha256(){return agentSha256;}
     public String imageId(){return imageId;}
     public Diagnostics.WorkerJava javaRuntime(){return javaRuntime;}
-    private static String resolveImage(WorkerOptions options,CancellationToken token,WorkerLaunch launch) throws Exception {
+    static String resolveImage(WorkerOptions options,CancellationToken token,WorkerLaunch launch) throws Exception {
+        return resolveImage(options,token,launch,15,TimeUnit.SECONDS);
+    }
+    static String resolveImage(WorkerOptions options,CancellationToken token,WorkerLaunch launch,long timeout,TimeUnit unit) throws Exception {
         token.check();
-        Process inspect=launch.command(List.of("image","inspect",options.dockerImage(),"--format","{{.Id}}"))
-                .redirectError(ProcessBuilder.Redirect.DISCARD).start();
+        Process inspect;
         try {
-            if(!inspect.waitFor(15,TimeUnit.SECONDS))throw new McIconException("DOCKER_UNAVAILABLE","Docker image inspection timed out",1);
-            token.check();String id=new String(inspect.getInputStream().readNBytes(1024),StandardCharsets.UTF_8).trim();
-            if(inspect.exitValue()!=0||!id.matches("sha256:[0-9a-f]{64}"))throw new McIconException("DOCKER_IMAGE_UNAVAILABLE","Build the rendering image in the selected Docker context first",1);
+            inspect=launch.command(List.of("image","inspect",options.dockerImage(),"--format","{{.Id}}"))
+                    .redirectError(ProcessBuilder.Redirect.DISCARD).start();
+        }catch(IOException failure){
+            throw diagnosticIOException("Docker image inspection failed to start","unknown","0",failure);
+        }
+        try {
+            if(!inspect.waitFor(timeout,unit))throw dockerTimeout();
+            token.check();
+            byte[] output;
+            try{output=inspect.getInputStream().readNBytes(1024);}
+            catch(IOException failure){throw diagnosticIOException("Docker image inspection output failed",Integer.toString(inspect.exitValue()),"unknown",failure);}
+            int exit=inspect.exitValue();
+            if(exit!=0)throw imageUnavailable("Docker image inspection exited unsuccessfully",exit,output.length,null);
+            String id=new String(output,StandardCharsets.UTF_8).trim();
+            if(!id.matches("sha256:[0-9a-f]{64}")) {
+                String classification=output.length==1024?"Docker image inspection response limit reached":"Docker image ID format did not match";
+                throw imageUnavailable(classification,exit,output.length,null);
+            }
             if(launch.managed()&&!id.equals(launch.expectedImageId()))throw new McIconException("MANAGED_RUNTIME_INVALID","管理imageのIDがdescriptorと一致しません",1);
             return id;
-        }finally{if(inspect.isAlive())inspect.destroyForcibly();}
+        }finally{
+            if(inspect.isAlive())inspect.destroyForcibly();
+        }
+    }
+    private static McIconException imageUnavailable(String classification,int exit,int stdoutBytes,String exceptionClass) {
+        String detail=Diagnostics.failureDetail(classification,Integer.toString(exit),Integer.toString(stdoutBytes),null,exceptionClass);
+        String message="Build the rendering image in the selected Docker context first ("+detail+")";
+        return new McIconException("DOCKER_IMAGE_UNAVAILABLE",message,1,new IOException(detail));
+    }
+    private static IOException diagnosticIOException(String classification,String exitCode,String stdoutBytes,Exception cause) {
+        String detail=Diagnostics.failureDetail(classification,exitCode,stdoutBytes,null,cause.getClass().getSimpleName());
+        return new IOException(detail);
+    }
+    private static McIconException dockerTimeout() {
+        String detail=Diagnostics.failureDetail("Docker image inspection timed out","unknown","unknown",null,"TimeoutException");
+        String message="Docker image inspection timed out ("+detail+")";
+        return new McIconException("DOCKER_UNAVAILABLE",message,1,new IOException(detail));
     }
     private void terminate() {
         process.destroyForcibly();
