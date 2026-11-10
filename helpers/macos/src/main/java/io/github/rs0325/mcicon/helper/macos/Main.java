@@ -3,6 +3,7 @@ package io.github.rs0325.mcicon.helper.macos;
 import io.github.rs0325.mcicon.helper.HelperProtocol;
 import io.github.rs0325.mcicon.helper.LeaseFile;
 import io.github.rs0325.mcicon.internal.AdmissionEvidence;
+import io.github.rs0325.mcicon.internal.RuntimePhaseLog;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
@@ -20,7 +21,11 @@ public final class Main {
             }
             command=HelperProtocol.parse(arguments);String launcher=System.getProperty("jpackage.app-path");if(launcher==null)throw new IOException("自己完結native entrypointから起動してください");Path executable=Path.of(launcher);if(!executable.isAbsolute())throw new IOException("native entrypointは絶対pathが必要です");
             LeaseFile lease=LeaseFile.open(command,executable);if(command.operation().equals("preflight"))failureStatus="setup-required";
-            if(command.operation().equals("release")&&MacRuntime.releaseUnstarted(command,lease,invocationStarted)){System.out.write(HelperProtocol.response("ok",List.of()));System.out.write('\n');return 0;}
+            if(command.operation().equals("release")) {
+                boolean unstarted=MacRuntime.releaseUnstarted(command,lease,invocationStarted);
+                new RuntimePhaseLog(command.lease().getParent().resolve("tmp"),"macos-helper","release",null).event("lease-verified",invocationStarted+java.time.Duration.ofSeconds(9).toNanos(),0);
+                if(unstarted){System.out.write(HelperProtocol.response("ok",List.of()));System.out.write('\n');return 0;}
+            }
             MacRuntime runtime=new MacRuntime(command,executable,lease,invocationStarted);
             switch(command.operation()) {
                 case "preflight" -> runtime.preflight();

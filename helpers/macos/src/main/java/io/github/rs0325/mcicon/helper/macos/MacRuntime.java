@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.rs0325.mcicon.helper.HelperProtocol;
 import io.github.rs0325.mcicon.helper.LeaseFile;
+import io.github.rs0325.mcicon.internal.RuntimePhaseLog;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -22,12 +23,16 @@ final class MacRuntime {
     final Commands commands;
     private final long preparationEnd;
     private long cleanupEnd;
+    private final RuntimePhaseLog phases;
     MacRuntime(HelperProtocol.Command command,Path executable,LeaseFile lease,long invocationStarted) throws IOException {
         this.command=command;this.executable=executable;this.lease=lease;cleanupEnd=command.operation().equals("release")||(command.operation().equals("docker")&&!command.dockerArguments().isEmpty()&&command.dockerArguments().getFirst().equals("rm"))?invocationStarted+Duration.ofSeconds(9).toNanos():Long.MAX_VALUE;descriptor=lease.descriptor();temporary=command.lease().getParent().resolve("tmp");
         if(!temporary.toRealPath().equals(temporary))throw new IOException("job tmpにlinkがあります");
+        phases=new RuntimePhaseLog(temporary,"macos-helper",command.operation(),null);
+        releasePhase("runtime-start");
         Path support=executable.getParent().getParent().resolve("app/support");payload=new Payload(support);
         Map<String,String> environment=new HashMap<>();for(String key:List.of("TMP","TEMP","TMPDIR"))environment.put(key,temporary.toString());
         JsonNode value=lease.read();Path guard=payload.path("process-guard");Commands bootstrap=new Commands(guard,environment,temporary);bootstrap.cleanupDeadline(cleanupEnd);host=HostFacts.read(payload.path("host-probe"),bootstrap,descriptor,value.path("hostId").asText());
+        releasePhase("host-verified");
         cache=new CacheState(command.root(),value.path("hostId").asText(),value.path("descriptorSha256").asText(),host.uid(),host.hostBindingSha256(),host.bootSessionId());
         environment.put("HOME",cache.home().toString());environment.put("LIMA_HOME",cache.limaHome().toString());environment.put("DOCKER_CONFIG",cache.anchor().resolve("d").toString());environment.put("PATH","/usr/bin:/bin:/usr/sbin:/sbin");environment.put("LC_ALL","C");
         commands=new Commands(guard,environment,temporary);commands.cleanupDeadline(cleanupEnd);
@@ -87,7 +92,9 @@ final class MacRuntime {
     }
     int docker(List<String> arguments) throws IOException {return new DockerTransport(this).run(arguments);}
     void release() throws IOException {
+        releasePhase("release-start");
         try(OperationJournal operation=journal(cleanupBudget(Duration.ofSeconds(30)));CacheState.Lock ignored=cache.lock(cleanupBudget(Duration.ofSeconds(30)))) {
+            releasePhase("release-locked");
             if(new RebootRecovery(this).release(operation))return;cache.verify();ObjectNode current=lease.read();
             if(current.path("resources").isEmpty()&&operation.unstarted()){operation.markReleased();return;}
             new RebootRecovery(this).requireDiskCleaned();
@@ -95,21 +102,26 @@ final class MacRuntime {
                 lease.replaceResources((ObjectNode)current.path("resources"),MacFiles.JSON.createObjectNode());return;
             }
             if(operation.released()) {if(!current.path("resources").isEmpty())lease.replaceResources((ObjectNode)current.get("resources"),MacFiles.JSON.createObjectNode());return;}
+            releasePhase("recovery-checked");
             operation.awaitRecoverable(cleanupBudget(Duration.ofSeconds(3)));
             if(!current.path("resources").isEmpty()) {
-                ObjectNode resources=(ObjectNode)current.path("resources").path("macos");verifyReady(resources);resources=resources.deepCopy();resources.put("phase","releasing");replace(resources);
+                ObjectNode resources=(ObjectNode)current.path("resources").path("macos");releasePhase("owner-start");resources=resources.deepCopy();resources.put("phase","releasing");replace(resources);
                 new DockerTransport(this).removeAll(operation);
-                LeaseReferences.Scan others=references();
+                releasePhase("owner-verified");releasePhase("containers-removed");
+                LeaseReferences.Scan others=references();releasePhase("references-checked");
                 if(others.stopAllowed()) {
-                    verifyReady((ObjectNode)lease.read().path("resources").path("macos"));var stop=operation.begin("stop");
-                    requireZero(commands.recover(lima("stop","v"),cleanupBudget(Duration.ofSeconds(15)),stop),"専用VM停止");
+                    verifyReady((ObjectNode)lease.read().path("resources").path("macos"));var stop=operation.begin("stop");releasePhase("stop-intent");
+                    long stopEnd=cleanupEnd-Commands.GUARD_RESERVE_NANOS-Duration.ofMillis(150).toNanos();
+                    requireZero(commands.recoverUntil(lima("stop","v"),stopEnd,stop),"専用VM停止");
+                    releasePhase("stop-client-ended");
                     if(!instance().path("status").asText().equals("Stopped"))throw new IOException("専用VM停止を確認できません");
-                    ObjectNode evidence=MacFiles.JSON.createObjectNode().put("status","Stopped").put("machineIdSha256",resources.path("machineIdSha256").asText());operation.settled(stop,evidence);
+                    ObjectNode evidence=MacFiles.JSON.createObjectNode().put("status","Stopped").put("machineIdSha256",resources.path("machineIdSha256").asText());operation.settled(stop,evidence);releasePhase("stop-settled");
                 }
             }
-            operation.markReleased();current=lease.read();lease.replaceResources((ObjectNode)current.path("resources"),MacFiles.JSON.createObjectNode());
+            operation.markReleased();current=lease.read();lease.replaceResources((ObjectNode)current.path("resources"),MacFiles.JSON.createObjectNode());releasePhase("release-complete");
         }
     }
+    private void releasePhase(String phase){if(command.operation().equals("release"))phases.event(phase,cleanupEnd,0);}
     OperationJournal journal(Duration budget) throws IOException {return OperationJournal.acquire(temporary,lease.read(),budget);}
     LeaseReferences.Scan references() throws IOException {return LeaseReferences.inspect(command,executable,lease.read().path("descriptorSha256").asText());}
     Commands.Owner owner() throws IOException {return owner(lease);}
