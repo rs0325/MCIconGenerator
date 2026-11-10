@@ -44,7 +44,7 @@ final class WindowsRuntime {
             if(!journal.released())journal.release();return true;
         }
     }
-    HostFacts facts() throws IOException {Commands.Result result=commands.capture(List.of(payload.path("windows-host.exe").toString(),"facts"),Duration.ofSeconds(3));Commands.zero(result,"Windows所有情報の読取");return HostFacts.parse(WindowsFiles.JSON.readTree(result.stdout()),descriptor);}
+    HostFacts facts() throws IOException {List<String> args=List.of(payload.path("windows-host.exe").toString(),"facts");Commands.Result result=command.operation().equals("release")?commands.capture(args):commands.capture(args,Duration.ofSeconds(3));Commands.zero(result,"Windows所有情報の読取");return HostFacts.parse(WindowsFiles.JSON.readTree(result.stdout()),descriptor);}
     OperationJournal journal() throws IOException {trace.event("journal-wait",commands.end(),0);OperationJournal result=OperationJournal.acquire(temporary,lease.read(),commands.left(Duration.ofSeconds(3)));trace.event("journal-locked",commands.end(),0);return result;}
     WslDistribution.Lock lock() throws IOException {trace.event("generation-lock-wait",commands.end(),0);WslDistribution.Lock result=distribution.lock(commands.left(Duration.ofSeconds(3)));trace.event("generation-locked",commands.end(),0);return result;}
     LeaseReferences.Scan references() throws IOException {return LeaseReferences.inspect(command,executable,lease.read().path("descriptorSha256").asText());}
@@ -152,10 +152,10 @@ final class WindowsRuntime {
             keeper.closeIntent(others.stopAllowed());keeper.endClient(commands);
             if(others.stopAllowed()) {
                 keeper.requireControllerLive();HostFacts fresh=facts();if(!fresh.boot().equals(keeper.value().path("boot").asText())||!fresh.sid().equals(owner.path("binding").path("sid").asText())||!distribution.verify(fresh).equals(owner))throw new IOException("keeper EOF後のhost/ownerが一致しません");
-                Commands.Result running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"),commands.left(Duration.ofSeconds(2)));Commands.zero(running,"WSL停止前照合");Set<String> names=runningNames(running.stdout()),registered=new HashSet<>();for(var row:fresh.distributions())registered.add(row.name());if(!registered.containsAll(names))throw new IOException("WSL稼働一覧の登録が不明です");
+                Commands.Result running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"));Commands.zero(running,"WSL停止前照合");Set<String> names=runningNames(running.stdout()),registered=new HashSet<>();for(var row:fresh.distributions())registered.add(row.name());if(!registered.containsAll(names))throw new IOException("WSL稼働一覧の登録が不明です");
                 if(names.contains(distribution.name)) {
-                    keeper.requireControllerLive();Commands.zero(commands.capture(List.of(wsl.toString(),"--terminate",distribution.name),commands.left(Duration.ofSeconds(3))),"専用WSL停止");
-                    running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"),commands.left(Duration.ofSeconds(2)));Commands.zero(running,"WSL停止照合");names=runningNames(running.stdout());
+                    keeper.requireControllerLive();Commands.zero(commands.capture(List.of(wsl.toString(),"--terminate",distribution.name)),"専用WSL停止");
+                    running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"));Commands.zero(running,"WSL停止照合");names=runningNames(running.stdout());
                 }
                 HostFacts after=facts();registered.clear();for(var row:after.distributions())registered.add(row.name());if(!after.boot().equals(fresh.boot())||!after.sid().equals(fresh.sid())||!registered.containsAll(names)||names.contains(distribution.name)||!distribution.verify(after).equals(owner))throw new IOException("専用WSL停止が未確認です");distribution.stopped(owner,after.boot());keeper.stopped();
             }

@@ -31,6 +31,8 @@ final class Commands {
         Duration remaining=left(maximum);if(deadline==Long.MAX_VALUE)return remaining;
         long nanos=Math.min(maximum.toNanos(),deadline-System.nanoTime()-Duration.ofSeconds(2).toNanos());if(nanos<=0)throw new IOException("native回収枠を残せません");return Duration.ofNanos(nanos);
     }
+    /** 局所上限を追加せず、共有絶対期限とnative回収枠内で実行する。 */
+    Result capture(List<String> args) throws IOException {return capture(args,Duration.ofNanos(Long.MAX_VALUE));}
     Result capture(List<String> args,Duration maximum) throws IOException {return capture(args,maximum,null);}
     Result capture(List<String> args,Duration maximum,Path input) throws IOException {return exchange(args,null,input,null,maximum);}
     Result request(List<String> args,byte[] request,Path input,Duration maximum) throws IOException {return exchange(args,request,input,null,maximum);}
@@ -80,10 +82,13 @@ final class Commands {
             if(error==null&&result!=null&&result.exit()!=0){ObjectNode summary=WindowsFiles.JSON.createObjectNode().put("nativeExit",result.exit());outputSummary(out,err,target==null?1024*1024:64L*1024*1024,summary);try{WindowsFiles.write(Path.of(prefix+".diagnostic.json"),summary);}catch(IOException failure){diagnosticSaved=false;error=failure;}}
             if(error!=null) {
                 String kind=Thread.currentThread().isInterrupted()?"INTERRUPTED":error.getMessage()!=null&&(error.getMessage().contains("timeout")||error.getMessage().contains("期限"))?"TIMEOUT":"IO_FAILED";
-                ObjectNode summary=WindowsFiles.JSON.createObjectNode().put("inputFailure",writerFailure.get()!=null?"INPUT_IO_FAILED":"NONE").put("executionFailure",kind).put("operation",operation).put("failedPhase",phase).put("phaseLog",trace.fileName()).put("reclaimed",reclaimed).put("terminal","unknown").put("jobEmpty",false);
+                ObjectNode summary=WindowsFiles.JSON.createObjectNode().put("inputFailure",writerFailure.get()!=null?"INPUT_IO_FAILED":"NONE").put("executionFailure",kind).put("operation",operation).put("mode",request==null?"exec":"exec-bridge").put("completionRequired",request!=null).put("failedPhase",phase).put("phaseLog",trace.fileName()).put("reclaimed",reclaimed).put("terminal","unknown").put("jobEmpty",false);
                 if(process!=null&&!process.isAlive()) {
                     summary.put("nativeExit",process.exitValue());
-                    trace.event("completion-read",deadline,0,process);try{Receipt receipt=observed(prefix,process,started);summary.put("terminal",receipt.done()?"done":"unknown");JsonNode proof=WindowsKeeper.completion(prefix,receipt.value(),process.exitValue());summary.set("completion",proof);summary.put("jobEmpty",receipt.done()&&proof.path("jobEmpty").asBoolean());trace.event("completion-read-done",deadline,0,process);}catch(IOException failure){summary.put("completionUnknown",true);trace.event("completion-unknown",deadline,0,process);}
+                    trace.event("terminal-read",deadline,0,process);try{Receipt receipt=observed(prefix,process,started);summary.put("terminal",receipt.done()?"done":"unknown");
+                        if(request==null){summary.put("jobEmpty",receipt.done());if(!receipt.done())summary.put("terminalUnknown",true);trace.event(receipt.done()?"terminal-read-done":"terminal-unknown",deadline,0,process);}
+                        else {trace.event("completion-read",deadline,0,process);JsonNode proof=WindowsKeeper.completion(prefix,receipt.value(),process.exitValue());summary.set("completion",proof);summary.put("jobEmpty",receipt.done()&&proof.path("jobEmpty").asBoolean());trace.event("completion-read-done",deadline,0,process);}
+                    }catch(IOException failure){summary.put(request==null?"terminalUnknown":"completionUnknown",true);trace.event(request==null?"terminal-unknown":"completion-unknown",deadline,0,process);}
                 }
                 outputSummary(out,err,target==null?1024*1024:64L*1024*1024,summary);
                 try{WindowsFiles.write(Path.of(prefix+".diagnostic.json"),summary);}catch(IOException failure){diagnosticSaved=false;summary.put("diagnosticSaveFailed",true);}
