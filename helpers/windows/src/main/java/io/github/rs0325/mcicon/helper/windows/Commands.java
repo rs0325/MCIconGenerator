@@ -27,12 +27,17 @@ final class Commands {
         if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("Windows操作が中断されました");long left=deadline-System.nanoTime();if(left<=0)throw new IOException("Windows操作の期限を超えました");return Duration.ofNanos(Math.min(left,maximum.toNanos()));
     }
     synchronized void cleanup(){deadline=Math.min(deadline,System.nanoTime()+Duration.ofSeconds(9).toNanos());}
-    private Duration runBudget(Duration maximum) throws IOException {
+    static Duration releaseTail(int steps){return Duration.ofSeconds(2).plusMillis(250L*steps);}
+    private Duration runBudget(Duration maximum) throws IOException {return runBudget(maximum,-1);}
+    private Duration runBudget(Duration maximum,int following) throws IOException {
         Duration remaining=left(maximum);if(deadline==Long.MAX_VALUE)return remaining;
-        long nanos=Math.min(maximum.toNanos(),deadline-System.nanoTime()-Duration.ofSeconds(2).toNanos());if(nanos<=0)throw new IOException("native回収枠を残せません");return Duration.ofNanos(nanos);
+        long nanos=Math.min(maximum.toNanos(),deadline-System.nanoTime()-Duration.ofSeconds(2).toNanos());if(nanos<=0)throw new IOException("native回収枠を残せません");if(following>=0){nanos-=Duration.ofMillis(250L*following).toNanos();if(nanos<Duration.ofMillis(250).toNanos())throw new IOException("後続必須段とnativeの最小実行枠250msを残せません（期限不足）");}return Duration.ofNanos(nanos);
     }
     /** 局所上限を追加せず、共有絶対期限とnative回収枠内で実行する。 */
     Result capture(List<String> args) throws IOException {return capture(args,Duration.ofNanos(Long.MAX_VALUE));}
+    /** 後続必須段の最小枠を予約する。keeper EOFも一段として数える。 */
+    Result releaseCapture(List<String> args,int following) throws IOException {return exchange(args,null,null,null,Duration.ofNanos(Long.MAX_VALUE),following);}
+    Result releaseRequest(List<String> args,byte[] request,Path input,int following) throws IOException {return exchange(args,request,input,null,Duration.ofNanos(Long.MAX_VALUE),following);}
     Result capture(List<String> args,Duration maximum) throws IOException {return capture(args,maximum,null);}
     Result capture(List<String> args,Duration maximum,Path input) throws IOException {return exchange(args,null,input,null,maximum);}
     Result request(List<String> args,byte[] request,Path input,Duration maximum) throws IOException {return exchange(args,request,input,null,maximum);}
@@ -49,11 +54,12 @@ final class Commands {
         if(args.size()==2&&args.getFirst().equals(nativeHost.toString())&&args.get(1).equals("facts"))return "facts";
         if(args.size()>1)return switch(args.get(1)){case "--status"->"wsl-status";case "--list"->"wsl-list";case "--terminate"->"wsl-stop";case "--import"->"wsl-import";default->"native-other";};return "native-other";
     }
-    private Result exchange(List<String> args,byte[] request,Path input,Path target,Duration maximum) throws IOException {
-        String operation=operation(args,request),phase="native-budget";RuntimePhaseLog trace=new RuntimePhaseLog(temporary,"windows",operation,keeper==null?null:keeper.path("attempt").asText());trace.event("exchange-start",deadline,maximum.toNanos());
+    private Result exchange(List<String> args,byte[] request,Path input,Path target,Duration maximum) throws IOException {return exchange(args,request,input,target,maximum,-1);}
+    private Result exchange(List<String> args,byte[] request,Path input,Path target,Duration maximum,int following) throws IOException {
+        String operation=operation(args,request),phase="native-budget";RuntimePhaseLog trace=new RuntimePhaseLog(temporary,"windows",operation,keeper==null?null:keeper.path("attempt").asText());trace.event("exchange-start",deadline,maximum.toNanos());if(following>=0)trace.event("native-required",deadline,releaseTail(following+1).toNanos());
         Path prefix=temporary.resolve("native-"+UUID.randomUUID()),out=target==null?Files.createTempFile(temporary,"stdout-",".bin"):target,err=Files.createTempFile(temporary,"stderr-",".bin");Process process=null;Thread writer=null;IOException error=null;Result result=null;AtomicReference<IOException> writerFailure=new AtomicReference<>();boolean reclaimed=false,diagnosticSaved=true;long started=0,runEnd=deadline;
         try {
-            runEnd=System.nanoTime()+runBudget(maximum).toNanos();long executionEnd=runEnd;trace.event(phase,runEnd,Math.max(0,runEnd-System.nanoTime()));
+            runEnd=System.nanoTime()+runBudget(maximum,following).toNanos();long executionEnd=runEnd;trace.event(phase,runEnd,Math.max(0,runEnd-System.nanoTime()));
             phase="native-spawn";trace.event(phase,runEnd,0);
             ProcessBuilder builder=(request==null?builder(args,"exec",0,0,prefix):bridgeBuilder(args,prefix)).redirectOutput(out.toFile()).redirectError(err.toFile());if(request==null&&input!=null)builder.redirectInput(input.toFile());process=builder.start();Process child=process;started=process.info().startInstant().orElseThrow(()->new IOException("native開始identity不明")).toEpochMilli();trace.event("native-started",runEnd,0,process);
             if(request!=null)writer=Thread.ofVirtual().start(()->{try(OutputStream stream=child.getOutputStream()){trace.event("guest-write",executionEnd,0,child);TimedRequest bounded=boundedRequest(request,executionEnd);stream.write(bounded.bytes());stream.write('\n');trace.event("guest-request-written",executionEnd,bounded.budgetNanos(),child);if(input!=null)try(InputStream source=Files.newInputStream(input)){source.transferTo(stream);}trace.event("guest-written",executionEnd,0,child);}catch(IOException failure){writerFailure.set(failure);}});

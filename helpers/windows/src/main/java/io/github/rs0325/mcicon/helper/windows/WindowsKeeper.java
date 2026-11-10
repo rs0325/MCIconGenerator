@@ -48,7 +48,7 @@ final class WindowsKeeper {
             releaseEnd=System.nanoTime()+remaining;
             runtime.trace.event("release-deadline",releaseEnd,remaining,child.process());
             HelperProtocol.Command release=new HelperProtocol.Command(runtime.command.root(),runtime.command.lease(),"release",List.of());
-            WindowsRuntime cleanup=new WindowsRuntime(release,runtime.executable,runtime.lease,System.nanoTime(),releaseEnd);
+            WindowsRuntime cleanup=new WindowsRuntime(release,runtime.executable,runtime.lease,System.nanoTime(),releaseEnd,controller.recovery());
             cleanup.release(this,controller.recovery());
             return;
         }catch(IOException|RuntimeException|Error error){failure=error;runtime.trace.event("keeper-failed",releaseEnd,0,child==null?null:child.process());throw error;}
@@ -119,7 +119,7 @@ final class WindowsKeeper {
     }
     private boolean clientEnded;
     void endClient(Commands commands) throws IOException {
-        releaseEnd=commands.end();long end=Math.min(releaseEnd-Duration.ofSeconds(3).toNanos(),System.nanoTime()+Duration.ofSeconds(2).toNanos());
+        releaseEnd=commands.end();long reserve=!controller.recovery()&&record.path("stopIntent").asBoolean()?Commands.releaseTail(5).toNanos():Duration.ofSeconds(3).toNanos();long end=Math.min(releaseEnd-reserve,System.nanoTime()+Duration.ofSeconds(2).toNanos());
         if(System.nanoTime()>=end)throw new IOException("keeper EOF後の停止/保存枠を残せません");
         runtime.trace.event("keeper-eof-start",end,Math.max(0,end-System.nanoTime()),child.process());
         if(!record.path("closeIntent").asBoolean()||!child.process().isAlive())throw new IOException("keeperの先行close intent/guardがありません");requireControllerLive();requireClientLive(record);
