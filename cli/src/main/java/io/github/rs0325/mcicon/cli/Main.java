@@ -7,7 +7,14 @@ import io.github.rs0325.mcicon.internal.WindowsDataHome;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 import java.nio.file.Path;
-import java.io.IOException;
+import java.io.*;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
+import java.net.http.HttpTimeoutException;
+import java.net.SocketTimeoutException;
+import javax.net.ssl.SSLException;
+import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.FileLockInterruptionException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.*;
 import java.util.concurrent.*;
@@ -41,7 +48,38 @@ public final class Main implements Runnable {
         while(cause instanceof CompletionException&&cause.getCause()!=null)cause=cause.getCause();
         String code=cause instanceof McIconException m?m.code():cause instanceof IllegalArgumentException?"INVALID_REQUEST":"INTERNAL_ERROR";
         int exit=cause instanceof McIconException m?m.exitCode():cause instanceof IllegalArgumentException?2:1;
-        line.getErr().println(code+": "+cause.getMessage());if(debug)cause.printStackTrace(line.getErr());line.getErr().flush();return exit;
+        line.getErr().println(code+": "+(code.equals("IO_FAILED")&&!debug?"Input/output operation failed":cause.getMessage()));
+        if(code.equals("IO_FAILED")&&!debug)line.getErr().println(ioFailureDetail(cause.getCause()));
+        if(debug)cause.printStackTrace(line.getErr());line.getErr().flush();return exit;
+    }
+    private static String ioFailureDetail(Throwable cause) {
+        List<Throwable> chain=new ArrayList<>();Set<Throwable> seen=Collections.newSetFromMap(new IdentityHashMap<>());
+        while(cause!=null&&seen.add(cause)){chain.add(cause);cause=cause.getCause();}
+        String[] categories={"TIMEOUT","INTERRUPTED","ACCESS_DENIED","NOT_FOUND","FILE_SYSTEM_ERROR","IO_ERROR"};
+        Class<?>[][] types={
+            {HttpTimeoutException.class,SocketTimeoutException.class,TimeoutException.class},
+            {InterruptedException.class,InterruptedIOException.class,ClosedByInterruptException.class,FileLockInterruptionException.class},
+            {java.nio.file.AccessDeniedException.class},
+            {java.nio.file.NoSuchFileException.class,FileNotFoundException.class},
+            {java.nio.file.FileSystemException.class},
+            {IOException.class}
+        };
+        Throwable selected=null;String category="UNKNOWN";
+        outer:for(int i=0;i<types.length;i++)for(Throwable item:chain)for(Class<?> type:types[i])if(type.isInstance(item)){selected=item;category=categories[i];break outer;}
+        if(selected==null&&!chain.isEmpty())selected=chain.get(0);
+        return "IO_FAILED_DETAIL category="+category+" causeClass="+causeClass(selected);
+    }
+    private static String causeClass(Throwable cause) {
+        if(cause==null)return "NONE";
+        Class<?>[] allowed={
+            HttpTimeoutException.class,SocketTimeoutException.class,TimeoutException.class,
+            InterruptedException.class,InterruptedIOException.class,ClosedByInterruptException.class,FileLockInterruptionException.class,
+            java.nio.file.AccessDeniedException.class,java.nio.file.NoSuchFileException.class,FileNotFoundException.class,
+            java.nio.file.FileSystemException.class,IOException.class,EOFException.class,ConnectException.class,
+            UnknownHostException.class,SSLException.class
+        };
+        for(Class<?> type:allowed)if(cause.getClass()==type)return type.getName();
+        return "OTHER";
     }
     private static Common common(Object command) {
         return switch(command){case Render value->value.common;case Catalog value->value.common;case Doctor value->value.common;case Cache value->value.common;case Extract value->value.common;case Versions value->value.common;default->null;};
