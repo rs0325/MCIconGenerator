@@ -49,7 +49,8 @@ final class WindowsRuntime {
     private HostFacts facts(int following) throws IOException {List<String> args=List.of(payload.path("windows-host.exe").toString(),"facts");Commands.Result result=command.operation().equals("release")?commands.releaseCapture(args,following):commands.capture(args,Duration.ofSeconds(3));Commands.zero(result,"Windows所有情報の読取");return HostFacts.parse(WindowsFiles.JSON.readTree(result.stdout()),descriptor);}
     OperationJournal journal() throws IOException {trace.event("journal-wait",commands.end(),0);OperationJournal result=OperationJournal.acquire(temporary,lease.read(),commands.left(Duration.ofSeconds(3)));trace.event("journal-locked",commands.end(),0);return result;}
     WslDistribution.Lock lock() throws IOException {trace.event("generation-lock-wait",commands.end(),0);WslDistribution.Lock result=distribution.lock(commands.left(Duration.ofSeconds(3)));trace.event("generation-locked",commands.end(),0);return result;}
-    LeaseReferences.Scan references() throws IOException {trace.event("references-start",commands.end(),0);LeaseReferences.Scan result=LeaseReferences.inspect(command,executable,lease.read().path("descriptorSha256").asText());trace.event("references-done",commands.end(),0);return result;}
+    LeaseReferences.Scan references() throws IOException {return references(commands.end());}
+    private LeaseReferences.Scan references(long end) throws IOException {trace.event("references-start",commands.end(),Math.max(0,end-System.nanoTime()));LeaseReferences.Scan result=LeaseReferences.inspect(command,executable,lease.read().path("descriptorSha256").asText(),end);trace.event("references-done",commands.end(),0);if(System.nanoTime()>=end)throw new IOException("TIMEOUT: 他lease照合の後続予約枠を残せません（期限不足）");return result;}
     void preflight() throws IOException {
         try(OperationJournal journal=journal();var ignored=lock()) {
             journal.settledRequired();HostFacts host=facts();LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseの所有が不明です");requireSharedCapacity(others);
@@ -150,7 +151,10 @@ final class WindowsRuntime {
             if(recovery&&owner.has("lastStop")){trace.event("daemon-recovery-start",commands.end(),0);owner=recoverDaemon(owner,keeper.value());trace.event("daemon-recovery-done",commands.end(),0);}
             trace.event("guest-release-start",commands.end(),0);
             JsonNode proof=bridge(recovery?"release-recover":"release",owner,null,null);if(!proof.path("closed").asBoolean()||proof.path("actors").asInt(-1)!=0||proof.path("containers").asInt(-1)!=0||!proof.path("identity").equals(identity())||!proof.path("keeper").equals(keeper.value().path("guest").path("keeper")))throw new IOException("guest fence終端証明が一致しません");
-            trace.event("guest-release-done",commands.end(),0);keeper.workProof(proof);LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseが不明なため回収完了を確定しません");
+            trace.event("guest-release-done",commands.end(),0);keeper.workProof(proof);
+            long scanEnd=recovery?commands.end():commands.end()-Commands.releaseTail(6).toNanos();
+            trace.event("references-reserved",commands.end(),recovery?0:Commands.releaseTail(6).toNanos());
+            LeaseReferences.Scan others=references(scanEnd);if(others.unknown())throw new IOException("他leaseが不明なため回収完了を確定しません");
             keeper.closeIntent(others.stopAllowed());keeper.endClient(commands);
             if(others.stopAllowed()) {
                 keeper.requireControllerLive();HostFacts fresh=facts(recovery?-1:4);if(!fresh.boot().equals(keeper.value().path("boot").asText())||!fresh.sid().equals(owner.path("binding").path("sid").asText())||!distribution.verify(fresh).equals(owner))throw new IOException("keeper EOF後のhost/ownerが一致しません");

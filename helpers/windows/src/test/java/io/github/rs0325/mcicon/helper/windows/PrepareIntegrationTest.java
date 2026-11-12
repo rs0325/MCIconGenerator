@@ -223,6 +223,50 @@ class PrepareIntegrationTest {
             }
         }
     }
+    @Test void 百件超のreleased照合後も六秒本体内でEOFと停止と保存を完了する() throws Exception {
+        mode("valid");prepareRecoveryPayload();LeaseReferencesTest.released(root,lease,104);
+        WindowsRuntime keep=runtime("keep");WindowsKeeper keeper=allocate(WindowsKeeper.class);set(keeper,"runtime",keep);
+        ProcessHandle parent=ProcessHandle.current().parent().orElseThrow();set(keeper,"controller",new HelperProtocol.Keeper(parent.pid(),parent.info().startInstant().orElseThrow().toEpochMilli(),attempt,Instant.now().plusSeconds(20),false));
+        Method start=WindowsKeeper.class.getDeclaredMethod("start");start.setAccessible(true);Field childField=WindowsKeeper.class.getDeclaredField("child");childField.setAccessible(true);Commands.Running child=null;
+        try {
+            start.invoke(keeper);child=(Commands.Running)childField.get(keeper);WindowsRuntime cleanup=runtime("release");long end=System.nanoTime()+Duration.ofSeconds(6).toNanos();cleanup.commands.end(end);
+            cleanup.release(keeper,false);assertEquals(end,cleanup.commands.end());assertTrue(System.nanoTime()<end);assertTrue(cleanup.lease.read().path("resources").isEmpty());
+            assertEquals("closed",keeper.value().path("state").asText());assertTrue(keeper.value().path("stopConfirmed").asBoolean());assertTrue(keeper.value().path("jobEmpty").asBoolean());assertTrue(keeper.value().path("workProof").path("closed").asBoolean());assertFalse(child.process().isAlive());
+            try(var journal=cleanup.journal()){assertTrue(journal.released());}
+            List<JsonNode> rows=new ArrayList<>();try(var files=Files.list(tmp)){for(Path path:files.filter(p->p.getFileName().toString().startsWith("phase-")).toList())for(String line:Files.readAllLines(path))rows.add(WindowsFiles.JSON.readTree(line));}
+            JsonNode reserved=rows.stream().filter(v->v.path("phase").asText().equals("references-reserved")).findFirst().orElseThrow();
+            JsonNode done=rows.stream().filter(v->v.path("phase").asText().equals("references-done")&&v.path("operation").asText().equals("release")).findFirst().orElseThrow();
+            assertEquals(3500000000L,reserved.path("budgetNanos").asLong());assertTrue(done.path("remainingNanos").asLong()>=3500000000L);
+        }finally{if(child==null)child=(Commands.Running)childField.get(keeper);if(child!=null){child.process().getOutputStream().close();assertTrue(child.process().waitFor(10,java.util.concurrent.TimeUnit.SECONDS));}}
+    }
+    @Test void 照合期限不足ではguest終端後でもEOF前にleaseとjournalを保持する() throws Exception {
+        mode("valid");prepareRecoveryPayload();
+        WindowsRuntime keep=runtime("keep");WindowsKeeper keeper=allocate(WindowsKeeper.class);set(keeper,"runtime",keep);
+        ProcessHandle parent=ProcessHandle.current().parent().orElseThrow();set(keeper,"controller",new HelperProtocol.Keeper(parent.pid(),parent.info().startInstant().orElseThrow().toEpochMilli(),attempt,Instant.now().plusSeconds(20),false));
+        Method start=WindowsKeeper.class.getDeclaredMethod("start");start.setAccessible(true);Field childField=WindowsKeeper.class.getDeclaredField("child");childField.setAccessible(true);Commands.Running child=null;
+        try {
+            start.invoke(keeper);child=(Commands.Running)childField.get(keeper);WindowsRuntime cleanup=runtime("release");long end=System.nanoTime()+Duration.ofSeconds(6).toNanos();cleanup.commands.end(end);
+            long scanEnd=end-Commands.releaseTail(6).toNanos();boolean[] proofReached={false};
+            ObjectNode delayed=new ObjectNode(WindowsFiles.JSON.getNodeFactory()) {
+                @Override public <T extends JsonNode> T set(String name,JsonNode value) {
+                    T result=super.set(name,value);
+                    if(name.equals("workProof")) {
+                        proofReached[0]=true;
+                        long left;while((left=scanEnd-System.nanoTime())>=0)java.util.concurrent.locks.LockSupport.parkNanos(Math.max(1,left));
+                    }
+                    return result;
+                }
+            };
+            delayed.setAll((ObjectNode)keeper.value());set(keeper,"record",delayed);
+            byte[] beforeLease=Files.readAllBytes(leasePath),beforeJournal=Files.readAllBytes(tmp.resolve("windows-operation.json"));
+            IOException failure=assertThrows(IOException.class,()->cleanup.release(keeper,false));
+            assertTrue(proofReached[0],"guest終端証明の保存境界を実際に通る");assertTrue(System.nanoTime()>=scanEnd);
+            assertTrue(failure.getMessage().contains("他lease照合")&&failure.getMessage().contains("期限不足"),failure.getMessage());
+            assertEquals(end,cleanup.commands.end());assertTrue(System.nanoTime()<end);assertTrue(keeper.value().path("workProof").path("closed").asBoolean());
+            assertFalse(keeper.value().path("closeIntent").asBoolean());assertFalse(Files.exists(tmp.resolve("fixture-eof-ms")));assertFalse(Files.exists(tmp.resolve("fixture-terminated")));
+            assertArrayEquals(beforeLease,Files.readAllBytes(leasePath));assertArrayEquals(beforeJournal,Files.readAllBytes(tmp.resolve("windows-operation.json")));assertFalse(cleanup.lease.read().path("resources").isEmpty());
+        }finally{if(child==null)child=(Commands.Running)childField.get(keeper);if(child!=null){child.process().getOutputStream().close();assertTrue(child.process().waitFor(10,java.util.concurrent.TimeUnit.SECONDS));}}
+    }
     @Test void 一覧が二秒を超えても共有close期限内だけ停止保存を確定する() throws Exception {
         for(int budget:new int[]{9000,4200,1900}) {
             PrepareIntegrationTest fixture=new PrepareIntegrationTest();fixture.root=Files.createDirectory(root.resolve("list-"+budget));fixture.setup();fixture.mode("release-list");fixture.prepareRecoveryPayload();Files.writeString(fixture.tmp.resolve("fixture-list-ms"),"2100");
