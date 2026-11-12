@@ -14,62 +14,144 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.*;
 
 /** 他世代をskipせず、全jobのbusy/不明を共有distroの停止禁止へ反映する。 */
 final class LeaseReferences {
     record Generation(String descriptorSha256,long containerMemoryMiB,List<LeaseSnapshot> leases) {}
     record Scan(boolean active,List<String> diagnostics,long memoryMiB,boolean currentPristine,boolean currentStarted,boolean stopBlocked,List<Generation> generations) {boolean restartAllowed(){return !currentStarted&&!unknown();}boolean unknown(){return !diagnostics.isEmpty();}boolean stopAllowed(){return !stopBlocked&&!unknown();}}
     private LeaseReferences() {}
-    static Scan inspect(HelperProtocol.Command command,Path executable,String descriptorSha256) throws IOException {
-        Path jobs=command.root().resolve("jobs");if(!jobs.toRealPath().equals(jobs))throw new IOException("job一覧にlinkがあります");
-        LeaseTrust trust=null;
-        String hostId=Files.readString(command.root().resolve("host-id"),StandardCharsets.US_ASCII).trim();
-        boolean active=false,pristine=true,activeStarted=false,stopBlocked=false;List<String> diagnostics=new ArrayList<>();long memory=0;Map<String,List<LeaseSnapshot>> generations=new LinkedHashMap<>();
-        try(DirectoryStream<Path> entries=Files.newDirectoryStream(jobs)) {
-            for(Path directory:entries) {
-                Path lease=directory.resolve("lease.json");if(lease.equals(command.lease()))continue;
-                try {
-                    if(!UUID.fromString(directory.getFileName().toString()).toString().equals(directory.getFileName().toString())||!Files.isDirectory(directory,LinkOption.NOFOLLOW_LINKS)||!directory.toRealPath().equals(directory))throw new IOException("未知のjob directoryです");
-                    Path receipt=directory.resolve("lease.lock");if(!Files.isRegularFile(receipt,LinkOption.NOFOLLOW_LINKS))throw new IOException("他jobのreceiptがありません");
-                    try(FileChannel channel=FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
-                        FileLock lock=null;try{lock=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
-                        try {
-                            ObjectNode value=(ObjectNode)WindowsFiles.json(lease);Path referredExecutable=executable;
-                            if(value.path("state").asText().equals("released")) {
-                                if(lock==null&&(!value.path("descriptorSha256").asText().equals(descriptorSha256)||!quiescent(directory,value,referredExecutable)))throw new IOException("released記録のlockが保持されています");
-                                if(!value.path("jobId").asText().equals(directory.getFileName().toString()))throw new IOException("released job識別が不正です");
-                                validateReleased(value,hostId);
-                                ObjectNode identity=value.deepCopy();identity.remove(List.of("state","resources"));
-                                if(channel.size()!=64)throw new IOException("released receiptは64bytesが必要です");
-                                channel.position(0);ByteBuffer saved=ByteBuffer.allocate(64);
-                                while(saved.hasRemaining()){if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("released receipt検証が中断されました");if(channel.read(saved)<=0)throw new IOException("released receiptが不足しています");}
-                                if(channel.size()!=64||!Arrays.equals(saved.array(),LeaseFile.receipt(identity)))throw new IOException("released receiptが一致しません");
-                            }else {
-                                active=true;
-                                if(trust==null)trust=LeaseFile.trust(command,executable);
-                                LeaseSnapshot current=LeaseFile.inspect(command.root(),lease,trust);JsonNode checked=current.lease();
-                                if(!current.descriptor().path("host").path("os").asText().equals("windows")||!current.descriptor().path("host").path("arch").asText().equals("x86_64"))throw new IOException("参照元descriptorのhostが一致しません");referredExecutable=current.helperExecutable();
-                                if(!checked.path("resources").isEmpty()||Files.exists(directory.resolve("tmp/keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
-                                    Path entry=Path.of(current.descriptor().path("helper").path("executable").asText());current.helperFile(entry.getParent().resolve("app/support/windows-host.exe").toString().replace('\\','/'));
-                                }
-                                if(lock!=null||!live(checked))throw new IOException("他jobのactive所有者が不明です");
-                                memory=Math.addExact(memory,checked.path("requirements").path("containerMemoryMiB").longValue());
-                                generations.computeIfAbsent(checked.path("descriptorSha256").asText(),key->new ArrayList<>()).add(current);current.verifyUnchanged();
-                            }
-                            boolean released=value.path("state").asText().equals("released"),same=value.path("descriptorSha256").asText().equals(descriptorSha256);
-                            if(!released) {
-                                if(!same)stopBlocked=true;
-                                if(value.path("resources").isEmpty()&&emptyJournal(directory,value)&&!Files.exists(directory.resolve("tmp/keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
-                                    try(var records=Files.newDirectoryStream(directory.resolve("tmp"),"keeper-*.json")){if(records.iterator().hasNext())throw new IOException("keeper部分開始が残っています");}
-                                }else if(!quiescent(directory,value,referredExecutable)) {
-                                    keeperLive(directory,value,referredExecutable);stopBlocked=true;
-                                }
-                            }
-                            if(!value.path("resources").isEmpty()||!emptyJournal(directory,value)){if(same)pristine=false;if(same&&!released)activeStarted=true;}
-                        }finally {if(lock!=null&&lock.isValid())lock.release();}
-                    }
-                }catch(IOException|RuntimeException failure){pristine=false;diagnostics.add(directory.getFileName()+": "+failure.getMessage());}
+    /** 割込みはUNKNOWNとし、flagを保持する。期限不足はEOF前の失敗にする。 */
+    static Scan inspect(HelperProtocol.Command command,Path executable,String descriptorSha256,long end) throws IOException {
+        try {
+            checkDeadline(end);
+            Path jobs=command.root().resolve("jobs");if(!jobs.toRealPath().equals(jobs))throw new IOException("job一覧にlinkがあります");
+            String hostId=Files.readString(command.root().resolve("host-id"),StandardCharsets.US_ASCII).trim();
+            List<List<Path>> partitions=new ArrayList<>();for(int i=0;i<4;i++)partitions.add(new ArrayList<>());
+            int index=0;
+            try(DirectoryStream<Path> entries=Files.newDirectoryStream(jobs)) {
+                for(Path directory:entries){checkDeadline(end);if(!directory.resolve("lease.json").equals(command.lease()))partitions.get(index++%4).add(directory);}
             }
+            if(index==0){checkDeadline(end);return new Scan(false,List.of(),0,true,false,false,List.of());}
+            List<Callable<Scan>> tasks=new ArrayList<>();
+            long workEnd=end==Long.MAX_VALUE?end:end-TimeUnit.MILLISECONDS.toNanos(250);
+            for(List<Path> partition:partitions)tasks.add(()->inspect(command,executable,descriptorSha256,hostId,partition,workEnd));
+            boolean active=false,pristine=true,started=false,blocked=false;long memory=0;
+            List<String> diagnostics=new ArrayList<>();Map<String,List<LeaseSnapshot>> generations=new LinkedHashMap<>();
+            for(Scan scan:scans(tasks,end)) {
+                active|=scan.active();pristine&=scan.currentPristine();started|=scan.currentStarted();blocked|=scan.stopBlocked();memory=Math.addExact(memory,scan.memoryMiB());diagnostics.addAll(scan.diagnostics());
+                for(Generation generation:scan.generations())generations.computeIfAbsent(generation.descriptorSha256(),key->new ArrayList<>()).addAll(generation.leases());
+            }
+            checkDeadline(end);return new Scan(active,List.copyOf(diagnostics),memory,pristine,started,blocked,summary(generations));
+        }catch(InterruptedIOException failure){return new Scan(false,List.of(failure.getMessage()),0,false,false,true,List.of());}
+    }
+    private static void checkDeadline(long end) throws IOException {
+        if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("他lease照合が中断されました");
+        if(System.nanoTime()>=end)throw new IOException("TIMEOUT: 他lease照合の後続予約枠を残せません（期限不足）");
+    }
+    static List<Scan> scans(List<Callable<Scan>> tasks,long end) throws IOException {
+        checkDeadline(end);
+        long workEnd=end==Long.MAX_VALUE?end:end-TimeUnit.MILLISECONDS.toNanos(250);
+        if(System.nanoTime()>=workEnd)throw new IOException("TIMEOUT: 他lease照合workerの実行/回収枠を残せません（期限不足）");
+        List<Thread> workers=new CopyOnWriteArrayList<>();
+        ExecutorService pool=Executors.newFixedThreadPool(4,task->{Thread worker=Thread.ofPlatform().name("mcicon-lease-scan-"+workers.size()).unstarted(task);workers.add(worker);return worker;});
+        BudgetGuard guard=new BudgetGuard(end);List<Future<Scan>> futures=new ArrayList<>();List<Scan> result=new ArrayList<>();boolean collected=false;
+        try {
+            for(Callable<Scan> task:tasks)futures.add(pool.submit(task));
+            for(Future<Scan> future:futures) {
+                long left=workEnd-System.nanoTime();if(left<=0)throw new TimeoutException();
+                result.add(future.get(left,TimeUnit.NANOSECONDS));
+            }
+            checkDeadline(end);collected=true;
+        }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException("他lease照合が中断されました");}
+        catch(TimeoutException failure){throw new IOException("TIMEOUT: 他lease照合の後続予約枠を残せません（期限不足）",failure);}
+        catch(ExecutionException failure){if(failure.getCause() instanceof IOException error)throw error;throw new IOException("他lease照合workerが失敗しました",failure.getCause());}
+        finally {
+            boolean interrupted=Thread.interrupted();
+            long reapEnd=collected&&end!=Long.MAX_VALUE?end:Math.min(end,System.nanoTime()+TimeUnit.MILLISECONDS.toNanos(250));
+            guard.limit(reapEnd);
+            for(Future<Scan> future:futures)future.cancel(true);
+            pool.shutdownNow();
+            try {
+                while(!pool.isTerminated()) {
+                    long left=reapEnd-System.nanoTime();if(left<=TimeUnit.MILLISECONDS.toNanos(100))Runtime.getRuntime().halt(1);
+                    try{pool.awaitTermination(left-TimeUnit.MILLISECONDS.toNanos(100),TimeUnit.NANOSECONDS);}catch(InterruptedException failure){interrupted=true;}
+                }
+                for(Thread worker:workers)while(worker.isAlive()) {
+                    long left=reapEnd-System.nanoTime();if(left<=TimeUnit.MILLISECONDS.toNanos(100))Runtime.getRuntime().halt(1);
+                    try{worker.join(java.time.Duration.ofNanos(left-TimeUnit.MILLISECONDS.toNanos(100)));}catch(InterruptedException failure){interrupted=true;}
+                }
+                guard.finish();
+                while(guard.thread.isAlive()) {
+                    long left=reapEnd-System.nanoTime();if(left<=0)Runtime.getRuntime().halt(1);
+                    try{guard.thread.join(java.time.Duration.ofNanos(left));}catch(InterruptedException failure){interrupted=true;}
+                }
+            }finally{if(interrupted)Thread.currentThread().interrupt();}
+        }
+        checkDeadline(end);return List.copyOf(result);
+    }
+    /** 非応答I/Oはhelperの失敗境界で止め、workerとreceiptを背景に残さない。 */
+    private static final class BudgetGuard {
+        private long end;private boolean finished;
+        private final Thread thread;
+        BudgetGuard(long end){this.end=end;thread=Thread.ofPlatform().daemon(true).name("mcicon-lease-scan-deadline").start(this::run);}
+        synchronized void limit(long end){this.end=Math.min(this.end,end);notifyAll();}
+        synchronized void finish(){finished=true;notifyAll();}
+        private synchronized void run() {
+            while(!finished) {
+                long left=end-System.nanoTime()-TimeUnit.MILLISECONDS.toNanos(100);
+                if(left<=0)Runtime.getRuntime().halt(1);
+                try{TimeUnit.NANOSECONDS.timedWait(this,left);}catch(InterruptedException ignored){}
+            }
+        }
+    }
+    private static Scan inspect(HelperProtocol.Command command,Path executable,String descriptorSha256,String hostId,List<Path> entries,long end) throws IOException {
+        LeaseTrust trust=null;
+        boolean active=false,pristine=true,activeStarted=false,stopBlocked=false;List<String> diagnostics=new ArrayList<>();long memory=0;Map<String,List<LeaseSnapshot>> generations=new LinkedHashMap<>();
+        for(Path directory:entries) {
+            checkDeadline(end);
+            Path lease=directory.resolve("lease.json");
+            try {
+                if(!UUID.fromString(directory.getFileName().toString()).toString().equals(directory.getFileName().toString())||!Files.isDirectory(directory,LinkOption.NOFOLLOW_LINKS)||!directory.toRealPath().equals(directory))throw new IOException("未知のjob directoryです");
+                Path receipt=directory.resolve("lease.lock");if(!Files.isRegularFile(receipt,LinkOption.NOFOLLOW_LINKS))throw new IOException("他jobのreceiptがありません");
+                try(FileChannel channel=FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
+                    FileLock lock=null;try{lock=channel.tryLock(64,1,false);}catch(OverlappingFileLockException busy){}
+                    try {
+                        ObjectNode value=(ObjectNode)WindowsFiles.json(lease);Path referredExecutable=executable;
+                        if(value.path("state").asText().equals("released")) {
+                            if(lock==null&&(!value.path("descriptorSha256").asText().equals(descriptorSha256)||!quiescent(directory,value,referredExecutable)))throw new IOException("released記録のlockが保持されています");
+                            if(!value.path("jobId").asText().equals(directory.getFileName().toString()))throw new IOException("released job識別が不正です");
+                            validateReleased(value,hostId);
+                            ObjectNode identity=value.deepCopy();identity.remove(List.of("state","resources"));
+                            if(channel.size()!=64)throw new IOException("released receiptは64bytesが必要です");
+                            channel.position(0);ByteBuffer saved=ByteBuffer.allocate(64);
+                            while(saved.hasRemaining()){if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("released receipt検証が中断されました");if(channel.read(saved)<=0)throw new IOException("released receiptが不足しています");}
+                            if(channel.size()!=64||!Arrays.equals(saved.array(),LeaseFile.receipt(identity)))throw new IOException("released receiptが一致しません");
+                        }else {
+                            active=true;
+                            if(trust==null)trust=LeaseFile.trust(command,executable);
+                            LeaseSnapshot current=LeaseFile.inspect(command.root(),lease,trust);JsonNode checked=current.lease();
+                            if(!current.descriptor().path("host").path("os").asText().equals("windows")||!current.descriptor().path("host").path("arch").asText().equals("x86_64"))throw new IOException("参照元descriptorのhostが一致しません");referredExecutable=current.helperExecutable();
+                            if(!checked.path("resources").isEmpty()||Files.exists(directory.resolve("tmp/keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
+                                Path entry=Path.of(current.descriptor().path("helper").path("executable").asText());current.helperFile(entry.getParent().resolve("app/support/windows-host.exe").toString().replace('\\','/'));
+                            }
+                            if(lock!=null||!live(checked))throw new IOException("他jobのactive所有者が不明です");
+                            memory=Math.addExact(memory,checked.path("requirements").path("containerMemoryMiB").longValue());
+                            generations.computeIfAbsent(checked.path("descriptorSha256").asText(),key->new ArrayList<>()).add(current);current.verifyUnchanged();
+                        }
+                        boolean released=value.path("state").asText().equals("released"),same=value.path("descriptorSha256").asText().equals(descriptorSha256);
+                        if(!released) {
+                            if(!same)stopBlocked=true;
+                            if(value.path("resources").isEmpty()&&emptyJournal(directory,value)&&!Files.exists(directory.resolve("tmp/keeper.json"),LinkOption.NOFOLLOW_LINKS)) {
+                                try(var records=Files.newDirectoryStream(directory.resolve("tmp"),"keeper-*.json")){if(records.iterator().hasNext())throw new IOException("keeper部分開始が残っています");}
+                            }else if(!quiescent(directory,value,referredExecutable)) {
+                                keeperLive(directory,value,referredExecutable);stopBlocked=true;
+                            }
+                        }
+                        if(!value.path("resources").isEmpty()||!emptyJournal(directory,value)){if(same)pristine=false;if(same&&!released)activeStarted=true;}
+                    }finally {if(lock!=null&&lock.isValid())lock.release();}
+                }
+            }catch(IOException|RuntimeException failure){pristine=false;diagnostics.add(directory.getFileName()+": "+failure.getMessage());}
         }
         return new Scan(active,List.copyOf(diagnostics),memory,pristine,activeStarted,stopBlocked,summary(generations));
     }

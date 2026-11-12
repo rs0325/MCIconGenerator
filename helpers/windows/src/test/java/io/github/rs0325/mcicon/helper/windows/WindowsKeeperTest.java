@@ -21,7 +21,7 @@ class WindowsKeeperTest {
             switch(mutation){case "short"->bytes=java.util.Arrays.copyOf(correct,63);case "long"->bytes=java.util.Arrays.copyOf(correct,65);case "corrupt"->bytes[0]^=1;case "other-owner"->changed.put("ownerId",java.util.UUID.randomUUID().toString());default->{}}
             WindowsFiles.write(job.resolve("lease.json"),changed);Files.write(receipt,bytes);
             if(mutation.equals("interrupted"))Thread.currentThread().interrupt();
-            try {var result=LeaseReferences.inspect(command,root.resolve("helper.exe"),"a".repeat(64));assertEquals(!mutation.equals("valid"),result.unknown(),mutation);if(mutation.equals("valid"))assertTrue(result.stopAllowed());else assertFalse(result.stopAllowed());}
+            try {var result=LeaseReferences.inspect(command,root.resolve("helper.exe"),"a".repeat(64),Long.MAX_VALUE);assertEquals(!mutation.equals("valid"),result.unknown(),mutation);if(mutation.equals("valid"))assertTrue(result.stopAllowed());else assertFalse(result.stopAllowed());}
             finally{Thread.interrupted();}
         }
     }
@@ -36,7 +36,7 @@ class WindowsKeeperTest {
         ObjectNode journalIdentity=identity.deepCopy();journalIdentity.set("hostId",lease.required("hostId"));WindowsFiles.write(tmp.resolve("windows-operation.json"),WindowsFiles.JSON.createObjectNode().put("state","released").set("identity",journalIdentity));
         var command=new io.github.rs0325.mcicon.helper.HelperProtocol.Command(root,jobs.resolve("current/lease.json"),"release",java.util.List.of());
         try(var channel=java.nio.channels.FileChannel.open(receipt,StandardOpenOption.READ,StandardOpenOption.WRITE);var lock=channel.lock(64,1,false)) {
-            assertTrue(LeaseReferences.inspect(command,exe,"a".repeat(64)).stopAllowed());Files.delete(Path.of(prefix+".done.json"));assertTrue(LeaseReferences.inspect(command,exe,"a".repeat(64)).unknown());
+            assertTrue(LeaseReferences.inspect(command,exe,"a".repeat(64),Long.MAX_VALUE).stopAllowed());Files.delete(Path.of(prefix+".done.json"));assertTrue(LeaseReferences.inspect(command,exe,"a".repeat(64),Long.MAX_VALUE).unknown());
         }
     }
     @Test void unpublishedKeeperRecoveryRechecksAttemptClientControllerAndJob0BeforeGuest() throws Exception {
