@@ -36,11 +36,11 @@ public final class FilesSupport {
     public static void atomicWrite(Path target,byte[] data) throws IOException {
         Files.createDirectories(target.getParent());
         Path temp=Files.createTempFile(target.getParent(),".mcicon-",".part");
-        try {
+        try(var cleanup=(Closeable)()->Files.deleteIfExists(temp)) {
             Files.write(temp,data);
             try {Files.move(temp,target,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}
             catch(AtomicMoveNotSupportedException e) {Files.move(temp,target,StandardCopyOption.REPLACE_EXISTING);}
-        } finally {Files.deleteIfExists(temp);}
+        }
     }
     /** Reclaims our reserved temporary namespace after a crash, under the export lock. */
     static void cleanupExportTemps(Path root) throws IOException {

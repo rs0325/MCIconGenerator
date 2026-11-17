@@ -27,6 +27,7 @@ class WindowsAdmissionTest {
         Fixture f=new Fixture(directory);try(RuntimeLease old=f.oldJob()) {
             Files.writeString(old.file().resolveSibling("lease.lock"),"0".repeat(64));long before=f.jobs();
             IOException failure=assertThrows(IOException.class,()->RuntimeLease.create(f.store,f.candidate,f.options,Instant.now().plusSeconds(30),f.gate()));
+            assertEquals(PreparationFailure.Stage.ADMISSION,assertInstanceOf(PreparationFailure.class,failure).stage);assertNotNull(failure.getCause());
             assertFalse(failure instanceof ManagedBusyFailure);assertEquals(before,f.jobs());assertFalse(Files.exists(f.store.root().resolve("logs"))&&f.admissions()>0);
         }
     }

@@ -19,6 +19,30 @@ import static org.junit.jupiter.api.Assertions.*;
 class ManagedRuntimeTest {
     @TempDir Path root;
     static final RuntimeDescriptor.Host HOST=new RuntimeDescriptor.Host("linux","x86_64");
+    @Test void helper取得失敗は新job前の段と元causeを残す() throws Exception {
+        Fixture fixture=new Fixture(false);IOException original=new IOException("fixture helper unavailable");
+        try(var loader=fixture.loader()) {
+            var failure=assertThrows(PreparationFailure.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,HOST,(u,o,t)->{throw original;}));
+            assertEquals(PreparationFailure.Stage.HELPER,failure.stage);assertSame(original,failure.getCause());assertFalse(Files.exists(options().runtimeRoot().resolve("jobs")));
+        }
+    }
+    @Test void recovery拒否は新job前の段と元codeを残す() throws Exception {
+        Fixture fixture=new Fixture(false);var host=new RuntimeDescriptor.Host("windows","x86_64");
+        ((ObjectNode)fixture.definition.json.get("host")).put("os","windows").put("arch","x86_64");fixture.publish();
+        Files.createDirectories(options().runtimeRoot());Files.writeString(options().runtimeRoot().resolve("jobs"),"fixture not a directory");
+        try(var loader=fixture.loader()) {
+            var failure=assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,host,fixture.transport(new AtomicInteger())));
+            assertEquals("MANAGED_OWNERSHIP_MISMATCH",failure.code());assertEquals(PreparationFailure.Stage.RECOVERY,assertInstanceOf(PreparationFailure.class,failure.getCause()).stage);assertInstanceOf(McIconException.class,failure.getCause().getCause());
+        }
+    }
+    @Test void reader認証拒否は新job前の段と元causeを残す() throws Exception {
+        Fixture fixture=new Fixture(false,false,false,null,true);var host=new RuntimeDescriptor.Host("windows","x86_64");
+        ((ObjectNode)fixture.definition.json.get("host")).put("os","windows").put("arch","x86_64");fixture.publish();
+        try(var loader=fixture.loader()) {
+            var failure=assertThrows(PreparationFailure.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,host,fixture.transport(new AtomicInteger())));
+            assertEquals(PreparationFailure.Stage.READER,failure.stage);assertNotNull(failure.getCause());assertFalse(Files.exists(options().runtimeRoot().resolve("jobs")));
+        }
+    }
     @Test void legacySingleTrustKeyIsRejectedWithoutStartingHelperOrDownloading() throws Exception {
         Fixture fixture=new Fixture(false);fixture.write("trust/fixture.der",fixture.definition.key.getPublic().getEncoded());AtomicInteger downloads=new AtomicInteger();
         try(var loader=fixture.loader()) {
@@ -218,6 +242,9 @@ class ManagedRuntimeTest {
         Fixture(boolean setup,boolean cleanupFails) throws Exception {this(setup,cleanupFails,false);}
         Fixture(boolean setup,boolean cleanupFails,boolean recovery) throws Exception {this(setup,cleanupFails,recovery,null);}
         Fixture(boolean setup,boolean cleanupFails,boolean recovery,String prepareFailure) throws Exception {
+            this(setup,cleanupFails,recovery,prepareFailure,false);
+        }
+        Fixture(boolean setup,boolean cleanupFails,boolean recovery,String prepareFailure,boolean missingReaderPin) throws Exception {
             String ok="{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}";
             String missing="{\"protocolVersion\":1,\"status\":\"setup-required\",\"diagnostics\":[{\"code\":\"FIXTURE_SETUP\",\"detail\":\"テスト専用の前提不足\",\"requiresPrivilege\":true,\"requiresRestart\":false}]}";
             String script="#!/bin/sh\nif [ \"$7\" = preflight ]; then /bin/cp \"$6\" \"${6%/*}/fixture-preflight-lease.json\" || exit 1; fi\n[ -f \"${6%/*}/descriptor.json\" ] || exit 1\nprintf '%s\\n' \"$7\" >> \"${6%/*}/fixture-operations\"\n"+(setup?"if [ \"$7\" = preflight ]; then printf '%s' '"+missing+"'; exit 2; fi\n":"")+(cleanupFails?"if [ \"$7\" = release ]; then printf '%s' '{\"protocolVersion\":1,\"status\":\"failed\",\"diagnostics\":[]}'; exit 1; fi\n":"")+"printf '%s' '"+ok+"'\n";
@@ -231,6 +258,7 @@ class ManagedRuntimeTest {
             ObjectNode listing=RuntimeDescriptor.JSON.createObjectNode();var rows=listing.putObject("contents").putArray("files");
             ByteArrayOutputStream bytes=new ByteArrayOutputStream();
             try(var zip=new org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream(bytes)){for(var file:payload.entrySet()){var entry=new org.apache.commons.compress.archivers.zip.ZipArchiveEntry(file.getKey());entry.setUnixMode(0100700);zip.putArchiveEntry(entry);zip.write(file.getValue());zip.closeArchiveEntry();rows.addObject().put("path",file.getKey()).put("bytes",file.getValue().length).put("sha256",FilesSupport.hash(file.getValue()));}}
+            if(missingReaderPin)rows.remove(rows.size()-1);
             helper=bytes.toByteArray();inventory=RuntimeDescriptor.JSON.writeValueAsBytes(listing);
             definition.json.put("toolVersion",ToolVersion.VERSION);((ObjectNode)definition.json.get("worker")).put("toolVersion",ToolVersion.VERSION).put("agentSha256",worker.sha256()).put("adapterSetSha256",ManagedRuntime.adapterDigest(ManagedRuntime.class.getClassLoader()));
             ArrayNode java=(ArrayNode)definition.json.get("rendering").get("javaExecutables");java.removeAll();for(int major:List.of(8,17,21,25))java.addObject().put("major",major).put("executable","/opt/java/java"+major+"/bin/java").put("sha256",ManagedFixture.HASH);
