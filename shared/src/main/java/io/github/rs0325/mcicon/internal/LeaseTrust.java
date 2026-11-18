@@ -72,18 +72,7 @@ public final class LeaseTrust {
         if(Files.getFileStore(file).supportsFileAttributeView("unix")&&((Number)Files.getAttribute(file,"unix:nlink",LinkOption.NOFOLLOW_LINKS)).longValue()!=1)throw new IOException("所有fileにhardlinkがあります");
         Object key=Files.readAttributes(file,java.nio.file.attribute.BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey();if(key!=null)return key;
         if(identityReader==null||!readerVerified||!readerSha256.equals(LeaseSnapshot.fileDigest(identityReader)))throw new IOException("file identityの認証済みreaderがありません");
-        Process child=new ProcessBuilder(identityReader.toString(),"file-identity",file.toString()).redirectError(ProcessBuilder.Redirect.DISCARD).start();
-        try {
-            if(!child.waitFor(2,java.util.concurrent.TimeUnit.SECONDS))throw new IOException("file identityの取得期限を超えました");
-            byte[] bytes=child.getInputStream().readNBytes(4097);if(child.exitValue()!=0||bytes.length>4096)throw new IOException("file identityを取得できません");
-            JsonNode value=LeaseSnapshot.read(bytes);LeaseSnapshot.fields(value,"schemaVersion","volumeSerial","fileId");
-            if(LeaseSnapshot.integer(value,"schemaVersion",1)!=1||!LeaseSnapshot.text(value,"volumeSerial",20).matches("[0-9]{1,20}")||!LeaseSnapshot.text(value,"fileId",32).matches("[0-9a-f]{32}"))throw new IOException("file identity応答が不正です");
-            return "windows-file-id-v1:"+value.path("volumeSerial").asText()+":"+value.path("fileId").asText();
-        }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new java.io.InterruptedIOException("file identity取得を中断しました");}
-        finally {
-            if(child.isAlive()){child.destroyForcibly();try{if(!child.waitFor(1,java.util.concurrent.TimeUnit.SECONDS))throw new IOException("identity readerを回収できません");}catch(InterruptedException failure){Thread.currentThread().interrupt();throw new java.io.InterruptedIOException("identity reader回収を中断しました");}}
-            child.getInputStream().close();child.getErrorStream().close();child.getOutputStream().close();
-        }
+        return FileIdentityReader.read(identityReader,file);
     }
     void verify(Path root,byte[] descriptor) throws IOException {
         String digest=LeaseSnapshot.digest(descriptor);

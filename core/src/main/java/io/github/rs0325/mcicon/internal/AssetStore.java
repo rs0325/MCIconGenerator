@@ -139,6 +139,7 @@ public final class AssetStore {
                 for(int attempt=0;attempt<3;attempt++) {
                     cancellation.check();
                     Path temp=Files.createTempFile(target.getParent(),".download-",".part");
+                    Throwable primary=null;
                     try(InputStream input=transport.open(uri);OutputStream output=Files.newOutputStream(temp)) {
                         long limit=expectedSize>=0?expectedSize:32L*1024*1024;
                         if(!copy(input,output,limit))throw new IOException("Input exceeds declared download limit");
@@ -148,9 +149,10 @@ public final class AssetStore {
                         catch(AtomicMoveNotSupportedException e) {Files.move(temp,target,StandardCopyOption.REPLACE_EXISTING);}
                         FilesSupport.atomicWrite(checksum,FilesSupport.hash(target,"SHA-256").getBytes(java.nio.charset.StandardCharsets.US_ASCII));
                         return target;
-                    } catch(InterruptedException e) {Thread.currentThread().interrupt();throw new IOException("Download interrupted",e);}
-                    catch(IOException e) {failure=e;}
-                    finally {Files.deleteIfExists(temp);}
+                    } catch(InterruptedException e) {Thread.currentThread().interrupt();IOException interrupted=new IOException("Download interrupted",e);primary=interrupted;throw interrupted;}
+                    catch(IOException e) {primary=e;failure=e;}
+                    catch(RuntimeException|Error e) {primary=e;throw e;}
+                    finally {try{Files.deleteIfExists(temp);}catch(IOException|RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}}
                 }
                 throw failure;
             }

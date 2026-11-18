@@ -9,6 +9,24 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CliArgumentsTest {
+    @Test @org.junit.jupiter.api.condition.EnabledOnOs(org.junit.jupiter.api.condition.OS.WINDOWS)
+    void 保持したnative失敗情報を既定JSONへ漏らさずdebugで参照できる() throws Exception {
+        String configured=System.getProperty("mcicon.testIdentityReader");org.junit.jupiter.api.Assumptions.assumeTrue(configured!=null,"明示したnative readerが必要です");
+        var reader=java.nio.file.Path.of(configured).resolveSibling("identity-fixture.exe");org.junit.jupiter.api.Assumptions.assumeTrue(java.nio.file.Files.isRegularFile(reader),"build済みidentity-fixture.exeが必要です");
+        var file=java.nio.file.Files.createTempFile("identity-cli-207-",".fixture");
+        try {
+            var method=Class.forName("io.github.rs0325.mcicon.internal.FileIdentityReader").getDeclaredMethod("read",java.nio.file.Path.class,java.nio.file.Path.class);method.setAccessible(true);
+            for(String mode:List.of("nonzero","stderr-secret")) {
+                java.nio.file.Files.writeString(file,mode);
+                Throwable failure=assertThrows(java.lang.reflect.InvocationTargetException.class,()->method.invoke(null,reader,file)).getCause();
+                String expected="IO_FAILED: Input/output operation failed"+System.lineSeparator()+"IO_FAILED_DETAIL category=IO_ERROR causeClass=OTHER"+System.lineSeparator();
+                assertEquals(expected,runIo(failure));assertEquals(expected,runIoWithMessage(failure,"outer secret","io-failure","--json"));
+                String debug=runIoWithMessage(failure,"outer secret","io-failure","--debug");
+                assertTrue(debug.contains("phase=FILE_IDENTITY kind=NONZERO_EXIT"));assertFalse(debug.contains("SECRET C:/private"));assertFalse(debug.contains("IO_FAILED_DETAIL"));
+                if(mode.equals("nonzero")){assertTrue(debug.contains("exitCode=23 stdoutBytes=3 collected=true"));assertTrue(debug.contains("operation=CreateFileW win32Code=32"));}
+            }
+        }finally {java.nio.file.Files.deleteIfExists(file);}
+    }
     @CommandLine.Command(name="io-failure")
     static class IoFailure implements Callable<Integer> {
         final Throwable failure;
@@ -18,6 +36,21 @@ class CliArgumentsTest {
         @CommandLine.Option(names="--json") boolean json;
         public Integer call() {
             throw new CompletionException(new McIconException("IO_FAILED",message,1,failure));
+        }
+    }
+    @Test void 不正native応答の元parse本文を既定debugJSONへ出さない() throws Exception {
+        var read=Class.forName("io.github.rs0325.mcicon.internal.LeaseSnapshot").getDeclaredMethod("read",byte[].class);read.setAccessible(true);
+        Class<?> kind=Class.forName("io.github.rs0325.mcicon.internal.FileIdentityReader$Kind"),type=Class.forName("io.github.rs0325.mcicon.internal.FileIdentityReader$Failure");
+        Object invalid=java.util.Arrays.stream(kind.getEnumConstants()).filter(value->value.toString().equals("INVALID_RESPONSE")).findFirst().orElseThrow();
+        var constructor=type.getDeclaredConstructor(kind,Throwable.class);constructor.setAccessible(true);
+        for(String response:List.of("NATIVE_SENTINEL_207","{\"NATIVE_SENTINEL_207\":1,\"NATIVE_SENTINEL_207\":2}","{} NATIVE_SENTINEL_207")) {
+            var original=assertThrows(java.lang.reflect.InvocationTargetException.class,()->read.invoke(null,(Object)response.getBytes(java.nio.charset.StandardCharsets.UTF_8))).getCause();
+            assertTrue(original.getMessage().contains("NATIVE_SENTINEL_207"));
+            var failure=(Throwable)constructor.newInstance(invalid,original);assertNull(failure.getCause());assertEquals(0,failure.getSuppressed().length);
+            for(String[] args:new String[][]{{"io-failure"},{"io-failure","--json"},{"--debug","io-failure"},{"--debug","io-failure","--json"}}) {
+                String output=runIo(failure,args);assertFalse(output.contains("NATIVE_SENTINEL_207"));
+                if(args[0].equals("--debug")){assertTrue(output.contains("kind=INVALID_RESPONSE"));assertTrue(output.contains("exceptionClass="+original.getClass().getName()));assertTrue(output.contains("line=1 column="));}
+            }
         }
     }
     @CommandLine.Command(name="other-failure")

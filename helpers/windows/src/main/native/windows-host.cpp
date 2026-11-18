@@ -165,13 +165,18 @@ static int wslExecute(int argc,wchar_t** argv,bool bridge){
 }
 // 同一handleからvolume/file IDを観測する。reparse・directoryは参照に採用しない。
 static int fileIdentity(const std::wstring& path){
+    auto failure=[](const char* operation,DWORD code,bool win32){
+        std::cerr<<"{\"schemaVersion\":1,\"phase\":\"file-identity\",\"kind\":\""<<(win32?"WIN32":"CONTRACT")<<"\",\"operation\":\""<<operation<<"\",\"win32Code\":"<<(win32?std::to_string(code):"null")<<"}\n";return 1;
+    };
     applicationPath(path);
     Handle file(CreateFileW(extended(path).c_str(),FILE_READ_ATTRIBUTES,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
-    require(file.value!=INVALID_HANDLE_VALUE);
+    if(file.value==INVALID_HANDLE_VALUE){DWORD code=GetLastError();return failure("CreateFileW",code,true);}
     FILE_ATTRIBUTE_TAG_INFO tag{};FILE_ID_INFO id{};FILE_STANDARD_INFO standard{};
-    require(GetFileInformationByHandleEx(file.value,FileAttributeTagInfo,&tag,sizeof(tag))&&!(tag.FileAttributes&(FILE_ATTRIBUTE_REPARSE_POINT|FILE_ATTRIBUTE_DIRECTORY)));
-    require(GetFileInformationByHandleEx(file.value,FileIdInfo,&id,sizeof(id)));
-    require(GetFileInformationByHandleEx(file.value,FileStandardInfo,&standard,sizeof(standard))&&standard.NumberOfLinks==1);
+    if(!GetFileInformationByHandleEx(file.value,FileAttributeTagInfo,&tag,sizeof(tag))){DWORD code=GetLastError();return failure("FileAttributeTagInfo",code,true);}
+    if(tag.FileAttributes&(FILE_ATTRIBUTE_REPARSE_POINT|FILE_ATTRIBUTE_DIRECTORY))return failure("FileAttributeTagInfo",0,false);
+    if(!GetFileInformationByHandleEx(file.value,FileIdInfo,&id,sizeof(id))){DWORD code=GetLastError();return failure("FileIdInfo",code,true);}
+    if(!GetFileInformationByHandleEx(file.value,FileStandardInfo,&standard,sizeof(standard))){DWORD code=GetLastError();return failure("FileStandardInfo",code,true);}
+    if(standard.NumberOfLinks!=1)return failure("FileStandardInfo",0,false);
     std::string hex;const char* digits="0123456789abcdef";for(unsigned char byte:id.FileId.Identifier){hex+=digits[byte>>4];hex+=digits[byte&15];}
     std::cout<<"{\"schemaVersion\":1,\"volumeSerial\":\""<<id.VolumeSerialNumber<<"\",\"fileId\":\""<<hex<<"\"}\n";return 0;
 }

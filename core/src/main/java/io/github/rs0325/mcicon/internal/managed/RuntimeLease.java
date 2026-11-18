@@ -39,7 +39,7 @@ public final class RuntimeLease implements AutoCloseable {
     }
     static RuntimeLease create(RuntimeStore store,RuntimeDescriptor descriptor,ManagedOptions options,Instant preparationDeadline,WindowsAdmission admission) throws IOException {
         try(var ignored=store.lock("generations")) {
-            if(admission!=null)admission.check();
+            if(admission!=null)PreparationFailure.at(PreparationFailure.Stage.ADMISSION,()->{admission.check();return null;});
             Path host=store.path("host-id");
             if(!Files.exists(host))FilesSupport.atomicWrite(host,UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.US_ASCII));
             String hostId=Files.readString(host).trim();

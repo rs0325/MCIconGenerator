@@ -2,6 +2,7 @@ package io.github.rs0325.mcicon.internal.managed;
 
 import io.github.rs0325.mcicon.internal.FilesSupport;
 import java.io.IOException;
+import java.io.Closeable;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -16,7 +17,7 @@ public final class RuntimeGeneration {
         try(var ignored=store.lock("helper-"+artifact.sha256())) {
             Path parent=store.path("helpers/"+descriptor.host().os()+"-"+descriptor.host().arch());Files.createDirectories(parent);
             Path destination=parent.resolve(artifact.sha256()),stage=parent.resolve("staging-"+UUID.randomUUID());
-            try {
+            try(var cleanup=(Closeable)()->removeStage(stage)) {
                 RuntimeArchive.extract(archive,stage,artifact,store);
                 Path executable=FilesSupport.safeResolve(stage,descriptor.helperExecutable());
                 if(!Files.isRegularFile(executable,LinkOption.NOFOLLOW_LINKS))throw RuntimeDescriptor.invalid("helper executableがarchiveにありません");
@@ -27,7 +28,7 @@ public final class RuntimeGeneration {
                 Path installed=FilesSupport.safeResolve(destination,descriptor.helperExecutable());
                 if(!descriptor.host().os().equals("windows")&&!Files.isExecutable(installed))throw RuntimeDescriptor.invalid("helperの実行権限がありません");
                 return installed;
-            }finally {removeStage(stage);}
+            }
         }
     }
     /** preflight成功後に呼び、guest/rootfsとrendererをhostへ展開せず確定する。inventoryは同梱resourceの元bytesを渡す。 */
@@ -39,14 +40,14 @@ public final class RuntimeGeneration {
             Path destination=store.generation(descriptor);Files.createDirectories(destination.getParent());
             if(Files.exists(destination,LinkOption.NOFOLLOW_LINKS)){verify(destination,descriptor);return destination;}
             Path stage=destination.getParent().resolve("staging-"+UUID.randomUUID());Files.createDirectory(stage);
-            try {
+            try(var cleanup=(Closeable)()->removeStage(stage)) {
                 for(var artifact:descriptor.artifacts()) {
                     store.check();if(artifact.role().equals("host-helper"))continue;
                     Path source=store.obtain(artifact);RuntimeStore.requireSpace(stage,Math.max(artifact.bytes(),artifact.unpackedBytes()));
                     store.copy(source,stage.resolve(artifact.id()+"."+artifact.format()),artifact.bytes());
                 }
                 verify(stage,descriptor);Files.move(stage,destination,StandardCopyOption.ATOMIC_MOVE);return destination;
-            }finally {removeStage(stage);}
+            }
         }
     }
     private void verify(Path directory,RuntimeDescriptor descriptor) throws IOException {

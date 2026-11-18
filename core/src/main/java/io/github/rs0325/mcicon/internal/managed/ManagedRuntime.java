@@ -50,9 +50,9 @@ public final class ManagedRuntime implements AutoCloseable {
             for(String existing:inventories.keySet())if(path.startsWith(existing+"/")||existing.startsWith(path+"/"))throw RuntimeDescriptor.invalid("inventory同士の配置が衝突しています");
             byte[] bytes=resource(loader,path,4*1024*1024);descriptor.verifyInventory(artifact,bytes);inventories.put(path,bytes);
         }
-        RuntimeGeneration generation=new RuntimeGeneration(store);Path executable=generation.helper(descriptor);
-        recover(store,descriptor,executable,token);store.check();
-        WindowsAdmission admission=host.os().equals("windows")?new WindowsAdmission(store,descriptor,executable,inventories,original):null;
+        RuntimeGeneration generation=new RuntimeGeneration(store);Path executable=PreparationFailure.at(PreparationFailure.Stage.HELPER,()->generation.helper(descriptor));
+        PreparationFailure.at(PreparationFailure.Stage.RECOVERY,()->{recover(store,descriptor,executable,token);store.check();return null;});
+        WindowsAdmission admission=host.os().equals("windows")?PreparationFailure.at(PreparationFailure.Stage.READER,()->new WindowsAdmission(store,descriptor,executable,inventories,original)):null;
         LeaseTrust proofTrust=admission==null?LeaseTrust.pinned(key,descriptor.digest(),null):admission.trust().restrictTo(descriptor.digest());
         RuntimeLease lease=RuntimeLease.create(store,descriptor,options,preparationDeadline,admission);RuntimeHelper helper=null;
         try {
@@ -64,8 +64,11 @@ public final class ManagedRuntime implements AutoCloseable {
             environment.put("TMPDIR",temp.toString());environment.put("TMP",temp.toString());environment.put("TEMP",temp.toString());
             if(host.os().equals("windows"))for(String name:List.of("SystemRoot","WINDIR")){String value=System.getenv(name);if(value!=null)environment.put(name,value);}
             helper=new RuntimeHelper(executable,store.root(),lease,environment,descriptor.host().os().equals("windows"));
-            requireAdmission(helper.control("preflight",store.remaining(),token),store,lease,descriptor,proofTrust);
-            generation.prepare(descriptor,inventories);if(host.os().equals("windows"))helper.keep(store.remaining(),token,false);requireAdmission(helper.control("prepare",store.remaining(),token),store,lease,descriptor,proofTrust);store.check();
+            RuntimeHelper preparedHelper=helper;
+            PreparationFailure.at(PreparationFailure.Stage.HELPER,()->{
+                requireAdmission(preparedHelper.control("preflight",store.remaining(),token),store,lease,descriptor,proofTrust);
+                generation.prepare(descriptor,inventories);if(host.os().equals("windows"))preparedHelper.keep(store.remaining(),token,false);requireAdmission(preparedHelper.control("prepare",store.remaining(),token),store,lease,descriptor,proofTrust);store.check();return null;
+            });
             ProcessBuilder prefix=helper.docker(List.of());Map<Integer,String> hashes=new TreeMap<>();for(var java:descriptor.javaExecutables())hashes.put(java.major(),java.sha256());
             WorkerLaunch launch=new WorkerLaunch(prefix.command(),prefix.environment(),descriptor.imageId(),descriptor.agentSha256(),hashes,descriptor.environment());
             return new ManagedRuntime(options,descriptor,worker,lease,helper,launch);
@@ -126,8 +129,8 @@ public final class ManagedRuntime implements AutoCloseable {
     @Override public void close() throws IOException {release(helper,lease);}
     private static void release(RuntimeHelper helper,RuntimeLease lease) throws IOException {
         boolean interrupted=Thread.interrupted();
-        try {if(helper!=null)requireOk(helper.control("release",Duration.ofSeconds(10),new CancellationToken()));}
-        finally {try {lease.close();}finally{if(interrupted)Thread.currentThread().interrupt();}}
+        try(lease) {if(helper!=null)requireOk(helper.control("release",Duration.ofSeconds(10),new CancellationToken()));}
+        finally {if(interrupted)Thread.currentThread().interrupt();}
     }
     static void requireAdmission(RuntimeHelper.Result result,RuntimeStore store,RuntimeLease lease,RuntimeDescriptor descriptor,LeaseTrust trust) throws IOException {
         if(!result.ok()&&result.diagnostics().stream().anyMatch(d->d.code().equals("MANAGED_BUSY"))) {
