@@ -46,11 +46,13 @@ class WindowsAdmissionTest {
         final RuntimeDescriptor old,candidate;
         final byte[] inventory,oldBytes,candidateBytes;
         final LeaseTrust trust;
-        Fixture(Path root) throws Exception {
+        Fixture(Path root) throws Exception {this(root,false);}
+        Fixture(Path root,boolean support) throws Exception {
             store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(30),(u,o,t)->{throw new AssertionError();});
             options=new ManagedOptions(store.root(),Duration.ofSeconds(30),Duration.ofSeconds(2),Duration.ofSeconds(1),3072,2048);
             ((ObjectNode)source.json.path("host")).put("os","windows");source.json.put("minimumOsVersion","10.0");
             ObjectNode listing=RuntimeDescriptor.JSON.createObjectNode();listing.putObject("contents").putArray("files").addObject().put("path","bin/helper").put("bytes",7).put("sha256",FilesSupport.hash("fixture".getBytes()));
+            if(support)listing.withObject("contents").withArray("files").addObject().put("path","support/tool").put("bytes",7).put("sha256",FilesSupport.hash("fixture".getBytes()));
             inventory=RuntimeDescriptor.JSON.writeValueAsBytes(listing);
             for(var artifact:source.json.path("artifacts"))((ObjectNode)artifact).put("inventorySha256",FilesSupport.hash(inventory));
             oldBytes=source.bytes();old=descriptor(oldBytes,"1.1.0");publish(oldBytes);
@@ -59,6 +61,7 @@ class WindowsAdmissionTest {
             candidateBytes=source.bytes();candidate=descriptor(candidateBytes,"1.1.2");publish(candidateBytes);
             Path helper=store.root().resolve("helpers/windows-x86_64/"+ManagedFixture.HASH+"/bin/helper");Files.createDirectories(helper.getParent());Files.writeString(helper,"fixture");
             Path newer=store.root().resolve("helpers/windows-x86_64/"+"d".repeat(64)+"/bin/helper");Files.createDirectories(newer.getParent());Files.writeString(newer,"fixture");
+            if(support)for(Path installed:List.of(helper,newer)){Path file=installed.getParent().getParent().resolve("support/tool");Files.createDirectories(file.getParent());Files.writeString(file,"fixture");}
             trust=IdentityFixtures.trust(source.trust);
         }
         RuntimeDescriptor descriptor(byte[] bytes,String version) throws Exception {return RuntimeDescriptor.verify(bytes,source.sign(bytes),source.trust,new RuntimeDescriptor.Pin(FilesSupport.hash(bytes),version,ManagedFixture.HASH,ManagedFixture.HASH,new RuntimeDescriptor.Host("windows","x86_64"),Set.of(21)));}

@@ -10,8 +10,10 @@ manifest=json.loads((a.payload/'payload.json').read_text());assert manifest['sch
 for row in manifest['files']:
  path=Path(row['path']);assert not path.is_absolute() and '..' not in path.parts;source=a.payload/path;assert source.is_file() and not source.is_symlink() and source.resolve().is_relative_to(a.payload.resolve());assert source.stat().st_size==row['bytes'] and hashlib.sha256(source.read_bytes()).hexdigest()==row['sha256'];names.append(row['path'])
 assert len(names)==len(set(names)) and 'bin/limactl' in names and 'share/lima/lima-guestagent.Linux-aarch64.gz' in names
+assert not {'lease-trust.bin','reference-contract.json'} & set(names),'固定support入力とpayloadの衝突'
 support=inputs/'support';support.mkdir();shutil.copy2(a.payload/'payload.json',support/'payload.json')
 shutil.copyfile(a.lease_trust,support/'lease-trust.bin')
+shutil.copyfile(Path(__file__).resolve().parents[2]/'common/src/main/resources/reference-contract.json',support/'reference-contract.json')
 for row in manifest['files']:
  target=support/row['path'];target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(a.payload/row['path'],target);target.chmod(0o755 if row['executable'] else 0o644)
 for jar in a.input.glob('*.jar'):shutil.copyfile(jar,inputs/jar.name)
