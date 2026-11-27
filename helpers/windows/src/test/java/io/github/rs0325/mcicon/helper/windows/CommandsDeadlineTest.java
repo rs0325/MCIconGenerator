@@ -11,6 +11,37 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CommandsDeadlineTest {
     @TempDir Path temporary;
+    @Test void 強制終了したnativeはdoneを作らなくても回収できる() throws Exception {
+        Commands commands=new Commands(temporary.resolve("unused"),temporary,Map.of(),Long.MAX_VALUE);Path prefix=temporary.resolve("native-test");
+        Process process=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",Path.of(WaitingProcess.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toString(),WaitingProcess.class.getName()).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+        try {
+            WindowsFiles.write(Path.of(prefix+".state.json"),WindowsFiles.JSON.createObjectNode().put("pid",process.pid()).put("started",process.info().startInstant().orElseThrow().toEpochMilli()).put("boot",OwnershipTest.BOOT));
+            process.destroyForcibly();assertTrue(process.waitFor(5,TimeUnit.SECONDS));assertTrue(commands.terminal(prefix));
+            assertDoesNotThrow(()->commands.reap(OwnershipTest.BOOT));assertFalse(Files.exists(Path.of(prefix+".done.json")));
+        } finally {if(process.isAlive())process.destroyForcibly();assertTrue(process.waitFor(2,TimeUnit.SECONDS));process.getOutputStream().close();process.getInputStream().close();process.getErrorStream().close();}
+    }
+    public static class WaitingProcess {public static void main(String[] args) throws Exception {System.in.read();}}
+    @Test void doneがなくてもnativeのPIDと開始時刻で終了を判定する() throws Exception {
+        Commands commands=new Commands(temporary.resolve("unused"),temporary,Map.of(),Long.MAX_VALUE);Path prefix=temporary.resolve("native-test");
+        var state=WindowsFiles.JSON.createObjectNode().put("pid",ProcessHandle.current().pid()).put("started",ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli());
+        WindowsFiles.write(Path.of(prefix+".state.json"),state);assertFalse(commands.terminal(prefix));
+        state.put("started",state.path("started").asLong()+1);WindowsFiles.write(Path.of(prefix+".state.json"),state);assertTrue(commands.terminal(prefix));
+        assertFalse(Files.exists(Path.of(prefix+".done.json")));
+    }
+    @Test void 生存中nativeの回収期限超過ではPIDを殺さず対象と対処を示す() throws Exception {
+        Commands commands=new Commands(temporary.resolve("unused"),temporary,Map.of(),Long.MAX_VALUE);Path prefix=temporary.resolve("native-test");
+        Process process=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",Path.of(WaitingProcess.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toString(),WaitingProcess.class.getName()).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+        try {
+            WindowsFiles.write(Path.of(prefix+".state.json"),WindowsFiles.JSON.createObjectNode().put("pid",process.pid()).put("started",process.info().startInstant().orElseThrow().toEpochMilli()).put("boot",OwnershipTest.BOOT));
+            commands.end(System.nanoTime()+Duration.ofMillis(100).toNanos());IOException failure=assertThrows(IOException.class,()->commands.reap(OwnershipTest.BOOT));
+            assertTrue(failure.getMessage().contains(prefix.toString()));assertTrue(failure.getMessage().contains("wsl --shutdown"));assertTrue(process.isAlive());
+        } finally {process.destroyForcibly();assertTrue(process.waitFor(2,TimeUnit.SECONDS));process.getOutputStream().close();process.getInputStream().close();process.getErrorStream().close();}
+    }
+    @Test void 再起動前のnative記録は現在のPIDが生存していても待機しない() throws Exception {
+        Commands commands=new Commands(temporary.resolve("unused"),temporary,Map.of(),Long.MAX_VALUE);Path prefix=temporary.resolve("native-test");
+        WindowsFiles.write(Path.of(prefix+".state.json"),WindowsFiles.JSON.createObjectNode().put("pid",ProcessHandle.current().pid()).put("started",ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli()).put("boot",java.util.UUID.randomUUID().toString()));
+        assertDoesNotThrow(()->commands.reap(OwnershipTest.BOOT));
+    }
     @Test void 待機開始前に期限を超えた終了済みexit0を成功にしない() throws Exception {
         Commands commands=new Commands(temporary.resolve("unused"),temporary,Map.of(),Long.MAX_VALUE);
         long expired=System.nanoTime()-Duration.ofMillis(1).toNanos();

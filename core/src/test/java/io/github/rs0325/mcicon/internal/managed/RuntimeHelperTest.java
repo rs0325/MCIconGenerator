@@ -11,6 +11,28 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RuntimeHelperTest {
     @TempDir Path root;
+    @Test void 未公開keeperはdoneなしでもnative終了後に回復対象となる() throws Exception {
+        root=root.toRealPath();var fixture=new ManagedFixture();byte[] inventory="fixture inventory".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        for(var artifact:fixture.json.withArray("artifacts"))((com.fasterxml.jackson.databind.node.ObjectNode)artifact).put("inventorySha256",io.github.rs0325.mcicon.internal.FilesSupport.hash(inventory));
+        var descriptor=fixture.descriptor();var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(5),(u,o,t)->{throw new AssertionError();});
+        var original=ManagedFixture.lease(store,descriptor);Path file=original.file(),job=file.getParent(),tmp=Files.createDirectory(job.resolve("tmp"));original.close();
+        ManagedFixture.owner(file,new ManagedFixture.Owner(ProcessHandle.current().pid(),java.time.Instant.EPOCH));Files.write(job.resolve("descriptor.json"),fixture.bytes());Files.createDirectory(job.resolve("inventory"));for(var artifact:descriptor.artifacts())Files.write(job.resolve(artifact.inventoryPath()),inventory);
+        var owner=RuntimeDescriptor.read(Files.readAllBytes(file));var identity=RuntimeDescriptor.JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256","hostId"))identity.set(key,owner.required(key));
+        String attempt=UUID.randomUUID().toString(),boot=UUID.randomUUID().toString();Path prefix=tmp.resolve("native-"+UUID.randomUUID());
+        var journal=RuntimeDescriptor.JSON.createObjectNode().put("state","pending").put("operation","keeper-start").put("boot",boot);journal.set("identity",identity.deepCopy());identity.remove("hostId");
+        var prior=RuntimeDescriptor.JSON.createObjectNode().put("state","starting").put("attempt",attempt).put("boot",boot).put("controllerPid",owner.path("pid").asLong()).put("controllerStarted",0).put("recovery",false).put("prefix",prefix.toString());prior.set("identity",identity);
+        Files.write(tmp.resolve("windows-operation.json"),RuntimeDescriptor.JSON.writeValueAsBytes(journal));Files.write(tmp.resolve("keeper.json"),RuntimeDescriptor.JSON.writeValueAsBytes(prior));Files.write(tmp.resolve("keeper-"+attempt+".json"),RuntimeDescriptor.JSON.writeValueAsBytes(prior));
+        var state=RuntimeDescriptor.JSON.createObjectNode().put("pid",ProcessHandle.current().pid()).put("started",ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli());
+        Files.write(Path.of(prefix+".state.json"),RuntimeDescriptor.JSON.writeValueAsBytes(state));
+        try(var lease=RuntimeLease.tryRecovery(store,descriptor,job)) {
+            assertNotNull(lease);RuntimeHelper helper=new RuntimeHelper(root.resolve("unused"),store.root(),lease,Map.of(),true);var pending=RuntimeHelper.class.getDeclaredMethod("pendingKeeper");pending.setAccessible(true);
+            assertThrows(java.lang.reflect.InvocationTargetException.class,()->pending.invoke(helper));
+            state.put("started",state.path("started").asLong()+1);Files.write(Path.of(prefix+".state.json"),RuntimeDescriptor.JSON.writeValueAsBytes(state));assertEquals(true,pending.invoke(helper));
+            assertFalse(Files.exists(Path.of(prefix+".done.json")));
+            prior.withObject("identity").put("ownerId",UUID.randomUUID().toString());Files.write(tmp.resolve("keeper.json"),RuntimeDescriptor.JSON.writeValueAsBytes(prior));Files.write(tmp.resolve("keeper-"+attempt+".json"),RuntimeDescriptor.JSON.writeValueAsBytes(prior));
+            assertThrows(java.lang.reflect.InvocationTargetException.class,()->pending.invoke(helper));
+        }
+    }
     @Test
     @org.junit.jupiter.api.condition.EnabledOnOs({org.junit.jupiter.api.condition.OS.MAC,org.junit.jupiter.api.condition.OS.LINUX})
     void pendingKeeperRoutesThroughRealControlOnlyWithCompleteOwnedJob0() throws Exception {
@@ -27,13 +49,13 @@ class RuntimeHelperTest {
             var state=RuntimeDescriptor.JSON.createObjectNode().put("parent",11).put("parentStarted",22).put("pid",33).put("started",44).put("boot",boot);var client=state.deepCopy().put("corePid",owner.path("pid").asLong()).put("coreStarted",0).put("clientPid",55).put("clientStarted",66);
             List<String> guest=List.of(directory.resolve("System32/wsl.exe").toString(),"--distribution","MCIcon-"+descriptor.digest().substring(0,24),"--user","root","--exec","/usr/bin/python3","/usr/lib/mcicon/guestbridge.py");
             var intent=RuntimeDescriptor.JSON.createObjectNode().put("parent",11).put("started",22).put("native",directory.resolve("app/support/windows-host.exe").toString()).put("argvSha256",io.github.rs0325.mcicon.internal.FilesSupport.hash(RuntimeDescriptor.JSON.writeValueAsBytes(guest)));
-            Files.writeString(exe,"#!/usr/bin/python3\nimport sys,json,pathlib,time,datetime\na=sys.argv\ntime.sleep(1.2)\nassert a[7]=='keep' and a[a.index('--recovery')+1]=='true'\npathlib.Path('"+called+"').write_text('keep-recover')\nprint(json.dumps({'state':'ready','attempt':a[a.index('--attempt')+1],'controllerPid':int(a[a.index('--controller')+1]),'controllerStarted':int(a[a.index('--controller')+2])}),flush=True)\nr=json.loads(sys.stdin.readline());assert r['operation']=='release';assert sys.stdin.read()==''\ntime.sleep(max(0,(datetime.datetime.strptime(r['deadline'][:19],'%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp()+float('0'+r['deadline'][19:-1]))-time.time()-0.1))\nprint('{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}',flush=True)\n");assertTrue(exe.toFile().setExecutable(true));
+            Files.writeString(exe,"#!/usr/bin/python3\nimport sys,json,pathlib,time,datetime\na=sys.argv\ntime.sleep(1.2)\nassert a[7]=='keep' and a[a.index('--recovery')+1]=='true'\npathlib.Path('"+called+"').write_text('keep-recover')\nprint(json.dumps({'state':'ready','attempt':a[a.index('--attempt')+1],'controllerPid':int(a[a.index('--controller')+1]),'controllerStarted':int(a[a.index('--controller')+2])}),flush=True)\nr=json.loads(sys.stdin.readline());assert r['operation']=='release';assert sys.stdin.read()==''\ntime.sleep(min(0.1,max(0,(datetime.datetime.strptime(r['deadline'][:19],'%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp()+float('0'+r['deadline'][19:-1]))-time.time()-0.1)))\nprint('{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}',flush=True)\n");assertTrue(exe.toFile().setExecutable(true));
             switch(mutation) {case "client"->client.put("coreStarted",9);case "identity"->identity.put("ownerId",UUID.randomUUID().toString());case "controller"->prior.put("controllerPid",999);case "boot"->prior.put("boot",UUID.randomUUID().toString());case "intent"->intent.put("argvSha256","0".repeat(64));case "operation"->journal.put("operation","import");case "recovery"->prior.put("recovery",true);default->{}}
             Files.write(tmp.resolve("windows-operation.json"),RuntimeDescriptor.JSON.writeValueAsBytes(journal));Files.write(tmp.resolve("keeper.json"),RuntimeDescriptor.JSON.writeValueAsBytes(prior));Files.write(tmp.resolve("keeper-"+attempt+".json"),RuntimeDescriptor.JSON.writeValueAsBytes(mutation.equals("attempt")?RuntimeDescriptor.JSON.createObjectNode():prior));
             for(var entry:Map.of("intent",intent,"state",state,"client",client,"done",state).entrySet())if(!mutation.equals("done")||!entry.getKey().equals("done"))Files.write(Path.of(prefix+"."+entry.getKey()+".json"),RuntimeDescriptor.JSON.writeValueAsBytes(entry.getValue()));
             try(var lease=RuntimeLease.tryRecovery(store,descriptor,job)) {
                 assertNotNull(lease);RuntimeHelper helper=new RuntimeHelper(exe,store.root(),lease,Map.of("SystemRoot",directory.toString()),true);
-                if(mutation.equals("valid")){assertTrue(helper.control("release",Duration.ofSeconds(18),new CancellationToken()).ok());assertEquals("keep-recover",Files.readString(called));}
+                if(Set.of("valid","done","client","intent").contains(mutation)){assertTrue(helper.control("release",Duration.ofSeconds(18),new CancellationToken()).ok());assertEquals("keep-recover",Files.readString(called));}
                 else {assertThrows(IOException.class,()->helper.control("release",Duration.ofSeconds(5),new CancellationToken()),mutation);assertFalse(Files.exists(called),mutation);assertEquals("active",lease.read().path("state").asText());}
             }
         }
@@ -57,31 +79,34 @@ class RuntimeHelperTest {
                 for(var entry:Map.<String,Object>of("keeper",child,"keeperReady",true,"keeperAttempt","fixture","keeperOutput",output).entrySet()){var field=RuntimeHelper.class.getDeclaredField(entry.getKey());field.setAccessible(true);field.set(helper,entry.getValue());}
                 CancellationToken token=new CancellationToken();if(mode.equals("cancel"))token.cancel();long started=System.nanoTime();
                 try {
-                    if(mode.equals("normal")){assertTrue(helper.control("release",Duration.ofSeconds(9),token).ok());assertEquals("released",RuntimeDescriptor.read(Files.readAllBytes(lease.file())).path("state").asText());}
-                    else {assertThrows(Exception.class,()->helper.control("release",mode.equals("empty")?Duration.ZERO:Duration.ofSeconds(9),token));assertEquals("active",lease.read().path("state").asText());}
+                    if(mode.equals("normal")){assertTrue(release(helper,token,System.nanoTime()+Duration.ofSeconds(2).toNanos()).ok());assertEquals("released",RuntimeDescriptor.read(Files.readAllBytes(lease.file())).path("state").asText());}
+                    else {assertThrows(Exception.class,()->release(helper,token,System.nanoTime()+(mode.equals("empty")?0:Duration.ofSeconds(2).toNanos())));assertEquals("active",lease.read().path("state").asText());}
                     assertFalse(child.isAlive());assertTrue(System.nanoTime()-started<Duration.ofSeconds(10).toNanos());
-                    String phases;try(var files=Files.list(phaseDirectory)){phases=Files.readString(files.filter(path->path.getFileName().toString().startsWith("phase-")).findFirst().orElseThrow());}
-                    assertTrue(phases.contains("\"phase\":\""+(mode.equals("normal")?"release-ok":"release-failed")+"\""));assertFalse(phases.contains(directory.toString()));
+                    try(var files=Files.list(phaseDirectory)){assertFalse(files.anyMatch(path->path.getFileName().toString().startsWith("phase-")));}
                 }finally{if(child.isAlive())child.destroyForcibly();assertTrue(child.waitFor(2,java.util.concurrent.TimeUnit.SECONDS));}
             }
         }
+    }
+    private static RuntimeHelper.Result release(RuntimeHelper helper,CancellationToken token,long end) throws Exception {
+        var method=RuntimeHelper.class.getDeclaredMethod("releaseKeeper",CancellationToken.class,long.class);method.setAccessible(true);
+        try{return (RuntimeHelper.Result)method.invoke(helper,token,end);}catch(java.lang.reflect.InvocationTargetException error){if(error.getCause() instanceof Exception failure)throw failure;throw error;}
     }
     public static class BudgetKeeper {
         public static void main(String[] arguments) throws Exception {
             var input=new java.io.BufferedReader(new java.io.InputStreamReader(System.in));String line=input.readLine();if(line==null)return;
             var request=RuntimeDescriptor.read(line.getBytes(java.nio.charset.StandardCharsets.UTF_8));assert input.readLine()==null;
             java.time.Instant deadline=java.time.Instant.parse(request.path("deadline").asText());long left=Duration.between(java.time.Instant.now(),deadline).toMillis();
-            if(arguments[0].equals("normal"))Thread.sleep(Math.max(0,left-100));else Thread.sleep(30000);
+            if(arguments[0].equals("normal"))Thread.sleep(Math.max(0,left-100));else Thread.sleep(4000);
             System.out.println("{\"protocolVersion\":1,\"status\":\"ok\",\"diagnostics\":[]}");
         }
     }
-    @Test void 回復開始で余った18秒枠を本体へ渡し上限を延長しない() throws Exception {
+    @Test void 回復開始からreleaseまで三十秒の同一期限を渡す() throws Exception {
         var store=new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(20),(u,o,t)->{throw new AssertionError();});
         try(var lease=ManagedFixture.lease(store,new ManagedFixture().descriptor())) {
             var value=lease.read();value.withObject("resources").put("fixture",true);Files.write(lease.file(),RuntimeDescriptor.JSON.writeValueAsBytes(value));
             RuntimeHelper helper=new RuntimeHelper(controlFixture("recovery"),store.root(),lease,fixtureEnvironment(),true);
             long began=System.nanoTime();assertTrue(helper.control("release",Duration.ofSeconds(18),new CancellationToken()).ok());
-            long budget=Long.parseLong(Files.readString(store.root().resolve("release-budget-ms")));assertTrue(budget>9000&&budget<=15000);assertTrue(System.nanoTime()-began<Duration.ofSeconds(18).toNanos());
+            long budget=Long.parseLong(Files.readString(store.root().resolve("release-budget-ms")));assertTrue(budget>25000&&budget<=30000);assertTrue(System.nanoTime()-began<Duration.ofSeconds(30).toNanos());
         }
     }
     @Test void 子孫が標準出力を保持しても正常応答を失敗にせず一時ログを増やさない() throws Exception {

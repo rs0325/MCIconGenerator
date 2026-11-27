@@ -21,7 +21,7 @@ public final class Main {
             }
             System.out.write(HelperProtocol.response("ok",List.of()));System.out.write('\n');return 0;
         }catch(IOException|InvalidPathException failure) {
-            String detail=failure.getMessage();if(detail==null||detail.isEmpty())detail="Windows helper操作に失敗しました";if(detail.length()>16000)detail=detail.substring(0,16000);
+            String detail=failure.getMessage();if(detail==null||detail.isEmpty())detail="Windows helper操作に失敗しました";if(command!=null)detail+="\n対象file: "+command.lease()+"。distroの状態を確認し、wsl --shutdownを実行して再試行してください";if(detail.length()>16000)detail=detail.substring(0,16000);
             if(command!=null&&command.operation().equals("docker")){System.err.println(detail);return 1;}
             try{System.out.write(HelperProtocol.response(status,List.of(new HelperProtocol.Diagnostic(status.equals("setup-required")?"WINDOWS_RUNTIME_SETUP_REQUIRED":"WINDOWS_RUNTIME_FAILED",detail,false,false))));System.out.write('\n');return HelperProtocol.exitCode(status);}catch(IOException output){System.err.println("helper応答を書き込めません");return 1;}
         }

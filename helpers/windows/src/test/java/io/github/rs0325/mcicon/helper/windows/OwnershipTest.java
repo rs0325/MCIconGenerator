@@ -28,14 +28,10 @@ class OwnershipTest {
             try(var file=java.nio.channels.FileChannel.open(outer,StandardOpenOption.WRITE);var lock=file.tryLock()){assertNotNull(lock,"失敗時も外側lockを解放する");}
         }finally{pool.shutdownNow();assertTrue(pool.awaitTermination(3,java.util.concurrent.TimeUnit.SECONDS));}
     }
-    @Test void Windows共有VMは世代別に容量を割り当てず全要求とdistroOverheadを一度ずつ数える() throws Exception {
-        long shared=16L*1024*1024*1024;
-        assertDoesNotThrow(()->GuestBudget.require(shared,GuestBudget.requiredBytes(12*1024,0,1)));
-        assertDoesNotThrow(()->GuestBudget.require(shared,GuestBudget.requiredBytes(6*1024,0,1)));
-        long combined=GuestBudget.requiredBytes(6*1024,12*1024,2);
-        assertEquals(20L*1024*1024*1024,combined);assertThrows(IOException.class,()->GuestBudget.require(shared,combined));
-        assertEquals(10L*1024*1024*1024,GuestBudget.requiredBytes(6*1024,3*1024,1));
-        assertThrows(IOException.class,()->GuestBudget.requiredBytes(3072,3072,0));assertThrows(IOException.class,()->GuestBudget.requiredBytes(Long.MAX_VALUE,3072,2));
+    @Test void guest予算は自jobと一つのdistroOverheadだけで計算する() throws Exception {
+        assertEquals(8L*1024*1024*1024,GuestBudget.requiredBytes(3072));
+        assertEquals(13L*1024*1024*1024,GuestBudget.requiredBytes(12*1024));
+        assertThrows(IOException.class,()->GuestBudget.requiredBytes(Long.MAX_VALUE));
     }
     @Test void GUIDとBasePathとSIDの一致を全て必要とする() throws Exception {
         Path root=temporary.toRealPath();ObjectNode lease=lease();HostFacts original=host(DEFAULT,List.of(new HostFacts.Distribution("existing",DEFAULT,"C:\\existing",2)));WslDistribution distribution=new WslDistribution(root,lease,original);ObjectNode owner=distribution.reserve(original);Files.createDirectory(distribution.basePath);
@@ -57,10 +53,10 @@ class OwnershipTest {
         try(OperationJournal journal=OperationJournal.acquire(temporary.toRealPath(),lease,Duration.ofSeconds(1))){assertTrue(journal.pending());journal.recovered(WindowsFiles.JSON.createObjectNode().put("closed",true));journal.release();assertThrows(IOException.class,journal::active);}
         lease.put("ownerId",UUID.randomUUID().toString());assertThrows(IOException.class,()->OperationJournal.acquire(temporary.toRealPath(),lease,Duration.ofMillis(50)));
     }
-    @Test void hostが足りても三jobのguest実容量不足を拒否する() throws Exception {
-        long hostBytes=16L*1024*1024*1024,guestBytes=8L*1024*1024*1024;
-        assertTrue(hostBytes>GuestBudget.requiredBytes(3072,6144));assertEquals(10L*1024*1024*1024,GuestBudget.requiredBytes(3072,6144));assertThrows(IOException.class,()->GuestBudget.require(guestBytes,GuestBudget.requiredBytes(3072,6144)));
-        GuestBudget.require(guestBytes,GuestBudget.requiredBytes(3072,3072));GuestBudget.require(12L*1024*1024*1024,GuestBudget.requiredBytes(3072,6144));assertThrows(IOException.class,()->GuestBudget.requiredBytes(Long.MAX_VALUE,3072));
+    @Test void hostが足りても自jobのguest実容量不足を拒否する() throws Exception {
+        long hostBytes=16L*1024*1024*1024,guestBytes=8L*1024*1024*1024,required=GuestBudget.requiredBytes(10*1024);
+        assertTrue(hostBytes>required);assertThrows(IOException.class,()->GuestBudget.require(guestBytes,required));
+        GuestBudget.require(guestBytes,GuestBudget.requiredBytes(3072));
     }
     @Test void WSLのUTF16一覧を文字列として読み不正encodingは拒否する() throws Exception {
         assertEquals(Set.of("専用 distro","docker-desktop"),WindowsRuntime.runningNames("専用 distro\r\ndocker-desktop\r\n".getBytes(StandardCharsets.UTF_16LE)));

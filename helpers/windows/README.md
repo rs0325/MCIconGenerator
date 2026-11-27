@@ -8,37 +8,37 @@ Java 21の自己完結app-imageと同梱native Job入口から、検証済みpre
 
 `WslDistribution`はroot/windows/descriptor SHA配下に、SID・正規root・hostId・descriptor・generationを保存する。名前だけで既存distroを採用せず、HKCU LxssのGUID/BasePath/WSL versionとguest markerを照合する。import意図だけ残った登録、別owner、欠落・置換したdiskは自動clearしない。通常prepareは、既定WSL登録が無い場合にsetup-requiredで停止する。初回importがdefaultを変える可能性についてsetup側の明示同意と準備が必要で、通常経路では暗黙に実行しない。
 
-`windows-host.cpp`はnative APIのSID/boot GUID/OS版/能力とWSL登録を読み取る。boot GUID取得不能は失敗とする。`PROC_THREAD_ATTRIBUTE_JOB_LIST`で子作成とJob登録を一体化し、`KILL_ON_JOB_CLOSE`を設定する。各起動前のJava intent、native pid/start/boot record、正常Job終端recordをjob tmpに残す。通常子の実exit採取後に自身のthread/process handleを解放し、Jobの実active数0だけを正常終端とする。child終了後の既存最大2秒を、自然drain最大500msと同じ終了時刻までの強制回収に配分する。親終了はdrainを行わず回収へ進み、例外時も2秒を再開始しない。Java側の絶対期限・既cleanup9秒・argvは変更しない。API失敗はdoneを残さず、accounting診断は有限のstderrへ出す。親死亡・timeout・PID再使用・record欠落を正常終了へ置き換えない。host JobとWSL内processの所有は別に検査する。同bootのdone欠落はguardが既に死亡していてもunknownを保持し、強制終了guardを正常Job終端recordの代用にしない。
+`windows-host.cpp`はnative APIのSID/boot GUID/OS版/能力とWSL登録を読み取る。`PROC_THREAD_ATTRIBUTE_JOB_LIST`で子作成とJob登録を一体化し、`KILL_ON_JOB_CLOSE`を設定する。nativeの起動形と出力fileは変更しない。hostはnativeのPIDと開始時刻で終了を確認し、終了済みならdoneがなくてもJob内の子を回収済みとする。PID再利用先にはsignalしない。生存中や開始時刻不明の場合は対象fileと対処を示して停止する。nativeの終了とguest内の清算は別に確認する。Javaからintent・phase log・診断JSONは作らず、nativeのintent/state/done/client/completion/rejected間の内容照合もしない。client情報の読取りはguest接続に必要なため残す。
 
 guestbridge ABI 1は専用daemon/socket/data-root、元job/owner/descriptor/generation label、完全container IDを扱う。create前にintentを保存する。正常full ID応答が無いcreateはdaemon側の終端証明が無い限りunknownを保持し、一時的なname一覧0件でもintentを消さない。start supervisorとDocker clientはjob専用cgroup v2へ入り、releaseはfenceを閉じて`cgroup.kill`後の`populated 0`を確認する。元guest bootが変わったrecordは旧actorの終了として分類し、旧container diskは再照合して回収する。guard終了だけではguest終了にしない。
 
 guestの`init`/`hello`はowner・bridge/engine pinの照合後、同じlifecycle lock内で専用distro-local cgroup rootを毎回確認する。初期emptyで現在所属・namespace/mount・root/leaf構造が一致するときだけcpu/memory/pidsを供給しreadbackする。既3controller供給済みならBのbuilder子やactive jobがあっても検証のみとし、partial供給は自動修復しない。専用daemon準備では新daemon生成直前に同じ確認を必須とし、releaseは新生成せず既存daemonの本人照合・回収を行う。root供給は個別jobのreleaseで解除せず、kernel状態をrootfsや永続ready recordへ保存しない。専用namespaceの同定はWSL実装と現viewの整合に基づく判断であり、他distro無影響の絶対証明ではない。旧H-C18 v3では当時のsourceとexact bytesが一致する固定guest bridgeをprepared rootfsに収録し、Windows同bootのready本人死亡後のprepare回復、別coreの同worker描画継続と正常releaseを限定受入した。ACK前死亡/partial import・曖昧createの終端・同時release・実reboot・全51版は未受入である。
 
-他leaseは全descriptorを走査し、busy/unknownがあれば専用distroを止めない。専用distroの停止にはGUID/BasePath照合、専用`--terminate`、正常`--list --running --quiet`による不在確認を要求する。停止receiptを残し、同じguest kernel bootのまま再起動した場合のdaemon再準備と、説明不能なdaemon消失を分ける。登録解除・VHD削除・既存distro/default/global config変更・global shutdownは行わない。
+`locks/render.lock`で描画を直列化するため、Windows helperは他jobを走査しない。停止可否は常に許可し、メモリは自jobの要求だけで計算する。専用distroの停止にはGUID/BasePath照合、専用`--terminate`、`--list --running --quiet`による自distroの不在確認を要求する。他のdistroの稼働状態は判定に使わない。停止receiptはguestのdaemon再準備に必要なため残す。登録解除・VHD削除・既存distro/default/global config変更・global shutdownは自動実行しない。
 
 停止receiptの`lastStop.boot`はhost bootであり、guest kernel bootとは別である。通常keep/helloはreceiptを消費しない。prepareはjob journal→generation lockを取得し、fresh ownerとready keeperを照合して`daemon-prepare`意図を保存する。ownerの`restartClaim`は`stop`（停止ID/host boot、初回はnull）、job/owner/descriptorの`identity`、`keeperAttempt`を固定する。他attemptの未確定claimはlock解放やhelper死亡だけでは奪わない。
 
 専用`daemon-prepare`はlifecycle→job fence lock内でmarker/pin、稼働keeper本人とattempt、開いたfenceを確認する。guestの`daemon-prepare.json`へpendingをspawn前に保存し、daemonのgeneration/guest boot/PID/startとDocker labelを確認したready証明を保存してACKする。同じclaimの再要求は保存済みready本人の照合だけを許し、pendingや失効本人から再spawnしない。新しい停止IDはhostで肯定した新停止の証明を前提とする。初回生成・guest boot変更も専用準備操作内に限り許可し、一般要求のrestartAllowedは常にfalse、通常releaseと停止証明のない回復releaseはdaemonを生成しない。
 
-hostはACKのmarker/pin/claimとdaemon本人の証明、およびbridgeのstate/done/completionと実終了値を照合し、owner全体の比較付き更新でreceipt/claimを除去して`preparedDaemon`へ証明を保存する。その後journalをsettledにし、ownerを再読込してload→CPU probeへ進む。消費後・settled前の中断は同じ保存証明とguestの本人照合でのみ再確定する。load/CPU失敗でreceiptは復活しない。host/guestの保存を跨ぐ原子的トランザクションではなく、曖昧なspawn/ACK/保存はpending/unknownとして保持する。
+hostはACKのmarker/pin/claimとdaemon本人の証明、およびnativeの実終了値を照合し、owner全体の比較付き更新でreceipt/claimを除去して`preparedDaemon`へ証明を保存する。その後journalをsettledにし、ownerを再読込してload→CPU probeへ進む。消費後・settled前の中断は同じ保存証明とguestの本人照合でのみ再確定する。load/CPU失敗でreceiptは復活しない。host/guestの保存を跨ぐ原子的トランザクションではなく、曖昧なspawn/ACK/保存はpending/unknownとして保持する。
 
 ### worker中断後の回復（2026-11-06修正候補）
 
 実worker起動後にWSL lifetime clientが失われると、専用distroのdaemonが消失しても共有kernelのboot IDは変わらない場合がある。旧経路はcontainer清算時に既存daemonを要求し、停止receiptがないためDAEMON_RESTART_DENIEDで回復できなかった。
 
-回復keeper開始前にlease資源と専用distroの所有を照合し、他leaseの停止禁止・unknownがない場合だけ旧native Jobの終端を確認して専用distroを停止する。稼働一覧からの不在とhost boot/SID/GUID/BasePathの再照合後に新しい停止receiptを保存する。他leaseが専用distroを使用中の場合は停止せず、既存の稼働daemonによる清算を維持する。
+回復keeper開始前に元ownerの死亡、lease資源と専用distroの所有、旧nativeの終了を確認し、専用distroを停止する。稼働一覧で自distroの不在とhost boot/SID/GUID/BasePathを再照合して新しい停止receiptを保存する。done欠落だけでは回復を拒否しない。nativeが生存中または所有情報が不明なら、対象と対処を示して止める。
 
 停止証明付きkeep-recoverは、keeperのcgroupを作る前に既存の厳格なdelegation初期化を行い、keeper記録に停止receiptを結び付ける。閉じたfence向けのdaemon-recoverは、そのreceipt・元job/owner/descriptor・稼働keeper本人とattemptを照合してからdaemonを準備する。停止済みの旧actor記録を清算し、通常のrelease-recoverで完全container IDと所有labelを再照合して回収する。container未作成ならdaemonを起動しない。pending create、部分import、Job終端不明、所有不一致は引き続き記録を保持して拒否する。
 
-hostは`daemon-recover`にも`daemon-prepare`と同じstate/done/completion・実終了値・子0終端の照合を要求する。空の回復が成功した場合はowner全体を比較して自分の`restartClaim`だけを解除し、停止receiptは保持する。preflight後に停止を挟んで別CLIのkeeperが開始しても、そのkeeperを止めずに次のprepareがreceiptを取得できる。比較不一致や終端不明ではclaimを解除しない。
+hostは`daemon-recover`にも`daemon-prepare`と同じguest応答とnative実終了値の確認を要求する。空の回復が成功した場合はowner全体を比較して自分の`restartClaim`だけを解除し、停止receiptは保持する。比較不一致や実行失敗ではclaimを解除しない。
 
 再現用自動テストを修正前に失敗させ、専用使い捨てWSLでも同bootの拒否を再現した。修正候補guestでは回復・旧container不存在・次jobの実行まで確認した。これは実workerのCLI JVMを中断して同じrenderコマンドからPNGを得る公開物E2Eではない。公開CLIには候補helper/rootfsの無署名差替え経路がなく、**次の配布候補で取消し→再開の再検証が必要**。実機試験の登録・稼働一覧・default・設定は前後一致し、専用distroと起動プロセスを回収した。[受入範囲と未解決事項](qa/cancel-resume-2026-11-06.json)を参照。
 
 配布にはhelper JAR/app-image、guestbridgeを含むrootfs、hash/pinを反映したdescriptorと同梱runtime資源の再ビルド・再署名・新版が必要になる。native PEのsourceは変更していない。旧公開descriptorのleaseは新descriptorによる回復対象から除外されるため、本修正だけで既存の旧世代leaseが救済されるとは扱わない。利用者は失敗時のlease・owner・ログを保全し、旧世代の清算は所有確認を伴う別途の対応対象とする。
 
-writerFailureではwriterがnativeを破棄せず、監督側が元期限内で自然終端と有限回収を行う。bridgeもkeeperと同形式のcompletionを保存する（bridgeのclientはnative state）。job tmpの`native-<UUID>.diagnostic.json`へ入力失敗種別、実native exit、照合済みcompletion、肯定Job0、回収・unknown、stdout/stderr総bytes・適用上限・超過とstderr切断をatomic保存する。stdoutはサイズだけを調べ、通常1MiB・fetch 64MiBの適用上限を記録する。共通の`outputLimitExceeded`はどちらかの超過でtrueになる。stderrは先頭/末尾各8192 bytesの有限読取りから固定guest reasonとnative accounting行だけを抽出し、任意文字列を出さない。固定reasonは末尾から消えても先頭側から別項目へ残す。保存失敗時は一時出力を保持し、保存/cleanup失敗を元失敗に併記する。helperの単一制御JSONにも同じ要約を載せる。
+releaseと回復はcoreからkeeper、guest清算、EOF、専用distro停止、owner/journal/lease保存まで単一の30秒期限を使う。段ごとの予約や期限の再開始は行わない。失敗後の直接process回収は最大2秒で打ち切る。入力pipeや実行の失敗では操作名・対象file・実exit・stderr末尾（最大8192 bytes）と対処を返し、診断JSONは保存しない。通常stdoutは1MiB、fetchは64MiB、stderrは1MiBの上限で読み取る。guest応答、`lastStop`・`restartClaim`・`preparedDaemon`、keeperのclient情報とOperationJournalの規則は変更しない。
 
-この内部形式は未リリースであり旧QA root/distroを移行しない。旧証拠を保全し、helper JAR・bridge/rootfs・native PE・payload/inventory・descriptor/signatureを同じ新世代へ再pinして、新rootから検証する。過去のH-C18/v7の受入を新bytesへ流用しない。
+Issue #218はhost側だけを変更し、guestbridge・guest image・guest protocol・native PEを再作成しない。既存のguest/native artifactを利用してhelperを再包装する。過去の実機受入を変更後のhelperへ流用せず、描画・close・強制終了後の回復は別途実機で確認する。
 
 ## Prepared rootfsとpayload
 
@@ -68,7 +68,7 @@ input payloadの`payload.json`は次の内部形式を持つ。値の例を配�
 }
 ```
 
-nativeは検査済LLVM-MinGWをMacで明示指定し、固定sourceから別buildする。packagerは事前build PE・build.json・元sourceを必須入力としてPE32+ AMD64 console、許可したWindows system/UCRT import、source/toolchain/flags/artifact/noticeのpinを検査し、nativeとbuild記録・noticeを含む最終payload.jsonとapp-image inventoryを出力する。コンパイラの探索・自動取得・Windowsでのsource compileは行わない。署名検証成功やWindows実OS受入を意味しない。projectのLICENSE・THIRD_PARTY_NOTICESと関連Apache/Commons/XZ文書はrepo正本から`app/support/licenses/mcicon/`へコピーし、payloadと最終inventoryへ結合する。正本欠損時は包装を拒否する。そのhelper archive全体を後続の署名descriptorで固定する。rootfs SHA/bridge/engine/probeの不明・不一致をreadyへ落とすfallbackは無い。guest helloはABI/marker/hashとguest実memory・CPU数を検査し、全active leaseのcontainer予算合計＋1GiB overhead（下限8GiB）をguest実容量へ照合する。host物理RAMが足りることだけでは代用しない。image load後にimage ID/platformと実CPU probeを検査する。
+nativeは検査済LLVM-MinGWをMacで明示指定し、固定sourceから別buildする。packagerは事前build PE・build.json・元sourceを必須入力としてPE32+ AMD64 console、許可したWindows system/UCRT import、source/toolchain/flags/artifact/noticeのpinを検査し、nativeとbuild記録・noticeを含む最終payload.jsonとapp-image inventoryを出力する。コンパイラの探索・自動取得・Windowsでのsource compileは行わない。署名検証成功やWindows実OS受入を意味しない。projectのLICENSE・THIRD_PARTY_NOTICESと関連Apache/Commons/XZ文書はrepo正本から`app/support/licenses/mcicon/`へコピーし、payloadと最終inventoryへ結合する。正本欠損時は包装を拒否する。そのhelper archive全体を後続の署名descriptorで固定する。rootfs SHA/bridge/engine/probeの不明・不一致をreadyへ落とすfallbackは無い。guest helloはABI/marker/hashとguest実memory・CPU数を検査し、自jobのcontainer予算と1GiB overhead（下限8GiB）をguest実容量へ照合する。host物理RAMが足りることだけでは代用しない。image load後にimage ID/platformと実CPU probeを検査する。
 
 ## 入出力と検証
 
@@ -78,7 +78,7 @@ DockerRequest/Snapshot/WorkerProxyはhelper-commonへ集約し、Mac/WindowsはP
 
 native buildの待機例外でもstdout/stderrと終了記録を保存する。未reapの直接child所有を確認できた場合だけ専用groupへsignalし、回収不能はunknownとする。元例外は回収/記録失敗で置き換えない。
 
-Java fixtureはargv/protocol/snapshot、登録衝突、GUID/BasePath/SID、未確定intent、native record欠落、回収期限を検査する。`scripts/test-guestbridge.py`は実関数を隔離filesystemとDocker境界で呼び、fence/曖昧create/失敗証拠を検査する。これらはWindows Job、kernel cgroup、実WSLの実証ではない。
+Java fixtureはargv/protocol/snapshot、登録衝突、GUID/BasePath/SID、未確定intent、native終了後のdone欠落、PID再利用、回収期限を検査する。`scripts/test-guestbridge.py`は実関数を隔離filesystemとDocker境界で呼び、fence/曖昧create/失敗証拠を検査する。これらはWindows Job、kernel cgroup、実WSLの実証ではない。
 
 ```text
 ./gradlew :helper-windows:test :core:test
