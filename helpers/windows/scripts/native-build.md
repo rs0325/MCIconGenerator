@@ -45,21 +45,13 @@ build.jsonはWindows版archive pinとcompiler/LLVM DLL・target library群のSHA
 この限定結果はWindows app-image/JRE包装、実WSL、renderer、再起動、OS最小版、署名・再配布の受入を含まない。build.jsonのcrossbuild区分は変更せず、限定QAの来歴と製品全体の受入を分ける。
 
 
-### Job終端修正時のsource/PE世代
+### 現在のsource/PE世代
 
 引用訂正source `55478f2c6852e9bc792ef7285ef1d99114f552a7a9edf2479ecdc07f253416d1` / PE `c31aa33644ddfba5c4075afbe06a7aefafa51d75e167c94e9efefb478821c405` は履歴として保持する。現sourceは `932c366edd7d7a909e96fb482db7d7b093f6105ec58181d372d9de6f0ff58e87`、現PE（1476608 bytes）は `a14c23cdbed4de8663e81aa072e3b96ec731180f91897ec169cd88a957ed4896`。argv/APIを変えず、child終了後の最大2秒を自然drain最大500msと同endまでの強制回収へ配分する。例外回収で期限を再開始しない。
 
 2026-10-20の同argv/flags0のfacts-only対照で旧PE guard125、新PE guard0を観測した。新PEはJobactive1→0、queries2を実測した。正確なdrain経過時間は未採取で、両caseを含むPSrun windowは475ms。4clientと両guard/controllerの回収・done・本人性を照合した。旧FAILを保持し、この結果をWSL import/attachedworker/全製品受入へ継承しない。boot GUIDの実読取は成功したが旧proofと今回値は同じで、実boot差は未受入。
 
 build.jsonは同じsourcebytesからのcrossbuild/notice整合記録を保ち、facts限定QAは別の来歴として扱う。`test-native-completion.py`は実sourceの回収関数を抽出し、fake API/clockで15条件を検査する。これは実Windowsやkernel動作の代用ではない。
-
-### 永続参照identity batchのsource/PE世代
-
-read-onlyの`file-identities-v1`を追加したsource SHA-256は`849fa1dd8192ecb94d30617056f191746b8ba92f7063d99731593d3e27f2bad8`。上記固定Windows LLVM-MinGWで再buildしたPEは1524224bytes、SHA-256は`31d3637ad9e462c334dd8faac6ddced8c307ec5594101d824dbf719258a91790`。build.jsonのsource/toolchain/PE/licenseと最終包装inventoryを照合する。過去PEや公開descriptorのdigestをこの新artifactへ転用しない。
-
-batchはfile/directory kindを明示し、最大256path・入力4MiB・応答65536bytes。同順のvolumeSerial/fileIdを返し、欠落・不正形式・重複path/実体・reparse・fileの複数linkは全体失敗にする。旧file-only `file-identity`、そのWin32診断、Job ABI/done/completionは維持する。
-
-`test-native-identities.py`で実Windowsの正負例、`test-native-identity.py`で既存scalar診断、`test-native-identity-api.py`で元scalarのfake WinAPI、`test-native-completion.py`で元Job回収・固定入口を検査する。Java側はroot排他scopeと元絶対期限にbatch・process回収を通算する。batch成功や包装成功だけではWSL・保持判断・運用終端予算の受入完了を意味しない。
 
 ### A-current実測の結合
 

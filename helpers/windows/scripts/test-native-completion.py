@@ -1,11 +1,10 @@
 """製品nativeの回収/起動pathをfake WinAPIへ接続する。実Windowsの代用ではない。"""
-import argparse, pathlib, subprocess, tempfile, sys
+import argparse, pathlib, subprocess, tempfile
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cxx', type=pathlib.Path, required=True)
     args = parser.parse_args()
-    flags = ['--no-default-config', '-rtlib=compiler-rt', '-unwindlib=libunwind', '-stdlib=libc++', '-fuse-ld=lld', '-static'] if sys.platform == 'win32' else []
     root = pathlib.Path(__file__).resolve().parents[1]
     source = (root / 'src/main/native/windows-host.cpp').read_text()
     client = next(line.strip() for line in source.splitlines() if line.strip().startswith('ULONGLONG end=0;int exit;Completion completion;'))
@@ -17,12 +16,12 @@ def main():
         (stage / 'native-completion.inc').write_text(source[start:end])
         (stage / 'native-client.inc').write_text(client)
         binary = stage / 'fixture'
-        subprocess.run([str(args.cxx), *flags, '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(fixture), '-o', str(binary)], check=True)
+        subprocess.run([str(args.cxx), '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(fixture), '-o', str(binary)], check=True)
         subprocess.run([str(binary)], check=True)
         observation = source[source.index('static void observeJob('):source.index('static DWORD remainingUntil(')]
         (stage / 'native-observation.inc').write_text(observation)
         fixture = root / 'src/test/native/observation-fixture.cpp'
-        subprocess.run([str(args.cxx), *flags, '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(fixture), '-o', str(binary)], check=True)
+        subprocess.run([str(args.cxx), '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(fixture), '-o', str(binary)], check=True)
         subprocess.run([str(binary)], check=True)
         functions = ['quoted', 'extended', 'applicationPath']
         lines = source.splitlines()
@@ -31,7 +30,7 @@ def main():
         assert 'application=applicationPath(argv[6])' in create and 'CreateProcessW(application.c_str(),command.data(),' in create
         (stage / 'native-create.inc').write_text(create)
         fixture = root / 'src/test/native/application-fixture.cpp'
-        subprocess.run([str(args.cxx), *flags, '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(fixture), '-o', str(binary)], check=True)
+        subprocess.run([str(args.cxx), '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(fixture), '-o', str(binary)], check=True)
         subprocess.run([str(binary)], check=True)
         (stage / 'native-completion-type.inc').write_text(next(line for line in lines if line.startswith('struct Completion ')))
         (stage / 'native-startup.inc').write_text(source[source.index('struct Startup {'):source.index('static int executeStarted(')])
@@ -39,7 +38,7 @@ def main():
         client = next(line.strip() for line in lines if line.strip().startswith('ULONGLONG end=0;int exit;Completion completion;'))
         (stage / 'native-client.inc').write_text(client)
         fixture = root / 'src/test/native/wsl-fixture.cpp'
-        subprocess.run([str(args.cxx), *flags, '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(fixture), '-o', str(binary)], check=True)
+        subprocess.run([str(args.cxx), '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(fixture), '-o', str(binary)], check=True)
         subprocess.run([str(binary)], check=True)
 
 if __name__ == '__main__': main()

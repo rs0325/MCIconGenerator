@@ -23,7 +23,7 @@ def main():
         require(not relative.is_absolute() and '..' not in relative.parts and source.is_file() and not source.is_symlink() and source.resolve().is_relative_to(args.payload.resolve()), 'payload path不一致')
         require(source.stat().st_size == row['bytes'] and digest(source) == row['sha256'], 'payload size/hash不一致')
     require(manifest['guestBase']['bridgeSha256'] == digest(args.payload / 'guestbridge.py'), 'guest bridge pin不一致')
-    require(not any(row['path'] in {'windows-host.exe', 'lease-trust.bin', 'reference-contract.json'} or row['path'].startswith('native-build/') for row in rows), '固定support入力とpayloadの衝突')
+    require(not any(row['path'] == 'windows-host.exe' or row['path'].startswith('native-build/') for row in rows), 'native入力とpayloadの衝突')
     for relative in PROJECT_NOTICES:
         source = PROJECT_ROOT / relative
         require(source.is_file() and not source.is_symlink(), 'project notice不足: ' + relative)
@@ -31,15 +31,11 @@ def main():
     native = args.native
     inputs = work / 'input'; inputs.mkdir(); support = inputs / 'support'; support.mkdir()
     shutil.copyfile(args.lease_trust, support / 'lease-trust.bin')
-    contract = PROJECT_ROOT / 'helpers/common/src/main/resources/reference-contract.json'
-    shutil.copyfile(contract, support / 'reference-contract.json')
-
     for row in rows:
         target = support / row['path']; target.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(args.payload / row['path'], target)
     shutil.copyfile(native, support / 'windows-host.exe')
     rows.append({'path': 'windows-host.exe', 'bytes': native.stat().st_size, 'sha256': digest(native)})
     rows.append({'path': 'lease-trust.bin', 'bytes': len(trust), 'sha256': digest(args.lease_trust)})
-    rows.append({'path': 'reference-contract.json', 'bytes': contract.stat().st_size, 'sha256': digest(contract)})
     for row in [{'path': args.native_build.name, 'bytes': args.native_build.stat().st_size, 'sha256': digest(args.native_build)}, *native_build['notices']]:
         relative = 'native-build/' + row['path']; target = support / relative
         target.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(args.native_build.parent / row['path'], target)

@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
 
-/** 固定同梱の信頼設定から準備し、同じleaseと起動指定をジョブ終了まで保持する。 */
+/** 固定同梱の信頼設定から準備し、描画lock・leaseと起動指定をジョブ終了まで保持する。 */
 public final class ManagedRuntime implements AutoCloseable {
     private static final String RESOURCE="META-INF/mcicon/runtime/";
     private final ManagedOptions options;
@@ -21,8 +21,9 @@ public final class ManagedRuntime implements AutoCloseable {
     private final RuntimeLease lease;
     private final RuntimeHelper helper;
     private final WorkerLaunch launch;
-    private ManagedRuntime(ManagedOptions options,RuntimeDescriptor descriptor,WorkerArtifact.Resolved worker,RuntimeLease lease,RuntimeHelper helper,WorkerLaunch launch) {
-        this.options=options;this.descriptor=descriptor;this.worker=worker;this.lease=lease;this.helper=helper;this.launch=launch;
+    private final RuntimeStore.Locked render;
+    private ManagedRuntime(ManagedOptions options,RuntimeDescriptor descriptor,WorkerArtifact.Resolved worker,RuntimeLease lease,RuntimeHelper helper,WorkerLaunch launch,RuntimeStore.Locked render) {
+        this.options=options;this.descriptor=descriptor;this.worker=worker;this.lease=lease;this.helper=helper;this.launch=launch;this.render=render;
     }
     public static ManagedRuntime prepare(ManagedOptions options,boolean offline,CancellationToken token) throws IOException {
         return prepare(options,offline,token,ManagedRuntime.class.getClassLoader(),host(),()->RuntimeStore.https(token));
@@ -37,6 +38,14 @@ public final class ManagedRuntime implements AutoCloseable {
         if(selected==null)throw new McIconException("MANAGED_SETUP_REQUIRED","このOS/arch用の管理runtimeは発行されていません: "+host.os()+"/"+host.arch(),1);
         long remaining=deadline-System.nanoTime();if(remaining<=0)throw new java.net.http.HttpTimeoutException("管理環境の準備期限を超えました");
         RuntimeStore store=new RuntimeStore(options.runtimeRoot(),offline,token,Duration.ofNanos(remaining),transport.get());
+        RuntimeStore.Locked render=store.render();
+        try {return prepare(options,host,loader,store,preparationDeadline,selected,token,render);}
+        catch(IOException|RuntimeException|Error failure) {
+            try {render.close();}catch(IOException cleanup){failure.addSuppressed(cleanup);}
+            throw failure;
+        }
+    }
+    private static ManagedRuntime prepare(ManagedOptions options,RuntimeDescriptor.Host host,ClassLoader loader,RuntimeStore store,Instant preparationDeadline,JsonNode selected,CancellationToken token,RuntimeStore.Locked render) throws IOException {
         store.check();WorkerArtifact.Resolved worker=WorkerArtifact.resolve(store.root(),token);store.check();
         String descriptorPath=selected.get("descriptorPath").asText();byte[] original=resource(loader,descriptorPath,1024*1024),signature=resource(loader,descriptorPath+".sig",64);
         TrustSet key;
@@ -50,6 +59,7 @@ public final class ManagedRuntime implements AutoCloseable {
             for(String existing:inventories.keySet())if(path.startsWith(existing+"/")||existing.startsWith(path+"/"))throw RuntimeDescriptor.invalid("inventory同士の配置が衝突しています");
             byte[] bytes=resource(loader,path,4*1024*1024);descriptor.verifyInventory(artifact,bytes);inventories.put(path,bytes);
         }
+        try(var ignored=store.lock("generations")){RuntimeLease.discardReleased(store);}
         RuntimeGeneration generation=new RuntimeGeneration(store);Path executable=PreparationFailure.at(PreparationFailure.Stage.HELPER,()->generation.helper(descriptor));
         PreparationFailure.at(PreparationFailure.Stage.RECOVERY,()->{recover(store,descriptor,executable,token);store.check();return null;});
         WindowsAdmission admission=host.os().equals("windows")?PreparationFailure.at(PreparationFailure.Stage.READER,()->new WindowsAdmission(store,descriptor,executable,inventories,original)):null;
@@ -71,9 +81,10 @@ public final class ManagedRuntime implements AutoCloseable {
             });
             ProcessBuilder prefix=helper.docker(List.of());Map<Integer,String> hashes=new TreeMap<>();for(var java:descriptor.javaExecutables())hashes.put(java.major(),java.sha256());
             WorkerLaunch launch=new WorkerLaunch(prefix.command(),prefix.environment(),descriptor.imageId(),descriptor.agentSha256(),hashes,descriptor.environment());
-            return new ManagedRuntime(options,descriptor,worker,lease,helper,launch);
+            return new ManagedRuntime(options,descriptor,worker,lease,helper,launch,render);
         }catch(IOException|RuntimeException|Error failure) {
-            try {release(helper,lease);}catch(Exception cleanup){failure.addSuppressed(cleanup);}
+            // 延期の証拠は自jobの記録を参照するため、Busyでは記録を次回起動時の削除まで残す。
+            try {release(helper,lease,!(failure instanceof AdmissionEvidence.Busy));}catch(Exception cleanup){failure.addSuppressed(cleanup);}
             if(failure instanceof AdmissionEvidence.Busy&&failure.getSuppressed().length==0) {
                 JsonNode claim=((AdmissionEvidence.Busy)failure).job();
                 AdmissionEvidence.verifyJob(store.root(),claim,descriptor.digest(),ProcessHandle.current().pid(),ProcessHandle.current().info().startInstant().orElseThrow(()->new IOException("core開始identityが不明です")).toString(),proofTrust.restrictTo(descriptor.digest()),true,RuntimeLease.receipts(store));
@@ -126,11 +137,13 @@ public final class ManagedRuntime implements AutoCloseable {
         var java=descriptor.javaExecutables().stream().filter(j->j.major()==major).findFirst().orElseThrow(()->RuntimeDescriptor.invalid("要求Java majorが管理世代にありません"));
         return new WorkerOptions(worker.agentJar(),"managed",descriptor.imageId(),options.startupTimeout(),options.itemTimeout(),java.executable().substring(0,java.executable().length()-9),options.containerMemoryMiB(),options.heapMemoryMiB());
     }
-    @Override public void close() throws IOException {release(helper,lease);}
-    private static void release(RuntimeHelper helper,RuntimeLease lease) throws IOException {
+    @Override public void close() throws IOException {try(render){release(helper,lease,true);}}
+    private static void release(RuntimeHelper helper,RuntimeLease lease,boolean discard) throws IOException {
         boolean interrupted=Thread.interrupted();
-        try(lease) {if(helper!=null)requireOk(helper.control("release",Duration.ofSeconds(10),new CancellationToken()));}
-        finally {if(interrupted)Thread.currentThread().interrupt();}
+        try {
+            try(lease) {if(helper!=null)requireOk(helper.control("release",Duration.ofSeconds(10),new CancellationToken()));}
+            if(discard)lease.discard();
+        }finally {if(interrupted)Thread.currentThread().interrupt();}
     }
     static void requireAdmission(RuntimeHelper.Result result,RuntimeStore store,RuntimeLease lease,RuntimeDescriptor descriptor,LeaseTrust trust) throws IOException {
         if(!result.ok()&&result.diagnostics().stream().anyMatch(d->d.code().equals("MANAGED_BUSY"))) {

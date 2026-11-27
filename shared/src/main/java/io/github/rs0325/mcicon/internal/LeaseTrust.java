@@ -15,10 +15,7 @@ public final class LeaseTrust {
             "e41d30a5241beac9e7276e5ad14caf9c279b5e8a9022123e8cd736221bb47d57");
     /** 呼出し元packageが認証済みのOS reader。file identityの代用品を返してはならない。 */
     @FunctionalInterface public interface IdentityReader {String read(Path path) throws IOException;}
-    /** 任意pathの欠落を単一file queryへfallbackしない、上限付きの一括reader。 */
-    @FunctionalInterface public interface BatchIdentityReader {Map<Path,String> readAll(List<Path> paths,Path scratch,long end) throws IOException;}
     private IdentityReader externalIdentity;
-    private final ThreadLocal<IdentityCapture> capture=new ThreadLocal<>();
     private final TrustSet trust;
     private Path identityReader;
     private String readerSha256;
@@ -26,8 +23,6 @@ public final class LeaseTrust {
     private String currentDescriptor;
     private Set<String> descriptorPins;
     private boolean packageUnbound;
-    private Path helperRoot;
-    private JsonNode helperInventory;
     private LeaseTrust(TrustSet trust){this.trust=trust;}
     /** 認証済みの同梱公開鍵を渡す。runtime rootから鍵を選択してはならない。 */
     public static LeaseTrust verified(TrustSet trust){return new LeaseTrust(Objects.requireNonNull(trust));}
@@ -65,114 +60,19 @@ public final class LeaseTrust {
         JsonNode listing=LeaseSnapshot.read(inventory);
         JsonNode executablePin=LeaseSnapshot.helperPin(listing,helperRoot.relativize(executable).toString().replace('\\','/'));
         if(Files.size(executable)!=LeaseSnapshot.integer(executablePin,"bytes",1)||!LeaseSnapshot.fileDigest(executable).equals(LeaseSnapshot.hash(executablePin,"sha256")))throw new IOException("現helperの実体と元inventoryが一致しません");
-        if(identityReader==null){currentDescriptor=LeaseSnapshot.digest(descriptor);packageUnbound=false;this.helperRoot=helperRoot;helperInventory=listing.deepCopy();return;}
+        if(identityReader==null){currentDescriptor=LeaseSnapshot.digest(descriptor);packageUnbound=false;return;}
         if(!identityReader.toRealPath().equals(identityReader)||!Files.isRegularFile(identityReader,LinkOption.NOFOLLOW_LINKS))throw new IOException("identity readerにlinkがあります");
         String relative=helperRoot.relativize(identityReader).toString().replace('\\','/');
         JsonNode pin=LeaseSnapshot.helperPin(listing,relative);
         if(Files.size(identityReader)!=LeaseSnapshot.integer(pin,"bytes",1)||!readerSha256.equals(LeaseSnapshot.hash(pin,"sha256")))throw new IOException("署名descriptorとreader実体が一致しません");
-        readerVerified=true;currentDescriptor=LeaseSnapshot.digest(descriptor);packageUnbound=false;this.helperRoot=helperRoot;helperInventory=listing.deepCopy();
-    }
-    /** job公開前に必要な能力宣言/probeを、束縛済みhelper inventoryから認証する。 */
-    public Path boundHelperFile(String relative) throws IOException {
-        if(helperRoot==null||helperInventory==null||packageUnbound)throw new IOException("helper readerが未認証です");
-        String name=LeaseSnapshot.relative(LeaseSnapshot.JSON.createObjectNode().put("path",relative),"path");
-        Path file=helperRoot.resolve(name);JsonNode pin=LeaseSnapshot.helperPin(helperInventory,name);
-        if(!file.toRealPath().equals(file)||!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)||Files.size(file)!=LeaseSnapshot.integer(pin,"bytes",1)||!LeaseSnapshot.fileDigest(file).equals(LeaseSnapshot.hash(pin,"sha256")))throw new IOException("helper supportのpinが一致しません");
-        return file;
-    }
-    /** 同じ認証済みinventoryのpinへ読取bytes自身を照合する。読取前後の置換も拒否する。 */
-    public byte[] boundHelperBytes(String relative,int limit) throws IOException {
-        Path file=boundHelperFile(relative);String key=fileIdentity(file);
-        byte[] bytes=LeaseSnapshot.readFile(file,limit);
-        JsonNode pin=LeaseSnapshot.helperPin(helperInventory,relative);
-        if(bytes.length!=LeaseSnapshot.integer(pin,"bytes",1)||!LeaseSnapshot.digest(bytes).equals(LeaseSnapshot.hash(pin,"sha256"))||!key.equals(fileIdentity(file)))throw new IOException("helper supportの元bytes/identityが一致しません");
-        return bytes;
-    }
-    /** 認証済みreaderで元file/directoryのidentityを得る。pathや時刻を代用品にしない。 */
-    public String fileIdentity(Path file) throws IOException {
-        if(capture.get()!=null)return capture.get().identity(file);
-        if(!file.toRealPath().equals(file))throw new IOException("所有pathにlinkがあります");
-        if(Files.isDirectory(file,LinkOption.NOFOLLOW_LINKS)) {
-            Object key=Files.readAttributes(file,java.nio.file.attribute.BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey();
-            if(key!=null)return key.toString();
-        }
-        return identity(file).toString();
+        readerVerified=true;currentDescriptor=LeaseSnapshot.digest(descriptor);packageUnbound=false;
     }
     Object identity(Path file) throws IOException {
-        if(capture.get()!=null)return capture.get().identity(file);
         if(externalIdentity!=null)return externalIdentity.read(file);
         if(Files.getFileStore(file).supportsFileAttributeView("unix")&&((Number)Files.getAttribute(file,"unix:nlink",LinkOption.NOFOLLOW_LINKS)).longValue()!=1)throw new IOException("所有fileにhardlinkがあります");
         Object key=Files.readAttributes(file,java.nio.file.attribute.BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey();if(key!=null)return key;
         if(identityReader==null||!readerVerified||!readerSha256.equals(LeaseSnapshot.fileDigest(identityReader)))throw new IOException("file identityの認証済みreaderがありません");
         return FileIdentityReader.read(identityReader,file);
-    }
-    /** root排他の同一区間でだけidentityを固定する。効果確定前にrevalidateを呼ぶ。 */
-    public IdentityCapture captureIdentities(Path root,RuntimeLock held,List<Path> paths,Path scratch,long end) throws IOException {
-        WindowsFileIdentities.check(end);
-        if(capture.get()!=null)throw new IOException("identity captureの再入を拒否しました");
-        held.requireHeld(root.resolve("locks/generations.lock"));
-        List<Path> selected=new ArrayList<>(new LinkedHashSet<>(paths));
-        if(!selected.contains(root))selected.add(root);
-        Path lock=root.resolve("locks/generations.lock");if(!selected.contains(lock))selected.add(lock);
-        IdentityCapture scope=new IdentityCapture(this,root,held,List.copyOf(selected),scratch,end);
-        capture.set(scope);return scope;
-    }
-    /** lock取得時などcapture開始前の単独観測も、呼出し元の絶対期限へ通算する。 */
-    public String fileIdentity(Path path,Path scratch,long end) throws IOException {
-        WindowsFileIdentities.check(end);
-        if(capture.get()!=null)return capture.get().identity(path);
-        return readIdentities(List.of(path),scratch,end).get(path);
-    }
-    Map<Path,String> readIdentities(List<Path> paths,Path scratch,long end) throws IOException {
-        WindowsFileIdentities.check(end);
-        if(paths.isEmpty()||new HashSet<>(paths).size()!=paths.size())throw new IOException("identity capture件数が不正です");
-        if(paths.size()>256) {
-            Map<Path,String> result=new LinkedHashMap<>();Set<String> identities=new HashSet<>();
-            for(int offset=0;offset<paths.size();offset+=256) {
-                WindowsFileIdentities.check(end);
-                Map<Path,String> batch=readIdentities(paths.subList(offset,Math.min(paths.size(),offset+256)),scratch,end);
-                for(var entry:batch.entrySet())if(!identities.add(entry.getValue()))throw new IOException("identity batch間で同実体が重複しています");
-                result.putAll(batch);
-            }
-            WindowsFileIdentities.check(end);return Map.copyOf(result);
-        }
-        if(externalIdentity instanceof BatchIdentityReader batch) {
-            Map<Path,String> result=batch.readAll(paths,scratch,end);WindowsFileIdentities.check(end);return result;
-        }
-        if(identityReader!=null) {
-            if(!readerVerified)throw new IOException("identity batch readerが未認証です");
-            return new WindowsFileIdentities(identityReader,readerSha256).readAll(paths,scratch,end);
-        }
-        Map<Path,String> result=new LinkedHashMap<>();
-        for(Path path:paths) {
-            WindowsFileIdentities.check(end);
-            if(!path.toRealPath().equals(path))throw new IOException("identity capture pathにlinkがあります");
-            if(Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)&&Files.getFileStore(path).supportsFileAttributeView("unix")&&((Number)Files.getAttribute(path,"unix:nlink",LinkOption.NOFOLLOW_LINKS)).longValue()!=1)throw new IOException("identity capture fileにhardlinkがあります");
-            Object key=Files.readAttributes(path,java.nio.file.attribute.BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey();
-            if(key==null)throw new IOException("identity batchの認証済みreaderがありません");
-            result.put(path,key.toString());
-        }
-        if(new HashSet<>(result.values()).size()!=result.size())throw new IOException("identity captureに同実体があります");
-        WindowsFileIdentities.check(end);return Map.copyOf(result);
-    }
-    void attach(LeaseSnapshot snapshot,java.nio.channels.FileChannel receipt) throws IOException {
-        if(capture.get()!=null)capture.get().attach(snapshot,receipt);
-    }
-    boolean helperVerified(Path path,long bytes,String sha256) throws IOException {
-        return capture.get()!=null&&capture.get().helperVerified(path,bytes,sha256);
-    }
-    void markHelperVerified(Path path) throws IOException {
-        if(capture.get()!=null)capture.get().markHelperVerified(path);
-    }
-    String helperDigest(Path path,long bytes) throws IOException {
-        return capture.get()==null?null:capture.get().helperDigest(path,bytes);
-    }
-    void endCapture(IdentityCapture scope) throws IOException {
-        if(capture.get()!=scope)throw new IOException("identity capture所有者が一致しません");
-        capture.remove();
-    }
-    void requireCaptureEnded() throws IOException {
-        if(capture.get()!=null)throw new IOException("稼働参照の更新前にidentity captureを終了してください");
     }
     void verify(Path root,byte[] descriptor) throws IOException {
         String digest=LeaseSnapshot.digest(descriptor);

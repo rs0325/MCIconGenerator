@@ -25,7 +25,6 @@ static int CompareStringOrdinal(const wchar_t* a,int,const wchar_t* b,int,int){s
 static int executeStarted(int argc,wchar_t** argv,Startup& startup,HANDLE witness=0,bool bridge=false,bool keeper=false,DWORD pid=0,ULONGLONG start=0){require(startup.parent.value==11);if(postJobFail)throw std::runtime_error("Job以後の失敗");require(argc==14&&std::wstring(argv[6])==L"C:\\Windows\\System32\\wsl.exe"&&witness==9&&bridge!=keeper&&pid==42&&start==23);calls++;return 7;}
 static int execute(int,wchar_t**){return 0;}
 static int facts(){return 0;}
-static int fileIdentities(){throw std::runtime_error("WSL試験ではbatch queryを開始しません");}
 static int identityCalls=0;static int fileIdentity(const std::wstring& path){require(path==L"C:\\record");identityCalls++;return 0;}
 static int remainingUntil(ULONGLONG end){return clockValue<end?1:0;}
 #include "native-wsl.inc"

@@ -4,7 +4,6 @@ import io.github.rs0325.mcicon.internal.FilesSupport;
 import java.io.IOException;
 import java.io.Closeable;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 /** 内容digest別の世代を確定する。既存世代への上書きと使用中世代の削除は行わない。 */
@@ -17,7 +16,7 @@ public final class RuntimeGeneration {
         try(var ignored=store.lock("helper-"+artifact.sha256())) {
             Path parent=store.path("helpers/"+descriptor.host().os()+"-"+descriptor.host().arch());Files.createDirectories(parent);
             Path destination=parent.resolve(artifact.sha256()),stage=parent.resolve("staging-"+UUID.randomUUID());
-            try(var cleanup=(Closeable)()->removeStage(stage)) {
+            try(var cleanup=(Closeable)()->FilesSupport.deleteTree(stage)) {
                 RuntimeArchive.extract(archive,stage,artifact,store);
                 Path executable=FilesSupport.safeResolve(stage,descriptor.helperExecutable());
                 if(!Files.isRegularFile(executable,LinkOption.NOFOLLOW_LINKS))throw RuntimeDescriptor.invalid("helper executableがarchiveにありません");
@@ -40,7 +39,7 @@ public final class RuntimeGeneration {
             Path destination=store.generation(descriptor);Files.createDirectories(destination.getParent());
             if(Files.exists(destination,LinkOption.NOFOLLOW_LINKS)){verify(destination,descriptor);return destination;}
             Path stage=destination.getParent().resolve("staging-"+UUID.randomUUID());Files.createDirectory(stage);
-            try(var cleanup=(Closeable)()->removeStage(stage)) {
+            try(var cleanup=(Closeable)()->FilesSupport.deleteTree(stage)) {
                 for(var artifact:descriptor.artifacts()) {
                     store.check();if(artifact.role().equals("host-helper"))continue;
                     Path source=store.obtain(artifact);RuntimeStore.requireSpace(stage,Math.max(artifact.bytes(),artifact.unpackedBytes()));
@@ -73,12 +72,5 @@ public final class RuntimeGeneration {
             }
         }
         return files;
-    }
-    private static void removeStage(Path stage) throws IOException {
-        if(!Files.exists(stage,LinkOption.NOFOLLOW_LINKS))return;
-        Files.walkFileTree(stage,new SimpleFileVisitor<>() {
-            @Override public FileVisitResult visitFile(Path file,BasicFileAttributes attributes) throws IOException {Files.delete(file);return FileVisitResult.CONTINUE;}
-            @Override public FileVisitResult postVisitDirectory(Path directory,IOException failure) throws IOException {if(failure!=null)throw failure;Files.delete(directory);return FileVisitResult.CONTINUE;}
-        });
     }
 }

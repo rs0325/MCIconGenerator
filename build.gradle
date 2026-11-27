@@ -33,7 +33,6 @@ subprojects {
         for (String name : ['leaseIdentityReader', 'leaseIdentityReaderSha256']) {
             if (providers.gradleProperty(name).isPresent()) systemProperty(name == 'leaseIdentityReader' ? 'mcicon.testIdentityReader' : 'mcicon.testIdentityReaderSha256', providers.gradleProperty(name).get())
         }
-        if (providers.gradleProperty('identityWaitFixture').isPresent()) systemProperty('mcicon.testIdentityWaitFixture', providers.gradleProperty('identityWaitFixture').get())
     }
 }
 
