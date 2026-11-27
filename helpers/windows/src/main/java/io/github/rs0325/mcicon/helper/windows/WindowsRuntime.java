@@ -3,7 +3,6 @@ package io.github.rs0325.mcicon.helper.windows;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.*;
 import io.github.rs0325.mcicon.helper.*;
-import io.github.rs0325.mcicon.internal.RuntimePhaseLog;
 import org.tukaani.xz.XZInputStream;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -21,23 +20,22 @@ final class WindowsRuntime {
     final Commands commands;
     final Map<String,String> environment;
     final WslDistribution distribution;
-    final RuntimePhaseLog trace;
     private final boolean cleanup;
     WindowsRuntime(HelperProtocol.Command command,Path executable,LeaseFile lease,long started) throws IOException {this(command,executable,lease,started,Long.MAX_VALUE);}
     WindowsRuntime(HelperProtocol.Command command,Path executable,LeaseFile lease,long started,long endLimit) throws IOException {this(command,executable,lease,started,endLimit,false);}
     WindowsRuntime(HelperProtocol.Command command,Path executable,LeaseFile lease,long started,long endLimit,boolean recovery) throws IOException {
         this.command=command;this.executable=executable;this.lease=lease;descriptor=lease.descriptor();temporary=command.lease().getParent().resolve("tmp");
         if(!temporary.toRealPath().equals(temporary))throw new IOException("job tmpの所有位置が不正です");
-        trace=new RuntimePhaseLog(temporary,"windows",command.operation(),command.keeper()==null?null:command.keeper().attempt());trace.event("runtime-initialize",endLimit,0);
+
         payload=new Payload(executable.getParent().resolve("app/support"));payload.verify();
-        trace.event("payload-verified",endLimit,0);
+
         cleanup=command.operation().equals("release")||command.operation().equals("docker")&&command.dockerArguments().getFirst().equals("rm");
         long now=System.nanoTime();Instant wall=Instant.now();
-        long end=command.keeper()!=null?now+Math.max(0,Duration.between(wall,command.keeper().deadline()).toNanos()):cleanup?endLimit!=Long.MAX_VALUE?endLimit:started+Duration.ofSeconds(9).toNanos():command.operation().equals("docker")?Long.MAX_VALUE:now+Math.max(0,Duration.between(wall,Instant.parse(lease.read().path("requirements").path("preparationDeadline").asText())).toNanos());
+        long end=command.keeper()!=null?now+Math.max(0,Duration.between(wall,command.keeper().deadline()).toNanos()):cleanup?endLimit!=Long.MAX_VALUE?endLimit:started+Duration.ofSeconds(30).toNanos():command.operation().equals("docker")?Long.MAX_VALUE:now+Math.max(0,Duration.between(wall,Instant.parse(lease.read().path("requirements").path("preparationDeadline").asText())).toNanos());
         environment=new HashMap<>();for(String key:List.of("TMP","TEMP","TMPDIR"))environment.put(key,temporary.toString());
         for(String key:List.of("SystemRoot","WINDIR")){String value=System.getenv(key);if(value!=null)environment.put(key,value);}
         String system=environment.get("SystemRoot");if(system==null||!Path.of(system).isAbsolute())throw new IOException("SystemRootが不明です");wsl=Path.of(system).resolve("System32/wsl.exe");if(!Files.isRegularFile(wsl,LinkOption.NOFOLLOW_LINKS)||!wsl.toRealPath().equals(wsl))throw new IOException("固定WSL実行物がありません");
-        commands=new Commands(payload.path("windows-host.exe"),temporary,environment,Math.min(end,endLimit));trace.event("runtime-deadline",commands.end(),0);distribution=new WslDistribution(command.root(),lease.read(),facts(command.operation().equals("release")&&!recovery?8:-1));trace.event("runtime-ready",commands.end(),0);
+        commands=new Commands(payload.path("windows-host.exe"),temporary,environment,Math.min(end,endLimit));distribution=new WslDistribution(command.root(),lease.read(),facts());
     }
     static boolean releaseUnstarted(HelperProtocol.Command command,LeaseFile lease) throws IOException {
         try(OperationJournal journal=OperationJournal.acquire(command.lease().getParent().resolve("tmp"),lease.read(),Duration.ofSeconds(1))) {
@@ -45,16 +43,13 @@ final class WindowsRuntime {
             if(!journal.released())journal.release();return true;
         }
     }
-    HostFacts facts() throws IOException {return facts(0);}
-    private HostFacts facts(int following) throws IOException {List<String> args=List.of(payload.path("windows-host.exe").toString(),"facts");Commands.Result result=command.operation().equals("release")?commands.releaseCapture(args,following):commands.capture(args,Duration.ofSeconds(3));Commands.zero(result,"Windows所有情報の読取");return HostFacts.parse(WindowsFiles.JSON.readTree(result.stdout()),descriptor);}
-    OperationJournal journal() throws IOException {trace.event("journal-wait",commands.end(),0);OperationJournal result=OperationJournal.acquire(temporary,lease.read(),commands.left(Duration.ofSeconds(3)));trace.event("journal-locked",commands.end(),0);return result;}
-    WslDistribution.Lock lock() throws IOException {trace.event("generation-lock-wait",commands.end(),0);WslDistribution.Lock result=distribution.lock(commands.left(Duration.ofSeconds(3)));trace.event("generation-locked",commands.end(),0);return result;}
-    LeaseReferences.Scan references() throws IOException {return references(commands.end());}
-    private LeaseReferences.Scan references(long end) throws IOException {trace.event("references-start",commands.end(),Math.max(0,end-System.nanoTime()));LeaseReferences.Scan result=LeaseReferences.inspect(command,executable,lease.read().path("descriptorSha256").asText(),end);trace.event("references-done",commands.end(),0);if(System.nanoTime()>=end)throw new IOException("TIMEOUT: 他lease照合の後続予約枠を残せません（期限不足）");return result;}
+    HostFacts facts() throws IOException {List<String> args=List.of(payload.path("windows-host.exe").toString(),"facts");Commands.Result result=commands.capture(args);Commands.zero(result,"Windows所有情報の読取 "+command.root());return HostFacts.parse(WindowsFiles.JSON.readTree(result.stdout()),descriptor);}
+    OperationJournal journal() throws IOException {return OperationJournal.acquire(temporary,lease.read(),commands.left(Duration.ofSeconds(30)));}
+    WslDistribution.Lock lock() throws IOException {return distribution.lock(commands.left(Duration.ofSeconds(30)));}
     void preflight() throws IOException {
         try(OperationJournal journal=journal();var ignored=lock()) {
-            journal.settledRequired();HostFacts host=facts();LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseの所有が不明です");requireSharedCapacity(others);
-            long memory=Math.addExact(lease.read().path("requirements").path("containerMemoryMiB").asLong(),others.memoryMiB());if(host.memoryBytes()/1024/1024<memory+2048)throw new IOException("hostの並行job memory予算が不足しています");
+            journal.settledRequired();HostFacts host=facts();
+            long memory=lease.read().path("requirements").path("containerMemoryMiB").asLong();if(host.memoryBytes()/1024/1024<memory+2048)throw new IOException("hostのjob memory予算が不足しています");
             if(Files.getFileStore(command.root()).getUsableSpace()<4L*1024*1024*1024)throw new IOException("WSL準備の空き容量が不足しています");
             Commands.zero(commands.capture(List.of(wsl.toString(),"--status"),Duration.ofSeconds(5)),"導入済みWSL確認");
             if(distribution.exists())distribution.verify(host);
@@ -68,7 +63,7 @@ final class WindowsRuntime {
             journal.active();ObjectNode owner=ready();JsonNode keeper=keeperRecord();commands.keeper(keeper);
             JsonNode resources=lease.read().path("resources").path("windows");
             if(resources.path("transports").size()!=1||!resources.path("containers").isEmpty()||!resources.path("transports").get(0).path("id").asText().equals(keeper.path("attempt").asText()))throw new IOException("prepare前のkeeper資源が一致しません");
-            LeaseReferences.Scan others=references();if(others.unknown())throw new IOException("他leaseが不明です");requireSharedCapacity(others);long guestRequired=guestRequired(lease.read(),others);
+            long guestRequired=GuestBudget.requiredBytes(lease.read().path("requirements").path("containerMemoryMiB").asLong());
             String boot=facts().boot(),attempt=keeper.path("attempt").asText();
             if(journal.pending()&&!journal.state().path("operation").asText().equals("daemon-prepare"))journal.settledRequired();
             if(!journal.pending())journal.begin("daemon-prepare",boot);
@@ -90,17 +85,14 @@ final class WindowsRuntime {
     ObjectNode keeperOwner(OperationJournal journal,boolean recovery) throws IOException {
         LeaseFile.Artifact base=lease.verifiedArtifact("guest-base");payload.base(base);HostFacts before=facts();
         if(recovery) {
-            ObjectNode owner=distribution.verify(before);if(!lease.read().path("resources").isEmpty())verifyResource(lease.read().path("resources").path("windows"),owner);LeaseReferences.Scan others=references();
-            if(others.unknown())throw new IOException("他leaseが不明なため回復用停止を拒否しました");
-            if(others.stopAllowed()) {
-                commands.reap(before.boot(),lease.read().path("resources").path("windows").path("transports"));
-                HostFacts fresh=facts();if(!fresh.boot().equals(before.boot())||!fresh.sid().equals(before.sid())||!distribution.verify(fresh).equals(owner))throw new IOException("回復用停止前の所有が変化しました");
-                Commands.Result running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"),commands.left(Duration.ofSeconds(2)));Commands.zero(running,"回復用WSL停止前照合");Set<String> names=runningNames(running.stdout()),registered=new HashSet<>();for(var row:fresh.distributions())registered.add(row.name());if(!registered.containsAll(names))throw new IOException("WSL稼働一覧の登録が不明です");
-                if(names.contains(distribution.name))Commands.zero(commands.capture(List.of(wsl.toString(),"--terminate",distribution.name),commands.left(Duration.ofSeconds(3))),"回復用専用WSL停止");
-                running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"),commands.left(Duration.ofSeconds(2)));Commands.zero(running,"回復用WSL停止照合");names=runningNames(running.stdout());
-                HostFacts after=facts();registered.clear();for(var row:after.distributions())registered.add(row.name());if(!after.boot().equals(fresh.boot())||!after.sid().equals(fresh.sid())||!registered.containsAll(names)||names.contains(distribution.name)||!distribution.verify(after).equals(owner))throw new IOException("回復用専用WSL停止が未確認です");
-                distribution.stopped(owner,after.boot());owner=distribution.owner();
-            }
+            ObjectNode owner=distribution.verify(before);if(!lease.read().path("resources").isEmpty())verifyResource(lease.read().path("resources").path("windows"),owner);
+            commands.reap(before.boot());
+            HostFacts fresh=facts();if(!fresh.boot().equals(before.boot())||!fresh.sid().equals(before.sid())||!distribution.verify(fresh).equals(owner))throw new IOException("回復用停止前の所有が変化しました");
+            Commands.Result running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"),commands.left(Duration.ofSeconds(30)));Commands.zero(running,"回復用WSL停止前照合");Set<String> names=runningNames(running.stdout());
+            if(names.contains(distribution.name))Commands.zero(commands.capture(List.of(wsl.toString(),"--terminate",distribution.name),commands.left(Duration.ofSeconds(30))),"回復用専用WSL停止");
+            running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"),commands.left(Duration.ofSeconds(30)));Commands.zero(running,"回復用WSL停止照合");names=runningNames(running.stdout());
+            HostFacts after=facts();if(!after.boot().equals(fresh.boot())||!after.sid().equals(fresh.sid())||names.contains(distribution.name)||!distribution.verify(after).equals(owner))throw new IOException("回復用専用WSL停止が未確認です");
+            distribution.stopped(owner,after.boot());owner=distribution.owner();
             return owner;
         }
         journal.settledRequired();if(!lease.read().path("resources").isEmpty())throw new IOException("keeper開始前の資源が空ではありません");
@@ -131,47 +123,33 @@ final class WindowsRuntime {
         for(JsonNode row:descriptor.path("artifacts"))if(row.path("role").asText().equals("guest-base"))limit=row.path("unpackedBytes").asLong();if(limit<1)throw new IOException("rootfs展開上限がありません");
         try(InputStream source=new XZInputStream(Files.newInputStream(artifact.path()),256*1024);OutputStream output=Files.newOutputStream(target,StandardOpenOption.CREATE_NEW)) {byte[] bytes=new byte[65536];long count=0;int length;while((length=source.read(bytes))!=-1){commands.left(Duration.ofMinutes(3));count=Math.addExact(count,length);if(count>limit)throw new IOException("rootfs展開上限を超えました");output.write(bytes,0,length);}}return target;
     }
-    private static long guestRequired(JsonNode current,LeaseReferences.Scan others) throws IOException {
-        Set<String> domains=new HashSet<>();domains.add(current.path("descriptorSha256").asText());for(var generation:others.generations())domains.add(generation.descriptorSha256());
-        return GuestBudget.requiredBytes(current.path("requirements").path("containerMemoryMiB").asLong(),others.memoryMiB(),domains.size());
-    }
-    private void requireSharedCapacity(LeaseReferences.Scan others) throws IOException {
-        if(others.unknown())throw new IOException("共有WSL VMの所有が不明です");
-        String current=lease.read().path("descriptorSha256").asText();
-        if(others.generations().stream().anyMatch(generation->!generation.descriptorSha256().equals(current)))throw new IOException("共有WSL VMの利用可能容量とhost余裕の肯定証拠が不足しています");
-    }
     void release() throws IOException {throw new IOException("keeperを通さないguest releaseを拒否しました");}
     void release(WindowsKeeper keeper,boolean recovery) throws IOException {
-        trace.event("release-start",commands.end(),0);
+
         commands.keeper(keeper.value());
         try(OperationJournal journal=journal();var ignored=lock()) {
             ObjectNode current=lease.read();if(current.path("resources").isEmpty()&&journal.unstarted()){journal.release();return;}
-            HostFacts before=facts(recovery?-1:7);ObjectNode owner=distribution.verify(before);verifyResource(current.path("resources").path("windows"),owner);
-            commands.reap(recovery?facts(-1).boot():before.boot(),current.path("resources").path("windows").path("transports"),keeperPrefix(keeper.value()));
-            if(recovery&&owner.has("lastStop")){trace.event("daemon-recovery-start",commands.end(),0);owner=recoverDaemon(owner,keeper.value());trace.event("daemon-recovery-done",commands.end(),0);}
-            trace.event("guest-release-start",commands.end(),0);
+            HostFacts before=facts();ObjectNode owner=distribution.verify(before);verifyResource(current.path("resources").path("windows"),owner);
+            commands.reap(before.boot(),keeperPrefix(keeper.value()));
+            if(recovery&&owner.has("lastStop"))owner=recoverDaemon(owner,keeper.value());
+
             JsonNode proof=bridge(recovery?"release-recover":"release",owner,null,null);if(!proof.path("closed").asBoolean()||proof.path("actors").asInt(-1)!=0||proof.path("containers").asInt(-1)!=0||!proof.path("identity").equals(identity())||!proof.path("keeper").equals(keeper.value().path("guest").path("keeper")))throw new IOException("guest fence終端証明が一致しません");
-            trace.event("guest-release-done",commands.end(),0);keeper.workProof(proof);
-            long scanEnd=recovery?commands.end():commands.end()-Commands.releaseTail(6).toNanos();
-            trace.event("references-reserved",commands.end(),recovery?0:Commands.releaseTail(6).toNanos());
-            LeaseReferences.Scan others=references(scanEnd);if(others.unknown())throw new IOException("他leaseが不明なため回収完了を確定しません");
-            keeper.closeIntent(others.stopAllowed());keeper.endClient(commands);
-            if(others.stopAllowed()) {
-                keeper.requireControllerLive();HostFacts fresh=facts(recovery?-1:4);if(!fresh.boot().equals(keeper.value().path("boot").asText())||!fresh.sid().equals(owner.path("binding").path("sid").asText())||!distribution.verify(fresh).equals(owner))throw new IOException("keeper EOF後のhost/ownerが一致しません");
-                Commands.Result running=commands.releaseCapture(List.of(wsl.toString(),"--list","--running","--quiet"),recovery?-1:3);Commands.zero(running,"WSL停止前照合");Set<String> names=runningNames(running.stdout()),registered=new HashSet<>();for(var row:fresh.distributions())registered.add(row.name());if(!registered.containsAll(names))throw new IOException("WSL稼働一覧の登録が不明です");
-                if(names.contains(distribution.name)) {
-                    keeper.requireControllerLive();Commands.zero(commands.releaseCapture(List.of(wsl.toString(),"--terminate",distribution.name),recovery?-1:2),"専用WSL停止");
-                    running=commands.releaseCapture(List.of(wsl.toString(),"--list","--running","--quiet"),recovery?-1:1);Commands.zero(running,"WSL停止照合");names=runningNames(running.stdout());
-                }
-                HostFacts after=facts(recovery?-1:0);registered.clear();for(var row:after.distributions())registered.add(row.name());if(!after.boot().equals(fresh.boot())||!after.sid().equals(fresh.sid())||!registered.containsAll(names)||names.contains(distribution.name)||!distribution.verify(after).equals(owner))throw new IOException("専用WSL停止が未確認です");distribution.stopped(owner,after.boot());keeper.stopped();
+            keeper.workProof(proof);
+            keeper.closeIntent(true);keeper.endClient(commands);
+            keeper.requireControllerLive();HostFacts fresh=facts();if(!fresh.boot().equals(keeper.value().path("boot").asText())||!fresh.sid().equals(owner.path("binding").path("sid").asText())||!distribution.verify(fresh).equals(owner))throw new IOException("keeper EOF後のhost/ownerが一致しません");
+            Commands.Result running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"));Commands.zero(running,"WSL停止前照合");Set<String> names=runningNames(running.stdout());
+            if(names.contains(distribution.name)) {
+                keeper.requireControllerLive();Commands.zero(commands.capture(List.of(wsl.toString(),"--terminate",distribution.name)),"専用WSL停止");
+                running=commands.capture(List.of(wsl.toString(),"--list","--running","--quiet"));Commands.zero(running,"WSL停止照合");names=runningNames(running.stdout());
             }
+            HostFacts after=facts();if(!after.boot().equals(fresh.boot())||!after.sid().equals(fresh.sid())||names.contains(distribution.name)||!distribution.verify(after).equals(owner))throw new IOException("専用WSL停止が未確認です");distribution.stopped(owner,after.boot());keeper.stopped();
             keeper.finish(commands);
-            commands.left(Duration.ofSeconds(2));if(!journal.released()){journal.recovered(proof);journal.release();}commands.left(Duration.ofSeconds(2));lease.replaceResources((ObjectNode)current.path("resources"),WindowsFiles.JSON.createObjectNode());commands.left(Duration.ofSeconds(2));
-            trace.event("release-done",commands.end(),0);
+            commands.left(Duration.ofSeconds(30));if(!journal.released()){journal.recovered(proof);journal.release();}commands.left(Duration.ofSeconds(30));lease.replaceResources((ObjectNode)current.path("resources"),WindowsFiles.JSON.createObjectNode());commands.left(Duration.ofSeconds(30));
+
         }
     }
     ObjectNode recoverDaemon(ObjectNode owner,JsonNode keeper) throws IOException {
-        owner=distribution.claimStop(owner,identity(),keeper.path("attempt").asText(),facts(-1).boot());
+        owner=distribution.claimStop(owner,identity(),keeper.path("attempt").asText(),facts().boot());
         JsonNode prepared=call(request("daemon-recover",owner).set("claim",owner.path("restartClaim")),null);verifyHello(prepared,owner);
         if(prepared.path("empty").asBoolean()) {
             if(prepared.has("daemon")||prepared.path("ready").asBoolean())throw new IOException("空の回復準備証明が矛盾しています");
@@ -193,11 +171,11 @@ final class WindowsRuntime {
     ObjectNode identity() throws IOException {ObjectNode value=WindowsFiles.JSON.createObjectNode();JsonNode current=lease.read();for(String key:List.of("jobId","ownerId","descriptorSha256"))value.set(key,current.required(key));return value;}
     ObjectNode request(String operation,ObjectNode owner) throws IOException {
         ObjectNode value=identity().put("abi",1).put("operation",operation).put("bridgeSha256",payload.manifest.path("guestBase").path("bridgeSha256").asText()).put("memoryBytes",Math.max(8L*1024*1024*1024,(lease.read().path("requirements").path("containerMemoryMiB").asLong()*2+1024)*1024*1024)).put("timeoutSeconds",Math.max(1,commands.left(Duration.ofMinutes(3)).toSeconds()));
-        if(operation.equals("create")){long nanos=commands.left(Duration.ofMinutes(3)).toNanos()-Duration.ofSeconds(2).toNanos();if(nanos<=0)throw new IOException("createのnative回収枠を残せません");value.put("timeoutSeconds",Math.min(30,nanos/1_000_000_000.0));}
+        if(operation.equals("create"))value.put("timeoutSeconds",Math.min(30,commands.left(Duration.ofMinutes(3)).toNanos()/1_000_000_000.0));
         value.put("restartAllowed",false).put("cpuProbeSha256",payload.manifest.path("guestBase").path("cpuProbeSha256").asText());value.set("marker",distribution.marker(owner));value.set("engines",payload.manifest.path("guestBase").required("engines"));return value;
     }
     List<String> guest(){return List.of(wsl.toString(),"--distribution",distribution.name,"--user","root","--exec","/usr/bin/python3","/usr/lib/mcicon/guestbridge.py");}
-    JsonNode call(ObjectNode request,Path input) throws IOException {byte[] bytes=WindowsFiles.JSON.writeValueAsBytes(request);Commands.Result result=request.path("operation").asText().equals("release")?commands.releaseRequest(guest(),bytes,input,6):commands.request(guest(),bytes,input,commands.left(Duration.ofMinutes(3)));Commands.zero(result,"専用guestbridge "+request.path("operation").asText());JsonNode value=WindowsFiles.JSON.readTree(result.stdout());if(value==null||!value.isObject())throw new IOException("guestbridge応答が不正です");return value;}
+    JsonNode call(ObjectNode request,Path input) throws IOException {byte[] bytes=WindowsFiles.JSON.writeValueAsBytes(request);Commands.Result result=commands.request(guest(),bytes,input,commands.left(Duration.ofMinutes(3)));Commands.zero(result,"専用guestbridge "+distribution.name+" "+request.path("operation").asText());JsonNode value=WindowsFiles.JSON.readTree(result.stdout());if(value==null||!value.isObject())throw new IOException("guestbridge応答が不正です");return value;}
     JsonNode bridge(String operation,ObjectNode owner,String field,JsonNode value) throws IOException {ObjectNode request=request(operation,owner);if(field!=null)request.set(field,value);return call(request,null);}
     void verifyHello(JsonNode hello,ObjectNode owner) throws IOException {if(hello.path("abi").asInt()!=1||!hello.path("marker").equals(distribution.marker(owner))||!hello.path("bridgeSha256").equals(payload.manifest.path("guestBase").path("bridgeSha256"))||!HostFacts.uuid(hello.path("boot").asText()))throw new IOException("guestbridge ABI/marker/pinが一致しません");}
     int docker(List<String> argv) throws IOException {return new DockerTransport(this).run(argv);}

@@ -62,8 +62,8 @@ final class DockerTransport {
         finally {runtime.commands.cleanup();if(process!=null&&process.isAlive())try{runtime.commands.stop(process);}catch(IOException error){if(failure==null)failure=error;else failure.addSuppressed(error);}}
         if(process!=null&&!process.isAlive()&&id!=null) {
             try(OperationJournal journal=runtime.journal();var ignored=runtime.lock()) {
-                if(!runtime.commands.terminal(running,processStarted))throw new IOException("native輸送の肯定終端がありません");
-                if(!LeaseReferences.live(runtime.lease.read()))throw new IOException("旧coreの生存を確認できないため追加guest清算を拒否しました");WindowsKeeper.requireClientLive(runtime.keeperRecord());
+                if(!runtime.commands.terminal(running))throw new IOException("native輸送の肯定終端がありません");
+                if(!WindowsKeeper.live(runtime.lease.read()))throw new IOException("旧coreの生存を確認できないため追加guest清算を拒否しました");WindowsKeeper.requireClientLive(runtime.keeperRecord());
                 ObjectNode owner=runtime.ready();JsonNode proof=runtime.call(runtime.request("remove",owner).put("id",id),null);if(!proof.path("removed").asText().equals(id))throw new IOException("container削除証明が不一致です");removeResource(id);journal.recovered(proof);
             }catch(IOException error){if(failure==null)failure=error;else failure.addSuppressed(error);}
         }
