@@ -102,10 +102,9 @@ root/
   helpers/<host>/<content-digest>/
   jobs/<uuid>/lease.json
   locks/
-  render.lock
 ```
 
-同じrootの描画は`render.lock`で1件ずつ実行し、専用VM/distroを複数の描画で共有しない。2件目は準備期限まで待ち、待ちきれなければ保持中のPIDを示す`MANAGED_BUSY`で止まる。`jobs/<uuid>/`は描画中だけ置き、helperが解放済みにしたらclose時に消す。Ctrl+C・異常終了で残った記録は、次の起動で回収してから消す。v1.1.xが残した解放済みの記録も、最初の起動でまとめて消す。
+同じrootの描画は`locks/render.lock`で1件ずつ実行し、専用VM/distroを複数の描画で共有しない。2件目は準備期限まで待ち、待ちきれなければ保持中のPIDを示す`MANAGED_BUSY`で止まる。`jobs/<uuid>/`は描画中だけ置き、helperが解放済みにしたらclose時に消す。Ctrl+C・異常終了で残った記録は、次の起動で回収してから消す。v1.1.xが残した解放済みの記録も、最初の起動でまとめて消す。
 
 ジョブleaseはtool/worker/runtime/descriptor digest、所有者token、開始時刻、host識別、process開始識別、worker予算/準備期限と専用VM/distribution/containerの所有recordを保持する。形式と排他範囲は[helper共通契約](managed-helper-1.1.md)で定める。PID単独や名前prefixだけで停止・削除しない。共有世代はleaseがなく、所有識別・lock取得・参照の不在が揃う時だけ回収する。出力PNG・元入力cacheは自動更新・通常uninstallで削除しない。
 

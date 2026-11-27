@@ -131,7 +131,7 @@ public final class RuntimeStore {
      * 先頭にPIDを書き、待ちきれない場合はそのPIDを示すMANAGED_BUSYで止める。
      */
     public Locked render() throws IOException {
-        Path file=path("render.lock");
+        Path file=path("locks/render.lock");Files.createDirectories(file.getParent());
         FileChannel channel=FileChannel.open(file,StandardOpenOption.CREATE,StandardOpenOption.READ,StandardOpenOption.WRITE);
         try {
             while(true) {
