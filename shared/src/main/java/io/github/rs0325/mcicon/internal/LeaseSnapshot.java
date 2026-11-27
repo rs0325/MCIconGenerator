@@ -33,7 +33,7 @@ public final class LeaseSnapshot {
         if(!Arrays.equals(leaseBytes,bytes.get(file))||!Arrays.equals(receipt(identity(lease)),bytes.get(file.resolveSibling("lease.lock")))||!digest(bytes.get(file.resolveSibling("descriptor.json"))).equals(hash(lease,"descriptorSha256")))throw invalid("検証中にlease/receipt/descriptorが変化しました");
         if(!new String(bytes.get(root.resolve("host-id")),StandardCharsets.US_ASCII).trim().equals(text(lease,"hostId",36)))throw invalid("検証中にhostIdが変化しました");
         for(JsonNode artifact:descriptor.get("artifacts"))if(!digest(bytes.get(file.getParent().resolve(relative(artifact,"inventoryPath")))).equals(hash(artifact,"inventorySha256")))throw invalid("検証中にinventoryが変化しました");
-        helperExecutable();verifyUnchanged(receiptChannel);trust.attach(this,receiptChannel);
+        helperExecutable();verifyUnchanged(receiptChannel);
     }
     /** package由来の信頼入力で全fileを検証したsnapshotを返す。自分でreceipt lockを持つ場合はchannel付き入口を使う。 */
     public static LeaseSnapshot read(Path root,Path file,LeaseTrust trust) throws IOException {
@@ -91,15 +91,9 @@ public final class LeaseSnapshot {
         if(!relative.matches("[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*")||Arrays.stream(relative.split("/")).anyMatch(x->x.equals(".")||x.equals("..")))throw invalid("helper相対pathが不正です");
         JsonNode selected=helperPin(inventory,relative);
         Path path=helperRoot.resolve(relative);if(!path.toRealPath().equals(path)||!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||Files.size(path)!=integer(selected,"bytes",0))throw invalid("helper実体のpath/sizeが一致しません");
-        if(trust.helperVerified(path,integer(selected,"bytes",0),hash(selected,"sha256")))return path;
-        String actual=trust.helperDigest(path,integer(selected,"bytes",0));
-        if(actual==null) {
-            MessageDigest digest=sha256();
-            try(InputStream input=Files.newInputStream(path)){byte[] buffer=new byte[65536];int count;while((count=input.read(buffer))!=-1){if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("helper検証を中断しました");digest.update(buffer,0,count);}}
-            actual=HexFormat.of().formatHex(digest.digest());
-        }
-        if(!actual.equals(hash(selected,"sha256")))throw invalid("helper実体のhashが一致しません");
-        trust.markHelperVerified(path);
+        MessageDigest digest=sha256();
+        try(InputStream input=Files.newInputStream(path)){byte[] buffer=new byte[65536];int count;while((count=input.read(buffer))!=-1){if(Thread.currentThread().isInterrupted())throw new InterruptedIOException("helper検証を中断しました");digest.update(buffer,0,count);}}
+        if(!HexFormat.of().formatHex(digest.digest()).equals(hash(selected,"sha256")))throw invalid("helper実体のhashが一致しません");
         return path;
     }
     static JsonNode helperFiles(JsonNode inventory) throws IOException {
@@ -179,30 +173,6 @@ public final class LeaseSnapshot {
     static String fileDigest(Path path) throws IOException {
         if(!path.toRealPath().equals(path)||!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS))throw invalid("実体pinにlinkがあります");
         MessageDigest digest=sha256();try(InputStream input=Files.newInputStream(path)){byte[] buffer=new byte[65536];int count;while((count=input.read(buffer))!=-1)digest.update(buffer,0,count);}return HexFormat.of().formatHex(digest.digest());
-    }
-    /** 新基盤のhashは元期限と初期sizeに制限する。期限なしの既存scalar入口とは分離する。 */
-    static String fileDigest(Path path,long size,long end) throws IOException {
-        WindowsFileIdentities.check(end);
-        if(!path.toRealPath().equals(path)||!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||Files.size(path)!=size)throw invalid("実体pinのpath/sizeが変化しました");
-        String result;
-        try(InputStream input=Files.newInputStream(path)){result=fileDigest(input,size,end);}
-        WindowsFileIdentities.check(end);
-        if(Files.size(path)!=size)throw invalid("実体pinの読取中にsizeが変化しました");
-        return result;
-    }
-    static String fileDigest(InputStream input,long size,long end) throws IOException {
-        MessageDigest digest=sha256();byte[] buffer=new byte[65536];long remaining=size;
-        while(remaining>0) {
-            WindowsFileIdentities.check(end);
-            int count=input.read(buffer,0,(int)Math.min(buffer.length,remaining));
-            WindowsFileIdentities.check(end);
-            if(count<0)throw invalid("実体pinの読取中にsizeが変化しました");
-            digest.update(buffer,0,count);remaining-=count;
-        }
-        WindowsFileIdentities.check(end);
-        int extra=input.read(buffer,0,1);WindowsFileIdentities.check(end);
-        if(extra!=-1)throw invalid("実体pinの読取中にsizeが変化しました");
-        return HexFormat.of().formatHex(digest.digest());
     }
     private static MessageDigest sha256() {try{return MessageDigest.getInstance("SHA-256");}catch(NoSuchAlgorithmException failure){throw new AssertionError(failure);}}
 }

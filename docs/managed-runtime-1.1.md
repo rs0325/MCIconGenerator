@@ -86,7 +86,7 @@ renderingのCPU要件は `cpuRequirement: "sse4.1"` に固定し、helperは対�
 | Windows WSL2 | host/guest arch、既存WSL2利用可否、専用登録GUID/BasePath、実memory/CPU制限 | host OS機能の導入・再起動を無断実行せず、installer setupへ分離 |
 | Linux rootless | user namespace、newuidmap/newgidmap、対象userのsubuid/subgid、cgroup v2のmemory/CPU委譲、helper pathに対するAppArmor制約 | 不足だけを示す。対象UID instanceへのsystemd設定で解決できなければ停止し、全user unitやglobal sysctlを既定変更しない |
 
-`MANAGED_SETUP_REQUIRED` は不足前提、`MANAGED_RUNTIME_INVALID` は署名・hash・世代互換の拒否、`MANAGED_OWNERSHIP_MISMATCH` は所有記録の不一致という追加error codeとする。download/IO・worker期限・ゲーム側失敗は既存error codeと原因を維持し、管理経路へ移した理由だけで成功や別backendへ変換しない。
+`MANAGED_SETUP_REQUIRED` は不足前提、`MANAGED_RUNTIME_INVALID` は署名・hash・世代互換の拒否、`MANAGED_OWNERSHIP_MISMATCH` は所有記録の不一致、`MANAGED_BUSY` は別の描画の実行中という追加error codeとする。download/IO・worker期限・ゲーム側失敗は既存error codeと原因を維持し、管理経路へ移した理由だけで成功や別backendへ変換しない。
 
 ## 配置と所有
 
@@ -102,7 +102,10 @@ root/
   helpers/<host>/<content-digest>/
   jobs/<uuid>/lease.json
   locks/
+  render.lock
 ```
+
+同じrootの描画は`render.lock`で1件ずつ実行し、専用VM/distroを複数の描画で共有しない。2件目は準備期限まで待ち、待ちきれなければ保持中のPIDを示す`MANAGED_BUSY`で止まる。`jobs/<uuid>/`は描画中だけ置き、helperが解放済みにしたらclose時に消す。Ctrl+C・異常終了で残った記録は、次の起動で回収してから消す。v1.1.xが残した解放済みの記録も、最初の起動でまとめて消す。
 
 ジョブleaseはtool/worker/runtime/descriptor digest、所有者token、開始時刻、host識別、process開始識別、worker予算/準備期限と専用VM/distribution/containerの所有recordを保持する。形式と排他範囲は[helper共通契約](managed-helper-1.1.md)で定める。PID単独や名前prefixだけで停止・削除しない。共有世代はleaseがなく、所有識別・lock取得・参照の不在が揃う時だけ回収する。出力PNG・元入力cacheは自動更新・通常uninstallで削除しない。
 

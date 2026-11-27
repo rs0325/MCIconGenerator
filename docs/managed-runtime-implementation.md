@@ -8,7 +8,7 @@ Issue #93の作業記録。iteration 2の起点は先行成果PR102のmerge `0f6
 
 leaseの `hostId` は管理root内で生成する登録UUIDであり、機械固有IDや利用者名ではない。別hostからコピーしたrootの本人性を証明せず、それだけで停止や回収を許可しない。`processStartedAt` が取得不能ならnullを保持し、PIDだけで生存・所有を推測しない。coreは初期leaseを書いた後、helper実行中には更新しない。helperはimmutableなfieldを保持し、`resources` だけを原子的に更新する。複数helper processの短いresources更新排他とMac/Windowsの閉じたrecord形式は共通moduleが検証する。実OSの所有照合と共有環境のlifecycle排他は各OS helperが実装する。詳細は[helper共通契約](managed-helper-1.1.md)を参照する。
 
-coreが保持する `lease.lock` はジョブの稼働証拠であり、helperが取得する更新lockではない。control helper終了後にcoreはimmutable fieldを再照合する。release成功とresources空を確認した時だけ `state:released` を原子的に記録する。失敗・timeout・取消時にはactiveなleaseを残し、file lockとprocessは有限に解放する。残存・破損・不明leaseはidleに扱わない。PIDと開始時刻が一致しても単独でVMやprocessを停止しない。
+coreが保持する `lease.lock` はジョブの稼働証拠であり、helperが取得する更新lockではない。control helper終了後にcoreはimmutable fieldを再照合する。release成功とresources空を確認した時だけ `state:released` を原子的に記録し、lock解放後にjob directoryを消す。失敗・timeout・取消時にはactiveなleaseを残し、file lockとprocessは有限に解放する。残存・破損・不明leaseはidleに扱わない。PIDと開始時刻が一致しても単独でVMやprocessを停止しない。
 
 専用VM/distribution/socket/containerの実OS所有照合、監督process回収は #94/#95/#96の前提であり、現段階で本番のVM停止・世代削除機能はない。`idle` は確認補助であり、削除許可ではない。
 

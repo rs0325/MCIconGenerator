@@ -16,7 +16,7 @@ def main():
     args.temporary.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=args.temporary) as directory:
         stage = pathlib.Path(directory).resolve()
-        (stage / 'native-identity.inc').write_text(source[source.index('static int fileIdentity('):source.index('struct IdentityItem {')], encoding='utf-8')
+        (stage / 'native-identity.inc').write_text(source[source.index('static int fileIdentity('):source.index('int wmain(')], encoding='utf-8')
         binary = stage / 'identity-api.exe'
         flags = ['--no-default-config', '-rtlib=compiler-rt', '-unwindlib=libunwind', '-stdlib=libc++', '-fuse-ld=lld', '-static'] if sys.platform == 'win32' else []
         subprocess.run([str(args.cxx.resolve()), *flags, '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I', str(stage), str(root / 'src/test/native/identity-api-fixture.cpp'), '-o', str(binary)], check=True, timeout=120)

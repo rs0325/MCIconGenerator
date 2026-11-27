@@ -42,6 +42,14 @@ public final class FilesSupport {
             catch(AtomicMoveNotSupportedException e) {Files.move(temp,target,StandardCopyOption.REPLACE_EXISTING);}
         }
     }
+    /** linkをたどらずにdirectoryを中身ごと消す。存在しなければ何もしない。 */
+    public static void deleteTree(Path root) throws IOException {
+        if(!Files.exists(root,LinkOption.NOFOLLOW_LINKS))return;
+        Files.walkFileTree(root,new SimpleFileVisitor<>() {
+            @Override public FileVisitResult visitFile(Path file,BasicFileAttributes attributes) throws IOException {Files.delete(file);return FileVisitResult.CONTINUE;}
+            @Override public FileVisitResult postVisitDirectory(Path directory,IOException failure) throws IOException {if(failure!=null)throw failure;Files.delete(directory);return FileVisitResult.CONTINUE;}
+        });
+    }
     /** Reclaims our reserved temporary namespace after a crash, under the export lock. */
     static void cleanupExportTemps(Path root) throws IOException {
         Files.walkFileTree(root,new SimpleFileVisitor<>() {

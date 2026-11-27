@@ -12,13 +12,7 @@ public final class IdentityFixtures {
         String executable=System.getProperty("mcicon.testIdentityReader"),expected=System.getProperty("mcicon.testIdentityReaderSha256");
         if(executable==null||expected==null)throw new IOException("Windows試験には明示したbuild済みidentity readerが必要です");
         Path reader=Path.of(executable);if(!LeaseSnapshot.fileDigest(reader).equals(expected))throw new IOException("試験identity readerのpinが一致しません");
-        class Reader implements LeaseTrust.IdentityReader,LeaseTrust.BatchIdentityReader {
-            private final WindowsFileIdentities batch=new WindowsFileIdentities(reader,expected);
-            @Override public java.util.Map<Path,String> readAll(java.util.List<Path> paths,Path scratch,long end) throws IOException {
-                return batch.readAll(paths,scratch,end);
-            }
-            @Override public String read(Path path) throws IOException {
-                if(Files.isDirectory(path,LinkOption.NOFOLLOW_LINKS))return batch.read(path);
+        return LeaseTrust.verified(trust,path->{
             Process process=new ProcessBuilder(reader.toString(),"file-identity",path.toString()).start();
             try {
                 if(!process.waitFor(2,TimeUnit.SECONDS)||process.exitValue()!=0)throw new IOException("試験identity readerが失敗しました");
@@ -27,8 +21,6 @@ public final class IdentityFixtures {
                 return "windows-file-id-v1:"+value.path("volumeSerial").asText()+":"+value.path("fileId").asText();
             }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException("試験identity reader待機を中断しました");}
             finally{if(process.isAlive()){process.destroyForcibly();try{if(!process.waitFor(1,TimeUnit.SECONDS))throw new IOException("試験identity readerを回収できません");}catch(InterruptedException failure){Thread.currentThread().interrupt();throw new InterruptedIOException("試験identity回収を中断しました");}}process.getInputStream().close();process.getErrorStream().close();process.getOutputStream().close();}
-            }
-        }
-        return LeaseTrust.verified(trust,new Reader());
+        });
     }
 }

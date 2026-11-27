@@ -20,6 +20,7 @@ public final class RuntimeStore {
     private final CancellationToken token;
     private final Transport transport;
     private final long deadline;
+    private static final long RENDER_LOCK_OFFSET=64;
     public RuntimeStore(Path root,boolean offline,CancellationToken token,Duration timeout) throws IOException {
         this(root,offline,token,timeout,https(token));
     }
@@ -121,6 +122,31 @@ public final class RuntimeStore {
                 check();FileLock lock=null;
                 try {lock=channel.tryLock();}catch(OverlappingFileLockException busy){}
                 if(lock!=null)return new Locked(channel,lock);
+                try {Thread.sleep(25);}catch(InterruptedException failure){Thread.currentThread().interrupt();throw new FileLockInterruptionException();}
+            }
+        }catch(IOException|RuntimeException failure){channel.close();throw failure;}
+    }
+    /**
+     * 描画が終わるまで保持するroot全体のlockを取る。別の描画が保持していれば準備期限まで待つ。
+     * 先頭にPIDを書き、待ちきれない場合はそのPIDを示すMANAGED_BUSYで止める。
+     */
+    public Locked render() throws IOException {
+        Path file=path("render.lock");
+        FileChannel channel=FileChannel.open(file,StandardOpenOption.CREATE,StandardOpenOption.READ,StandardOpenOption.WRITE);
+        try {
+            while(true) {
+                FileLock lock=null;
+                try {lock=channel.tryLock(RENDER_LOCK_OFFSET,1,false);}catch(OverlappingFileLockException busy){}
+                if(lock!=null) {
+                    channel.write(java.nio.ByteBuffer.wrap(String.format("%-20d",ProcessHandle.current().pid()).getBytes(java.nio.charset.StandardCharsets.US_ASCII)),0);
+                    return new Locked(channel,lock);
+                }
+                try {check();}
+                catch(HttpTimeoutException timeout) {
+                    java.nio.ByteBuffer owner=java.nio.ByteBuffer.allocate(20);channel.read(owner,0);
+                    String pid=new String(owner.array(),0,owner.position(),java.nio.charset.StandardCharsets.US_ASCII).trim();
+                    throw new McIconException("MANAGED_BUSY","別の描画が実行中です(PID "+(pid.isEmpty()?"不明":pid)+")。終了してから実行してください: "+file,1,timeout);
+                }
                 try {Thread.sleep(25);}catch(InterruptedException failure){Thread.currentThread().interrupt();throw new FileLockInterruptionException();}
             }
         }catch(IOException|RuntimeException failure){channel.close();throw failure;}

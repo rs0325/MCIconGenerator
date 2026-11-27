@@ -29,7 +29,7 @@ public final class RuntimeLease implements AutoCloseable {
     private final ObjectNode identity;
     private final FileChannel channel;
     private final FileLock lock;
-    private boolean closed;
+    private boolean closed,released;
     private RuntimeLease(Path file,ObjectNode identity,FileChannel channel,FileLock lock) {
         this.file=file;this.identity=identity;this.channel=channel;this.lock=lock;
         synchronized(receipts){receipts.get(file).owned=true;}
@@ -234,7 +234,41 @@ public final class RuntimeLease implements AutoCloseable {
     public synchronized void released() throws IOException {
         ObjectNode value=read();if(!matchesReceipt(channel,identity))throw mismatch("release時のreceiptが一致しません");
         if(!value.path("resources").isEmpty())throw mismatch("helperが回収済みresourceを残しています");
-        value.put("state","released");FilesSupport.atomicWrite(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));
+        value.put("state","released");FilesSupport.atomicWrite(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));released=true;
+    }
+    /** close後に呼ぶ。helperが解放済みにしたjobの記録を消す。未解放なら次回起動時の回収に残す。 */
+    synchronized void discard() throws IOException {
+        if(!closed)throw mismatch("保持中のleaseは消せません");
+        if(!released)return;
+        try {FilesSupport.deleteTree(file.getParent());}
+        catch(IOException failure){throw new McIconException("IO_FAILED","描画の記録を消せませんでした。このフォルダを削除してください: "+file.getParent(),1,failure);}
+    }
+    /**
+     * 描画lockの保持中に、解放済みで誰も保持していないjobの記録を消す。
+     * Macの再起動で終わったjobは、helperが旧diskを回収するまで残す。形式の分からない記録は後続の照合に任せる。
+     */
+    static void discardReleased(RuntimeStore store) throws IOException {
+        Path jobs=store.path("jobs");if(!Files.isDirectory(jobs,LinkOption.NOFOLLOW_LINKS))return;
+        List<Path> directories;try(var paths=Files.list(jobs)){directories=paths.toList();}
+        for(Path directory:directories) {
+            store.check();
+            Path file=directory.resolve("lease.json"),tmp=directory.resolve("tmp");
+            if(!Files.isDirectory(directory,LinkOption.NOFOLLOW_LINKS)||!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)||Files.size(file)>1024*1024||!Files.isRegularFile(directory.resolve("lease.lock"),LinkOption.NOFOLLOW_LINKS))continue;
+            JsonNode value;
+            try {value=RuntimeDescriptor.read(Files.readAllBytes(file));}catch(IOException invalid){continue;}
+            if(value==null||!value.path("state").asText().equals("released"))continue;
+            if(Files.exists(tmp.resolve("macos-ended-by-reboot.json"),LinkOption.NOFOLLOW_LINKS)&&!Files.exists(tmp.resolve("macos-reboot-cleanup.json"),LinkOption.NOFOLLOW_LINKS))continue;
+            FileChannel channel=openReceipt(file,false,store);if(channel==null)continue;
+            boolean idle;
+            try {
+                FileLock lock;
+                try {lock=channel.tryLock(ACTIVE_LOCK_OFFSET,ACTIVE_LOCK_LENGTH,false);}catch(OverlappingFileLockException busy){lock=null;}
+                idle=lock!=null;if(idle)lock.release();
+            }finally{closeReceipt(file,channel,null);}
+            if(!idle)continue;
+            try {FilesSupport.deleteTree(directory);}
+            catch(IOException failure){throw new McIconException("IO_FAILED","終わった描画の記録を消せませんでした。このフォルダを削除してください: "+directory,1,failure);}
+        }
     }
     /** 回収失敗時もJVMを止めない。lease.jsonは削除せず、次回の不明lease診断に残す。 */
     @Override public synchronized void close() throws IOException {
