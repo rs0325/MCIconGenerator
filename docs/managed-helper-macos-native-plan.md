@@ -1,5 +1,8 @@
 # macOS実機受入計画と限定結果
 
+この文書は#220より前の受入計画・結果の履歴である。現在の状態・回復契約は[Mac helper](managed-helper-macos-1.1.md)を参照し、旧journal・所有証明・並列jobの条件を現行実装へ適用しない。
+
+
 この文書は各段の実行許可を固定した計画と、実施済み範囲を記録する。以下の実行順は検証候補を含み、すべてを実行した一覧ではない。Main/VM/Dockerの接続実装と限定反証は完了した。第1段runnerは `helpers/macos/scripts/native-acceptance.py` で、`prepare` はローカルfixtureデータだけを作り、`execute-vm` は別途の明示許可後だけ実行する。実path・artifact pin・凍結SHAは私用approval planへ記録する。第1段は具体許可のもと実施し、固定offline準備・診断・通常releaseと結果auditが成功した。第2段のraw・4代表・offline・片側取消・既知異常回収も別候補で限定受入した。第3段の通常close後の実再起動と、別許可の欠落cache再構成は末尾へ記録する。
 
 ## 対象と隔離

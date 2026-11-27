@@ -32,12 +32,6 @@ record HostFacts(long uid,String hostBindingSha256,String bootSessionId,long mem
         try {if(!UUID.fromString(boot).toString().equals(boot))throw new IllegalArgumentException();}catch(IllegalArgumentException failure){throw new IOException("boot識別の読取結果が不正です");}
         return new HostFacts(value.path("uid").asLong(),binding,boot,value.path("physicalMemory").asLong(),value.path("cpus").asInt(),version);
     }
-    static void requireNoLimaProcess(Path probe,Path lima,Commands commands) throws IOException {
-        Commands.Result result=commands.capture(List.of(probe.toString(),"--owned-executable",lima.toString()),Duration.ofSeconds(5));
-        if(result.exit()!=0)throw new IOException("当該managed実行物の現在process観測が不明です");
-        JsonNode value=MacFiles.JSON.readTree(result.stdout());
-        if(value==null||!value.isObject()||!value.path("complete").isBoolean()||!value.path("complete").booleanValue()||!value.path("matched").isBoolean()||value.path("matched").booleanValue())throw new IOException("当該managed実行物が現在動作し得るため再起動終了を確定しません");
-    }
     private static int compare(String left,String right) throws IOException {
         if(!left.matches("[0-9]+(?:[.][0-9]+){0,2}")||!right.matches("[0-9]+(?:[.][0-9]+){0,2}"))throw new IOException("macOS版の形式が不正です");
         String[] a=left.split("[.]"),b=right.split("[.]");
