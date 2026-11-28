@@ -35,6 +35,20 @@ class ManagedRuntimeTest {
             assertEquals("MANAGED_OWNERSHIP_MISMATCH",failure.code());assertEquals(PreparationFailure.Stage.RECOVERY,assertInstanceOf(PreparationFailure.class,failure.getCause()).stage);assertInstanceOf(McIconException.class,failure.getCause().getCause());
         }
     }
+    @Test void 破損JSONの回収拒否は表示用エラーに対象と対処を残す() throws Exception {
+        Fixture fixture=new Fixture(false);var host=new RuntimeDescriptor.Host("windows","x86_64");
+        ((ObjectNode)fixture.definition.json.get("host")).put("os",host.os()).put("arch",host.arch());fixture.publish();
+        Path job=Files.createDirectories(options().runtimeRoot().resolve("jobs").resolve(UUID.randomUUID().toString()));
+        Files.writeString(job.resolve("lease.json"),"{broken");Files.writeString(job.resolve("lease.lock"),"0".repeat(64));
+        try(var loader=fixture.loader()) {
+            var failure=assertThrows(McIconException.class,()->ManagedRuntime.prepare(options(),false,new CancellationToken(),loader,host,fixture.transport(new AtomicInteger())));
+            assertEquals("MANAGED_OWNERSHIP_MISMATCH",failure.code());assertTrue(failure.getMessage().contains(job.toAbsolutePath().toString()));
+            assertTrue(failure.getMessage().contains("描画が動いていないことを確かめてから、このフォルダを削除して再試行してください"));
+            assertEquals(PreparationFailure.Stage.RECOVERY,assertInstanceOf(PreparationFailure.class,failure.getCause()).stage);
+        }
+        assertEquals("{broken",Files.readString(job.resolve("lease.json")));
+        try(var jobs=Files.list(job.getParent())){assertEquals(1,jobs.count());}
+    }
     @Test void reader認証拒否は新job前の段と元causeを残す() throws Exception {
         Fixture fixture=new Fixture(false,false,false,null,true);var host=new RuntimeDescriptor.Host("windows","x86_64");
         ((ObjectNode)fixture.definition.json.get("host")).put("os","windows").put("arch","x86_64");fixture.publish();

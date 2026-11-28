@@ -16,6 +16,21 @@ class OwnershipTest {
     ObjectNode lease(){return WindowsFiles.JSON.createObjectNode().put("jobId",UUID.randomUUID().toString()).put("ownerId",UUID.randomUUID().toString()).put("hostId",UUID.randomUUID().toString()).put("descriptorSha256","a".repeat(64));}
     ObjectNode descriptor(){ObjectNode value=WindowsFiles.JSON.createObjectNode().put("minimumOsVersion","10.0.19045");value.putObject("host").put("os","windows").put("arch","x86_64");return value;}
     HostFacts host(String defaultGuid,List<HostFacts.Distribution> rows){return new HostFacts("S-1-5-21-1",BOOT,"10.0.26200",16L*1024*1024*1024,8,defaultGuid,rows);}
+    @Test void 壊れた所有記録は対象と専用distroの削除手順を示して保持する() throws Exception {
+        WslDistribution distribution=new WslDistribution(temporary.toRealPath(),lease(),host(DEFAULT,List.of()));
+        Path file=distribution.anchor.resolve("owner.json");
+        for(String value:List.of("{broken","[]","null","{}")) {
+            Files.writeString(file,value);
+            var failure=assertThrows(WslDistribution.OwnerFailure.class,distribution::owner);
+            assertTrue(failure.getMessage().contains(file.toAbsolutePath().toString()),failure.getMessage());
+            assertTrue(failure.getMessage().contains("wsl --unregister "+distribution.name));
+            assertTrue(failure.getMessage().contains("runtimeフォルダ "+distribution.anchor.toAbsolutePath()+" を削除して再試行してください"));
+            assertFalse(failure.getMessage().contains("lease.json"));assertFalse(failure.getMessage().contains("wsl --shutdown"));
+            assertNotNull(failure.getCause());assertEquals(value,Files.readString(file));
+        }
+        Files.delete(file);
+        assertTrue(assertThrows(WslDistribution.OwnerFailure.class,distribution::owner).getMessage().contains(file.toString()));
+    }
     @Test void rootとgenerationの競合待機で予算を再開始しない() throws Exception {
         Path root=temporary.toRealPath();WslDistribution distribution=new WslDistribution(root,lease(),host(DEFAULT,List.of()));
         Files.createDirectories(root.resolve("locks"));Path outer=root.resolve("locks/windows-lifecycle.lock"),inner=distribution.anchor.resolve("generation.lock");Files.write(outer,new byte[0]);Files.write(inner,new byte[0]);

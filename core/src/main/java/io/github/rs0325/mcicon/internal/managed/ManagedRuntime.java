@@ -131,6 +131,7 @@ public final class ManagedRuntime implements AutoCloseable {
                 requireOk(new RuntimeHelper(executable,store.root(),lease,environment,descriptor.host().os().equals("windows")).control("release",store.remaining(),token));
             }
         }
+        try(var ignored=store.lock("generations")){RuntimeLease.discardReleased(store);}
     }
     public WorkerLaunch launch(){return launch;}
     public WorkerOptions worker(int major) {
