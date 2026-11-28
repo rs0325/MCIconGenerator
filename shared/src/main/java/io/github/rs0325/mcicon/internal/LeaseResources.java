@@ -14,12 +14,8 @@ public final class LeaseResources {
         switch(os) {case "macos"->macos(value);case "windows"->windows(value);case "linux"->linux(value);}
     }
     private static void macos(JsonNode value) throws IOException {
-        fields(value,Set.of("phase","generationOwner","instanceDir","containers"),Set.of("phase","generationOwner","instanceDir","containers","machineIdSha256","hostAgent","dockerSocket","forwardConfigSha256","guestOwnerMarkerSha256"));
+        fields(value,"phase","generationOwner","instanceDir","containers");
         String phase=text(value,"phase",32);if(!Set.of("starting","ready","releasing").contains(phase))throw invalid("Mac phaseが不正です");uuid(value,"generationOwner");text(value,"instanceDir",4096);
-        if(phase.equals("ready"))for(String name:List.of("machineIdSha256","hostAgent","dockerSocket","forwardConfigSha256","guestOwnerMarkerSha256"))if(!value.has(name))throw invalid("readyの所有情報が不足しています");
-        for(String name:List.of("machineIdSha256","forwardConfigSha256","guestOwnerMarkerSha256"))if(value.has(name))hash(value,name);
-        if(value.has("hostAgent")) {JsonNode process=value.get("hostAgent");fields(process,"pid","processStartedAt","bootSessionId");integer(process,"pid",1);instant(process,"processStartedAt");text(process,"bootSessionId",256);}
-        if(value.has("dockerSocket")) {JsonNode socket=value.get("dockerSocket");fields(socket,"path","dev","ino","uid");text(socket,"path",4096);for(String name:List.of("dev","ino","uid"))integer(socket,name,0);}
         containers(value.get("containers"),false,Set.of());
     }
     private static void windows(JsonNode value) throws IOException {

@@ -232,28 +232,6 @@
         }
       }
     },
-    "hostAgent": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "pid",
-        "processStartedAt",
-        "bootSessionId"
-      ],
-      "properties": {
-        "pid": {
-          "$ref": "#/$defs/positive"
-        },
-        "processStartedAt": {
-          "$ref": "#/$defs/instant"
-        },
-        "bootSessionId": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
-        }
-      }
-    },
     "dockerSocket": {
       "type": "object",
       "additionalProperties": false,
@@ -305,21 +283,6 @@
           "minLength": 1,
           "maxLength": 4096
         },
-        "machineIdSha256": {
-          "$ref": "#/$defs/sha256"
-        },
-        "hostAgent": {
-          "$ref": "#/$defs/hostAgent"
-        },
-        "dockerSocket": {
-          "$ref": "#/$defs/dockerSocket"
-        },
-        "forwardConfigSha256": {
-          "$ref": "#/$defs/sha256"
-        },
-        "guestOwnerMarkerSha256": {
-          "$ref": "#/$defs/sha256"
-        },
         "containers": {
           "type": "array",
           "items": {
@@ -337,27 +300,7 @@
             ]
           }
         }
-      },
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "phase": {
-                "const": "ready"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "machineIdSha256",
-              "hostAgent",
-              "dockerSocket",
-              "forwardConfigSha256",
-              "guestOwnerMarkerSha256"
-            ]
-          }
-        }
-      ]
+      }
     },
     "distribution": {
       "oneOf": [

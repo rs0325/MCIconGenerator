@@ -292,13 +292,10 @@ class HelperCommonTest {
             JsonNode changed=AdmissionEvidence.jobReference(fixture.base,candidate.path("jobId").asText());assertThrows(IOException.class,()->AdmissionEvidence.verifyJob(fixture.base,changed,digest,ProcessHandle.current().pid(),candidate.path("processStartedAt").asText(),fixture.trust,false));
         }
     }
-    @Test void releasedでもMacjournal未終端を回収済みへしない() throws Exception {
+    @Test void Macの解放済みjobに生成journalを要求しない() throws Exception {
         Fixture fixture=new Fixture();ObjectNode lease=fixture.open().read().put("state","released");Files.write(fixture.file,HelperProtocol.JSON.writeValueAsBytes(lease));
-        Path journal=Files.createDirectories(fixture.file.getParent().resolve("tmp/macos-operations"));ObjectNode identity=HelperProtocol.JSON.createObjectNode();for(String key:List.of("jobId","ownerId","descriptorSha256"))identity.set(key,lease.get(key));Files.write(journal.resolve("released.json"),HelperProtocol.JSON.writeValueAsBytes(identity));
-        Path operation=Files.createDirectory(journal.resolve(UUID.randomUUID().toString()));ObjectNode intent=HelperProtocol.JSON.createObjectNode().put("operationId",operation.getFileName().toString()).put("kind","prepare");intent.set("identity",identity);byte[] bytes=HelperProtocol.JSON.writeValueAsBytes(intent);Files.write(operation.resolve("intent.json"),bytes);
-        LeaseSnapshot snapshot=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust);assertThrows(IOException.class,()->RuntimeMaintenanceVerifier.requireReleased(snapshot));
-        Files.writeString(operation.resolve("client-complete"),hash(bytes)+"\n");ObjectNode settled=HelperProtocol.JSON.createObjectNode().put("intentSha256",hash(bytes));settled.putObject("evidence").put("owned",true);Files.write(operation.resolve("settled.json"),HelperProtocol.JSON.writeValueAsBytes(settled));assertDoesNotThrow(()->RuntimeMaintenanceVerifier.requireReleased(snapshot));
-        Files.writeString(operation.resolve("client-complete.pending"),"");assertThrows(IOException.class,()->RuntimeMaintenanceVerifier.requireReleased(snapshot));
+        LeaseSnapshot snapshot=LeaseFile.inspect(fixture.base,fixture.file,fixture.trust);
+        assertDoesNotThrow(()->RuntimeMaintenanceVerifier.requireReleased(snapshot));
     }
     @Test void 署名が正しくても固定helperや保守pinに結合しない世代は拒否する() throws Exception {
         Fixture fixture=new Fixture();byte[] original=Files.readAllBytes(fixture.file.resolveSibling("descriptor.json"));

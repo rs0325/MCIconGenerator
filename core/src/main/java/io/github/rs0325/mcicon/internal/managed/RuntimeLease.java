@@ -245,19 +245,18 @@ public final class RuntimeLease implements AutoCloseable {
     }
     /**
      * 描画lockの保持中に、解放済みで誰も保持していないjobの記録を消す。
-     * Macの再起動で終わったjobは、helperが旧diskを回収するまで残す。形式の分からない記録は後続の照合に任せる。
+     * 形式の分からない記録は後続の照合に任せる。
      */
     static void discardReleased(RuntimeStore store) throws IOException {
         Path jobs=store.path("jobs");if(!Files.isDirectory(jobs,LinkOption.NOFOLLOW_LINKS))return;
         List<Path> directories;try(var paths=Files.list(jobs)){directories=paths.toList();}
         for(Path directory:directories) {
             store.check();
-            Path file=directory.resolve("lease.json"),tmp=directory.resolve("tmp");
+            Path file=directory.resolve("lease.json");
             if(!Files.isDirectory(directory,LinkOption.NOFOLLOW_LINKS)||!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)||Files.size(file)>1024*1024||!Files.isRegularFile(directory.resolve("lease.lock"),LinkOption.NOFOLLOW_LINKS))continue;
             JsonNode value;
             try {value=RuntimeDescriptor.read(Files.readAllBytes(file));}catch(IOException invalid){continue;}
             if(value==null||!value.path("state").asText().equals("released"))continue;
-            if(Files.exists(tmp.resolve("macos-ended-by-reboot.json"),LinkOption.NOFOLLOW_LINKS)&&!Files.exists(tmp.resolve("macos-reboot-cleanup.json"),LinkOption.NOFOLLOW_LINKS))continue;
             FileChannel channel=openReceipt(file,false,store);if(channel==null)continue;
             boolean idle;
             try {

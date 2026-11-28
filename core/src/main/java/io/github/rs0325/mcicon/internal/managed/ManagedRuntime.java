@@ -141,7 +141,7 @@ public final class ManagedRuntime implements AutoCloseable {
     private static void release(RuntimeHelper helper,RuntimeLease lease,boolean discard) throws IOException {
         boolean interrupted=Thread.interrupted();
         try {
-            try(lease) {if(helper!=null)requireOk(helper.control("release",Duration.ofSeconds(10),new CancellationToken()));}
+            try(lease) {if(helper!=null)requireOk(helper.control("release",Duration.ofSeconds(30),new CancellationToken()));}
             if(discard)lease.discard();
         }finally {if(interrupted)Thread.currentThread().interrupt();}
     }

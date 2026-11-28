@@ -1,5 +1,8 @@
 # Mac候補資材の実Minecraft描画受入（F2）
 
+この文書は#220より前の受入計画・結果の履歴である。現在の状態・回復契約は[Mac helper](managed-helper-macos-1.1.md)を参照し、旧journal・所有証明・並列jobの条件を現行実装へ適用しない。
+
+
 Refs #91 #94。2026-11-04、固定51版すべてで `minecraft:stone` の64×64描画を2回実行し、102/102回がexit 0で有効なPNGを生成した。全51版で2回のPNGが直接バイト比較で一致し、Java選択も合格した。Windowsの版別PNG SHA-256は51/51版で一致した。親Issueはcloseしない。
 
 測定値は[QA JSON](../qa/mac-render-acceptance-2026-11-04.json)と[checksum](../qa/mac-render-acceptance-2026-11-04.json.sha256)に保持する。jar・Minecraft資産・PNG本体は含めない。基準commitは `c5a46b01a1c4dc4dba6be038f00dd13ae1dc0f33`、ブランチは `feature/issue-94-render-acceptance-mac`。commit・push・PR作成は実施していない。

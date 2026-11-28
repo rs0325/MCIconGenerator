@@ -25,7 +25,7 @@ def checked_copy(source,target,pin):
  target.chmod(0o600)
 def prepare(a):
  output=a.output.absolute();output.mkdir(mode=0o700);output=output.resolve();root=output/'runtime';root.mkdir(mode=0o700);host=str(uuid.uuid4());(root/'host-id').write_text(host);(root/'jobs').mkdir();inventory={'fixtureOnly':True,'scope':'第1段control/diagnosticのみ、production inventory/trustではない'};inventory_bytes=encoded(inventory)
-helper=(a.helper_zip.stat().st_size,sha(a.helper_zip));descriptor={'schemaVersion':1,'runtimeId':'macos-native-fixture','toolVersion':'1.1.0','host':{'os':'macos','arch':'aarch64'},'minimumOsVersion':'15.8.1','helper':{'protocolVersion':1,'artifactId':'host','executable':'MCIconHelper.app/Contents/MacOS/MCIconHelper'},'worker':{'toolVersion':'1.1.0','agentSha256':'0'*64,'protocolVersion':1,'adapterSetSha256':'0'*64},'rendering':{'imageId':IMAGE,'environment':{},'javaExecutables':[{'executable':path,'sha256':digest} for path,digest in JAVA]},'artifacts':[]}
+ helper=(a.helper_zip.stat().st_size,sha(a.helper_zip));descriptor={'schemaVersion':1,'runtimeId':'macos-native-fixture','toolVersion':'1.1.0','host':{'os':'macos','arch':'aarch64'},'minimumOsVersion':'15.8.1','helper':{'protocolVersion':1,'artifactId':'host','executable':'MCIconHelper.app/Contents/MacOS/MCIconHelper'},'worker':{'toolVersion':'1.1.0','agentSha256':'0'*64,'protocolVersion':1,'adapterSetSha256':'0'*64},'rendering':{'imageId':IMAGE,'environment':{},'javaExecutables':[{'executable':path,'sha256':digest} for path,digest in JAVA]},'artifacts':[]}
  for name,role,pin,format in [('host','host-helper',helper,'zip'),('base','guest-base',BASE,'qcow2'),('renderer','renderer-image',RENDERER,'tar.gz')]:
   descriptor['artifacts'].append({'id':name,'role':role,'url':'https://example.invalid/private-native-fixture/'+name,'bytes':pin[0],'sha256':pin[1],'unpackedBytes':pin[0],'format':format,'inventoryPath':'inventory/'+name+'.json','inventorySha256':hashlib.sha256(inventory_bytes).hexdigest(),'licenseFiles':[],'noticeFiles':[],'sourceArchives':[]})
  digest=hashlib.sha256(encoded(descriptor)).hexdigest();runtime=root/'runtimes'/descriptor['runtimeId']/digest
@@ -78,7 +78,6 @@ def execute(a):
   for file in row['files']:
    path=entries[file['path']]
    if path.stat().st_size!=file['bytes'] or sha(path)!=file['sha256']:raise RuntimeError('過去jobの保存bytesが不一致')
-  if {p.name for p in (job/'tmp/macos-operations').iterdir()}!={'released.json'}:raise RuntimeError('過去jobに生成intentが存在する')
  for row in plan['helperTree']:
   path=Path(plan['entrypoint']).parents[2]/row['path']
   if path.is_symlink() or path.stat().st_size!=row['bytes'] or sha(path)!=row['sha256']:raise RuntimeError('helper treeが凍結時と不一致')
@@ -117,7 +116,7 @@ def execute(a):
    call('preflight','preflight')
    if not getattr(a,'preflight_only',False):
     call('prepare','prepare',seconds=1200);save(result/'prepared-lease.json',json.loads(lease_path.read_text()))
-    registration=Path(plan['registration']);save(result/'registration.json',json.loads(registration.read_text()));save(result/'owner-marker.json',json.loads((anchor/'owner.json').read_text()))
+    registration=Path(plan['registration']);save(result/'registration.json',json.loads(registration.read_text()))
     call('image-inspect','docker',['image','inspect',IMAGE,'--format','{{.Os}}/{{.Architecture}} {{.Id}}'])
     for index,(java,digest) in enumerate(JAVA):
      name='mcicon-doctor-'+str(uuid.uuid4());prefix=['run','--rm','--name',name,'--platform','linux/amd64','--network','none']

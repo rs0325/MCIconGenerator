@@ -222,3 +222,9 @@ workerの実cgroup memory.max=3221225472、cpu.max=400000 100000を採取した�
 | #91全体と最終artifact/配布条件 | 未完了 | 方式/schema・本番inventory/trust・license/sourceを確定し、closeは別操作 |
 
 [Linux限定QAと世代別証拠hash](../qa/validation-2026-10-19-linux-rootless-proof.json)を参照する。この補足はRefs #91であり、製品実装や#91 close、#96の開始条件成立を宣言しない。
+
+## Macの状態と終了処理（#220）
+
+Macは管理rootのrender lockで描画を直列化する。descriptorごとの`macos/<digest>.json`だけにinstanceの場所・generation・作成時メモリ・boot・実行中ownerを保存する。他jobの参照走査と世代横断のメモリ予約は使わず、搭載メモリから2048 MiBを引いた容量と、VMの要求メモリ（既存VMでは作成時容量）を比較する。前回owner死亡・再起動後はVMを止め、再起動したVMの残containerをgeneration label指定で消してから進める。短cacheが再起動で消えた場合は同じ短pathへVMを再生成する。
+
+releaseは30秒を上限にcontainer削除・VM停止・resources解放・ownerクリアを行う。操作journal・再起動証明・履歴・旧版保守コマンドは作らない。解放済みjobの記録はclose後または次回起動時に削除する。読めない状態などは専用VM・cache・状態ファイルを示すエラーで止める。旧状態形式は自動移行せず、案内された対象を削除して再生成する。[Mac helperの契約](managed-helper-macos-1.1.md)を参照する。

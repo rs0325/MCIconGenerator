@@ -85,21 +85,7 @@
           "phase": "ready",
           "generationOwner": "00000000-0000-4000-8000-000000000002",
           "instanceDir": "/fixture/lima/instance",
-          "containers": [],
-          "machineIdSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-          "hostAgent": {
-            "pid": 123,
-            "processStartedAt": "2026-10-18T00:00:00Z",
-            "bootSessionId": "fixture-session"
-          },
-          "dockerSocket": {
-            "path": "/fixture/docker.sock",
-            "dev": 1,
-            "ino": 2,
-            "uid": 501
-          },
-          "forwardConfigSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-          "guestOwnerMarkerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          "containers": []
         }
       },
       "schemaValid": true,
@@ -167,7 +153,7 @@
       "helperValid": true
     },
     {
-      "name": "unknown-socket-field",
+      "name": "mac-unknown-field",
       "os": "macos",
       "resources": {
         "macos": {
@@ -175,50 +161,20 @@
           "generationOwner": "00000000-0000-4000-8000-000000000002",
           "instanceDir": "/fixture/lima/instance",
           "containers": [],
-          "machineIdSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-          "hostAgent": {
-            "pid": 123,
-            "processStartedAt": "2026-10-18T00:00:00Z",
-            "bootSessionId": "fixture-session"
-          },
-          "dockerSocket": {
-            "path": "/fixture/docker.sock",
-            "dev": 1,
-            "ino": 2,
-            "uid": 501,
-            "process": {
-              "pid": 9
-            }
-          },
-          "forwardConfigSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-          "guestOwnerMarkerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          "unknown": true
         }
       },
       "schemaValid": false,
       "helperValid": false
     },
     {
-      "name": "ready-missing-machine-id",
+      "name": "mac-ready-missing-generation",
       "os": "macos",
       "resources": {
         "macos": {
           "phase": "ready",
-          "generationOwner": "00000000-0000-4000-8000-000000000002",
           "instanceDir": "/fixture/lima/instance",
-          "containers": [],
-          "hostAgent": {
-            "pid": 123,
-            "processStartedAt": "2026-10-18T00:00:00Z",
-            "bootSessionId": "fixture-session"
-          },
-          "dockerSocket": {
-            "path": "/fixture/docker.sock",
-            "dev": 1,
-            "ino": 2,
-            "uid": 501
-          },
-          "forwardConfigSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-          "guestOwnerMarkerSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          "containers": []
         }
       },
       "schemaValid": false,

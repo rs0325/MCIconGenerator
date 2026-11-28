@@ -34,18 +34,14 @@ class RenderRecordTest {
     }
     @Test void 起動時は解放済みで誰も保持しない記録だけを消す() throws Exception {
         var store=store(Duration.ofSeconds(10));
-        RuntimeLease done=lease(store),rebooted=lease(store),held=lease(store);
+        RuntimeLease done=lease(store),held=lease(store);
         done.released();done.close();
-        rebooted.released();rebooted.close();
-        Path tmp=rebooted.file().resolveSibling("tmp");Files.createDirectories(tmp);Files.writeString(tmp.resolve("macos-ended-by-reboot.json"),"{}");
         held.released();
         RuntimeLease.discardReleased(store);
         assertFalse(Files.exists(done.file().getParent()));
-        assertTrue(Files.exists(rebooted.file().getParent()),"旧diskの回収前は残す");
         assertTrue(Files.exists(held.file().getParent()),"保持中のjobは消さない");
-        Files.writeString(tmp.resolve("macos-reboot-cleanup.json"),"{}");held.close();
+        held.close();
         RuntimeLease.discardReleased(store);
-        assertFalse(Files.exists(rebooted.file().getParent()));
         assertFalse(Files.exists(held.file().getParent()));
     }
 }

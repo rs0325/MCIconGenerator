@@ -27,7 +27,7 @@ receiptはstate/resourcesを除くidentity全体を全階層でfield名順に並
 | `lease.lock` receipt | offset 0..63、file長は厳密64bytes | coreが一度だけ書き、helperはこの範囲だけを読む |
 | `lease.lock` 稼働lock | offset 64、length 1、exclusive | coreが保持。idleは同じ範囲を取得してからreceiptを読む |
 | `tmp/helper-lease.lock` | offset 0、length 1、exclusive | 共通helperの短いresources更新。core稼働lockと別 |
-| OS共有環境のlifecycle lock | OS担当が同じ共有環境に対して固定 | 並行prepareと全他lease確認→環境停止の間を排他 |
+| OS共有環境のlifecycle lock | OS担当が同じ共有環境に対して固定 | 環境の準備・停止を排他 |
 
 coreは稼働lock取得→receipt書込/force→lease atomic公開→job descriptor/inventory/tmpの確定→helper起動の順で可視化する。helperは稼働lock範囲を読まない/取得しない。Windows mandatory byte-range lockを考慮した契約であり、Windows実機成功を示さない。
 
@@ -37,11 +37,11 @@ coreは稼働lock取得→receipt書込/force→lease atomic公開→job descrip
 
 `schemas/managed-helper-v1.schema.json`はlease/controlをrootで検証し、$defsのidentity/requirements/resourcesは固定fixtureの参照先とする。重複key、trailing JSON、予算の大小、ID重複/参照整合や実OSの所有はschemaだけで完結せず、共通validatorとOS側で検査する。`processStartedAt:null`は記録できるが、PID単独で停止・回収しない。
 
-Macはstarting/ready/releasingの閉objectとする。readyには世代owner、instanceDir、実`vz-identifier` bytesのhash、hostAgentのPID/開始/boot session、socket path/dev/ino/uid、固定forward設定hash、guest owner marker hash、containersを要する。socketの値は輸送の照合でありsocket peerを直接killする権限ではない。ha.pidをDocker socket daemon本人性へ流用しない。全他lease不在確認からlimactl stopまでlifecycle lockを保持し、部分起動・識別子不足・不明leaseでは停止せず証拠を残す。
+Macのresourcesはphase（starting/ready/releasing）・generationOwner・instanceDir・containersだけを持つ閉objectとする。VMの作成時メモリ・boot・実行中ownerは管理rootの単一状態ファイルで管理する。Mac helperはcontainerの永続一覧を持たず、generation label指定でdaemonから列挙して削除する。機械ID・設定hash・socket dev/ino・hostAgent UIDによる所有照合は行わない。描画lockとMac lifecycle lockのもとで終了した持ち主のVMを停止し、残ったcontainerを片付ける。
 
 Windowsはimporting/ready/releasingの閉objectとする。distributionの名前/BasePathだけは生成前の意図、GUID/marker hashを持つものが登録済record。readyでは登録済情報とsocket/guest job pathを必須にする。意図やregistry差分が不明なdistributionを取り込まない。releasingでも削除にはready相当の実registry GUID/BasePath、host記録、guest markerの一致を必要とし、phase名だけで削除しない。transportはidだけの意図とPID/processStartedAtを伴う実体を区別し、containerのtransport IDを照合する。Job HANDLEは永続保存しない。
 
-containerのnameは作成意図であり、実生成後は完全IDと実inspect上のjob/owner/descriptor labelを照合する。label/imageの期待値はlease/descriptorから得て冗長保存しない。create→recordの窓は意図/CIDと所有labelで照合し、名前prefixだけで削除しない。Linuxは以下のrootless候補方式の閉recordを使用する。recordの保存成功は実OSの所有や停止権限を証明しない。
+Windowsのcontainerのnameは作成意図であり、実生成後は完全IDと実inspect上のjob/owner/descriptor labelを照合する。label/imageの期待値はlease/descriptorから得て冗長保存しない。create→recordの窓は意図/CIDと所有labelで照合し、名前prefixだけで削除しない。Linuxは以下のrootless候補方式の閉recordを使用する。recordの保存成功は実OSの所有や停止権限を証明しない。
 
 ## Linux rootlessの所有record
 
