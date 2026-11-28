@@ -32,7 +32,12 @@ final class WslDistribution {
     record Lock(FileChannel channel,FileLock lock,Lock outer) implements AutoCloseable {public void close() throws IOException{try{try{lock.release();}finally{channel.close();}}finally{if(outer!=null)outer.close();}}}
     boolean exists(){return Files.exists(anchor.resolve("owner.json"),LinkOption.NOFOLLOW_LINKS);}
     ObjectNode owner() throws IOException {
-        ObjectNode value=(ObjectNode)WindowsFiles.json(anchor.resolve("owner.json"));if(!value.path("binding").equals(binding)||!HostFacts.uuid(value.path("generationOwner").asText())||!value.path("name").asText().equals(name)||!value.path("basePath").asText().equals(basePath.toString())||!Set.of("reserved","registered").contains(value.path("state").asText()))throw new IOException("distro所有anchorが一致しません");return value;
+        try {
+            ObjectNode value=(ObjectNode)WindowsFiles.json(anchor.resolve("owner.json"));if(!value.path("binding").equals(binding)||!HostFacts.uuid(value.path("generationOwner").asText())||!value.path("name").asText().equals(name)||!value.path("basePath").asText().equals(basePath.toString())||!Set.of("reserved","registered").contains(value.path("state").asText()))throw new IOException("distro所有anchorが一致しません");return value;
+        }catch(IOException failure){throw new OwnerFailure("distro所有記録を読めません: "+anchor.resolve("owner.json").toAbsolutePath()+"。wsl --unregister "+name+" を実行し、runtimeフォルダ "+anchor.toAbsolutePath()+" を削除して再試行してください",failure);}
+    }
+    static final class OwnerFailure extends IOException {
+        OwnerFailure(String message,IOException cause){super(message,cause);}
     }
     ObjectNode reserve(HostFacts host) throws IOException {
         if(exists()||host.named(name)!=null||Files.exists(basePath,LinkOption.NOFOLLOW_LINKS))throw new IOException("専用distro名/path/所有recordが衝突しています");

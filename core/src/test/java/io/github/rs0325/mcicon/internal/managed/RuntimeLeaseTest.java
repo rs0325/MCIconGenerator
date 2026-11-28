@@ -88,6 +88,32 @@ class RuntimeLeaseTest {
         }
     }
     RuntimeStore store() throws Exception {return new RuntimeStore(root,true,new CancellationToken(),Duration.ofSeconds(10),(u,o,t)->{throw new AssertionError();});}
+    @Test void 回収できない記録は理由と対象フォルダと削除手順を示して保持する() throws Exception {
+        var store=store();var descriptor=new ManagedFixture().descriptor();
+        for(String mode:List.of("receipt欠落","JSON破損","所有不明","receipt不一致","世代不一致")) {
+            var lease=ManagedFixture.lease(store,descriptor);Path file=lease.file(),job=file.getParent();lease.close();
+            ObjectNode value=(ObjectNode)RuntimeDescriptor.read(Files.readAllBytes(file));
+            String reason;
+            switch(mode) {
+                case "receipt欠落"->{Files.delete(job.resolve("lease.lock"));reason="旧job receiptがありません";}
+                case "JSON破損"->{Files.writeString(file,"{broken");reason="Unexpected character";}
+                case "所有不明"->{value.putNull("processStartedAt");Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));reason="旧leaseの所有記録が不明です";}
+                case "receipt不一致"->{Files.writeString(job.resolve("lease.lock"),"0".repeat(64));reason="旧leaseのreceiptが一致しません";}
+                case "世代不一致"->{
+                    value.put("workerSha256","b".repeat(64));Files.write(file,RuntimeDescriptor.JSON.writeValueAsBytes(value));
+                    ObjectNode identity=value.deepCopy();identity.remove(List.of("state","resources"));Files.write(job.resolve("lease.lock"),RuntimeLease.receipt(identity));reason="旧leaseの実行世代が一致しません";
+                }
+                default->throw new AssertionError(mode);
+            }
+            byte[] before=Files.readAllBytes(file);
+            var failure=assertThrows(McIconException.class,()->RuntimeLease.tryRecovery(store,descriptor,job));
+            assertEquals("MANAGED_OWNERSHIP_MISMATCH",failure.code());
+            assertTrue(failure.getMessage().contains(reason),failure.getMessage());
+            assertTrue(failure.getMessage().contains(job.toAbsolutePath().toString()),failure.getMessage());
+            assertTrue(failure.getMessage().contains("描画が動いていないことを確かめてから、このフォルダを削除して再試行してください"));
+            assertArrayEquals(before,Files.readAllBytes(file));
+        }
+    }
     @Test void requirementsReachLeaseAndArePartOfImmutableReceipt() throws Exception {
         var descriptor=new ManagedFixture().descriptor();var store=store();var deadline=java.time.Instant.parse("2026-10-18T00:15:00Z");
         var options=new ManagedOptions(root,Duration.ofSeconds(10),Duration.ofSeconds(2),Duration.ofSeconds(1),6144,4096);

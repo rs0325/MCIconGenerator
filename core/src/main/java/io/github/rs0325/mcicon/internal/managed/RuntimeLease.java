@@ -77,6 +77,16 @@ public final class RuntimeLease implements AutoCloseable {
     }
     /** 同じ信頼世代の終了coreだけを引き継ぐ。OS資源の回収可否は同版helperのreleaseへ委ねる。 */
     static RuntimeLease tryRecovery(RuntimeStore store,RuntimeDescriptor descriptor,Path directory) throws IOException {
+        try {return recover(store,descriptor,directory);}
+        catch(IOException|McIconException failure) {
+            if(failure instanceof java.io.InterruptedIOException||failure instanceof java.net.http.HttpTimeoutException||failure instanceof ClosedByInterruptException)throw (IOException)failure;
+            if(failure instanceof McIconException error&&!Set.of("MANAGED_OWNERSHIP_MISMATCH","MANAGED_RUNTIME_INVALID").contains(error.code()))throw error;
+            String detail=failure.getMessage()+"。対象jobフォルダ: "+directory.toAbsolutePath()+"。描画が動いていないことを確かめてから、このフォルダを削除して再試行してください";
+            if(failure instanceof McIconException error)throw new McIconException(error.code(),detail,error.exitCode(),error);
+            throw new McIconException("MANAGED_OWNERSHIP_MISMATCH",detail,1,failure);
+        }
+    }
+    private static RuntimeLease recover(RuntimeStore store,RuntimeDescriptor descriptor,Path directory) throws IOException {
         if(!Files.isDirectory(directory,LinkOption.NOFOLLOW_LINKS)||!directory.toRealPath().equals(directory))throw mismatch("旧job directoryが不正です");
         Path file=directory.resolve("lease.json"),receipt=directory.resolve("lease.lock");
         if(!Files.isRegularFile(receipt,LinkOption.NOFOLLOW_LINKS))throw mismatch("旧job receiptがありません");
